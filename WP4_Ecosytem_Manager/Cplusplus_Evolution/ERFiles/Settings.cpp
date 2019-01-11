@@ -16,10 +16,11 @@ Settings::Settings() {
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
 	maxModuleTypes[0][1] = 100; // one base module
-	maxAmountModules = 5;
-	//morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_LSYSTEM;
-	populationSize = 20;
+	maxAmountModules = 20;
+	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
+	morphologyType = MODULAR_CPPN;
+	controlType = ANN_CUSTOM;
+	populationSize = 4;
 	energyDissipationRate = 0.0;
 	lIncrements = 3; // not used, should be somewhere else
 //	environmentType = ENV_SWITCHOBJECTIVE;
@@ -30,9 +31,8 @@ Settings::Settings() {
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
-	morphMutRate = 0.5;
+	morphMutRate = 0.1;
 	maxGeneration = 20;
-	
 }
 
 Settings::~Settings() {

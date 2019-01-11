@@ -35,7 +35,7 @@ void ER_VREP::initializeServer() {
 
 
 void ER_VREP::initializeSimulation() {
-	// simSet = RECALLBEST;
+	simSet = RECALLBEST;
 	// set env
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;

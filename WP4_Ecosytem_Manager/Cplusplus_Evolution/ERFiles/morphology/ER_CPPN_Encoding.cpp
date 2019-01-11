@@ -42,7 +42,7 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 	cppn = shared_ptr<CPPN>(new CPPN);
 	cppn->init(8, 8, 6); // output is type, orientation and activation of sin 
 	cppn->mutate(settings->morphMutRate);
-	cppn->mutate(0.5);
+	cppn->mutate(0.1);
 
 	// make a temporary storage for phenotype based on genotypic information
 	//for (int i = 0; i < genome->amountModules; i++) {
@@ -583,6 +583,9 @@ shared_ptr<Morphology> ER_CPPN_Encoding::clone() const {
 		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
 	}
 	ur->genome = ur->genome->clone();
+	shared_ptr<CPPN> cppnClone = make_unique<CPPN>(*cppn);
+	cppnClone->makeDependenciesUnique();
+	ur->cppn = cppnClone;
 	return ur;
 }
 

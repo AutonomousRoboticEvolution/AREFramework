@@ -146,7 +146,6 @@ shared_ptr<Morphology>MorphologyFactoryVREP::createBaseMorphologyGenome()
 
 shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology> morph)
 {
-
 	switch (morph->settings->morphologyType) {
 	case 0:
 	{
@@ -191,7 +190,6 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 		std::shared_ptr<ER_CPPN_Interpreter> placeHolder;
 		placeHolder = std::static_pointer_cast<ER_CPPN_Interpreter>(morph);
 		
-		// Make a 
 		shared_ptr<ER_CPPN_Interpreter> castObject;
 		castObject = make_shared<ER_CPPN_Interpreter>();
 		castObject->genome = placeHolder->genome;
@@ -206,7 +204,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 		// first save do a static cast to access ER_CPPN_Encoding values
 		std::shared_ptr<ER_DirectEncodingInterpreter> placeHolder;
 		placeHolder = std::static_pointer_cast<ER_DirectEncodingInterpreter>(morph);
-
+		
 		// Make a 
 		shared_ptr<ER_DirectEncodingInterpreter> castObject;
 		castObject = make_shared<ER_DirectEncodingInterpreter>();

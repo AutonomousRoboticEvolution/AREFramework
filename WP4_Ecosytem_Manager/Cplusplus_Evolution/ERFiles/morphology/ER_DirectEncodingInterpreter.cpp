@@ -583,7 +583,6 @@ void ER_DirectEncodingInterpreter::init() { // should use create instead
 		modules[i]->parent = genome->moduleParameters[i]->parent;
 		modules[i]->parentSite = genome->moduleParameters[i]->parentSite;
 		modules[i]->orientation = genome->moduleParameters[i]->orientation;
-
 	}
 	mf.reset();
 	initializeDirectEncoding(positionFirstObject); // amount increment is not in genome anymore	
@@ -603,7 +602,6 @@ shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const {
 		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
 	}
 	ur->genome = ur->genome->clone();
-
 	return ur;
 }
 

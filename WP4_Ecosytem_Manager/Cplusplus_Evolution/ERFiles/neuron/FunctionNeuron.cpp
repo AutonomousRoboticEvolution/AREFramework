@@ -119,6 +119,7 @@ FunctionNeuron::~FunctionNeuron() {
 
 void FunctionNeuron::init(int id) {
 	neuronID = id;
+	function_type = randomNum->randInt(14, 0);
 }
 
 void FunctionNeuron::update() {
@@ -139,6 +140,7 @@ void FunctionNeuron::reset() {
 shared_ptr<Neuron> FunctionNeuron::clone() {
 	shared_ptr<FunctionNeuron> thisNeuron = make_unique<FunctionNeuron>(*this);
 	thisNeuron->input = 0;
+	thisNeuron->m_activation = 0;
 	thisNeuron->output = 0;
 	return thisNeuron;
 }

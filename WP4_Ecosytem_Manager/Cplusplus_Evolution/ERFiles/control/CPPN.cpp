@@ -104,6 +104,12 @@ void CPPN::addNeurons(float mutationRate) {
 	}
 }
 
+shared_ptr<Control> CPPN::clone() {
+	shared_ptr<Control> newANN = make_unique<CPPN>(*this);
+	newANN->makeDependenciesUnique();
+	return newANN;
+}
+
 vector<float> CPPN::update(vector<float> inputs) {
 	// flush
 

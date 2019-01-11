@@ -112,12 +112,17 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->update();
 	}
+	cf = 0.0;
 	for (int i = 0; i < outputLayer.size(); i++) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
+		cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
 		// cout << "outputvalues " <<  outputValues[0] << endl;
 	}
-	return outputValues; 
+	cf += 0.5;
+	//	printNeuronValues();
+		//leaky(0.8);
+	return outputValues;
 }
 
 void CustomANN::mutateConnections(float mutationRate) {
@@ -126,6 +131,11 @@ void CustomANN::mutateConnections(float mutationRate) {
 
 void CustomANN::addNeurons(float mutationRate) {
 	ANN::addNeurons(mutationRate);
+}
+
+void CustomANN::setFloatParameters(vector<float> values) {
+	// function can be used to manually set specific parameters
+	recurrentLayer[0]->setFloatParameters(values);
 }
 
 void CustomANN::removeNeurons(float mutationRate) {

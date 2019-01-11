@@ -584,7 +584,7 @@ void ER_CPPN_Interpreter::init() {
 	genome->moduleParameters[0]->parentSite = -1;
 	genome->moduleParameters[0]->orientation = 0;
 	// create axiom module control which is actually not used... 
-	genome->moduleParameters[0]->control = cf->createNewControlGenome(1, randomNum, settings);
+	genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	genome->moduleParameters[0]->control->init(1, 1, 1);
 	if (settings->verbose) {
 		cout << "quereuing cppn" << endl;
@@ -592,6 +592,7 @@ void ER_CPPN_Interpreter::init() {
 	for (int i = 0; i < maxIterations; i++)
 	{
 		// query CPPN a few times. 
+		cout << i << endl;
 		int sizeIt = genome->moduleParameters.size();
 		for (int n = 0; n < sizeIt; n++) {
 			if (genome->moduleParameters[n]->queried == false) {
@@ -626,15 +627,22 @@ void ER_CPPN_Interpreter::init() {
 					inputs.push_back(genome->moduleParameters[n]->orientation / 4);
 					inputs.push_back(genome->moduleParameters[n]->parentSite / genome->moduleParameters[n]->maxChilds);
 					inputs.push_back(i / maxIterations);
+					//cout << "updating cppn" << endl;
 					vector<float> moduleTypeFloat = cppn->update(inputs);
+					//cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
 						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
+						if (typeM < 0) {
+							typeM = 0;
+						}
+						//cout << "typeM:  " << typeM << endl;
 						int mt = settings->moduleTypes[typeM];
 						genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 						genome->moduleParameters[genome->moduleParameters.size() - 1]->type = mt;
 						//genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
 						int mn = genome->moduleParameters.size() - 1;
+						//cout << "GHerp: " << mn << endl;
 						if (settings->moduleTypes[typeM] == 4 || settings->moduleTypes[typeM] == 9) {
 							genome->moduleParameters[mn]->maxChilds = 3;
 						}
@@ -654,6 +662,7 @@ void ER_CPPN_Interpreter::init() {
 						if (ori < 0) { 
 							ori = 0; 
 						}
+						//cout << "ORI:" << ori << endl;
 						genome->moduleParameters[mn]->orientation = ori;
 						genome->moduleParameters[mn]->control = cf->createNewControlGenome(1, randomNum, settings);
 						genome->moduleParameters[mn]->control->init(1, 1, 1);
@@ -662,7 +671,6 @@ void ER_CPPN_Interpreter::init() {
 						controlValues.push_back(moduleTypeFloat[3]);
 						controlValues.push_back(moduleTypeFloat[4]);
 						genome->moduleParameters[mn]->control->setFloatParameters(controlValues);
-						
 					}
 				}
 			}
@@ -695,12 +703,12 @@ void ER_CPPN_Interpreter::initCustomMorphology() {
 
 shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
 	BaseMorphology::clone();
+	// shouldn't clone this?
 	shared_ptr<ER_CPPN_Interpreter> ur = make_unique<ER_CPPN_Interpreter>(*this);
 	for (int i = 0; i < ur->genome->moduleParameters.size(); i++) {
 		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
 	}
 	ur->genome = ur->genome->clone();
-
 	return ur;
 }
 
@@ -714,6 +722,10 @@ void ER_CPPN_Interpreter::update() {
 	for (int i = 0; i < createdModules.size(); i++) {
 		//float outputModule = 
 		vector<float> moduleInput;
+		if (settings->controlType == settings->ANN_CUSTOM) {
+			createdModules[i]->updateModule(input);
+			moduleInput.push_back(0.0);
+		}
 		if (settings->controlType == settings->ANN_DEFAULT) {
 			createdModules[i]->updateModule(input);
 			moduleInput.push_back(0.0);

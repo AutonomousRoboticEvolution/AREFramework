@@ -28,9 +28,9 @@ public:
 	
 	void mutateConnections(float mutationRate);
 	void addNeurons(float mutationRate);
+	void setFloatParameters(vector<float> values);
 	void removeNeurons(float mutationRate);
 	void changeNeurons(float mutationRate);
-	void setFloatParameters(vector<float> values) {};
 //	float tmpMutRate = 0.05; //delete!!!
 
 	/*struct Connection {

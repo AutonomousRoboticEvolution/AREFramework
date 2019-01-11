@@ -45,7 +45,7 @@ void EA_SteadyState::replacement()
 {
 	if (nextGenGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
-		replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
+		replaceNewPopRandom(10); // int is amount trials comparing offspring to existing population
 	}
 }
 
@@ -149,7 +149,7 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 	for (int p = 0; p < populationGenomes.size(); p++) {
 		for (int n = 0; n < numAttempts; n++) {
 			int currentInd = randomNum->randInt(populationGenomes.size(), 0);
-			cout << currentInd << endl;
+			// cout << currentInd << endl;
 			//for (int i = 0; i < populationGenomes.size(); i++) {
 			//	if (populationFitness[i] == 0) {
 			//		currentInd = i;
@@ -157,7 +157,7 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 			//	}
 			//}
 			if (nextGenGenomes[p]->fitness >= populationGenomes[currentInd]->fitness) {
-				cout << "replacement: " << p << " replaces " << currentInd << endl;
+				cout << "replacement: " << nextGenGenomes[p]->individualNumber << " replaces " << populationGenomes[currentInd]->individualNumber << endl;
 				cout << "replacement: " << nextGenGenomes[p]->fitness << " replaces " << populationGenomes[currentInd]->fitness << endl;
 				// save the genome again, but this time save its fitness as well
 				// populationGenomes[currentInd]->morph->saveGenome(nextGenGenomes[p]->individualNumber, sceneNum, nextGenFitness[p]); NO, THIS WILL GO WRONG
@@ -178,4 +178,5 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 			}
 		}
 	}
+	cout << "REPLACED POP" << endl;
 }
