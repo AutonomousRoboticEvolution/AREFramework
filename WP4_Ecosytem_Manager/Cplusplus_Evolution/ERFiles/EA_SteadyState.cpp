@@ -45,7 +45,7 @@ void EA_SteadyState::replacement()
 {
 	if (nextGenGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
-		replaceNewPopRandom(10); // int is amount trials comparing offspring to existing population
+		replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
 	}
 }
 
