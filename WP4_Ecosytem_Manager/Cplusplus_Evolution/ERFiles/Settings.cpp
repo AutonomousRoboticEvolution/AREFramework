@@ -20,7 +20,7 @@ Settings::Settings() {
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
 	morphologyType = MODULAR_CPPN;
 	controlType = ANN_CUSTOM;
-	populationSize = 4;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 3; // not used, should be somewhere else
 //	environmentType = ENV_SWITCHOBJECTIVE;

@@ -15,6 +15,7 @@ void ClientEA::init(int amountPorts)
 		ports.push_back(i + 1040000);
 	}
 	int amPorts = ports.size();
+	simxFinish(-1);
 	for (int i = 0; i < ports.size(); i++) {
 		clientIDs.push_back(simxStart("127.0.0.1", ports[i], true, true, 5000, 5));
 		if (clientIDs[i] == -1) {
@@ -30,17 +31,23 @@ void ClientEA::init(int amountPorts)
 		}
 	}
 	randNum = shared_ptr<RandNum>(new RandNum(settings->seed));
-	pop = shared_ptr<Population>(new Population(settings->populationSize, randNum, settings));
+	// TODO: use factory
+	//ea_fac = new EA_Factory();
+	ea = shared_ptr<EA>(new EA_SteadyState());
+	ea->setSettings(settings, randNum);
+	ea->init();
 }
 
 void ClientEA::initGA() {
 	// init GA
 	queuedInds;
-	for (int i = 0; i < pop->populationGenomes.size(); i++) {
-		pop->initializeIndividual(i);
-		pop->populationGenomes[i]->morph->saveGenome(indCounter, 0, -1);
-		pop->populationGenomes[i]->individualNumber = i;
-		pop->popIndNumbers.push_back(i);
+	for (int i = 0; i < ea->populationGenomes.size(); i++) {
+		// ea->initializePopulation();
+		// ea->initializeIndividual(i);
+		ea->populationGenomes[i]->init();
+		ea->populationGenomes[i]->morph->saveGenome(indCounter, 0, -1);
+		ea->populationGenomes[i]->individualNumber = i;
+		ea->popIndNumbers.push_back(i);
 		shared_ptr<IND> nIND = shared_ptr<IND>(new IND);
 		nIND->nr = i;
 		nIND->sceneNr = 0;
@@ -73,10 +80,13 @@ void ClientEA::evaluateNextGen()
 		exit(0);
 	}
 
-	// create new genomes 
-	pop->createNewGenRandomSelect(indCounter, sceneNum);
-	pop->createNewGenPareto(indCounter, sceneNum);
-	indCounter += pop->populationGenomes.size();
+	// create new genomes
+	ea->settings->indCounter = indCounter;
+	ea->selection();
+	// assign number to new genomes 
+	indCounter += ea->populationGenomes.size();
+	ea->settings->indCounter = indCounter;
+	//indCounter += ea->populationGenomes.size();
 	extApi_sleepMs(100);
 	// communicate with all ports
 	int currentEv = 0;
@@ -93,11 +103,11 @@ void ClientEA::evaluateNextGen()
 					int state[1];
 					simxGetIntegerSignal(clientIDs[i], "simulationState", state, simx_opmode_oneshot);
 					//	cout << state[0] << endl;
-					if (state[0] == 0 && portState[i] == 0 && currentEv < pop->populationGenomes.size()) {
+					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
-						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", pop->nextGenGenomes[currentEv]->individualNumber, simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", ea->nextGenGenomes[currentEv]->individualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
-						cout << "evaluating:  " << currentEv << " in port " << i + 1040000 << endl;
+						cout << "evaluating:  " << currentEv << " in port " << i + 1040000 <<" num: " << ea->nextGenGenomes[currentEv]->individualNumber <<  endl;
 						portIndividual[i] = currentEv;
 						// tells the simulator to start evaluating the genome
 						//	cout << "setting integer signal" << endl;
@@ -113,13 +123,14 @@ void ClientEA::evaluateNextGen()
 						simxGetFloatSignal(clientIDs[i], "fitness", fitness, simx_opmode_blocking);
 						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
 			//			cout << "phenValue = " << phenValue[0] << endl;
-						pop->nextGenFitness[portIndividual[i]] = fitness[0];
-						pop->nextGenGenomes[portIndividual[i]]->morph->phenValue = phenValue[0];
+						// ea->nextGenFitness[portIndividual[i]] = fitness[0];
+						ea->nextGenGenomes[portIndividual[i]]->fitness = fitness[0];
+						ea->nextGenGenomes[portIndividual[i]]->morph->phenValue = phenValue[0];
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 0, simx_opmode_oneshot);
-						pop->nextGenGenomes[portIndividual[i]]->isEvaluated = true;
+						ea->nextGenGenomes[portIndividual[i]]->isEvaluated = true;
 						portIndividual[i] = -1;
-						for (int z = 0; z < pop->nextGenGenomes.size(); z++) {
-							if (pop->nextGenGenomes[z]->isEvaluated != true) {
+						for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
+							if (ea->nextGenGenomes[z]->isEvaluated != true) {
 								doneEvaluating = false;
 								break;
 							}
@@ -152,11 +163,13 @@ void ClientEA::evaluateNextGen()
 		extApi_sleepMs(5);
 	}
 	if (settings->replacementType == settings->RANDOM_REPLACEMENT) {
-		pop->replaceNewPopRandom(indCounter, sceneNum, 1);
+		// I don't think this is used?
+		ea->replacement();
+		ea->savePopFitness(settings->generation);
 	}
-	else if (settings->replacementType == settings->PARETOMORPH_REPLACEMENT) {
-		pop->replaceNewPopPareto(indCounter, sceneNum, 5);
-	}
+	//else if (settings->replacementType == settings->PARETOMORPH_REPLACEMENT) {
+	//	ea->replaceNewPopPareto(indCounter, sceneNum, 5);
+	//}
 
 }
 
@@ -185,7 +198,7 @@ void ClientEA::evaluateInitialPop()
 					int state[1];
 					simxGetIntegerSignal(clientIDs[i], "simulationState", state, simx_opmode_oneshot);
 					//	cout << state[0] << endl;
-					if (state[0] == 0 && portState[i] == 0 && currentEv < pop->populationGenomes.size()) {
+					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", currentEv, simx_opmode_blocking);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
@@ -202,13 +215,14 @@ void ClientEA::evaluateInitialPop()
 						float fitness[1];
 						simxGetFloatSignal(clientIDs[i], "fitness", fitness, simx_opmode_blocking);
 						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
-						pop->populationFitness[portIndividual[i]] = fitness[0];
-						pop->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], sceneNum, fitness[0]);
-						pop->populationGenomes[portIndividual[i]]->isEvaluated = true;
+						// ea->popFitness[portIndividual[i]] = fitness[0];
+						ea->populationGenomes[portIndividual[i]]->fitness = fitness[0];
+						ea->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], sceneNum, fitness[0]);
+						ea->populationGenomes[portIndividual[i]]->isEvaluated = true;
 						portIndividual[i] = -1;
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 0, simx_opmode_oneshot);
-						for (int z = 0; z < pop->populationGenomes.size(); z++) {
-							if (pop->populationGenomes[z]->isEvaluated == false) {
+						for (int z = 0; z < ea->populationGenomes.size(); z++) {
+							if (ea->populationGenomes[z]->isEvaluated == false) {
 								doneEvaluating = false;
 								break;
 							}
@@ -238,17 +252,17 @@ void ClientEA::evaluateInitialPop()
 		}
 		extApi_sleepMs(5);
 	}
-	pop->savePopFitness(0, pop->populationFitness, sceneNum);
-	settings->indNumbers = pop->popIndNumbers;
-	settings->indFits = pop->populationFitness;
-	settings->saveSettings(sceneNum);
+	ea->savePopFitness(0);
+	settings->indNumbers = ea->popIndNumbers;
+	//settings->indFits = ea->popFitness;
+	settings->saveSettings();
 }
 
 void ClientEA::createNextGenGenomes()
 {
-	pop->createNewGenRandomSelect(indCounter, sceneNum); 
-	for (int i = 0; i < pop->nextGenGenomes.size(); i++) {
-		pop->nextGenGenomes[i]->morph->saveGenome(indCounter, 0, -1);
+	ea->selection(); 
+	for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
+		ea->nextGenGenomes[i]->morph->saveGenome(indCounter, 0, -1);
 		indCounter++;
 	}
 }
