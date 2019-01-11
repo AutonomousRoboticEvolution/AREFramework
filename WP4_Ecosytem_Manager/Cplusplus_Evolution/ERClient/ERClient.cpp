@@ -47,13 +47,16 @@ int main(int argc, char* argv[])
 	string destination = argv[1];
 	client->settings->repository = destination;
 	client->sceneNum = 0;
+	client->settings->sceneNum = 0;
 	client->settings->readSettings(); // essential, settings need to correspond with server settings
 	client->settings->seed = atoi(argv[2]);
+	client->randNum = shared_ptr<RandNum>(new RandNum(0));
 	client->randNum->setSeed(atoi(argv[2]));
 	srand(atoi(argv[2]));
 	extApi_sleepMs(1000);
 	cout << "settings read" << endl;
-	client->init(atoi(argv[3]));
+	// client->init(atoi(argv[3]));
+	client->init(5);
 	if (client->settings->generation != 0) {
 		client->ea->loadPopulationGenomes();
 	}

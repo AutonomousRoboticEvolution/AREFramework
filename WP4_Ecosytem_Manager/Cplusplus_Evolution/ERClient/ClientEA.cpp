@@ -80,9 +80,12 @@ void ClientEA::evaluateNextGen()
 		exit(0);
 	}
 
-	// create new genomes 
+	// create new genomes
+	ea->settings->indCounter = indCounter;
 	ea->selection();
+	// assign number to new genomes 
 	indCounter += ea->populationGenomes.size();
+	//indCounter += ea->populationGenomes.size();
 	extApi_sleepMs(100);
 	// communicate with all ports
 	int currentEv = 0;
