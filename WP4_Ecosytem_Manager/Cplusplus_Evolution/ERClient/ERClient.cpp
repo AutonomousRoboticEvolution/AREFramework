@@ -46,25 +46,21 @@ int main(int argc, char* argv[])
 	client->settings = shared_ptr<Settings>(new Settings);
 	string destination = argv[1];
 	client->settings->repository = destination;
-	client->sceneNum = 0;
-	client->settings->sceneNum = 0;
-	client->settings->readSettings(); // essential, settings need to correspond with server settings
+	client->settings->readSettings(0); // essential, settings need to correspond with server settings
 	client->settings->seed = atoi(argv[2]);
-	client->randNum = shared_ptr<RandNum>(new RandNum(0));
 	client->randNum->setSeed(atoi(argv[2]));
 	srand(atoi(argv[2]));
 	extApi_sleepMs(1000);
 	cout << "settings read" << endl;
-	// client->init(atoi(argv[3]));
-	client->init(5);
+	client->init(6);
 	if (client->settings->generation != 0) {
-		client->ea->loadPopulationGenomes();
+		client->pop->loadPopulationGenomes(0);
 	}
 	else {
 		client->initGA();
 		client->evaluateInitialPop(); // initial generation
-		client->settings->indNumbers = client->ea->popIndNumbers;
-//		client->settings->indFits = client->ea->popFitness;
+		client->settings->indNumbers = client->pop->popIndNumbers;
+		client->settings->indFits = client->pop->populationFitness;
 	}
 	
 
@@ -76,13 +72,13 @@ int main(int argc, char* argv[])
 //	}
 	for (int i = initialGen; i < client->settings->maxGeneration; i++) {
 	//	tStart = clock();
-	//	client->ea->agePop(); // should be in update function of EA
+		client->pop->agePop();
 		client->evaluateNextGen();
-//		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-		client->settings->indNumbers = client->ea->popIndNumbers;
-//		client->settings->indFits = client->ea->popFitness;
+		client->pop->savePopFitness(i + 1, client->pop->populationFitness, client->sceneNum);
+		client->settings->indNumbers = client->pop->popIndNumbers;
+		client->settings->indFits = client->pop->populationFitness;
 		client->settings->generation = i + 1;
-		client->settings->saveSettings();
+		client->settings->saveSettings(client->sceneNum);
 //		saveLog(i);
 	}
 

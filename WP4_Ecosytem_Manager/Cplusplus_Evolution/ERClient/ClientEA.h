@@ -7,16 +7,12 @@
 
 #include "../../include/v_repLib.h"
 #include "../../include/v_repConst.h"
-//#include "../ERFiles/Population.h"
+#include "../ERFiles/Population.h"
 #include "../ERFiles/SettingsERClient.h"
 #include "../RandNum.h"
-#include "../ERFiles/EA.h"
-#include "../ERFiles/EA_SteadyState.h"
-#include "../ERFiles/EA_Factory.h"
 
 extern "C" {
-//	#include "../../remoteApi/extApiPlatform.h"
-	#include "../../remoteApi/extApi.h" //../../remoteApi/extApi.h"
+#include "../../remoteApi/extApi.h"
 }
 
 #define IPNUM = "127.0.0.1"
@@ -41,8 +37,7 @@ public:
 	shared_ptr<Settings> settings;
 	shared_ptr<RandNum> randNum;
 	vector<shared_ptr<IND>> queuedInds;
-	//shared_ptr<Population> pop;
-	shared_ptr<EA> ea;
+	shared_ptr<Population> pop;
 
 	// functions
 	void init(int amountPorts);
