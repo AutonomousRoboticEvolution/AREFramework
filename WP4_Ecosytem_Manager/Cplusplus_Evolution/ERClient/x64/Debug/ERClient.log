@@ -1,0 +1,552 @@
+﻿  extApi.c
+  extApiPlatform.c
+  Adding library: Winmm.lib
+  Adding library: Ws2_32.lib
+c:\program files\v-rep3\v-rep_pro_edu\programming\remoteapi\extapiplatform.c(203): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.17134.0\ucrt\stdio.h(208): note: see declaration of 'fopen'
+  Generating Code...
+  group_bulk_read.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(51): warning C4251: 'dynamixel::GroupBulkRead::id_list_': class 'std::vector<uint8_t,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkRead'
+          with
+          [
+              _Ty=uint8_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\packet_handler.h(104): note: see declaration of 'std::vector<uint8_t,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=uint8_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(52): warning C4251: 'dynamixel::GroupBulkRead::address_list_': class 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkRead'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(52): note: see declaration of 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(53): warning C4251: 'dynamixel::GroupBulkRead::length_list_': class 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkRead'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(52): note: see declaration of 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(54): warning C4251: 'dynamixel::GroupBulkRead::data_list_': class 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkRead'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h(54): note: see declaration of 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp(148): warning C4267: 'argument': conversion from 'size_t' to 'uint16_t', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp(152): warning C4267: 'argument': conversion from 'size_t' to 'uint16_t', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp(158): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  group_bulk_write.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(51): warning C4251: 'dynamixel::GroupBulkWrite::id_list_': class 'std::vector<uint8_t,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkWrite'
+          with
+          [
+              _Ty=uint8_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\packet_handler.h(104): note: see declaration of 'std::vector<uint8_t,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=uint8_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(52): warning C4251: 'dynamixel::GroupBulkWrite::address_list_': class 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkWrite'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(52): note: see declaration of 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(53): warning C4251: 'dynamixel::GroupBulkWrite::length_list_': class 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkWrite'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(52): note: see declaration of 'std::map<uint8_t,uint16_t,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint16_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(54): warning C4251: 'dynamixel::GroupBulkWrite::data_list_': class 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupBulkWrite'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h(54): note: see declaration of 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+  group_sync_read.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_read.h(51): warning C4251: 'dynamixel::GroupSyncRead::id_list_': class 'std::vector<uint8_t,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupSyncRead'
+          with
+          [
+              _Ty=uint8_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\packet_handler.h(104): note: see declaration of 'std::vector<uint8_t,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=uint8_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_read.h(52): warning C4251: 'dynamixel::GroupSyncRead::data_list_': class 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupSyncRead'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_read.h(52): note: see declaration of 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_read.cpp(132): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  group_sync_write.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_write.h(51): warning C4251: 'dynamixel::GroupSyncWrite::id_list_': class 'std::vector<uint8_t,std::allocator<_Ty>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupSyncWrite'
+          with
+          [
+              _Ty=uint8_t
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\packet_handler.h(104): note: see declaration of 'std::vector<uint8_t,std::allocator<_Ty>>'
+          with
+          [
+              _Ty=uint8_t
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_write.h(52): warning C4251: 'dynamixel::GroupSyncWrite::data_list_': class 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>' needs to have dll-interface to be used by clients of class 'dynamixel::GroupSyncWrite'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_write.h(52): note: see declaration of 'std::map<uint8_t,uint8_t *,std::less<_Kty>,std::allocator<std::pair<const _Kty,_Ty>>>'
+          with
+          [
+              _Kty=uint8_t,
+              _Ty=uint8_t *
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\group_sync_write.cpp(141): warning C4267: 'argument': conversion from 'size_t' to 'uint16_t', possible loss of data
+  packet_handler.cpp
+  port_handler.cpp
+  protocol1_packet_handler.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp(674): warning C4244: '=': conversion from 'uint16_t' to 'uint8_t', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp(675): warning C4244: '=': conversion from 'uint16_t' to 'uint8_t', possible loss of data
+  protocol2_packet_handler.cpp
+  port_handler_windows.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp(59): warning C4474: 'sprintf_s' : too many arguments passed for format string
+  c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp(59): note: placeholders and their parameters expect 0 variadic arguments, but 1 were provided
+  ANN.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(129): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(130): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(167): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(193): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(201): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(215): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(227): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(239): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(240): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(250): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(251): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(264): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(271): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(282): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(293): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(305): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(306): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(316): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(317): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(342): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(347): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\ann.cpp(362): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Control.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+  ControlFactory.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  CPPN.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\cppn.cpp(44): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\cppn.cpp(50): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\cppn.cpp(124): warning C4244: '+=': conversion from 'double' to 'float', possible loss of data
+  CustomANN.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Hormones.cpp
+  SimpleControl.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+  DefaultGenome.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  EA.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  EA_Generational.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  EA_SteadyState.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\ea_steadystate.cpp(111): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\ea_steadystate.cpp(151): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  Generating Code...
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\control\controlfactory.cpp(48): warning C4715: 'ControlFactory::createNewControlGenome': not all control paths return a value
+  Compiling...
+  Genome.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  GenomeFactory.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  BaseMorphology.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  CAT.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\cat.cpp(106): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  CustomMorphology.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Development.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\development.cpp(66): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\development.cpp(110): warning C4305: 'argument': truncation from 'double' to 'const float'
+  EdgarsAmazingMorphologyClass.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  ER_CPPN.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+  ER_CPPN_Encoding.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(33): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(266): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(270): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(272): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(295): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(400): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(406): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(520): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(522): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(525): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(526): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.cpp(610): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  ER_DirectEncoding.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(52): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(56): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(58): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(74): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(78): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(80): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(96): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(191): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(197): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(301): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(303): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(306): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(307): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(376): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(380): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(382): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(540): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(586): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(587): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(596): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(606): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(610): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(647): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(684): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.cpp(735): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+  ER_LSystem.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(51): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(55): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(57): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(118): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(149): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(166): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(184): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(188): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(190): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(259): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(265): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(269): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(273): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(277): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(309): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(326): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(345): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(349): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(351): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(420): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(427): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(434): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(447): warning C4305: '=': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(455): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(456): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(542): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(548): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(630): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(632): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(635): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(636): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(716): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(720): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(722): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(856): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.cpp(895): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
+  FixedBaseMorphology.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Morphology.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  MorphologyFactory.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  CPGNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\cpgneuron.cpp(6): warning C4305: '=': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\cpgneuron.cpp(72): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\cpgneuron.cpp(75): warning C4305: 'argument': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\cpgneuron.cpp(114): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\cpgneuron.cpp(119): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  FunctionNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(152): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(155): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(187): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(192): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(209): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(211): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(213): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(215): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(217): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(219): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(221): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(223): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(225): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(227): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(229): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(231): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(233): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(235): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(237): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(239): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.cpp(241): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  InputNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Neuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\neuron.cpp(71): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\neuron.cpp(82): warning C4244: 'argument': conversion from 'double' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=float
+          ]
+  NeuronFactory.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+  OutputNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Generating Code...
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\development.cpp(102): warning C4715: 'Development::getMainHandle': not all control paths return a value
+  Compiling...
+  PatternNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\patternneuron.cpp(24): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\patternneuron.cpp(113): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\patternneuron.cpp(118): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\patternneuron.cpp(123): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  SimpleNeuron.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\simpleneuron.cpp(72): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Settings.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(434): warning C4244: 'argument': conversion from 'double' to '_Ty', possible loss of data
+          with
+          [
+              _Ty=float
+          ]
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(442): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(447): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(458): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(478): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(499): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(521): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.cpp(527): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  SettingsERClient.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+  RandNum.cpp
+  ClientEA.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erclient\clientea.cpp(17): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erclient\clientea.cpp(63): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erclient\clientea.cpp(85): warning C4267: '+=': conversion from 'size_t' to 'int', possible loss of data
+  ERClient.cpp
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(155): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\settings.h(156): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\neuron\functionneuron.h(42): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\module\module_solar.h(31): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(95): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsystem.h(99): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn.h(2): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_lsysteminterpreter.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_directencoding.h(101): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(3): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+c:\program files\v-rep3\v-rep_pro_edu\programming\v_repexter_minimal\erfiles\morphology\er_cppn_encoding.h(102): warning C4305: 'initializing': truncation from 'double' to 'float'
+  Generating Code...
+     Creating library C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\x64\Debug\ERClient.lib and object C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\x64\Debug\ERClient.exp
+  ERClient.vcxproj -> C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\x64\Debug\ERClient.exe

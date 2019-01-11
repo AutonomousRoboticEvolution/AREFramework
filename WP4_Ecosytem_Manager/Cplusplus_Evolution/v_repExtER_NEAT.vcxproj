@@ -1,0 +1,237 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{EEDCDA96-D7EA-41BA-A8D8-DF6E064B94B9}</ProjectGuid>
+    <RootNamespace>v_repExtBubbleRob</RootNamespace>
+    <Keyword>MFCDLLProj</Keyword>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v140</PlatformToolset>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>12.0.30501.0</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Libraries;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\Libraries\boost_1_60_0;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <ModuleDefinitionFile />
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>false</MkTypLibCompatible>
+    </Midl>
+    <ClCompile>
+      <AdditionalIncludeDirectories>../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+      <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
+    <Link>
+      <ModuleDefinitionFile />
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\common\v_repLib.cpp" />
+    <ClCompile Include="ERfiles\CollisionDetector.cpp" />
+    <ClCompile Include="ERfiles\control\ANN.cpp" />
+    <ClCompile Include="ERfiles\control\Control.cpp" />
+    <ClCompile Include="ERfiles\control\ControlFactory.cpp" />
+    <ClCompile Include="ERFiles\control\CPPN.cpp" />
+    <ClCompile Include="ERFiles\control\CustomANN.cpp" />
+    <ClCompile Include="ERfiles\control\Hormones.cpp" />
+    <ClCompile Include="ERfiles\control\SimpleControl.cpp" />
+    <ClCompile Include="ERfiles\DefaultGenome.cpp" />
+    <ClCompile Include="ERfiles\env\BasicSunEnv.cpp" />
+    <ClCompile Include="ERfiles\env\ConstrainedSunEnv.cpp" />
+    <ClCompile Include="ERfiles\env\Environment.cpp" />
+    <ClCompile Include="ERfiles\env\EnvironmentFactory.cpp" />
+    <ClCompile Include="ERfiles\env\MoveAndSun.cpp" />
+    <ClCompile Include="ERfiles\env\MoveEnv.cpp" />
+    <ClCompile Include="ERfiles\env\MovingSunEnv.cpp" />
+    <ClCompile Include="ERfiles\env\RoughMoveEnv.cpp" />
+    <ClCompile Include="ERfiles\env\WaterEnv.cpp" />
+    <ClCompile Include="ERfiles\ER.cpp" />
+    <ClCompile Include="ERfiles\module\ER_Module.cpp" />
+    <ClCompile Include="ERfiles\module\ModuleFactory.cpp" />
+    <ClCompile Include="ERfiles\module\Module_APlantBase.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Bend.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Brain.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Cube.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Leaf.cpp" />
+    <ClCompile Include="ERfiles\module\Module_LeafChloe.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Rectangle.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Rodrigo.cpp" />
+    <ClCompile Include="ERfiles\module\Module_Spring.cpp" />
+    <ClCompile Include="ERfiles\morphology\BaseMorphology.cpp" />
+    <ClCompile Include="ERfiles\morphology\CAT.cpp" />
+    <ClCompile Include="ERFiles\morphology\Development.cpp" />
+    <ClCompile Include="ERFiles\morphology\ER_CPPN.cpp" />
+    <ClCompile Include="ERfiles\morphology\ER_LSystem.cpp" />
+    <ClCompile Include="ERfiles\morphology\FixedBaseMorphology.cpp" />
+    <ClCompile Include="ERfiles\morphology\Morphology.cpp" />
+    <ClCompile Include="ERfiles\morphology\MorphologyFactory.cpp" />
+    <ClCompile Include="ERfiles\neuron\CPGNeuron.cpp" />
+    <ClCompile Include="ERFiles\neuron\FunctionNeuron.cpp" />
+    <ClCompile Include="ERfiles\neuron\InputNeuron.cpp" />
+    <ClCompile Include="ERfiles\neuron\Neuron.cpp" />
+    <ClCompile Include="ERfiles\neuron\NeuronFactory.cpp" />
+    <ClCompile Include="ERfiles\neuron\OutputNeuron.cpp" />
+    <ClCompile Include="ERFiles\neuron\PatternNeuron.cpp" />
+    <ClCompile Include="ERfiles\neuron\SimpleNeuron.cpp" />
+    <ClCompile Include="ERfiles\Population.cpp" />
+    <ClCompile Include="ERFiles\Settings.cpp" />
+    <ClCompile Include="ERfiles\VREPFunctions.cpp" />
+    <ClCompile Include="RandNum.cpp" />
+    <ClCompile Include="v_repExtER.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\v_repLib.h" />
+    <ClInclude Include="ERfiles\CollisionDetector.h" />
+    <ClInclude Include="ERfiles\control\ANN.h" />
+    <ClInclude Include="ERfiles\control\Control.h" />
+    <ClInclude Include="ERfiles\control\ControlFactory.h" />
+    <ClInclude Include="ERFiles\control\CPPN.h" />
+    <ClInclude Include="ERFiles\control\CustomANN.h" />
+    <ClInclude Include="ERfiles\control\Hormones.h" />
+    <ClInclude Include="ERfiles\control\SimpleControl.h" />
+    <ClInclude Include="ERfiles\DefaultGenome.h" />
+    <ClInclude Include="ERfiles\env\BasicSunEnv.h" />
+    <ClInclude Include="ERfiles\env\ConstrainedSunEnv.h" />
+    <ClInclude Include="ERfiles\env\Environment.h" />
+    <ClInclude Include="ERfiles\env\EnvironmentFactory.h" />
+    <ClInclude Include="ERfiles\env\MoveAndSun.h" />
+    <ClInclude Include="ERfiles\env\MoveEnv.h" />
+    <ClInclude Include="ERfiles\env\MovingSunEnv.h" />
+    <ClInclude Include="ERfiles\env\RoughMoveEnv.h" />
+    <ClInclude Include="ERfiles\env\WaterEnv.h" />
+    <ClInclude Include="ERfiles\ER.h" />
+    <ClInclude Include="ERfiles\module\ER_Module.h" />
+    <ClInclude Include="ERfiles\module\ModuleFactory.h" />
+    <ClInclude Include="ERfiles\module\Module_APlantBase.h" />
+    <ClInclude Include="ERfiles\module\Module_Bend.h" />
+    <ClInclude Include="ERfiles\module\Module_Brain.h" />
+    <ClInclude Include="ERfiles\module\Module_Cube.h" />
+    <ClInclude Include="ERfiles\module\Module_Leaf.h" />
+    <ClInclude Include="ERfiles\module\Module_LeafChloe.h" />
+    <ClInclude Include="ERfiles\module\Module_Rectangle.h" />
+    <ClInclude Include="ERfiles\module\Module_Rodrigo.h" />
+    <ClInclude Include="ERfiles\module\Module_Spring.h" />
+    <ClInclude Include="ERfiles\morphology\BaseMorphology.h" />
+    <ClInclude Include="ERfiles\morphology\CAT.h" />
+    <ClInclude Include="ERFiles\morphology\Development.h" />
+    <ClInclude Include="ERFiles\morphology\ER_CPPN.h" />
+    <ClInclude Include="ERfiles\morphology\ER_LSystem.h" />
+    <ClInclude Include="ERfiles\morphology\FixedBaseMorphology.h" />
+    <ClInclude Include="ERfiles\morphology\Morphology.h" />
+    <ClInclude Include="ERfiles\morphology\MorphologyFactory.h" />
+    <ClInclude Include="ERfiles\neuron\CPGNeuron.h" />
+    <ClInclude Include="ERFiles\neuron\FunctionNeuron.h" />
+    <ClInclude Include="ERfiles\neuron\InputNeuron.h" />
+    <ClInclude Include="ERfiles\neuron\Neuron.h" />
+    <ClInclude Include="ERfiles\neuron\NeuronFactory.h" />
+    <ClInclude Include="ERfiles\neuron\OutputNeuron.h" />
+    <ClInclude Include="ERFiles\neuron\PatternNeuron.h" />
+    <ClInclude Include="ERfiles\neuron\SimpleNeuron.h" />
+    <ClInclude Include="ERfiles\Population.h" />
+    <ClInclude Include="ERfiles\resource.h" />
+    <ClInclude Include="ERfiles\Settings.h" />
+    <ClInclude Include="ERfiles\stdafx.h" />
+    <ClInclude Include="ERfiles\VREPFunctions.h" />
+    <ClInclude Include="RandNum.h" />
+    <ClInclude Include="v_repExtER.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties RESOURCE_FILE="v_repExtBubbleRob.rc" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

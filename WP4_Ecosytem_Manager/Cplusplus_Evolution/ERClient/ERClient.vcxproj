@@ -1,0 +1,253 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{8B923EF5-85AB-4E28-8923-52245263D026}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>bubbleRobClient</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;MAX_EXT_API_CONNECTIONS=255;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;DO_NOT_USE_SHARED_MEMORY;MAX_EXT_API_CONNECTIONS=255;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NON_MATLAB_PARSING;MAX_EXT_API_CONNECTIONS=255;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\remoteApi;..\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;NON_MATLAB_PARSING;MAX_EXT_API_CONNECTIONS=255;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\remoteApi;..\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\remoteApi\extApi.c" />
+    <ClCompile Include="..\..\remoteApi\extApiPlatform.c" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_read.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_write.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\packet_handler.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\port_handler.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol2_packet_handler.cpp" />
+    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp" />
+    <ClCompile Include="..\ERfiles\control\ANN.cpp" />
+    <ClCompile Include="..\ERfiles\control\Control.cpp" />
+    <ClCompile Include="..\ERfiles\control\ControlFactory.cpp" />
+    <ClCompile Include="..\ERFiles\control\CPPN.cpp" />
+    <ClCompile Include="..\ERFiles\control\CustomANN.cpp" />
+    <ClCompile Include="..\ERfiles\control\Hormones.cpp" />
+    <ClCompile Include="..\ERfiles\control\SimpleControl.cpp" />
+    <ClCompile Include="..\ERFiles\DefaultGenome.cpp" />
+    <ClCompile Include="..\ERFiles\EA.cpp" />
+    <ClCompile Include="..\ERFiles\EA_Generational.cpp" />
+    <ClCompile Include="..\ERFiles\EA_SteadyState.cpp" />
+    <ClCompile Include="..\ERFiles\Genome.cpp" />
+    <ClCompile Include="..\ERFiles\GenomeFactory.cpp" />
+    <ClCompile Include="..\ERfiles\morphology\BaseMorphology.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\CAT.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\CustomMorphology.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Development.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\ER_CPPN.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\ER_CPPN_Encoding.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\ER_DirectEncoding.cpp" />
+    <ClCompile Include="..\ERfiles\morphology\ER_LSystem.cpp" />
+    <ClCompile Include="..\ERfiles\morphology\FixedBaseMorphology.cpp" />
+    <ClCompile Include="..\ERfiles\morphology\Morphology.cpp" />
+    <ClCompile Include="..\ERfiles\morphology\MorphologyFactory.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\CPGNeuron.cpp" />
+    <ClCompile Include="..\ERFiles\neuron\FunctionNeuron.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\InputNeuron.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\Neuron.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\NeuronFactory.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\OutputNeuron.cpp" />
+    <ClCompile Include="..\ERFiles\neuron\PatternNeuron.cpp" />
+    <ClCompile Include="..\ERfiles\neuron\SimpleNeuron.cpp" />
+    <ClCompile Include="..\ERFiles\Settings.cpp" />
+    <ClCompile Include="..\ERFiles\SettingsERClient.cpp" />
+    <ClCompile Include="..\RandNum.cpp" />
+    <ClCompile Include="ClientEA.cpp" />
+    <ClCompile Include="ERClient.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\remoteApi\extApi.h" />
+    <ClInclude Include="..\..\remoteApi\extApiPlatform.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_read.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_write.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_read.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_write.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\packet_handler.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\port_handler.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol1_packet_handler.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol2_packet_handler.h" />
+    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk_windows\port_handler_windows.h" />
+    <ClInclude Include="..\ERfiles\control\ANN.h" />
+    <ClInclude Include="..\ERfiles\control\Control.h" />
+    <ClInclude Include="..\ERfiles\control\ControlFactory.h" />
+    <ClInclude Include="..\ERFiles\control\CPPN.h" />
+    <ClInclude Include="..\ERFiles\control\CustomANN.h" />
+    <ClInclude Include="..\ERfiles\control\Hormones.h" />
+    <ClInclude Include="..\ERfiles\control\SimpleControl.h" />
+    <ClInclude Include="..\ERFiles\DefaultGenome.h" />
+    <ClInclude Include="..\ERFiles\EA.h" />
+    <ClInclude Include="..\ERFiles\EA_Generational.h" />
+    <ClInclude Include="..\ERFiles\EA_SteadyState.h" />
+    <ClInclude Include="..\ERFiles\Genome.h" />
+    <ClInclude Include="..\ERFiles\GenomeFactory.h" />
+    <ClInclude Include="..\ERfiles\morphology\BaseMorphology.h" />
+    <ClInclude Include="..\ERFiles\morphology\CAT.h" />
+    <ClInclude Include="..\ERFiles\morphology\CustomMorphology.h" />
+    <ClInclude Include="..\ERFiles\morphology\Development.h" />
+    <ClInclude Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.h" />
+    <ClInclude Include="..\ERFiles\morphology\ER_CPPN.h" />
+    <ClInclude Include="..\ERFiles\morphology\ER_CPPN_Encoding.h" />
+    <ClInclude Include="..\ERFiles\morphology\ER_DirectEncoding.h" />
+    <ClInclude Include="..\ERfiles\morphology\ER_LSystem.h" />
+    <ClInclude Include="..\ERfiles\morphology\FixedBaseMorphology.h" />
+    <ClInclude Include="..\ERfiles\morphology\Morphology.h" />
+    <ClInclude Include="..\ERfiles\morphology\MorphologyFactory.h" />
+    <ClInclude Include="..\ERfiles\neuron\CPGNeuron.h" />
+    <ClInclude Include="..\ERFiles\neuron\FunctionNeuron.h" />
+    <ClInclude Include="..\ERfiles\neuron\InputNeuron.h" />
+    <ClInclude Include="..\ERfiles\neuron\Neuron.h" />
+    <ClInclude Include="..\ERfiles\neuron\NeuronFactory.h" />
+    <ClInclude Include="..\ERfiles\neuron\OutputNeuron.h" />
+    <ClInclude Include="..\ERFiles\neuron\PatternNeuron.h" />
+    <ClInclude Include="..\ERfiles\neuron\SimpleNeuron.h" />
+    <ClInclude Include="..\ERFiles\Settings.h" />
+    <ClInclude Include="..\ERFiles\SettingsERClient.h" />
+    <ClInclude Include="..\RandNum.h" />
+    <ClInclude Include="ClientEA.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

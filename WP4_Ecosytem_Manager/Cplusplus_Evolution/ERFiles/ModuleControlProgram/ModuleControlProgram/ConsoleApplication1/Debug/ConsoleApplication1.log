@@ -1,0 +1,9 @@
+﻿  ConsoleApplication1.cpp
+c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\modulecontrolprogram\modulecontrolprogram\consoleapplication1\consoleapplication1.cpp(5): warning C4627: '#include "../../../robotModules/FlowerControl.h"': skipped when looking for precompiled header use
+  c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\modulecontrolprogram\modulecontrolprogram\consoleapplication1\consoleapplication1.cpp(5): note: Add directive to 'stdafx.h' or rebuild precompiled header
+c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\modulecontrolprogram\modulecontrolprogram\consoleapplication1\consoleapplication1.cpp(13): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  FlowerControl.cpp
+c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\robotmodules\flowercontrol.cpp(1): warning C4627: '#include "FlowerControl.h"': skipped when looking for precompiled header use
+  c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\robotmodules\flowercontrol.cpp(1): note: Add directive to 'stdafx.h' or rebuild precompiled header
+c:\program files (x86)\v-rep3\v-rep_pro_edu\programming\v_repexter\erfiles\robotmodules\flowercontrol.cpp(324): fatal error C1010: unexpected end of file while looking for precompiled header. Did you forget to add '#include "stdafx.h"' to your source?
+  Generating Code...

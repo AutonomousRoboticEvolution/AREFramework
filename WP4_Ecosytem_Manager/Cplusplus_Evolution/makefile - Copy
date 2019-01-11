@@ -1,0 +1,87 @@
+CXX = gcc
+
+CFLAGS = -I../include -Wall -fPIC -static -std=c++1y
+LDFLAGS = -shared
+
+OS = $(shell uname -s)
+ifeq ($(OS), Linux)
+	CFLAGS += -D__Linux
+	EXT = so
+else 
+	CFLAGS += -D__APPLE__
+	EXT = dylib
+endif
+
+all:
+	@rm -f lib/*.$(EXT)
+	@rm -f *.o
+	$(CXX) $(CFLAGS) -c VREPUI.cpp -o VREPUI.o
+	$(CXX) $(CFLAGS) -c ERFiles/DefaultGenomeVREP.cpp -o DefaultGenomeVREP.o
+	$(CXX) $(CFLAGS) -c ERFiles/EA_VREP.cpp -o EA_VREP.o
+	$(CXX) $(CFLAGS) -c ERFiles/ER_VREP.cpp -o ER_VREP.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/MorphologyFactoryVREP.cpp -o MorphologyFactoryVREP.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/ER_DirectEncoding.cpp -o DirectEncoding.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/ER_DirectEncodingInterpreter.cpp -o DirectEncodingInterpreter.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/ER_LSystemInterpreter.cpp -o ER_LSystemInterpreter.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/CATVREP.cpp -o CATVREP.o
+	
+	$(CXX) $(CFLAGS) -c common/v_repLib.cpp -o v_repLib.o
+	$(CXX) $(CFLAGS) -c v_repExtER.cpp -o v_repExtER.o
+	$(CXX) $(CFLAGS) -c ERFiles/ER.cpp -o ER.o
+	$(CXX) $(CFLAGS) -c ERFiles/Settings.cpp -o Settings.o
+	$(CXX) $(CFLAGS) -c RandNum.cpp -o RandNum.o	
+	$(CXX) $(CFLAGS) -c ERFiles/EA.cpp -o EA.o
+	$(CXX) $(CFLAGS) -c ERFiles/Genome.cpp -o Genome.o
+	$(CXX) $(CFLAGS) -c ERFiles/GenomeFactory.cpp -o GenomeFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/GenomeFactoryVREP.cpp -o GenomeFactoryVREP.o
+	$(CXX) $(CFLAGS) -c ERFiles/DefaultGenome.cpp -o DefaultGenome.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/ANN.cpp -o ANN.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/Control.cpp -o Control.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/ControlFactory.cpp -o ControlFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/CPPN.cpp -o CPPN.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/CustomANN.cpp -o CustomANN.o
+#	$(CXX) $(CFLAGS) -c ERFiles/control/Hormones.cpp -o Hormones.o
+	$(CXX) $(CFLAGS) -c ERFiles/control/SimpleControl.cpp -o SimpleControl.o
+#	$(CXX) $(CFLAGS) -c ERFiles/control/TransferNetwork.cpp -o TransferNetwork.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/Environment.cpp -o Environment.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/EnvironmentFactory.cpp -o EnvironmentFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/ConstrainedSunEnv.cpp -o ConstrainedSunEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/BasicSunEnv.cpp -o BasicSunEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/BlockingSunEnv.cpp -o BlockingSunEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/MoveAndSun.cpp -o MoveAndSun.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/MoveEnv.cpp -o MoveEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/MovingSunEnv.cpp -o MovingSunEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/RoughMoveEnv.cpp -o RoughMoveEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/env/WaterEnv.cpp -o WaterEnv.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/ER_Module.cpp -o ER_Module.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_APlantBase.cpp -o Module_APlantBase.o
+#	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Bend.cpp -o Module_Bend.o
+#	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Brain.cpp -o Module_Brain.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Cube.cpp -o Module_Cube.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Leaf.cpp -o Module_Leaf.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_LeafChloe.cpp -o Module_LeafChloe.o
+#	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Rectangle.cpp -o Module_Rectangle.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Servo.cpp -o Module_Servo.o
+#	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Spring.cpp -o Module_Spring.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/Module_Solar.cpp -o Module_Solar.o
+	$(CXX) $(CFLAGS) -c ERFiles/module/ModuleFactory.cpp -o ModuleFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/BaseMorphology.cpp -o BaseMorphology.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/CAT.cpp -o CAT.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/Development.cpp -o Development.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/ER_CPPN.cpp -o ER_CPPN.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/ER_LSystem.cpp -o ER_LSystem.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/FixedBaseMorphology.cpp -o FixedBaseMorphology.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/Morphology.cpp -o Morphology.o
+	$(CXX) $(CFLAGS) -c ERFiles/morphology/MorphologyFactory.cpp -o MorphologyFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/CPGNeuron.cpp -o CPGNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/FunctionNeuron.cpp -o FunctionNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/InputNeuron.cpp -o InputNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/Neuron.cpp -o Neuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/NeuronFactory.cpp -o NeuronFactory.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/PatternNeuron.cpp -o PatternNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/OutputNeuron.cpp -o OutputNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/neuron/SimpleNeuron.cpp -o SimpleNeuron.o
+	$(CXX) $(CFLAGS) -c ERFiles/CollisionDetector.cpp -o CollisionDetector.o
+	
+	@mkdir -p lib
+	$(CXX) v_repExtER.o v_repLib.o ER.o Settings.o RandNum.o DefaultGenome.o EA.o Genome.o GenomeFactory.o GenomeFactoryVREP.o ANN.o Control.o ControlFactory.o CPPN.o CustomANN.o SimpleControl.o Environment.o EnvironmentFactory.o ConstrainedSunEnv.o BasicSunEnv.o BlockingSunEnv.o MoveAndSun.o MoveEnv.o MovingSunEnv.o RoughMoveEnv.o WaterEnv.o ER_Module.o Module_APlantBase.o Module_Cube.o Module_Leaf.o Module_LeafChloe.o Module_Servo.o Module_Solar.o ModuleFactory.o BaseMorphology.o CAT.o Development.o ER_CPPN.o ER_LSystem.o FixedBaseMorphology.o Morphology.o MorphologyFactory.o CPGNeuron.o FunctionNeuron.o InputNeuron.o Neuron.o NeuronFactory.o OutputNeuron.o PatternNeuron.o SimpleNeuron.o 	VREPUI.o DefaultGenomeVREP.o EA_VREP.o ER_VREP.o MorphologyFactoryVREP.o DirectEncoding.o DirectEncodingInterpreter.o ER_LSystemInterpreter.o CATVREP.o CollisionDetector.o -o lib/libv_repExtER.$(EXT) -lpthread -ldl -shared

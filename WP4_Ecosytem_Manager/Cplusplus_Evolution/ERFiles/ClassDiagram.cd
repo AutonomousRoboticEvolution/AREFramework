@@ -1,0 +1,3644 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="CLuaFunctionData" Collapsed="true">
+    <Position X="13.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AEAAAAEAAIAgAAQAAAAAAAEAAAAAABAAAMAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\luaFunctionData.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CLuaFunctionDataItem" Collapsed="true">
+    <Position X="15.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAQAJAAAEAIEAQAAAAGAAAABAAASAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\luaFunctionDataItem.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="DefaultGenome" Collapsed="true">
+    <Position X="22.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>mkQJkOZIwBAm5GpQkGAiBQA0AcQZiHJE6Kg+BSkh4Ag=</HashCode>
+      <FileName>DefaultGenome.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LGenome" Collapsed="true">
+    <Position X="32.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAQAAGxAkAAiYAAAAEAABAgAAAAACAAEAAAgBAAAgAA=</HashCode>
+      <FileName>DefaultGenome.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="GenomeConstructor" Collapsed="true">
+    <Position X="29.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACgAQAA=</HashCode>
+      <FileName>GenomeConstructor.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Morphology" Collapsed="true">
+    <Position X="0.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAAAAEAAAQAAAAggACAAAAAIAAIAQCAAAAAAAAA=</HashCode>
+      <FileName>Morphology.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="BaseMorphology" Collapsed="true">
+    <Position X="3" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAQABACOpCYAAQBiiTkgAmCJRABYCBJmQLRkAUCAJBA=</HashCode>
+      <FileName>BaseMorphology.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="LMorphology" Collapsed="true">
+    <Position X="34.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>YAQEBAAIACACDgBAAAQAAACQAAAAABoAAAAgAAEAAQA=</HashCode>
+      <FileName>LMorphology.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Control" Collapsed="true">
+    <Position X="17" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAAAAAAAAAAAAAAAAAAAAMAAAAAAAAEAAA=</HashCode>
+      <FileName>Control.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NeuralNetwork" Collapsed="true">
+    <Position X="36.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAQAAAgAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>NeuralNetwork.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="FixedPosition" Collapsed="true">
+    <Position X="27.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAABAAAAAAAAEAAEAAAIAAAAAAAAAAgACA=</HashCode>
+      <FileName>FixedPosition.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ANN" Collapsed="true">
+    <Position X="7.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAgAgAAAIAAAAAAAAEAAA=</HashCode>
+      <FileName>ANN.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Environment" Collapsed="true">
+    <Position X="25.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAACAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAEAA=</HashCode>
+      <FileName>Environment.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ObjectCreator" Collapsed="true">
+    <Position X="38" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAEMAAAAAICAAAAAAAAAAAEAAAAEAAABAAAAAAA=</HashCode>
+      <FileName>VREPFunctions.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="ObjectRemover" Collapsed="true">
+    <Position X="39.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAgAAAAAAAgCAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>VREPFunctions.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="RetrieveVREPInfo" Collapsed="true">
+    <Position X="2.75" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIRAAgAAggAAAAAACAAAAAAAAAAAABEAAAQAAIMAAA=</HashCode>
+      <FileName>VREPFunctions.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="SetVREPInfo" Collapsed="true">
+    <Position X="7.25" Y="3.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAIAAAAAAAAAAAAAAAAAAAAAAABAAAAEQEAAAAAAAAA=</HashCode>
+      <FileName>VREPFunctions.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Agent" Collapsed="true">
+    <Position X="6.75" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAiAABEAAAAAAAAAAAEAAAAAAAAAAAA=</HashCode>
+      <FileName>Agent.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CPreparationApp" Collapsed="true">
+    <Position X="18.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>ENN.cpp</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CCat" Collapsed="true">
+    <Position X="10" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAEAAAAAABAIABAAAAAAAkAkAIAAAEQQATAAA=</HashCode>
+      <FileName>ENN.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="I_TEMP" Collapsed="true">
+    <Position X="31" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAMAAIEIBIAApBCgAEgAgCCLAAgxIAMEAAAAgIAEJA=</HashCode>
+      <FileName>ENN.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CENN" Collapsed="true">
+    <Position X="11.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>Tqf+n3DftT32/+l7CufGfT95v6vb6u78J7Lfxf6/e3k=</HashCode>
+      <FileName>ENN.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CUserInterface" Collapsed="true">
+    <Position X="20.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAQIIAAAAAAAAAAA=</HashCode>
+      <FileName>ENN.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Settings" Collapsed="true">
+    <Position X="4.75" Y="2" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Settings.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Enum" Collapsed="true">
+    <Position X="24" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enum.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="Population" Collapsed="true">
+    <Position X="41.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAIAAAAAIAAAAAAACAAAABAAAAAAAA=</HashCode>
+      <FileName>Population.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="CAT" Collapsed="true">
+    <Position X="9" Y="2.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAEAEAAAAAQAAAAogACAAAAAIAAIAQCAIAAAAAAA=</HashCode>
+      <FileName>CAT.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="PlantMorphology" Collapsed="true">
+    <Position X="0.5" Y="1.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAYAAAAwgACCAAAAIAIIAQCAAAACBIAA=</HashCode>
+      <FileName>PlantMorphology.h</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Struct Name="sBubbleRob" Collapsed="true">
+    <Position X="3" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAIAAAAAAQAAAAIAIAAACAAAAAAAAAACAAAAQAA=</HashCode>
+      <FileName>v_repExtBubbleRob.cpp</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Struct Name="variables" Collapsed="true">
+    <Position X="4.75" Y="2.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAACA=</HashCode>
+      <FileName>Settings.h</FileName>
+    </TypeIdentifier>
+  </Struct>
+  <Typedef Name="ptrSimRunSimulator" Collapsed="true">
+    <Position X="38" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSimulatorMessage" Collapsed="true">
+    <Position X="11.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMainWindow" Collapsed="true">
+    <Position X="10" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetLastError" Collapsed="true">
+    <Position X="4.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLoadModule" Collapsed="true">
+    <Position X="15.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimUnloadModule" Collapsed="true">
+    <Position X="4.75" Y="20.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSendModuleMessage" Collapsed="true">
+    <Position X="15.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetBooleanParameter" Collapsed="true">
+    <Position X="34.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetBooleanParameter" Collapsed="true">
+    <Position X="34.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetIntegerParameter" Collapsed="true">
+    <Position X="10" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetIntegerParameter" Collapsed="true">
+    <Position X="27.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetFloatingParameter" Collapsed="true">
+    <Position X="41.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetFloatingParameter" Collapsed="true">
+    <Position X="20.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetStringParameter" Collapsed="true">
+    <Position X="3" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetStringParameter" Collapsed="true">
+    <Position X="13.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectHandle" Collapsed="true">
+    <Position X="38" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveObject" Collapsed="true">
+    <Position X="34.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveModel" Collapsed="true">
+    <Position X="31" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectName" Collapsed="true">
+    <Position X="4.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjects" Collapsed="true">
+    <Position X="15.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectName" Collapsed="true">
+    <Position X="3" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetCollectionHandle" Collapsed="true">
+    <Position X="38" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveCollection" Collapsed="true">
+    <Position X="25.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetCollectionName" Collapsed="true">
+    <Position X="39.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetCollectionName" Collapsed="true">
+    <Position X="36.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectMatrix" Collapsed="true">
+    <Position X="3" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectMatrix" Collapsed="true">
+    <Position X="41.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectPosition" Collapsed="true">
+    <Position X="10" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectPosition" Collapsed="true">
+    <Position X="8.25" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectOrientation" Collapsed="true">
+    <Position X="6.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectOrientation" Collapsed="true">
+    <Position X="4.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointPosition" Collapsed="true">
+    <Position X="38" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointPosition" Collapsed="true">
+    <Position X="18.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointTargetPosition" Collapsed="true">
+    <Position X="20.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointTargetPosition" Collapsed="true">
+    <Position X="39.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointForce" Collapsed="true">
+    <Position X="13.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetPathPosition" Collapsed="true">
+    <Position X="41.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetPathPosition" Collapsed="true">
+    <Position X="20.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetPathLength" Collapsed="true">
+    <Position X="38" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointMatrix" Collapsed="true">
+    <Position X="34.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetSphericalJointMatrix" Collapsed="true">
+    <Position X="41.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointInterval" Collapsed="true">
+    <Position X="32.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointInterval" Collapsed="true">
+    <Position X="15.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectParent" Collapsed="true">
+    <Position X="8.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectChild" Collapsed="true">
+    <Position X="29.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectParent" Collapsed="true">
+    <Position X="6.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectType" Collapsed="true">
+    <Position X="29.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointType" Collapsed="true">
+    <Position X="3" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimBuildIdentityMatrix" Collapsed="true">
+    <Position X="22.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCopyMatrix" Collapsed="true">
+    <Position X="13.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimBuildMatrix" Collapsed="true">
+    <Position X="24" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetEulerAnglesFromMatrix" Collapsed="true">
+    <Position X="17" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimInvertMatrix" Collapsed="true">
+    <Position X="4.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimMultiplyMatrices" Collapsed="true">
+    <Position X="29.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimInterpolateMatrices" Collapsed="true">
+    <Position X="3" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTransformVector" Collapsed="true">
+    <Position X="32.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReservedCommand" Collapsed="true">
+    <Position X="4.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSimulationTime" Collapsed="true">
+    <Position X="8.25" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSimulationState" Collapsed="true">
+    <Position X="6.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSystemTime" Collapsed="true">
+    <Position X="17" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSystemTimeInMilliseconds" Collapsed="true">
+    <Position X="18.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSystemTimeInMs" Collapsed="true">
+    <Position X="20.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLoadScene" Collapsed="true">
+    <Position X="17" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCloseScene" Collapsed="true">
+    <Position X="10" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSaveScene" Collapsed="true">
+    <Position X="3" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLoadModel" Collapsed="true">
+    <Position X="13.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSaveModel" Collapsed="true">
+    <Position X="41.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLoadUI" Collapsed="true">
+    <Position X="18.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSaveUI" Collapsed="true">
+    <Position X="4.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddStatusbarMessage" Collapsed="true">
+    <Position X="39.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddModuleMenuEntry" Collapsed="true">
+    <Position X="24" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetModuleMenuItemState" Collapsed="true">
+    <Position X="31" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimDoesFileExist" Collapsed="true">
+    <Position X="17" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimIsObjectInSelection" Collapsed="true">
+    <Position X="8.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddObjectToSelection" Collapsed="true">
+    <Position X="29.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveObjectFromSelection" Collapsed="true">
+    <Position X="36.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectSelectionSize" Collapsed="true">
+    <Position X="18.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectLastSelection" Collapsed="true">
+    <Position X="41.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectSelection" Collapsed="true">
+    <Position X="17" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSearchPath" Collapsed="true">
+    <Position X="11.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimInitializePathSearch" Collapsed="true">
+    <Position X="39.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimPerformPathSearchStep" Collapsed="true">
+    <Position X="32.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleCollision" Collapsed="true">
+    <Position X="10" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadCollision" Collapsed="true">
+    <Position X="39.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleDistance" Collapsed="true">
+    <Position X="13.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadDistance" Collapsed="true">
+    <Position X="3" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleProximitySensor" Collapsed="true">
+    <Position X="31" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadProximitySensor" Collapsed="true">
+    <Position X="6.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleMill" Collapsed="true">
+    <Position X="27.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleIkGroup" Collapsed="true">
+    <Position X="20.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckIkGroup" Collapsed="true">
+    <Position X="34.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleDynamics" Collapsed="true">
+    <Position X="15.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMechanismHandle" Collapsed="true">
+    <Position X="13.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetPathPlanningHandle" Collapsed="true">
+    <Position X="39.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleMechanism" Collapsed="true">
+    <Position X="25.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptHandle" Collapsed="true">
+    <Position X="18.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetScriptText" Collapsed="true">
+    <Position X="29.25" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptText" Collapsed="true">
+    <Position X="27.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptProperty" Collapsed="true">
+    <Position X="22.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAssociateScriptWithObject" Collapsed="true">
+    <Position X="10" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScript" Collapsed="true">
+    <Position X="13.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptAssociatedWithObject" Collapsed="true">
+    <Position X="15.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetCustomizationScriptAssociatedWithObject" Collapsed="true">
+    <Position X="8.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectAssociatedWithScript" Collapsed="true">
+    <Position X="27.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptName" Collapsed="true">
+    <Position X="20.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleMainScript" Collapsed="true">
+    <Position X="24" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleGeneralCallbackScript" Collapsed="true">
+    <Position X="17" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetScript" Collapsed="true">
+    <Position X="22.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddScript" Collapsed="true">
+    <Position X="38" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveScript" Collapsed="true">
+    <Position X="39.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRefreshDialogs" Collapsed="true">
+    <Position X="13.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetCollisionHandle" Collapsed="true">
+    <Position X="3" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetDistanceHandle" Collapsed="true">
+    <Position X="15.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetIkGroupHandle" Collapsed="true">
+    <Position X="24" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetCollision" Collapsed="true">
+    <Position X="6.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetDistance" Collapsed="true">
+    <Position X="8.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetProximitySensor" Collapsed="true">
+    <Position X="20.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetMill" Collapsed="true">
+    <Position X="15.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckProximitySensor" Collapsed="true">
+    <Position X="36.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckProximitySensorEx" Collapsed="true">
+    <Position X="38" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckProximitySensorEx2" Collapsed="true">
+    <Position X="39.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddSceneCustomData" Collapsed="true">
+    <Position X="36.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSceneCustomDataLength" Collapsed="true">
+    <Position X="11.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSceneCustomData" Collapsed="true">
+    <Position X="10" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddObjectCustomData" Collapsed="true">
+    <Position X="25.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectCustomDataLength" Collapsed="true">
+    <Position X="34.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectCustomData" Collapsed="true">
+    <Position X="32.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateBuffer" Collapsed="true">
+    <Position X="18.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReleaseBuffer" Collapsed="true">
+    <Position X="20.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckCollision" Collapsed="true">
+    <Position X="29.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckCollisionEx" Collapsed="true">
+    <Position X="31" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckDistance" Collapsed="true">
+    <Position X="32.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectConfiguration" Collapsed="true">
+    <Position X="31" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectConfiguration" Collapsed="true">
+    <Position X="36.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetConfigurationTree" Collapsed="true">
+    <Position X="4.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetConfigurationTree" Collapsed="true">
+    <Position X="38" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetSimulationTimeStep" Collapsed="true">
+    <Position X="39.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSimulationTimeStep" Collapsed="true">
+    <Position X="10" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetRealTimeSimulation" Collapsed="true">
+    <Position X="6.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimIsRealTimeSimulationStepNeeded" Collapsed="true">
+    <Position X="10" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAdjustRealTimeTimer" Collapsed="true">
+    <Position X="41.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSimulationPassesPerRenderingPass" Collapsed="true">
+    <Position X="4.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAdvanceSimulationByOneStep" Collapsed="true">
+    <Position X="4.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimStartSimulation" Collapsed="true">
+    <Position X="27.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimStopSimulation" Collapsed="true">
+    <Position X="29.25" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimPauseSimulation" Collapsed="true">
+    <Position X="31" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimBroadcastMessage" Collapsed="true">
+    <Position X="20.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetModuleName" Collapsed="true">
+    <Position X="17" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptSimulationParameter" Collapsed="true">
+    <Position X="25.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetScriptSimulationParameter" Collapsed="true">
+    <Position X="27.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimFloatingViewAdd" Collapsed="true">
+    <Position X="29.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimFloatingViewRemove" Collapsed="true">
+    <Position X="31" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAdjustView" Collapsed="true">
+    <Position X="3" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetPath" Collapsed="true">
+    <Position X="18.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandlePath" Collapsed="true">
+    <Position X="29.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetJoint" Collapsed="true">
+    <Position X="13.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleJoint" Collapsed="true">
+    <Position X="22.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetLastError" Collapsed="true">
+    <Position X="24" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleGraph" Collapsed="true">
+    <Position X="18.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetGraph" Collapsed="true">
+    <Position X="11.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetNavigationMode" Collapsed="true">
+    <Position X="34.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetNavigationMode" Collapsed="true">
+    <Position X="25.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetPage" Collapsed="true">
+    <Position X="18.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetPage" Collapsed="true">
+    <Position X="36.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimDisplayDialog" Collapsed="true">
+    <Position X="15.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetDialogResult" Collapsed="true">
+    <Position X="13.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetDialogInput" Collapsed="true">
+    <Position X="11.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimEndDialog" Collapsed="true">
+    <Position X="20.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRegisterCustomLuaFunction" Collapsed="true">
+    <Position X="17" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRegisterCustomLuaVariable" Collapsed="true">
+    <Position X="18.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointTargetVelocity" Collapsed="true">
+    <Position X="22.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointTargetVelocity" Collapsed="true">
+    <Position X="41.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetPathTargetNominalVelocity" Collapsed="true">
+    <Position X="22.25" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLockInterface" Collapsed="true">
+    <Position X="20.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptRawBuffer" Collapsed="true">
+    <Position X="24" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetScriptRawBuffer" Collapsed="true">
+    <Position X="25.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReleaseScriptRawBuffer" Collapsed="true">
+    <Position X="22.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCopyPasteSelectedObjects" Collapsed="true">
+    <Position X="17" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCopyPasteObjects" Collapsed="true">
+    <Position X="15.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimScaleSelectedObjects" Collapsed="true">
+    <Position X="10" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimScaleObjects" Collapsed="true">
+    <Position X="8.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimDeleteSelectedObjects" Collapsed="true">
+    <Position X="11.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectUniqueIdentifier" Collapsed="true">
+    <Position X="31" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetNameSuffix" Collapsed="true">
+    <Position X="24" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSendData" Collapsed="true">
+    <Position X="13.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReceiveData" Collapsed="true">
+    <Position X="11.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetGraphUserData" Collapsed="true">
+    <Position X="4.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetNameSuffix" Collapsed="true">
+    <Position X="32.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddDrawingObject" Collapsed="true">
+    <Position X="15.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveDrawingObject" Collapsed="true">
+    <Position X="27.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddDrawingObjectItem" Collapsed="true">
+    <Position X="17" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddParticleObject" Collapsed="true">
+    <Position X="31" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveParticleObject" Collapsed="true">
+    <Position X="38" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddParticleObjectItem" Collapsed="true">
+    <Position X="32.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectSizeFactor" Collapsed="true">
+    <Position X="22.25" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAnnounceSceneContentChange" Collapsed="true">
+    <Position X="6.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetMilling" Collapsed="true">
+    <Position X="17" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimApplyMilling" Collapsed="true">
+    <Position X="8.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetIntegerSignal" Collapsed="true">
+    <Position X="11.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetIntegerSignal" Collapsed="true">
+    <Position X="29.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimClearIntegerSignal" Collapsed="true">
+    <Position X="6.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetFloatSignal" Collapsed="true">
+    <Position X="3" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetFloatSignal" Collapsed="true">
+    <Position X="22.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimClearFloatSignal" Collapsed="true">
+    <Position X="4.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetStringSignal" Collapsed="true">
+    <Position X="4.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetStringSignal" Collapsed="true">
+    <Position X="15.25" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimClearStringSignal" Collapsed="true">
+    <Position X="8.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetSignalName" Collapsed="true">
+    <Position X="3" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectProperty" Collapsed="true">
+    <Position X="10" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectProperty" Collapsed="true">
+    <Position X="11.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectSpecialProperty" Collapsed="true">
+    <Position X="15.25" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectSpecialProperty" Collapsed="true">
+    <Position X="25.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetPositionOnPath" Collapsed="true">
+    <Position X="3" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetOrientationOnPath" Collapsed="true">
+    <Position X="34.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetDataOnPath" Collapsed="true">
+    <Position X="10" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetClosestPositionOnPath" Collapsed="true">
+    <Position X="36.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadForceSensor" Collapsed="true">
+    <Position X="4.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimBreakForceSensor" Collapsed="true">
+    <Position X="18.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeVertex" Collapsed="true">
+    <Position X="41.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeTriangle" Collapsed="true">
+    <Position X="39.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetLightParameters" Collapsed="true">
+    <Position X="25.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetLightParameters" Collapsed="true">
+    <Position X="6.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleVarious" Collapsed="true">
+    <Position X="32.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetVelocity" Collapsed="true">
+    <Position X="39.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectVelocity" Collapsed="true">
+    <Position X="32.75" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddForceAndTorque" Collapsed="true">
+    <Position X="20.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddForce" Collapsed="true">
+    <Position X="18.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetExplicitHandling" Collapsed="true">
+    <Position X="39.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetExplicitHandling" Collapsed="true">
+    <Position X="18.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetLinkDummy" Collapsed="true">
+    <Position X="8.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetLinkDummy" Collapsed="true">
+    <Position X="27.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetModelProperty" Collapsed="true">
+    <Position X="29.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetModelProperty" Collapsed="true">
+    <Position X="15.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetShapeColor" Collapsed="true">
+    <Position X="31" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeColor" Collapsed="true">
+    <Position X="29.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetDynamicObject" Collapsed="true">
+    <Position X="10" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetJointMode" Collapsed="true">
+    <Position X="17" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointMode" Collapsed="true">
+    <Position X="36.25" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialOpen" Collapsed="true">
+    <Position X="20.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialClose" Collapsed="true">
+    <Position X="18.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialSend" Collapsed="true">
+    <Position X="31" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialRead" Collapsed="true">
+    <Position X="29.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialCheck" Collapsed="true">
+    <Position X="17" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialPortOpen" Collapsed="true">
+    <Position X="24" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialPortClose" Collapsed="true">
+    <Position X="22.25" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialPortSend" Collapsed="true">
+    <Position X="27.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSerialPortRead" Collapsed="true">
+    <Position X="25.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetContactInfo" Collapsed="true">
+    <Position X="6.5" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetThreadIsFree" Collapsed="true">
+    <Position X="6.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTubeOpen" Collapsed="true">
+    <Position X="36.25" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTubeClose" Collapsed="true">
+    <Position X="34.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTubeWrite" Collapsed="true">
+    <Position X="41.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTubeRead" Collapsed="true">
+    <Position X="38" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimTubeStatus" Collapsed="true">
+    <Position X="39.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAuxiliaryConsoleOpen" Collapsed="true">
+    <Position X="13.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAuxiliaryConsoleClose" Collapsed="true">
+    <Position X="11.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAuxiliaryConsoleShow" Collapsed="true">
+    <Position X="17" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAuxiliaryConsolePrint" Collapsed="true">
+    <Position X="15.25" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimImportShape" Collapsed="true">
+    <Position X="38" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimImportMesh" Collapsed="true">
+    <Position X="36.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimExportMesh" Collapsed="true">
+    <Position X="22.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateMeshShape" Collapsed="true">
+    <Position X="32.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreatePureShape" Collapsed="true">
+    <Position X="39.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateHeightfieldShape" Collapsed="true">
+    <Position X="25.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeMesh" Collapsed="true">
+    <Position X="36.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddBanner" Collapsed="true">
+    <Position X="13.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveBanner" Collapsed="true">
+    <Position X="24" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateJoint" Collapsed="true">
+    <Position X="31" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateDummy" Collapsed="true">
+    <Position X="22.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateForceSensor" Collapsed="true">
+    <Position X="24" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateVisionSensor" Collapsed="true">
+    <Position X="8.25" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateProximitySensor" Collapsed="true">
+    <Position X="38" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreatePath" Collapsed="true">
+    <Position X="36.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimInsertPathCtrlPoints" Collapsed="true">
+    <Position X="41.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCutPathCtrlPoints" Collapsed="true">
+    <Position X="10" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRegisterContactCallback" Collapsed="true">
+    <Position X="15.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectIntParameter" Collapsed="true">
+    <Position X="39.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectIntParameter" Collapsed="true">
+    <Position X="39.75" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectFloatParameter" Collapsed="true">
+    <Position X="36.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectFloatParameter" Collapsed="true">
+    <Position X="38" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectStringParameter" Collapsed="true">
+    <Position X="27.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectStringParameter" Collapsed="true">
+    <Position X="17" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetSimulationPassesPerRenderingPass" Collapsed="true">
+    <Position X="38" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetRotationAxis" Collapsed="true">
+    <Position X="8.25" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRotateAroundAxis" Collapsed="true">
+    <Position X="36.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimJointGetForce" Collapsed="true">
+    <Position X="11.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetJointForce" Collapsed="true">
+    <Position X="31" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetArrayParameter" Collapsed="true">
+    <Position X="32.75" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetArrayParameter" Collapsed="true">
+    <Position X="32.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetIkGroupProperties" Collapsed="true">
+    <Position X="8.25" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetIkElementProperties" Collapsed="true">
+    <Position X="6.5" Y="18.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCameraFitToView" Collapsed="true">
+    <Position X="27.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimPersistentDataWrite" Collapsed="true">
+    <Position X="36.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimPersistentDataRead" Collapsed="true">
+    <Position X="34.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimIsHandleValid" Collapsed="true">
+    <Position X="6.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleVisionSensor" Collapsed="true">
+    <Position X="34.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadVisionSensor" Collapsed="true">
+    <Position X="10" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimResetVisionSensor" Collapsed="true">
+    <Position X="24" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckVisionSensor" Collapsed="true">
+    <Position X="41.5" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCheckVisionSensorEx" Collapsed="true">
+    <Position X="3" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetVisionSensorResolution" Collapsed="true">
+    <Position X="6.5" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetVisionSensorImage" Collapsed="true">
+    <Position X="4.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetVisionSensorCharImage" Collapsed="true">
+    <Position X="41.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetVisionSensorImage" Collapsed="true">
+    <Position X="24" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetVisionSensorCharImage" Collapsed="true">
+    <Position X="22.25" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetVisionSensorDepthBuffer" Collapsed="true">
+    <Position X="3" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateUI" Collapsed="true">
+    <Position X="3" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateUIButton" Collapsed="true">
+    <Position X="4.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIHandle" Collapsed="true">
+    <Position X="32.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIProperty" Collapsed="true">
+    <Position X="36.25" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIEventButton" Collapsed="true">
+    <Position X="31" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIProperty" Collapsed="true">
+    <Position X="18.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIButtonProperty" Collapsed="true">
+    <Position X="27.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIButtonProperty" Collapsed="true">
+    <Position X="13.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIButtonSize" Collapsed="true">
+    <Position X="29.25" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIButtonLabel" Collapsed="true">
+    <Position X="11.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIButtonLabel" Collapsed="true">
+    <Position X="25.75" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUISlider" Collapsed="true">
+    <Position X="20.5" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUISlider" Collapsed="true">
+    <Position X="38" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIButtonColor" Collapsed="true">
+    <Position X="10" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIButtonTexture" Collapsed="true">
+    <Position X="15.25" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateUIButtonArray" Collapsed="true">
+    <Position X="6.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIButtonArrayColor" Collapsed="true">
+    <Position X="8.25" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimDeleteUIButtonArray" Collapsed="true">
+    <Position X="13.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveUI" Collapsed="true">
+    <Position X="41.5" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetUIPosition" Collapsed="true">
+    <Position X="17" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetUIPosition" Collapsed="true">
+    <Position X="34.5" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectQuaternion" Collapsed="true">
+    <Position X="13.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectQuaternion" Collapsed="true">
+    <Position X="11.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLPosition" Collapsed="true">
+    <Position X="27.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLVelocity" Collapsed="true">
+    <Position X="34.5" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLPos" Collapsed="true">
+    <Position X="25.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLVel" Collapsed="true">
+    <Position X="32.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLStep" Collapsed="true">
+    <Position X="31" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRMLRemove" Collapsed="true">
+    <Position X="29.25" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimBuildMatrixQ" Collapsed="true">
+    <Position X="25.75" Y="8.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetQuaternionFromMatrix" Collapsed="true">
+    <Position X="4.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimFileDialog" Collapsed="true">
+    <Position X="24" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimMsgBox" Collapsed="true">
+    <Position X="27.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetShapeMassAndInertia" Collapsed="true">
+    <Position X="32.75" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeMassAndInertia" Collapsed="true">
+    <Position X="32.75" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGroupShapes" Collapsed="true">
+    <Position X="8.25" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimUngroupShape" Collapsed="true">
+    <Position X="3" Y="20.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimConvexDecompose" Collapsed="true">
+    <Position X="11.75" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetIkGroupMatrix" Collapsed="true">
+    <Position X="25.75" Y="11" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMotionPlanningHandle" Collapsed="true">
+    <Position X="18.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMpConfigForTipPose" Collapsed="true">
+    <Position X="20.5" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimFindMpPath" Collapsed="true">
+    <Position X="27.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSimplifyMpPath" Collapsed="true">
+    <Position X="25.75" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMpConfigTransition" Collapsed="true">
+    <Position X="22.25" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddGhost" Collapsed="true">
+    <Position X="22.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimModifyGhost" Collapsed="true">
+    <Position X="24" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimQuitSimulator" Collapsed="true">
+    <Position X="38" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetThreadId" Collapsed="true">
+    <Position X="24" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimLockResources" Collapsed="true">
+    <Position X="22.25" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimUnlockResources" Collapsed="true">
+    <Position X="6.5" Y="20.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimEnableEventCallback" Collapsed="true">
+    <Position X="18.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetMaterialId" Collapsed="true">
+    <Position X="11.75" Y="11.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetShapeMaterial" Collapsed="true">
+    <Position X="34.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeMaterial" Collapsed="true">
+    <Position X="34.5" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimFindIkPath" Collapsed="true">
+    <Position X="25.75" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetTextureId" Collapsed="true">
+    <Position X="22.25" Y="14" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadTexture" Collapsed="true">
+    <Position X="8.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimWriteTexture" Collapsed="true">
+    <Position X="10" Y="20.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateTexture" Collapsed="true">
+    <Position X="41.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimWriteCustomDataBlock" Collapsed="true">
+    <Position X="8.25" Y="20.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReadCustomDataBlock" Collapsed="true">
+    <Position X="41.5" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddPointCloud" Collapsed="true">
+    <Position X="34.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimModifyPointCloud" Collapsed="true">
+    <Position X="25.75" Y="15.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeGeomInfo" Collapsed="true">
+    <Position X="31" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectsInTree" Collapsed="true">
+    <Position X="20.5" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetObjectSizeValues" Collapsed="true">
+    <Position X="13.5" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetObjectSizeValues" Collapsed="true">
+    <Position X="24" Y="12.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimScaleObject" Collapsed="true">
+    <Position X="6.5" Y="17.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetShapeTexture" Collapsed="true">
+    <Position X="36.25" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetShapeTextureId" Collapsed="true">
+    <Position X="38" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetCollectionObjects" Collapsed="true">
+    <Position X="41.5" Y="10.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimHandleCustomizationScripts" Collapsed="true">
+    <Position X="11.75" Y="14.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSetScriptAttribute" Collapsed="true">
+    <Position X="24" Y="19.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimGetScriptAttribute" Collapsed="true">
+    <Position X="17" Y="13.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimReorientShapeBoundingBox" Collapsed="true">
+    <Position X="3" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSwitchThread" Collapsed="true">
+    <Position X="31" Y="20" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateIkGroup" Collapsed="true">
+    <Position X="29.25" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveIkGroup" Collapsed="true">
+    <Position X="29.25" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateIkElement" Collapsed="true">
+    <Position X="27.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateMotionPlanning" Collapsed="true">
+    <Position X="34.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimRemoveMotionPlanning" Collapsed="true">
+    <Position X="32.75" Y="16.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimCreateCollection" Collapsed="true">
+    <Position X="20.5" Y="9.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimAddObjectToCollection" Collapsed="true">
+    <Position X="27.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptrSimSaveImage" Collapsed="true">
+    <Position X="39.75" Y="17" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetContactCallbackCount" Collapsed="true">
+    <Position X="22.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetContactCallback" Collapsed="true">
+    <Position X="20.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicSimulationIconCode" Collapsed="true">
+    <Position X="36.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicObjectFlagForVisualization" Collapsed="true">
+    <Position X="32.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectListSize" Collapsed="true">
+    <Position X="10" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectFromIndex" Collapsed="true">
+    <Position X="6.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectID" Collapsed="true">
+    <Position X="8.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectType" Collapsed="true">
+    <Position X="13.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectChildren" Collapsed="true">
+    <Position X="3" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetGeomProxyFromShape" Collapsed="true">
+    <Position X="8.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetParentObject" Collapsed="true">
+    <Position X="18.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObject" Collapsed="true">
+    <Position X="41.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetIkGroupObject" Collapsed="true">
+    <Position X="15.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simMpHandleIkGroupObject" Collapsed="true">
+    <Position X="20.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectLocalTransformation" Collapsed="true">
+    <Position X="11.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetObjectLocalTransformation" Collapsed="true">
+    <Position X="8.25" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetObjectCumulativeTransformation" Collapsed="true">
+    <Position X="6.5" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetObjectCumulativeTransformation" Collapsed="true">
+    <Position X="4.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsShapeDynamicallyStatic" Collapsed="true">
+    <Position X="17" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetTreeDynamicProperty" Collapsed="true">
+    <Position X="32.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDummyLinkType" Collapsed="true">
+    <Position X="29.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointMode" Collapsed="true">
+    <Position X="24" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsJointInHybridOperation" Collapsed="true">
+    <Position X="13.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simDisableDynamicTreeForManipulation" Collapsed="true">
+    <Position X="8.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsShapeDynamicallyRespondable" Collapsed="true">
+    <Position X="15.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicCollisionMask" Collapsed="true">
+    <Position X="31" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetLastParentForLocalGlobalCollidable" Collapsed="true">
+    <Position X="32.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetShapeIsStaticAndNotRespondableButDynamicTag" Collapsed="true">
+    <Position X="11.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetShapeIsStaticAndNotRespondableButDynamicTag" Collapsed="true">
+    <Position X="27.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetJointPosition" Collapsed="true">
+    <Position X="3" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointPosition" Collapsed="true">
+    <Position X="27.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicMotorPositionControlTargetPosition" Collapsed="true">
+    <Position X="29.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetInitialDynamicVelocity" Collapsed="true">
+    <Position X="18.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetInitialDynamicVelocity" Collapsed="true">
+    <Position X="41.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetInitialDynamicAngVelocity" Collapsed="true">
+    <Position X="17" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetInitialDynamicAngVelocity" Collapsed="true">
+    <Position X="39.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetStartSleeping" Collapsed="true">
+    <Position X="29.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetWasPutToSleepOnce" Collapsed="true">
+    <Position X="38" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicsFullRefreshFlag" Collapsed="true">
+    <Position X="41.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicsFullRefreshFlag" Collapsed="true">
+    <Position X="34.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetGeomProxyDynamicsFullRefreshFlag" Collapsed="true">
+    <Position X="38" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetGeomProxyDynamicsFullRefreshFlag" Collapsed="true">
+    <Position X="6.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetParentFollowsDynamic" Collapsed="true">
+    <Position X="17" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetShapeDynamicVelocity" Collapsed="true">
+    <Position X="10" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetAdditionalForceAndTorque" Collapsed="true">
+    <Position X="11.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simClearAdditionalForceAndTorque" Collapsed="true">
+    <Position X="6.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointPositionInterval" Collapsed="true">
+    <Position X="29.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointType" Collapsed="true">
+    <Position X="31" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointOdeParameters" Collapsed="true">
+    <Position X="25.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointBulletParameters" Collapsed="true">
+    <Position X="20.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsForceSensorBroken" Collapsed="true">
+    <Position X="8.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicForceSensorLocalTransformationPart2" Collapsed="true">
+    <Position X="32.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsDynamicMotorEnabled" Collapsed="true">
+    <Position X="3" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsDynamicMotorPositionCtrlEnabled" Collapsed="true">
+    <Position X="4.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsDynamicMotorTorqueModulationEnabled" Collapsed="true">
+    <Position X="6.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetMotorPid" Collapsed="true">
+    <Position X="38" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicMotorTargetPosition" Collapsed="true">
+    <Position X="36.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicMotorTargetVelocity" Collapsed="true">
+    <Position X="38" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicMotorMaxForce" Collapsed="true">
+    <Position X="34.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDynamicMotorUpperLimitVelocity" Collapsed="true">
+    <Position X="39.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicMotorReflectedPositionFromDynamicEngine" Collapsed="true">
+    <Position X="31" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetJointSphericalTransformation" Collapsed="true">
+    <Position X="4.75" Y="8" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simAddForceSensorCumulativeForcesAndTorques" Collapsed="true">
+    <Position X="3" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simAddJointCumulativeForcesOrTorques" Collapsed="true">
+    <Position X="4.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicJointLocalTransformationPart2" Collapsed="true">
+    <Position X="25.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicForceSensorLocalTransformationPart2" Collapsed="true">
+    <Position X="22.25" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicJointLocalTransformationPart2IsValid" Collapsed="true">
+    <Position X="27.5" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simSetDynamicForceSensorLocalTransformationPart2IsValid" Collapsed="true">
+    <Position X="24" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetGeomWrapFromGeomProxy" Collapsed="true">
+    <Position X="10" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetLocalInertiaFrame" Collapsed="true">
+    <Position X="34.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetPurePrimitiveType" Collapsed="true">
+    <Position X="25.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsGeomWrapGeometric" Collapsed="true">
+    <Position X="11.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simIsGeomWrapConvex" Collapsed="true">
+    <Position X="10" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetGeometricCount" Collapsed="true">
+    <Position X="4.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetAllGeometrics" Collapsed="true">
+    <Position X="13.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetPurePrimitiveSizes" Collapsed="true">
+    <Position X="24" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simMakeDynamicAnnouncement" Collapsed="true">
+    <Position X="18.75" Y="7.25" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetVerticesLocalFrame" Collapsed="true">
+    <Position X="34.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetHeightfieldData" Collapsed="true">
+    <Position X="13.5" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetCumulativeMeshes" Collapsed="true">
+    <Position X="24" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetOdeMaxContactFrictionCFMandERP" Collapsed="true">
+    <Position X="15.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetBulletCollisionMargin" Collapsed="true">
+    <Position X="15.25" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetBulletStickyContact" Collapsed="true">
+    <Position X="18.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetBulletRestitution" Collapsed="true">
+    <Position X="17" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetMass" Collapsed="true">
+    <Position X="36.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetPrincipalMomentOfInertia" Collapsed="true">
+    <Position X="20.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDamping" Collapsed="true">
+    <Position X="25.75" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetFriction" Collapsed="true">
+    <Position X="3" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetGravity" Collapsed="true">
+    <Position X="11.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetTimeDiffInMs" Collapsed="true">
+    <Position X="31" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simDoEntitiesCollide" Collapsed="true">
+    <Position X="10" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetDistanceBetweenEntitiesIfSmaller" Collapsed="true">
+    <Position X="27.5" Y="5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simHandleJointControl" Collapsed="true">
+    <Position X="41.5" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simHandleCustomContact" Collapsed="true">
+    <Position X="39.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetPureHollowScaling" Collapsed="true">
+    <Position X="22.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetVortexParameters" Collapsed="true">
+    <Position X="36.25" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetJointCallbackCallOrder" Collapsed="true">
+    <Position X="22.25" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Typedef Name="ptr_simGetNewtonParameters" Collapsed="true">
+    <Position X="39.75" Y="5.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>C:\Program Files (x86)\V-REP3\V-REP_PRO_EDU\programming\include\v_repLib.h</FileName>
+    </TypeIdentifier>
+  </Typedef>
+  <Enum Name="MorphologyType" Collapsed="true">
+    <Position X="4.75" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAgAAAAAAAAAAAAAAAAAAAAAAQAAAAABAAAAAAAAA=</HashCode>
+      <FileName>Enum.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="ControlType" Collapsed="true">
+    <Position X="3" Y="4" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAABAAAAAAAAAAgAAAEAAAIAAAAABAAAAAAAAAA=</HashCode>
+      <FileName>Enum.h</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

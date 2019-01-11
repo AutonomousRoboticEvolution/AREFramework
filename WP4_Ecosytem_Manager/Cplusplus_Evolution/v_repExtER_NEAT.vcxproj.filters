@@ -1,0 +1,320 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\common\v_repLib.cpp" />
+    <ClCompile Include="ERfiles\env\WaterEnv.cpp" />
+    <ClCompile Include="ERFiles\Settings.cpp" />
+    <ClCompile Include="ERfiles\VREPFunctions.cpp" />
+    <ClCompile Include="RandNum.cpp" />
+    <ClCompile Include="v_repExtER.cpp" />
+    <ClCompile Include="ERfiles\control\ANN.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\BaseMorphology.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\BasicSunEnv.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\CAT.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\ConstrainedSunEnv.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\control\Control.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\control\ControlFactory.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\CPGNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\control\CPPN.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\control\CustomANN.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\Environment.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\EnvironmentFactory.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\MoveAndSun.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\MoveEnv.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\MovingSunEnv.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\env\RoughMoveEnv.cpp">
+      <Filter>ERFiles\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\DefaultGenome.cpp">
+      <Filter>ERFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\Population.cpp">
+      <Filter>ERFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\morphology\Development.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\morphology\ER_CPPN.cpp">
+      <Filter>Old</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\CollisionDetector.cpp">
+      <Filter>Old</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\ER.cpp">
+      <Filter>ERFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\ER_LSystem.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\FixedBaseMorphology.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\neuron\FunctionNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\InputNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\control\Hormones.cpp">
+      <Filter>Old</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\ER_Module.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_APlantBase.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Bend.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Brain.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Cube.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Leaf.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_LeafChloe.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Rectangle.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Rodrigo.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\Module_Spring.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\module\ModuleFactory.cpp">
+      <Filter>ERFiles\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\Morphology.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\morphology\MorphologyFactory.cpp">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\Neuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\NeuronFactory.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\OutputNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERFiles\neuron\PatternNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\control\SimpleControl.cpp">
+      <Filter>ERFiles\Control</Filter>
+    </ClCompile>
+    <ClCompile Include="ERfiles\neuron\SimpleNeuron.cpp">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\v_repLib.h" />
+    <ClInclude Include="ERfiles\env\WaterEnv.h" />
+    <ClInclude Include="ERfiles\resource.h" />
+    <ClInclude Include="ERfiles\Settings.h" />
+    <ClInclude Include="ERfiles\stdafx.h" />
+    <ClInclude Include="ERfiles\VREPFunctions.h" />
+    <ClInclude Include="RandNum.h" />
+    <ClInclude Include="v_repExtER.h" />
+    <ClInclude Include="ERfiles\control\ANN.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\BaseMorphology.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\BasicSunEnv.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\CAT.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\ConstrainedSunEnv.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\control\Control.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\control\ControlFactory.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\CPGNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\control\CPPN.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\control\CustomANN.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\Environment.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\EnvironmentFactory.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\MoveAndSun.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\MoveEnv.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\MovingSunEnv.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\env\RoughMoveEnv.h">
+      <Filter>ERFiles\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\DefaultGenome.h">
+      <Filter>ERFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\Population.h">
+      <Filter>ERFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\morphology\Development.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\morphology\ER_CPPN.h">
+      <Filter>Old</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\CollisionDetector.h">
+      <Filter>Old</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\ER.h">
+      <Filter>ERFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\ER_LSystem.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\FixedBaseMorphology.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\neuron\FunctionNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\InputNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\control\Hormones.h">
+      <Filter>Old</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\ER_Module.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_APlantBase.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Bend.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Brain.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Cube.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Leaf.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_LeafChloe.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Rectangle.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Rodrigo.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\Module_Spring.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\module\ModuleFactory.h">
+      <Filter>ERFiles\Modules</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\Morphology.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\morphology\MorphologyFactory.h">
+      <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\Neuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\NeuronFactory.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\OutputNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERFiles\neuron\PatternNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\control\SimpleControl.h">
+      <Filter>ERFiles\Control</Filter>
+    </ClInclude>
+    <ClInclude Include="ERfiles\neuron\SimpleNeuron.h">
+      <Filter>ERFiles\Neuron</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ERFiles">
+      <UniqueIdentifier>{78913f0f-d177-4213-864f-c9a40b75784d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ERFiles\Environment">
+      <UniqueIdentifier>{9677277e-1988-40c6-8a6a-3543dd8f8572}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ERFiles\Morphology">
+      <UniqueIdentifier>{8c5b53c0-77de-4c99-bf03-614b400373f6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ERFiles\Control">
+      <UniqueIdentifier>{224156a1-3f6b-4a65-bd5b-bdf6c9ae760a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ERFiles\Neuron">
+      <UniqueIdentifier>{1503e307-d42d-4396-8c54-4a503f708e72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ERFiles\Modules">
+      <UniqueIdentifier>{69ffc5c7-0362-4821-95d0-4d6755678bd7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Old">
+      <UniqueIdentifier>{9e80902c-57c0-4d6d-af4f-a5d05767be8d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
