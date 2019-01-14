@@ -1,4 +1,5 @@
 #include "ClientEA.h"
+#define DO_NOT_USE_SHARED_MEMORY
 
 ClientEA::ClientEA()
 {
@@ -32,7 +33,8 @@ void ClientEA::init(int amountPorts)
 	}
 	randNum = shared_ptr<RandNum>(new RandNum(settings->seed));
 	// TODO: use factory
-	//ea_fac = new EA_Factory();
+	// ea_fac = new EA_Factory();
+
 	ea = shared_ptr<EA>(new EA_SteadyState());
 	ea->setSettings(settings, randNum);
 	ea->init();

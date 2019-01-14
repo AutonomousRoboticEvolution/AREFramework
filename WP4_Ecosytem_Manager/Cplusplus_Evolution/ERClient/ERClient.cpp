@@ -40,23 +40,44 @@ void saveLog(int counter) {
 int main(int argc, char* argv[])
 {
 	unique_ptr<ClientEA> client = unique_ptr<ClientEA>(new ClientEA);
-
+	std::vector<std::string> arguments(argv + 1, argv + argc);
 	int amountGen = 0;
-
 	client->settings = shared_ptr<Settings>(new Settings);
-	string destination = argv[1];
+	string destination;
+	if (arguments.size() > 0) {
+		destination = arguments[0];
+		cout << "arguments are: ";
+		for (int i = 0; i < arguments.size(); i++) {
+			cout << arguments[i] << ", ";
+		}
+		cout << endl;
+	}
+	else {
+		destination = "files";
+	}
 	client->settings->repository = destination;
 	client->sceneNum = 0;
 	client->settings->sceneNum = 0;
 	client->settings->readSettings(); // essential, settings need to correspond with server settings
-	client->settings->seed = atoi(argv[2]);
 	client->randNum = shared_ptr<RandNum>(new RandNum(0));
-	client->randNum->setSeed(atoi(argv[2]));
-	srand(atoi(argv[2]));
+	if (arguments.size() > 1) {
+		client->settings->seed = atoi(arguments[1].c_str());
+		client->randNum->setSeed(atoi(arguments[1].c_str()));
+		srand(atoi(arguments[1].c_str()));
+	}
+	else {
+		client->settings->seed = 0;
+		client->randNum->setSeed(0);
+		srand(0);
+	}
 	extApi_sleepMs(1000);
 	cout << "settings read" << endl;
-	// client->init(atoi(argv[3]));
-	client->init(5);
+	if (arguments.size() > 2) {
+		client->init(atoi(arguments[2].c_str()));
+	}
+	else {
+		client->init(2);
+	}
 	if (client->settings->generation != 0) {
 		client->ea->loadPopulationGenomes();
 	}
