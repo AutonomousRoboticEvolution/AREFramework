@@ -1,5 +1,6 @@
 #include "Module_LeafChloe.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -22,8 +23,7 @@ int Module_LeafChloe::init() {
 
 
 int Module_LeafChloe::mutate(float mutationRate) {
-	float PI = 3.14159265;
-	bendAngle = randomNum->randFloat(-0.25 * PI,0.75 * PI);
+	bendAngle = randomNum->randFloat(-0.25 * M_PI,0.75 * M_PI);
 	return 1;
 }
 
@@ -62,7 +62,6 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 
 	// TO DO: Check collision
 	// cout << "Creating Bend" << endl; 
-		float PI = 3.14159265;
 //		int baseHandle = 0;
 		float objectOrigin[3];
 		float zeroOrigin[3] = { 0,0,0 };
@@ -102,7 +101,7 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 		//	int joint = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 //		float baseHandlePos[3] = { 0,0,size[2] / 2 };
 		float radius = 0.041;
-		float degree = 0.4 * PI;
+		float degree = 0.4 * M_PI;
 
 		int joint1 = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 		int joint2 = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
@@ -114,10 +113,10 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 		//	simSetObjectPosition(appearancePeace, baseHandle, appearancePos);
 		float baseHandleOr[3] = { 0,0,0 };
 		float leaf1Or[3] = { 0,0,0 };
-		float leaf2Or[3] = { 0,0,(2.0 * PI * 1 * 0.2) };
-		float leaf3Or[3] = { 0,0,(2.0 * PI * 2 * 0.2) };
-		float leaf4Or[3] = { 0,0,(2.0 * PI * 3 * 0.2) };
-		float leaf5Or[3] = { 0,0,(2.0 * PI * 4 * 0.2) };
+		float leaf2Or[3] = { 0,0,(2.0 * M_PI * 1 * 0.2) };
+		float leaf3Or[3] = { 0,0,(2.0 * M_PI * 2 * 0.2) };
+		float leaf4Or[3] = { 0,0,(2.0 * M_PI * 3 * 0.2) };
+		float leaf5Or[3] = { 0,0,(2.0 * M_PI * 4 * 0.2) };
 	//	simSetObjectOrientation(baseHandle, -1, baseHandleOr);
 		simSetObjectOrientation(leaf1, baseHandle, leaf1Or);
 		simSetObjectOrientation(leaf2, baseHandle, leaf2Or);
@@ -144,11 +143,11 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 		float joint4Pos[3] = { radius * cosf(3 * degree), radius * sinf(3 * degree),0.025 };
 		float joint5Pos[3] = { radius * cosf(4 * degree), radius * sinf(4 * degree),0.025 };
 
-		float joint1Or[3] = { 0.5*PI,(1.0 * PI),0 };
-		float joint2Or[3] = { 0.5*PI,((1.0 * PI) + (2.0 * PI * 1 * 0.2)),0 };
-		float joint3Or[3] = { 0.5*PI,((1.0 * PI) + (2.0 * PI * 2 * 0.2)),0 };
-		float joint4Or[3] = { 0.5*PI,((1.0 * PI) + (2.0 * PI * 3 * 0.2)),0 };
-		float joint5Or[3] = { 0.5*PI,((1.0 * PI) + (2.0 * PI * 4 * 0.2)),0 };
+		float joint1Or[3] = { 0.5*M_PI,(1.0 * M_PI),0 };
+		float joint2Or[3] = { 0.5*M_PI,((1.0 * M_PI) + (2.0 * M_PI * 1 * 0.2)),0 };
+		float joint3Or[3] = { 0.5*M_PI,((1.0 * M_PI) + (2.0 * M_PI * 2 * 0.2)),0 };
+		float joint4Or[3] = { 0.5*M_PI,((1.0 * M_PI) + (2.0 * M_PI * 3 * 0.2)),0 };
+		float joint5Or[3] = { 0.5*M_PI,((1.0 * M_PI) + (2.0 * M_PI * 4 * 0.2)),0 };
 
 		simSetObjectOrientation(joint1, baseHandle, joint1Or);
 		simSetObjectOrientation(joint2, baseHandle, joint2Or);
@@ -182,11 +181,11 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 		jointHandles.push_back(joint5);
 
 		for (int i = 0; i < 5; i++) {
-			simSetJointPosition(jointHandles[i], 0.5 * PI);
-			simSetJointPosition(jointHandles[i], 0.5 * PI);
-			simSetJointPosition(jointHandles[i], 0.5 * PI);
-			simSetJointPosition(jointHandles[i], 0.5 * PI);
-			simSetJointPosition(jointHandles[i], 0.5 * PI);
+			simSetJointPosition(jointHandles[i], 0.5 * M_PI);
+			simSetJointPosition(jointHandles[i], 0.5 * M_PI);
+			simSetJointPosition(jointHandles[i], 0.5 * M_PI);
+			simSetJointPosition(jointHandles[i], 0.5 * M_PI);
+			simSetJointPosition(jointHandles[i], 0.5 * M_PI);
 
 			simSetObjectInt32Parameter(jointHandles[i], 2000, 1);
 			simSetObjectInt32Parameter(jointHandles[i], 2001, 1);
@@ -288,7 +287,7 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 	//	int hingeJoint = simCreateForceSensor(0, fsParams, fsFParams, NULL);//simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 1, jointSize, NULL, NULL);
 	//	float jointPos[3] = { 0, -0.0, (0.5 * size[2]) };
 	//	simSetObjectPosition(hingeJoint, baseHandle, jointPos);
-	//	float jointOrientation[3] = { 0.0*PI,0.0*PI,0.0 * PI };
+	//	float jointOrientation[3] = { 0.0*M_PI,0.0*M_PI,0.0 * M_PI };
 	//	simSetObjectOrientation(hingeJoint, baseHandle, jointOrientation);
 	//	simSetObjectParent(hingeJoint, baseHandle, true);
 	
@@ -296,7 +295,7 @@ int Module_LeafChloe::createModule(vector<float> configuration, int relativePosH
 	
 	//	int cube2 = simCreatePureShape(0, objectPhysics, size2, mass2, NULL);
 	//	float cube2Origin[3] = { 0, 0.0, (0.5 * size[2]) + (0.2501 * size2[2])};
-	//	float rotation[3] = { 0.0*PI,0.0*PI,0.0001 * PI };
+	//	float rotation[3] = { 0.0*M_PI,0.0*M_PI,0.0001 * M_PI };
 	//	simSetObjectPosition(cube2, baseHandle, cube2Origin);
 	//	simSetObjectOrientation(cube2, baseHandle, rotation);
 	//	simPauseSimulation();
@@ -391,7 +390,7 @@ vector<float> Module_LeafChloe::updateModule(vector<float> input) {
 
 	for (int i = 0; i < 5; i++) {
 		simSetJointPosition(leafHandles[i], 0);
-		simSetJointTargetPosition(leafHandles[0], 0 * PI);
+		simSetJointTargetPosition(leafHandles[0], 0 * M_PI);
 	}
 
 
@@ -466,7 +465,6 @@ vector<float> Module_LeafChloe::updateModule(vector<float> input) {
 		float pos[3];
 		simGetObjectPosition(notCollidedProxSensors[n], -1, pos);
 
-		float PI = 3.14159265;
 		fourPoints.push_back(pos[0]);
 		fourPoints.push_back(pos[1]);
 		fourPoints.push_back(pos[2]);

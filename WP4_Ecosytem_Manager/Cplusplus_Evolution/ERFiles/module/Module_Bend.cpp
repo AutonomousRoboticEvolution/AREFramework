@@ -1,5 +1,6 @@
 #include "Module_Bend.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -12,9 +13,9 @@ Module_Bend::Module_Bend()
 		site1[i].x = 0.0;
 		site1[i].y = 0.0;
 		site1[i].z = 0.0;
-		site1[i].rX = 0.0 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.0 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(0);
@@ -22,9 +23,9 @@ Module_Bend::Module_Bend()
 		site1[i].x = 0.0;
 		site1[i].y = -0.1;
 		site1[i].z = -0.00;
-		site1[i].rX = 0.5 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.5 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(1);
@@ -32,9 +33,9 @@ Module_Bend::Module_Bend()
 		site1[i].x = 0.0;
 		site1[i].y = 0.1;
 		site1[i].z = -0.0;
-		site1[i].rX = -0.5 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = -0.5 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(2);
@@ -42,9 +43,9 @@ Module_Bend::Module_Bend()
 		site1[i].x = 0.1;
 		site1[i].y = 0.0;
 		site1[i].z = -0.0;
-		site1[i].rX = -0.5 * PI;
-		site1[i].rY = 0.5 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = -0.5 * M_PI;
+		site1[i].rY = 0.5 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(3);
@@ -52,9 +53,9 @@ Module_Bend::Module_Bend()
 		site1[i].x = -0.1;
 		site1[i].y = 0.0;
 		site1[i].z = -0.0;
-		site1[i].rX = 0.5 * PI;
-		site1[i].rY = -0.5 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.5 * M_PI;
+		site1[i].rY = -0.5 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(4);*/
@@ -72,8 +73,7 @@ int Module_Bend::init() {
 }
 
 int Module_Bend::mutate(float mutationRate) {
-	float PI = 3.14159265;
-	bendAngle = randomNum->randFloat(-0.25 * PI, 0.75 * PI);
+	bendAngle = randomNum->randFloat(-0.25 * M_PI, 0.75 * M_PI);
 	return 1;
 }
 
@@ -161,7 +161,7 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		int hingeJoint = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 1, jointSize, NULL, NULL);
 		float jointPos[3] = { 0, -0.05 * 0.2751 * 2, 0.05 * 0.2751 * 2 };
 		simSetObjectPosition(hingeJoint, baseHandle, jointPos);
-		float jointOrientation[3] = { 0.0*PI,0.5*PI,0.0 * PI };
+		float jointOrientation[3] = { 0.0*M_PI,0.5*M_PI,0.0 * M_PI };
 		simSetObjectOrientation(hingeJoint, baseHandle, jointOrientation);
 		simSetObjectParent(hingeJoint, baseHandle, true);
 	
@@ -169,7 +169,7 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 	
 		int cube2 = simCreatePureShape(0, objectPhysics, size, mass, NULL);
 		float cube2Origin[3] = { 0, - 0.02751 ,0.1205 * 0.2751 * 2 };
-		float rotation[3] = { 0.25*PI,0.0*PI,0.0 * PI };
+		float rotation[3] = { 0.25*M_PI,0.0*M_PI,0.0 * M_PI };
 		simSetObjectPosition(cube2, baseHandle, cube2Origin);
 		simSetObjectOrientation(cube2, baseHandle, rotation);
 //		simPauseSimulation();
@@ -213,9 +213,9 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.02751;
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site1[i]->parentHandle = cube2;
 	}
 	siteConfigurations.push_back(site1);
@@ -224,9 +224,9 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		site2[i]->x = 0.0;
 		site2[i]->y = 0;//-0.1;
 		site2[i]->z = 0.02751;
-		site2[i]->rX = 0.5 * PI;
-		site2[i]->rY = 0.0 * PI;
-		site2[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site2[i]->rX = 0.5 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site2[i]->parentHandle = cube2;
 	}
 	siteConfigurations.push_back(site2);
@@ -235,9 +235,9 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.02751;
-		site3[i]->rX = -0.5 * PI;
-		site3[i]->rY = 0.0 * PI;
-		site3[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site3[i]->rX = -0.5 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site3[i]->parentHandle = cube2;
 	}
 	siteConfigurations.push_back(site3);
@@ -246,9 +246,9 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.02751;
-		site3[i]->rX = -0.5 * PI;
-		site3[i]->rY = 0.5 * PI;
-		site3[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site3[i]->rX = -0.5 * M_PI;
+		site3[i]->rY = 0.5 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site3[i]->parentHandle = cube2;
 	}
 	siteConfigurations.push_back(site4);
@@ -257,9 +257,9 @@ int Module_Bend::createModule(vector<float> configuration, int relativePosHandle
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.02751;
-		site3[i]->rX = 0.5 * PI;
-		site3[i]->rY = -0.5 * PI;
-		site3[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site3[i]->rX = 0.5 * M_PI;
+		site3[i]->rY = -0.5 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site3[i]->parentHandle = cube2;
 	}
 	siteConfigurations.push_back(site5);

@@ -1,5 +1,6 @@
 #include "Module_Spring.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -12,9 +13,9 @@ Module_Spring::Module_Spring()
 		site1[i].x = 0.0;
 		site1[i].y = 0.0;
 		site1[i].z = 0.0;
-		site1[i].rX = 0.0 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.0 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(0);
@@ -22,9 +23,9 @@ Module_Spring::Module_Spring()
 		site1[i].x = 0.0;
 		site1[i].y = -0.1;
 		site1[i].z = -0.00;
-		site1[i].rX = 0.5 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.5 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(1);
@@ -32,9 +33,9 @@ Module_Spring::Module_Spring()
 		site1[i].x = 0.0;
 		site1[i].y = 0.1;
 		site1[i].z = -0.0;
-		site1[i].rX = -0.5 * PI;
-		site1[i].rY = 0.0 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = -0.5 * M_PI;
+		site1[i].rY = 0.0 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(2);
@@ -42,9 +43,9 @@ Module_Spring::Module_Spring()
 		site1[i].x = 0.1;
 		site1[i].y = 0.0;
 		site1[i].z = -0.0;
-		site1[i].rX = -0.5 * PI;
-		site1[i].rY = 0.5 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = -0.5 * M_PI;
+		site1[i].rY = 0.5 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(3);
@@ -52,9 +53,9 @@ Module_Spring::Module_Spring()
 		site1[i].x = -0.1;
 		site1[i].y = 0.0;
 		site1[i].z = -0.0;
-		site1[i].rX = 0.5 * PI;
-		site1[i].rY = -0.5 * PI;
-		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i].rX = 0.5 * M_PI;
+		site1[i].rY = -0.5 * M_PI;
+		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 	}
 	siteConfigurations.push_back(site1);
 	sites.push_back(4);*/
@@ -73,8 +74,7 @@ int Module_Spring::init() {
 }
 
 int Module_Spring::mutate(float mutationRate) {
-	float PI = 3.14159265;
-	bendAngle = randomNum->randFloat(-0.25 * PI, 0.75 * PI);
+	bendAngle = randomNum->randFloat(-0.25 * M_PI, 0.75 * M_PI);
 	return 1;
 }
 
@@ -96,7 +96,7 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 
 	//float rdrOr[3];
 	//rdrOr[0] = 0;
-	//rdrOr[1] = 0.5 * PI;
+	//rdrOr[1] = 0.5 * M_PI;
 	//rdrOr[2] = 0;
 
 	int fsParams[5];
@@ -142,10 +142,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 
 	float rotationOrigin[3];
 	rotationOrigin[0] = 0.0;
-	rotationOrigin[1] = 0.0 - 0.5 * PI;
+	rotationOrigin[1] = 0.0 - 0.5 * M_PI;
 	rotationOrigin[2] = 0.0;
 
-	float PI = 3.14159265;
 
 	simSetObjectOrientation(sprJ, fs, rotationOrigin);
 	simSetObjectPosition(sprJ, fs, objectOrigin);
@@ -175,9 +174,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.0;
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site1[i]->parentHandle = shapes[1];
 		site1[i]->relativePosHandle = d1;
 	}
@@ -288,7 +287,7 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		int hingeJoint = simCreateJoint(sim_joint_prismatic_subtype, sim_jointmode_force, 1, jointSize, NULL, NULL);
 //		float jointPos[3] = { 0, 0, 0.02751 };// { 0, -0.05 * 0.2751 * 2, 0.05 * 0.2751 * 2 };
 //		simSetObjectPosition(hingeJoint, baseHandle, jointPos);
-//		float jointOrientation[3] = { 0.0*PI,0.0*PI,0.0 * PI };
+//		float jointOrientation[3] = { 0.0*M_PI,0.0*M_PI,0.0 * M_PI };
 //		simSetObjectOrientation(hingeJoint, baseHandle, jointOrientation);
 //		simSetObjectParent(hingeJoint, baseHandle, true);
 //	
@@ -296,7 +295,7 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //	
 //		int cube2 = simCreatePureShape(0, objectPhysics, size, mass, NULL);
 //		float cube2Origin[3] = { 0,0 ,0.02751 * 4 };
-//		float rotation[3] = { 0*PI,0.0*PI,0.0 * PI };
+//		float rotation[3] = { 0*M_PI,0.0*M_PI,0.0 * M_PI };
 //		simSetObjectPosition(cube2, baseHandle, cube2Origin);
 //		simSetObjectOrientation(cube2, baseHandle, rotation);
 ////		simPauseSimulation();
@@ -321,9 +320,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		site1[i].x = 0.0;
 //		site1[i].y = 0.0;
 //		site1[i].z = 0.02751;
-//		site1[i].rX = 0.0 * PI;
-//		site1[i].rY = 0.0 * PI;
-//		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+//		site1[i].rX = 0.0 * M_PI;
+//		site1[i].rY = 0.0 * M_PI;
+//		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 //		site1[i].parentHandle = cube2;
 //	}
 //	siteConfigurations.push_back(site1);
@@ -332,9 +331,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		site1[i].x = 0.0;
 //		site1[i].y = 0;//-0.1;
 //		site1[i].z = 0.02751;
-//		site1[i].rX = 0.5 * PI;
-//		site1[i].rY = 0.0 * PI;
-//		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+//		site1[i].rX = 0.5 * M_PI;
+//		site1[i].rY = 0.0 * M_PI;
+//		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 //		site1[i].parentHandle = cube2;
 //	}
 //	siteConfigurations.push_back(site1);
@@ -343,9 +342,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		site1[i].x = 0.0;
 //		site1[i].y = 0.0;
 //		site1[i].z = 0.02751;
-//		site1[i].rX = -0.5 * PI;
-//		site1[i].rY = 0.0 * PI;
-//		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+//		site1[i].rX = -0.5 * M_PI;
+//		site1[i].rY = 0.0 * M_PI;
+//		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 //		site1[i].parentHandle = cube2;
 //	}
 //	siteConfigurations.push_back(site1);
@@ -354,9 +353,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		site1[i].x = 0.0;
 //		site1[i].y = 0.0;
 //		site1[i].z = 0.02751;
-//		site1[i].rX = -0.5 * PI;
-//		site1[i].rY = 0.5 * PI;
-//		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+//		site1[i].rX = -0.5 * M_PI;
+//		site1[i].rY = 0.5 * M_PI;
+//		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 //		site1[i].parentHandle = cube2;
 //	}
 //	siteConfigurations.push_back(site1);
@@ -365,9 +364,9 @@ int Module_Spring::createModule(vector<float> configuration, int relativePosHand
 //		site1[i].x = 0.0;
 //		site1[i].y = 0.0;
 //		site1[i].z = 0.02751;
-//		site1[i].rX = 0.5 * PI;
-//		site1[i].rY = -0.5 * PI;
-//		site1[i].rZ = (0.0 + (0.5 *i)) * PI;
+//		site1[i].rX = 0.5 * M_PI;
+//		site1[i].rY = -0.5 * M_PI;
+//		site1[i].rZ = (0.0 + (0.5 *i)) * M_PI;
 //		site1[i].parentHandle = cube2;
 //	}
 //	siteConfigurations.push_back(site1);

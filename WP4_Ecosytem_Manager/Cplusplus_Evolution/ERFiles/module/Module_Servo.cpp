@@ -1,5 +1,6 @@
 #include "Module_Servo.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -21,7 +22,6 @@ int Module_Servo::init() {
 
 int Module_Servo::mutate(float mutationRate) {
 //	cout << "About to mutate" << endl;
-	float PI = 3.14159265;
 	control->mutate(mutationRate);
 	return 1;
 }
@@ -94,7 +94,6 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 	rotationOrigin[1] = configuration[4];
 	rotationOrigin[2] = configuration[5];
 
-	float PI = 3.14159265;
 //	float size[3] = { 0.055,0.055,0.003 };
 	float mass = 0.0275;
 	int baseHandle = simCreatePureShape(0, objectPhysics, size, mass, 0);
@@ -131,8 +130,8 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 	simSetObjectPosition(d3, baseHandle, part4Pos);
 
 	float part2Or[3] = { 0,0,0 };
-	float part3Or[3] = { -0.5 * PI,0.0,0 };
-	float part4Or[3] = { 0.5 * PI,-0.0,0 };
+	float part3Or[3] = { -0.5 * M_PI,0.0,0 };
+	float part4Or[3] = { 0.5 * M_PI,-0.0,0 };
 
 	simSetObjectOrientation(appearancePeace, baseHandle, zeroOrigin);
 	//	simSetObjectOrientation(innerfs, baseHandle, zeroOrigin);
@@ -142,13 +141,13 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 	simSetObjectOrientation(d1, baseHandle, part2Or);
 	simSetObjectOrientation(d2, baseHandle, part3Or);
 	simSetObjectOrientation(d3, baseHandle, part4Or);
-	float pos[3] = { 0.0,0.0,size[2]*0.5 };
+	float pos[3] = { 0.0,0.0,size[2]*0.5f };
 	simSetObjectPosition(d1, d1, pos);
 	simSetObjectPosition(d2, d2, pos);
 	simSetObjectPosition(d3, d3, pos);
 
 	float jointPos[3] = { 0,0,0.045 };
-	float jointOr[3] = { 0.5*PI,0,0 };
+	float jointOr[3] = { 0.5*M_PI,0,0 };
 
 	simSetObjectPosition(joint, baseHandle, jointPos);
 	simSetObjectOrientation(joint, baseHandle, jointOr);
@@ -177,9 +176,9 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.0;
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site1[i]->parentHandle = groupedShaps;
 		site1[i]->relativePosHandle = d1;
 	}
@@ -189,9 +188,9 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 		site2[i]->x = 0.0;
 		site2[i]->y = 0.0;
 		site2[i]->z = 0.00;
-		site2[i]->rX = 0.0 * PI;
-		site2[i]->rY = 0.0 * PI;
-		site2[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site2[i]->rX = 0.0 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site2[i]->parentHandle = groupedShaps;
 		site2[i]->relativePosHandle = d2;
 	}
@@ -201,9 +200,9 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.0;
-		site3[i]->rX = 0.0 * PI;
-		site3[i]->rY = 0.0 * PI;
-		site3[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site3[i]->rX = 0.0 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site3[i]->parentHandle = groupedShaps;
 		site3[i]->relativePosHandle = d3;
 	}
@@ -290,7 +289,7 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 
 	//float rdrOr[3];
 	//rdrOr[0] = 0;
-	//rdrOr[1] = 0.5 * PI;
+	//rdrOr[1] = 0.5 * M_PI;
 	//rdrOr[2] = 0;
 
 	int fsParams[5];
@@ -338,10 +337,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 
 	float rotationOrigin[3];
 	rotationOrigin[0] = 0.0;
-	rotationOrigin[1] = 0.0 -0.5 * PI;
+	rotationOrigin[1] = 0.0 -0.5 * M_PI;
 	rotationOrigin[2] = 0.0;
 
-	float PI = 3.14159265;
 
 	simSetObjectOrientation(rdr, fs, rotationOrigin);
 	simSetObjectPosition(rdr, fs, objectOrigin);
@@ -353,7 +351,7 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	d1pos[1] = 0.00;
 	d1pos[2] = 0.0;
 	d1or[0] = 0.0;
-	d1or[1] = 0.5 * PI;
+	d1or[1] = 0.5 * M_PI;
 	d1or[2] = 0.0;
 	float d2pos[3];
 	float d2or[3];
@@ -361,7 +359,7 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	d2pos[1] = 0.0;
 	d2pos[2] = 0.030501;
 	d2or[0] = 0.0;
-	d2or[1] = 0.0 * PI;
+	d2or[1] = 0.0 * M_PI;
 	d2or[2] = 0.0;
 	float d3pos[3];
 	float d3or[3];
@@ -369,7 +367,7 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	d3pos[1] = 0.0;
 	d3pos[2] = -0.030501;
 	d3or[0] = 0.0;
-	d3or[1] = 1.0 * PI;
+	d3or[1] = 1.0 * M_PI;
 	d3or[2] = 0.0;
 
 	simSetObjectParent(d1, shapes[1], true);
@@ -401,9 +399,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.0;
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site1[i]->parentHandle = shapes[1];
 		site1[i]->relativePosHandle = d1;
 	}
@@ -413,9 +411,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 		site2[i]->x = 0.0;
 		site2[i]->y = 0.0;
 		site2[i]->z = 0.00;
-		site2[i]->rX = 0.0 * PI;
-		site2[i]->rY = 0.0 * PI;
-		site2[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site2[i]->rX = 0.0 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site2[i]->parentHandle = shapes[1];
 		site2[i]->relativePosHandle = d2;
 	}
@@ -425,9 +423,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.0;
-		site3[i]->rX = 0.0 * PI;
-		site3[i]->rY = 0.0 * PI;
-		site3[i]->rZ = (0.0 + (0.5*i)) * PI;
+		site3[i]->rX = 0.0 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5*i)) * M_PI;
 		site3[i]->parentHandle = shapes[1];
 		site3[i]->relativePosHandle = d3;
 	}
@@ -599,7 +597,7 @@ void Module_Servo::controlModule(float input) {
 	//	cout << "ERROR:: output size is not 1, but should be" << endl;
 //	}
 //	cout << "output[0] = " << input << endl;
-	simSetJointTargetPosition(controlHandles[0], 0.5 * input * PI);
+	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);
 //	return output;
 }
 

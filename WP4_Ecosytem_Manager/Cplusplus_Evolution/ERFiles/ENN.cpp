@@ -29,7 +29,7 @@
 #include "v_repLib.h"
 // #include "Serial.h"
 #include <iostream>
-
+#include <cmath>
 #include <thread>
 //csv
 #include <fstream> // for storing arrays and using ofstream
@@ -2046,7 +2046,6 @@ void CENN::initializeCreaturePars() {
 		i_jointMaxMinAngles[i].resize(2);
 	}
 
-	float pi = 3.1415;
 	//obj0
 	int objNum = -1;
 	int jointNum = -1;
@@ -2068,7 +2067,7 @@ void CENN::initializeCreaturePars() {
 	i_jointPosition[jointNum][0] = 0.05;
 	i_jointPosition[jointNum][1] = 0.0;
 	i_jointPosition[jointNum][2] = 0.425;
-	i_jointOrientation[jointNum][0] = 0.5*pi;
+	i_jointOrientation[jointNum][0] = 0.5*M_PI;
 	i_jointOrientation[jointNum][1] = 0;
 	i_jointOrientation[jointNum][2] = 0;
 	i_jointSizes[jointNum][0] = 0.05;
@@ -2082,7 +2081,7 @@ void CENN::initializeCreaturePars() {
 	i_jointPosition[jointNum][0] = -0.05;
 	i_jointPosition[jointNum][1] = 0.0;
 	i_jointPosition[jointNum][2] = 0.425;
-	i_jointOrientation[jointNum][0] = -0.5*pi;
+	i_jointOrientation[jointNum][0] = -0.5*M_PI;
 	i_jointOrientation[jointNum][1] = 0;
 	i_jointOrientation[jointNum][2] = 0;
 	i_jointSizes[jointNum][0] = 0.05;
@@ -2125,7 +2124,7 @@ void CENN::initializeCreaturePars() {
 	i_jointPosition[jointNum][1] = 0.0;
 	i_jointPosition[jointNum][2] = 0.275;
 	i_jointOrientation[jointNum][0] = 0;
-	i_jointOrientation[jointNum][1] = 0.5*pi;
+	i_jointOrientation[jointNum][1] = 0.5*M_PI;
 	i_jointOrientation[jointNum][2] = 0;
 	i_jointSizes[jointNum][0] = 0.05;
 	i_jointSizes[jointNum][1] = 0.025;
@@ -2139,7 +2138,7 @@ void CENN::initializeCreaturePars() {
 	i_jointPosition[jointNum][1] = 0.0;
 	i_jointPosition[jointNum][2] = 0.275;
 	i_jointOrientation[jointNum][0] = 0;
-	i_jointOrientation[jointNum][1] = -0.5*pi;
+	i_jointOrientation[jointNum][1] = -0.5*M_PI;
 	i_jointOrientation[jointNum][2] = 0;
 	i_jointSizes[jointNum][0] = 0.05;
 	i_jointSizes[jointNum][1] = 0.025;
@@ -2211,7 +2210,6 @@ void CENN::initializePlantPars() {
 		i_jointMaxMinAngles[i].resize(2);
 	}
 
-	float pi = 3.1415;
 	//obj0
 	int objNum = -1;
 	int jointNum = -1;
@@ -2305,7 +2303,7 @@ void CENN::objectCreator(int totalAmountObjects) {
 
 /*			float jointSize[2] = { 0.1, 0.025 };
 			float jointPosition[3] = { 0.05, 0, 0.425 };
-			float jointOrientation[3] = { 0.5 *pi, 0, 0 };
+			float jointOrientation[3] = { 0.5 *M_PI, 0, 0 };
 			simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 			joint1Handle = simGetjointHandle("Revolute_joint");
 			simSetjointName(joint1Handle, "joint1");
@@ -2341,7 +2339,6 @@ void CENN::objectCreator(int totalAmountObjects) {
 /*
 void CENN::createCreature2() { // not working anymore
 	cout << "Default test is loading" << endl;
-	float pi = 3.1415;
 	int defaultHandles;
 	// create object
 	i_objectSizes.resize(9);
@@ -2379,18 +2376,18 @@ void CENN::createCreature2() { // not working anymore
 	int joint2Handle;
 	float jointSize[2] = { 0.1, 0.025 };
 	float jointPosition[3] = { 0.05, 0, 0.425 };
-	float jointOrientation[3] = { 0.5 *pi, 0, 0 };
+	float jointOrientation[3] = { 0.5 *M_PI, 0, 0 };
 	simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 	joint1Handle = simGetObjectHandle("Revolute_joint");
 	simSetObjectName(joint1Handle, "joint1");
 	simSetObjectPosition(joint1Handle, -1, jointPosition);
 	simSetObjectOrientation(joint1Handle, -1, jointOrientation);
 
-	// save joint props´#1
+	// save joint propsï¿½#1
 	storeObjectPars(1, jointPosition, jointOrientation, jointSize, 0, 0, 1);
 
 	jointPosition[0] = -0.05;
-	jointOrientation[0] = -0.5*pi;
+	jointOrientation[0] = -0.5*M_PI;
 	simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 	joint2Handle = simGetObjectHandle("Revolute_joint");
 	simSetObjectName(joint2Handle, "joint2");
@@ -2428,7 +2425,7 @@ void CENN::createCreature2() { // not working anymore
 	jointPosition[0] = 0.1;
 	jointPosition[2] = 0.275;
 	jointOrientation[0] = 0;
-	jointOrientation[1] = 0.5*pi;
+	jointOrientation[1] = 0.5*M_PI;
 	simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 	joint3Handle = simGetObjectHandle("Revolute_joint");
 	simSetObjectName(joint3Handle, "joint3");
@@ -2439,7 +2436,7 @@ void CENN::createCreature2() { // not working anymore
 
 	jointPosition[0] = -0.1;
 	jointOrientation[0] = 0;
-	jointOrientation[1] = -0.5*pi;
+	jointOrientation[1] = -0.5*M_PI;
 	simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
 	joint4Handle = simGetObjectHandle("Revolute_joint");
 	simSetObjectName(joint4Handle, "joint4");
@@ -5132,19 +5129,19 @@ void CENN::initialize() {
 	
 	// start of simulation
 /*	MorpologyConstructor *morpologyConstructor = new MorphologyConstructor;
-	for (int i = 0; i < initíalPopulationSize; i++) {
+	for (int i = 0; i < initï¿½alPopulationSize; i++) {
 		morphologyConstructor->create(populations[0]->populationGenomes[0]);
 	}
 
 	// handle 
 	Control *control = new Control;
-	for (int i = 0; i < initíalPopulationSize; i++) {
+	for (int i = 0; i < initï¿½alPopulationSize; i++) {
 		control(currentIndividual);
 		//evaluator->evaluate(pop->populationGenomes[i]);
 	}
 
 	// end of simulation
-	for (int i = 0; i < initíalPopulationSize; i++) {
+	for (int i = 0; i < initï¿½alPopulationSize; i++) {
 		evaluate(currentIndividual);
 		//evaluator->evaluate(pop->populationGenomes[i]);
 	}

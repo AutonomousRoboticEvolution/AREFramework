@@ -1,5 +1,6 @@
 #include "PatternNeuron.h"
 #include <iostream>
+#include <cmath>
 
 
 PatternNeuron::PatternNeuron() {
@@ -21,14 +22,13 @@ void PatternNeuron::init(int id) {
 	neuronID = id;
 }
 void PatternNeuron::update() {
-	float PI = 3.1415;
 //	if (usePhaseControl && !useAngularFreqControl && !useAmplitudeControl) {
-//		targetPosition = (float)(maxAmplitude[module] * Math.sin(maxAngFreq[module] * time + phaseControl[module] / 180 * Math.PI));
+//		targetPosition = (float)(maxAmplitude[module] * Math.sin(maxAngFreq[module] * time + phaseControl[module] / 180 * Math.M_PI));
 //	}
 //	else {
 //		double amplitude = maxAmplitude[module] * amplitudeControl[module];
 //		double angularFreq = maxAngFreq[module] * andularFreqControl[module];
-//		targetPosition = (float)(amplitude * Math.sin(angularFreq * time + phaseControl[module] / 180 * Math.PI));
+//		targetPosition = (float)(amplitude * Math.sin(angularFreq * time + phaseControl[module] / 180 * Math.M_PI));
 //	}
 	// triangle
 //	float a = frequency * time;
@@ -36,7 +36,7 @@ void PatternNeuron::update() {
 	// sin
 	double amplitudeD = amplitude;
 	double angularFreq = frequency * maxFreq;
-	output = (float)(amplitudeD * sin(angularFreq * time + phase / 180 * PI));
+	output = (float)(amplitudeD * sin(angularFreq * time + phase / 180 * M_PI));
 	if (output > 1.0) {
 		output = 1.0;
 	}
@@ -48,7 +48,7 @@ void PatternNeuron::update() {
 //	cout << "amplitude: " << amplitude << endl;
 //	cout << "a-frequency: " << angularFreq << endl;
 
-//	output = (float)amplitude *(sin((frequency * time * PI) + (phase * 2 * PI)));
+//	output = (float)amplitude *(sin((frequency * time * M_PI) + (phase * 2 * M_PI)));
 	time += timeStep;
 	
 

@@ -1,4 +1,5 @@
 #include "R_Module_Rodrigo.h"
+#include <cmath>
 
 int R_Module_Rodrigo::init(dynamixel::PacketHandler * packetH1, dynamixel::PacketHandler * packetH2, dynamixel::PortHandler * portH)
 {
@@ -42,8 +43,8 @@ vector<float> R_Module_Rodrigo::updateModule(vector<float> input) {
 	else if (output[0] < -1.0) {
 		output[0] = -1.0;
 	}
-	simSetJointTargetPosition(controlHandles[0], 0.5 * output[0] * PI);
-	//	simSetJointTargetPosition(controlHandles[0], input[0] * PI);
+	simSetJointTargetPosition(controlHandles[0], 0.5 * output[0] * M_PI);
+	//	simSetJointTargetPosition(controlHandles[0], input[0] * M_PI);
 
 	int movePars[3] = { moduleID, 32,  300 };
 	write(settings->portHandler, settings->packetHandler1, movePars[0], movePars[1], 2, movePars[2]);
@@ -112,8 +113,8 @@ void R_Module_Rodrigo::controlModule()
 	else if (output[0] < -1.0) {
 		output[0] = -1.0;
 	}
-	simSetJointTargetPosition(controlHandles[0], 0.5 * output[0] * PI);
-//	simSetJointTargetPosition(controlHandles[0], input[0] * PI);
+	simSetJointTargetPosition(controlHandles[0], 0.5 * output[0] * M_PI);
+//	simSetJointTargetPosition(controlHandles[0], input[0] * M_PI);
 
 	int movePars[3] = { moduleID, 32,  300 };
 	write(settings->portHandler, settings->packetHandler1, movePars[0], movePars[1], 2, movePars[2]);

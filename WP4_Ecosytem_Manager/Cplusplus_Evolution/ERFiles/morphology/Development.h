@@ -6,8 +6,6 @@
 #include "../module/ModuleFactory.h"
 //#include "../eigen/Eigen/Dense"
 #include "../eigen/Eigen/Dense"
-#include <iostream>
-#include <math.h>
 #include <vector>
 
 using namespace std;

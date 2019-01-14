@@ -1,6 +1,6 @@
 #include "ER_DirectEncodingInterpreter.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 
 ER_DirectEncodingInterpreter::ER_DirectEncodingInterpreter()
@@ -117,7 +117,6 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 void ER_DirectEncodingInterpreter::initializeGenomeCustom(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -265,7 +264,6 @@ void ER_DirectEncodingInterpreter::initializeGenomeCustom(int type) {
 void ER_DirectEncodingInterpreter::initializeLRobot(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -807,7 +805,6 @@ void ER_DirectEncodingInterpreter::shiftRobotPosition() {
 				vector<vector<float>> points;
 				points.resize(8);
 
-				float PI = 3.14159265;
 				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
@@ -892,7 +889,6 @@ bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int object
 	vector<vector<float>> points;
 	points.resize(8);
 
-	float PI = 3.14159265;
 	float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 	simGetObjectMatrix(objectHandle, -1, objectMatrix);

@@ -1,5 +1,6 @@
 #include "Module_Rectangle.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std; 
 
@@ -80,7 +81,6 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 //	simSetObjectPosition(cube, parentHandle, objectOrigin);
 //	simSetObjectOrientation(cube, parentHandle, orientation);
 	
-	float PI = 3.14159265;
 	vector<shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
 		site1.push_back(shared_ptr<SITE>(new SITE));
@@ -106,9 +106,9 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.50001 * size[2];
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site1[i]->parentHandle = cube;
 		site1[i]->relativePosHandle = cube;
 	}
@@ -133,9 +133,9 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 		}
 
 		site2[i]->z = 0.50001 * size[0];
-		site2[i]->rX = 0.5 * PI;
-		site2[i]->rY = 0.0 * PI;
-		site2[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site2[i]->rX = 0.5 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site2[i]->parentHandle = cube;
 		site2[i]->relativePosHandle = cube;
 	}
@@ -159,9 +159,9 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 			site3[i]->y = (0.0 * size[2]);
 		}
 		site3[i]->z = 0.50001 * size[0];
-		site3[i]->rX = -0.5 * PI;
-		site3[i]->rY = 0.0 * PI;
-		site3[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site3[i]->rX = -0.5 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site3[i]->parentHandle = cube;
 		site3[i]->relativePosHandle = cube;
 	}
@@ -185,9 +185,9 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 			site4[i]->y = 0.0;
 		}
 		site4[i]->z = 0.501 * size[0];
-		site4[i]->rX = -0.5 * PI;
-		site4[i]->rY = 0.5 * PI;
-		site4[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site4[i]->rX = -0.5 * M_PI;
+		site4[i]->rY = 0.5 * M_PI;
+		site4[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site4[i]->parentHandle = cube;
 		site4[i]->relativePosHandle = cube;
 	}
@@ -212,9 +212,9 @@ int Module_Rectangle::createModule(vector<float> configuration, int relativePosH
 		}
 //		site1[i].y = 0.0;
 		site5[i]->z = 0.501 * size[0];
-		site5[i]->rX = 0.5 * PI;
-		site5[i]->rY = -0.5 * PI;
-		site5[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site5[i]->rX = 0.5 * M_PI;
+		site5[i]->rY = -0.5 * M_PI;
+		site5[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site5[i]->parentHandle = cube;
 		site5[i]->relativePosHandle = cube;
 	}

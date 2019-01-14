@@ -3,8 +3,6 @@
 // change below path
 #include "v_repLib.h"
 #include <vector>
-#include <iostream>
-#include <math.h>
 
 using namespace std; 
 

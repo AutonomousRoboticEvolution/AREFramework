@@ -146,15 +146,15 @@ int EdgarsAmazingMorphologyClassVREP::morphologyInterpreter() { // credit to Wei
 	simSetObjectName(RobotMorphology.cubeHandles[3], "sensorOrgan2");
 	simSetObjectName(RobotMorphology.cubeHandles[4], "batteryOrgan");
 
-	float organ1_pos[] = { parsedCsv[0][0] / 100, parsedCsv[0][1] / 100 + 0.025, parsedCsv[0][2] / 100 };
+	float organ1_pos[] = { parsedCsv[0][0] / 100.0f, parsedCsv[0][1] / 100.0f + 0.025f, parsedCsv[0][2] / 100.0f };
 	simSetObjectPosition(RobotMorphology.cubeHandles[0], -1, organ1_pos);
-	float organ2_pos[] = { parsedCsv[1][0] / 100, parsedCsv[1][1] / 100 - 0.025, parsedCsv[1][2] / 100 };
+	float organ2_pos[] = { parsedCsv[1][0] / 100.0f, parsedCsv[1][1] / 100.0f - 0.025f, parsedCsv[1][2] / 100.0f };
 	simSetObjectPosition(RobotMorphology.cubeHandles[1], -1, organ2_pos);
-	float organ3_pos[] = { parsedCsv[2][0] / 100, parsedCsv[2][1] / 100, parsedCsv[2][2] / 100 };
+	float organ3_pos[] = { parsedCsv[2][0] / 100.0f, parsedCsv[2][1] / 100.0f, parsedCsv[2][2] / 100.0f };
 	simSetObjectPosition(RobotMorphology.cubeHandles[2], -1, organ3_pos);
-	float organ4_pos[] = { parsedCsv[3][0] / 100, parsedCsv[3][1] / 100, parsedCsv[3][2] / 100 };
+	float organ4_pos[] = { parsedCsv[3][0] / 100.0f, parsedCsv[3][1] / 100.0f, parsedCsv[3][2] / 100.0f };
 	simSetObjectPosition(RobotMorphology.cubeHandles[3], -1, organ4_pos);
-	float organ5_pos[] = { parsedCsv[4][0] / 100, parsedCsv[4][1] / 100, parsedCsv[4][2] / 100 };
+	float organ5_pos[] = { parsedCsv[4][0] / 100.0f, parsedCsv[4][1] / 100.0f, parsedCsv[4][2] / 100.0f };
 	simSetObjectPosition(RobotMorphology.cubeHandles[4], -1, organ5_pos);
 
 	float organ_angle[] = { 1.57080, 0, 0 };

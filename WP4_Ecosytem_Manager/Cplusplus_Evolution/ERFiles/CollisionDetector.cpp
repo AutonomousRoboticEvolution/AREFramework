@@ -1,6 +1,8 @@
 #pragma once
 
 #include "CollisionDetector.h"
+#include <iostream>
+#include <cmath>
 
 
 CollisionDetector::CollisionDetector()
@@ -165,7 +167,6 @@ bool CollisionDetector::checkCollisionWithRay(int objectHandle, float rayParamet
 	vector<vector<float>> points;
 	points.resize(8);
 
-	float PI = 3.14159265;
 	float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 	simGetObjectMatrix(objectHandle, -1, objectMatrix);
 	cout << "objectMatrix = ";

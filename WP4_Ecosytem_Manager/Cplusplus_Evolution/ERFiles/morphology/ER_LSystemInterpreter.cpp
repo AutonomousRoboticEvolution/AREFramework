@@ -1,6 +1,5 @@
 #include "ER_LSystemInterpreter.h"
 #include <iostream>
-#include <math.h>
 
 
 ER_LSystemInterpreter::ER_LSystemInterpreter()
@@ -267,7 +266,6 @@ void ER_LSystemInterpreter::checkForceSensors() {
 void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -415,7 +413,6 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 void ER_LSystemInterpreter::initializeLRobot(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -920,7 +917,6 @@ void ER_LSystemInterpreter::shiftRobotPosition() {
 				vector<vector<float>> points;
 				points.resize(8);
 
-				float PI = 3.14159265;
 				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
@@ -1015,7 +1011,6 @@ bool ER_LSystemInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle)
 	vector<vector<float>> points;
 	points.resize(8);
 
-	float PI = 3.14159265;
 	float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 	simGetObjectMatrix(objectHandle, -1, objectMatrix);

@@ -1,6 +1,6 @@
 #include "ER_CPPN_Encoding.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 
 ER_CPPN_Encoding::ER_CPPN_Encoding()
@@ -30,7 +30,6 @@ void ER_CPPN_Encoding::init() {
 
 int ER_CPPN_Encoding::initializeGenome(int type) {
 	//first read settings
-	float PI = 3.14159265;
 
 	cout << "initializing CPPN Encoding Genome" << endl;
 	
@@ -263,7 +262,6 @@ void ER_CPPN_Encoding::printSome() {
  */
 void ER_CPPN_Encoding::initializeQuadruped(int type)
 {
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };

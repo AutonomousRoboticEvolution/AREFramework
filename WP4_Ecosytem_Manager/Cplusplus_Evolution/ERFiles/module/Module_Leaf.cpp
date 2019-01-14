@@ -1,5 +1,6 @@
 #include "Module_Leaf.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -21,8 +22,7 @@ int Module_Leaf::init() {
 
 
 int Module_Leaf::mutate(float mutationRate) {
-	float PI = 3.14159265;
-	bendAngle = randomNum->randFloat(-0.25 * PI,0.75 * PI);
+	bendAngle = randomNum->randFloat(-0.25 * M_PI,0.75 * M_PI);
 	return 1;
 }
 
@@ -58,7 +58,6 @@ int Module_Leaf::createModule(vector<float> configuration, int relativePosHandle
 
 	// TO DO: Check collision
 	// cout << "Creating Bend" << endl; 
-		float PI = 3.14159265;
 		int baseHandle = 0;
 		float objectOrigin[3];
 		
@@ -105,17 +104,17 @@ int Module_Leaf::createModule(vector<float> configuration, int relativePosHandle
 		float jointSize[3] = { 0.01,0.01,0.01 };
 		// add hinge
 		int hingeJoint = simCreateForceSensor(0, fsParams, fsFParams, NULL);//simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 1, jointSize, NULL, NULL);
-		float jointPos[3] = { 0, -0.0, (0.5 * size[2]) };
+		float jointPos[3] = { 0, -0.0, (0.5f * size[2]) };
 		simSetObjectPosition(hingeJoint, baseHandle, jointPos);
-		float jointOrientation[3] = { 0.0*PI,0.0*PI,0.0 * PI };
+		float jointOrientation[3] = { 0.0*M_PI,0.0*M_PI,0.0 * M_PI };
 		simSetObjectOrientation(hingeJoint, baseHandle, jointOrientation);
 		simSetObjectParent(hingeJoint, baseHandle, true);
 	
 	//	cout << "hingeJoint = " << hingeJoint << endl; 
 	
 		int cube2 = simCreatePureShape(0, objectPhysics, size2, mass2, NULL);
-		float cube2Origin[3] = { 0, 0.0, (0.5 * size[2]) + (0.2501 * size2[2])};
-		float rotation[3] = { 0.0*PI,0.0*PI,0.0001 * PI };
+		float cube2Origin[3] = { 0, 0.0, (0.5f * size[2]) + (0.2501f * size2[2])};
+		float rotation[3] = { 0.0*M_PI,0.0*M_PI,0.0001 * M_PI };
 		simSetObjectPosition(cube2, baseHandle, cube2Origin);
 		simSetObjectOrientation(cube2, baseHandle, rotation);
 	//	simPauseSimulation();
@@ -217,7 +216,6 @@ vector<float> Module_Leaf::updateModule(vector<float> input) {
 	vector<vector<float>> points;
 	points.resize(5);
 
-	float PI = 3.14159265;
 	simGetObjectMatrix(leafHandle, -1, objectMatrix);
 	/*cout << "objectMatrix = ";
 	for (int i = 0; i < 12; i++) {

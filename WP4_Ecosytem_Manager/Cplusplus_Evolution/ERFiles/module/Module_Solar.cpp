@@ -1,5 +1,6 @@
 #include "Module_Solar.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -121,8 +122,7 @@ int Module_Solar::init() {
 
 
 int Module_Solar::mutate(float mutationRate) {
-	float PI = 3.14159265;
-	bendAngle = randomNum->randFloat(-0.25 * PI,0.75 * PI);
+	bendAngle = randomNum->randFloat(-0.25 * M_PI,0.75 * M_PI);
 	return 1;
 }
 
@@ -161,7 +161,6 @@ int Module_Solar::createModule(vector<float> configuration, int relativePosHandl
 
 	// TO DO: Check collision
 	// cout << "Creating Bend" << endl; 
-	float PI = 3.14159265;
 	//		int baseHandle = 0;
 	float objectOrigin[3];
 	float zeroOrigin[3] = { 0,0,0 };
@@ -260,7 +259,7 @@ int Module_Solar::createModule(vector<float> configuration, int relativePosHandl
 	//	int hingeJoint = simCreateForceSensor(0, fsParams, fsFParams, NULL);//simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 1, jointSize, NULL, NULL);
 	//	float jointPos[3] = { 0, -0.0, (0.5 * size[2]) };
 	//	simSetObjectPosition(hingeJoint, baseHandle, jointPos);
-	//	float jointOrientation[3] = { 0.0*PI,0.0*PI,0.0 * PI };
+	//	float jointOrientation[3] = { 0.0*M_PI,0.0*M_PI,0.0 * M_PI };
 	//	simSetObjectOrientation(hingeJoint, baseHandle, jointOrientation);
 	//	simSetObjectParent(hingeJoint, baseHandle, true);
 
@@ -268,7 +267,7 @@ int Module_Solar::createModule(vector<float> configuration, int relativePosHandl
 
 	//	int cube2 = simCreatePureShape(0, objectPhysics, size2, mass2, NULL);
 	//	float cube2Origin[3] = { 0, 0.0, (0.5 * size[2]) + (0.2501 * size2[2])};
-	//	float rotation[3] = { 0.0*PI,0.0*PI,0.0001 * PI };
+	//	float rotation[3] = { 0.0*M_PI,0.0*M_PI,0.0001 * M_PI };
 	//	simSetObjectPosition(cube2, baseHandle, cube2Origin);
 	//	simSetObjectOrientation(cube2, baseHandle, rotation);
 	//	simPauseSimulation();

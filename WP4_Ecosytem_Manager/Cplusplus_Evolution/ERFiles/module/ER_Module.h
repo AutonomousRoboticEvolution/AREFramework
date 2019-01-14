@@ -6,7 +6,6 @@
 #include "../control/ControlFactory.h"
 #include <sstream>
 #include <iostream>
-#include <math.h>
 #include "../../RandNum.h"
 
 using namespace std;
@@ -47,7 +46,6 @@ public:
 
 
 	void colorModule(float color[3], float alpha);
-	float PI = 3.14159265f;
 	float moduleColor[3];
 	// L-System info
 	vector<int> sites;

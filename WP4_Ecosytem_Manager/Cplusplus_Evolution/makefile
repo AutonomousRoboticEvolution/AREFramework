@@ -42,6 +42,9 @@ _OBJ = ERFiles/VREPUI/VREPUI.o \
 	ERFiles/Settings.o \
 	RandNum.o \
 	ERFiles/EA.o \
+	ERFiles/EA_Factory.o \
+	ERFiles/EA_SteadyState.o \
+	ERFiles/EA_Generational.o \
 	ERFiles/Genome.o \
 	ERFiles/GenomeFactory.o \
 	ERFiles/GenomeFactoryVREP.o \
@@ -74,10 +77,15 @@ _OBJ = ERFiles/VREPUI/VREPUI.o \
 	ERFiles/morphology/CAT.o \
 	ERFiles/morphology/Development.o \
 	ERFiles/morphology/ER_CPPN.o \
+	ERFiles/morphology/ER_CPPN_Encoding.o \
+	ERFiles/morphology/ER_CPPN_Interpreter.o \
 	ERFiles/morphology/ER_LSystem.o \
+	ERFiles/morphology/EdgarsAmazingMorphologyClass.o \
+	ERFiles/morphology/EdgarsAmazingMorphologyClassVREP.o \
 	ERFiles/morphology/FixedBaseMorphology.o \
 	ERFiles/morphology/Morphology.o \
 	ERFiles/morphology/CustomMorphology.o \
+	ERFiles/morphology/CustomMorphologyVREP.o \
 	ERFiles/morphology/MorphologyFactory.o \
 	ERFiles/neuron/CPGNeuron.o \
 	ERFiles/neuron/FunctionNeuron.o \

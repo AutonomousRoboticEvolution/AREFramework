@@ -1,5 +1,6 @@
 #include "Module_APlantBase.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std; 
 
@@ -84,7 +85,7 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 
 	float latchSize[3] = { 0.05,0.05,0.005 };
 	int attach1 = simCreatePureShape(0, objectPhysics, latchSize, 0.1, 0);
-	float attach1Rot[3] = {0, -PI * 0.25,0};
+	float attach1Rot[3] = {0, -M_PI * 0.25,0};
 	float attach1Pos[3] = { -0.045,0,0.035 };
 	simSetObjectPosition(attach1, cube, attach1Pos);
 	simSetObjectOrientation(attach1, cube, attach1Rot);
@@ -105,7 +106,7 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 	simSetObjectParent(attach2, cube, true);
 
 	int attach3 = simCreatePureShape(0, objectPhysics, latchSize, 0.1, 0);
-	float attach3Rot[3] = { 0, PI * 0.25,0 };
+	float attach3Rot[3] = { 0, M_PI * 0.25,0 };
 	float attach3Pos[3] = { 0.045,0,0.035 };
 	simSetObjectPosition(attach3, cube, attach3Pos);
 	simSetObjectOrientation(attach3, cube, attach3Rot);
@@ -129,7 +130,6 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 //	simSetObjectPosition(cube, parentHandle, objectOrigin);
 //	simSetObjectOrientation(cube, parentHandle, orientation);
 	
-	float PI = 3.14159265;
 	vector<shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
 		site1.push_back(shared_ptr<SITE>(new SITE));
@@ -148,9 +148,9 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
 		site1[i]->z = 0.0026;
-		site1[i]->rX = 0.0 * PI;
-		site1[i]->rY = 0.0 * PI;
-		site1[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site1[i]->parentHandle = groupedShaps;
 		site1[i]->relativePosHandle = d1;
 	}
@@ -160,9 +160,9 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 		site2[i]->x = 0.0;
 		site2[i]->y = 0.0;
 		site2[i]->z = 0.0026;
-		site2[i]->rX = 0.0 * PI;
-		site2[i]->rY = 0.0 * PI;
-		site2[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site2[i]->rX = 0.0 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site2[i]->parentHandle = groupedShaps;
 		site2[i]->relativePosHandle = d2;
 	}
@@ -172,9 +172,9 @@ int Module_APlantBase::createModule(vector<float> configuration, int relativePos
 		site3[i]->x = 0.0;
 		site3[i]->y = 0.0;
 		site3[i]->z = 0.0026;
-		site3[i]->rX = 0.0 * PI;
-		site3[i]->rY = 0.0 * PI;
-		site3[i]->rZ = (0.0 + (0.5 *i)) * PI;
+		site3[i]->rX = 0.0 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
 		site3[i]->parentHandle = groupedShaps;
 		site3[i]->relativePosHandle = d3;
 	}

@@ -1,5 +1,5 @@
 #include "ConstrainedSunEnv.h"
-
+#include <cmath>
 
 
 ConstrainedSunEnv::ConstrainedSunEnv()

@@ -1,6 +1,6 @@
 #include "ER_CPPN_Interpreter.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 
 ER_CPPN_Interpreter::ER_CPPN_Interpreter()
@@ -116,7 +116,6 @@ void ER_CPPN_Interpreter::checkForceSensors() {
 void ER_CPPN_Interpreter::initializeGenomeCustom(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -264,7 +263,6 @@ void ER_CPPN_Interpreter::initializeGenomeCustom(int type) {
 void ER_CPPN_Interpreter::initializeLRobot(int type) {
 	//srand(rand()%100000);
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -915,7 +913,6 @@ void ER_CPPN_Interpreter::shiftRobotPosition() {
 				vector<vector<float>> points;
 				points.resize(8);
 
-				float PI = 3.14159265;
 				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
@@ -1000,7 +997,6 @@ bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	vector<vector<float>> points;
 	points.resize(8);
 
-	float PI = 3.14159265;
 	float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 	simGetObjectMatrix(objectHandle, -1, objectMatrix);

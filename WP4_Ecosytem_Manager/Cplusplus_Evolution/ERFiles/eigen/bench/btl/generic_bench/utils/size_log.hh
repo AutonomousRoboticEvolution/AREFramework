@@ -20,7 +20,7 @@
 #ifndef SIZE_LOG
 #define SIZE_LOG
 
-#include "math.h"
+#include "cmath.h"
 // The Vector class must satisfy the following part of STL vector concept :
 //            resize() method
 //            [] operator for seting element

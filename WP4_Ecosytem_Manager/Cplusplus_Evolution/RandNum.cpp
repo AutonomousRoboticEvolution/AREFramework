@@ -1,5 +1,6 @@
 #include "RandNum.h"
 #include <iostream>
+#include <cmath>
 using namespace std;
 
 RandNum::RandNum(int seed)

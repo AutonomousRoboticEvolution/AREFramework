@@ -1,5 +1,6 @@
 #include "R_Module_LeafChloe.h"
 #include <iostream>
+#include <cmath>
 
 using namespace std;
 
@@ -37,7 +38,7 @@ vector<float> R_Module_LeafChloe::updateModule(vector<float> input) {
 
 	for (int i = 0; i < 5; i++) {
 		simSetJointPosition(leafHandles[i], 0);
-		simSetJointTargetPosition(leafHandles[0], 0 * PI);
+		simSetJointTargetPosition(leafHandles[0], 0 * M_PI);
 	}
 
 
@@ -108,7 +109,6 @@ vector<float> R_Module_LeafChloe::updateModule(vector<float> input) {
 		float pos[3];
 		simGetObjectPosition(notCollidedProxSensors[n], -1, pos);
 
-		float PI = 3.14159265;
 		fourPoints.push_back(pos[0]);
 		fourPoints.push_back(pos[1]);
 		fourPoints.push_back(pos[2]);

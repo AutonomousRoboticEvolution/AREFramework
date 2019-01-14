@@ -1,6 +1,5 @@
 #include "ER_LSystem.h"
 #include <iostream>
-#include <math.h>
 
 
 ER_LSystem::ER_LSystem()
@@ -48,7 +47,6 @@ void ER_LSystem::printSome() {
 
 void ER_LSystem::initializeGenomeCustom(int type)
 {
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -181,7 +179,6 @@ void ER_LSystem::initializeGenomeCustom(int type)
 
 void ER_LSystem::initializeQuadruped(int type)
 {
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -342,7 +339,6 @@ void ER_LSystem::initializeQuadruped(int type)
 void ER_LSystem::initializeSolar(int type)
 {
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -713,7 +709,6 @@ int ER_LSystem::initializeLGenome(int type) {
 	lGenome->amountStates = settings->amountModules;
 	lGenome->maxAmountStates = settings->maxAmountModules; // states *
 
-	float PI = 3.14159265;
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
 	float yellow[3] = { 1.0, 1.0, 0.0 };
