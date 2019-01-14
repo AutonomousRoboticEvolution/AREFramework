@@ -615,6 +615,10 @@ void ER_DirectEncodingInterpreter::update() {
 	for (int i = 0; i < createdModules.size(); i++) {
 		//float outputModule = 
 		vector<float> moduleInput;
+		if (settings->controlType == settings->ANN_CUSTOM) {
+			createdModules[i]->updateModule(input);
+			moduleInput.push_back(0.0);
+		}
 		if (settings->controlType == settings->ANN_DEFAULT) {
 			createdModules[i]->updateModule(input);
 			moduleInput.push_back(0.0);
