@@ -1,8 +1,3 @@
-CXX = gcc
-
-CFLAGS = -I../include -Wall -fPIC -static -std=c++1y
-LDFLAGS = -shared
-
 OS = $(shell uname -s)
 ifeq ($(OS), Linux)
 	CFLAGS += -D__Linux

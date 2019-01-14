@@ -1,7 +1,6 @@
 #include "FunctionNeuron.h"
 #include <iostream>
-
-
+#include <cmath>
 
 
 inline double af_sigmoid_unsigned(double aX, double aSlope, double aShift)
