@@ -18,7 +18,7 @@
 //#include "luaFunctionData.h"
 #include <iostream>
 #include <fstream>
-#include "include/v_repLib.h"
+#include "v_repLib.h"
 
 
 using namespace std;

@@ -3,7 +3,7 @@
 #include "ER.h"
 #include "env/Environment.h"
 #include "env/EnvironmentFactory.h"
-#include "../include/v_repLib.h"
+#include "v_repLib.h"
 #include "EA_Factory.h"
 
 using namespace std;

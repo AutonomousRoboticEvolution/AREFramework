@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <memory>
-#include "../../../include/v_repLib.h"
+#include "v_repLib.h"
 #include "../control/Control.h"
 #include "../control/ControlFactory.h"
 #include <sstream>

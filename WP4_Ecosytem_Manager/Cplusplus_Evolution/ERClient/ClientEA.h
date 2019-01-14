@@ -5,8 +5,8 @@
 #include <iostream>
 #include <vector>
 
-#include "../../include/v_repLib.h"
-#include "../../include/v_repConst.h"
+#include "v_repLib.h"
+#include "v_repConst.h"
 //#include "../ERFiles/Population.h"
 #include "../ERFiles/SettingsERClient.h"
 #include "../RandNum.h"

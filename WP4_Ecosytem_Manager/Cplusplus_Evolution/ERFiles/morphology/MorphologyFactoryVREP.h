@@ -6,7 +6,7 @@
 #include "ER_CPPN.h"
 // #include "Manual_ModularRobot.h"
 #include "ER_LSystemInterpreter.h"
-#include "../../../include/v_repLib.h"
+#include "v_repLib.h"
 #include "MorphologyFactory.h"
 #include "ER_DirectEncodingInterpreter.h"
 #include "EdgarsAmazingMorphologyClassVREP.h"

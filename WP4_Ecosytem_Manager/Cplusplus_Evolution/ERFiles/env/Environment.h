@@ -1,8 +1,7 @@
 #pragma once
 #include <vector>
 #include <iostream>
-#include "../../../include/v_repLib.h"
-//#include "../include/v_repLib.h"
+#include "v_repLib.h"
 #include <memory>
 #include "../DefaultGenome.h"
 #include "../module/ER_Module.h"

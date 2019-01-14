@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "../include/v_repLib.h"
+#include "v_repLib.h"
 #include "cassert"
 
 using namespace std;
