@@ -2,7 +2,6 @@
 #include <iostream>
 #include <cmath>
 
-
 ER_DirectEncodingInterpreter::ER_DirectEncodingInterpreter()
 {
 	modular = true;
@@ -114,286 +113,7 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 	}
 }
 
-void ER_DirectEncodingInterpreter::initializeGenomeCustom(int type) {
-	//srand(rand()%100000);
 
-	float red[3] = { 1.0, 0, 0 };
-	float blue[3] = { 0.0, 0.0, 1.0 };
-	float yellow[3] = { 1.0, 1.0, 0.0 };
-	float green[3] = { 0.0, 0.3, 0.0 };
-	float orange[3] = { 1.0, 0.5, 0.0 };
-	float orangePlus[3] = { 1.0, 0.6, 0.2 };
-	float black[3] = { 0.0, 0.0, 0 };
-	float pink[3] = { 1.0, 0.5, 0.5 };
-	float white[3] = { 1.0, 1.0, 1.0 };
-
-	cout << "initializing custom L-System Genome" << endl;
-
-	morphFitness = 0;
-	for (int i = 0; i < genome->amountModules; i++) {
-		genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-		vector<float>tempVector;
-		//	cout << "Initializing state modules" << endl; 
-		switch (i) {
-		case 0:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = red[j];
-			}
-			break;
-		case 1:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = blue[j];
-			}
-			break;
-		case 2:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = yellow[j];
-			}
-			break;
-		case 3:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = pink[j];
-			}
-			break;
-		case 4:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = green[j];
-			}
-		case 5:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = orange[j];
-			}
-		default:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = white[j];
-			}
-			break;
-
-		}
-
-		if (i == 0) {
-			modules.push_back(moduleFactory->createModuleGenome(1, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(0);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			genome->moduleParameters[i]->childConfigurations.push_back(1);
-			genome->moduleParameters[i]->childSites.push_back(2);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			genome->moduleParameters[i]->childConfigurations.push_back(2);
-			genome->moduleParameters[i]->childSites.push_back(3);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			/*	lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(2);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(3);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(4);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();*/
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		else if (i == 1) {
-			modules.push_back(moduleFactory->createModuleGenome(1, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(0);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->module = lGenome->moduleFactory->createModuleGenome(4, randomNum, settings);
-			//			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//			lGenome->lParameters[i]->childSites.push_back(1);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->module = lGenome->moduleFactory->createModuleGenome(4, randomNum, settings);
-			//			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//			lGenome->lParameters[i]->childSites.push_back(2);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			genome->moduleParameters[i]->maxChilds = 3;
-		}
-		else if (i == 2) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(3);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			genome->moduleParameters[i]->maxChilds = 3;
-		}
-		else if (i == 3) {
-			modules.push_back(moduleFactory->createModuleGenome(11, randomNum, settings));
-			/*	lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(3);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->maxChilds = 0;*/
-		}
-		else if (i == 4) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		else {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		modules[i]->state = i;
-		modules[i]->moduleColor[0] = genome->moduleParameters[i]->color[0];
-		modules[i]->moduleColor[1] = genome->moduleParameters[i]->color[1];
-		modules[i]->moduleColor[2] = genome->moduleParameters[i]->color[2];
-
-
-		//	lGenome->mutationRate = 0;
-
-		/*	if (i == 2) {
-		lGenome->lParameters[i]->module->state = i;
-		lGenome->lParameters[i]->childConfigurations.push_back(0);
-		lGenome->lParameters[i]->childSites.push_back(1);
-		lGenome->lParameters[i]->childSiteStates.push_back(0);
-		lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}*/
-	}
-	//	mutateERLGenome(0.05);
-	//	mutateControlERLGenome(0.3);
-}
-
-void ER_DirectEncodingInterpreter::initializeLRobot(int type) {
-	//srand(rand()%100000);
-
-	float red[3] = { 1.0, 0, 0 };
-	float blue[3] = { 0.0, 0.0, 1.0 };
-	float yellow[3] = { 1.0, 1.0, 0.0 };
-	float green[3] = { 0.0, 0.3, 0.0 };
-	float orange[3] = { 1.0, 0.5, 0.0 };
-	float orangePlus[3] = { 1.0, 0.6, 0.2 };
-	float black[3] = { 0.0, 0.0, 0 };
-	float pink[3] = { 1.0, 0.5, 0.5 };
-	float white[3] = { 1.0, 1.0, 1.0 };
-
-	cout << "initializing Robot Direct Encoding" << endl;
-	morphFitness = 0;
-	for (int i = 0; i < genome->amountModules; i++) {
-		genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>());
-		vector<float>tempVector;
-		//	cout << "Initializing state modules" << endl; 
-		switch (i) {
-		case 0:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = red[j];
-			}
-			break;
-		case 1:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = blue[j];
-			}
-			break;
-		case 2:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = yellow[j];
-			}
-			break;
-		case 3:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = pink[j];
-			}
-			break;
-		case 4:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = green[j];
-			}
-		case 5:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = orange[j];
-			}
-		default:
-			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->color[j] = white[j];
-			}
-			break;
-		}
-
-		if (i == 0) {
-			modules.push_back(moduleFactory->createModuleGenome(10, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(0);
-			genome->moduleParameters[i]->childSiteStates.push_back(1);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			/*	lGenome->lParameters[i]->childConfigurations.push_back(2);
-			lGenome->lParameters[i]->childSites.push_back(1);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			/*	lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(2);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(3);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(4);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();*/
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		else if (i == 1) {
-			modules.push_back(moduleFactory->createModuleGenome(10, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(0);
-			genome->moduleParameters[i]->childSiteStates.push_back(2);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			//	lGenome->lParameters[i]->module = lGenome->moduleFactory->createModuleGenome(4, randomNum, settings);
-			//	lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//	lGenome->lParameters[i]->childSites.push_back(1);
-			//	lGenome->lParameters[i]->childSiteStates.push_back(3);
-			//	lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			genome->moduleParameters[i]->maxChilds = 3;
-		}
-		else if (i == 2) {
-			modules.push_back(moduleFactory->createModuleGenome(10, randomNum, settings));
-			//			lGenome->lParameters[i]->childConfigurations.push_back(3);
-			//			lGenome->lParameters[i]->childSites.push_back(0);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->maxChilds = 0;
-		}
-		else if (i == 3) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->childConfigurations.push_back(0);
-			genome->moduleParameters[i]->childSites.push_back(0);
-			genome->moduleParameters[i]->childSiteStates.push_back(3);
-			genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			genome->moduleParameters[i]->maxChilds = 0;
-		}
-		else if (i == 4) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		else {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			genome->moduleParameters[i]->maxChilds = 5;
-		}
-		genome->moduleParameters[i]->currentState = i;
-		modules[i]->moduleColor[0] = genome->moduleParameters[i]->color[0];
-		modules[i]->moduleColor[1] = genome->moduleParameters[i]->color[1];
-		modules[i]->moduleColor[2] = genome->moduleParameters[i]->color[2];
-
-		//	lGenome->mutationRate = 0;
-		/*	if (i == 2) {
-		lGenome->lParameters[i]->module->state = i;
-		lGenome->lParameters[i]->childConfigurations.push_back(0);
-		lGenome->lParameters[i]->childSites.push_back(1);
-		lGenome->lParameters[i]->childSiteStates.push_back(0);
-		lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}*/
-	}
-	//	mutateERLGenome(0.05);
-	//	mutateControlERLGenome(0.3);
-}
 
 void ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum) {
 	ER_DirectEncoding::loadGenome(individualNumber, sceneNum);
@@ -429,18 +149,15 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	configuration[5] = 0;
 	createdModules[0]->createModule(configuration, -1, parentHandle);
 
-	// temp _--------------------------
-	//createdModules.push_back(moduleFactory->copyModuleGenome(modules[1]));
-	//parentHandle = -1;
-	//configuration.resize(6);
-	//configuration[0] = initialPosition[0] + 1;
-	//configuration[1] = initialPosition[1] + 1;
-	//configuration[2] = initialPosition[2];
-	//configuration[3] = 0;
-	//configuration[4] = 0;
-	//configuration[5] = 0;
-	//createdModules[1]->createModule(configuration, -1, parentHandle);
-	// --------------------------------
+	/* old 
+	for (int i = 1; i < modules.size(); i++) {
+		for (int j = 0; j < modules.size(); j++) {
+			int parentNR = modules[i]->parent;
+			if (j == parentNR) {
+				modules[i]->parentModulePointer = createdModules[j];
+			}
+		}
+	}*/
 
 	for (int i = 1; i < modules.size(); i++) {
 		if (modules[i]->parent == 0) {
@@ -460,79 +177,80 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 		{
 			if (createdModules[n]->moduleID == parentNr) {
 				createdParentNumber = n;
+				// modules[i]->parentModulePointer = createdModules[n];
 			}
 		}
 
 		if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-			if (genome->moduleParameters[parentNr]->expressed == true) {
-				if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
-					cout << "state " << createdModules[createdParentNumber]->state << ",";
-					cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
-					//	cout << "id " << createdModules[parentNr]-> << endl;
-				}
-				// parentHandle = createdModules[i]->parentModulePointer->;
-				cout << "should create module : " << i << ",";
-				shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
-				if (parentModulePointer == NULL) {
-					cout << ", null , ";
-				}
-				cout << "parentModulePointer = " << parentModulePointer << ", ";
-				cout << "parentSite = " << parentSite << ", ";
-				cout << " .. " << parentModulePointer->moduleID << ",";
-				cout << " pType " << parentModulePointer->type << ",";
-
-				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
-				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
-				cout << " 1 ,";
-				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
-				cout << " 1.1, ";
-				int createdModulesSize = createdModules.size();
-				vector<float> siteConfiguration;
-				cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
-				cout << createdModules[createdParentNumber]->type << ",";
-				cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-				
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
-				cout << " a ,";
-				createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
-				createdModulesSize = createdModules.size();
-				cout << " b ,";
-
-				// set color
-				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
-
-				vector<int> exception;
-				exception.push_back(parentHandle);
-				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
-				}
-
-				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-					createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-					//		genome->moduleParameters[i]->expressed = false;
-				}
-				else {
-					for (int n = 0; n < modules.size(); n++) {
-						if (modules[n]->parent == i) {
-							modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-						}
-					}
-					genome->moduleParameters[i]->expressed = true;
-				}
-				cout << "created Module" << endl;
+			if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
+				cout << "state " << createdModules[createdParentNumber]->state << ",";
+				cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
+				//	cout << "id " << createdModules[parentNr]-> << endl;
 			}
+			// parentHandle = createdModules[i]->parentModulePointer->;
+			cout << "should create module : " << i << ",";
+			shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
+			if (parentModulePointer == NULL) {
+				cout << ", null , ";
+			}
+			// cout << "parent = " << modules[i]->parent << endl;
+			// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+			// cout << "parentModulePointer = " << parentModulePointer << ", ";
+			// cout << "parentSite = " << parentSite << ", ";
+			// cout << " .. " << parentModulePointer->moduleID << ",";
+			// cout << " pType " << parentModulePointer->type << ",";
+			cout << "orientation " << orien << endl;
+			parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
+			int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
+			// cout << " 1 ,";
+			createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+			// cout << " 1.1, ";
+			int createdModulesSize = createdModules.size();
+			vector<float> siteConfiguration;
+			// cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
+			// cout << createdModules[createdParentNumber]->type << ",";
+			// cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
+
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
+			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
+			// cout << " a ,";
+			createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
+			createdModulesSize = createdModules.size();
+			// cout << " b ,";
+
+			// set color
+			// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
+
+			vector<int> exception;
+			exception.push_back(parentHandle);
+			for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+				exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+			}
+
+			if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
+				createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+				//		genome->moduleParameters[i]->expressed = false;
+			}
+			else {
+				for (int n = 0; n < modules.size(); n++) {
+					if (modules[n]->parent == i) {
+						modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+					}
+				}
+				genome->moduleParameters[i]->expressed = true;
+			}
+			cout << "created Module" << endl;
 		}
 		else {
 			for (int j = 0; j < genome->moduleParameters.size(); j++) {
 				cout << "pi: " << genome->moduleParameters[j]->parent << endl;
 			}
 			cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
-		} 
+		}
 	}
 
 //	cout << "shifting robot position" << endl;
@@ -572,6 +290,7 @@ void ER_DirectEncodingInterpreter::setPhenValue() {
 
 void ER_DirectEncodingInterpreter::init() { // should use create instead
 	ER_DirectEncoding::init();
+	
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		modules.push_back(mf->createModuleGenome(genome->moduleParameters[i]->type, randomNum, settings));
