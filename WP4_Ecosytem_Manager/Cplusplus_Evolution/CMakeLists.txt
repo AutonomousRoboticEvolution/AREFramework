@@ -2,44 +2,36 @@ cmake_minimum_required(VERSION 3.0)
 project(ER)
 
 set(SOURCES 
-    ERFiles/VREPUI/VREPUI.cpp
-    ERFiles/DefaultGenomeVREP.cpp
-    ERFiles/EA_VREP.cpp
-    ERFiles/ER_VREP.cpp
-    ERFiles/morphology/MorphologyFactoryVREP.cpp
-    ERFiles/morphology/ER_DirectEncoding.cpp
-    ERFiles/morphology/ER_DirectEncodingInterpreter.cpp
-    ERFiles/morphology/ER_LSystemInterpreter.cpp
-    ERFiles/morphology/CATVREP.cpp
     common/v_repLib.cpp
-    v_repExtER.cpp
-    ERFiles/ER.cpp
-    ERFiles/Settings.cpp
-    RandNum.cpp
-    ERFiles/EA.cpp
-    ERFiles/EA_Factory.cpp
-    ERFiles/EA_SteadyState.cpp
-    ERFiles/EA_Generational.cpp
-    ERFiles/Genome.cpp
-    ERFiles/GenomeFactory.cpp
-    ERFiles/GenomeFactoryVREP.cpp
-    ERFiles/DefaultGenome.cpp
+    ERFiles/CollisionDetector.cpp
     ERFiles/control/ANN.cpp
     ERFiles/control/Control.cpp
     ERFiles/control/ControlFactory.cpp
     ERFiles/control/CPPN.cpp
     ERFiles/control/CustomANN.cpp
     ERFiles/control/SimpleControl.cpp
-    ERFiles/env/Environment.cpp
-    ERFiles/env/EnvironmentFactory.cpp
-    ERFiles/env/ConstrainedSunEnv.cpp
+    ERFiles/DefaultGenome.cpp
+    ERFiles/DefaultGenomeVREP.cpp
+    ERFiles/EA_Factory.cpp
+    ERFiles/EA_Generational.cpp
+    ERFiles/EA_SteadyState.cpp
+    ERFiles/EA_VREP.cpp
+    ERFiles/EA.cpp
     ERFiles/env/BasicSunEnv.cpp
     ERFiles/env/BlockingSunEnv.cpp
+    ERFiles/env/ConstrainedSunEnv.cpp
+    ERFiles/env/Environment.cpp
+    ERFiles/env/EnvironmentFactory.cpp
     ERFiles/env/MoveAndSun.cpp
     ERFiles/env/MoveEnv.cpp
     ERFiles/env/MovingSunEnv.cpp
     ERFiles/env/RoughMoveEnv.cpp
     ERFiles/env/WaterEnv.cpp
+    ERFiles/ER_VREP.cpp
+    ERFiles/ER.cpp
+    ERFiles/Genome.cpp
+    ERFiles/GenomeFactory.cpp
+    ERFiles/GenomeFactoryVREP.cpp
     ERFiles/module/ER_Module.cpp
     ERFiles/module/Module_APlantBase.cpp
     ERFiles/module/Module_Cube.cpp
@@ -50,31 +42,39 @@ set(SOURCES
     ERFiles/module/ModuleFactory.cpp
     ERFiles/morphology/BaseMorphology.cpp
     ERFiles/morphology/CAT.cpp
-    ERFiles/morphology/Development.cpp
-    ERFiles/morphology/ER_CPPN.cpp
-    ERFiles/morphology/ER_CPPN_Encoding.cpp
-    ERFiles/morphology/ER_CPPN_Interpreter.cpp
-    ERFiles/morphology/ER_LSystem.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClass.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClassVREP.cpp
-    ERFiles/morphology/FixedBaseMorphology.cpp
-    ERFiles/morphology/Morphology.cpp
+    ERFiles/morphology/CATVREP.cpp
     ERFiles/morphology/CustomMorphology.cpp
     ERFiles/morphology/CustomMorphologyVREP.cpp
+    ERFiles/morphology/Development.cpp
+    ERFiles/morphology/EdgarsAmazingMorphologyClass.cpp
+    ERFiles/morphology/EdgarsAmazingMorphologyClassVREP.cpp
+    ERFiles/morphology/ER_CPPN_Encoding.cpp
+    ERFiles/morphology/ER_CPPN_Interpreter.cpp
+    ERFiles/morphology/ER_CPPN.cpp
+    ERFiles/morphology/ER_DirectEncoding.cpp
+    ERFiles/morphology/ER_DirectEncodingInterpreter.cpp
+    ERFiles/morphology/ER_LSystem.cpp
+    ERFiles/morphology/ER_LSystemInterpreter.cpp
+    ERFiles/morphology/FixedBaseMorphology.cpp
+    ERFiles/morphology/Morphology.cpp
     ERFiles/morphology/MorphologyFactory.cpp
+    ERFiles/morphology/MorphologyFactoryVREP.cpp
     ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
     ERFiles/neuron/InputNeuron.cpp
     ERFiles/neuron/Neuron.cpp
     ERFiles/neuron/NeuronFactory.cpp
-    ERFiles/neuron/PatternNeuron.cpp
     ERFiles/neuron/OutputNeuron.cpp
+    ERFiles/neuron/PatternNeuron.cpp
     ERFiles/neuron/SimpleNeuron.cpp
-    ERFiles/CollisionDetector.cpp
-    #	ERFiles/module/Module_Bend.cpp
-    #	ERFiles/module/Module_Brain.cpp
+    ERFiles/Settings.cpp
+    ERFiles/VREPUI/VREPUI.cpp
+    RandNum.cpp
+    v_repExtER.cpp
     #	ERFiles/control/Hormones.cpp
     #	ERFiles/control/TransferNetwork.cpp
+    #	ERFiles/module/Module_Bend.cpp
+    #	ERFiles/module/Module_Brain.cpp
     #	ERFiles/module/Module_Rectangle.cpp
     #	ERFiles/module/Module_Spring.cpp
 )
