@@ -1,6 +1,9 @@
 # IDE files
 /.vscode/
 
+#cmake build directory
+/build/
+
 #compiled and intermediatory files
 /obj/
 *.o
