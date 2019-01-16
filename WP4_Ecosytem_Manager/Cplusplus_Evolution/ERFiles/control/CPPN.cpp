@@ -38,17 +38,24 @@ void CPPN::init(int input, int inter, int output) {
 	//recurrentLayer[1]->connectionsID.push_back(outputLayer[2]->neuronID);
 
 	// randomized TODO
-	int amountConnections = 3; // the amount of connections the initial neurons have
+	int amountConnections = settings->initialAmountConnectionsNeurons; // the amount of connections the initial neurons have
 	for (int i = 0; i < inputLayer.size(); i++) {
 		for (int j = 0; j < amountConnections; j++) {
-			inputLayer[i]->connectionsID.push_back(recurrentLayer[randomNum->randInt(recurrentLayer.size(), 0)]->neuronID);
-			inputLayer[i]->connectionWeights.push_back(0.5);
+				inputLayer[i]->connectionsID.push_back(recurrentLayer[randomNum->randInt(recurrentLayer.size(), 0)]->neuronID);
+				inputLayer[i]->connectionWeights.push_back(0.5);
+			
 		}
 	}
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		for (int j = 0; j < amountConnections; j++) {
-			recurrentLayer[i]->connectionsID.push_back(outputLayer[randomNum->randInt(outputLayer.size(), 0)]->neuronID);
-			recurrentLayer[i]->connectionWeights.push_back(0.5);
+			if (randomNum->randFloat(0.0, 1.0) < 0.5) {
+				recurrentLayer[i]->connectionsID.push_back(outputLayer[randomNum->randInt(outputLayer.size(), 0)]->neuronID);
+				recurrentLayer[i]->connectionWeights.push_back(0.5);
+			}
+			else {
+				recurrentLayer[i]->connectionsID.push_back(recurrentLayer[randomNum->randInt(recurrentLayer.size(), 0)]->neuronID);
+				recurrentLayer[i]->connectionWeights.push_back(0.5);
+			}
 		}
 	}
 	
@@ -81,25 +88,65 @@ void CPPN::init(int input, int inter, int output) {
 	changeConnectionIDToPointer();
 	neuronFactory.reset();
 
+	maxLayerSize = 100;
+	maxCon = 20;
+
+	mutate(0.5);
+	
 	checkConnections();
 	changeConnectionIDToPointer();
 	neuronFactory.reset();
 }
 
+void CPPN::mutate(float mutationRate) {
+	for (int i = 0; i < inputLayer.size(); i++) {
+		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
+			inputLayer[i]->mutate(mutationRate);
+		}
+	}
+	for (int i = 0; i < recurrentLayer.size(); i++) {
+		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
+			recurrentLayer[i]->mutate(mutationRate);
+		}
+	}
+	cout << "about to mutate cppn neurons" << endl;
+	mutateConnections(mutationRate);
+	addNeurons(mutationRate);
+	removeNeurons(mutationRate);
+
+	changeConnectionIDToPointer();
+	checkConnections();
+}
+
 void CPPN::addNeurons(float mutationRate) {
-	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-		if (recurrentLayer.size() < maxLayerSize) {
-			//		cout << "adding neuron" << endl;
-			unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
-			int neuronType = 4; // only create FunctionNeurons (type 4)
-			recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(neuronType, settings));
-			recurrentLayer[recurrentLayer.size() - 1]->init(neuronID);
-			neuronID++;
-			neuronFactory.reset();
-			recurrentLayer[recurrentLayer.size() - 1]->connectionsID.push_back(outputLayer[0]->neuronID);
-			checkConnections();
-			changeConnectionIDToPointer();
-			//		cout << "added neuron" << endl;
+	for (int i = 0; i < settings->maxAddedNeurons; i++) {
+		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
+			if (recurrentLayer.size() < maxLayerSize) {
+				//		cout << "adding neuron" << endl;
+				unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
+				int neuronType = 4; // only create FunctionNeurons (type 4)
+				recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(neuronType, settings));
+				recurrentLayer[recurrentLayer.size() - 1]->init(neuronID);
+				neuronID++;
+				neuronFactory.reset();
+				// add a single random connection from the neuron to output or recurrent layer. 
+				if (randomNum->randFloat(0.0, 1.0) < 0.5) {
+					recurrentLayer[recurrentLayer.size() - 1]->connectionsID.push_back(outputLayer[randomNum->randInt(outputLayer.size(), 0)]->neuronID);
+				}
+				else {
+					recurrentLayer[recurrentLayer.size() - 1]->connectionsID.push_back(recurrentLayer[randomNum->randInt(recurrentLayer.size(), 0)]->neuronID);
+				}
+				recurrentLayer[recurrentLayer.size() - 1]->connectionWeights.push_back(randomNum->randFloat(-1.0, 1.0));
+				// attach a random input neuron to this new recurrent neuron. 
+				int randInput = randomNum->randInt(inputLayer.size(), 0);
+				inputLayer[randInput]->connectionsID.push_back(recurrentLayer.size() - 1);
+				inputLayer[randInput]->connectionWeights.push_back(randomNum->randFloat(0.0, 1.0));
+				
+
+				checkConnections();
+				changeConnectionIDToPointer();
+				//		cout << "added neuron" << endl;
+			}
 		}
 	}
 }

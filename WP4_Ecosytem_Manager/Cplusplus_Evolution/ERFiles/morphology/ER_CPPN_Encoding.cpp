@@ -39,9 +39,10 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 
 	// CPPN currently takes the increment and position as inputs
 	cppn = shared_ptr<CPPN>(new CPPN);
+	cppn->settings = settings;
 	cppn->init(8, 8, 6); // output is type, orientation and activation of sin 
 	cppn->mutate(settings->morphMutRate);
-	cppn->mutate(0.1);
+	cppn->mutate(0.5);
 
 	// make a temporary storage for phenotype based on genotypic information
 	//for (int i = 0; i < genome->amountModules; i++) {

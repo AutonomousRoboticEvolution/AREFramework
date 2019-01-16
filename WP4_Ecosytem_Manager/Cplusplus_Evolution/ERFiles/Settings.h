@@ -189,7 +189,8 @@ public:
 	int initialInputNeurons = 3;
 	int initialInterNeurons = 1;
 	int initialOutputNeurons = 3;
-
+	int initialAmountConnectionsNeurons = 3;
+	int	maxAddedNeurons = 4;
 
 	vector<int> envObjectHandles;
 

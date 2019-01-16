@@ -20,9 +20,9 @@ Settings::Settings() {
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
 	morphologyType = MODULAR_CPPN;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 50;
 	energyDissipationRate = 0.0;
-	lIncrements = 3; // not used, should be somewhere else
+	lIncrements = 4; // not used, should be somewhere else
 //	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
 	verbose = false;
@@ -31,8 +31,12 @@ Settings::Settings() {
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
+	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
-	maxGeneration = 20;
+	mutationRate = 0.1;
+	maxGeneration = 200;
+	initialAmountConnectionsNeurons = 1;
+	maxAddedNeurons = 2;
 }
 
 Settings::~Settings() {
