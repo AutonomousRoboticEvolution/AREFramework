@@ -2,11 +2,10 @@
 #include "DefaultGenome.h"
 #include <iostream>
 
-using namespace std;
 
 DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 {
-	randomNum = rn;
+	randNum = rn;
 	settings = st;
 	genomeFitness = 0;
 	maxAge = settings->maxAge;
@@ -16,7 +15,7 @@ DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 DefaultGenome::~DefaultGenome() {
 }
 
-shared_ptr<Genome> DefaultGenome::clone() const
+unique_ptr<DefaultGenome> DefaultGenome::clone() const
 {
 	return make_unique<DefaultGenome>(*this);
 }
@@ -25,13 +24,9 @@ void DefaultGenome::createInitialMorphology(int individualNumber) {
 }
 
 void DefaultGenome::update() {
-	// This can only be called if the phenotype is created
-	morph->update();
-}
-
-void DefaultGenome::loadGenome(int indNum, int sceneNum)
-{
-	loadMorphologyGenome(indNum, sceneNum);
+	morph->update(); // this can only be called if the phenotype is created
+//	cout << "The update function should be removed from 'DefaultGenome.cpp'" << endl;
+//	environment->updateEnv(morph);
 }
 
 void DefaultGenome::saveGenome(int indNum, int sceneNum) {
@@ -40,80 +35,80 @@ void DefaultGenome::saveGenome(int indNum, int sceneNum) {
 
 void DefaultGenome::checkGenome() {
 	cout << "mainHandle = " << morph->getMainHandle() << endl;
+	//	cout << "morph == " << morph << endl;
 	if (morph == NULL) {
-		cout << "morph is null, cannot run evolution without a morphology being loaded" << endl;
+		cout << "morph is null" << endl;
 	}
-	if (settings->verbose) {
-		// prints some debugging information in the terminal
-		morph->printSome();
-	}
-}
-
-shared_ptr<Genome> DefaultGenome::cloneGenome()
-{
-	shared_ptr<DefaultGenome> cloned = make_unique<DefaultGenome>(*this);
-	cloned->morph = morph->clone();
-	return cloned;
+	cout << "morph. " << endl;
+	morph->printSome();
 }
 
 void DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
-	if (settings->verbose) {
-		cout << "Loading genome " << indNum << endl;
-	}
-	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
-
+//	cout << "about to load genome" << endl;
 	morph->loadGenome(indNum, sceneNum);
-	if (settings->verbose) {
-		cout << "Succesfully loaded genome " << indNum << endl;
-	}
+//	morph->init();
 }
 
 void DefaultGenome::loadBaseMorphology(int indNum, int sceneNum) {
-	// This is an old piece of code that I didn't want to delete yet. 
 	cout << "about to load base morphology" << endl;
 	morph->loadBaseMorphology(indNum, sceneNum);
 }
 
 void DefaultGenome::init_noMorph() {
-	// For debugging. Shouldn't be used otherwise. 
 	int m_type = settings->morphologyType;
 	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+	morph = morphologyFactory->createMorphologyGenome(m_type, randNum, settings);
 	morphologyFactory.reset();
-	//morph->init_noMorph();
-	//if (m_type == -1) {
-	//	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-	//	control = controlFactory->createNewControlGenome(0, randomNum, settings);
-	//	controlFactory.reset();
-	//}
+	morph->init_noMorph();
+	if (m_type == -1) {
+		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+		control = controlFactory->createNewControlGenome(0, randNum, settings);
+		controlFactory.reset();
+	}
 }
 
 void DefaultGenome::init() {
-	// To initialize a genome
+	//	cout << "DefaultGenome.init called" << endl; 
 	int m_type = settings->morphologyType;
 	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+	morph = morphologyFactory->createMorphologyGenome(m_type, randNum, settings);
 	morphologyFactory.reset();
 	morph->init();
-//	if (m_type == -1) { // not used
-//		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-//		morph->control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
-//		controlFactory.reset();
-//	}
+	//	cout << "creating control" << endl;
+	if (m_type == -1) { // not used
+		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+		morph->control = controlFactory->createNewControlGenome(0, randNum, settings); // ann
+		controlFactory.reset();
+//		morph->control->init(1, 1, 1);//morph->morph_jointHandles);
+	}
 }
 
 void DefaultGenome::mutate() {
 	if (morph == NULL) {
-		cout << "ERROR: morph == NULL" << endl;
-	}	
-	// TODO: The morphology mutation rate should be gathered from the settings file in the mutate function?
-	morph->mutate(); 
+		cout << "morph == NULL" << endl;
+	}
+	else {
+		//	cout << "morph is not NULL" << endl; 
+	//		cout << morph << endl; 
+	}
+	/*if (morph->modular == true) {
+		if (randNum->randFloat(0.0, 1.0) < crossLGenome.mutationRate) {
+			crossLGenome.mutationRate += randNum->randFloat(-0.01, 0.01);
+			if (crossLGenome.mutationRate > 1.0) {
+				crossLGenome.mutationRate = 1.0;
+			}
+			else if (crossLGenome.mutationRate < 0.0) {
+				crossLGenome.mutationRate = 0.0;
+			}
+		}
+	}*/
+	
+	morph->mutate(settings->morphMutRate);
+
 }
 
 void DefaultGenome::create() {
+//	cout << "trying to create morph" << endl; 
 	morph->create();
 }
 

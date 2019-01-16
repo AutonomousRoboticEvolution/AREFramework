@@ -5,7 +5,7 @@
 
 DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 {
-	randomNum = rn;
+	randNum = rn;
 	settings = st;
 	genomeFitness = 0;
 	maxAge = settings->maxAge;
@@ -13,55 +13,106 @@ DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings
 }
 
 DefaultGenomeVREP::~DefaultGenomeVREP() {
+}
 
+void DefaultGenomeVREP::createInitialMorphology(int individualNumber) {
+}
+
+void DefaultGenomeVREP::update() {
+	morph->update(); // this can only be called if the phenotype is created
+					 //	cout << "The update function should be removed from 'DefaultGenomeVREP.cpp'" << endl;
+					 //	environment->updateEnv(morph);
+}
+
+void DefaultGenomeVREP::saveGenome(int indNum, int sceneNum) {
+	morph->saveGenome(indNum, sceneNum, 0);
+}
+
+void DefaultGenomeVREP::checkGenome() {
+	cout << "mainHandle = " << morph->getMainHandle() << endl;
+	//	cout << "morph == " << morph << endl;
+	if (morph == NULL) {
+		cout << "morph is null" << endl;
+	}
+	cout << "morph. " << endl;
+	morph->printSome();
 }
 
 void DefaultGenomeVREP::loadMorphologyGenome(int indNum, int sceneNum) {
-	if (settings->verbose) {
-		cout << "Loading genome " << indNum << endl;
-	}
-	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
+	cout << "about to load genome" << endl;
 	morph->loadGenome(indNum, sceneNum);
-	//morph->create();
-	if (settings->verbose) {
-		cout << "Succesfully loaded genome " << indNum << endl;
-	}
-	//morph->create();
+	cout << "LOADED (defaultGenomeVREP) " << endl;
 }
 
-void DefaultGenomeVREP::loadGenome(int indNum, int sceneNum)
-{
-	loadMorphologyGenome(indNum, sceneNum);
+void DefaultGenomeVREP::loadBaseMorphology(int indNum, int sceneNum) {
+//	cout << "about to load base morphology" << endl;
+	morph->loadBaseMorphology(indNum, sceneNum);
+}
+
+void DefaultGenomeVREP::init_noMorph() {
+	int m_type = settings->morphologyType;
+	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
+	morph = morphologyFactory->createMorphologyGenome(m_type, randNum, settings);
+	morphologyFactory.reset();
+	morph->init_noMorph();
+	if (m_type == -1) {
+		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+		control = controlFactory->createNewControlGenome(0, randNum, settings);
+		controlFactory.reset();
+	}
 }
 
 void DefaultGenomeVREP::init() {
-	// This function calls a VREP based morphology factory which contains VREP specific functions. 
+	//	cout << "DefaultGenomeVREP.init called" << endl; 
 	int m_type = settings->morphologyType;
 	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+	morph = morphologyFactory->createMorphologyGenome(m_type, randNum, settings);
 	morphologyFactory.reset();
 	morph->init();
-	// The control creation is the same as the one in DefaultGenome::init(). Code can be improved.
+	//	cout << "creating control" << endl;
 	if (m_type == -1) { // not used
 		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-		morph->control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
+		morph->control = controlFactory->createNewControlGenome(0, randNum, settings); // ann
 		controlFactory.reset();
+//		morph->control->init(1, 1, morph->outputHandles.size());//morph->morph_jointHandles);
 	}
-	//control = new control();
-	//vector<float> output = control->update();
-	//morph->update(output);
-
-	//if (morph->changed == true) {
-	//	control->change(morph->morphoparameters);
-	//}
-	//vector<Module> morphoparameters;
-	//moduleID
 }
 
-shared_ptr<Genome> DefaultGenomeVREP::clone() const
-{
-	return make_unique<DefaultGenomeVREP>(*this);
+void DefaultGenomeVREP::mutate() {
+	if (morph == NULL) {
+		cout << "morph == NULL" << endl;
+	}
+	else {
+		//	cout << "morph is not NULL" << endl; 
+		//		cout << morph << endl; 
+	}
+	/*if (morph->modular == true) {
+	if (randNum->randFloat(0.0, 1.0) < crossLGenome.mutationRate) {
+	crossLGenome.mutationRate += randNum->randFloat(-0.01, 0.01);
+	if (crossLGenome.mutationRate > 1.0) {
+	crossLGenome.mutationRate = 1.0;
+	}
+	else if (crossLGenome.mutationRate < 0.0) {
+	crossLGenome.mutationRate = 0.0;
+	}
+	}
+	}*/
+	morph->mutate(settings->mutationRate);
+}
+
+void DefaultGenomeVREP::create() {
+	//	cout << "trying to create morph" << endl; 
+	morph->create();
+}
+
+void DefaultGenomeVREP::createAtPosition(float x, float y, float z) {
+	morph->createAtPosition(x, y, z);
+}
+
+void DefaultGenomeVREP::deleteCreated() {
+	// function not used anymore
+}
+
+void DefaultGenomeVREP::clearGenome() {
+	morph->clearMorph();
 }

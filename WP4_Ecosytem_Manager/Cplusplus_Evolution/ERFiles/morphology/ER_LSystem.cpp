@@ -817,9 +817,8 @@ int ER_LSystem::initializeLGenome(int type) {
 		}*/
 	}
 	mutateERLGenome(0.5);
-	mutateControlERLGenome(0.5);
 	mutateERLGenome(0.5);
-	// mutateERLGenome(0.5);
+	mutateERLGenome(0.5);
 	cf.reset();
 
 	return 1;
@@ -851,8 +850,7 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
 		int childSize = lGenome->lParameters[i]->childSites.size();
 	//	cout << "childSize = " << childSize << endl; 
-		// change amount children
-		if (randomNum->randFloat(0.0, 1.0) < mutationRate) { 
+		if (randomNum->randFloat(0.0, 1.0) < settings->morphMutRate) { // change amount childs
 			if (lGenome->lParameters[i]->maxChilds != 0) {
 	//			cout << "maxChilds = " << lGenome->lParameters[i]->maxChilds << endl;
 				int newChildSize = randomNum->randInt(lGenome->lParameters[i]->maxChilds, 0);

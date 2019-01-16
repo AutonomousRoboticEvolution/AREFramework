@@ -1,55 +1,104 @@
 
 #include "ER_VREP.h"
-
 //#include <afxwin.h> ;
+
 //***************************************************************************************//
 ER_VREP::ER_VREP(){
-
+	// to initialize ER
 }
 ER_VREP::~ER_VREP(){
 
 }
 
+// for reading text files
 
-/*!
- * Initializes ER as a server to accept genomes from client. 
- * 
- */
 void ER_VREP::initializeServer() {
-	// create the environment
+	populationsVREP.clear();
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+	//	EnvironmentFactory *environmentFactory = new EnvironmentFactory;
+	int envType = settings->environmentType;
+	int fitnessType = settings->fitnessType;
 	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
-	// EA is not present on the server anymore. Genomes are directly loaded in ER
-	// unique_ptr<EA_Factory> eaf(new EA_Factory);
-	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
-	// ea->randomNum = randNum;
-	// ea->settings = settings;
-	// ea->init();
-	// initNewGenome(settings, 0);
-	//ea->initializePopulation(settings, false);
 	environment->init();
-	// eaf.reset();
-
+	environmentFactory.reset();
+	// server has a populationSize of 0 since the populationGenomes are never used, only newgenome
+	populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(0, randNum, settings)));
 }
 
-
 void ER_VREP::initializeSimulation() {
-	// simSet = RECALLBEST;
 	// set env
-	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
-	genomeFactory->randomNum = randNum;
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+//	EnvironmentFactory *environmentFactory = new EnvironmentFactory;
+	int envType = settings->environmentType;
+	int fitnessType = settings->fitnessType;
 	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
-	unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
-	ea->randomNum = randNum;
-	ea->init();
-	// ea->initializePopulation(settings, false);
 	environment->init();
-	eaf.reset();
+	
+	environmentFactory.reset();
 
+	if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9 || atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 8) {
+		simSet = RECALLBEST;
+	}
+
+	if ((settings->evolutionType == settings->STEADY_STATE || settings->evolutionType == settings->GENERATIONAL) && simSet != RECALLBEST) {
+		// note that the environment pointer is empty in this class, the VREP relevant files assign a pointer to it, thus accessing it when
+		// running the client will give a null pointer error.. Could I fix this?
+		populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(settings->populationSize, randNum, settings)));
+		cout << "Population created" << endl;
+		populationsVREP[0]->popIndNumbers = settings->indNumbers;
+		indCounter = settings->individualCounter;
+		for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+			populationsVREP[0]->populationGenomes[i]->mutationRate = settings->mutationRate;
+		}
+		for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+			populationsVREP[0]->populationGenomes[i]->maxAge = settings->maxAge;
+		}
+
+		if (settings->morphologyType == 0) {
+			for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+				populationsVREP[0]->populationGenomes[i]->morphologyType = 2; // should be changed to 0 at some point
+			}
+		}
+		if (settings->morphologyType == 1) {
+			for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+				populationsVREP[0]->populationGenomes[i]->morphologyType = 1; // should be changed to 0 at some point
+			}
+		}
+		if (settings->morphologyType == 3) {
+			for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+				populationsVREP[0]->populationGenomes[i]->morphologyType = 3; // should be changed to 0 at some point
+			}
+		}
+		if (settings->evolutionType == settings->GENERATIONAL) {
+			populationsVREP[0]->nextGenFitness.resize(settings->populationSize);
+		}
+	}
+	else if (settings->evolutionType == settings->EMBODIED_EVOLUTION && simSet != RECALLBEST) {
+		populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(1, randNum, settings)));
+	}
+
+	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && simSet == RECALLBEST) {
+		populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(1, randNum, settings)));
+	}
+	else if (settings->evolutionType == settings->EMBODIED_EVOLUTION && simSet == RECALLBEST) {
+		populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(1, randNum, settings)));
+	}
+	else if (settings->generation != 0) {
+		cout << "loading genomes" << endl;
+		populationsVREP[0]->loadPopulationGenomes(sceneNum);
+		indCounter = settings->individualCounter;
+		indCounter++;
+		generation = settings->generation;
+		cout << "population loaded" << endl;
+	}
+	newGenerations = 0; /**/
+}
+
+void ER_VREP::initializeRobot() {
+	settings->openPort();
+//	populationsVREP.push_back(unique_ptr<PopulationVREP>(new PopulationVREP(settings->populationSize, randNum, settings)));
+//	populationsVREP[0]->initializeIndividual(currentInd);
+	
 }
 
 void ER_VREP::initialize() {
@@ -58,23 +107,45 @@ void ER_VREP::initialize() {
 	 * A random number class will also be created and all other files
 	 * refer to this class. 
 	 */
-	settings->indCounter = 0;
+
+	//NEAT neat = new NEAT();
+	settings = shared_ptr<Settings>(new Settings);
+//	cout << "set seed to " << sceneNum << endl;
+	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
+	randNum = newRandNum;
+	newRandNum.reset();
+	settings->repository = simGetStringParameter(sim_stringparam_app_arg3);
+	settings->readSettings(sceneNum);
+	if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
+		cout << "Recalling best" << endl;
+		simSet = RECALLBEST;
+		settings->instanceType = settings->INSTANCE_REGULAR;
+	}
+	
+	/*indicate that a robot should be loaded
+	*/
+	if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 8) {
+		cout << "recalling best and coupling it to robot" << endl;
+		simSet = RECALLBEST;
+		settings->instanceType = settings->INSTANCE_REGULAR;
+		settings->evolutionType = settings->EMBODIED_EVOLUTION;
+	}
+
+
+	/* Start by determining whether the simulation is connected to
+	 * to an actual robot morphology as specified in the settings file.
+	 */
+
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
-		cout << "Regular Evolution" << endl;
-		settings->client = true;
 		initializeSimulation();
 	}
 	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
-		cout << "Initializing Server" << endl;
-		settings->client = false;
 		initializeServer();
 	}
 	else {
-		// used to initialize robot connected to V-REP
-		// initializeSimulation();
-		// initializeRobot();
+		initializeSimulation();
+		initializeRobot();
 	}
-	//simSet = RECALLBEST;
 }
 
 void ER_VREP::startOfSimulation(){
@@ -83,63 +154,137 @@ void ER_VREP::startOfSimulation(){
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.
 	*/
-
 	if (settings->verbose) {
-		cout << "Starting" << endl;
+		cout << "starting" << endl;
 	}
-
-	// set the random seed
-	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
-	
-	// old code snippet to be removed after evaluation:
-	// environment->initialPos.clear();
-	// environment->init();
+	randNum->setSeed(settings->seed + indCounter * indCounter);
+	environment->initialPos.clear();
+	environment->init();
+	// cout << "WHAT!" << endl;
 	
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		// If the simulation is a server. It just holds information for one genome for now. 
-		// currentGenome should be created, double check
-		currentGenome->create();
-		// OLD CODE:
-		// ea->newGenome->create(); 
-		// new genome should be initialized through api command. 
-		currentMorphology = currentGenome->morph;
+		// create newGenome
+		cout << "creating genome" << endl; 
+		currentMorphology = populationsVREP[0]->newGenome->morph; // essential function
+		populationsVREP[0]->createNewIndividual();
+		cout << "individual created" << endl;
 	}
 	else {
-		if (simSet != RECALLBEST) { 
-			if (settings->verbose) {
-				cout << "Creating Individual " << settings->indCounter << endl;
-			}
-			if (settings->indCounter < ea->populationGenomes.size()) {		
-				// First generation:
-				currentInd = settings->indCounter;
-				ea->populationGenomes[currentInd]->init();
-				ea->popIndNumbers.push_back(settings->indCounter);
+		if (settings->evolutionType == settings->STEADY_STATE && simSet != RECALLBEST) { // by default do an evolutionary run. 
+			if (indCounter < populationsVREP[0]->populationGenomes.size()) {
+		
+				// cout << "creating initial individual : " << indCounter << endl; 
+				//	indCounter = 100;
+				currentInd = indCounter;
+				populationsVREP[0]->initializeIndividual(currentInd);
+				currentMorphology = populationsVREP[0]->populationGenomes[currentInd]->morph; // essential function
+			//	populationsVREP[0]->loadIndividualGenome(1, 2);
+			//	populationsVREP[0]->growInd(2, indCounter);
+			//	populationsVREP[0]->growInd(amountIncrements, currentInd);
+				populationsVREP[0]->popIndNumbers.push_back(indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
-				//currentGenome->init(); // should not initialize base class
-				currentGenome->create();
-				currentMorphology = currentGenome->morph;
-				// ea->newGenome = ea->populationGenomes[settings->indCounter];
+				populationsVREP[0]->createIndividual(indCounter);
+				if (settings->verbose) {
+					cout << "created individual" << endl;
+				}
+
 			}
-			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				// != first generation
-				// ea->selection(); // selection done in end
-				// ea->newGenome->init();
-				currentInd = settings->indCounter % settings->populationSize;
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
-				currentGenome->create();
-				currentMorphology = currentGenome->morph; // essential function... But for what? I forgot...
+			else if (indCounter >= populationsVREP[0]->populationGenomes.size()) {
+				currentInd = randNum->randInt(populationsVREP[0]->populationGenomes.size(), 0);
+				if (settings->selectionType != settings->PROPORTIONATE_SELECTION) {
+					cout << "selecting new individual" << endl;
+					populationsVREP[0]->selectNewIndividual(currentInd); // before this, the old stored class of newGenome needs to be deleted, else memory will leak
+					cout << "setting morph" << endl;
+					currentMorphology = populationsVREP[0]->newGenome->morph; // essential function
+					cout << "done selecting new individual" << endl;
+				}
+				else {
+					populationsVREP[0]->selectNewIndividualProportional(currentInd, sceneNum);
+					currentMorphology = populationsVREP[0]->newGenome->morph; // essential function
+				}
+				cout << "Muatating new individual!" << endl;
+				populationsVREP[0]->mutateNewIndividual();
+				cout << "Creating new individual" << endl;
+				populationsVREP[0]->createNewIndividual();
+			}
+		}
+		else if (settings->evolutionType == settings->EMBODIED_EVOLUTION && simSet != RECALLBEST) {
+			currentInd = indCounter;
+			//		populationsVREP[0]->initializeIndividual(currentInd);
+			//		cout << "creating new individual" << endl;
+			populationsVREP[0]->initializeNewIndividual();
+			currentMorphology = populationsVREP[0]->newGenome->morph; // essential function
+	//		populationsVREP[0]->createNewIndividual();
+			if (settings->verbose) {
+				cout << "created new individual" << endl;
+			}
+		}
+		else if (settings->evolutionType == settings->GENERATIONAL) {
+			if (generation == 0) {
+				populationsVREP[0]->initializeIndividual(currentInd);
+				populationsVREP[0]->popIndNumbers.push_back(indCounter);
+			}
+			else {
+				if (populationsVREP[0]->nextGenGenomes.size() < populationsVREP[0]->populationGenomes.size()) {
+		//			populationsVREP[0]->createNewGenRandomlySelect(1,1);
+					for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+						populationsVREP[0]->createNewIndividual();
+						populationsVREP[0]->nextGenGenomes.push_back(std::move(populationsVREP[0]->newGenome));
+						populationsVREP[0]->popNextIndNumbers.push_back(indCounter);
+					}
+					currentInd = 0;
+				}
+				//	populationsVREP[0]->evaluateNextGen(currentInd);
+				//	currentInd++;
+			}
+		}
+		else if (settings->evolutionType == settings->AFPO) {
+			if (generation == 0) {
+				populationsVREP[0]->initializeIndividual(currentInd);
+				populationsVREP[0]->popIndNumbers.push_back(indCounter);
+			}
+			else {
+				vector<int> paretoIndividuals;
+				populationsVREP[0]->getParetoIndividuals();
+//				for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+//				}
+
+				if (populationsVREP[0]->nextGenGenomes.size() < populationsVREP[0]->populationGenomes.size()) {
+					for (int i = 0; i < populationsVREP[0]->populationGenomes.size(); i++) {
+						populationsVREP[0]->createNewIndividual();
+						populationsVREP[0]->nextGenGenomes.push_back(std::move(populationsVREP[0]->newGenome));
+						populationsVREP[0]->popNextIndNumbers.push_back(indCounter);
+					}
+					currentInd = 0;
+				}
+				//	populationsVREP[0]->evaluateNextGen(currentInd);
+				//	currentInd++;
 			}
 		}
 
+		//else if (simType == COEVOLUTION) {
+		//	if (indCounter < populationsVREP[0]->populationGenomes.size()) {
+		//		currentInd = indCounter;
+		//		populationsVREP[0]->initializeIndividual(currentInd);
+		//		populationsVREP[0]->popIndNumbers.push_back(indCounter);
+		//	}
+		//	else if (indCounter >= populationsVREP[0]->populationGenomes.size()) {
+		//		currentInd = randNum->randInt(populationsVREP[0]->populationGenomes.size(),0);
+		//		populationsVREP[0]->selectNewIndividual(currentInd); 
+		//		populationsVREP[0]->mutateNewIndividual();
+		//		populationsVREP[0]->createNewIndividual();
+		//		populationsVREP[0]->selectNewCoPop();
+		//		populationsVREP[0]->createCoPopulation(1.5);
+		//	}
+		//}
 		else if (simSet == RECALLBEST) {
-
-			loadBestIndividualGenome(settings->sceneNum);
-			currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
-			currentGenome->create();
-			currentMorphology = currentGenome->morph;
+			//	populationsVREP[0]->initializeIndividual(0);
+		//		populationsVREP[0]->loadIndividualGenome(settings->bestIndividual, sceneNum);
+			populationsVREP[0]->loadBestIndividualGenome(sceneNum);
+			currentMorphology = populationsVREP[0]->newGenome->morph;
+			//		populationsVREP[0]->loadIndividualGenome(0, sceneNum);
 		}
 	}
 	currentMorphology->setPhenValue();
@@ -156,269 +301,222 @@ void ER_VREP::handleSimulation() {
 	simulationTime += simGetSimulationTimeStep();
 	environment->updateEnv(currentMorphology);
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		currentGenome->update();
+		populationsVREP[0]->update();
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
 	}
 	else {
-		currentGenome->update();
-		if (simGetSimulationTime() > environment->maxTime) {
+		if (settings->evolutionType == settings->EMBODIED_EVOLUTION && simSet != RECALLBEST) {
+		//	cout << "UPDATING EMBODIED" << endl;
+			populationsVREP[0]->update();
+		}
+		else if (settings->evolutionType == settings->STEADY_STATE && simSet != RECALLBEST) {
+			if (indCounter < populationsVREP[0]->populationGenomes.size()) {
+				populationsVREP[0]->update(indCounter);
+			}
+			else {
+				populationsVREP[0]->update();
+			}
+			if (simGetSimulationTime() > environment->maxTime) {
+				simStopSimulation();
+			}
+		}
+		else if (settings->evolutionType == settings->GENERATIONAL) {
+			populationsVREP[0]->updateNextGen(currentInd);
+			if (simGetSimulationTime() > environment->maxTime) {
+				simStopSimulation();
+			}
+		}
+		if (simSet == RECALLBEST && settings->evolutionType != settings->EMBODIED_EVOLUTION) {
+			populationsVREP[0]->update();
+			if (simGetSimulationTime() > environment->maxTime) {
+				simStopSimulation();
+			}
+		}
+		if (simSet == RECALLBEST && settings->evolutionType == settings->EMBODIED_EVOLUTION) {
+			populationsVREP[0]->update();
+		
+//			if (simGetSimulationTime() > environment->maxTime) {
+//				simStopSimulation();
+//			}
+		}
+		if (settings->evolutionType == settings->EMPTY_RUN) {
 			simStopSimulation();
 		}
+		//	case (COEVOLUTION) :
+		//		break; 
+		//	}
 	}
-}
-
-float ER_VREP::fitnessFunction(MorphologyPointer morph) {
-	vector <float> pStart;
-	vector <float> pOne;
-	vector <float> pEnd;
-	float fitness = 0;
-
-		//	int mainHandle = morph->getMainHandle();
-		//	float pos[3];
-		//	simGetObjectPosition(mainHandle, -1, pos);
-		//	return pos[0];
-		if (settings->moveDirection == settings->FORWARD_Y) {
-			if (morph->modular == false) {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				pOne.clear();
-				pEnd.clear();
-			}
-			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(-pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
-			}
-		}
-		else {
-			if (morph->modular == false) {
-				//		cout << "getting main handle" << endl;
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				pOne.clear();
-				pEnd.clear();
-				//	fitness = 0; // no fixed morphology that can absorb light
-			}
-			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
-				// to do: pEnd - pOne
-
-			//	vector<shared_ptr<ER_Module> > createdModules = morph->getCreatedModules();
-			//	vector<float> pos = createdModules[0]->getPosition();
-			//	fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
-			}
-		}
-
-		return fitness;
-	
-
 }
 
 void ER_VREP::endOfSimulation(){
 	/* At the end of the simulation the fitness value of the simulated individual
 	* is retrieved and stored in the appropriate files. 
 	*/
+	cout << "end" << endl;
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		float fitness = environment->fitnessFunction(currentMorphology);
-		// Environment independent fitness function:
-		// float fitness = fit->fitnessFunction(currentMorphology);
-		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+		float phenValue = populationsVREP[0]->newGenome->morph->phenValue;
 		cout << "fitness = " << fitness << endl;
+	//	cout << "phenValue = " << phenValue << endl;
 		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue
+
 		int signal[1] = { 2 };
 		simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+//		int signal[1] = { 0 };
+//		simSetIntegerSignal((simChar*) "simulationState", signal[0]); // this means that the client can get the fitness value
 	}
 	else {
-		cout << "settings->indCounter = " << settings->indCounter << endl;
-		if (simSet != RECALLBEST) {
-			if (settings->indCounter < ea->populationGenomes.size()) {
-				float fitness = environment->fitnessFunction(currentMorphology);
-				ea->populationGenomes[currentInd]->fitness = fitness;
-				cout << "fitness = " << ea->populationGenomes[currentInd]->fitness << endl;
-				ea->populationGenomes[currentInd]->morph->saveGenome(settings->indCounter, settings->sceneNum, fitness);
-				ea->popIndNumbers[currentInd] = settings->indCounter;
-				settings->indCounter++;
+		cout << "indCounter = " << indCounter << endl;
+		if (settings->evolutionType == settings->STEADY_STATE && simSet != RECALLBEST) {
+			if (indCounter - 1 >= populationsVREP[0]->populationGenomes.size()) {
 			}
-			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				float fitness = environment->fitnessFunction(currentMorphology);
-				currentGenome->fitness = fitness;
-				// TODO set fitness
-				ea->setFitness(settings->indCounter % ea->populationGenomes.size(), fitness);
-				currentGenome->morph->saveGenome(settings->indCounter, settings->sceneNum, fitness);
-				cout << "FITNESS = " << fitness << endl;
-				settings->indCounter++;
+			else {
+				populationsVREP[0]->populationGenomes[indCounter - 1]->deleteCreated();
 			}
-			if (settings->indCounter % ea->populationGenomes.size() == 0 && settings->indCounter != 0) {
-				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
-				ea->selection();
-				ea->savePopFitness(generation);
+			if (indCounter % populationsVREP[0]->populationGenomes.size() == 0 && indCounter != 0) {
+				populationsVREP[0]->savePopFitness(generation, populationsVREP[0]->populationFitness, sceneNum);
+				if (settings->ageInds == 1) {
+					populationsVREP[0]->agePop();
+				}
 				generation++;
 				saveSettings();
 				newGenerations++;
 			}
+			if (indCounter < populationsVREP[0]->populationGenomes.size()) {
+				float fitness = environment->fitnessFunction(currentMorphology);
+				cout << "fitness = " << fitness << endl;
+				populationsVREP[0]->populationGenomes[currentInd]->morph->saveGenome(indCounter, sceneNum, fitness);
+				populationsVREP[0]->populationFitness[currentInd] = fitness;
+				populationsVREP[0]->popIndNumbers[currentInd] = indCounter;
+				// populationsVREP[0]->evaluateIndividual(currentInd, indCounter, sceneNum);
+				indCounter++;
+			}
+			else if (indCounter >= populationsVREP[0]->populationGenomes.size()) {
+				float fitness = environment->fitnessFunction(currentMorphology);
+				if (settings->replacementType == 0) {
+					populationsVREP[0]->replaceNewIndividual(indCounter, sceneNum, fitness);
+				}
+				else if (settings->replacementType == 1) {
+					populationsVREP[0]->replaceNewIndividualAgainstWorst(indCounter, sceneNum, fitness); //
+				}
+				cout << "FITNESS = " << fitness << endl;
+				indCounter++;
+			}
+		}
+		if (settings->evolutionType == settings->GENERATIONAL) {
+			float fitness = environment->fitnessFunction(currentMorphology);
+			populationsVREP[0]->nextGenFitness[currentInd] = fitness;
+			//		populationsVREP[0]->evaluateIndividual(currentInd, indCounter, sceneNum);
+			indCounter++;
+			currentInd++;
+
+			if (indCounter % populationsVREP[0]->populationGenomes.size() == 0 && indCounter != 0) {
+				populationsVREP[0]->savePopFitness(generation, populationsVREP[0]->populationFitness, sceneNum);
+				if (settings->ageInds == 1) {
+					populationsVREP[0]->agePop();
+				}
+				generation++;
+				saveSettings();
+				newGenerations++;
+				populationsVREP[0]->replacePopulation();
+				//			currentInd = 0; in this case currentInd is set to zero at the start of the simulation
+			}
+		}
+		if (settings->evolutionType == settings->RANDOM_SEARCH) { // note, this is not functioning properly yet
+			populationsVREP[0]->populationGenomes[currentInd]->deleteCreated();
+			float fitness = environment->fitnessFunction(currentMorphology);
+			populationsVREP[0]->replaceNewIndividual(indCounter, sceneNum, fitness);
+
+
+			//	float fitness = populationGenomes[currentInd]->evaluateGenome(sceneNum);
+			//	populationGenomes[currentInd]->morph->saveGenome(indCounter, sceneNum, fitness);
+			//	populationFitness[currentInd] = fitness;
+			//	popIndNumbers[currentInd] = indCounter;
+			//	return fitness;
+
+
+			indCounter++;
+			currentInd++;
+
+			if (indCounter % populationsVREP[0]->populationGenomes.size() == 0 && indCounter != 0) {
+				populationsVREP[0]->savePopFitness(generation, populationsVREP[0]->populationFitness, sceneNum);
+				if (settings->ageInds == 1) {
+					populationsVREP[0]->agePop();
+				}
+				generation++;
+				saveSettings();
+				newGenerations++;
+				populationsVREP[0]->replacePopulation();
+				currentInd = 0;
+			}
 		}
 		if (simSet == RECALLBEST) {
 			float fitness = environment->fitnessFunction(currentMorphology);
-			currentGenome.reset();
+			populationsVREP[0]->newGenome.reset();
 			cout << "-----------------------------------" << endl;
 			cout << "fitness = " << fitness << endl;
 			cout << "-----------------------------------" << endl;
 		}
-		
-		// following uncommented code was necessary when V-REP itself contained a memory leak.
-		// if (newGenerations == settings->xGenerations) { // close v-rep every x generations
-		//	string lightName = "Light"; // +to_string(sceneNum);
-		//	int light_handle = simGetObjectHandle(lightName.c_str());
-		//	simRemoveObject(light_handle);
-		//	simQuitSimulator(false);
-		// }
+		/*case (COEVOLUTION) : {
+			if (indCounter - 1 >= populationsVREP[0]->populationGenomes.size()) {
+			}
+			else {
+				populationsVREP[0]->populationGenomes[indCounter - 1]->deleteCreated();
+			}
+			if (indCounter % populationsVREP[0]->populationGenomes.size() == 0 && indCounter != 0) {
+				populationsVREP[0]->savePopFitness(generation, populationsVREP[0]->populationFitness, sceneNum);
+				generation++;
+				newGenerations++;
+			}
+			if (indCounter < populationsVREP[0]->populationGenomes.size()) {
+				populationsVREP[0]->evaluateIndividual(currentInd, indCounter, sceneNum);
+				indCounter++;
+			}
+			else if (indCounter >= populationsVREP[0]->populationGenomes.size()) {
+				float fitness = populationsVREP[0]->evaluateNewIndividual(indCounter, sceneNum);
+				cout << "FITNESS = " << fitness << endl;
+				indCounter++;
+			}
+			break;
+		}
+		}*/
+		//	simCloseScene();
+
+		if (newGenerations == settings->xGenerations) { // close v-rep every x generations
+			string lightName = "Light"; // +to_string(sceneNum);
+			int light_handle = simGetObjectHandle(lightName.c_str());
+			simRemoveObject(light_handle);
+			//		cout << "removed lightHandle" << endl;
+			simQuitSimulator(false);
+		}
 	}
 }
 
-shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
-{
-	return shared_ptr<Morphology>();
-}
-
-void ER_VREP::loadIndividual(int individualNum, int sceneNum) {
-	cout << "loading individual " << individualNum << ", sceneNum " << sceneNum << endl;
-	currentGenome = genomeFactory->createGenome(0, randNum, settings);
-	currentGenome->loadGenome(individualNum, sceneNum);
-	cout << "loaded" << endl;
-}
-
-
-void ER_VREP::saveSettings(){
+void ER_VREP::saveSettings(){ 
 	cout << "saving" << endl;
 	settings->generation = generation;
-	settings->individualCounter = settings->indCounter;
+	settings->individualCounter = indCounter;
 	vector<int> indNums;
-	for (int i = 0; i < ea->popIndNumbers.size(); i++) {
-		indNums.push_back(ea->popIndNumbers[i]); // must be set when saving
+	for (int i = 0; i < populationsVREP[0]->popIndNumbers.size(); i++) {
+		indNums.push_back(populationsVREP[0]->popIndNumbers[i]); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
 	int bestInd = 0;
 	int bestIndividual = 0;
 	float bestFitness = 0;
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		if (bestFitness < ea->populationGenomes[i]->fitness) {
-			bestFitness = ea->populationGenomes[i]->fitness;
+	for (int i = 0; i < populationsVREP[0]->populationFitness.size(); i++) {
+		if (bestFitness < populationsVREP[0]->populationFitness[i]) {
+			bestFitness = populationsVREP[0]->populationFitness[i];
 			bestInd = i;
-			bestIndividual = ea->popIndNumbers[bestInd];
-			cout << "Best individual has number " << ea->popIndNumbers[bestInd] << endl;
+			bestIndividual = populationsVREP[0]->popIndNumbers[bestInd];
+			cout << "Best individual has number " << populationsVREP[0]->popIndNumbers[bestInd] << endl;
 		}
 	}
 	settings->bestIndividual = bestIndividual;
-	settings->saveSettings();
+	settings->saveSettings(sceneNum);
 	cout << "Settings saved" << endl;
 }
-
-void ER_VREP::loadBestIndividualGenome(int sceneNum)
-{
-	vector<int> individuals;
-	vector<float> fitnessValues;
-
-	ifstream file(settings->repository + "/SavedGenerations" + to_string(settings->sceneNum) + ".csv");
-	if (file.good()) {
-		cout << "saved generations file found" << endl;
-		string value;
-		list<string> values;
-		// read the settings file and store the comma seperated values
-		while (file.good()) {
-			getline(file, value, ','); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-			if (value.find('\n') != string::npos) {
-				split_line(value, "\n", values);
-			}
-			else {
-				values.push_back(value);
-			}
-		}
-		file.close();
-
-		list<string>::const_iterator it = values.begin();
-		for (it = values.begin(); it != values.end(); it++) {
-			string tmp = *it;
-			if (tmp == "ind: ") {
-				it++;
-				tmp = *it;
-				individuals.push_back(atoi(tmp.c_str()));
-			}
-			else if (tmp == "fitness: ") {
-				it++;
-				tmp = *it;
-				fitnessValues.push_back(atof(tmp.c_str()));
-			}
-		}
-	}
-	int bestInd = 0;
-	float bestFit = 0.0;
-	cout << "individuals size = " << individuals.size() << endl;
-	for (int i = 0; i < individuals.size(); i++) {
-		if (fitnessValues[i] >= bestFit) {
-			bestFit = fitnessValues[i];
-			bestInd = individuals[i];
-		}
-	}
-
-	cout << "loading individual " << bestInd << ", sceneNum " << settings->sceneNum << endl;
-	randNum->setSeed(settings->seed + bestInd * bestInd);
-
-	currentGenome.reset();
-	currentGenome = genomeFactory->createGenome(1, randNum, settings);
-	currentGenome->init();	//	cout << "loading" << endl;
-	currentGenome->loadMorphologyGenome(bestInd, settings->sceneNum);
-}
-

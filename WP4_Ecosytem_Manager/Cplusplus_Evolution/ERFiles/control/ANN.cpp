@@ -54,9 +54,8 @@ void ANN::init(int input, int inter, int output) {
 			recurrentLayer[i]->connectionWeights.push_back(1.0);
 		}
 		else {
-			// now, additional recurrent neurons will not be connected to an output neuron
-			// recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-			// recurrentLayer[i]->connectionWeights.push_back(1.0);
+			recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
+			recurrentLayer[i]->connectionWeights.push_back(1.0);
 		}
 	}
 //	cout << "OUTPUTSIZE = " << outputLayer.size() << endl;
@@ -172,7 +171,7 @@ vector<float> ANN::update(vector<float> sensorValues) {
 	}
 	cf += 0.5;
 //	printNeuronValues();
-	//leaky(0.8);
+	leaky(0.8);
 	return outputValues; 
 }
 
@@ -450,7 +449,6 @@ void ANN::mutate(float mutationRate) {
 			recurrentLayer[i]->mutate(mutationRate);
 		}
 	}
-	cout << "about to mutate neurons" << endl;
 	mutateConnections(mutationRate);
 	addNeurons(mutationRate);
 	removeNeurons(mutationRate);
@@ -518,11 +516,6 @@ stringstream ANN::getControlParams() {
 	ss << endl;
 //	printNeuronValues();
 	return ss;
-}
-
-void ANN::setFloatParameters(vector<float> values) {
-	// function can be used to manually set specific parameters
-	recurrentLayer[0]->setFloatParameters(values);
 }
 
 void ANN::setControlParams(vector<string> values) {

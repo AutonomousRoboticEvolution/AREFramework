@@ -28,7 +28,6 @@ public:
 	
 	void mutateConnections(float mutationRate);
 	void addNeurons(float mutationRate);
-	void setFloatParameters(vector<float> values);
 	void removeNeurons(float mutationRate);
 	void changeNeurons(float mutationRate);
 //	float tmpMutRate = 0.05; //delete!!!

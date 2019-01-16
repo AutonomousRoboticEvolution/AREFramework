@@ -20,12 +20,11 @@ public:
 	int type = 0; 
 	void checkConnections(); 
 	stringstream getControlParams();
-	void setFloatParameters(vector<float> values);
 	void setControlParams(vector<string>);
 	void changeConnectionIDToPointer(); 
 	void cloneControlParameters(shared_ptr<Control> parent);
-	int maxLayerSize;
-	int maxCon;
+	int maxLayerSize = 6;
+	int maxCon = 2;
 	bool checkControl(vector<string> values);
 	void changeConnectionPointerToID();
 	void reset();
@@ -48,7 +47,6 @@ public:
 	vector<float> out; 
 	vector<shared_ptr<Neuron>> inputLayer;
 	vector<shared_ptr<Neuron>> outputLayer;
-	// TODO recurrentLayer -> vector<vector<shared_ptr<Neuron>>> interLayer 
 	vector<shared_ptr<Neuron>> recurrentLayer;
 //	vector<shared_ptr<Neuron>> allNeurons; 
 	//vector<Connection> connections;

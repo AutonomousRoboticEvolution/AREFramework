@@ -15,28 +15,15 @@ Settings::Settings() {
 		tmpMaxModuleTypes.push_back(50);
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
-	maxModuleTypes[0][1] = 100; // one base module
-	maxAmountModules = 20;
-	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_CPPN;
-	controlType = ANN_CUSTOM;
-	populationSize = 50;
+	maxModuleTypes[0][1] = 50; // one base module
+//	morphologyType = CUSTOM_MODULAR_MORPHOLOGY;
+	populationSize = 2;
 	energyDissipationRate = 0.0;
-	lIncrements = 4; // not used, should be somewhere else
+	lIncrements = 3;
 //	environmentType = ENV_SWITCHOBJECTIVE;
-//	controlType = ANN_DEFAULT;
-	verbose = false;
+	morphologyType = CAT_MORPHOLOGY;
+	controlType = ANN_DEFAULT;
 	verbose = true;
-	initialInputNeurons = 1;
-	initialInterNeurons = 1;
-	initialOutputNeurons = 1;
-	evolutionType = STEADY_STATE;
-	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.1;
-	mutationRate = 0.1;
-	maxGeneration = 200;
-	initialAmountConnectionsNeurons = 1;
-	maxAddedNeurons = 2;
 }
 
 Settings::~Settings() {
@@ -63,27 +50,27 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 }
 
 void Settings::openPort() {
-	// deprecated
-	//packetHandler1 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION1);
-	//packetHandler2 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION2);
-	//char *dev_name = (char*)DEVICENAME;
-	//portHandler = dynamixel::PortHandler::getPortHandler(dev_name);
+	packetHandler1 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION1);
+	packetHandler2 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION2);
+	char *dev_name = (char*)DEVICENAME;
+	portHandler = dynamixel::PortHandler::getPortHandler(dev_name);
 
-	//if (portHandler->openPort())
-	//{
-	//	printf("Succeeded to open the port!\n\n");
-	//	printf(" - Device Name : %s\n", dev_name);
-	//	printf(" - Baudrate    : %d\n\n", portHandler->getBaudRate());
-	//}
-	//else
-	//{
-	//	printf("Failed to open the port! [%s]\n", dev_name);
-	//	printf("Press any key to terminate...\n");
-	//	//		getch();
-	//}
+	if (portHandler->openPort())
+	{
+		printf("Succeeded to open the port!\n\n");
+		printf(" - Device Name : %s\n", dev_name);
+		printf(" - Baudrate    : %d\n\n", portHandler->getBaudRate());
+	}
+	else
+	{
+		printf("Failed to open the port! [%s]\n", dev_name);
+		printf("Press any key to terminate...\n");
+		//		getch();
+	}
+
 }
 
-void Settings::readSettings() {
+void Settings::readSettings(int sceneNum) {
 	bool fileExists = false;
 	//	cout << "sceneNum = " << sceneNum << endl; 
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
@@ -140,6 +127,9 @@ void Settings::readSettings() {
 					break;
 				case GENERATIONAL:
 					evolutionType = GENERATIONAL;
+					break;
+				case NEAT:
+					evolutionType = NEAT;
 					break;
 				case EMBODIED_EVOLUTION:
 					evolutionType = EMBODIED_EVOLUTION;
@@ -555,10 +545,9 @@ void Settings::readSettings() {
 			fileExists = true;
 		}
 	}
-	cout << "Loaded Settings" << endl;
 }
 
-void Settings::saveSettings() {
+void Settings::saveSettings(int sceneNum) {
 	ofstream settingsFile;
 	settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
 	settingsFile << ",#serverMode," << instanceType << "," << endl;

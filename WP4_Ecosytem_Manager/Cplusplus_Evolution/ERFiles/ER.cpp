@@ -24,8 +24,8 @@
 
 #include "ER.h"
 //#include <afxwin.h> ;
-//***************************************************************************************//
 
+//***************************************************************************************//
 CER::CER(){
 	// to initialize ER
 }
@@ -50,17 +50,64 @@ void CER::split_line(string& line, string delim, list<string>& values)
 
 void CER::initializeSimulation() {
 
-	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-	//	simSet = RECALLBEST;
-	// }
-}
+	if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
+		simSet = RECALLBEST;
+	}
+	
+	if (settings->evolutionType == settings->STEADY_STATE || settings->evolutionType == settings->GENERATIONAL && simSet != RECALLBEST) {
+		// note that the environment pointer is empty in this class, the VREP relevant files assign a pointer to it, thus accessing it when
+		// running the client will give a null pointer error.. Could I fix this?
+		populations.push_back(unique_ptr<Population>(new Population(settings->populationSize, randNum, settings)));
+		cout << "Population created" << endl;
+		populations[0]->popIndNumbers = settings->indNumbers;
+		indCounter = settings->individualCounter;
+		for (int i = 0; i < populations[0]->populationGenomes.size(); i++) {
+			populations[0]->populationGenomes[i]->mutationRate = settings->mutationRate;
+		}
+		for (int i = 0; i < populations[0]->populationGenomes.size(); i++) {
+			populations[0]->populationGenomes[i]->maxAge = settings->maxAge;
+		}
 
-void CER::loadIndividual(int individualNum, int sceneNum)
-{
-	cout << "ERROR:" << endl;
-	cout << "	Trying to load an individual in a non-VREP instance, " << endl;
-	cout << "	Make sure you're using ER_VREP to load robots. " << endl;
+		if (settings->generation != 0) {
+			populations[0]->loadPopulationGenomes(sceneNum);
+		}
 
+		if (settings->morphologyType == 0) {
+			for (int i = 0; i < populations[0]->populationGenomes.size(); i++) {
+				populations[0]->populationGenomes[i]->morphologyType = 2; // should be changed to 0 at some point
+			}
+		}
+		if (settings->morphologyType == 1) {
+			for (int i = 0; i < populations[0]->populationGenomes.size(); i++) {
+				populations[0]->populationGenomes[i]->morphologyType = 1; // should be changed to 0 at some point
+			}
+		}
+		if (settings->morphologyType == 3) {
+			for (int i = 0; i < populations[0]->populationGenomes.size(); i++) {
+				populations[0]->populationGenomes[i]->morphologyType = 3; // should be changed to 0 at some point
+			}
+		}
+		if (settings->evolutionType == settings->GENERATIONAL) {
+			populations[0]->nextGenFitness.resize(settings->populationSize);
+		}
+	}
+	else if (settings->evolutionType == settings->EMBODIED_EVOLUTION) {
+		populations.push_back(unique_ptr<Population>(new Population(1, randNum, settings)));
+	}
+
+	if (simSet == RECALLBEST) {
+		populations.push_back(unique_ptr<Population>(new Population(1, randNum, settings)));
+	}
+
+	if (settings->generation != 0) {
+		cout << "loading genomes" << endl;
+		populations[0]->loadPopulationGenomes(sceneNum);
+		indCounter = settings->individualCounter;
+		indCounter++;
+		generation = settings->generation;
+		cout << "population loaded" << endl;
+	}
+	newGenerations = 0; /**/
 }
 
 void CER::initialize() {
@@ -70,51 +117,41 @@ void CER::initialize() {
 	 * refer to this class. 
 	 */
 
+	//NEAT neat = new NEAT();
 	settings = shared_ptr<Settings>(new Settings);
+//	cout << "set seed to " << sceneNum << endl;
 	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
 	randNum = newRandNum;
 	newRandNum.reset();
 	settings->repository = simGetStringParameter(sim_stringparam_app_arg3);
-	settings->readSettings();
-
-	//TODO : Factory
-	ea = unique_ptr<EA>(new EA_SteadyState); // default evolutionary algorithm
-	ea->setSettings(settings, randNum);
-	ea->init();
-
+	settings->readSettings(sceneNum);
 	initializeSimulation();
 }
 
 
 void CER::saveSettings() {
-	if (settings->verbose) {
-		cout << "Saving settings" << endl;
-	}
+	cout << "saving" << endl;
 	settings->generation = generation;
-	// TODO : remove redundancy
-	settings->individualCounter = settings->indCounter;
+	settings->individualCounter = indCounter;
 	vector<int> indNums;
-	for (int i = 0; i < ea->popIndNumbers.size(); i++) {
-		indNums.push_back(ea->popIndNumbers[i]); // must be set when saving
+	for (int i = 0; i < populations[0]->popIndNumbers.size(); i++) {
+		indNums.push_back(populations[0]->popIndNumbers[i]); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
 	int bestInd = 0;
 	int bestIndividual = 0;
 	float bestFitness = 0;
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		if (bestFitness < ea->populationGenomes[i]->fitness) {
-			bestFitness = ea->populationGenomes[i]->fitness;
+	for (int i = 0; i < populations[0]->populationFitness.size(); i++) {
+		if (bestFitness < populations[0]->populationFitness[i]) {
+			bestFitness = populations[0]->populationFitness[i];
 			bestInd = i;
-			bestIndividual = ea->popIndNumbers[bestInd];
-			if (settings->verbose) {
-				cout << "Best individual has number " << ea->popIndNumbers[bestInd] << endl;
-			}
+			bestIndividual = populations[0]->popIndNumbers[bestInd];
+			cout << "Best individual has number " << populations[0]->popIndNumbers[bestInd] << endl;
 		}
 	}
 	settings->bestIndividual = bestIndividual;
-	settings->saveSettings();
-	if (settings->verbose) {
-		cout << "Settings saved" << endl;
-	}
+	
+	settings->saveSettings(sceneNum);
+	cout << "Settings saved" << endl;
 }
