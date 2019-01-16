@@ -438,71 +438,78 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 //	typeOfMutation = 0;
 //	switch (typeOfMutation) {
 //	case 0: {
-	for (int am = 0; am < 5; am++) {
+	// modularParameters.size() influences the chance of adding modules. 
+	int maxModuleAddition = 5; // up to five modules can be added each mutation step...
+	for (int am = 0; am < maxModuleAddition; am++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			if (settings->verbose) {
 				cout << "adding module" << endl;
 			}		// add module
 			// select where module should be attached to
-			if (genome->moduleParameters.size() < 50) { // absolute max amount modules
+			if (genome->moduleParameters.size() < settings->maxAmountModules) { // absolute max amount modules
 				int attachModule = randomNum->randInt(genome->moduleParameters.size(), 0);
-				int attachType = genome->moduleParameters[attachModule]->type;
-				if (genome->moduleParameters[attachModule]->childSiteStates.size() < genome->moduleParameters[attachModule]->maxChilds) {
-					int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
+				if (checkTreeDepth(attachModule, 0) > settings->lIncrements) {
 
-					bool collideSite = true;
-					int newModuleLocation = 0;
-					newModuleLocation = randomNum->randInt(genome->moduleParameters[attachModule]->maxChilds, 0);
+				}
+				else {
+					int attachType = genome->moduleParameters[attachModule]->type;
+					if (genome->moduleParameters[attachModule]->childSiteStates.size() < genome->moduleParameters[attachModule]->maxChilds) {
+						int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
 
-					// Check module to be created
-					int moduleAmount = 0;
-					int typeLoc = -1; // should always be assigned
-					for (int j = 0; j < settings->moduleTypes.size(); j++) {
-						if (newModuleType == settings->moduleTypes[j]) {
-							typeLoc = j;
-							for (int i = 0; i < genome->moduleParameters.size(); i++) {
-								if (genome->moduleParameters[i]->type == settings->moduleTypes[j]) {
-									moduleAmount++;
-									break;
+						bool collideSite = true;
+						int newModuleLocation = 0;
+						newModuleLocation = randomNum->randInt(genome->moduleParameters[attachModule]->maxChilds, 0);
+
+						// Check module to be created
+						int moduleAmount = 0;
+						int typeLoc = -1; // should always be assigned
+						for (int j = 0; j < settings->moduleTypes.size(); j++) {
+							if (newModuleType == settings->moduleTypes[j]) {
+								typeLoc = j;
+								for (int i = 0; i < genome->moduleParameters.size(); i++) {
+									if (genome->moduleParameters[i]->type == settings->moduleTypes[j]) {
+										moduleAmount++;
+										break;
+									}
 								}
 							}
 						}
-					}
 
 
-					if (moduleAmount > settings->maxModuleTypes[typeLoc][1]) {
+						if (moduleAmount > settings->maxModuleTypes[typeLoc][1]) {
 
-					}
-					else {
-						genome->moduleParameters[attachModule]->childSiteStates.push_back(newModuleType);
-						int newOr = randomNum->randInt(4, 0);
-						// add a new moduleParameter struct for the new genome
-						unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-						genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-						int theNewModule = genome->moduleParameters.size() - 1;
-						int n = randomNum->randInt(settings->moduleTypes.size() - 1, 1);
-						genome->moduleParameters[theNewModule]->type = settings->moduleTypes[n];
-						vector<float>tempVector;
-						// currently everything has a neural network...
-						genome->moduleParameters[theNewModule]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
-						genome->moduleParameters[theNewModule]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
-						genome->moduleParameters[theNewModule]->control->mutate(0.5);
-						genome->moduleParameters[theNewModule]->control->mutate(0.5);
-						cf.reset();
-						genome->moduleParameters[theNewModule]->control->mutate(0.8);
-						if (genome->moduleParameters[theNewModule]->type == 1) {
-							genome->moduleParameters[theNewModule]->maxChilds = 5;
-						}
-						else if (genome->moduleParameters[theNewModule]->type == 4) {
-							genome->moduleParameters[theNewModule]->maxChilds = 3;
 						}
 						else {
-							genome->moduleParameters[theNewModule]->maxChilds = 0;
+							genome->moduleParameters[attachModule]->childSiteStates.push_back(newModuleType);
+							int newOr = randomNum->randInt(4, 0);
+							// add a new moduleParameter struct for the new genome
+							unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
+							genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+							int theNewModule = genome->moduleParameters.size() - 1;
+							int n = randomNum->randInt(settings->moduleTypes.size() - 1, 1);
+							genome->moduleParameters[theNewModule]->type = settings->moduleTypes[n];
+							vector<float>tempVector;
+							// currently everything has a neural network...
+							genome->moduleParameters[theNewModule]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
+							genome->moduleParameters[theNewModule]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
+							genome->moduleParameters[theNewModule]->control->mutate(0.5);
+							genome->moduleParameters[theNewModule]->control->mutate(0.5);
+							cf.reset();
+							genome->moduleParameters[theNewModule]->control->mutate(0.8);
+							if (genome->moduleParameters[theNewModule]->type == 1) {
+								genome->moduleParameters[theNewModule]->maxChilds = 5;
+							}
+							else if (genome->moduleParameters[theNewModule]->type == 4) {
+								genome->moduleParameters[theNewModule]->maxChilds = 3;
+							}
+							else {
+								genome->moduleParameters[theNewModule]->maxChilds = 0;
+							}
+							genome->moduleParameters[theNewModule]->parent = attachModule;
+							genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
+							genome->moduleParameters[theNewModule]->orientation = newOr;
+							genome->amountModules = genome->moduleParameters.size();
 						}
-						genome->moduleParameters[theNewModule]->parent = attachModule;
-						genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
-						genome->moduleParameters[theNewModule]->orientation = newOr;
-						genome->amountModules = genome->moduleParameters.size();
 					}
 				}
 			}
@@ -575,6 +582,16 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 		cout << "mutated direct" << endl;
 	} 
 	return 1;
+}
+
+bool ER_DirectEncoding::checkTreeDepth(int attachModule, int increment) {
+	if (genome->moduleParameters[attachModule]->parent > -1) {
+		increment++;
+		return checkTreeDepth(genome->moduleParameters[attachModule]->parent, increment);
+	}
+	else {
+		return increment;
+	}
 }
 
 int ER_DirectEncoding::mutateControlERGenome(float mutationRate) {

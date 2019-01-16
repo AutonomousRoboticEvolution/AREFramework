@@ -19,6 +19,7 @@ public:
 	int initializeGenome(int type);
 	void initializeRobot(int type);
 	int mutateERGenome(float mutationRate);
+	bool checkTreeDepth(int attachModule, int increment);
 	int mutateControlERGenome(float mutationRate);
 
 	void deleteModuleFromGenome(int num);
