@@ -7,6 +7,9 @@ public:
 	CPPN();
 	~CPPN();
 	void init(int input, int inter, int output);
+	void mutate(float mutationRate);
 	void addNeurons(float mutationRate);
+	shared_ptr<Control> clone();
+	vector<float> update(vector<float> inputs);
 };
 

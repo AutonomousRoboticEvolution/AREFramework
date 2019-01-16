@@ -54,13 +54,14 @@ void ANN::init(int input, int inter, int output) {
 			recurrentLayer[i]->connectionWeights.push_back(1.0);
 		}
 		else {
-			recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-			recurrentLayer[i]->connectionWeights.push_back(1.0);
+			// now, additional recurrent neurons will not be connected to an output neuron
+			// recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
+			// recurrentLayer[i]->connectionWeights.push_back(1.0);
 		}
 	}
 //	cout << "OUTPUTSIZE = " << outputLayer.size() << endl;
-	checkConnections();
 	changeConnectionIDToPointer();
+	checkConnections();
 	neuronFactory.reset();
 //	cout << "OUTPUTSIZE = " << outputLayer.size() << endl;
 }
@@ -85,10 +86,10 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 		for (int j = 0; j < inputLayer[i]->connections.size(); j++) {
 			if (inputLayer[i]->connections[j] == NULL) {
 	//			cout << "ERROR: connection " << j << " of neuron " << i << " is NULL" << endl;
-				for (int k = 0; k < inputLayer[i]->connections.size(); k++) {
+	//			for (int k = 0; k < inputLayer[i]->connections.size(); k++) {
 	//				cout << "Con " << k << " = " << inputLayer[i]->connections[k] << endl;
 	//				cout << "Con ID " << k << " = " << inputLayer[i]->connectionsID[k] << endl;
-				}
+	//			}
 
 			}
 	//		cout << "j:" << j << endl;
@@ -171,7 +172,7 @@ vector<float> ANN::update(vector<float> sensorValues) {
 	}
 	cf += 0.5;
 //	printNeuronValues();
-	leaky(0.8);
+	//leaky(0.8);
 	return outputValues; 
 }
 
@@ -449,6 +450,7 @@ void ANN::mutate(float mutationRate) {
 			recurrentLayer[i]->mutate(mutationRate);
 		}
 	}
+	cout << "about to mutate neurons" << endl;
 	mutateConnections(mutationRate);
 	addNeurons(mutationRate);
 	removeNeurons(mutationRate);
@@ -518,6 +520,11 @@ stringstream ANN::getControlParams() {
 	return ss;
 }
 
+void ANN::setFloatParameters(vector<float> values) {
+	// function can be used to manually set specific parameters
+	recurrentLayer[0]->setFloatParameters(values);
+}
+
 void ANN::setControlParams(vector<string> values) {
 	bool checkingNeuron = false;
 	vector<string> neuronValues;
@@ -584,9 +591,6 @@ void ANN::changeConnectionIDToPointer() {
 		}
 		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());
 		for (int j = 0; j < inputLayer[i]->connectionsID.size(); j++) {
-			if (inputLayer[i]->connections[j] == NULL) {
-	//			cout << "ERROR: now inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
-			}
 			for (int k = 0; k < recurrentLayer.size(); k++) {
 				if (inputLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = recurrentLayer[k];

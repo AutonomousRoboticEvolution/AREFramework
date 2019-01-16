@@ -209,7 +209,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				//		saveLog();
 			}
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-				simStartSimulation();
+				// simStartSimulation();
 			}
 		}
 		//	}

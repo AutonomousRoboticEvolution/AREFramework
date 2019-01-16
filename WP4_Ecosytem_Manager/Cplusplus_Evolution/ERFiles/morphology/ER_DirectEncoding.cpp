@@ -450,9 +450,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 			}		
 			// add module
 			// select where module should be attached to
-			if (genome->moduleParameters.size() < settings->maxAmountModules) { // absolute max amount modules
+			if (genome->moduleParameters.size() < 50) { // absolute max amount modules
 				int attachModule = randomNum->randInt(genome->moduleParameters.size(), 0);
-				if (checkTreeDepth(attachModule, 0) > settings->lIncrements) {
+				if (checkTreeDepth(attachModule, 0) > settings->lIncrements -1 ) {
 
 				}
 				else {

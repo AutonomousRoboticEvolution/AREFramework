@@ -1,6 +1,7 @@
 #include "PatternNeuron.h"
 #include <iostream>
-#include <cmath>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 
 PatternNeuron::PatternNeuron() {

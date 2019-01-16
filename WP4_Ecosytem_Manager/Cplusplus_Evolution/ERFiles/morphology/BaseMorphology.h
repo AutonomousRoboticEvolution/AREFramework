@@ -49,6 +49,7 @@ public:
 	void saveGenome(int indNum, int sceneNum, float fitness);
 	void checkControl(int individual, int sceneNum);
 	
+	void savePhenotype(int ind, float fitness) {};
 	// note plural
 		
 	void setMainHandlePosition(float position[3]); 

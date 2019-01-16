@@ -28,6 +28,8 @@ public:
 	virtual shared_ptr<Genome> clone() const = 0;
 	virtual void mutate() = 0;
 
+	virtual void savePhenotype(int indNum, int sceneNum) = 0;
+
 	virtual void loadGenome(int indNum, int sceneNum) = 0;
 	virtual void saveGenome(int indNum, int sceneNum) = 0;
 	virtual void clearGenome() = 0;

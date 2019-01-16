@@ -20,8 +20,8 @@ public:
 	void update(); 
 	void updateColors();
 	void checkForceSensors();
-	void initializeGenomeCustom(int type);
-	void initializeLRobot(int type);
+	void initializeGenomeCustom(int type) {};
+	void initializeLRobot(int type) {};
 	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
 
 	int initializeCPPNEncoding(float initialPosition[3]);
@@ -33,6 +33,8 @@ public:
 
 	void printSome();
 	int getMainHandle();
+
+	void savePhenotype(int ind, float fitness);
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();

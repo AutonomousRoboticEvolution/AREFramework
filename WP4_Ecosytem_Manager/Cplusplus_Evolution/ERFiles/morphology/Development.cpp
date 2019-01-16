@@ -59,6 +59,45 @@ void Development::init_noMorph() {
 
 }
 
+//vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
+	
+//}
+
+void Development::savePhenotype(vector<shared_ptr<ER_Module>> createdModules, int indNum, float fitness)
+{
+	cout << "saving direct genome " << endl << "-------------------------------- " << endl;
+	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
+	int amountExpressedModules = createdModules.size();
+	
+	ofstream genomeFile;
+	ostringstream genomeFileName;
+	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotye" << indNum << ".csv";
+
+	genomeFile.open(genomeFileName.str());
+	genomeFile << "#Individual:" << indNum << endl;
+	genomeFile << "#Fitness:," << fitness << endl;
+	genomeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
+	//	cout << "#AmountStates:," << amountStates << "," << endl << endl;
+
+	genomeFile << "Module Parameters Start Here: ," << endl << endl;
+	for (int i = 0; i < createdModules.size(); i++) {
+		genomeFile << "#Module:," << i << endl;
+		genomeFile << "#ModuleType:," << createdModules[i]->type << endl;
+		
+		genomeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
+		genomeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
+		genomeFile << "#Orientation:," << createdModules[i]->orientation << endl;
+
+		genomeFile << "#ControlParams:," << endl;
+		genomeFile << createdModules[i]->control->getControlParams().str();
+		genomeFile << "#EndControlParams" << endl;
+		genomeFile << "#EndOfModule," << endl << endl;
+	}
+	genomeFile << "End Module Parameters" << endl;
+	genomeFile.close();
+}
+
+
 void Development::init() {
 
 }

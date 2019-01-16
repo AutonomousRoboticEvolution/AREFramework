@@ -21,6 +21,7 @@ public:
 	virtual void init() = 0;
 	virtual void init_noMorph() = 0;
 	virtual void clearMorph() = 0;
+	virtual void savePhenotype(int ind, float fitness) = 0;
 
 	virtual void mutate() = 0;
 	virtual void create() = 0;

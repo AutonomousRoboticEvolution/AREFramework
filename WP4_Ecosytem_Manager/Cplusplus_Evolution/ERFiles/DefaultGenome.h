@@ -8,32 +8,18 @@
 #include <memory>
 #include "../RandNum.h"
 #include "Settings.h"
+#include "Genome.h"
 
-using namespace std;
-
-class DefaultGenome 
+class DefaultGenome : public Genome
 {
 public:
 	DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st);
 	DefaultGenome() {};
 	
 	~DefaultGenome();
-	unique_ptr<DefaultGenome> clone() const;
-	//GenomeClone* clone() const { return new DefaultGenome(*this); }
-	int morphologyType = 1;
-//	vector<Morphology> genomeMorphologies;
-	void saveGenome(int indNum, int sceneNum);
-	bool isEvaluated = false;
+	shared_ptr<Genome> clone() const;
 
 	void createInitialMorphology(int individualNumber);
-	void controlHandle();
-
-	shared_ptr<Settings> settings;
-	shared_ptr<RandNum> randNum;
-	shared_ptr<Morphology> morph;
-	shared_ptr<Control> control;
-
-//	unique_ptr<Control> control;
 
 	int age = 0;
 	int maxAge = 0;
@@ -41,36 +27,27 @@ public:
 	float mutationRate = 0.05f;
 	float parentPhenValue;
 
+	void savePhenotype(int indNum, int sceneNum);
 	void init();
-	void init_noMorph();
-	void mutate();
 	void create();
-	void createAtPosition(float x, float y, float z);
 	void update(); 
+	void loadGenome(int indNum, int sceneNum);
+	void saveGenome(int indNum, int sceneNum);
+	void clearGenome();
+	void mutate();
+	void checkGenome();
+	shared_ptr<Genome> cloneGenome();
 
-//	DefaultGenome * clone(DefaultGenome *parent);
-	
-	void mutate(float);
-	void loadGenome(){};
-	float evaluateGenome(int sceneNum);
-	float evaluateGenomeStep(int sceneNum);
+	void init_noMorph();
+	void createAtPosition(float x, float y, float z);
+
+	//void mutate();
 	float genomeFitness;  
 
 	void loadMorphologyGenome(int indNum, int sceneNum); 
+	void loadBaseMorphology(int indNum, int sceneNum); // old
 
-	void duplicate(){};
-	void deleteCreated();
 
-	void loadBaseMorphology(int indNum, int sceneNum);
-
-	void clearGenome();
-	void checkGenome();
-
-	void currentGenomeChecker();
-	int individualNumber;
-	void printIndividualInfo();
-
-	// for crossing over the lSystem
 protected:
 
 };

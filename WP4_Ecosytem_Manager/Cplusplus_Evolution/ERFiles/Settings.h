@@ -5,7 +5,7 @@
 #include <fstream> // ifstream
 #include <list>
 #include <vector>
-#include "../dynamixel/c++/src/dynamixel_sdk.h"
+//#include "../dynamixel/c++/src/dynamixel_sdk.h"
 
 #define PROTOCOL_VERSION1               1.0                 // See which protocol version is used in the Dynamixel
 #define PROTOCOL_VERSION2               2.0
@@ -85,9 +85,9 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-		CUSTOM_MODULAR_MORPHOLOGY = 6,
-		QUADRUPED_GENERATIVE = 7, 
-		QUADRUPED_DIRECT = 8,
+		CUSTOM_MODULAR_MORPHOLOGY = 6, // not working 
+		QUADRUPED_GENERATIVE = 7, // head missing
+		QUADRUPED_DIRECT = 8, // not working. 
 		CUSTOM_SOLAR_GENERATIVE = 9
 	
 	};
@@ -113,7 +113,6 @@ public:
 		RANDOM_SEARCH = 0,
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
-		NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
 		EMPTY_RUN = 5,
 		AFPO
@@ -123,6 +122,12 @@ public:
 		INSTANCE_REGULAR = 0,
 		INSTANCE_SERVER = 1
 	};
+
+	enum OS {
+		WINDOWS,
+		LINUX
+	};
+
 	/*enum LSystemType{
 	DEFAULT_LSYSTEM = 0,
 	CUBE_LSYSTEM = 1,
@@ -136,18 +141,23 @@ public:
 	FitnessType fitnessType = MOVE;
 	EnvironmentType environmentType = DEFAULT_ENV;
 	MoveDirection moveDirection = DISTANCE_XY;
-	MorphologyType morphologyType = MODULAR_DIRECT; // CUSTOM_MODULAR_MORPHOLOGY; //MODULAR_LSYSTEM;//CAT_MORPHOLOGY;// MODULAR_LSYSTEM;
-	ControlType controlType = ANN_DISTRIBUTED_BOTH;
+	MorphologyType morphologyType = CAT_MORPHOLOGY; // CUSTOM_MODULAR_MORPHOLOGY; //MODULAR_LSYSTEM;//CAT_MORPHOLOGY;// MODULAR_LSYSTEM;
+	ControlType controlType = ANN_DEFAULT;
 	SelectionType selectionType = RANDOM_SELECTION;
 	ReplacementType replacementType = RANDOM_REPLACEMENT;
+
 //	EvolutionType evolutionType = GENERATIONAL; // not implemented yet
 
-	float mutationRate = 0.1;
+	int indCounter;
+	int sceneNum;
+
+	bool client;
+	float mutationRate = 0.8;
 	float morphMutRate = 0.15;
 	int generation = 0;
 	int maxGeneration = 1000;
 	int xGenerations = 1000;
-	int populationSize = 2;
+	int populationSize = 3;
 	int individualCounter = 0;
 	int crossover = 0;
 	float crossoverRate = 0;
@@ -164,7 +174,7 @@ public:
 	float maxForce = 1.5;
 	float maxForceSensor = 80; // N*m
 	int consecutiveThresholdViolations = 10;
-	int maxAmountModules = 5;
+	int maxAmountModules = 20;
 	vector<int> moduleTypes;
 	vector<vector<int> > maxModuleTypes;
 	string repository = "files";
@@ -179,18 +189,19 @@ public:
 	int initialInputNeurons = 3;
 	int initialInterNeurons = 1;
 	int initialOutputNeurons = 3;
-
-
+	int initialAmountConnectionsNeurons = 3;
+	int	maxAddedNeurons = 4;
+	bool savePhenotype = true;
 	vector<int> envObjectHandles;
 
 	void openPort();
 
-	dynamixel::PacketHandler *packetHandler1;
-	dynamixel::PacketHandler *packetHandler2;
-	dynamixel::PortHandler *portHandler;
+//	dynamixel::PacketHandler *packetHandler1;
+//	dynamixel::PacketHandler *packetHandler2;
+//	dynamixel::PortHandler *portHandler;
 
-	void readSettings(int sceneNum);
-	void saveSettings(int sceneNum);
+	void readSettings();
+	void saveSettings();
 	bool portOpen = false;
 private:
 	void split_line(string& line, string delim, list<string>& values);

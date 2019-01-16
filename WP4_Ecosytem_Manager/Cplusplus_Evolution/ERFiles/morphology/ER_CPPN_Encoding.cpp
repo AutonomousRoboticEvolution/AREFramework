@@ -290,7 +290,6 @@ void ER_CPPN_Encoding::saveGenome(int indNum, int sceneNum, float fitness) {
 	cout << "saving CPPN genome " << endl << "-------------------------------- "<< endl;
 	// TODO
 
-
 	int amountStates = genome->moduleParameters.size(); 
 	ofstream genomeFile; 
 	ostringstream genomeFileName; 
@@ -308,36 +307,6 @@ void ER_CPPN_Encoding::saveGenome(int indNum, int sceneNum, float fitness) {
 	genomeFile << "#CPPN_End," << endl;
 	genomeFile << endl;
 
-	genomeFile << "#DirectRepresentation:," << endl;
-	genomeFile << "Module Parameters Start Here: ," << endl << endl;
-	for (int i = 0; i < amountStates; i++) {
-		if (genome->moduleParameters[i]->expressed == true) {
-			genomeFile << "#Module:," << i << endl;
-			genomeFile << "#ModuleType:," << genome->moduleParameters[i]->type << endl;
-			//		genomeFile << "#ModuleState:," << genome->moduleParameters[i]->currentState << endl; 
-			genomeFile << "#ModuleParent:," << genome->moduleParameters[i]->parent << endl;
-			genomeFile << "#ParentSite:," << genome->moduleParameters[i]->parentSite << endl;
-			genomeFile << "#ParentSiteOrientation:," << genome->moduleParameters[i]->orientation << endl;
-			genomeFile << "#AmountChilds:," << "0," << endl;
-			//		genomeFile << "#AmountChilds:," << genome->moduleParameters[i]->amountChilds << endl;
-			genomeFile << "#ChildSites:,";
-			for (int j = 0; j < genome->moduleParameters[i]->childSites.size(); j++) {
-				genomeFile << genome->moduleParameters[i]->childSites[j] << ",";
-			} genomeFile << endl;
-			genomeFile << "#ChildConfigurations:,";
-			for (int j = 0; j < genome->moduleParameters[i]->childConfigurations.size(); j++) {
-				genomeFile << genome->moduleParameters[i]->childConfigurations[j] << ",";
-			} genomeFile << endl;
-			genomeFile << "#ChildSiteStates:,";
-			for (int j = 0; j < genome->moduleParameters[i]->childSiteStates.size(); j++) {
-				genomeFile << genome->moduleParameters[i]->childSiteStates[j] << ",";
-			} genomeFile << endl;
-			//		genomeFile << "," << lGenome->lParameters[i]->moduleType << ",";
-			genomeFile << "#ControlParams:," << endl;
-			genomeFile << genome->moduleParameters[i]->control->getControlParams().str();
-			genomeFile << "#EndOfModule," << endl << endl;
-		}
-	}
 	genomeFile.close();
 }
 
@@ -423,9 +392,6 @@ void ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 			it++;
 			tmp = *it;
 			int ac = atoi(tmp.c_str());
-			genome->moduleParameters[moduleNum]->amountChilds = ac;
-			genome->moduleParameters[moduleNum]->childSites.resize(ac);
-			genome->moduleParameters[moduleNum]->childConfigurations.resize(ac);
 			genome->moduleParameters[moduleNum]->childSiteStates.resize(ac);
 		}
 		else if (tmp == "#ModuleParent:")
@@ -450,35 +416,11 @@ void ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 		{
 			genome->moduleParameters[moduleNum]->orientation = atoi(tmp.c_str());
 		}
-		else if (tmp == "#ChildSites:") {
-			genome->moduleParameters[moduleNum]->maxChilds = 0;
-			for (int i = 0; i < genome->moduleParameters[moduleNum]->amountChilds; i++) {
-				it++;
-				tmp = *it;
-				genome->moduleParameters[moduleNum]->childSites[i] = atoi(tmp.c_str());
-			}
-		}
-		else if (tmp == "#ChildConfigurations:") {
-			for (int i = 0; i < genome->moduleParameters[moduleNum]->amountChilds; i++) {
-				it++;
-				tmp = *it;
-				genome->moduleParameters[moduleNum]->childConfigurations[i] = atoi(tmp.c_str());
-			}
-		}
-		else if (tmp == "#ChildSiteStates:") {
-	//		cout << "loading childSiteStates" << endl;
-			for (int i = 0; i < genome->moduleParameters[moduleNum]->amountChilds; i++) {
-				it++;
-				tmp = *it;
-				genome->moduleParameters[moduleNum]->childSiteStates[i] = atoi(tmp.c_str());
-			}
-		}
 		else if (tmp == "#ModuleType:") {
 			it++;
 			tmp = *it;
 	//		cout << "creating module of type: " << atoi(tmp.c_str()) << endl; 
 			genome->moduleParameters[moduleNum]->type = atoi(tmp.c_str());
-			genome->moduleParameters[moduleNum]->currentState = moduleNum;
 	//		cout << "state = " << lGenome->lParameters[moduleNum].module->state << endl;
 		}
 		if (tmp == "#CPPN_Start") {
@@ -608,12 +550,9 @@ int ER_CPPN_Encoding::mutateControlERGenome(float mutationRate) {
 
 void ER_CPPN_Encoding::deleteModuleFromGenome(int num)
 {
-	while (genome->moduleParameters[num]->childStates.size() > 0) {
-		deleteModuleFromGenome(genome->moduleParameters[num]->childStates.size() - 1);
-		genome->moduleParameters[num]->childSites.pop_back();
-		genome->moduleParameters[num]->childConfigurations.pop_back();
+	while (genome->moduleParameters[num]->childSiteStates.size() > 0) {
+		deleteModuleFromGenome(genome->moduleParameters[num]->childSiteStates.size() - 1);
 		genome->moduleParameters[num]->childSiteStates.pop_back();
-		genome->moduleParameters[num]->childStates.pop_back();
 	}
 }
 

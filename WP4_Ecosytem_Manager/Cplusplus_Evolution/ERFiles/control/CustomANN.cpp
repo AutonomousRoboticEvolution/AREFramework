@@ -19,16 +19,19 @@ void CustomANN::init(int input, int inter, int output) {
 	for (int i = 0; i < input; i++) {
 		inputLayer.push_back(neuronFactory->createNewNeuronGenome(1, settings));
 		inputLayer[i]->init(neuronID);
+		inputLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
 	}
 	for (int i = 0; i < inter; i++) {
 		recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates pattern neuron 
 		recurrentLayer[i]->init(neuronID);
+		recurrentLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
 	}
 	for (int i = 0; i < output; i++) {
 		outputLayer.push_back(neuronFactory->createNewNeuronGenome(2, settings));
 		outputLayer[i]->init(neuronID);
+		outputLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
 	}
 	inputLayer[0]->connectionsID.push_back(recurrentLayer[0]->neuronID);
@@ -95,11 +98,10 @@ void CustomANN::checkConnections() { // this function deletes the connections to
 }
 
 vector<float> CustomANN::update(vector<float> sensorValues) {
-	cout << "check" << endl;
 	vector<float> outputValues; 
 	if (sensorValues.size() != inputLayer.size()) {
-		std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
-		cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
+		//std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
+		//cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
 	}
 	else {
 		for (int i = 0; i < sensorValues.size(); i++) {
@@ -110,11 +112,17 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->update();
 	}
+	cf = 0.0;
 	for (int i = 0; i < outputLayer.size(); i++) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
+		cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
+		// cout << "outputvalues " <<  outputValues[0] << endl;
 	}
-	return outputValues; 
+	cf += 0.5;
+	//	printNeuronValues();
+		//leaky(0.8);
+	return outputValues;
 }
 
 void CustomANN::mutateConnections(float mutationRate) {
@@ -123,6 +131,11 @@ void CustomANN::mutateConnections(float mutationRate) {
 
 void CustomANN::addNeurons(float mutationRate) {
 	ANN::addNeurons(mutationRate);
+}
+
+void CustomANN::setFloatParameters(vector<float> values) {
+	// function can be used to manually set specific parameters
+	recurrentLayer[0]->setFloatParameters(values);
 }
 
 void CustomANN::removeNeurons(float mutationRate) {

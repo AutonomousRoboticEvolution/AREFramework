@@ -169,88 +169,95 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	}
 
 	for (int i = 1; i < modules.size(); i++) {
-		int parentNr = genome->moduleParameters[i]->parent;
-		int parentSite = genome->moduleParameters[i]->parentSite;
-		int orien = genome->moduleParameters[i]->orientation;
-		int createdParentNumber = -1;
-		for (int n = 0; n < createdModules.size(); n++)
-		{
-			if (createdModules[n]->moduleID == parentNr) {
-				createdParentNumber = n;
-				// modules[i]->parentModulePointer = createdModules[n];
-			}
-		}
-
-		if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-			if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
-				cout << "state " << createdModules[createdParentNumber]->state << ",";
-				cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
-				//	cout << "id " << createdModules[parentNr]-> << endl;
-			}
-			// parentHandle = createdModules[i]->parentModulePointer->;
-			cout << "should create module : " << i << ",";
-			shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
-			if (parentModulePointer == NULL) {
-				cout << ", null , ";
-			}
-			// cout << "parent = " << modules[i]->parent << endl;
-			// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
-			// cout << "parentModulePointer = " << parentModulePointer << ", ";
-			// cout << "parentSite = " << parentSite << ", ";
-			// cout << " .. " << parentModulePointer->moduleID << ",";
-			// cout << " pType " << parentModulePointer->type << ",";
-			cout << "orientation " << orien << endl;
-			parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
-			int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
-			// cout << " 1 ,";
-			createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
-			// cout << " 1.1, ";
-			int createdModulesSize = createdModules.size();
-			vector<float> siteConfiguration;
-			// cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
-			// cout << createdModules[createdParentNumber]->type << ",";
-			// cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
-			siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
-			// cout << " a ,";
-			createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
-			createdModulesSize = createdModules.size();
-			// cout << " b ,";
-
-			// set color
-			// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
-
-			vector<int> exception;
-			exception.push_back(parentHandle);
-			for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-				exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+		if (i < settings->maxAmountModules) {
+			int parentNr = genome->moduleParameters[i]->parent;
+			int parentSite = genome->moduleParameters[i]->parentSite;
+			int orien = genome->moduleParameters[i]->orientation;
+			int createdParentNumber = -1;
+			for (int n = 0; n < createdModules.size(); n++)
+			{
+				if (createdModules[n]->moduleID == parentNr) {
+					createdParentNumber = n;
+					// modules[i]->parentModulePointer = createdModules[n];
+				}
 			}
 
-			if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-				createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-				//		genome->moduleParameters[i]->expressed = false;
+			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
+				if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
+					cout << "state " << createdModules[createdParentNumber]->state << ",";
+					cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
+					//	cout << "id " << createdModules[parentNr]-> << endl;
+				}
+				// parentHandle = createdModules[i]->parentModulePointer->;
+				cout << "should create module : " << i << ",";
+				shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
+				if (parentModulePointer == NULL) {
+					cout << ", null , ";
+				}
+				// cout << "parent = " << modules[i]->parent << endl;
+				// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+				// cout << "parentModulePointer = " << parentModulePointer << ", ";
+				// cout << "parentSite = " << parentSite << ", ";
+				// cout << " .. " << parentModulePointer->moduleID << ",";
+				// cout << " pType " << parentModulePointer->type << ",";
+				cout << "orientation " << orien << endl;
+				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
+				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
+				// cout << " 1 ,";
+				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+				// cout << " 1.1, ";
+				int createdModulesSize = createdModules.size();
+				vector<float> siteConfiguration;
+				// cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
+				// cout << createdModules[createdParentNumber]->type << ",";
+				// cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
+
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
+				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
+				// cout << " a ,";
+				createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
+				createdModulesSize = createdModules.size();
+				// cout << " b ,";
+
+				// set color
+				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
+
+				vector<int> exception;
+				exception.push_back(parentHandle);
+				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+				}
+
+				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
+					createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+					//		genome->moduleParameters[i]->expressed = false;
+				}
+				else {
+					for (int n = 0; n < modules.size(); n++) {
+						if (modules[n]->parent == i) {
+							modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+						}
+					}
+					genome->moduleParameters[i]->expressed = true;
+				}
+				cout << "created Module" << endl;
 			}
 			else {
-				for (int n = 0; n < modules.size(); n++) {
-					if (modules[n]->parent == i) {
-						modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-					}
+				for (int j = 0; j < genome->moduleParameters.size(); j++) {
+					cout << "pi: " << genome->moduleParameters[j]->parent << endl;
 				}
-				genome->moduleParameters[i]->expressed = true;
+				cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
 			}
-			cout << "created Module" << endl;
 		}
 		else {
-			for (int j = 0; j < genome->moduleParameters.size(); j++) {
-				cout << "pi: " << genome->moduleParameters[j]->parent << endl;
-			}
-			cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
+			cout << "Already created " << settings->maxAmountModules << endl;
+			break;
 		}
+		
 	}
 
 //	cout << "shifting robot position" << endl;

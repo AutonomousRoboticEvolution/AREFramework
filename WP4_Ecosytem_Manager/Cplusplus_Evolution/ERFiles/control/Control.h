@@ -25,6 +25,7 @@ public:
 	float cf = 1.0;
 	shared_ptr<RandNum> randomNum;
 	shared_ptr<Settings> settings;
+	virtual void setFloatParameters(vector<float> values) = 0;
 //	virtual void deleteControl() = 0;
 //	vector<ANN> aNN;
 //	vector<FixedPosition> fixedControl;

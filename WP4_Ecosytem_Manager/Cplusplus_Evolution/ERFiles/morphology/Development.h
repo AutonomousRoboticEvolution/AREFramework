@@ -21,6 +21,33 @@ public:
 	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
 
+	struct MODULEPARAMETERS {
+		// State specific parameters
+		shared_ptr<MODULEPARAMETERS> clone() const {
+			return make_unique<MODULEPARAMETERS>(*this);
+		};
+		bool expressed = true;
+		int maxChilds;
+
+		// not stored in genome
+		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
+		float rgb[3];
+		// parameter identifiers
+		int handle;
+		float color[3] = { 0.45f,0.45f,0.45f };
+		shared_ptr<Control> control;
+		float moduleColor[3];
+		int type = -1; // cube, servo, leaf, etc.
+
+		// for direct encoding
+		int parent;
+		int parentSite;
+		int orientation;
+	};
+	
+	void savePhenotype(vector<shared_ptr<ER_Module>> createdModules, int indNum, float fitness);
+	void savePhenotype(int ind, float fitness) {};
+
 	void init();
 	void mutate();
 	void create();
@@ -37,6 +64,7 @@ public:
 	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
 	//	ER_LSystem getMultiPurposeLSystemPointer();
 	void init_noMorph();
+	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
 	// object creators
 	void createAtPosition(float x, float y, float z);
 
