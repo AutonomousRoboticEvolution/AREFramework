@@ -1,24 +1,25 @@
 #pragma once
 
 #include <vector>;
-#include "BaseMorphology.h"
+#include "Development.h"
 #include <algorithm>
 
 using namespace std;
 
 
-class ER_DirectEncoding : public BaseMorphology
+class ER_DirectEncoding : public Development
 {
 public:
 	ER_DirectEncoding();
 	~ER_DirectEncoding();
 
 	void init();
-	void mutate(float mutationRate);
+	void mutate();
 
 	int initializeGenome(int type);
 	void initializeRobot(int type);
 	int mutateERGenome(float mutationRate);
+	bool checkTreeDepth(int attachModule, int increment);
 	int mutateControlERGenome(float mutationRate);
 
 	void deleteModuleFromGenome(int num);
@@ -34,6 +35,7 @@ public:
 	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
 	float getFitness();
 	void loadGenome(int individualNumber, int sceneNum);
+	void setGenomeColors();
 	void symmetryMutation(float mutationRate); 
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 protected:
@@ -52,28 +54,15 @@ protected:
 		shared_ptr<MODULEPARAMETERS> clone() const {
 			return make_unique<MODULEPARAMETERS>(*this);
 		};
-		int currentState;		// The current state of the object
-		int newState;			// The state of the object can change in this particular state. 
-
-		int amountChilds;		// How much childs need to be created 
-		int connectType;
-
 		bool expressed = true;
-	
-		vector<int> childStates; // -1 = no child able
-		int childObjectType; // cube, light-Sensor, sphere
-		int childConnectType; // joint, force sensor
 		int maxChilds; 
 
-		vector<int> attachmentSites;
-		vector<int> attachmentObjects; // corresponds to the object number used to identify a specific object within a state. 0 is the default parent. 
+		// not stored in genome
 		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
-		vector<int> childConfigurations; 
 		float rgb[3];
 		// parameter identifiers
 		int handle;	
 		float color[3] = { 0.45f,0.45f,0.45f };
-		vector <int>childSites;
 		shared_ptr<Control> control;
 		float moduleColor[3];
 		int type = -1; // cube, servo, leaf, etc.

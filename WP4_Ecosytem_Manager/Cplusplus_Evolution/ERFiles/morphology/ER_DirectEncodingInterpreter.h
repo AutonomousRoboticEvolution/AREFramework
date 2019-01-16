@@ -20,7 +20,7 @@ public:
 	void update(); 
 	void updateColors();
 	void checkForceSensors();
-	void initializeGenomeCustom(int type);
+	void initializeGenomeCustom(int type) {};
 	void initializeLRobot(int type);
 	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
 
