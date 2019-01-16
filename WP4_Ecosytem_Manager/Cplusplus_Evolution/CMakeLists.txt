@@ -89,7 +89,6 @@ set_target_properties(v_repExtER PROPERTIES
 
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(v_repExtER PUBLIC "__WINDOWS__")
-    target_compile_definitions(v_repExtER PUBLIC "_USE_MATH_DEFINES")
 elseif(APPLE)
     target_compile_definitions(v_repExtER PUBLIC "__APPLE__")
 elseif(UNIX)    
