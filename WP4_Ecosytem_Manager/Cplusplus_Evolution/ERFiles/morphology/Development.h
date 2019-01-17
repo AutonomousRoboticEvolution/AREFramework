@@ -2,8 +2,8 @@
 #include "BaseMorphology.h"
 #include <memory>
 #include <fstream>
-#include "../module/ER_Module.h"
-#include "../module/ModuleFactory.h"
+//#include "../module/ER_Module.h"
+//#include "../module/ModuleFactory.h"
 //#include "../eigen/Eigen/Dense"
 #include "../eigen/Eigen/Dense"
 #include <vector>
@@ -18,13 +18,13 @@ public:
 	Development();
 	~Development();
 //	typedef shared_ptr<ER_Module> ModulePointer;
-	vector <shared_ptr<ER_Module>> getCreatedModules();
+//	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
 
-	struct MODULEPARAMETERS {
+	struct BASEMODULEPARAMETERS {
 		// State specific parameters
-		shared_ptr<MODULEPARAMETERS> clone() const {
-			return make_unique<MODULEPARAMETERS>(*this);
+		shared_ptr<BASEMODULEPARAMETERS> clone() const {
+			return make_unique<BASEMODULEPARAMETERS>(*this);
 		};
 		bool expressed = true;
 		int maxChilds;
@@ -45,8 +45,12 @@ public:
 		int orientation;
 	};
 	
-	void savePhenotype(vector<shared_ptr<ER_Module>> createdModules, int indNum, float fitness);
+	void savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
 	void savePhenotype(int ind, float fitness) {};
+
+	vector<shared_ptr<BASEMODULEPARAMETERS>> loadBasePhenotype(int indNum);
+	void loadPhenotype(int ind) {}; 
+
 
 	void init();
 	void mutate();
@@ -54,14 +58,13 @@ public:
 	float callFitness();
 	void update();
 
-	void checkForceSensors();
-
-	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
+//	void checkForceSensors();
+//	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
 
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
-	vector<float> checkCollisionReturnPos(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
-	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
+//	vector<float> checkCollisionReturnPos(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
+//	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
 	//	ER_LSystem getMultiPurposeLSystemPointer();
 	void init_noMorph();
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
@@ -100,11 +103,11 @@ public:
 	struct PlanePoints {
 		float points[4][3];
 	};
-	float checkArea(float interSection[3], float pps[4][3]);
-	CollisionPars checkIntersection(float pps[4][3], float color[3], float rayVector[3], float rayOrigin[3], float vectorDirections[3]);
-	void cubeDrawing(vector<vector<float>> rotatedPoints, float color[3]);
-	vector<int> debugDrawings;
-	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
+//	float checkArea(float interSection[3], float pps[4][3]);
+//	CollisionPars checkIntersection(float pps[4][3], float color[3], float rayVector[3], float rayOrigin[3], float vectorDirections[3]);
+//	void cubeDrawing(vector<vector<float>> rotatedPoints, float color[3]);
+//	vector<int> debugDrawings;
+//	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 
 protected:
 

@@ -578,8 +578,17 @@ int ER_CPPN_Interpreter::getMainHandle() {
 
 void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
 {
-	ER_CPPN_Encoding::amountIncrement;
-	Development::savePhenotype(createdModules, ind, fitness);
+	// change createdModules back to a moduleParameters array. 
+	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
+	for (int i = 0; i < createdModules.size(); i++) {
+		bmp.push_back(shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
+		bmp[i]->control = createdModules[i]->control; // no deep copy needed since created modules will be deleted
+		bmp[i]->type = createdModules[i]->type;
+		bmp[i]->parent = createdModules[i]->parent;
+		bmp[i]->parentSite = createdModules[i]->parentSite;
+		bmp[i]->orientation = createdModules[i]->orientation;
+	}
+	Development::savePhenotype(bmp, ind, fitness);
 }
 
 int ER_CPPN_Interpreter::getAmountBrokenModules() {

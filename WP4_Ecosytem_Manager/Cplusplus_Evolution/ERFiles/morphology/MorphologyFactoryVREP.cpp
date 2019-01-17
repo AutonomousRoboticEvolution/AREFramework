@@ -121,6 +121,12 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
 		m_morph->settings = st;
 		return m_morph;
 	}
+	case 11: {
+		shared_ptr<Morphology> morph(new ER_DirectEncodingInterpreter);
+		morph->randomNum = rn;
+		morph->settings = st;
+		return morph;
+	}
 	default: {
 		shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
 		return fixedBaseMorph;
@@ -237,7 +243,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 	}
 	case 10: {
 		// transform ER_CPPN_Encoding to ER_CPPN_Interpreter
-// first save do a static cast to access ER_CPPN_Encoding values
+		// first save do a static cast to access ER_CPPN_Encoding values
 		std::shared_ptr<EdgarsAmazingMorphologyClassVREP> placeHolder;
 		placeHolder = std::static_pointer_cast<EdgarsAmazingMorphologyClassVREP>(morph);
 
@@ -252,6 +258,19 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 		//shared_ptr<Morphology> m_morph(new EdgarsAmazingMorphologyClassVREP);
 		//EdgarsAmazingMorphologyClass 
 		//return m_morph;
+	}
+	case 11: {
+		// transform ER_CPPN_Encoding to ER_CPPN_Interpreter
+		// first save do a static cast to access ER_CPPN_Encoding values
+		std::shared_ptr<ER_DirectEncodingInterpreter> placeHolder;
+		placeHolder = std::static_pointer_cast<ER_DirectEncodingInterpreter>(morph);
+
+		shared_ptr<ER_DirectEncodingInterpreter> castObject;
+		castObject = make_shared<ER_DirectEncodingInterpreter>();
+		castObject->genome = placeHolder->genome;
+		castObject->randomNum = placeHolder->randomNum;
+		castObject->settings = placeHolder->settings;
+		return castObject;
 	}
 	default: {
 		shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);

@@ -172,9 +172,13 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 				stringstream ss;
 				ss << settings->repository + "/morphologies" << settings->sceneNum << "/genome" << nextGenGenomes[p]->individualNumber << ".csv";
 				string genomeFileName = ss.str();
+				stringstream ssp;
+				ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[p]->individualNumber << ".csv";
+				string phenotypeFileName = ssp.str();	
 				//	genomeFileName << indNum << ".csv";
 				cout << "Removing " << nextGenGenomes[p]->individualNumber << endl;
 				remove(genomeFileName.c_str());
+				remove(phenotypeFileName.c_str());
 			}
 		}
 	}

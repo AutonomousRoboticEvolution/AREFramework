@@ -84,7 +84,7 @@ bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module
 
 			// checks if collition with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
 			// don't delete this function!
-			if (createdModules[0]->type = 8) {
+			if (createdModules[0]->type == 8) {
 				if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
 					return true;
 				}
@@ -116,6 +116,7 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 
 
 void ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum) {
+	// NEVER LOADS THROUGH THIS CLASS ANYMORE???
 	ER_DirectEncoding::loadGenome(individualNumber, sceneNum);
 	cout << "ADJUSTING DIRECT GENOME" << endl;
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
@@ -294,6 +295,24 @@ void ER_DirectEncodingInterpreter::setPhenValue() {
 	}
 	phenValue = val; 
 }
+
+void ER_DirectEncodingInterpreter::savePhenotype(int ind, float fitness)
+{
+	// change createdModules back to a moduleParameters array. 
+	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
+	for (int i = 0; i < createdModules.size(); i++) {
+		bmp.push_back(shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
+		bmp[i]->control = createdModules[i]->control; // no deep copy needed since created modules will be deleted
+		bmp[i]->type = createdModules[i]->type;
+		bmp[i]->parent = createdModules[i]->parent;
+		bmp[i]->parentSite = createdModules[i]->parentSite;
+		bmp[i]->orientation = createdModules[i]->orientation;
+	}
+	Development::savePhenotype(bmp, ind, fitness);
+}
+
+
+
 
 void ER_DirectEncodingInterpreter::init() { // should use create instead
 	ER_DirectEncoding::init();

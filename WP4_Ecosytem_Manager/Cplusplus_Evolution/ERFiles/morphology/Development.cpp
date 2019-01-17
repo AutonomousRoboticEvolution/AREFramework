@@ -1,5 +1,6 @@
 #include "Development.h"
 #include <iostream>
+#include <algorithm>
 
 Development::Development()
 {
@@ -21,9 +22,9 @@ int Development::getAmountBrokenModules() {
 	return amountBrokenModules;
 }
 
-vector <shared_ptr<ER_Module>> Development::getCreatedModules() {
-	return createdModules;
-}
+//vector <shared_ptr<ER_Module>> Development::getCreatedModules() {
+//	return createdModules;
+//}
 
 void Development::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl;
@@ -63,15 +64,15 @@ void Development::init_noMorph() {
 	
 //}
 
-void Development::savePhenotype(vector<shared_ptr<ER_Module>> createdModules, int indNum, float fitness)
+void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
 {
-	cout << "saving direct genome " << endl << "-------------------------------- " << endl;
+	cout << "saving direct phenotype genome " << endl << "-------------------------------- " << endl;
 	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountExpressedModules = createdModules.size();
 	
 	ofstream genomeFile;
 	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotye" << indNum << ".csv";
+	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
 
 	genomeFile.open(genomeFileName.str());
 	genomeFile << "#Individual:" << indNum << endl;
@@ -95,6 +96,113 @@ void Development::savePhenotype(vector<shared_ptr<ER_Module>> createdModules, in
 	}
 	genomeFile << "End Module Parameters" << endl;
 	genomeFile.close();
+}
+
+std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
+{
+	cout << "loading direct phenotype genome " << endl << "-------------------------------- " << endl;
+
+	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
+	ostringstream genomeFileName;
+	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
+	//	genomeFileName << "files/morphologies0/genome9137.csv";
+	cout << genomeFileName.str() << endl;
+	ifstream genomeFile(genomeFileName.str());
+	string value;
+	list<string> values;
+	while (genomeFile.good()) {
+		getline(genomeFile, value, ',');
+		//		cout << value << ",";
+		if (value.find('\n') != string::npos) {
+			split_line(value, "\n", values);
+		}
+		else {
+			values.push_back(value);
+		}
+	}
+	int moduleNum;
+	vector<string> moduleValues;
+	vector<string> controlValues;
+	bool checkingModule = false;
+	bool checkingControl = false;
+
+	list<string>::const_iterator it = values.begin();
+	for (it = values.begin(); it != values.end(); it++) {
+		string tmp = *it;
+		if (settings->verbose) {
+			cout << "," << tmp;
+		}
+		if (checkingModule == true) {
+			moduleValues.push_back(tmp);
+		}
+		if (checkingControl == true) {
+			controlValues.push_back(tmp);
+		}
+		if (tmp == "#Fitness:") {
+			it++;
+			tmp = *it;
+			fitness = atof(tmp.c_str());
+			//		cout << "Fitness was " << fitness << endl; 
+		}
+		if (tmp == "#phenValue;") {
+			it++;
+			tmp = *it;
+			phenValue = atof(tmp.c_str());
+		}
+		if (tmp == "#Module:") {
+			it++;
+			tmp = *it;
+			bmp.push_back(shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
+			moduleNum = bmp.size() - 1;// atoi(tmp.c_str());
+			checkingModule = true;
+			//		cout << "moduleNum set to " << moduleNum << endl; 
+		}
+		else if (tmp == "#ModuleParent:")
+		{
+			it++;
+			tmp = *it;
+			bmp[moduleNum]->parent = atoi(tmp.c_str());
+		}
+		else if (tmp == "#ModuleType:")
+		{
+			it++;
+			tmp = *it;
+			//genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+			bmp[moduleNum]->type = atoi(tmp.c_str());
+		}
+		else if (tmp == "#ParentSite:")
+		{
+			it++;
+			tmp = *it;
+			bmp[moduleNum]->parentSite = atoi(tmp.c_str());
+		}
+		else if (tmp == "#Orientation:")
+		{
+			it++;
+			tmp = *it;
+			bmp[moduleNum]->orientation = atoi(tmp.c_str());
+		}
+		
+		if (tmp == "#ControlParams:") {
+			checkingControl = true;
+		}
+		else if (tmp == "#EndOfModule") {
+			//			lGenome->lParameters[moduleNum]->module->setModuleParams(moduleValues);
+			moduleValues.clear();
+			if (checkingControl == true) {
+				unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+				bmp[moduleNum]->control = controlFactory->createNewControlGenome(atoi(controlValues[2].c_str()), randomNum, settings); // 0 is ANN
+			//	lGenome->lParameters[moduleNum]->control->init(1, 2, 1);
+				bmp[moduleNum]->control->setControlParams(controlValues);
+				checkingControl = false;
+				controlValues.clear();
+				controlFactory.reset();
+			}
+			moduleNum++;
+			checkingModule = false;
+		}
+	}
+	return bmp;
 }
 
 

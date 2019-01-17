@@ -136,6 +136,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 			ER->simSet = RECALLBEST;
 			ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 		}
+		else if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 1) {
+			ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
+		}
 		cout << "Initializing ER" << endl;
 		ER->randNum = shared_ptr<RandNum>(new RandNum(0));
 		ER->initialize();

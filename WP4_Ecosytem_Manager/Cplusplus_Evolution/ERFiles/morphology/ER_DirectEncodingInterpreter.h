@@ -52,5 +52,7 @@ public:
 	shared_ptr<ModuleFactory> moduleFactory;
 
 	void setPhenValue();
+	void savePhenotype(int ind, float fitness);
+	//void loadPhenotype(int ind);
 };
 

@@ -104,7 +104,31 @@ float ER_DirectEncoding::getFitness() {
 	return fitness;
 }
 
+void ER_DirectEncoding::loadPhenotype(int ind)
+{
+	// load the phenotype
+	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
+	bmp = Development::loadBasePhenotype(ind);
+	// change the BASEMODULEPARAMETERS to actual parameters for the create function to use. (they are actually the same right now)
+	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
+	for (int i = 0; i < bmp.size(); i++) {
+		genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+		genome->moduleParameters[i]->parent = bmp[i]->parent;
+		genome->moduleParameters[i]->type = bmp[i]->type;
+		genome->moduleParameters[i]->parentSite = bmp[i]->parentSite;
+		genome->moduleParameters[i]->orientation = bmp[i]->orientation;
+		genome->moduleParameters[i]->control = bmp[i]->control;
+	}
+}
+
 void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
+	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
+		loadPhenotype(individualNumber);
+		genome->amountModules = genome->moduleParameters.size();
+		morphFitness = 0;
+		setGenomeColors();
+		return;
+	}
 	if (settings->verbose) {
 		cout << "loading genome " << individualNumber << "(ER_Direct)" << endl;
 	}
@@ -199,13 +223,6 @@ void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 			genome->moduleParameters[moduleNum]->orientation = atoi(tmp.c_str());
 		}
 
-		else if (tmp == "#ModuleType:") {
-			it++;
-			tmp = *it;
-	//		cout << "creating module of type: " << atoi(tmp.c_str()) << endl; 
-			genome->moduleParameters[moduleNum]->type = atoi(tmp.c_str());
-	//		cout << "state = " << lGenome->lParameters[moduleNum].module->state << endl;
-		}
 		if (tmp == "#ControlParams:") {
 			checkingControl = true; 
 		}

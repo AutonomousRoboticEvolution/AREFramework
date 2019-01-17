@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>;
+#include "../module/ModuleFactory.h"
 #include "ER_LSystem.h"
 #include "Modular_Morphology.h"
 #include "../VREPUI/VREPUI.h"
@@ -24,6 +25,7 @@ public:
 	float simTime = 0;
 
 	void checkForceSensors();
+	void savePhenotype(int ind, float fitness);
 	void initializeGenomeCustom(int type);
 	void initializeLRobot(int type);
 	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);

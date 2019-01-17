@@ -263,8 +263,25 @@ void ER_LSystemInterpreter::checkForceSensors() {
 	}
 }
 
+void ER_LSystemInterpreter::savePhenotype(int ind, float fitness)
+{
+	// change createdModules back to a moduleParameters array. 
+	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
+	for (int i = 0; i < createdModules.size(); i++) {
+		bmp.push_back(shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
+		bmp[i]->control = createdModules[i]->control; // no deep copy needed since created modules will be deleted
+		bmp[i]->type = createdModules[i]->type;
+		bmp[i]->parent = createdModules[i]->parent;
+		bmp[i]->parentSite = createdModules[i]->parentSite;
+		bmp[i]->orientation = createdModules[i]->orientation;
+	}
+	Development::savePhenotype(bmp, ind, fitness);
+}
+
 void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 	//srand(rand()%100000);
+
+	shared_ptr<ModuleFactory> mf = shared_ptr<ModuleFactory>(new ModuleFactory);
 
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
@@ -321,7 +338,7 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 		}
 
 		if (i == 0) {
-			modules.push_back(moduleFactory->createModuleGenome(1, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(1, randomNum, settings));
 			lGenome->lParameters[i]->childConfigurations.push_back(0);
 			lGenome->lParameters[i]->childSites.push_back(0);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
@@ -349,7 +366,7 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else if (i == 1) {
-			modules.push_back(moduleFactory->createModuleGenome(1, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(1, randomNum, settings));
 			lGenome->lParameters[i]->childConfigurations.push_back(0);
 			lGenome->lParameters[i]->childSites.push_back(0);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
@@ -367,7 +384,7 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->maxChilds = 3;
 		}
 		else if (i == 2) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
 			lGenome->lParameters[i]->childConfigurations.push_back(0);
 			lGenome->lParameters[i]->childSites.push_back(3);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
@@ -375,7 +392,7 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->maxChilds = 3;
 		}
 		else if (i == 3) {
-			modules.push_back(moduleFactory->createModuleGenome(11, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(11, randomNum, settings));
 			/*	lGenome->lParameters[i]->childConfigurations.push_back(0);
 			lGenome->lParameters[i]->childSites.push_back(0);
 			lGenome->lParameters[i]->childSiteStates.push_back(3);
@@ -383,11 +400,11 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->maxChilds = 0;*/
 		}
 		else if (i == 4) {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
 			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else {
-			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
+			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
 			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		modules[i]->state = i;
@@ -408,6 +425,7 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 	}
 	//	mutateERLGenome(0.05);
 	//	mutateControlERLGenome(0.3);
+	mf.reset();
 }
 
 void ER_LSystemInterpreter::initializeLRobot(int type) {
