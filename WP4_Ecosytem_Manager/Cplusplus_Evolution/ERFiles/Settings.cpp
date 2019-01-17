@@ -31,7 +31,7 @@ Settings::Settings() {
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
-	instanceType = INSTANCE_SERVER;
+	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
 	maxGeneration = 200;
