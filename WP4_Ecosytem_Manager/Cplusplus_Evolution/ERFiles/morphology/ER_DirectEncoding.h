@@ -19,7 +19,7 @@ public:
 	int initializeGenome(int type);
 	void initializeRobot(int type);
 	int mutateERGenome(float mutationRate);
-	bool checkTreeDepth(int attachModule, int increment);
+	int checkTreeDepth(int attachModule, int increment);
 	int mutateControlERGenome(float mutationRate);
 
 	void deleteModuleFromGenome(int num);
@@ -37,7 +37,8 @@ public:
 	void loadPhenotype(int ind);
 	void loadGenome(int individualNumber, int sceneNum);
 	void setGenomeColors();
-	void symmetryMutation(float mutationRate); 
+	void symmetryMutation(float mutationRate);
+
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 protected:
 	enum OBJECTTYPE {
@@ -100,7 +101,7 @@ protected:
 
 public:
 	shared_ptr<GENOTYPE> genome;
-	
+	bool checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAMETERS>> mps, int parentSite, int parent);
 
 private:
 	void checkGenome(int individualNumber, int sceneNum);
