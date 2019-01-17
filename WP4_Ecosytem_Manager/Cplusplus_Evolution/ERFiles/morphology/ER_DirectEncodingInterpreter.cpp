@@ -201,7 +201,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				// cout << "parentSite = " << parentSite << ", ";
 				// cout << " .. " << parentModulePointer->moduleID << ",";
 				// cout << " pType " << parentModulePointer->type << ",";
-				cout << "orientation " << orien << endl;
+				// cout << "orientation " << orien << endl;
 				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
 				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
 				// cout << " 1 ,";

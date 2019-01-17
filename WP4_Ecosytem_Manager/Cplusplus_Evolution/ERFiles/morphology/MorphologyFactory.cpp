@@ -80,6 +80,12 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
 		morph->settings = st;
 		return morph;
 	}
+	case 11: {
+		shared_ptr<Morphology> morph(new ER_DirectEncoding);
+		morph->randomNum = rn;
+		morph->settings = st;
+		return morph;
+	}
 	default: {
 		shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
 		return fixedBaseMorph;

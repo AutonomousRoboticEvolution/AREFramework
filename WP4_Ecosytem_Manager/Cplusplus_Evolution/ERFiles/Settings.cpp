@@ -22,7 +22,7 @@ Settings::Settings() {
 	controlType = ANN_CUSTOM;
 	populationSize = 20;
 	energyDissipationRate = 0.0;
-	lIncrements = 4; // not used, should be somewhere else
+	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
 	verbose = false;
@@ -31,10 +31,11 @@ Settings::Settings() {
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
+	seed = 0;
 	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
-	maxGeneration = 200;
+	maxGeneration = 50;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	savePhenotype = true;

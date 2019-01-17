@@ -84,7 +84,7 @@ bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<
 
 			// checks if collition with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
 			// don't delete this function!
-			if (createdModules[0]->type = 8) {
+			if (createdModules[0]->type == 8) {
 				if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
 					return true;
 				}
@@ -192,6 +192,8 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 					int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
 					//cout << " 1 ,";
 					createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+					createdModules[createdModules.size() - 1]->parent = createdParentNumber;
+					//createdModules[createdModules.size() - 1]->parentSite = parentSite;
 					//cout << " 1.1, ";
 					int createdModulesSize = createdModules.size();
 					vector<float> siteConfiguration;

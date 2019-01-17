@@ -20,7 +20,6 @@
 #include <fstream>
 #include "v_repLib.h"
 
-
 using namespace std;
 //CCatContainer* catContainer = NULL;
 //CCreatureCreator* creatureCreator = NULL;
@@ -135,6 +134,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 		if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 			ER->simSet = RECALLBEST;
 			ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+			ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 		}
 		else if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 1) {
 			ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
