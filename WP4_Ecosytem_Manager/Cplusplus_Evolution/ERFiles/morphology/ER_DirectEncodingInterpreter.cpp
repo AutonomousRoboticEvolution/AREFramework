@@ -134,11 +134,12 @@ void ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum
 int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition[3]) {
 //	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
 	cout << "initializing direct encoding interpreter" << endl;
+	shared_ptr<ModuleFactory> mf = shared_ptr<ModuleFactory>(new ModuleFactory);
 	createdModules.clear();
 	for (int i = 1; i < genome->moduleParameters.size(); i++) {
 		genome->moduleParameters[i]->expressed = false;
 	}
-	createdModules.push_back(moduleFactory->copyModuleGenome(modules[0]));
+	createdModules.push_back(mf->copyModuleGenome(modules[0]));
 	int parentHandle = -1;
 	vector<float> configuration;
 	configuration.resize(6);
@@ -269,6 +270,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
 //	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;
 //	update();
+	mf.reset();
 	return 1;
 }
 
