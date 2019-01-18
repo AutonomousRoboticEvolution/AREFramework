@@ -23,7 +23,7 @@ public:
 	// storage vectors
 	// This genome will be evaluated so needs to be assigned
 	// shared_ptr<Genome> newGenome; // for creating one genome at a time
-	vector<int> popIndNumbers;
+	// vector<int> popIndNumbers;
 	// vector<float> popFitness; // used by client-server
 	// vector<float> nextGenFitness; // used by client-server
 	vector<int> popNextIndNumbers;

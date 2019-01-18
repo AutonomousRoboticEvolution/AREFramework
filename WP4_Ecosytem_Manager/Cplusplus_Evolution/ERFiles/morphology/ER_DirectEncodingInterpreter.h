@@ -13,6 +13,7 @@ class ER_DirectEncodingInterpreter : public ER_DirectEncoding
 public:
 	ER_DirectEncodingInterpreter();
 	~ER_DirectEncodingInterpreter();
+	bool checkJointModule();
 	vector<shared_ptr<ER_Module> > createdModules;
 
 	void init();

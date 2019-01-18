@@ -12,6 +12,16 @@ ER_LSystemInterpreter::~ER_LSystemInterpreter()
 	createdModules.clear();
 }
 
+bool ER_LSystemInterpreter::checkJointModule() {
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->type == 4) {
+			return true;
+		}
+	}
+	simStopSimulation();
+	return false;
+}
+
 void ER_LSystemInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
@@ -833,6 +843,7 @@ void ER_LSystemInterpreter::create() {
 	//}
 	//mf.reset();
 	initializeLSystem(settings->lIncrements, positionFirstObject); // amount increment is not in genome anymore
+	checkJointModule(); // quits simulator when no joint found.
 }
 
 

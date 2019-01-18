@@ -23,6 +23,16 @@ void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
 	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
 }
 
+bool ER_CPPN_Interpreter::checkJointModule() {
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->type == 4) {
+			return true;
+		}
+	}
+	simStopSimulation();
+	return false;
+}
+
 void ER_CPPN_Interpreter::printSome() {
 	BaseMorphology::printSome();
 	cout << "printing some from ER_CPPN_Interpreter" << endl;
@@ -567,6 +577,7 @@ void ER_CPPN_Interpreter::create() {
 	}
 	mf.reset();
 	initializeCPPNEncoding(positionFirstObject); // amount increment is not in genome anymore
+	checkJointModule(); // quits simulator when no joint found. 
 }
 
 int ER_CPPN_Interpreter::getMainHandle() {

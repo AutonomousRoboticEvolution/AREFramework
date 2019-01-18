@@ -12,6 +12,16 @@ ER_DirectEncodingInterpreter::~ER_DirectEncodingInterpreter()
 	createdModules.clear();
 }
 
+bool ER_DirectEncodingInterpreter::checkJointModule() {
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->type == 4) {
+			return true;
+		}
+	}
+	simStopSimulation();
+	return false;
+}
+
 void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
@@ -483,6 +493,7 @@ void ER_DirectEncodingInterpreter::create() {
 	}
 	mf.reset();
 	initializeDirectEncoding(positionFirstObject); // amount increment is not in genome anymore
+	checkJointModule(); // quits simulator when no joint found.
 }
 
 int ER_DirectEncodingInterpreter::getMainHandle() {

@@ -16,6 +16,8 @@ public:
 	ER_LSystemInterpreter();
 	~ER_LSystemInterpreter();
 
+	bool checkJointModule();
+
 	void init();
 	void create();
 	void update(); 

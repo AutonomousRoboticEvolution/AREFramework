@@ -116,6 +116,6 @@ void EA_Generational::replaceNewPopRandom()
 		populationGenomes[currentInd].reset();
 		populationGenomes[currentInd] = nextGenGenomes[p]->clone(); // new DefaultGenome();
 //		popFitness[currentInd] = nextGenFitness[p];
-		popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
+//		popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
 	}
 }

@@ -94,8 +94,8 @@ void CER::saveSettings() {
 	// TODO : remove redundancy
 	settings->individualCounter = settings->indCounter;
 	vector<int> indNums;
-	for (int i = 0; i < ea->popIndNumbers.size(); i++) {
-		indNums.push_back(ea->popIndNumbers[i]); // must be set when saving
+	for (int i = 0; i < ea->populationGenomes.size(); i++) {
+		indNums.push_back(ea->populationGenomes[i]->individualNumber); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
@@ -106,9 +106,9 @@ void CER::saveSettings() {
 		if (bestFitness < ea->populationGenomes[i]->fitness) {
 			bestFitness = ea->populationGenomes[i]->fitness;
 			bestInd = i;
-			bestIndividual = ea->popIndNumbers[bestInd];
+			bestIndividual = ea->populationGenomes[bestInd]->individualNumber;
 			if (settings->verbose) {
-				cout << "Best individual has number " << ea->popIndNumbers[bestInd] << endl;
+				cout << "Best individual has number " << ea->populationGenomes[bestInd]->individualNumber << endl;
 			}
 		}
 	}

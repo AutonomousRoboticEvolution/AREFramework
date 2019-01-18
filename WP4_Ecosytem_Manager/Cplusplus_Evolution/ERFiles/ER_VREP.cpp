@@ -113,7 +113,7 @@ void ER_VREP::startOfSimulation(){
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->populationGenomes[currentInd]->init();
-				ea->popIndNumbers.push_back(settings->indCounter);
+//				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
@@ -296,7 +296,7 @@ void ER_VREP::endOfSimulation(){
 					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
 				}
 				ea->populationGenomes[currentInd]->morph->saveGenome(settings->indCounter, settings->sceneNum, fitness);
-				ea->popIndNumbers[currentInd] = settings->indCounter;
+				ea->populationGenomes[currentInd]->individualNumber = settings->indCounter;
 				settings->indCounter++;
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
@@ -357,8 +357,8 @@ void ER_VREP::saveSettings(){
 	settings->generation = generation;
 	settings->individualCounter = settings->indCounter;
 	vector<int> indNums;
-	for (int i = 0; i < ea->popIndNumbers.size(); i++) {
-		indNums.push_back(ea->popIndNumbers[i]); // must be set when saving
+	for (int i = 0; i < ea->populationGenomes.size(); i++) {
+		indNums.push_back(ea->populationGenomes[i]->individualNumber); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
@@ -369,8 +369,8 @@ void ER_VREP::saveSettings(){
 		if (bestFitness < ea->populationGenomes[i]->fitness) {
 			bestFitness = ea->populationGenomes[i]->fitness;
 			bestInd = i;
-			bestIndividual = ea->popIndNumbers[bestInd];
-			cout << "Best individual has number " << ea->popIndNumbers[bestInd] << endl;
+			bestIndividual = ea->populationGenomes[bestInd]->individualNumber;
+			cout << "Best individual has number " << ea->populationGenomes[bestInd]->individualNumber << endl;
 		}
 	}
 	settings->bestIndividual = bestIndividual;

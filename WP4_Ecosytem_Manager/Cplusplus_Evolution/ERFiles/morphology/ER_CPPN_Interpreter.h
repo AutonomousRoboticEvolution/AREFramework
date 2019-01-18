@@ -29,6 +29,7 @@ public:
 	void init_noMorph();
 	// object creators
 	void createAtPosition(float x, float y, float z);
+	bool checkJointModule();
 	shared_ptr<Morphology> clone() const;
 
 	void printSome();

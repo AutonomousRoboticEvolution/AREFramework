@@ -83,8 +83,13 @@ int main(int argc, char* argv[])
 	else {
 		client->initGA();
 		client->evaluateInitialPop(); // initial generation
-		client->settings->indNumbers = client->ea->popIndNumbers;
-//		client->settings->indFits = client->ea->popFitness;
+		if (client->settings->indNumbers.size() < 1) {
+			client->settings->indNumbers.resize(client->ea->populationGenomes.size());
+		}
+		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
+			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
+		}
+		//		client->settings->indFits = client->ea->popFitness;
 	}
 	
 
@@ -99,8 +104,13 @@ int main(int argc, char* argv[])
 	//	client->ea->agePop(); // should be in update function of EA
 		client->evaluateNextGen();
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-		client->settings->indNumbers = client->ea->popIndNumbers;
-//		client->settings->indFits = client->ea->popFitness;
+		if (client->settings->indNumbers.size() < 1) {
+			client->settings->indNumbers.resize(client->ea->populationGenomes.size());
+		}
+		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
+			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
+		}
+		//		client->settings->indFits = client->ea->popFitness;
 		client->settings->generation = i + 1;
 		client->settings->saveSettings();
 //		saveLog(i);

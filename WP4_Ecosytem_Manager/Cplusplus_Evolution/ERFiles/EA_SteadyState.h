@@ -26,6 +26,7 @@ public:
 	void createNewGenRandomSelect();
 	
 	void replaceNewPopRandom(int numAttempts);
+	void replaceNewRank();
 	void loadPopulationGenomes(int scenenum);
 };
 

@@ -81,11 +81,11 @@ void EA::savePopFitness(int generation, vector<float> popfit) {
 			bestInd = i;
 		}
 	}
-	savePopFile << "ind: ," << popIndNumbers[bestInd] << ",";
+	savePopFile << "ind: ," << populationGenomes[bestInd]->individualNumber << ",";
 	savePopFile << "fitness: ," << bestFitness << ",";
 	savePopFile << "individuals: ,";
-	for (int i = 0; i < popIndNumbers.size(); i++) {
-		savePopFile << popIndNumbers[i] << ",";
+	for (int i = 0; i < populationGenomes.size(); i++) {
+		savePopFile << populationGenomes[i]->individualNumber << ",";
 	}
 	savePopFile << endl;
 	savePopFile.close();
@@ -117,11 +117,11 @@ void EA::savePopFitness(int generation) {
 			bestInd = i;
 		}
 	}
-	savePopFile << "ind: ," << popIndNumbers[bestInd] << ",";
+	savePopFile << "ind: ," << populationGenomes[bestInd]->individualNumber << ",";
 	savePopFile << "fitness: ," << bestFitness << ",";
 	savePopFile << "individuals: ,";
-	for (int i = 0; i < popIndNumbers.size(); i++) {
-		savePopFile << popIndNumbers[i] << ",";
+	for (int i = 0; i < populationGenomes.size(); i++) {
+		savePopFile << populationGenomes[i]->individualNumber << ",";
 	}
 	savePopFile << endl;
 	savePopFile.close();
@@ -130,7 +130,7 @@ void EA::savePopFitness(int generation) {
 
 void EA::loadPopulationGenomes()
 {
-	popIndNumbers = settings->indNumbers;
+	vector<int> popIndNumbers = settings->indNumbers;
 	//popFitness = settings->indFits;
 
 	for (int i = 0; i < popIndNumbers.size(); i++) {

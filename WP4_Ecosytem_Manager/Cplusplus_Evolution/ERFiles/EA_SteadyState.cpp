@@ -1,5 +1,5 @@
 #include "EA_SteadyState.h"
-
+#include <algorithm>
 
 
 EA_SteadyState::EA_SteadyState()
@@ -45,7 +45,8 @@ void EA_SteadyState::replacement()
 {
 	if (nextGenGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
-		replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
+		//replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
+		replaceNewRank(); 
 	}
 }
 
@@ -57,18 +58,19 @@ void EA_SteadyState::mutation() {
 
 void EA_SteadyState::initializePopulation()
 {
-	if (settings->client) {
+	//if (settings->client) {
 		for (int i = 0; i < settings->populationSize; i++)
 		{
 			populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
 			populationGenomes[i]->fitness = 0;
+			populationGenomes[i]->individualNumber = i;
 			// for easy access of fitness values (used by client-server)
 			//popFitness.push_back(0);
 		}
-	}
-	else {
+	//}
+	//else {
 		cout << "Cannot create VREP dependent genome. Use EA_SteadyState_VREP for online evolution" << endl;
-	}
+	//}
 }
 
 void EA_SteadyState::selectIndividuals()
@@ -90,7 +92,7 @@ void EA_SteadyState::replaceIndividuals()
 
 void EA_SteadyState::loadPopulationGenomes(int scenenum)
 {
-	popIndNumbers = settings->indNumbers;
+	vector<int> popIndNumbers = settings->indNumbers;
 //	popFitness = settings->indFits;
 
 	for (int i = 0; i < popIndNumbers.size(); i++) {
@@ -164,7 +166,7 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 				populationGenomes[currentInd].reset();
 				populationGenomes[currentInd] = nextGenGenomes[p]->clone(); // new DefaultGenome();
 				//populationGenomes[currentInd]->fitness = nextGenGenomes[p]->fitness;
-				popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
+				//popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
 				break;
 			}
 			else if (n == (numAttempts - 1)) {
@@ -183,4 +185,69 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 		}
 	}
 	cout << "REPLACED POP" << endl;
+}
+
+struct indFit {
+	float fitness;
+	int ind;
+};
+
+bool compareByFitness(const shared_ptr<indFit> a, const shared_ptr<indFit> b)
+{
+	return a->fitness > b->fitness;
+}
+
+void EA_SteadyState::replaceNewRank()
+{
+	// create one big population. 
+	for (int i = 0; i < nextGenGenomes.size(); i++) {
+		populationGenomes.push_back(nextGenGenomes[i]);
+	}
+	// sort population on fitness
+
+	vector<shared_ptr<indFit>> fitnesses;
+
+	for (int i = 0; i < populationGenomes.size(); i++) {
+		fitnesses.push_back(shared_ptr<indFit>(new indFit));
+		fitnesses[i]->fitness = populationGenomes[i]->fitness;
+		fitnesses[i]->ind = populationGenomes[i]->individualNumber; // not individual number!
+	}
+	
+	std::sort(fitnesses.begin(), fitnesses.end(), compareByFitness);
+
+	// remove all individuals on the bottom of the list. 
+	for (int i = settings->populationSize; i < fitnesses.size(); i++) {
+		for (int j = 0; j < populationGenomes.size(); j++) {
+			if (fitnesses[i]->ind == populationGenomes[j]->individualNumber) {
+				populationGenomes.erase(populationGenomes.begin() + j);
+				break;
+			}
+		}
+	}
+
+	// remove next gen files that didn't make it. 
+	for (int i = 0; i < nextGenGenomes.size(); i++) {
+		bool deleteGenome = true;
+		for (int j = 0; j < populationGenomes.size(); j++) {
+			if (nextGenGenomes[i]->individualNumber == populationGenomes[j]->individualNumber) {
+				deleteGenome = false;
+				break;
+			}
+		}
+		if (deleteGenome == true) {
+			// delete genome file
+			stringstream ss;
+			ss << settings->repository + "/morphologies" << settings->sceneNum << "/genome" << nextGenGenomes[i]->individualNumber << ".csv";
+			string genomeFileName = ss.str();
+			stringstream ssp;
+			ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[i]->individualNumber << ".csv";
+			string phenotypeFileName = ssp.str();
+			//	genomeFileName << indNum << ".csv";
+			cout << "Removing " << nextGenGenomes[i]->individualNumber << endl;
+			remove(genomeFileName.c_str());
+			remove(phenotypeFileName.c_str());
+		}
+	}
+
+	cout << "REPLACED POP RANKED" << endl;
 }

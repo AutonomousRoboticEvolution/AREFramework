@@ -49,7 +49,6 @@ void ClientEA::initGA() {
 		ea->populationGenomes[i]->init();
 		ea->populationGenomes[i]->morph->saveGenome(indCounter, 0, -1);
 		ea->populationGenomes[i]->individualNumber = i;
-		ea->popIndNumbers.push_back(i);
 		shared_ptr<IND> nIND = shared_ptr<IND>(new IND);
 		nIND->nr = i;
 		nIND->sceneNr = 0;
@@ -255,7 +254,12 @@ void ClientEA::evaluateInitialPop()
 		extApi_sleepMs(5);
 	}
 	ea->savePopFitness(0);
-	settings->indNumbers = ea->popIndNumbers;
+	if (settings->indNumbers.size() < 1) {
+		settings->indNumbers.resize(ea->populationGenomes.size());
+	}
+	for (int i = 0; i < ea->populationGenomes.size(); i++) {
+		settings->indNumbers[i] = ea->populationGenomes[i]->individualNumber;
+	}
 	//settings->indFits = ea->popFitness;
 	settings->saveSettings();
 }
