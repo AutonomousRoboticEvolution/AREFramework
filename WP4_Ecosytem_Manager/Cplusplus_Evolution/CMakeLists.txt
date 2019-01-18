@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
-set(SOURCES 
-    common/v_repLib.cpp
+set(SOURCES
     ERFiles/CollisionDetector.cpp
     ERFiles/control/ANN.cpp
     ERFiles/control/Control.cpp
@@ -70,6 +69,7 @@ set(SOURCES
     ERFiles/Settings.cpp
     ERFiles/VREPUI/VREPUI.cpp
     RandNum.cpp
+    "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/common/v_repLib.cpp"
     #	ERFiles/control/Hormones.cpp
     #	ERFiles/control/TransferNetwork.cpp
     #	ERFiles/module/Module_Bend.cpp

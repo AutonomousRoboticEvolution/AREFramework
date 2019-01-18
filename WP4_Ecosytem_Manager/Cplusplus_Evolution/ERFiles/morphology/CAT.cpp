@@ -57,6 +57,9 @@ void CAT::saveGenome(int indNum, int sceneNum, float fitness) {
 	genomeFileName << settings->repository << "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+	}
 	genomeFile << ",#GenomeType,CatGenome," << endl;
 	genomeFile << "#Individual:" << indNum << endl;
 	genomeFile << "#Fitness:," << fitness << endl;

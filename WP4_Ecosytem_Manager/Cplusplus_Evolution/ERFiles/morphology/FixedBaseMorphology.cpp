@@ -28,6 +28,9 @@ void FixedBaseMorphology::saveGenome(int indNum, int sceneNum, float fitness) {
 	genomeFileName << settings->repository << "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+	}
 	if (settings->morphologyType == settings->CAT_MORPHOLOGY) {
 		genomeFile << ",#GenomeType,CatGenome," << endl;
 	}
