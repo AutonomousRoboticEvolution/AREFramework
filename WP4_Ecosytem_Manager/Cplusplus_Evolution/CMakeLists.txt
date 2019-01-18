@@ -95,6 +95,8 @@ add_library(v_repExtER SHARED
     v_repExtER.cpp
 )
 
+target_link_libraries(v_repExtER ER_library)
+
 target_include_directories(v_repExtER PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/include"
 )
@@ -114,7 +116,7 @@ elseif(APPLE)
 elseif(UNIX)    
     target_compile_definitions(v_repExtER PUBLIC "__linux")
     target_compile_definitions(ER_library PUBLIC "__linux")
-    add_subdirectory(MPI)
 endif()
 
 add_subdirectory(ERClient)
+add_subdirectory(MPI)
