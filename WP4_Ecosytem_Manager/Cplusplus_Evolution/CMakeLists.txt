@@ -95,7 +95,7 @@ elseif(APPLE)
     target_compile_definitions(v_repExtER PUBLIC "__APPLE__")
 elseif(UNIX)    
     target_compile_definitions(v_repExtER PUBLIC "__linux")
+    add_subdirectory(MPI)
 endif()
 
 add_subdirectory(ERClient)
-add_subdirectory(MPI)
