@@ -296,7 +296,7 @@ void ER_CPPN_Encoding::saveGenome(int indNum, int sceneNum, float fitness) {
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
 	}
 	genomeFile << "#CPPN Genome" << endl;
 	genomeFile << "#Individual:" << indNum << "," << endl;

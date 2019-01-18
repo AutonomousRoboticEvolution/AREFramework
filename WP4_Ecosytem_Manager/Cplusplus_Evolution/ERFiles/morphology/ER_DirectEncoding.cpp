@@ -77,7 +77,7 @@ void ER_DirectEncoding::saveGenome(int indNum, int sceneNum, float fitness) {
 	// std::cout << "Saving genome to " << genomeFileName.str() << std::endl;
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
 	}
 
 	genomeFile << "#Individual:" << indNum << endl; 
