@@ -15,8 +15,9 @@
 #include "../ERFiles/EA_Factory.h"
 
 extern "C" {
-//	#include "../../remoteApi/extApiPlatform.h"
-	#include "../../remoteApi/extApi.h" //../../remoteApi/extApi.h"
+	#include "v_repConst.h"
+	#include "remoteApi/extApiPlatform.h"
+	#include "remoteApi/extApi.h"
 }
 
 #define IPNUM = "127.0.0.1"

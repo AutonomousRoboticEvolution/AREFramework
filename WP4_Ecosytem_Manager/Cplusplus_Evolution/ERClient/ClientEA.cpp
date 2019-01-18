@@ -1,5 +1,5 @@
 #include "ClientEA.h"
-#define DO_NOT_USE_SHARED_MEMORY
+// #define DO_NOT_USE_SHARED_MEMORY
 
 ClientEA::ClientEA()
 {
@@ -13,7 +13,7 @@ ClientEA::~ClientEA()
 void ClientEA::init(int amountPorts)
 {
 	for (int i = 0; i < amountPorts; i++) {
-		ports.push_back(i + 1040000);
+		ports.push_back(i + 104000 +1);
 	}
 	int amPorts = ports.size();
 	simxFinish(-1);

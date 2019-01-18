@@ -35,23 +35,30 @@ int main(int argc, char ** argv) {
 int master_io( master_comm, comm )
 MPI_Comm comm;
 {
-    int        i,j, size;
-    char       buf[256];
+	int	i,j, size;
+	int	seed = 0;
+	int	n_nodes = 1;
+	char	buf[256];
+	char	erClientArguments[256];
+	const char* clientPath = "WP4_Ecosytem_Manager/Cplusplus_Evolution/ERClient/ERClient";
 	sprintf( buf, "Hello?");
- 	printf("Master here\n");
+	printf("Master here\n");
 
-    MPI_Status status;
-printf("Master is going to run vrep\n");
-    system("shvrep.sh");
-printf("Master ran VREP\n");
+	MPI_Status status;
+	printf("Master is going to run vrep\n");
+	sprintf(erClientArguments, "%s /tmp/files %d %d ", clientPath, seed, n_nodes);
+	
+	// arguments: repository, sceneNumber and amount CPU's
+    	system(erClientArguments);
+	printf("Master ran VREP\n");
 
 
     MPI_Comm_size( master_comm, &size );
     for (j=1; j<=2; j++) {
-	for (i=1; i<size; i++) {
-	    MPI_Recv( buf, 256, MPI_CHAR, i, 0, master_comm, &status );
-	    fputs( buf, stdout );
-	}
+		for (i=1; i<size; i++) {
+			MPI_Recv( buf, 256, MPI_CHAR, i, 0, master_comm, &status );
+			fputs( buf, stdout );
+		}
     }
 
 }
@@ -60,38 +67,41 @@ printf("Master ran VREP\n");
 int slave_io( master_comm, comm )
 MPI_Comm comm;
 {
-    char buf[256];
-    	int rank, size, length;
-	char name[80];
-MPI_Status          status;
+	char 	buf[256];
+    	int 	rank, size, length;
+	char 	name[80];
+	MPI_Status	status;
 
-    MPI_Comm_rank( comm, &rank );
-    sprintf( buf, "Hello from slave %d\n", rank );
-    MPI_Send( buf, strlen(buf) + 1, MPI_CHAR, 0, 0, master_comm );
-    
+	MPI_Comm_rank( comm, &rank );
+	sprintf( buf, "Hello from slave %d\n", rank );
+	// MPI_Send( buf, strlen(buf) + 1, MPI_CHAR, 0, 0, master_comm );
+	
    
 	
+	printf("Hello from slave %d\n", rank);
 	MPI_Get_processor_name(name,&length);
-	char vrepArguments[255];
-	//sprintf(vrepArguments, "xvfb-run sh vrep.sh -h -g%d -g0 -g/users/f/v/fveenstr/scratch/VREP/V-REP_PRO_V3_4_0_64_Linux/plantResults",rank);
+	char erClientArguments[255];
+	//sprintf(erClientArguments, "xvfb-run sh vrep.sh -h -g%d -g0 -g/users/f/v/fveenstr/scratch/VREP/V-REP_PRO_V3_4_0_64_Linux/plantResults",rank);
 		
-	sprintf(vrepArguments, "sh vrep.sh -h -g%d -g0 -g/users/f/v/fveenstr/scratch/VREP/V-REP_PRO_V3_4_0_64_Linux/plantResults",rank);
+	// parameters
+	// - 
+	sprintf(erClientArguments, "../../V-REP_PRO_EDU_V3_5_0_Linux/vrep.sh -g%d -gREMOTEAPISERVERSERVICE_%d_TRUE_TRUE",rank, rank + 104000);
 	printf("Hello MPI: processor %d of %d on %s\n", rank,size,name);
 
 	char cwd[1024];
    	if (getcwd(cwd, sizeof(cwd)) != NULL)
-       		fprintf(stdout, "Current working dir: %s\n", cwd);
+		fprintf(stdout, "Current working dir: %s\n", cwd);
    	else
-       		printf('.');
+		printf('.');
 
-	printf("vrepArguments: %s\n", vrepArguments);
+	printf("erClientArguments: %s\n", erClientArguments);
 	printf("Slave %d is going to run vrep\n", rank);
-	system(vrepArguments);
+	system(erClientArguments);
 	printf("Slave %d completed running vrep\n", rank);
 
 
 	sprintf( buf, "Hello master %d\n", rank );
-        MPI_Send( buf, strlen(vrepArguments) + 1, MPI_CHAR, 0, 0, master_comm );
+        MPI_Send( buf, strlen(erClientArguments) + 1, MPI_CHAR, 0, 0, master_comm );
 
 
 	

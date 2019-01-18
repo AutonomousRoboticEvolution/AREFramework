@@ -17,7 +17,6 @@
 // Make sure to have the server side running in V-REP!
 // Start the server from a child script with following command:
 // simExtRemoteApiStart(portNumber) -- starts a remote API server service on the specified port
-#pragma once
 
 // ER files
 #include "ClientEA.h"

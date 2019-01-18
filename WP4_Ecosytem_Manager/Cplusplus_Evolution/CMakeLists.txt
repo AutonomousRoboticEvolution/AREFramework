@@ -80,17 +80,22 @@ set(SOURCES
 )
 
 add_library(v_repExtER SHARED ${SOURCES})
-target_include_directories(v_repExtER PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+target_include_directories(v_repExtER PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/include"
+)
 set_target_properties(v_repExtER PROPERTIES 
     CXX_STANDARD 14
     # COMPILE_FLAGS "-w"
-    POSITION_INDEPENDENT_CODE ON)
-
+    POSITION_INDEPENDENT_CODE ON
+)
 
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(v_repExtER PUBLIC "__WINDOWS__")
 elseif(APPLE)
     target_compile_definitions(v_repExtER PUBLIC "__APPLE__")
 elseif(UNIX)    
-    target_compile_definitions(v_repExtER PUBLIC "__Linux")
+    target_compile_definitions(v_repExtER PUBLIC "__linux")
 endif()
+
+add_subdirectory(ERClient)
+add_subdirectory(MPI)
