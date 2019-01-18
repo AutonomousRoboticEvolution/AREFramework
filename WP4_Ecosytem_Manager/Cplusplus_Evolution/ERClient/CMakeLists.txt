@@ -11,14 +11,13 @@ set(SOURCES
 )
 
 add_executable(ERClient ${SOURCES})
-target_include_directories(v_repExtER PUBLIC 
+target_include_directories(ERClient PUBLIC 
     "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming"
     "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/include"
 )
 target_link_libraries(ERClient
-    v_repExtER
+    ER_library
     ${CMAKE_DL_LIBS} #dlopen library
-    rt #shared memory library
     ${CMAKE_THREAD_LIBS_INIT}
 )
 target_compile_definitions(ERClient PUBLIC 
@@ -34,7 +33,8 @@ set_target_properties(ERClient PROPERTIES
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(ERClient PUBLIC "__WINDOWS__" "_USE_MATH_DEFINES" "DO_NOT_USE_SHARED_MEMORY")
 elseif(APPLE)
-    target_compile_definitions(ERClient PUBLIC "__APPLE__")
+    target_compile_definitions(ERClient PUBLIC "__APPLE__" "DO_NOT_USE_SHARED_MEMORY")
 elseif(UNIX)    
     target_compile_definitions(ERClient PUBLIC "__linux")
+    target_link_libraries(ERClient rt)
 endif()
