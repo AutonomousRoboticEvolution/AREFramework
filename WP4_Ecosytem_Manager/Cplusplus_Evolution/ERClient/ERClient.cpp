@@ -70,8 +70,9 @@ int main(int argc, char* argv[])
 		srand(0);
 	}
 	extApi_sleepMs(1000);
-	cout << "settings read" << endl;
+	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
+		std::cout << "client should connect to " << arguments[2].c_str() << " servers" << std::endl;
 		client->init(atoi(arguments[2].c_str()));
 	}
 	else {

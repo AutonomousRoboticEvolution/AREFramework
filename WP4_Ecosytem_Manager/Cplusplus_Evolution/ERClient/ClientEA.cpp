@@ -13,7 +13,7 @@ ClientEA::~ClientEA()
 void ClientEA::init(int amountPorts)
 {
 	for (int i = 0; i < amountPorts; i++) {
-		ports.push_back(i + 104000 +1);
+		ports.push_back(i + 104000);
 	}
 	int amPorts = ports.size();
 	simxFinish(-1);
