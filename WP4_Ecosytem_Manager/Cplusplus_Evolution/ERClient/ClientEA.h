@@ -16,10 +16,10 @@
 
 extern "C" {
 	#include "v_repConst.h"
-	#include "../remoteApi/extApiPlatform.h"
-	#include "../remoteApi/extApi.h"
-//	#include "remoteApi/extApiPlatform.h"
-//	#include "remoteApi/extApi.h"
+//	#include "../remoteApi/extApiPlatform.h"
+//	#include "../remoteApi/extApi.h"
+	#include "remoteApi/extApiPlatform.h"
+	#include "remoteApi/extApi.h"
 }
 
 #define IPNUM = "127.0.0.1"
