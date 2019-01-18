@@ -119,7 +119,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
 	if (startEvolution == true) {
 		ER = unique_ptr<ER_VREP>(new ER_VREP);
-		int run = atoi(simGetStringParameter(sim_stringparam_app_arg1));
+
+
+		int run = 0;
+		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
+		if (arg1_param != NULL) {
+			run = atoi(arg1_param);
+			simReleaseBuffer(arg1_param);
+		}
 
 		//	cout << simGetStringParameter(sim_stringparam_app_arg1);
 		//	if (atoi(simGetStringParameter(sim_stringparam_app_arg3 == 99))) {
@@ -131,14 +138,32 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 		ER->settings = shared_ptr<Settings>(new Settings);
 		ER->settings->sceneNum = run;
 		ER->settings->readSettings();
-		if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-			ER->simSet = RECALLBEST;
-			ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-			ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+
+		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
+		if (arg2_param != NULL) {
+			const int arg2_param_i = atoi(arg2_param);
+
+			if (arg2_param_i == 9)
+			{
+				ER->simSet = RECALLBEST;
+				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+			}
+			else if (arg2_param_i == 1)
+			{
+				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
+			}
+
+			simReleaseBuffer(arg2_param);
 		}
-		else if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 1) {
-			ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
+
+		
+		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
+		if (arg3_param != NULL) {
+			ER->settings->setRepository(arg3_param);
+			simReleaseBuffer(arg3_param);
 		}
+
 		cout << "Initializing ER" << endl;
 		ER->randNum = shared_ptr<RandNum>(new RandNum(0));
 		ER->initialize();

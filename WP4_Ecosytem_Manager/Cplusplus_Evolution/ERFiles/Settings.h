@@ -179,7 +179,7 @@ public:
 	int maxAmountModules = 20;
 	vector<int> moduleTypes;
 	vector<vector<int> > maxModuleTypes;
-	string repository = "files";
+	string repository = "";
 	int initialModuleType = 1; // initial module for direct encoding, similar to axiom of L-System
 	float energyDissipationRate = 0.00;
 	int lIncrements = 3;
@@ -205,6 +205,14 @@ public:
 	void readSettings();
 	void saveSettings();
 	bool portOpen = false;
+
+	// SETTERS
+	void setRepository(std::string repository)
+	{
+		this->repository = repository; 
+		std::cout << "setting repository to " << repository << std::endl;
+	}
+
 private:
 	void split_line(string& line, string delim, list<string>& values);
 };

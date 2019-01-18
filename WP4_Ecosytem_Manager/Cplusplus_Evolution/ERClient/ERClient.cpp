@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
 	else {
 		destination = "files";
 	}
-	client->settings->repository = destination;
+	client->settings->setRepository(destination);
 	client->sceneNum = 0;
 	client->settings->sceneNum = 0;
 	client->settings->readSettings(); // essential, settings need to correspond with server settings

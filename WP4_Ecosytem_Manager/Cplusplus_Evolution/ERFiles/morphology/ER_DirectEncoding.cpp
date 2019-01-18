@@ -74,7 +74,12 @@ void ER_DirectEncoding::saveGenome(int indNum, int sceneNum, float fitness) {
 	ostringstream genomeFileName; 
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
 //	genomeFileName << indNum << ".csv";
+	// std::cout << "Saving genome to " << genomeFileName.str() << std::endl;
 	genomeFile.open(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+	}
+
 	genomeFile << "#Individual:" << indNum << endl; 
 	genomeFile << "#Fitness:," << fitness << endl;
 	genomeFile << "#phenValue;," << phenValue << endl;
@@ -140,6 +145,11 @@ void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 //	genomeFileName << "files/morphologies0/genome9137.csv";
 	cout << genomeFileName.str() << endl;
 	ifstream genomeFile(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		std::exit(1);
+	}
+
 	string value;
 	list<string> values;
 	while (genomeFile.good()) {

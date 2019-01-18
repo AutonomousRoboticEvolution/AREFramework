@@ -53,6 +53,9 @@ void EdgarsAmazingMorphologyClass::saveGenome(int indNum, int sceneNum, float fi
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." std::endl;
+	}
 	genomeFile << "#Individual:" << indNum << endl;
 	genomeFile << "#Fitness:," << fitness << endl;
 	//	cout << "#AmountStates:," << amountStates << "," << endl << endl;

@@ -74,7 +74,7 @@ void CER::initialize() {
 	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
 	randNum = newRandNum;
 	newRandNum.reset();
-	settings->repository = simGetStringParameter(sim_stringparam_app_arg3);
+	settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));
 	settings->readSettings();
 
 	//TODO : Factory
