@@ -178,7 +178,7 @@ void ClientEA::quitSimulators()
 {
 	for (int i = 0; i < clientIDs.size(); i++) {
 		cout << "closing simulator " << ports[i] << endl;
-		simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_oneshot);
+		simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 	}
 }
 
