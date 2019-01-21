@@ -5,7 +5,7 @@ import sys, string, os
 directory = os.getcwd()
 if (os.name == 'nt'):
 	print("Running windows")
-	directory = "C:/Program Files/V-REP3/V-REP_PRO_EDU/"
+	directory = "C:/Program Files/V-REP3/V-REP_PRO_EDU"
 else:
 	print("Not running windows")
 
@@ -27,24 +27,36 @@ repository.configure(text=directory)
 def clickRun():
 	con.configure(text="Starting Evolution")
 	repository.configure(text=directory)
-	subprocess.Popen([r""+ directory + "vrep.exe", "-g0", "-g2", "-gfiles"])
+	if (os.name == 'nt'):
+		subprocess.Popen([r""+ directory + "/vrep.exe", "-g0", "-g2", "-gfiles"])
+	else:
+		subprocess.Popen([r""+ directory + "/vrep.sh", "-g0", "-g2", "-gfiles"])
 	# file = 'C:\\Program Files\\V-REP3\\V-REP_PRO_EDU\\vrep.exe'
 	# os.system('"'+ file + '"' + ' -g10 - g2 -gfiles')
 
 def clickRecallBest():
 	con.configure(text="RECALLING BEST")
 	repository.configure(text=directory)
-	subprocess.Popen([r""+ directory + "vrep.exe", "-g0", "-g9", "-gfiles"])
+	if (os.name == 'nt'):
+		subprocess.Popen([r""+ directory + "/vrep.exe", "-g0", "-g9", "-gfiles"])
+	else:
+		subprocess.Popen([r""+ directory + "/vrep.sh", "-g0", "-g9", "-gfiles"])
 	
 def clickRunParallel():
 	con.configure(text="Starting Parallel Evolution")
 	repository.configure(text=directory)
 	for i in range(7):
 		#arguments = "-h -g" + str(i) + " -g2 -gfiles -gREMOTEAPISERVERSERVICE_"+ str(i + 1) +"_FALSE_FALSE"
-		subprocess.Popen([r""+directory+"vrep.exe" ,"-h","-g0" ,"-g1" ,"-gfiles", "-gREMOTEAPISERVERSERVICE_"+str(i+104000)+"_TRUE_TRUE"])
+		if (os.name == 'nt'):
+			subprocess.Popen([r""+directory+"/vrep.exe" ,"-h","-g0" ,"-g1" ,"-gfiles", "-gREMOTEAPISERVERSERVICE_"+str(i+104000)+"_TRUE_TRUE"])
+		else:
+			subprocess.Popen([r""+directory+"/vrep.sh" ,"-h","-g0" ,"-g1" ,"-gfiles", "-gREMOTEAPISERVERSERVICE_"+str(i+104000)+"_TRUE_TRUE"])
 				   #-gREMOTEAPISERVERSERVICE_"+ str(i+1040000) + "_FALSE_FALSE"])
-
-
+	if (os.name == 'nt'):
+		subprocess.Popen([r""+directory+"/programming/v_repExtER_Minimal/x64/Debug/ERClient.exe","files" ,"0" ,"7"])
+	else:
+		subprocess.Popen([r""+directory+"/programming/Cplusplus_Evolution/ERClient/ERClient","files" ,"0" ,"7"])
+		
 
 runB = Button(window, text="Run Evolution", command=clickRun)
 recallB = Button(window, text="Recall Best", command=clickRecallBest)
