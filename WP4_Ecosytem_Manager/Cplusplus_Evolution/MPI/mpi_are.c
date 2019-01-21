@@ -53,21 +53,21 @@ int master_io( master_comm, comm )
 MPI_Comm comm;
 {
 	int	i,j, size;
-	int	n_nodes = 1;
 	char	buf[256];
 	char	erClientArguments[256];
 	const char* clientPath = "WP4_Ecosytem_Manager/Cplusplus_Evolution/ERClient/ERClient";
+
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
 	sprintf( buf, "Hello?");
 	printf("Master here\n");
 
 	MPI_Status status;
 	printf("Master is going to run vrep\n");
-	sprintf(erClientArguments, "%s %s %d %d ", clientPath, REPOSITORY, SEED, n_nodes);
-	
-	// arguments: repository, sceneNumber and amount CPU's
+
+	// arguments: repository, seed and amount CPU's
+	sprintf(erClientArguments, "%s %s %d %d ", clientPath, REPOSITORY, SEED, size);
 	system(erClientArguments);
 	printf("Master ran VREP\n");
-
 
     MPI_Comm_size( master_comm, &size );
     for (j=1; j<=2; j++) {
@@ -84,15 +84,14 @@ int slave_io( master_comm, comm )
 MPI_Comm comm;
 {
 	char 	buf[256];
-    	int 	rank, size, length;
+	int 	rank, size, length;
 	char 	name[80];
 	MPI_Status	status;
 
 	MPI_Comm_rank( comm, &rank );
+	MPI_Comm_size( comm, &size );
 	sprintf( buf, "Hello from slave %d\n", rank );
 	MPI_Send( buf, strlen(buf) + 1, MPI_CHAR, 0, 0, master_comm );
-	
-   
 	
 	printf("Hello from slave %d\n", rank);
 	MPI_Get_processor_name(name,&length);
@@ -106,6 +105,7 @@ MPI_Comm comm;
 	//       - 9 RECALL
 	// [3] repository
 	sprintf(erClientArguments, "%s -h -g%d -g1 -g%s -gREMOTEAPISERVERSERVICE_%d_TRUE_TRUE", VREP_EXE, rank, REPOSITORY, rank + 104000);
+	// sprintf(erClientArguments, "%s -h -g%d -g1 -g%s -gREMOTEAPISERVERSERVICE_%d_TRUE_TRUE", VREP_EXE, 0, REPOSITORY, rank + 104000);
 	printf("Hello MPI: processor %d of %d on %s\n", rank,size,name);
 
 	char cwd[1024];
@@ -122,8 +122,6 @@ MPI_Comm comm;
 
 	sprintf( buf, "Hello master %d\n", rank );
         MPI_Send( buf, strlen(erClientArguments) + 1, MPI_CHAR, 0, 0, master_comm );
-
-
 	
 
 	if (status.MPI_TAG == DIETAG) {

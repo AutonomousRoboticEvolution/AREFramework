@@ -2,6 +2,11 @@
 
 set -e
 
+VREP_EXE=''
+SEED=0
+REPOSITORY=''
+MPI_NODES=16 # population = MPI_NODES-1
+
 function usage {
     echo """
 This program will compile and run the entire project in MPI mode.
@@ -44,12 +49,13 @@ cd build
 cmake ..
 make
 
-mkdir -p "${REPOSITORY}/morphologies${SEED}"
+# mkdir -p "${REPOSITORY}/morphologies${SEED}"
+mkdir -p "${REPOSITORY}/morphologies0"
 
 echo "copying plugin into vrep folder"
 VREP_FOLDER=$(dirname ${VREP_EXE})
 cp "WP4_Ecosytem_Manager/Cplusplus_Evolution/libv_repExtER.so" "${VREP_FOLDER}/"
 
 echo "STARTING MPI PROGRAM"
-echo mpirun -c 16 WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
-exec mpirun -c 16 WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
+echo mpirun -c ${MPI_NODES} WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
+exec mpirun -c ${MPI_NODES} WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}

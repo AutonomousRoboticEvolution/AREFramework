@@ -121,7 +121,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 		ER = unique_ptr<ER_VREP>(new ER_VREP);
 
 
-		int run = 0;
+		int run = -1;
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
 			run = atoi(arg1_param);
