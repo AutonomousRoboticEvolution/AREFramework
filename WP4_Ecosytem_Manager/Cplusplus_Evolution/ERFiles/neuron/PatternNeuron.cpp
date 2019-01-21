@@ -37,7 +37,10 @@ void PatternNeuron::update() {
 	// sin
 	double amplitudeD = amplitude;
 	double angularFreq = frequency * maxFreq;
-	output = (float)(amplitudeD * sin(angularFreq * time + phase / 180 * M_PI));
+	//angularFreq = 1.0;
+	//amplitudeD = 1.0;
+	//phase = 1.0;
+	output = (float)(amplitudeD * sin(angularFreq * time + (phase * M_PI))); //; / 180 * M_PI));
 	if (output > 1.0) {
 		output = 1.0;
 	}
@@ -87,7 +90,9 @@ void PatternNeuron::mutate(float mutationRate) {
 	if (mutationRate > randomNum->randFloat(0.0, 1.0)) {
 		phase = randomNum->randFloat(-1.0, 1.0);
 	}
-	Neuron::mutate(mutationRate);
+	if (settings->controlType != settings->ANN_CUSTOM) {
+		Neuron::mutate(mutationRate);
+	}
 }
 
 stringstream PatternNeuron::getNeuronParams() {
