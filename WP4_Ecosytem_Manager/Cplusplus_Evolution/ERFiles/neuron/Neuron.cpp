@@ -18,8 +18,19 @@ void Neuron::init(int neuronID) {
 void Neuron::mutate(float mr) {
 	// randomly mutate connection
 	for (int i = 0; i < connectionWeights.size(); i++) {
+		// random mutations
 		if (randomNum->randFloat(0.0, 1.0) < mr) {
 			connectionWeights[i] = randomNum->randFloat(-1.0, 1.0);
+		}
+		// local mutations
+		if (randomNum->randFloat(0.0, 1.0) < mr) {
+			connectionWeights[i]+= randomNum->randFloat(-sigma, sigma);
+			if (connectionWeights[i] > 1.0) {
+				connectionWeights[i] = 1.0;
+			}
+			else if (connectionWeights[i] < -1.0) {
+				connectionWeights[i] = -1.0;
+			}
 		}
 	}
 }

@@ -25,6 +25,7 @@ public:
 	float input = 0;
 	float output;
 	float threshold;
+	float sigma = 0.2;
 	virtual stringstream getNeuronParams() = 0; 
 	virtual void setNeuronParams(vector<string>) = 0; 
 	virtual bool checkNeuron(vector<string>) = 0;
