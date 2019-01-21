@@ -120,6 +120,7 @@ void EA_SteadyState::createNewGenRandomSelect() {
 			nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
 			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
 			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());
+			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
 			// artefact, use for morphological protection
 			// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
 			// cout << "..";
@@ -204,12 +205,17 @@ void EA_SteadyState::replaceNewRank()
 		populationGenomes.push_back(nextGenGenomes[i]);
 	}
 	// sort population on fitness
-
 	vector<shared_ptr<indFit>> fitnesses;
 
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		fitnesses.push_back(shared_ptr<indFit>(new indFit));
-		fitnesses[i]->fitness = populationGenomes[i]->fitness;
+		if (populationGenomes[i]->fitness > 10) {
+			std::cout << "ERROR: The fitness wasn't set correctly" << std::endl;
+			fitnesses[i] = 0;
+		}
+		else {
+			fitnesses[i]->fitness = populationGenomes[i]->fitness;
+		}
 		fitnesses[i]->ind = populationGenomes[i]->individualNumber; // not individual number!
 	}
 	
@@ -219,6 +225,7 @@ void EA_SteadyState::replaceNewRank()
 	for (int i = settings->populationSize; i < fitnesses.size(); i++) {
 		for (int j = 0; j < populationGenomes.size(); j++) {
 			if (fitnesses[i]->ind == populationGenomes[j]->individualNumber) {
+				populationGenomes[j].reset(); // all objects within class should be deleted since they are smart pointers. 
 				populationGenomes.erase(populationGenomes.begin() + j);
 				break;
 			}
