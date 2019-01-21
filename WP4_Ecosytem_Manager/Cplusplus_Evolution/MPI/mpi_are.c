@@ -5,28 +5,45 @@
 #define WORKTAG     1
 #define DIETAG     2
 
+long SEED = 0;
+char * REPOSITORY = NULL;
+char * VREP_EXE = NULL;
+
 int main(int argc, char ** argv) {
 	int rank, size;
 	char name[80];
 	int length;
 	MPI_Comm new_comm;
 
+	if (argc < 4) {
+		printf("Usage: %s [vrep_exe] [seed] [repository]\n", argv[0]);
+		return 1;
+	}
+	
+	VREP_EXE   = argv[1];
+	SEED       = atol(argv[2]);
+	REPOSITORY = argv[3];
 
-	printf("starting MPI");
+	// printf("starting MPI\n");
 
 	MPI_Init(&argc, &argv);
 
 	MPI_Comm_rank(MPI_COMM_WORLD,&rank);
-//	MPI_Comm_size(MPI_COMM_WORLD,&size);
-  	MPI_Comm_split( MPI_COMM_WORLD, rank == 0, 0, &new_comm );
-    	if (rank == 0) 
-		printf("Rank is zero thus initializing master")<
+	MPI_Comm_size(MPI_COMM_WORLD,&size);
 
+
+	// printf("[%d] vrep_exe = %s\n", rank, VREP_EXE);
+	// printf("[%d] SEED = %d\n", rank, SEED);
+	// printf("[%d] REPO = %s\n", rank, REPOSITORY);
+
+  	MPI_Comm_split( MPI_COMM_WORLD, rank == 0, 0, &new_comm );
+
+	if (rank == 0) {
+		printf("Rank is zero thus initializing master\n");
 		master_io( MPI_COMM_WORLD, new_comm );
-    	else
+	} else {
 		slave_io( MPI_COMM_WORLD, new_comm );
-	
-	
+	}
 
 	MPI_Finalize();
 }
@@ -36,7 +53,6 @@ int master_io( master_comm, comm )
 MPI_Comm comm;
 {
 	int	i,j, size;
-	int	seed = 0;
 	int	n_nodes = 1;
 	char	buf[256];
 	char	erClientArguments[256];
@@ -46,10 +62,10 @@ MPI_Comm comm;
 
 	MPI_Status status;
 	printf("Master is going to run vrep\n");
-	sprintf(erClientArguments, "%s /tmp/files %d %d ", clientPath, seed, n_nodes);
+	sprintf(erClientArguments, "%s %s %d %d ", clientPath, REPOSITORY, SEED, n_nodes);
 	
 	// arguments: repository, sceneNumber and amount CPU's
-    	system(erClientArguments);
+	system(erClientArguments);
 	printf("Master ran VREP\n");
 
 
@@ -74,7 +90,7 @@ MPI_Comm comm;
 
 	MPI_Comm_rank( comm, &rank );
 	sprintf( buf, "Hello from slave %d\n", rank );
-	// MPI_Send( buf, strlen(buf) + 1, MPI_CHAR, 0, 0, master_comm );
+	MPI_Send( buf, strlen(buf) + 1, MPI_CHAR, 0, 0, master_comm );
 	
    
 	
@@ -84,8 +100,12 @@ MPI_Comm comm;
 	//sprintf(erClientArguments, "xvfb-run sh vrep.sh -h -g%d -g0 -g/users/f/v/fveenstr/scratch/VREP/V-REP_PRO_V3_4_0_64_Linux/plantResults",rank);
 		
 	// parameters
-	// - 
-	sprintf(erClientArguments, "../../V-REP_PRO_EDU_V3_5_0_Linux/vrep.sh -g%d -gREMOTEAPISERVERSERVICE_%d_TRUE_TRUE",rank, rank + 104000);
+	// [1] rank
+	// [2] type of run
+	//       - 1 SERVER
+	//       - 9 RECALL
+	// [3] repository
+	sprintf(erClientArguments, "%s -h -g%d -g1 -g%s -gREMOTEAPISERVERSERVICE_%d_TRUE_TRUE", VREP_EXE, rank, REPOSITORY, rank + 104000);
 	printf("Hello MPI: processor %d of %d on %s\n", rank,size,name);
 
 	char cwd[1024];
