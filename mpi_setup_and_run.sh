@@ -32,12 +32,12 @@ else
     echo "SEED is set to '${SEED}'"
 fi
 
-REPOSITORY=$3
 if [ -z ${3+x} ]; then 
     echo "REPOSITORY is unset"
     usage
     exit 1
 else
+    REPOSITORY=$(realpath $3)
     echo "REPOSITORY is set to '${REPOSITORY}'"
 fi
 
