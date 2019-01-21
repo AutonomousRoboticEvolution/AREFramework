@@ -18,15 +18,17 @@ void ClientEA::init(int amountPorts)
 	int amPorts = ports.size();
 	simxFinish(-1);
 	for (int i = 0; i < ports.size(); i++) {
-		clientIDs.push_back(simxStart("127.0.0.1", ports[i], true, true, 5000, 5));
-		if (clientIDs[i] == -1) {
-			cout << "Port " << ports[i] << " could not be opened" << endl;
-			ports.erase(ports.begin() + i);
-			clientIDs.erase(clientIDs.begin() + i);
-			i--;
-		}
-		else {
+		std::cout << "Connecting to vrep on port " << ports[i] << std::endl;
+		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5);
+		if (new_connection == -1) {
+			std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
+			std::exit(1);
+			// ports.erase(ports.begin() + i);
+			// clientIDs.erase(clientIDs.begin() + i);
+			// i--;
+		} else {
 			cout << "Connected to port " << ports[i] << endl;
+			clientIDs.push_back(new_connection);
 			portState.push_back(0);
 			portIndividual.push_back(-1); // this checks which individual the specific port is evaluating
 		}
@@ -176,7 +178,9 @@ void ClientEA::evaluateNextGen()
 
 void ClientEA::quitSimulators()
 {
-	for (int i = 0; i < clientIDs.size(); i++) {
+	// std::cout << "closing " << clientIDs.size() << " simulators" << std::endl;
+	// std::cout << "closing " << ports.size() << " simulators" << std::endl;
+	for (int i = 0; i < ports.size(); i++) {
 		cout << "closing simulator " << ports[i] << endl;
 		simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 	}

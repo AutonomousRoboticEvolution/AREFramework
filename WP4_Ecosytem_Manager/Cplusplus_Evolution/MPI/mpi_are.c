@@ -73,8 +73,13 @@ MPI_Comm comm;
 
 	// arguments: repository, seed and amount CPU's
 	sprintf(erClientArguments, "%s %s %d %d ", clientPath, REPOSITORY, SEED, size);
-	system(erClientArguments);
-	printf("Master ran VREP\n");
+	int return_value = system(erClientArguments);
+	printf("Master ran ERClient with return value %d\n", return_value);
+
+	if (return_value != 0) {
+		MPI_Abort(MPI_COMM_WORLD, return_value);
+		// exit(return_value);
+	}
 
 	// FINALIZE BARRIER
 	MPI_Barrier(MPI_COMM_WORLD);
@@ -125,8 +130,8 @@ MPI_Comm comm;
 
 	printf("erClientArguments: %s\n", erClientArguments);
 	printf("Slave %d is going to run vrep\n", rank);
-	system(erClientArguments);
-	printf("Slave %d completed running vrep\n", rank);
+	int return_value = system(erClientArguments);
+	printf("Slave %d completed running vrep with value %d\n", rank, return_value);
 
 
 	// sprintf( buf, "Hello master %d\n", rank );

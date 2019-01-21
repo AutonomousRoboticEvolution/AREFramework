@@ -73,7 +73,8 @@ int main(int argc, char* argv[])
 	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
 		std::cout << "client should connect to " << arguments[2].c_str() << " servers" << std::endl;
-		client->init(atoi(arguments[2].c_str()));
+		int numberOfNodes = atoi(arguments[2].c_str());
+		client->init(numberOfNodes - 1);
 	}
 	else {
 		client->init(2);
@@ -119,7 +120,6 @@ int main(int argc, char* argv[])
 
 	extApi_sleepMs(1000);
 	client->quitSimulators();
-	exit(0);
 
 	return 0;
 }
