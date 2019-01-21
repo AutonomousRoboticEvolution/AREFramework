@@ -53,9 +53,9 @@ def clickRunParallel():
 			subprocess.Popen([r""+directory+"/vrep.sh" ,"-h","-g0" ,"-g1" ,"-gfiles", "-gREMOTEAPISERVERSERVICE_"+str(i+104000)+"_TRUE_TRUE"])
 				   #-gREMOTEAPISERVERSERVICE_"+ str(i+1040000) + "_FALSE_FALSE"])
 	if (os.name == 'nt'):
-		subprocess.Popen([r""+directory+"/programming/v_repExtER_Minimal/x64/Debug/ERClient.exe","files" ,"0" ,"7"])
+		subprocess.Popen([r""+directory+"/programming/v_repExtER_Minimal/x64/Debug/ERClient.exe",directory+"/files" ,"0" ,"7"])
 	else:
-		subprocess.Popen([r""+directory+"/programming/Cplusplus_Evolution/ERClient/ERClient","files" ,"0" ,"7"])
+		subprocess.Popen([r""+directory+"/programming/Cplusplus_Evolution/ERClient/ERClient", directory+"/files" ,"0" ,"7"])
 		
 
 runB = Button(window, text="Run Evolution", command=clickRun)
