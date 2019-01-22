@@ -54,6 +54,7 @@ mkdir -p "${REPOSITORY}/morphologies0"
 
 echo "copying plugin into vrep folder"
 VREP_FOLDER=$(dirname ${VREP_EXE})
+cp "../WP4_Ecosytem_Manager/Cplusplus_Evolution/VREP_Files/Servo_Module.ttm" "${VREP_FOLDER}/models"
 cp "WP4_Ecosytem_Manager/Cplusplus_Evolution/libv_repExtER.so" "${VREP_FOLDER}/"
 
 echo "STARTING MPI PROGRAM"
