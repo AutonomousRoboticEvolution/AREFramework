@@ -3,9 +3,6 @@
 
 ER_DirectEncoding::ER_DirectEncoding()
 {
-	if (settings->verbose) {
-		cout << "CREATED DIRECT ENCODING" << endl;
-	}
 	modular = true;
 }
 
