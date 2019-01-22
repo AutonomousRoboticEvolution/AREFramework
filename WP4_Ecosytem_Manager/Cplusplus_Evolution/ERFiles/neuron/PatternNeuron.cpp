@@ -37,8 +37,8 @@ void PatternNeuron::update() {
 	// sin
 	double amplitudeD = amplitude;
 	double angularFreq = frequency * maxFreq;
-	angularFreq = 3.0;
-	amplitudeD = 1.0;
+	// angularFreq = 3.0;
+	// amplitudeD = 1.0;
 	//phase = 1.0;
 	output = (float)(amplitudeD * sin(angularFreq * time + (phase * M_PI))); //; / 180 * M_PI));
 	if (output > 1.0) {
@@ -81,14 +81,47 @@ shared_ptr<Neuron> PatternNeuron::clone() {
 }
 
 void PatternNeuron::mutate(float mutationRate) {
-	if (mutationRate > randomNum->randFloat(0.0, 3.0)) {
-		frequency = randomNum->randFloat(-1.0, 1.0);
+	if (mutationRate > randomNum->randFloat(0.0, 1.0)) {
+		if (randomNum->randFloat(0.0, 1.0) > 0.5) {
+			frequency = randomNum->randFloat(-1.0, 1.0);
+		} 
+		else {
+			frequency += randomNum->randFloat(-sigma, sigma);
+			if (frequency > 1.0) {
+				frequency = 1.0;
+			}
+			else if (frequency < -1.0) {
+				frequency = -1.0;
+			}
+		}
 	}
 	if (mutationRate > randomNum->randFloat(0.0, 1.0)) {
-		amplitude = randomNum->randFloat(0.0, 1.0);
+		if (randomNum->randFloat(0.0, 1.0) > 0.5) {
+			amplitude = randomNum->randFloat(-1.0, 1.0);
+		}
+		else {
+			amplitude += randomNum->randFloat(-sigma, sigma);
+			if (amplitude > 1.0) {
+				amplitude = 1.0;
+			}
+			else if (amplitude < -1.0) {
+				amplitude = -1.0;
+			}
+		}
 	}	
 	if (mutationRate > randomNum->randFloat(0.0, 1.0)) {
-		phase = randomNum->randFloat(-1.0, 1.0);
+		if (randomNum->randFloat(0.0, 1.0) > 0.5) {
+			phase = randomNum->randFloat(-1.0, 1.0);
+		}
+		else {
+			phase += randomNum->randFloat(-sigma, sigma);
+			if (phase > 1.0) {
+				phase = 1.0;
+			}
+			else if (phase < -1.0) {
+				phase = -1.0;
+			}
+		}
 	}
 	if (settings->controlType != settings->ANN_CUSTOM) {
 		Neuron::mutate(mutationRate);
