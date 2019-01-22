@@ -10,6 +10,7 @@ Development::Development()
 
 Development::~Development()
 {
+	createdModules.clear();
 }
 
 int Development::getAmountBrokenModules() {

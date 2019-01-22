@@ -14,6 +14,12 @@ DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 }
 
 DefaultGenome::~DefaultGenome() {
+	/*if (morph) {
+		morph->~Morphology();
+	}
+	if (control) {
+		control->~Control();
+	}*/
 }
 
 shared_ptr<Genome> DefaultGenome::clone() const

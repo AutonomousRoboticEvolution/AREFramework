@@ -13,7 +13,6 @@ DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings
 }
 
 DefaultGenomeVREP::~DefaultGenomeVREP() {
-
 }
 
 void DefaultGenomeVREP::loadMorphologyGenome(int indNum, int sceneNum) {

@@ -3,13 +3,25 @@
 
 ER_DirectEncoding::ER_DirectEncoding()
 {
-	cout << "CREATED DIRECT ENCODING" << endl;
+	if (settings->verbose) {
+		cout << "CREATED DIRECT ENCODING" << endl;
+	}
 	modular = true;
 }
 
 ER_DirectEncoding::~ER_DirectEncoding()
 {
-
+	//if (genome) {
+	//	for (int i = 0; i < genome->moduleParameters.size(); i++)
+	//	{
+	//		if (genome->moduleParameters[i]->control) {
+	//			genome->moduleParameters[i]->control->~Control();
+	//		}
+	//		genome->moduleParameters[i].reset();
+	//	}
+	//	genome->moduleParameters.clear();
+	//	genome.reset();
+	//}
 }
 
 
@@ -66,7 +78,9 @@ void ER_DirectEncoding::initializeGenomeCustom(int type)
 
 
 void ER_DirectEncoding::saveGenome(int indNum, int sceneNum, float fitness) {
-	cout << "saving direct genome " << endl << "-------------------------------- "<< endl;
+	if (settings->verbose) {
+		cout << "saving direct genome " << endl << "-------------------------------- " << endl;
+	}
 //	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountStates = genome->moduleParameters.size(); 
 
@@ -454,7 +468,9 @@ void ER_DirectEncoding::update() {
 }
 
 void ER_DirectEncoding::symmetryMutation(float mutationRate) {
-	cout << "This version does not support symmetry mutation, check code" << endl;
+	if (settings->verbose) {
+		cout << "This version does not support symmetry mutation, check code" << endl;
+	}
 }
 
 bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAMETERS>> mps, int parentSite, int parent) {
@@ -467,7 +483,9 @@ bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAME
 }
 
 int ER_DirectEncoding::mutateERGenome(float mutationRate) {
-	cout << "mutating direct" << endl;
+	if (settings->verbose) {
+		cout << "mutating direct" << endl;
+	}
 	// 1) add module, 
 	// 2) mutate morphology
 	// 3) mutate control
@@ -492,7 +510,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 				int treeDepth = checkTreeDepth(attachModule, 0);
 				// cout << "Tree depth = " << treeDepth << endl;
 				if (treeDepth > settings->lIncrements -1 ) {
-					cout << "Tree too deep" << endl;
+					if (settings->verbose) {
+						cout << "Tree too deep" << endl;
+					}
 				}
 				else {
 					int attachType = genome->moduleParameters[attachModule]->type;
@@ -587,9 +607,13 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 			vector<int> deleteModules;
 			deleteModules.push_back(randomModule);
 //			genome->moduleParameters.erase(genome->moduleParameters.begin() + randomModule);
-			cout << "deleting: " << randomModule << endl;
+			if (settings->verbose) {
+				cout << "deleting: " << randomModule << endl;
+			}
 			for (int j = 0; j < deleteModules.size(); j++) {
-				cout << "dm[j]: " << deleteModules[j] << endl;
+				if (settings->verbose) {
+					cout << "dm[j]: " << deleteModules[j] << endl;
+				}
 				for (int i = 0; i < genome->moduleParameters.size(); i++) {
 					if (genome->moduleParameters[i]->parent == deleteModules[j])
 					{
@@ -599,16 +623,22 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 					}
 				}
 			}
-			cout << "actual deletion" << endl;
+			if (settings->verbose) {
+				cout << "actual deletion" << endl;
+			}			
 			int dCounter = 0;
 			std::sort(deleteModules.begin(), deleteModules.end());
 			for (int i = deleteModules.size() -1; i >= 0; i--) {
-				cout << "i: " << i << endl;
-//				cout << "deleting " << deleteModules[i] - dCounter << endl;
-				cout << "module params size = " << genome->moduleParameters.size() << endl;
-//				cout << "dcounter = " << dCounter; cout << ", deleteModules[i] = " << deleteModules[i];
+				if (settings->verbose) {
+					cout << "i: " << i << endl;
+					//				cout << "deleting " << deleteModules[i] - dCounter << endl;
+					cout << "module params size = " << genome->moduleParameters.size() << endl;
+					//				cout << "dcounter = " << dCounter; cout << ", deleteModules[i] = " << deleteModules[i];
+				}
 				genome->moduleParameters.erase(genome->moduleParameters.begin() + (deleteModules[i]));
-				cout << "removed one from module parameters" << endl;
+				if (settings->verbose) {
+					cout << "removed one from module parameters" << endl;
+				}
 				genome->amountModules -= 1;
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
 					cout << "j: " << j << endl;
@@ -616,8 +646,10 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 						genome->moduleParameters[j]->parent -= 1;
 					}
 				}
-				cout << "deleted" << endl;
-	//			dCounter++;
+				if (settings->verbose) {
+					cout << "deleted" << endl;
+				}
+				//			dCounter++;
 			}
 			
 //			genome->moduleParameters[randomModule];
