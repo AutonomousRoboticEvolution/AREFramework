@@ -39,6 +39,12 @@ void BaseMorphology::mutate(){
 	cout << "Cannot Mutate Base Morphology: check settings" << endl; 
 }
 
+bool BaseMorphology::loadGenome(int individualNumber, int sceneNum)
+{
+	std::cout << "cannot load basemorph" << std::endl;
+	return false;
+}
+
 vector <shared_ptr<ER_Module>> BaseMorphology::getCreatedModules() {
 	vector <shared_ptr<ER_Module>> vec;
 	return vec;

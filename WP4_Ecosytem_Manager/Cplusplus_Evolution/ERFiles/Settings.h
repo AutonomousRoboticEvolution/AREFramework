@@ -122,7 +122,8 @@ public:
 
 	enum InstanceType {
 		INSTANCE_REGULAR = 0,
-		INSTANCE_SERVER = 1
+		INSTANCE_SERVER = 1,
+		INSTANCE_DEBUGGING = 2
 	};
 
 	enum OS {
@@ -154,8 +155,8 @@ public:
 	int sceneNum;
 
 	bool client;
-	float mutationRate = 0.8;
-	float morphMutRate = 0.15;
+	float mutationRate = 0.1;
+	float morphMutRate = 0.1;
 	int generation = 0;
 	int maxGeneration = 1000;
 	int xGenerations = 1000;
@@ -179,7 +180,7 @@ public:
 	int maxAmountModules = 20;
 	vector<int> moduleTypes;
 	vector<vector<int> > maxModuleTypes;
-	string repository = "";
+	string repository = "files";
 	int initialModuleType = 1; // initial module for direct encoding, similar to axiom of L-System
 	float energyDissipationRate = 0.00;
 	int lIncrements = 3;

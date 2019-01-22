@@ -44,8 +44,8 @@ shared_ptr<Genome> GenomeFactoryVREP::convertToGenomeVREP(shared_ptr<Genome> gn)
 	vrepGenome->randomNum = gn->randomNum;
 	vrepGenome->settings = gn->settings;
 	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
-	vrepGenome->morph.reset();
-	shared_ptr<Morphology> m = mf->convertMorph(gn->morph);
+	// vrepGenome->morph.reset();
+	// shared_ptr<Morphology> m = mf->convertMorph(gn->morph);
 	vrepGenome->morph = mf->convertMorph(gn->morph);
 	// gn->clone();
 	mf.reset();

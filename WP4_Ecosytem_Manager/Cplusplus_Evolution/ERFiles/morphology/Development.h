@@ -86,7 +86,7 @@ public:
 
 	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
 
-	void loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(int individualNumber, int sceneNum);
 	//void recallAndCreate();
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 

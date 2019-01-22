@@ -137,13 +137,13 @@ void ER_DirectEncoding::loadPhenotype(int ind)
 	}
 }
 
-void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
+bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
 		loadPhenotype(individualNumber);
 		genome->amountModules = genome->moduleParameters.size();
 		morphFitness = 0;
 		setGenomeColors();
-		return;
+		return true; // TODO CHANGE
 	}
 	if (settings->verbose) {
 		cout << "loading genome " << individualNumber << "(ER_Direct)" << endl;
@@ -152,13 +152,15 @@ void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 //	lGenome->lParameters.clear();
 //	cout << "lGenome cleared" << endl; 
 	ostringstream genomeFileName;
+
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
 //	genomeFileName << "files/morphologies0/genome9137.csv";
 	cout << genomeFileName.str() << endl;
 	ifstream genomeFile(genomeFileName.str());
 	if (!genomeFile) {
 		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		std::exit(1);
+		return false;
+//		std::exit(1);
 	}
 
 	string value;
@@ -269,8 +271,11 @@ void ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 	genome->amountModules = genome->moduleParameters.size();
 	morphFitness = 0;
 	setGenomeColors();
-	
-	cout << "loaded direct genome" << endl;
+
+	if (settings->verbose) {
+		cout << "loaded direct genome" << endl;
+	}
+	return true;
 }
 
 void ER_DirectEncoding::setGenomeColors() {

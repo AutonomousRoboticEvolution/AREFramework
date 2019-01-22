@@ -30,11 +30,11 @@ public:
 
 	virtual void savePhenotype(int indNum, int sceneNum) = 0;
 
-	virtual void loadGenome(int indNum, int sceneNum) = 0;
+	virtual bool loadGenome(int indNum, int sceneNum) = 0;
 	virtual void saveGenome(int indNum, int sceneNum) = 0;
 	virtual void clearGenome() = 0;
 	virtual void checkGenome() = 0; // for debugging
-	virtual void loadMorphologyGenome(int indNum, int sceneNum) = 0;
+	virtual bool loadMorphologyGenome(int indNum, int sceneNum) = 0;
 
 };
 

@@ -251,9 +251,9 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 
 
 int Module_Servo::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
-	int rdr = simLoadModel("models/RodrigoModule.ttm");
+	int rdr = simLoadModel("models/Servo_Module.ttm");
 	if (rdr < 0) {
-		std::cerr << "Error loading models/RodrigoModule.ttm" << std::endl;
+		std::cerr << "Error loading models/Servo_Module.ttm" << std::endl;
 	}
 	int shapeAmount[1];
 //	energyDissipationRate = 0.1;

@@ -258,8 +258,8 @@ void ANN::mutateConnections(float mutationRate) {
 		}
 	}
 	//	cout << "input connections mutated" << endl;
-	// mutate recurrent layer
 
+	// mutate recurrent layer
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		int amountCon = recurrentLayer[i]->connections.size();
 		for (int j = 0; j < amountCon; j++) {
@@ -328,7 +328,9 @@ void ANN::mutateConnections(float mutationRate) {
 void ANN::addNeurons(float mutationRate) {
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 		if (recurrentLayer.size() < maxLayerSize) {
-			cout << "adding neuron" << endl;
+			if (settings->verbose) {
+				cout << "adding neuron" << endl;
+			}
 			unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 			int neuronType = randomNum->randInt(2, 0);
 			if (neuronType == 1) {
@@ -358,7 +360,9 @@ void ANN::addNeurons(float mutationRate) {
 void ANN::removeNeurons(float mutationRate) {
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate / 2) { // it is less likely that neurons are removed
 		if (recurrentLayer.size() > 0) {
-			cout << "removing neuron" << endl;
+			if (settings->verbose) {
+				cout << "removing neuron" << endl;
+			}
 			int randNeur = randomNum->randInt(recurrentLayer.size(), 0);
 	//		cout << "Removing neuron nr: " << randNeur << endl;
 			int deletedID = recurrentLayer[randNeur]->neuronID;
@@ -450,7 +454,9 @@ void ANN::mutate(float mutationRate) {
 			recurrentLayer[i]->mutate(mutationRate);
 		}
 	}
-	cout << "about to mutate neurons" << endl;
+	if (settings->verbose) {
+		cout << "about to mutate neurons" << endl;
+	}
 	mutateConnections(mutationRate);
 	addNeurons(mutationRate);
 	removeNeurons(mutationRate);

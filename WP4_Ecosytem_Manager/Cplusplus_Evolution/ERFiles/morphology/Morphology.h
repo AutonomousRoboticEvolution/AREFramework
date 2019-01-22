@@ -3,6 +3,8 @@
 #include <memory>
 //#include "../env/Environment.h" // impossible, environment already includes morphology
 #include "../module/ER_Module.h"
+#include "../control/Control.h"
+#include "../control/ControlFactory.h"
 #include "../../RandNum.h"
 #include "../Settings.h"
 
@@ -46,13 +48,14 @@ public:
 	virtual vector<int> getJointHandles(int) =0;
 	virtual vector<int> getAllHandles(int) = 0;
 
-	virtual void loadGenome(int individualNumber, int sceneNum) = 0;
+	virtual bool loadGenome(int individualNumber, int sceneNum) = 0;
 	virtual void crossover(shared_ptr<Morphology>, float crossoverRate) = 0;
 //	virtual void checkControl(int individual, int sceneNum) =0;
 	bool modular = false;
 //	typedef shared_ptr<ER_Module> ModulePointer;
 
 	// modular functions
+	// This function is needed to implement fluid dynamics on modules...
 	virtual vector <shared_ptr<ER_Module>> getCreatedModules() = 0;
 	virtual int getAmountBrokenModules() = 0;
 

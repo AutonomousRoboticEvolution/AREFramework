@@ -45,7 +45,7 @@ public:
 	void crossover(shared_ptr<Morphology>, float cr) {};
 	void grow() {};
 	void mutate();
-	void loadGenome(int individualNumber, int sceneNum) {};
+	bool loadGenome(int individualNumber, int sceneNum);
 	void saveGenome(int indNum, int sceneNum, float fitness);
 	void checkControl(int individual, int sceneNum);
 	

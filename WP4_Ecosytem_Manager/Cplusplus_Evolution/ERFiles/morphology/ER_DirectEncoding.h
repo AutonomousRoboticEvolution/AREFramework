@@ -35,7 +35,7 @@ public:
 	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
 	float getFitness();
 	void loadPhenotype(int ind);
-	void loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(int individualNumber, int sceneNum);
 	void setGenomeColors();
 	void symmetryMutation(float mutationRate);
 

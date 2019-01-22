@@ -53,7 +53,9 @@ float Development::callFitness() {
 	return fitness;
 }
 
-void Development::loadGenome(int individualNumber, int sceneNum) {
+bool Development::loadGenome(int individualNumber, int sceneNum) {
+	std::cout << "Cannot instantiate development class, also, should become abstract" << endl;
+	return false;
 }
 
 
@@ -67,7 +69,9 @@ void Development::init_noMorph() {
 
 void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
 {
-	cout << "saving direct phenotype genome " << endl << "-------------------------------- " << endl;
+	if (settings->verbose) {
+		cout << "saving direct phenotype genome " << endl << "-------------------------------- " << endl;
+	}
 	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountExpressedModules = createdModules.size();
 	

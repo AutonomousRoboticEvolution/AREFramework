@@ -31,7 +31,7 @@ public:
 	void init();
 	void create();
 	void update(); 
-	void loadGenome(int indNum, int sceneNum);
+	bool loadGenome(int indNum, int sceneNum);
 	void saveGenome(int indNum, int sceneNum);
 	void clearGenome();
 	void mutate();
@@ -44,7 +44,7 @@ public:
 	//void mutate();
 	float genomeFitness;  
 
-	void loadMorphologyGenome(int indNum, int sceneNum); 
+	bool loadMorphologyGenome(int indNum, int sceneNum); 
 	void loadBaseMorphology(int indNum, int sceneNum); // old
 
 

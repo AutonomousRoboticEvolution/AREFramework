@@ -125,8 +125,8 @@ void ER_CPPN_Interpreter::checkForceSensors() {
 
 
 
-void ER_CPPN_Interpreter::loadGenome(int individualNumber, int sceneNum) {
-	ER_CPPN_Encoding::loadGenome(individualNumber, sceneNum);
+bool ER_CPPN_Interpreter::loadGenome(int individualNumber, int sceneNum) {
+	bool load = ER_CPPN_Encoding::loadGenome(individualNumber, sceneNum);
 	cout << "ADJUSTING CPPN GENOME" << endl;
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
@@ -138,11 +138,14 @@ void ER_CPPN_Interpreter::loadGenome(int individualNumber, int sceneNum) {
 	}
 	cout << "Loaded all modules" << endl;
 	mf.reset();
+	return load;
 }
 
 int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 //	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
-	cout << "initializing CPPN encoding interpreter" << endl;
+	if (settings->verbose) {
+		cout << "initializing CPPN encoding interpreter" << endl;
+	}
 	createdModules.clear();
 	for (int i = 1; i < genome->moduleParameters.size(); i++) {
 		genome->moduleParameters[i]->expressed = false;
@@ -259,8 +262,9 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 			// cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
 		} 
 	}
-
-	cout << "shifting robot position" << endl;
+	if (settings->verbose) {
+		cout << "shifting robot position" << endl;
+	}
 	if (createdModules[0]->type != 8) {
 		shiftRobotPosition();
 	}
@@ -302,7 +306,9 @@ void ER_CPPN_Interpreter::init() {
 		ER_CPPN_Encoding::init();
 	}
 	// from the CPPN create a robot
-	cout << "creating CPPN robot" << endl;
+	if (settings->verbose) {
+		cout << "creating CPPN robot" << endl;
+	}
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
 	genome->moduleParameters.clear();
@@ -323,7 +329,9 @@ void ER_CPPN_Interpreter::init() {
 	for (int i = 0; i < maxIterations; i++)
 	{
 		// query CPPN a few times. 
-		cout << i << endl;
+		if (settings->verbose) {
+			cout << "query: " << i << endl;
+		}
 		int sizeIt = genome->moduleParameters.size();
 		for (int n = 0; n < sizeIt; n++) {
 			if (genome->moduleParameters[n]->queried == false) {
@@ -727,7 +735,9 @@ void ER_CPPN_Interpreter::shiftRobotPosition() {
 	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
 	float postpos[3];
 	simGetObjectPosition(mainHandle, -1, postpos);
-	cout << "postpos: " << postpos[2] << endl;
+	if (settings->verbose) {
+		cout << "postpos: " << postpos[2] << endl;
+	}
 }
 
 bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {

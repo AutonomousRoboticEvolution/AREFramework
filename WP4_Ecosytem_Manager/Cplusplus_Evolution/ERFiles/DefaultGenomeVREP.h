@@ -19,8 +19,8 @@ public:
 	DefaultGenomeVREP() {};
 
 	~DefaultGenomeVREP();
-	void loadMorphologyGenome(int indNum, int sceneNum);
-	void loadGenome(int indNum, int sceneNum);
+	bool loadMorphologyGenome(int indNum, int sceneNum);
+	bool loadGenome(int indNum, int sceneNum);
 
 	// deepcopy
 	shared_ptr<Genome> clone() const;

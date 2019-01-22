@@ -106,6 +106,13 @@ void ClientEA::evaluateNextGen()
 					int state[1];
 					simxGetIntegerSignal(clientIDs[i], "simulationState", state, simx_opmode_oneshot);
 					//	cout << state[0] << endl;
+					if (state[0] == 9) {
+						extApi_sleepMs(20);
+						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again." << std::endl;
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividual[i], simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
+					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", ea->nextGenGenomes[currentEv]->individualNumber, simx_opmode_oneshot);

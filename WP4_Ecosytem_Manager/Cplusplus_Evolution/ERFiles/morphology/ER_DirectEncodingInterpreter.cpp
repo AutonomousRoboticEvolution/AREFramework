@@ -125,9 +125,9 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 
 
 
-void ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum) {
+bool ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum) {
 	// NEVER LOADS THROUGH THIS CLASS ANYMORE???
-	ER_DirectEncoding::loadGenome(individualNumber, sceneNum);
+	bool loaded = ER_DirectEncoding::loadGenome(individualNumber, sceneNum);
 	cout << "ADJUSTING DIRECT GENOME" << endl;
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
@@ -139,6 +139,7 @@ void ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum
 	}
 	cout << "Loaded all modules" << endl;
 	mf.reset();
+	return loaded;
 }
 
 int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition[3]) {

@@ -10,7 +10,16 @@ ER_LSystem::ER_LSystem()
 
 ER_LSystem::~ER_LSystem()
 {
-
+	//if (lGenome) {
+	//	for (int i = 0; i < lGenome->lParameters.size(); i++) {
+	//		if (lGenome->lParameters[i]->control) {
+	//			lGenome->lParameters[i]->control->~Control();
+	//		}
+	//		lGenome->lParameters[i].reset();
+	//	}
+	//	lGenome->lParameters.clear();
+	//	lGenome.reset();
+	//}
 }
 
 
@@ -497,7 +506,7 @@ float ER_LSystem::getFitness() {
 	return fitness;
 }
 
-void ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
+bool ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
 //	cout << "loading genome " << individualNumber << endl;
 	lGenome = shared_ptr<LGENOME>(new LGENOME);
 //	lGenome->lParameters.clear();
@@ -505,8 +514,12 @@ void ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
 	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
 //	genomeFileName << "files/morphologies0/genome9137.csv";
-	cout << genomeFileName.str() << endl;
+
 	ifstream genomeFile(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
+	}
 	string value;
 	list<string> values;
 	while (genomeFile.good()) {
@@ -680,6 +693,7 @@ void ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
 		lGenome->lParameters[i]->moduleColor[1] = lGenome->lParameters[i]->color[1];
 		lGenome->lParameters[i]->moduleColor[2] = lGenome->lParameters[i]->color[2];
 	}
+	return true;
 //	cout << "loaded L-System genome" << endl;
 }
 
@@ -820,7 +834,7 @@ int ER_LSystem::initializeLGenome(int type) {
 		}*/
 	}
 	mutateERLGenome(0.5);
-	mutateControlERLGenome(0.5);
+//	mutateControlERLGenome(0.5);
 	mutateERLGenome(0.5);
 	// mutateERLGenome(0.5);
 	cf.reset();

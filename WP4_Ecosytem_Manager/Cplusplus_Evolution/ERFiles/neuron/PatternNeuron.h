@@ -28,7 +28,7 @@ public:
 private:
 	float time = 0; // initial
 	float timeStep = 0.05f;
-	float maxFreq = 1.0f;// 2.5f;
+	float maxFreq = 2.5f;// 1.0f;// 2.5f;
 };
 
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "CustomMorphology.h"
+#include "v_repLib.h"
+
 class CustomMorphologyVREP : public CustomMorphology
 {
 public:

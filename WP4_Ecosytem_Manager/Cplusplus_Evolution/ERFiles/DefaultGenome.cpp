@@ -35,9 +35,9 @@ void DefaultGenome::update() {
 	morph->update();
 }
 
-void DefaultGenome::loadGenome(int indNum, int sceneNum)
+bool DefaultGenome::loadGenome(int indNum, int sceneNum)
 {
-	loadMorphologyGenome(indNum, sceneNum);
+	return loadMorphologyGenome(indNum, sceneNum);
 }
 
 void DefaultGenome::saveGenome(int indNum, int sceneNum) {
@@ -62,7 +62,7 @@ shared_ptr<Genome> DefaultGenome::cloneGenome()
 	return cloned;
 }
 
-void DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
+bool DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
 	if (settings->verbose) {
 		cout << "Loading genome " << indNum << endl;
 	}
@@ -71,10 +71,11 @@ void DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 
-	morph->loadGenome(indNum, sceneNum);
-	if (settings->verbose) {
+	bool load = morph->loadGenome(indNum, sceneNum);
+	if (settings->verbose && load == true) {
 		cout << "Succesfully loaded genome " << indNum << endl;
 	}
+	return load;
 }
 
 void DefaultGenome::loadBaseMorphology(int indNum, int sceneNum) {

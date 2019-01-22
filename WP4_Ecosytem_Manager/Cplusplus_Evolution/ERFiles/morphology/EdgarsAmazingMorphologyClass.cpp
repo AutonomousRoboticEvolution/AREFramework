@@ -100,7 +100,7 @@ void EdgarsAmazingMorphologyClass::saveGenome(int indNum, int sceneNum, float fi
  * \param sceneNum
  */
 
-void EdgarsAmazingMorphologyClass::loadGenome(int individualNumber, int sceneNum)
+bool EdgarsAmazingMorphologyClass::loadGenome(int individualNumber, int sceneNum)
 {
 	randomNum->getSeed(); // setSeed(individualNumber);
 	if (settings->verbose) {
@@ -110,6 +110,11 @@ void EdgarsAmazingMorphologyClass::loadGenome(int individualNumber, int sceneNum
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
 	cout << genomeFileName.str() << endl;
 	ifstream genomeFile(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
+		//		std::exit(1);
+	}
 	string value;
 	list<string> values;
 	while (genomeFile.good()) {
@@ -165,4 +170,5 @@ void EdgarsAmazingMorphologyClass::loadGenome(int individualNumber, int sceneNum
 			}
 		}
 	}
+	return true;
 }

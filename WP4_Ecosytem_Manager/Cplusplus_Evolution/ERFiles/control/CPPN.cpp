@@ -109,7 +109,9 @@ void CPPN::mutate(float mutationRate) {
 			recurrentLayer[i]->mutate(mutationRate);
 		}
 	}
-	cout << "about to mutate cppn neurons" << endl;
+	if (settings->verbose) {
+		std::cout << "about to mutate cppn neurons" << std::endl;
+	}
 	mutateConnections(mutationRate);
 	addNeurons(mutationRate);
 	removeNeurons(mutationRate);

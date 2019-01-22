@@ -43,7 +43,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 //	cout << "length_i = " << length_i << endl; 
 	for (int i = 0; i < length_i; i++) {
 		if (createdModules[i]->handled != true) {
-			//createdModules[i]->handled = true;
+			createdModules[i]->handled = true;
 			//	cout << "handling module " << i << endl; 
 			vector<int> tempFreeSites;
 			int t_state = createdModules[i]->state; // temp save state
@@ -573,8 +573,8 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 }
 
 
-void ER_LSystemInterpreter::loadGenome(int individualNumber, int sceneNum) {
-	ER_LSystem::loadGenome(individualNumber, sceneNum);
+bool ER_LSystemInterpreter::loadGenome(int individualNumber, int sceneNum) {
+	bool load = ER_LSystem::loadGenome(individualNumber, sceneNum);
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		shared_ptr<ER_Module> mod = mf->createModuleGenome(lGenome->lParameters[i]->type,randomNum,settings);
@@ -584,6 +584,7 @@ void ER_LSystemInterpreter::loadGenome(int individualNumber, int sceneNum) {
 		modules.push_back(mod);
 	}
 	mf.reset();
+	return load;
 }
 
 int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialPosition[3]) {

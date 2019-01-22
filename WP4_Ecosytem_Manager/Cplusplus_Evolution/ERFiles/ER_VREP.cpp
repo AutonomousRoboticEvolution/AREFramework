@@ -83,7 +83,9 @@ void ER_VREP::startOfSimulation(){
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.
 	*/
-
+	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+		return;
+	}
 	if (settings->verbose) {
 		cout << "Starting" << endl;
 	}
@@ -153,6 +155,10 @@ void ER_VREP::handleSimulation() {
 	* updated until the maximum simulation time, as specified in the environment
 	* class, is reached.
 	*/
+	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+		simStopSimulation();
+		return;
+	}
 	simulationTime += simGetSimulationTimeStep();
 	environment->updateEnv(currentMorphology);
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
@@ -269,6 +275,9 @@ void ER_VREP::endOfSimulation(){
 	/* At the end of the simulation the fitness value of the simulated individual
 	* is retrieved and stored in the appropriate files. 
 	*/
+	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+		return;
+	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		float fitness = environment->fitnessFunction(currentMorphology);
 		// Environment independent fitness function:
@@ -344,11 +353,12 @@ shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 	return shared_ptr<Morphology>();
 }
 
-void ER_VREP::loadIndividual(int individualNum, int sceneNum) {
+bool ER_VREP::loadIndividual(int individualNum, int sceneNum) {
 	cout << "loading individual " << individualNum << ", sceneNum " << sceneNum << endl;
 	currentGenome = genomeFactory->createGenome(0, randNum, settings);
-	currentGenome->loadGenome(individualNum, sceneNum);
+	bool load = currentGenome->loadGenome(individualNum, sceneNum);
 	cout << "loaded" << endl;
+	return load;
 }
 
 

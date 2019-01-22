@@ -74,7 +74,7 @@ void CAT::saveGenome(int indNum, int sceneNum, float fitness) {
 	genomeFile.close();
 }
 
-void CAT::loadGenome(int individualNumber, int sceneNum) {
+bool CAT::loadGenome(int individualNumber, int sceneNum) {
 	cout << "loading cat genome " << individualNumber << endl;
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
@@ -82,6 +82,11 @@ void CAT::loadGenome(int individualNumber, int sceneNum) {
 	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
 	ifstream genomeFile(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
+		//		std::exit(1);
+	}
 	string value;
 	list<string> values;
 	while (genomeFile.good()) {
@@ -118,6 +123,7 @@ void CAT::loadGenome(int individualNumber, int sceneNum) {
 			checkingControl = false;
 		}
 	}
+	return true;
 }
 
 void CAT::mutate() {

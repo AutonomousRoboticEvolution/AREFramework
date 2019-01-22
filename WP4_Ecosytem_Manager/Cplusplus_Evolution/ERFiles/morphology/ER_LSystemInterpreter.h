@@ -47,7 +47,7 @@ public:
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();
 	void incrementLSystem(); 
-	void loadGenome(int indNum, int sceneNum);
+	bool loadGenome(int indNum, int sceneNum);
 
 	void setColors();
 

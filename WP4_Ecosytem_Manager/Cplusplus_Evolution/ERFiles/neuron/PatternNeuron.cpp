@@ -37,8 +37,8 @@ void PatternNeuron::update() {
 	// sin
 	double amplitudeD = amplitude;
 	double angularFreq = frequency * maxFreq;
-	//angularFreq = 1.0;
-	//amplitudeD = 1.0;
+	angularFreq = 3.0;
+	amplitudeD = 1.0;
 	//phase = 1.0;
 	output = (float)(amplitudeD * sin(angularFreq * time + (phase * M_PI))); //; / 180 * M_PI));
 	if (output > 1.0) {

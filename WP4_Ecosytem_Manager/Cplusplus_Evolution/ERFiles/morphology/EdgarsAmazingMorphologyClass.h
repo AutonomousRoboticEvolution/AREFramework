@@ -36,7 +36,7 @@ public:
 
 	void saveGenome(int indNum, int sceneNum, float fitness);
 	// this loads genome
-	void loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(int individualNumber, int sceneNum);
 
 	vector<Actuator> actuators;
 	vector<Sensor> sensors;

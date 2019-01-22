@@ -14,7 +14,7 @@ public:
 	void create();
 
 	void init();
-	void loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(int individualNumber, int sceneNum);
 	//int morphologyInterpreter();
 
 	vector<int> outputHandles;

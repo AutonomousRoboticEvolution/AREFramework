@@ -243,9 +243,9 @@ void EdgarsAmazingMorphologyClassVREP::init() {
 	control->mutate(0.5);
 }
 
-void EdgarsAmazingMorphologyClassVREP::loadGenome(int individualNumber, int sceneNum)
+bool EdgarsAmazingMorphologyClassVREP::loadGenome(int individualNumber, int sceneNum)
 {
-	EdgarsAmazingMorphologyClass::loadGenome(individualNumber, sceneNum);
+	return EdgarsAmazingMorphologyClass::loadGenome(individualNumber, sceneNum);
 }
 /*!
  * 

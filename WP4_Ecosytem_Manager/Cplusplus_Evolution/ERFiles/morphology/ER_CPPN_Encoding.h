@@ -34,7 +34,7 @@ public:
 	void initializeQuadruped(int type);
 	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
 	float getFitness();
-	void loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(int individualNumber, int sceneNum);
 	void symmetryMutation(float mutationRate); 
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 

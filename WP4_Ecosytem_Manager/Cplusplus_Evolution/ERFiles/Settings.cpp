@@ -20,22 +20,22 @@ Settings::Settings() {
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
 	morphologyType = MODULAR_DIRECT;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 90;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
 	verbose = false;
-	verbose = true;
+	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
 	seed = 0;
-	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.1;
-	mutationRate = 0.1;
-	maxGeneration = 50;
+//	instanceType = INSTANCE_REGULAR;
+//	morphMutRate = 0.1;
+//	mutationRate = 0.1;
+	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	savePhenotype = true;
@@ -92,9 +92,9 @@ void Settings::readSettings() {
 	string morphType;
 	int popCounter = 0;
 
-	cout << "Looking up settings in: " << repository << endl;
+	std::cout << "Looking up settings in: " << repository << std::endl;
 	if (file.good()) {
-		cout << "settings found" << endl;
+		std::cout << "settings found" << std::endl;
 		int popCounter = 0;
 		string value;
 		list<string> values;
@@ -488,6 +488,11 @@ void Settings::readSettings() {
 				tmp = *it;
 				lIncrements = atoi(tmp.c_str());
 			}
+			else if (tmp == "#verbose") {
+				it++;
+				tmp = *it;
+				verbose = atoi(tmp.c_str());
+			}
 			else if (tmp == "#bestIndividual") {
 				cout << "found best individual" << endl;
 				it++;
@@ -588,6 +593,7 @@ void Settings::saveSettings() {
 	settingsFile << ",#lIncrements," << lIncrements << "," << endl;
 	settingsFile << ",#bestIndividual," << bestIndividual << endl; // set when saving
 	settingsFile << ",#initialSeed," << seed << "," << endl;
+	settingsFile << ",#verbose," << verbose << "," << endl;
 	settingsFile << ",#amountModules," << amountModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
 	settingsFile << ",#maxAmountModules," << maxAmountModules << "," << endl;
