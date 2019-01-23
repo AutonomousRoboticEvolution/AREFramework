@@ -88,11 +88,11 @@ void Settings::openPort() {
 void Settings::readSettings() {
 	bool fileExists = false;
 	//	cout << "sceneNum = " << sceneNum << endl; 
-	ifstream file(repository + "/settings " + to_string(sceneNum) + ".csv");
+	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;
 	int popCounter = 0;
 
-	std::cout << "Looking up settings in: " << repository << std::endl;
+	std::cout << "Looking up settings in: " << repository << "/settings" << to_string(sceneNum) << ".csv" << std::endl;
 	if (file.good()) {
 		std::cout << "settings found" << std::endl;
 		int popCounter = 0;
