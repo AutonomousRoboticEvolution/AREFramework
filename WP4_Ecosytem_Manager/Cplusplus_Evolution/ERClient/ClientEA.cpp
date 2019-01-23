@@ -21,8 +21,9 @@ void ClientEA::init(int amountPorts)
 		std::cout << "Connecting to vrep on port " << ports[i] << std::endl;
 		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5);
 		if (new_connection == -1) {
+			cout << "Could not connect to V-REP on port" << ports[i] << endl;
 			std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
-			std::exit(1);
+			// std::exit(1);
 			// ports.erase(ports.begin() + i);
 			// clientIDs.erase(clientIDs.begin() + i);
 			// i--;
@@ -49,7 +50,7 @@ void ClientEA::initGA() {
 		// ea->initializePopulation();
 		// ea->initializeIndividual(i);
 		ea->populationGenomes[i]->init();
-		ea->populationGenomes[i]->morph->saveGenome(indCounter, 0, -1);
+		ea->populationGenomes[i]->morph->saveGenome(indCounter, settings->sceneNum, -1);
 		ea->populationGenomes[i]->individualNumber = i;
 		shared_ptr<IND> nIND = shared_ptr<IND>(new IND);
 		nIND->nr = i;
@@ -64,6 +65,7 @@ void ClientEA::evaluateNextGen()
 {
 	// first connect to port again
 	int amPorts = ports.size();
+	//	cout << "amount ports = " << ports.size() << endl;
 	for (int i = 0; i < ports.size(); i++) {
 		clientIDs.push_back(simxStart(ipNum, ports[i], true, true, 2000, 5));
 		if (clientIDs[i] == -1) {
@@ -200,6 +202,9 @@ void ClientEA::quitSimulators()
 void ClientEA::evaluateInitialPop()
 {
 	// communicate with all ports
+	if (settings->verbose) {
+		cout << "port size = " << ports.size() << endl;
+	}
 	int currentEv = 0;
 	bool doneEvaluating = false;
 	while (ports.size() > 0) {
@@ -211,8 +216,14 @@ void ClientEA::evaluateInitialPop()
 			{
 				if (clientIDs[i] != -1)
 				{
+					//if (settings->verbose) {
+					//	cout << "trying to get signal from server" << endl;
+					//}
 					int state[1];
 					simxGetIntegerSignal(clientIDs[i], "simulationState", state, simx_opmode_oneshot);
+					if (settings->verbose) {
+						cout << "state[0] = " << state[0];
+					}
 					//	cout << state[0] << endl;
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
@@ -233,7 +244,7 @@ void ClientEA::evaluateInitialPop()
 						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
 						// ea->popFitness[portIndividual[i]] = fitness[0];
 						ea->populationGenomes[portIndividual[i]]->fitness = fitness[0];
-						ea->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], sceneNum, fitness[0]);
+						ea->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], settings->sceneNum, fitness[0]);
 						ea->populationGenomes[portIndividual[i]]->isEvaluated = true;
 						portIndividual[i] = -1;
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 0, simx_opmode_oneshot);
@@ -283,7 +294,7 @@ void ClientEA::createNextGenGenomes()
 {
 	ea->selection(); 
 	for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-		ea->nextGenGenomes[i]->morph->saveGenome(indCounter, 0, -1);
+		ea->nextGenGenomes[i]->morph->saveGenome(indCounter, settings->sceneNum, -1);
 		indCounter++;
 	}
 }
