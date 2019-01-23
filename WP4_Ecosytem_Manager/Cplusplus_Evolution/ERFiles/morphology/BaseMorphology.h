@@ -36,52 +36,51 @@ public:
 	virtual ~BaseMorphology();
 	
 	void split_line(string& line, string delim, list<string>& values);
-	shared_ptr<Morphology> clone() const;
+	virtual shared_ptr<Morphology> clone() const override;
 	
-	void printSome();
-	void update();
+	virtual void printSome() override;
+	virtual void update() override;
 
 	// operators of the evolutionary algorithm
-	void crossover(shared_ptr<Morphology>, float cr) {};
+	virtual void crossover(shared_ptr<Morphology>, float cr) override {};
 	void grow() {};
-	void mutate();
-	bool loadGenome(int individualNumber, int sceneNum);
-	void saveGenome(int indNum, int sceneNum, float fitness);
-	void checkControl(int individual, int sceneNum);
+	virtual void mutate() override;
+	virtual bool loadGenome(int individualNumber, int sceneNum) override;
+	virtual void saveGenome(int indNum, int sceneNum, float fitness) override;
+	virtual const std::string generateGenome(int indNum, float fitness) const override;
+	// void checkControl(int individual, int sceneNum);
 	
-	void savePhenotype(int ind, float fitness) {};
+	virtual void savePhenotype(int ind, float fitness) override {};
 	// note plural
 		
-	void setMainHandlePosition(float position[3]); 
-	int mainHandle;
+	void setMainHandlePosition(float position[3]);
 	void deleteCreatedMorph() {};
-	float morphFitness;
-	float getFitness();
+	virtual float getFitness() override;
 //	vector<int> rayHandles;
 
-	void create();
+	virtual void create() override;
 //	void deleteRays();
 //	vector<int> rayHandles;
 
-	vector<int> getObjectHandles(int);
-	vector<int> getJointHandles(int);
-	vector<int> getAllHandles(int);
+	virtual vector<int> getObjectHandles(int) override;
+	virtual vector<int> getJointHandles(int) override;
+	virtual vector<int> getAllHandles(int) override;
 
-	void init();
-	void init_noMorph() {};
-	void createAtPosition(float x, float y, float z);
-	int getMainHandle();
-	void saveBaseMorphology(int indNum, int sceneNum, float fitness);
-	void loadBaseMorphology(int indNum, int sceneNum);
-	void clearMorph(); 
+	virtual void init() override;
+	virtual void init_noMorph() override {};
+	virtual void createAtPosition(float x, float y, float z) override;
+	virtual int getMainHandle() override;
+	virtual void saveBaseMorphology(int indNum, int sceneNum, float fitness) override;
+	virtual void loadBaseMorphology(int indNum, int sceneNum) override;
+	virtual void clearMorph() override;
 	
 	// Modular Functions
-	int getAmountBrokenModules();
-	vector <shared_ptr<ER_Module>> getCreatedModules();
-	
+	virtual int getAmountBrokenModules() override;
+	virtual vector <shared_ptr<ER_Module>> getCreatedModules() override;
 
-	void setPhenValue();
+	virtual void setPhenValue() override;
 
 	// variables
-
+	int mainHandle;
+	float morphFitness;
 };

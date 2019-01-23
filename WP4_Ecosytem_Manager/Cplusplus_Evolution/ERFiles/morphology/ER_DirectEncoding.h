@@ -32,7 +32,7 @@ public:
 
 	void initializeGenomeCustom(int type);
 	void initializeQuadruped(int type);
-	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
+	virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
 	void loadPhenotype(int ind);
 	bool loadGenome(int individualNumber, int sceneNum);

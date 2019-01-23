@@ -29,7 +29,7 @@ public:
 	void initializeGenomeCustom(int type);
 	void initializeQuadruped(int type);
 	void initializeSolar(int type);
-	void saveGenome(int individual, int sceneNum, float fitness); // overrides baseMorphology function
+	virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
 	bool loadGenome(int individualNumber, int sceneNum);
 	void symmetryMutation(float mutationRate); 

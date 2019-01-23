@@ -34,6 +34,7 @@ public:
 
 	// saving
 	virtual void saveGenome(int indNum, int sceneNum, float fitness) = 0;
+	virtual const std::string generateGenome(int indNum, float fitness) const = 0;
 	virtual float getFitness() = 0;
 
 	// cloning

@@ -1,5 +1,6 @@
 #include "ER_CPPN_Encoding.h"
 #include <iostream>
+#include <sstream>
 #include <cmath>
 
 
@@ -292,39 +293,32 @@ void ER_CPPN_Encoding::initializeQuadruped(int type)
 }
 
 /*!
- * Saving the genome
+ * Generating the genome
  * 
  * \param indNum
- * \param sceneNum
  * \param fitness
  */
-void ER_CPPN_Encoding::saveGenome(int indNum, int sceneNum, float fitness) {
+const std::string ER_CPPN_Encoding::generateGenome(int indNum, float fitness) const {
 	if (settings->verbose) {
-		cout << "saving CPPN genome " << endl << "-------------------------------- " << endl;
+		cout << "generating CPPN genome " << endl << "-------------------------------- " << endl;
 	}
-	// TODO
 
-	int amountStates = genome->moduleParameters.size(); 
-	ofstream genomeFile; 
-	ostringstream genomeFileName; 
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
-	genomeFile.open(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
-	}
-	genomeFile << "#CPPN Genome" << endl;
-	genomeFile << "#Individual:" << indNum << "," << endl;
-	genomeFile << "#Fitness:," << fitness << "," << endl;
-	genomeFile << "#phenValue;," << phenValue << endl;
-	genomeFile << "#AmountStates:," << amountStates << "," << endl << endl;
-	
-	genomeFile << "#CPPN_Start," << endl;
+	int amountStates = genome->moduleParameters.size();
 	stringstream cppndata = cppn->getControlParams();
-	genomeFile << cppndata.str() << endl;
-	genomeFile << "#CPPN_End," << endl;
-	genomeFile << endl;
+	
+	ostringstream genomeText;
+	genomeText << "#CPPN Genome" << endl;
+	genomeText << "#Individual:" << indNum << "," << endl;
+	genomeText << "#Fitness:," << fitness << "," << endl;
+	genomeText << "#phenValue;," << phenValue << endl;
+	genomeText << "#AmountStates:," << amountStates << "," << endl << endl;
+	
+	genomeText << "#CPPN_Start," << endl;
+	genomeText << cppndata.str() << endl;
+	genomeText << "#CPPN_End," << endl;
+	genomeText << endl;
 
-	genomeFile.close();
+	return genomeText.str();
 }
 
 float ER_CPPN_Encoding::getFitness() {

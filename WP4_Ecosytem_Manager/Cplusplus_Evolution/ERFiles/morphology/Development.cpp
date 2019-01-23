@@ -45,8 +45,21 @@ void Development::printSome() {
 }
 
 
-void Development::saveGenome(int indNum, int sceneNum, float fitness) {
+void Development::saveGenome(int indNum, int sceneNum, float fitness)
+{
+	ofstream genomeFile;
+	ostringstream genomeFileName;
+	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
+//	genomeFileName << indNum << ".csv";
+	// std::cout << "Saving genome to " << genomeFileName.str() << std::std::endl;
+	genomeFile.open(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
+	}
 
+	const std::string genomeText = this->generateGenome(indNum, fitness);
+	genomeFile << genomeText << std::endl;
+	genomeFile.close();
 }
 
 float Development::callFitness() {

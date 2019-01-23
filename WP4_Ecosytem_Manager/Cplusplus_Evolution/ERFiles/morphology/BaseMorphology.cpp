@@ -138,6 +138,7 @@ void BaseMorphology::saveGenome(int indNum, int sceneNum, float fitness) {
 	cout << "Basemorphology cannot save genome, check code" << endl;
 }
 
-void BaseMorphology::checkControl(int individual, int sceneNum) {
-	cout << "Basemorphology cannot check control, check code" << endl;
+const std::string BaseMorphology::generateGenome(int indNum, float fitness) const
+{
+	std::cout << "Basemorphology cannot generate genome, check code" << std::endl;
 }

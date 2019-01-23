@@ -1,5 +1,6 @@
 #include "ER_LSystem.h"
 #include <iostream>
+#include <sstream>
 
 
 ER_LSystem::ER_LSystem()
@@ -454,52 +455,46 @@ void ER_LSystem::initializeSolar(int type)
 }
 
 
-void ER_LSystem::saveGenome(int indNum, int sceneNum, float fitness) {
+const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
+{
 //	cout << "saving lGenome " << indNum << " in folder " << sceneNum << ", that had a fitness of " << fitness << endl << "-------------------------------- "<< endl;
 //	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountCreatedModules = createdModules.size(); 
 	int amountStates = lGenome->lParameters.size(); 
 
-	ofstream genomeFile; 
-	ostringstream genomeFileName; 
-//	cout << "destination: " << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
-//	genomeFileName << indNum << ".csv";
-	genomeFile.open(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
-	}
-	genomeFile << "#Individual:" << indNum << endl; 
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#phenValue;," << phenValue << endl;
-	genomeFile << "#AmountStates:," << amountStates << "," << endl << endl;
+	ostringstream genomeText;
+	genomeText << "#Individual:" << indNum << endl; 
+	genomeText << "#Fitness:," << fitness << endl;
+	genomeText << "#phenValue;," << phenValue << endl;
+	genomeText << "#AmountStates:," << amountStates << "," << endl << endl;
 //	cout << "#AmountStates:," << amountStates << "," << endl << endl;
 
-	genomeFile << "Module Parameters Start Here: ," << endl << endl;
+	genomeText << "Module Parameters Start Here: ," << endl << endl;
 	for (int i = 0; i < amountStates; i++) {
-		genomeFile << "#Module:," << i << endl;
-		genomeFile << "#ModuleType:," << lGenome->lParameters[i]->type << endl;
-		genomeFile << "#ModuleState:," << lGenome->lParameters[i]->currentState << endl; 
-		genomeFile << "#AmountChilds:," << lGenome->lParameters[i]->amountChilds << endl;
-		genomeFile << "#ChildSites:,";
+		genomeText << "#Module:," << i << endl;
+		genomeText << "#ModuleType:," << lGenome->lParameters[i]->type << endl;
+		genomeText << "#ModuleState:," << lGenome->lParameters[i]->currentState << endl; 
+		genomeText << "#AmountChilds:," << lGenome->lParameters[i]->amountChilds << endl;
+		genomeText << "#ChildSites:,";
 		for (int j = 0; j < lGenome->lParameters[i]->childSites.size(); j++) {
-			genomeFile << lGenome->lParameters[i]->childSites[j] << ",";
-		} genomeFile << endl; 
-		genomeFile << "#ChildConfigurations:,";
+			genomeText << lGenome->lParameters[i]->childSites[j] << ",";
+		} genomeText << endl; 
+		genomeText << "#ChildConfigurations:,";
 		for (int j = 0; j < lGenome->lParameters[i]->childConfigurations.size(); j++) {
-			genomeFile << lGenome->lParameters[i]->childConfigurations[j] << ",";
-		} genomeFile << endl;
-		genomeFile << "#ChildSiteStates:,";
+			genomeText << lGenome->lParameters[i]->childConfigurations[j] << ",";
+		} genomeText << endl;
+		genomeText << "#ChildSiteStates:,";
 		for (int j = 0; j < lGenome->lParameters[i]->childSiteStates.size(); j++) {
-			genomeFile << lGenome->lParameters[i]->childSiteStates[j] << ",";
-		} genomeFile << endl;
-//		genomeFile << "," << lGenome->lParameters[i]->moduleType << ",";
-		genomeFile << "#ControlParams:," << endl;
-		genomeFile << lGenome->lParameters[i]->control->getControlParams().str(); 
+			genomeText << lGenome->lParameters[i]->childSiteStates[j] << ",";
+		} genomeText << endl;
+//		genomeText << "," << lGenome->lParameters[i]->moduleType << ",";
+		genomeText << "#ControlParams:," << endl;
+		genomeText << lGenome->lParameters[i]->control->getControlParams().str(); 
 
-		genomeFile << "#EndOfModule," << endl << endl;
+		genomeText << "#EndOfModule," << endl << endl;
 	}
-	genomeFile.close();
+
+	return genomeText.str();
 }
 
 float ER_LSystem::getFitness() {
