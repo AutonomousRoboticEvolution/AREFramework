@@ -75,7 +75,7 @@ int main(int argc, char* argv[])
 		// client->randNum->setSeed(0); // not initialized
 		srand(0);
 	}
-	extApi_sleepMs(5000); // wait 5 seconds before connecting to ports
+	extApi_sleepMs(1000); // wait 5 seconds before connecting to ports
 	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
 		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;
@@ -128,9 +128,9 @@ int main(int argc, char* argv[])
 //		saveLog(i);
 	}
 
-	extApi_sleepMs(1000);
+	extApi_sleepMs(2000);
 	client->quitSimulators();
-
+	std::cout << "Client done, shutting down" << std::endl;
 	return 0;
 }
 

@@ -254,8 +254,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
 		}
-
-		if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
+		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
 			// wait until command is received
 			if (signal[0] == 1) {
 				simSetIntegerSignal((simChar*) "simulationState", 8);

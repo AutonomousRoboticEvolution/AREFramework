@@ -22,7 +22,7 @@ void ClientEA::init(int amountPorts)
 		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5);
 		if (new_connection == -1) {
 			cout << "Could not connect to V-REP on port" << ports[i] << endl;
-			std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
+			// std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
 			// std::exit(1);
 			// ports.erase(ports.begin() + i);
 			// clientIDs.erase(clientIDs.begin() + i);
