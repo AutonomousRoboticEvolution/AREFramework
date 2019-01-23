@@ -258,10 +258,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
-				simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber);
+				simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
 				simGetIntegerSignal((simChar*) "individual", individual);
 				cout << "loading individual " << individual[0] << " in sceneNumber " << sceneNumber[0] << " (this is v_repExtER.cpp)" << endl;
-				if (ER->loadIndividual(individual[0], sceneNumber[0]) == false) {
+				if (ER->loadIndividual(individual[0]) == false) {
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
 				}
 				else {

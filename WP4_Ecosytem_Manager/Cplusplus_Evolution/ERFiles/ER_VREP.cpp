@@ -353,10 +353,10 @@ shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 	return shared_ptr<Morphology>();
 }
 
-bool ER_VREP::loadIndividual(int individualNum, int sceneNum) {
-	cout << "loading individual " << individualNum << ", sceneNum " << sceneNum << endl;
+bool ER_VREP::loadIndividual(int individualNum) {
+	cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
 	currentGenome = genomeFactory->createGenome(0, randNum, settings);
-	bool load = currentGenome->loadGenome(individualNum, sceneNum);
+	bool load = currentGenome->loadGenome(individualNum, settings->sceneNum);
 	cout << "loaded" << endl;
 	return load;
 }

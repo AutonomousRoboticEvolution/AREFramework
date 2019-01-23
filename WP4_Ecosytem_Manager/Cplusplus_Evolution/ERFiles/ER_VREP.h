@@ -38,6 +38,6 @@ public:
 	void saveSettings();
 
 	// These functions used to be in newGenome
-	bool loadIndividual(int individualNum, int sceneNum);
+	bool loadIndividual(int individualNum);
 	void loadBestIndividualGenome(int sceneNum);
 };

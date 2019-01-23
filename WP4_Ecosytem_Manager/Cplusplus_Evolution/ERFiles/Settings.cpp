@@ -491,7 +491,12 @@ void Settings::readSettings() {
 			else if (tmp == "#verbose") {
 				it++;
 				tmp = *it;
-				verbose = atoi(tmp.c_str());
+				if (atoi(tmp.c_str()) == 0) {
+					verbose = false;
+				}
+				else {
+					verbose = true;
+				}
 			}
 			else if (tmp == "#bestIndividual") {
 				cout << "found best individual" << endl;

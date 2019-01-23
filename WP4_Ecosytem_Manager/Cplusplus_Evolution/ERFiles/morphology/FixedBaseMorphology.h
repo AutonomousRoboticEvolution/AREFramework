@@ -8,7 +8,7 @@ public:
 	~FixedBaseMorphology();
 	void init();
 	void addDefaultMorphology();
-	void saveGenome(int indNum, int sceneNum,float fitness);
+	void saveGenome(int indNum,float fitness);
 
 };
 
