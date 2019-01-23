@@ -17,7 +17,7 @@ public:
 	DefaultGenome() {};
 	
 	~DefaultGenome();
-	shared_ptr<Genome> clone() const;
+	virtual shared_ptr<Genome> clone() const override;
 
 	void createInitialMorphology(int individualNumber);
 
@@ -28,14 +28,16 @@ public:
 	float parentPhenValue;
 
 	void savePhenotype(int indNum, int sceneNum);
-	void init();
-	void create();
-	void update(); 
-	bool loadGenome(int indNum, int sceneNum);
-	void saveGenome(int indNum, int sceneNum);
-	void clearGenome();
-	void mutate();
-	void checkGenome();
+	virtual void init() override;
+	virtual void create() override;
+	virtual void update() override; 
+	virtual void mutate() override;
+	virtual bool loadGenome(int indNum, int sceneNum) override;
+	virtual void saveGenome(int indNum, int sceneNum) override;
+	virtual const std::string generateGenome(int indNum, int sceneNum) const override;
+	virtual void clearGenome() override;
+	virtual void checkGenome() override;
+	virtual bool loadMorphologyGenome(int indNum, int sceneNum) override; 
 	shared_ptr<Genome> cloneGenome();
 
 	void init_noMorph();
@@ -44,7 +46,6 @@ public:
 	//void mutate();
 	float genomeFitness;  
 
-	bool loadMorphologyGenome(int indNum, int sceneNum); 
 	void loadBaseMorphology(int indNum, int sceneNum); // old
 
 

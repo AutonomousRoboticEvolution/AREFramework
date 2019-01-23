@@ -44,6 +44,11 @@ void DefaultGenome::saveGenome(int indNum, int sceneNum) {
 	morph->saveGenome(indNum, sceneNum, 0);
 }
 
+const std::string DefaultGenome::generateGenome(int indNum, int sceneNum) const
+{
+	return morph->generateGenome(indNum, 0);
+}
+
 void DefaultGenome::checkGenome() {
 	cout << "mainHandle = " << morph->getMainHandle() << endl;
 	if (morph == NULL) {

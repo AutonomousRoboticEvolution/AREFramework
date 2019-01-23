@@ -1,5 +1,6 @@
 #include "ER_DirectEncoding.h"
 #include <iostream>
+#include <sstream>
 
 ER_DirectEncoding::ER_DirectEncoding()
 {
@@ -73,50 +74,47 @@ void ER_DirectEncoding::initializeGenomeCustom(int type)
 	cf.reset();
 }
 
-
-void ER_DirectEncoding::saveGenome(int indNum, int sceneNum, float fitness) {
+const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) const
+{
 	if (settings->verbose) {
-		cout << "saving direct genome " << endl << "-------------------------------- " << endl;
+		std::cout << "generating direct genome " << std::endl << "-------------------------------- " << std::endl;
 	}
 //	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountStates = genome->moduleParameters.size(); 
 
-	ofstream genomeFile; 
-	ostringstream genomeFileName; 
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
-//	genomeFileName << indNum << ".csv";
-	// std::cout << "Saving genome to " << genomeFileName.str() << std::endl;
-	genomeFile.open(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
-	}
+	std::ostringstream genomeText;
 
-	genomeFile << "#Individual:" << indNum << endl; 
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#phenValue;," << phenValue << endl;
-	genomeFile << "#AmountStates:," << amountStates << "," << endl << endl;
-//	cout << "#AmountStates:," << amountStates << "," << endl << endl;
+	genomeText << "#Individual:" << indNum << std::endl; 
+	genomeText << "#Fitness:," << fitness << std::endl;
+	genomeText << "#phenValue;," << phenValue << std::endl;
+	genomeText << "#AmountStates:," << amountStates << "," << std::endl << std::endl;
+//	cout << "#AmountStates:," << amountStates << "," << std::endl << std::endl;
 
-	genomeFile << "Module Parameters Start Here: ," << endl << endl;
+	genomeText << "Module Parameters Start Here: ," << std::endl << std::endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		//if (genome->moduleParameters[i]->expressed == true) {
-			genomeFile << "#Module:," << i << endl;
-			genomeFile << "#ModuleType:," << genome->moduleParameters[i]->type << endl;
+			genomeText << "#Module:," << i << std::endl;
+			genomeText << "#ModuleType:," << genome->moduleParameters[i]->type << std::endl;
 			
-			genomeFile << "#ModuleParent:," << genome->moduleParameters[i]->parent << endl;
-			genomeFile << "#ParentSite:," << genome->moduleParameters[i]->parentSite << endl;
-			genomeFile << "#Orientation:," << genome->moduleParameters[i]->orientation << endl;
+			genomeText << "#ModuleParent:," << genome->moduleParameters[i]->parent << std::endl;
+			genomeText << "#ParentSite:," << genome->moduleParameters[i]->parentSite << std::endl;
+			genomeText << "#Orientation:," << genome->moduleParameters[i]->orientation << std::endl;
 			
-			genomeFile << "#ControlParams:," << endl;
-			genomeFile << genome->moduleParameters[i]->control->getControlParams().str();
-			genomeFile << "#EndControlParams" << endl;
-			genomeFile << "#EndOfModule," << endl << endl;
+			genomeText << "#ControlParams:," << std::endl;
+			genomeText << genome->moduleParameters[i]->control->getControlParams().str();
+			genomeText << "#EndControlParams" << std::endl;
+			genomeText << "#EndOfModule," << std::endl;
 		//}
 	}
+<<<<<<< HEAD
 	genomeFile.close();
 	if (settings->verbose) {
 		cout << "Direct Genome Saved" << endl;
 	}
+=======
+
+	return genomeText.str();
+>>>>>>> e8340cc6beeb790aeb22e88e5ef62d697fb908a0
 }
 
 float ER_DirectEncoding::getFitness() {
@@ -157,8 +155,7 @@ bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 	ostringstream genomeFileName;
 
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-//	genomeFileName << "files/morphologies0/genome9137.csv";
-	cout << genomeFileName.str() << endl;
+	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
 	ifstream genomeFile(genomeFileName.str());
 	if (!genomeFile) {
 		std::cerr << "Could not load " << genomeFileName.str() << std::endl;

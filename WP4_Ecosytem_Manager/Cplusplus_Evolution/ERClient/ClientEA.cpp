@@ -116,10 +116,14 @@ void ClientEA::evaluateNextGen()
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
 					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
+						int invidividualNumber = ea->nextGenGenomes[currentEv]->individualNumber;
+						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
+						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
+						simxSetStringSignal(clientIDs[i], (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenome.size(), simx_opmode_blocking);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
-						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", ea->nextGenGenomes[currentEv]->individualNumber, simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", invidividualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
-						cout << "evaluating:  " << currentEv << " in port " << i + 1040000 <<" num: " << ea->nextGenGenomes[currentEv]->individualNumber <<  endl;
+						cout << "evaluating:  " << currentEv << " in port " << ports[i] <<" num: " << invidividualNumber <<  endl;
 						portIndividual[i] = currentEv;
 						// tells the simulator to start evaluating the genome
 						//	cout << "setting integer signal" << endl;
