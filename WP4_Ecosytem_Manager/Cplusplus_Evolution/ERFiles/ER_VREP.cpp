@@ -357,6 +357,7 @@ bool ER_VREP::loadIndividual(int individualNum) {
 	cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
 	currentGenome = genomeFactory->createGenome(0, randNum, settings);
 	bool load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+	currentGenome->individualNumber = individualNum;
 	cout << "loaded" << endl;
 	return load;
 }
