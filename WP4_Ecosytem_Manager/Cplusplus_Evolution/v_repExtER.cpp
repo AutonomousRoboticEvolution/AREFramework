@@ -129,6 +129,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
 			run = atoi(arg1_param);
+			std::cout << "run is set to " << arg1_param << std::endl;
 			simReleaseBuffer(arg1_param);
 		}
 
