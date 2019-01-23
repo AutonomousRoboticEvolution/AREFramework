@@ -114,6 +114,9 @@ void ER_DirectEncoding::saveGenome(int indNum, int sceneNum, float fitness) {
 		//}
 	}
 	genomeFile.close();
+	if (settings->verbose) {
+		cout << "Direct Genome Saved" << endl;
+	}
 }
 
 float ER_DirectEncoding::getFitness() {
@@ -357,8 +360,10 @@ int ER_DirectEncoding::initializeGenome(int type) {
 	float black[3] = { 0.0, 0.0, 0 };
 	float pink[3] = { 1.0, 0.5, 0.5 };
 	float white[3] = { 1.0, 1.0, 1.0 };
-	
-	cout << "initializing Direct Encoding Genome" << endl; 
+
+	if (settings->verbose) {
+		cout << "initializing Direct Encoding Genome" << endl;
+	}
 	morphFitness = 0;
 	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
 	for (int i = 0; i < genome->amountModules; i++) {
@@ -620,8 +625,10 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 					if (genome->moduleParameters[i]->parent == deleteModules[j])
 					{
 						deleteModules.push_back(i);
-						cout << "deleting: " << i << ", " << genome->moduleParameters[i]->parent << ", dm: " << deleteModules[j] << endl;
-//						genome->moduleParameters.erase(genome->moduleParameters.begin() + i);
+						if (settings->verbose) {
+							cout << "deleting: " << i << ", " << genome->moduleParameters[i]->parent << ", dm: " << deleteModules[j] << endl;
+						}	
+						//genome->moduleParameters.erase(genome->moduleParameters.begin() + i);
 					}
 				}
 			}
@@ -643,7 +650,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 				}
 				genome->amountModules -= 1;
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
-					cout << "j: " << j << endl;
+					if (settings->verbose) {
+						cout << "j: " << j << endl;
+					}
 					if (genome->moduleParameters[j]->parent >= deleteModules[i] - dCounter) {
 						genome->moduleParameters[j]->parent -= 1;
 					}

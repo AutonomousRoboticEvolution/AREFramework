@@ -69,7 +69,7 @@ void EA_SteadyState::initializePopulation()
 		}
 	//}
 	//else {
-		cout << "Cannot create VREP dependent genome. Use EA_SteadyState_VREP for online evolution" << endl;
+	//	cout << "Cannot create VREP dependent genome. Use EA_SteadyState_VREP for online evolution" << endl;
 	//}
 }
 
@@ -94,7 +94,7 @@ void EA_SteadyState::loadPopulationGenomes(int scenenum)
 {
 	vector<int> popIndNumbers = settings->indNumbers;
 //	popFitness = settings->indFits;
-
+	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
 		cout << "loading individual " << popIndNumbers[i] << endl;
 		//populationGenomes[i]->init_noMorph();
