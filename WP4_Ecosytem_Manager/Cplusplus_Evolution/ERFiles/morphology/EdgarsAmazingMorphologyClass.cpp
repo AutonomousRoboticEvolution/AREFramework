@@ -42,7 +42,7 @@ void EdgarsAmazingMorphologyClass::init() {
 	control->mutate(0.5);
 }
 
-void EdgarsAmazingMorphologyClass::saveGenome(int indNum, int sceneNum, float fitness)
+void EdgarsAmazingMorphologyClass::saveGenome(int indNum, float fitness)
 {
 	cout << "Saving Edgar's Amazing Genome " << endl << "-------------------------------- " << endl;
 	cout << "saving direct genome " << endl << "-------------------------------- " << endl;
@@ -50,7 +50,7 @@ void EdgarsAmazingMorphologyClass::saveGenome(int indNum, int sceneNum, float fi
 	
 	ofstream genomeFile;
 	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
+	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {

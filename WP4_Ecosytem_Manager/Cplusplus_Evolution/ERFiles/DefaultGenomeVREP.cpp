@@ -32,9 +32,9 @@ bool DefaultGenomeVREP::loadMorphologyGenome(int indNum, int sceneNum) {
 	//morph->create();
 }
 
-bool DefaultGenomeVREP::loadGenome(int indNum, int sceneNum)
+bool DefaultGenomeVREP::loadGenome(int indNum)
 {
-	bool load = loadMorphologyGenome(indNum, sceneNum);
+	bool load = loadMorphologyGenome(indNum, settings->sceneNum);
 	individualNumber = indNum;
 	return load;
 }

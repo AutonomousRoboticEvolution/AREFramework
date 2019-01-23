@@ -84,7 +84,7 @@ public:
 
 	void initCustomMorphology();
 
-	virtual void saveGenome(int individual, int sceneNum, float fitness) override;
+	virtual void saveGenome(int individual, float fitness) override;
 	virtual bool loadGenome(int individualNumber, int sceneNum) override;
 
 	//void recallAndCreate();

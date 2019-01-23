@@ -304,7 +304,7 @@ void ER_VREP::endOfSimulation(){
 					currentGenome->fitness = fitness;
 					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
 				}
-				ea->populationGenomes[currentInd]->morph->saveGenome(settings->indCounter, settings->sceneNum, fitness);
+				ea->populationGenomes[currentInd]->morph->saveGenome(settings->indCounter, fitness);
 				ea->populationGenomes[currentInd]->individualNumber = settings->indCounter;
 				settings->indCounter++;
 			}
@@ -317,7 +317,7 @@ void ER_VREP::endOfSimulation(){
 				}
 				// TODO set fitness
 				ea->setFitness(settings->indCounter % ea->populationGenomes.size(), fitness);
-				currentGenome->morph->saveGenome(settings->indCounter, settings->sceneNum, fitness);
+				currentGenome->morph->saveGenome(settings->indCounter, fitness);
 				cout << "FITNESS = " << fitness << endl;
 				settings->indCounter++;
 			}

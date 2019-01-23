@@ -17,7 +17,7 @@ public:
 //	virtual void mutate(float mutationRate){};
 	virtual	void setMainHandlePosition(float position[3]) {};
 	virtual int getMainHandle();
-	void saveGenome(int indNum, int sceneNum, float fitness);
+	void saveGenome(int indNum, float fitness);
 	bool loadGenome(int individualNumber, int sceneNum);
 	int catHandle;
 	shared_ptr<Morphology> clone() const;

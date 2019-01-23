@@ -100,7 +100,7 @@ void BaseMorphology::update() {
 }
 
 
-void BaseMorphology::saveBaseMorphology(int indNum, int sceneNum, float fitness)
+void BaseMorphology::saveBaseMorphology(int indNum, float fitness)
 {
 }
 
@@ -134,11 +134,12 @@ float BaseMorphology::getFitness() {
 	return 0.0; 
 }
 
-void BaseMorphology::saveGenome(int indNum, int sceneNum, float fitness) {
+void BaseMorphology::saveGenome(int indNum, float fitness) {
 	cout << "Basemorphology cannot save genome, check code" << endl;
 }
 
 const std::string BaseMorphology::generateGenome(int indNum, float fitness) const
 {
 	std::cout << "Basemorphology cannot generate genome, check code" << std::endl;
+	return "Herp derp"; 
 }

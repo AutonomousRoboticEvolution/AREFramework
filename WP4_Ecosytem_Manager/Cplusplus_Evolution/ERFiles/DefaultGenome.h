@@ -33,7 +33,7 @@ public:
 	virtual void update() override; 
 	virtual void mutate() override;
 	virtual bool loadGenome(int indNum, int sceneNum) override;
-	virtual void saveGenome(int indNum, int sceneNum) override;
+	virtual void saveGenome(int indNum) override;
 	virtual const std::string generateGenome(int indNum, int sceneNum) const override;
 	virtual void clearGenome() override;
 	virtual void checkGenome() override;

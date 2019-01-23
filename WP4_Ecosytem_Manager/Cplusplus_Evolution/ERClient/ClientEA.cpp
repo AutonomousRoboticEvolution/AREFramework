@@ -50,7 +50,7 @@ void ClientEA::initGA() {
 		// ea->initializePopulation();
 		// ea->initializeIndividual(i);
 		ea->populationGenomes[i]->init();
-		ea->populationGenomes[i]->morph->saveGenome(indCounter, settings->sceneNum, -1);
+		ea->populationGenomes[i]->morph->saveGenome(indCounter, -1);
 		ea->populationGenomes[i]->individualNumber = i;
 		shared_ptr<IND> nIND = shared_ptr<IND>(new IND);
 		nIND->nr = i;
@@ -244,7 +244,7 @@ void ClientEA::evaluateInitialPop()
 						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
 						// ea->popFitness[portIndividual[i]] = fitness[0];
 						ea->populationGenomes[portIndividual[i]]->fitness = fitness[0];
-						ea->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], settings->sceneNum, fitness[0]);
+						ea->populationGenomes[portIndividual[i]]->morph->saveGenome(portIndividual[i], fitness[0]);
 						ea->populationGenomes[portIndividual[i]]->isEvaluated = true;
 						portIndividual[i] = -1;
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 0, simx_opmode_oneshot);
@@ -294,7 +294,7 @@ void ClientEA::createNextGenGenomes()
 {
 	ea->selection(); 
 	for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-		ea->nextGenGenomes[i]->morph->saveGenome(indCounter, settings->sceneNum, -1);
+		ea->nextGenGenomes[i]->morph->saveGenome(indCounter, -1);
 		indCounter++;
 	}
 }

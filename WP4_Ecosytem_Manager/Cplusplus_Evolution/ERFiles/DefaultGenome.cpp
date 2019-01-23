@@ -40,8 +40,8 @@ bool DefaultGenome::loadGenome(int indNum, int sceneNum)
 	return loadMorphologyGenome(indNum, sceneNum);
 }
 
-void DefaultGenome::saveGenome(int indNum, int sceneNum) {
-	morph->saveGenome(indNum, sceneNum, 0);
+void DefaultGenome::saveGenome(int indNum) {
+	morph->saveGenome(indNum, 0);
 }
 
 const std::string DefaultGenome::generateGenome(int indNum, int sceneNum) const

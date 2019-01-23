@@ -141,7 +141,7 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	mutation();
 	// saving genomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber, settings->sceneNum);
+		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
 	}
 	mfact.reset();
 }

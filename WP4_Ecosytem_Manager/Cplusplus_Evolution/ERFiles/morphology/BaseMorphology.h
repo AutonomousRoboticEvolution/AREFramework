@@ -46,7 +46,7 @@ public:
 	void grow() {};
 	virtual void mutate() override;
 	virtual bool loadGenome(int individualNumber, int sceneNum) override;
-	virtual void saveGenome(int indNum, int sceneNum, float fitness) override;
+	virtual void saveGenome(int indNum, float fitness) override;
 	virtual const std::string generateGenome(int indNum, float fitness) const override;
 	// void checkControl(int individual, int sceneNum);
 	
@@ -70,7 +70,7 @@ public:
 	virtual void init_noMorph() override {};
 	virtual void createAtPosition(float x, float y, float z) override;
 	virtual int getMainHandle() override;
-	virtual void saveBaseMorphology(int indNum, int sceneNum, float fitness) override;
+	virtual void saveBaseMorphology(int indNum, float fitness) override;
 	virtual void loadBaseMorphology(int indNum, int sceneNum) override;
 	virtual void clearMorph() override;
 	

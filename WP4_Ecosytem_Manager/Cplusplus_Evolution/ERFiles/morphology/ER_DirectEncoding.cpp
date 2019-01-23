@@ -106,15 +106,15 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 			genomeText << "#EndOfModule," << std::endl;
 		//}
 	}
-<<<<<<< HEAD
-	genomeFile.close();
-	if (settings->verbose) {
-		cout << "Direct Genome Saved" << endl;
-	}
-=======
+
+	//genomeFile.close();
+	//if (settings->verbose) {
+	//	cout << "Direct Genome Saved" << endl;
+	//}
+
 
 	return genomeText.str();
->>>>>>> e8340cc6beeb790aeb22e88e5ef62d697fb908a0
+
 }
 
 float ER_DirectEncoding::getFitness() {

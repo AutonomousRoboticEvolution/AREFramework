@@ -104,7 +104,7 @@ void EA_Generational::createNewGenRandomSelect() {
 	mutation();
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		nextGenGenomes[i]->fitness = 0; // setting their fitness to zero since they haven't been evaluated yet. 
-		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber, settings->sceneNum);
+		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
 	}
 	mfact.reset();
 }

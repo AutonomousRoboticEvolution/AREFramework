@@ -43,17 +43,17 @@ using namespace std;
 
 LIBRARY vrepLib;
 
-VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
+VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 { // This is called just once, at the start of V-REP.
 	// Dynamically load and bind V-REP functions:
 	char curDirAndFile[1024];
 #ifdef _WIN32
-	#ifdef QT_COMPIL
-		_getcwd(curDirAndFile, sizeof(curDirAndFile));
-	#else
-		GetModuleFileName(NULL,curDirAndFile,1023);
-		PathRemoveFileSpec(curDirAndFile);
-	#endif
+#ifdef QT_COMPIL
+	_getcwd(curDirAndFile, sizeof(curDirAndFile));
+#else
+	GetModuleFileName(NULL, curDirAndFile, 1023);
+	PathRemoveFileSpec(curDirAndFile);
+#endif
 #elif defined (__linux) || defined (__APPLE__)
 	getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
@@ -62,20 +62,20 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
-	temp+="\\v_rep.dll";
+	temp += "\\v_rep.dll";
 #elif defined (__linux)
-	temp+="/libv_rep.so";
+	temp += "/libv_rep.so";
 #elif defined (__APPLE__)
-	temp+="/libv_rep.dylib";
+	temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
 
-	vrepLib=loadVrepLibrary(temp.c_str());
-	if (vrepLib==NULL)
+	vrepLib = loadVrepLibrary(temp.c_str());
+	if (vrepLib == NULL)
 	{
 		std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
 		return(0); // Means error, V-REP will unload this plugin
 	}
-	if (getVrepProcAddresses(vrepLib)==0)
+	if (getVrepProcAddresses(vrepLib) == 0)
 	{
 		std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
 		unloadVrepLibrary(vrepLib);
@@ -84,8 +84,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 
 	// Check the V-REP version:
 	int vrepVer;
-	simGetIntegerParameter(sim_intparam_program_version,&vrepVer);
-	if (vrepVer<30200) // if V-REP version is smaller than 3.02.00
+	simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
+	if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
 	{
 		std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
 		unloadVrepLibrary(vrepLib);
@@ -118,9 +118,13 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 	//}
 
 	if (startEvolution == true) {
+
+		// Construct classes
 		ER = unique_ptr<ER_VREP>(new ER_VREP);
+		ER->settings = shared_ptr<Settings>(new Settings);
 
-
+		// set all arguments
+		// 1: seed and location
 		int run = 0;
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
@@ -128,17 +132,18 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 			simReleaseBuffer(arg1_param);
 		}
 
-		//	cout << simGetStringParameter(sim_stringparam_app_arg1);
-		//	if (atoi(simGetStringParameter(sim_stringparam_app_arg3 == 99))) {
-		//		
-		//	}
-		//	cout << "run: " << run << endl;
-		//	cout << "..." << endl;
-		//	srand(run);
-		ER->settings = shared_ptr<Settings>(new Settings);
-		ER->settings->sceneNum = run;
+		// 3: set the repository of the settings file. 
+		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
+		if (arg3_param != NULL) {
+			ER->settings->setRepository(arg3_param);
+			simReleaseBuffer(arg3_param);
+		}
+		// Read the settings file
+		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();
 
+		// Override settings parameters if argument 2
+		// 2: 
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
 		if (arg2_param != NULL) {
 			const int arg2_param_i = atoi(arg2_param);
@@ -157,19 +162,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 			simReleaseBuffer(arg2_param);
 		}
 
-		
-		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
-		if (arg3_param != NULL) {
-			ER->settings->setRepository(arg3_param);
-			simReleaseBuffer(arg3_param);
-		}
+		// sceneNum and seed will not be utilized from the settings file anymore
+		ER->settings->sceneNum = run;
+		ER->settings->seed = run;
+		ER->randNum = shared_ptr<RandNum>(new RandNum(run));
 
-		cout << "Initializing ER" << endl;
-		ER->randNum = shared_ptr<RandNum>(new RandNum(0));
+		// Actual initialization of ER
 		ER->initialize();
-		//	ER->settings->repository = "files";
 		//	ER->environment->sceneLoader();
-		cout << "ER initialized" << endl;
+		if (ER->settings->verbose) {
+			cout << "ER initialized" << endl;
+		}
 	}
 	int signal[1] = { 0 };
 	simSetIntegerSignal((simChar*) "simulationState", signal[0]);

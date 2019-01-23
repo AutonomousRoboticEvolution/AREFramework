@@ -33,12 +33,12 @@ public:
 
 
 	// saving
-	virtual void saveGenome(int indNum, int sceneNum, float fitness) = 0;
+	virtual void saveGenome(int indNum, float fitness) = 0;
 	virtual const std::string generateGenome(int indNum, float fitness) const = 0;
 	virtual float getFitness() = 0;
 
 	// cloning
-	virtual void saveBaseMorphology(int indNum, int sceneNum, float fitness) = 0; // currently not used
+	virtual void saveBaseMorphology(int indNum, float fitness) = 0; // currently not used
 //	virtual void saveBaseMorphology(int indNum, int sceneNum, float fitness) = 0; // currently not used
 	virtual void loadBaseMorphology(int indNum, int sceneNum) = 0;
 //	virtual void setMainHandlePosition(float position[3]) = 0;

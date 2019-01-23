@@ -21,11 +21,11 @@ void FixedBaseMorphology::addDefaultMorphology() {
 	cout << "addDefaultMorphology is called but the function is deprived" << endl; 
 }
 
-void FixedBaseMorphology::saveGenome(int indNum, int sceneNum, float fitness) {
+void FixedBaseMorphology::saveGenome(int indNum, float fitness) {
 	cout << "saving Fixed Genome " << endl << "-------------------------------- " << endl;
 	ofstream genomeFile;
 	ostringstream genomeFileName;
-	genomeFileName << settings->repository << "/morphologies" << sceneNum << "/genome" << indNum << ".csv";
+	genomeFileName << settings->repository << "/morphologies" << settings->sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
