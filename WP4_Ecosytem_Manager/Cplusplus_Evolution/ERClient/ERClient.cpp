@@ -69,10 +69,10 @@ int main(int argc, char* argv[])
 		client->randNum->setSeed(0);
 		srand(0);
 	}
-	extApi_sleepMs(1000);
+	extApi_sleepMs(10000);
 	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
-		std::cout << "client should connect to " << arguments[2].c_str() << " servers" << std::endl;
+		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;
 		int numberOfNodes = atoi(arguments[2].c_str());
 		client->init(numberOfNodes - 1);
 	}
@@ -80,10 +80,14 @@ int main(int argc, char* argv[])
 		client->init(2);
 	}
 	if (client->settings->generation != 0) {
+		cout << "generation not set to 0????" << endl;
 		client->ea->loadPopulationGenomes();
 	}
 	else {
 		client->initGA();
+		if (client->settings->verbose) {
+			cout << "initialized EA " << endl;
+		}
 		client->evaluateInitialPop(); // initial generation
 		if (client->settings->indNumbers.size() < 1) {
 			client->settings->indNumbers.resize(client->ea->populationGenomes.size());

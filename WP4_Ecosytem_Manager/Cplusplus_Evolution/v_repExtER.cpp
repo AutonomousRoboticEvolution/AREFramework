@@ -121,7 +121,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 		ER = unique_ptr<ER_VREP>(new ER_VREP);
 
 
-		int run = -1;
+		int run = 0;
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
 			run = atoi(arg1_param);
@@ -147,7 +147,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt)
 			{
 				ER->simSet = RECALLBEST;
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
 			else if (arg2_param_i == 1)
 			{
@@ -188,13 +188,13 @@ VREP_DLLEXPORT void v_repEnd()
 	unloadVrepLibrary(vrepLib); // release the library
 }
 
-void saveLog() {
+void saveLog(int num) {
 	ofstream logFile;
-	logFile.open("timeLog.txt", ios::app);
+	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
 	clock_t now = clock();
 //	double deltaSysTime = difftime((double) time(0), sysTime) ;
 	int deltaSysTime = now - sysTime;
-	logFile << "time for completing " << counter << " individuals = " << deltaSysTime << endl;
+	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
 	sysTime = clock() ;
 	counter = 0; 
 	logFile.close();
@@ -224,7 +224,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		}
 
 		if (message == sim_message_eventcallback_simulationabouttostart) {
-			tStart = clock();
+			//tStart = clock();
 			ER->startOfSimulation();
 		}
 
@@ -234,7 +234,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
 				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER) {
 				simStartSimulation();
-				//		saveLog();
+
 			}
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
@@ -258,13 +258,17 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber);
 				simGetIntegerSignal((simChar*) "individual", individual);
 				cout << "loading individual " << individual[0] << " in sceneNumber " << sceneNumber[0] << " (this is v_repExtER.cpp)" << endl;
-				ER->loadIndividual(individual[0], sceneNumber[0]);
-				// old function:
-				//ER->ea->loadIndividual(individual[0], sceneNumber[0]);
-
-				//cout << "Not loaded: see this comment in code to adjust" << endl;
-				simStartSimulation();
-				loadingPossible = false;
+				if (ER->loadIndividual(individual[0], sceneNumber[0]) == false) {
+					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
+				}
+				else {
+					// old function:
+					//ER->ea->loadIndividual(individual[0], sceneNumber[0]);
+					//saveLog(1);
+					//cout << "Not loaded: see this comment in code to adjust" << endl;
+					simStartSimulation();
+					loadingPossible = false;
+				}
 			}
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
