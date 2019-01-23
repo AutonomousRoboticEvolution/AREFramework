@@ -87,7 +87,7 @@ void Settings::openPort() {
 
 void Settings::readSettings() {
 	bool fileExists = false;
-	//	cout << "sceneNum = " << sceneNum << endl; 
+	cout << "sceneNum = " << sceneNum << endl; 
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;
 	int popCounter = 0;

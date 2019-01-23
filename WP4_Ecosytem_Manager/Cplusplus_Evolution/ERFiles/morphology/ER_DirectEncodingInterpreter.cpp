@@ -206,7 +206,9 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 					//	cout << "id " << createdModules[parentNr]-> << endl;
 				}
 				// parentHandle = createdModules[i]->parentModulePointer->;
-				cout << "should create module : " << i << ",";
+				if (settings->verbose) {
+					cout << "should create module : " << i << ",";
+				}
 				shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
 				if (parentModulePointer == NULL) {
 					cout << ", null , ";
@@ -261,17 +263,23 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 					}
 					genome->moduleParameters[i]->expressed = true;
 				}
-				cout << "created Module" << endl;
+				if (settings->verbose) {
+					cout << "created Module" << endl;
+				}
 			}
 			else {
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
-					cout << "pi: " << genome->moduleParameters[j]->parent << endl;
+					if (settings->verbose) {
+						cout << "pi: " << genome->moduleParameters[j]->parent << endl;
+					}
 				}
 				cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
 			}
 		}
 		else {
-			cout << "Already created " << settings->maxAmountModules << endl;
+			if (settings->verbose) {
+				cout << "Already created " << settings->maxAmountModules << endl;
+			}			
 			break;
 		}
 		
