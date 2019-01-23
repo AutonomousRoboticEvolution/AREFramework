@@ -138,6 +138,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			ER->settings->setRepository(arg3_param);
 			simReleaseBuffer(arg3_param);
 		}
+		else {
+			std::cout << "Argument 3 was NULL" << endl;
+		}
 		// Read the settings file
 		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();
@@ -258,9 +261,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
-				simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
+				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
 				simGetIntegerSignal((simChar*) "individual", individual);
-				cout << "loading individual " << individual[0] << " in sceneNumber " << sceneNumber[0] << " (this is v_repExtER.cpp)" << endl;
 				if (ER->loadIndividual(individual[0]) == false) {
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
 				}

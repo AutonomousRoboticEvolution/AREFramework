@@ -64,10 +64,10 @@ int main(int argc, char* argv[])
 		client->settings->readSettings(); // essential, settings need to correspond with server settings
 		// needs to be fixed at some point
 		client->settings->sceneNum = run;
-		client->settings->seed = atoi(arguments[1].c_str());
+		client->settings->seed = run;
 		client->randNum = shared_ptr<RandNum>(new RandNum(run));
 		// client->randNum->setSeed(atoi(arguments[1].c_str()));
-		srand(atoi(arguments[1].c_str()));
+		srand(run);
 	}
 	else {
 		client->settings->seed = 0;
