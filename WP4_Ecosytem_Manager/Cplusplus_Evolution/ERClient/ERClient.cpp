@@ -55,18 +55,24 @@ int main(int argc, char* argv[])
 		destination = "files";
 	}
 	client->settings->setRepository(destination);
-	client->sceneNum = 0;
-	client->settings->sceneNum = 0;
-	client->settings->readSettings(); // essential, settings need to correspond with server settings
-	client->randNum = shared_ptr<RandNum>(new RandNum(0));
+
 	if (arguments.size() > 1) {
+		int run = atoi(arguments[1].c_str());
+		client->sceneNum = run; 
+		client->settings->sceneNum = run; // sceneNum will be overridden...
+		client->settings->seed = run; // sceneNum will be overridden...
+		client->settings->readSettings(); // essential, settings need to correspond with server settings
+		// needs to be fixed at some point
+		client->settings->sceneNum = run;
 		client->settings->seed = atoi(arguments[1].c_str());
-		client->randNum->setSeed(atoi(arguments[1].c_str()));
+		client->randNum = shared_ptr<RandNum>(new RandNum(run));
+		// client->randNum->setSeed(atoi(arguments[1].c_str()));
 		srand(atoi(arguments[1].c_str()));
 	}
 	else {
 		client->settings->seed = 0;
-		client->randNum->setSeed(0);
+		client->randNum = shared_ptr<RandNum>(new RandNum(0));
+		// client->randNum->setSeed(0); // not initialized
 		srand(0);
 	}
 	extApi_sleepMs(5000); // wait 5 seconds before connecting to ports
