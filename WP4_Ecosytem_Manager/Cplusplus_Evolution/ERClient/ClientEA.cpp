@@ -79,6 +79,7 @@ bool ClientEA::evaluateNextGen()
 			cout << "Connected to port " << ports[i] << endl;
 			portState.push_back(0);
 			portIndividual.push_back(-1); // this checks which individual the specific port is evaluating
+			portIndividualNum.push_back(-1); // Only used in evaluateNextGen
 		}
 	}
 	if (ports.size() == 0) {
@@ -118,13 +119,13 @@ bool ClientEA::evaluateNextGen()
 						extApi_sleepMs(20);
 						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again. (" << portIndividual[i] <<  ")" << std::endl;
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
-						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividual[i], simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividualNum[i], simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
 						tries++;
 					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						int invidividualNumber = ea->nextGenGenomes[currentEv]->individualNumber;
-						portIndividual[i] = invidividualNumber; // Ensuring loading is done properly. 
+						portIndividualNum[i] = invidividualNumber; // Ensuring loading is done properly. 
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
 						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
 						simxSetStringSignal(clientIDs[i], (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenome.size(), simx_opmode_blocking);
@@ -132,7 +133,7 @@ bool ClientEA::evaluateNextGen()
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", invidividualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
 						cout << "evaluating:  " << currentEv << " in port " << ports[i] <<" num: " << invidividualNumber <<  endl;
-						// portIndividual[i] = currentEv;
+						portIndividual[i] = currentEv;
 						// tells the simulator to start evaluating the genome
 						//	cout << "setting integer signal" << endl;
 						currentEv++;
