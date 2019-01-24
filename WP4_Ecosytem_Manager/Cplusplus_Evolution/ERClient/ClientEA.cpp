@@ -146,7 +146,7 @@ bool ClientEA::evaluateNextGen()
 						float phenValue[1] = { 0.0 };
 						simxGetFloatSignal(clientIDs[i], "phenValue", phenValue, simx_opmode_blocking);
 						simxGetFloatSignal(clientIDs[i], "fitness", fitness, simx_opmode_blocking);
-						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
+						cout << "fitness of individual " << portIndividualNum[i] << " was " << fitness[0] << endl;
 			//			cout << "phenValue = " << phenValue[0] << endl;
 						// ea->nextGenFitness[portIndividual[i]] = fitness[0];
 						ea->nextGenGenomes[portIndividual[i]]->fitness = fitness[0];
