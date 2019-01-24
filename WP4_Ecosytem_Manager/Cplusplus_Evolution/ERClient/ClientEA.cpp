@@ -132,7 +132,7 @@ bool ClientEA::evaluateNextGen()
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", invidividualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
 						cout << "evaluating:  " << currentEv << " in port " << ports[i] <<" num: " << invidividualNumber <<  endl;
-						portIndividual[i] = currentEv;
+						// portIndividual[i] = currentEv;
 						// tells the simulator to start evaluating the genome
 						//	cout << "setting integer signal" << endl;
 						currentEv++;
