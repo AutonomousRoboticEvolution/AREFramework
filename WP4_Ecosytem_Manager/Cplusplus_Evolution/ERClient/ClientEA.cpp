@@ -104,6 +104,7 @@ bool ClientEA::evaluateNextGen()
 		if (tries > loadingTrials) {
 			std::cout << "I have told the slaves (server instances) too many times to load the genomes. If they don't want to do it, I'll kill them and myself." << endl;
 			quitSimulators();
+			return false;
 		}
 		for (int i = 0; i < ports.size(); i++) {
 			if (simxGetConnectionId(clientIDs[i]) != -1)
@@ -192,6 +193,7 @@ bool ClientEA::evaluateNextGen()
 		ea->replacement();
 		ea->savePopFitness(settings->generation);
 	}
+	return true;
 	//else if (settings->replacementType == settings->PARETOMORPH_REPLACEMENT) {
 	//	ea->replaceNewPopPareto(indCounter, sceneNum, 5);
 	//}
