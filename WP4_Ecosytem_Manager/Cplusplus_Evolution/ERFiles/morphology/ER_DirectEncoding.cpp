@@ -152,16 +152,17 @@ bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 //	lGenome->lParameters.clear();
 //	cout << "lGenome cleared" << endl; 
-	ostringstream genomeFileName;
 
+	//	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
+//	if (!genomeFile) {
+//		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+//		return false;
+////		std::exit(1);
+//	}
+
+	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
 	ifstream genomeFile(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
-//		std::exit(1);
-	}
 
 	string value;
 	list<string> values;
@@ -179,7 +180,8 @@ bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 		genomeFile.close();
 	}
 	else {
-		std::cout << "Direct encoding file not found" << endl;
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
 	}
 
 	int moduleNum;

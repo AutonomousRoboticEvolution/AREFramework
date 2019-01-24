@@ -506,15 +506,16 @@ bool ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
 	lGenome = shared_ptr<LGENOME>(new LGENOME);
 //	lGenome->lParameters.clear();
 //	cout << "lGenome cleared" << endl; 
+
+	//if (!genomeFile) {
+	//	std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+	//	return false;
+	//}
+
 	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-//	genomeFileName << "files/morphologies0/genome9137.csv";
-
 	ifstream genomeFile(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
-	}
+
 	string value;
 	list<string> values;
 	if (genomeFile.is_open()) {
@@ -531,7 +532,8 @@ bool ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
 		genomeFile.close();
 	}
 	else {
-		std::cout << "L-System file not found" << endl;
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
 	}
 	int moduleNum;
 	vector<string> moduleValues;

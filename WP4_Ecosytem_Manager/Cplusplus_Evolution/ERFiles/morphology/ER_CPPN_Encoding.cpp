@@ -332,16 +332,16 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	//	lGenome->lParameters.clear();
 	//	cout << "lGenome cleared" << endl; 
+	//if (!genomeFile) {
+	//	std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+	//	return false;
+	//	//		std::exit(1);
+	//}
+
 	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	//	genomeFileName << "files/morphologies0/genome9137.csv";
-	cout << genomeFileName.str() << endl;
 	ifstream genomeFile(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
-		//		std::exit(1);
-	}
+
 	string value;
 	list<string> values;
 	if (genomeFile.is_open()) {
@@ -358,7 +358,8 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 		genomeFile.close();
 	}
 	else {
-		std::cout << "CPPN file not found" << endl;
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
 	}
 
 	int moduleNum;
