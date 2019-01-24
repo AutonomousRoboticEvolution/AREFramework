@@ -61,8 +61,9 @@ void ClientEA::initGA() {
 	extApi_sleepMs(500);
 }
 
-void ClientEA::evaluateNextGen()
+bool ClientEA::evaluateNextGen()
 {
+	int tries = 0; 
 	// first connect to port again
 	int amPorts = ports.size();
 	//	cout << "amount ports = " << ports.size() << endl;
@@ -100,6 +101,10 @@ void ClientEA::evaluateNextGen()
 		if (doneEvaluating == true) {
 			break;
 		}
+		if (tries > loadingTrials) {
+			std::cout << "I have told the slaves (server instances) too many times to load the genomes. If they don't want to do it, I'll kill them and myself." << endl;
+			quitSimulators();
+		}
 		for (int i = 0; i < ports.size(); i++) {
 			if (simxGetConnectionId(clientIDs[i]) != -1)
 			{
@@ -110,13 +115,15 @@ void ClientEA::evaluateNextGen()
 					//	cout << state[0] << endl;
 					if (state[0] == 9) {
 						extApi_sleepMs(20);
-						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again." << std::endl;
+						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again. (" << portIndividual[i] <<  ")" << std::endl;
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividual[i], simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
+						tries++;
 					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						int invidividualNumber = ea->nextGenGenomes[currentEv]->individualNumber;
+						portIndividual[i] = invidividualNumber; // Ensuring loading is done properly. 
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
 						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
 						simxSetStringSignal(clientIDs[i], (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenome.size(), simx_opmode_blocking);
@@ -166,6 +173,8 @@ void ClientEA::evaluateNextGen()
 			}
 			else {
 				cout << "Connection lost with API " << ports[i] << ", terminating remote API" << endl;
+				cout << "closing simulator " << ports[i] << endl;
+				simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 				ports.erase(ports.begin() + i);
 				simxFinish(clientIDs[i]);
 				clientIDs.erase(clientIDs.begin() + i);
@@ -266,6 +275,8 @@ void ClientEA::evaluateInitialPop()
 			}
 			else {
 				cout << "Connection lost with API " << ports[i] << ", terminating remote API" << endl;
+				cout << "closing simulator " << ports[i] << endl;
+				simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 				ports.erase(ports.begin() + i);
 				simxFinish(clientIDs[i]);
 				clientIDs.erase(clientIDs.begin() + i);

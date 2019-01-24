@@ -114,7 +114,10 @@ int main(int argc, char* argv[])
 	for (int i = initialGen; i < client->settings->maxGeneration; i++) {
 	//	tStart = clock();
 	//	client->ea->agePop(); // should be in update function of EA
-		client->evaluateNextGen();
+		if (!client->evaluateNextGen()) {
+			std::cout << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << endl;
+			break;
+		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
 		if (client->settings->indNumbers.size() < 1) {
 			client->settings->indNumbers.resize(client->ea->populationGenomes.size());

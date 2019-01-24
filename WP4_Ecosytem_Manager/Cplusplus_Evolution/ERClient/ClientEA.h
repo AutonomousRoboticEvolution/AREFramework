@@ -52,11 +52,12 @@ public:
 	void initGA();
 	void evaluateInitialPop();
 	void createNextGenGenomes();
-	void evaluateNextGen();
+	bool evaluateNextGen();
 	void quitSimulators();
 
 	int indCounter = 0;
 	int sceneNum = 0;
+	int loadingTrials = 1000;
 
 	ClientEA();
 	~ClientEA();

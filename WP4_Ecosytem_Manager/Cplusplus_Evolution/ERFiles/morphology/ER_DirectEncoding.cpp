@@ -165,16 +165,23 @@ bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 
 	string value;
 	list<string> values;
-	while (genomeFile.good()) {
-		getline(genomeFile, value, ',');
-//		cout << value << ",";
-		if (value.find('\n') != string::npos) {
-			split_line(value, "\n", values);
+	if (genomeFile.is_open()) {
+		while (genomeFile.good()) {
+			getline(genomeFile, value, ',');
+			//		cout << value << ",";
+			if (value.find('\n') != string::npos) {
+				split_line(value, "\n", values);
+			}
+			else {
+				values.push_back(value);
+			}
 		}
-		else {
-			values.push_back(value);
-		}
+		genomeFile.close();
 	}
+	else {
+		std::cout << "Direct encoding file not found" << endl;
+	}
+
 	int moduleNum;
 	vector<string> moduleValues;
 	vector<string> controlValues;
