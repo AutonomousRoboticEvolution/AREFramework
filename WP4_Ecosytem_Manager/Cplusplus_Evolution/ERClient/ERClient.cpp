@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
 	}
 	if (client->settings->generation != 0) {
 		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
-		client->indCounter = (int)(client->settings->generation * client->settings->populationSize);
+		client->indCounter = (int)((client->settings->generation + 1) * client->settings->populationSize);
 		std::cout << "Loading Genomes" << std::endl;
 		client->ea->loadPopulationGenomes();
 	}
@@ -98,27 +98,14 @@ int main(int argc, char* argv[])
 		}
 		client->evaluateInitialPop(); // initial generation
 		if (client->settings->indNumbers.size() < 1) {
-			client->settings->indNumbers.resize(client->ea->populationGenomes.size());
+			for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
+				client->settings->indNumbers.push_back(client->ea->populationGenomes[i]->individualNumber);
+				client->settings->indFits.push_back(client->ea->populationGenomes[i]->fitness);
+			}
 		}
-		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
-			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
-		}
-		//		client->settings->indFits = client->ea->popFitness;
 	}
-	
 
-	int initialGen = client->settings->generation;
-	if (initialGen != 0) {
-		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
-			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
-		}
-	}
-//	sysTime = clock();
-//	for (int i = 0; i < 1000; i++) {
-//		client->evaluateInitialPop();
-//		saveLog(i);
-//	}
-	for (int i = initialGen; i < client->settings->maxGeneration; i++) {
+	for (int i = client->settings->generation; i < client->settings->maxGeneration; i++) {
 	//	tStart = clock();
 	//	client->ea->agePop(); // should be in update function of EA
 		if (!client->evaluateNextGen()) {
@@ -126,13 +113,6 @@ int main(int argc, char* argv[])
 			break;
 		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-		if (client->settings->indNumbers.size() < 1) {
-			client->settings->indNumbers.resize(client->ea->populationGenomes.size());
-		}
-		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
-			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
-		}
-		//		client->settings->indFits = client->ea->popFitness;
 		client->settings->generation = i + 1;
 		client->settings->saveSettings();
 //		saveLog(i);

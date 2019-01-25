@@ -130,15 +130,12 @@ void EA::savePopFitness(int generation) {
 
 void EA::loadPopulationGenomes()
 {
-	vector<int> popIndNumbers = settings->indNumbers;
-	//popFitness = settings->indFits;
-
-	for (int i = 0; i < popIndNumbers.size(); i++) {
-		cout << "loading individual " << popIndNumbers[i] << endl;
-		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], settings->sceneNum);
-		cout << "Make sure the following is correct" << endl;
-		populationGenomes[i]->fitness;
-		populationGenomes[i]->individualNumber = popIndNumbers[i];
+	for (int i = 0; i < settings->indNumbers.size(); i++) {
+		cout << "loading individual " << settings->indNumbers[i] << endl;
+		populationGenomes[i]->loadMorphologyGenome(settings->indNumbers[i], settings->sceneNum);
+		//cout << "Make sure the following is correct" << endl;
+		populationGenomes[i]->fitness = settings->indFits[i];
+		populationGenomes[i]->individualNumber = settings->indNumbers[i];
 		//cout << "called fitness = " << popFitness[i] << endl;
 	}
 }

@@ -7,6 +7,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>..\..\..</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>files 0</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>files 0 7</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

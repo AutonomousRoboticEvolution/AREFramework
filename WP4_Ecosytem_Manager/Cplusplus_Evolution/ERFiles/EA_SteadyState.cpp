@@ -93,13 +93,12 @@ void EA_SteadyState::replaceIndividuals()
 void EA_SteadyState::loadPopulationGenomes(int scenenum)
 {
 	vector<int> popIndNumbers = settings->indNumbers;
-//	popFitness = settings->indFits;
 	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
-		cout << "loading individual " << popIndNumbers[i] << endl;
+		std::cout << "loading individual " << popIndNumbers[i] << std::endl;
 		//populationGenomes[i]->init_noMorph();
-		// bug??
 		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
+		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
 		//	populationFitness[i] = populationGenomes[i]->morph->getFitness();
 //		cout << "called fitness = " << popFitness[i] << endl;
 	}
