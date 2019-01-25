@@ -115,6 +115,10 @@ int main(int argc, char* argv[])
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
 		client->settings->generation = i + 1;
 		client->settings->saveSettings();
+		if (client->settings->generation % client->settings->xGenerations == 0) {
+			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
+			break;
+		}
 //		saveLog(i);
 	}
 

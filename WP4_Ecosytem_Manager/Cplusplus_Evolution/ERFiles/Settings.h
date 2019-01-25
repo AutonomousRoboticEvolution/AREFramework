@@ -159,7 +159,7 @@ public:
 	float morphMutRate = 0.1;
 	int generation = 0;
 	int maxGeneration = 1000;
-	int xGenerations = 1000;
+	int xGenerations = 4;
 	int populationSize = 3;
 	int individualCounter = 0;
 	int crossover = 0;
