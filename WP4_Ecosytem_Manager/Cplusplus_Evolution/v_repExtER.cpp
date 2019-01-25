@@ -1,18 +1,23 @@
-// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
+// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved.
 // marc@coppeliarobotics.com
 // www.coppeliarobotics.com
-// 
+//
 // -------------------------------------------------------------------
 // THIS FILE IS DISTRIBUTED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
 // WARRANTY. THE USER WILL USE IT AT HIS/HER OWN RISK. THE ORIGINAL
 // AUTHORS AND COPPELIA ROBOTICS GMBH WILL NOT BE LIABLE FOR DATA LOSS,
 // DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR
 // MISUSING THIS SOFTWARE.
-// 
+//
 // You are free to use/modify/distribute this file for whatever purpose!
 // -------------------------------------------------------------------
 //
 // This file was automatically created for V-REP release V3.2.1 on May 3rd 2015
+
+/**
+	@file v_repExtER.cpp
+	@brief Implementation of the plugin
+*/
 
 #include "v_repExtER.h"
 //#include "luaFunctionData.h"
@@ -68,7 +73,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 #elif defined (__APPLE__)
 	temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
-
+  
 	vrepLib = loadVrepLibrary(temp.c_str());
 	if (vrepLib == NULL)
 	{
@@ -133,7 +138,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg1_param);
 		}
 
-		// 3: set the repository of the settings file. 
+		// 3: set the repository of the settings file.
 		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
 		if (arg3_param != NULL) {
 			ER->settings->setRepository(arg3_param);
@@ -147,7 +152,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ER->settings->readSettings();
 
 		// Override settings parameters if argument 2
-		// 2: 
+		// 2:
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
 		if (arg2_param != NULL) {
 			const int arg2_param_i = atoi(arg2_param);
@@ -185,7 +190,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 	// version 1 was for V-REP versions before V-REP 2.5.12
 	// version 2 was for V-REP versions before V-REP 2.6.0
-	// version 5 was for V-REP versions before V-REP 3.1.0 
+	// version 5 was for V-REP versions before V-REP 3.1.0
 	// version 6 is for V-REP versions after V-REP 3.1.3
 	// version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
 }
@@ -203,7 +208,7 @@ void saveLog(int num) {
 	int deltaSysTime = now - sysTime;
 	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
 	sysTime = clock() ;
-	counter = 0; 
+	counter = 0;
 	logFile.close();
 }
 
@@ -224,10 +229,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		}
 	}
 	*///if (initialized == true) {
-	
+
 	if (startEvolution == true) {
 		if (message == sim_message_eventcallback_modulehandle) {
-			ER->handleSimulation(); // handling the simulation. 
+			ER->handleSimulation(); // handling the simulation.
 		}
 
 		if (message == sim_message_eventcallback_simulationabouttostart) {
@@ -261,7 +266,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
-				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
+				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 				simGetIntegerSignal((simChar*) "individual", individual);
 				if (ER->loadIndividual(individual[0]) == false) {
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
@@ -286,7 +291,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			//	file.open(fileName.str(), ios::out | ios::ate | ios::app);
 			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
 			//	file.close();
-		//	}	
+		//	}
 			timeCount++;
 			ER->endOfSimulation();
 			loadingPossible = true;
