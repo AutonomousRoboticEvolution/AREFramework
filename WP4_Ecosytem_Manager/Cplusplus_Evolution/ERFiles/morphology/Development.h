@@ -86,6 +86,7 @@ public:
 
 	virtual void saveGenome(int individual, float fitness) override;
 	virtual bool loadGenome(int individualNumber, int sceneNum) override;
+	virtual bool loadGenome(std::istream &input, int individualNumber) override;
 
 	//void recallAndCreate();
 	void crossover(shared_ptr<Morphology>, float crossoverRate);

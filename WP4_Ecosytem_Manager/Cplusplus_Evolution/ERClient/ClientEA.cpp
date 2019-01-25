@@ -1,14 +1,18 @@
 #include "ClientEA.h"
 // #define DO_NOT_USE_SHARED_MEMORY
 
-ClientEA::ClientEA()
+void sendGenomeSignal(simxInt clientID, const std::string &individualGenome)
 {
-
+	simxInt individualGenomeLength = individualGenome.size();
+	simxSetStringSignal(clientID, (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenomeLength, simx_opmode_blocking);
+	simxSetIntegerSignal(clientID, (simxChar*) "individualGenomeLenght", individualGenomeLength, simx_opmode_blocking);
 }
+
+ClientEA::ClientEA()
+{}
 
 ClientEA::~ClientEA()
-{
-}
+{}
 
 void ClientEA::init(int amountPorts)
 {
@@ -117,9 +121,11 @@ void ClientEA::evaluateNextGen()
 					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						int invidividualNumber = ea->nextGenGenomes[currentEv]->individualNumber;
+
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
 						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
-						simxSetStringSignal(clientIDs[i], (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenome.size(), simx_opmode_blocking);
+						sendGenomeSignal(clientIDs[i], individualGenome);
+
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", invidividualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
@@ -222,10 +228,16 @@ void ClientEA::evaluateInitialPop()
 					int state[1];
 					simxGetIntegerSignal(clientIDs[i], "simulationState", state, simx_opmode_oneshot);
 					if (settings->verbose) {
-						cout << "state[0] = " << state[0];
+						// cout << "state[0] = " << state[0];
 					}
 					//	cout << state[0] << endl;
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
+						int invidividualNumber = ea->populationGenomes[currentEv]->individualNumber;
+
+						const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome(invidividualNumber, 0);
+						// const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
+						sendGenomeSignal(clientIDs[i], individualGenome);
+
 						// simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", currentEv, simx_opmode_blocking);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);

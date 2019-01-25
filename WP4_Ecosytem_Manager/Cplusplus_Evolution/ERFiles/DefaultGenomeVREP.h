@@ -19,8 +19,8 @@ public:
 	DefaultGenomeVREP() {};
 
 	~DefaultGenomeVREP();
-	bool loadMorphologyGenome(int indNum, int sceneNum);
-	bool loadGenome(int indNum);
+	virtual bool loadGenome(int indNum, int sceneNum) override;
+	virtual bool loadGenome(std::istream &input, int indNum) override;
 
 	// deepcopy
 	shared_ptr<Genome> clone() const;
@@ -30,7 +30,7 @@ public:
 	void init();
 
 protected:
-
+	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory() override;
 };
 
 

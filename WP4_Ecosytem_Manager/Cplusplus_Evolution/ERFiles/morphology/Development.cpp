@@ -66,7 +66,24 @@ float Development::callFitness() {
 	return fitness;
 }
 
-bool Development::loadGenome(int individualNumber, int sceneNum) {
+bool Development::loadGenome(int individualNumber, int sceneNum)
+{
+	ostringstream genomeFileName;
+
+	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
+	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
+	ifstream genomeFile(genomeFileName.str());
+	if (!genomeFile) {
+		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+		return false;
+//		std::exit(1);
+	}
+
+	return this->loadGenome(genomeFile, individualNumber);
+}
+
+bool Development::loadGenome(std::istream &input, int individualNumber)
+{
 	std::cout << "Cannot instantiate development class, also, should become abstract" << endl;
 	return false;
 }

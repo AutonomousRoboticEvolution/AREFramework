@@ -46,6 +46,7 @@ public:
 	void grow() {};
 	virtual void mutate() override;
 	virtual bool loadGenome(int individualNumber, int sceneNum) override;
+	virtual bool loadGenome(std::istream &input, int individualNumber) override;
 	virtual void saveGenome(int indNum, float fitness) override;
 	virtual const std::string generateGenome(int indNum, float fitness) const override;
 	// void checkControl(int individual, int sceneNum);

@@ -33,11 +33,13 @@ public:
 	virtual void update() override; 
 	virtual void mutate() override;
 	virtual bool loadGenome(int indNum, int sceneNum) override;
+	virtual bool loadGenome(std::istream &input, int indNum) override;
 	virtual void saveGenome(int indNum) override;
 	virtual const std::string generateGenome(int indNum, int sceneNum) const override;
 	virtual void clearGenome() override;
 	virtual void checkGenome() override;
-	virtual bool loadMorphologyGenome(int indNum, int sceneNum) override; 
+	virtual bool loadMorphologyGenome(int indNum, int sceneNum) override;
+	virtual bool loadMorphologyGenome(std::istream &input, int indNum) override;
 	shared_ptr<Genome> cloneGenome();
 
 	void init_noMorph();
@@ -50,7 +52,8 @@ public:
 
 
 protected:
-
+	// virtual functions to extend with simulator specific classes
+	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory();
 };
 
 

@@ -34,7 +34,7 @@ public:
 	void initializeQuadruped(int type);
 	virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
-	bool loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(std::istream &input, int individualNumber);
 	void symmetryMutation(float mutationRate); 
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 

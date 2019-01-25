@@ -353,10 +353,50 @@ shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 	return shared_ptr<Morphology>();
 }
 
-bool ER_VREP::loadIndividual(int individualNum) {
-	cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
+bool ER_VREP::loadIndividual(int individualNum)
+{
+	std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
 	currentGenome = genomeFactory->createGenome(0, randNum, settings);
-	bool load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+	// try to load from signal
+	simInt signalLength = -1;
+	simInt signalLengthVerify = -1;
+	simChar* signal = simGetStringSignal("individualGenome", &signalLength);
+	simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
+
+	if (settings->verbose) {
+		if (signal != nullptr && signalLength != signalLengthVerify) {
+			std::cout << "genome received by signal, but lenght got corrupted, using file." << std::endl;
+			std::cout << signalLength << " != " << signalLengthVerify << std::endl;
+		}
+		std::cout << "loading genome " << individualNum << " from ";
+	}
+	
+	bool load = false;
+	if (signal != nullptr && signalLength == signalLengthVerify)
+	{
+		// load from signal
+		if (settings->verbose) {
+			std::cout << " signal." << std::endl;
+		}
+		
+		const std::string individualGenome((char*)signal, signalLength);
+		std::istringstream individualGenomeStream(individualGenome);
+		load = currentGenome->loadGenome(individualGenomeStream, individualNum);
+	} 
+	else 
+	{
+		// load from file
+		if (settings->verbose) {
+			std::cout << " file." << std::endl;
+		}
+		
+		load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+	}
+
+	if (signal != nullptr) {
+		simReleaseBuffer(signal);
+	}
+	
 	currentGenome->individualNumber = individualNum;
 	cout << "loaded" << endl;
 	return load;

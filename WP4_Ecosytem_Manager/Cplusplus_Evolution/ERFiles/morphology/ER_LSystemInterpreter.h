@@ -1,6 +1,7 @@
 #pragma once
 
-#include <vector>;
+#include <vector>
+#include <iostream>
 #include "../module/ModuleFactory.h"
 #include "ER_LSystem.h"
 #include "Modular_Morphology.h"
@@ -47,7 +48,7 @@ public:
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();
 	void incrementLSystem(); 
-	bool loadGenome(int indNum, int sceneNum);
+	virtual bool loadGenome(std::istream &input, int indNum) override;
 
 	void setColors();
 

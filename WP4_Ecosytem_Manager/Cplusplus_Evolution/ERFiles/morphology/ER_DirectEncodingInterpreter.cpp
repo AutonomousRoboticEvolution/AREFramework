@@ -125,9 +125,10 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 
 
 
-bool ER_DirectEncodingInterpreter::loadGenome(int individualNumber, int sceneNum) {
-	// NEVER LOADS THROUGH THIS CLASS ANYMORE???
-	bool loaded = ER_DirectEncoding::loadGenome(individualNumber, sceneNum);
+bool ER_DirectEncodingInterpreter::loadGenome(std::istream &input, int individualNumber)
+{
+	// call "father" method
+	bool loaded = ER_DirectEncoding::loadGenome(input, individualNumber);
 	if (settings->verbose) {
 		cout << "ADJUSTING DIRECT GENOME" << endl;
 	}
