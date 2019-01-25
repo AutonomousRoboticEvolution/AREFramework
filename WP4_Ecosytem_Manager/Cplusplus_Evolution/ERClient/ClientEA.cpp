@@ -36,6 +36,7 @@ void ClientEA::init(int amountPorts)
 			clientIDs.push_back(new_connection);
 			portState.push_back(0);
 			portIndividual.push_back(-1); // this checks which individual the specific port is evaluating
+			portIndividualNum.push_back(-1); // this checks which individual the specific port is evaluating
 		}
 	}
 	randNum = shared_ptr<RandNum>(new RandNum(settings->seed));
