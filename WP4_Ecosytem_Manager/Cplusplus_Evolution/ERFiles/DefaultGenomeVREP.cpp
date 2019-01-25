@@ -15,26 +15,22 @@ DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings
 DefaultGenomeVREP::~DefaultGenomeVREP() {
 }
 
-bool DefaultGenomeVREP::loadMorphologyGenome(int indNum, int sceneNum) {
-	if (settings->verbose) {
-		cout << "Loading genome " << indNum << endl;
-	}
-	int m_type = settings->morphologyType;
+std::shared_ptr<MorphologyFactory> DefaultGenomeVREP::newMorphologyFactory()
+{
 	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
-	bool load = morph->loadGenome(indNum, sceneNum);
-	//morph->create();
-	if (settings->verbose && load == true) {
-		cout << "Succesfully loaded genome " << indNum << endl;
-	}
-	return load;
-	//morph->create();
+	return morphologyFactory;
 }
 
-bool DefaultGenomeVREP::loadGenome(int indNum)
+bool DefaultGenomeVREP::loadGenome(int indNum, int sceneNum)
 {
-	bool load = loadMorphologyGenome(indNum, settings->sceneNum);
+	bool load = DefaultGenome::loadGenome(indNum, sceneNum);
+	individualNumber = indNum;
+	return load;
+}
+
+bool DefaultGenomeVREP::loadGenome(std::istream &input, int indNum)
+{
+	bool load = DefaultGenome::loadGenome(input, indNum);
 	individualNumber = indNum;
 	return load;
 }

@@ -40,6 +40,11 @@ bool DefaultGenome::loadGenome(int indNum, int sceneNum)
 	return loadMorphologyGenome(indNum, sceneNum);
 }
 
+bool DefaultGenome::loadGenome(std::istream &input, int indNum)
+{
+	return loadMorphologyGenome(input, indNum);
+}
+
 void DefaultGenome::saveGenome(int indNum) {
 	morph->saveGenome(indNum, 0);
 }
@@ -67,16 +72,39 @@ shared_ptr<Genome> DefaultGenome::cloneGenome()
 	return cloned;
 }
 
+
+std::shared_ptr<MorphologyFactory> DefaultGenome::newMorphologyFactory()
+{
+	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+	return morphologyFactory;
+}
+
 bool DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
 	if (settings->verbose) {
 		cout << "Loading genome " << indNum << endl;
 	}
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+	shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 
 	bool load = morph->loadGenome(indNum, sceneNum);
+	if (settings->verbose && load == true) {
+		cout << "Succesfully loaded genome " << indNum << endl;
+	}
+	return load;
+}
+
+bool DefaultGenome::loadMorphologyGenome(std::istream &input, int indNum) {
+	if (settings->verbose) {
+		cout << "Loading genome " << indNum << endl;
+	}
+	int m_type = settings->morphologyType;
+	shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
+	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+	morphologyFactory.reset();
+
+	bool load = morph->loadGenome(input, indNum);
 	if (settings->verbose && load == true) {
 		cout << "Succesfully loaded genome " << indNum << endl;
 	}

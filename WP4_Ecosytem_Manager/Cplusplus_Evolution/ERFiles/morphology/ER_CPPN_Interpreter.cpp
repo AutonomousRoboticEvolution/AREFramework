@@ -125,8 +125,9 @@ void ER_CPPN_Interpreter::checkForceSensors() {
 
 
 
-bool ER_CPPN_Interpreter::loadGenome(int individualNumber, int sceneNum) {
-	bool load = ER_CPPN_Encoding::loadGenome(individualNumber, sceneNum);
+bool ER_CPPN_Interpreter::loadGenome(std::istream &input, int individualNumber)
+{
+	bool load = ER_CPPN_Encoding::loadGenome(input, individualNumber);
 	cout << "ADJUSTING CPPN GENOME" << endl;
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {

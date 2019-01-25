@@ -45,6 +45,12 @@ bool BaseMorphology::loadGenome(int individualNumber, int sceneNum)
 	return false;
 }
 
+bool BaseMorphology::loadGenome(std::istream &input, int individualNumber)
+{
+	std::cout << "cannot load basemorph" << std::endl;
+	return false;
+}
+
 vector <shared_ptr<ER_Module>> BaseMorphology::getCreatedModules() {
 	vector <shared_ptr<ER_Module>> vec;
 	return vec;

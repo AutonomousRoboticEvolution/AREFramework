@@ -142,7 +142,8 @@ void ER_DirectEncoding::loadPhenotype(int ind)
 	}
 }
 
-bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
+bool ER_DirectEncoding::loadGenome(std::istream &genomeInput, int individualNumber)
+{
 	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
 		loadPhenotype(individualNumber);
 		genome->amountModules = genome->moduleParameters.size();
@@ -153,39 +154,21 @@ bool ER_DirectEncoding::loadGenome(int individualNumber, int sceneNum) {
 	if (settings->verbose) {
 		cout << "loading genome " << individualNumber << "(ER_Direct)" << endl;
 	}
-	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
+	genome = std::shared_ptr<GENOTYPE>(new GENOTYPE);
 //	lGenome->lParameters.clear();
 //	cout << "lGenome cleared" << endl; 
 
-	//	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
-//	if (!genomeFile) {
-//		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-//		return false;
-////		std::exit(1);
-//	}
-
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	ifstream genomeFile(genomeFileName.str());
-
 	string value;
 	list<string> values;
-	if (genomeFile.is_open()) {
-		while (genomeFile.good()) {
-			getline(genomeFile, value, ',');
-			//		cout << value << ",";
-			if (value.find('\n') != string::npos) {
-				split_line(value, "\n", values);
-			}
-			else {
-				values.push_back(value);
-			}
+	while (genomeInput.good()) {
+		getline(genomeInput, value, ',');
+		//		cout << value << ",";
+		if (value.find('\n') != string::npos) {
+			split_line(value, "\n", values);
 		}
-		genomeFile.close();
-	}
-	else {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
+		else {
+			values.push_back(value);
+		}
 	}
 
 	int moduleNum;

@@ -50,6 +50,7 @@ public:
 	virtual vector<int> getAllHandles(int) = 0;
 
 	virtual bool loadGenome(int individualNumber, int sceneNum) = 0;
+	virtual bool loadGenome(std::istream &input, int individualNumber) = 0;
 	virtual void crossover(shared_ptr<Morphology>, float crossoverRate) = 0;
 //	virtual void checkControl(int individual, int sceneNum) =0;
 	bool modular = false;

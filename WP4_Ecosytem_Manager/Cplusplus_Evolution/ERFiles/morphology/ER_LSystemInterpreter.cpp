@@ -573,8 +573,9 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 }
 
 
-bool ER_LSystemInterpreter::loadGenome(int individualNumber, int sceneNum) {
-	bool load = ER_LSystem::loadGenome(individualNumber, sceneNum);
+bool ER_LSystemInterpreter::loadGenome(std::istream &input, int individualNumber)
+{
+	bool load = ER_LSystem::loadGenome(input, individualNumber);
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		shared_ptr<ER_Module> mod = mf->createModuleGenome(lGenome->lParameters[i]->type,randomNum,settings);

@@ -325,41 +325,27 @@ float ER_CPPN_Encoding::getFitness() {
 	return fitness;
 }
 
-bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
+bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumber)
+{
 	if (settings->verbose) {
-		cout << "loading genome " << individualNumber << "(ER_Direct)" << endl;
+		cout << "loading genome " << individualNumber << "(ER_CPPN_Encoding)" << endl;
 	}
-	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
+	genome = std::shared_ptr<GENOTYPE>(new GENOTYPE);
 	//	lGenome->lParameters.clear();
-	//	cout << "lGenome cleared" << endl; 
-	//if (!genomeFile) {
-	//	std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-	//	return false;
-	//	//		std::exit(1);
-	//}
-
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	ifstream genomeFile(genomeFileName.str());
+	//	cout << "lGenome cleared" << endl;
 
 	string value;
 	list<string> values;
-	if (genomeFile.is_open()) {
-		while (genomeFile.good()) {
-			getline(genomeFile, value, ',');
-			//		cout << value << ",";
-			if (value.find('\n') != string::npos) {
-				split_line(value, "\n", values);
-			}
-			else {
-				values.push_back(value);
-			}
+	while (genomeInput.good())
+	{
+		getline(genomeInput, value, ',');
+		//		cout << value << ",";
+		if (value.find('\n') != string::npos) {
+			split_line(value, "\n", values);
 		}
-		genomeFile.close();
-	}
-	else {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
+		else {
+			values.push_back(value);
+		}
 	}
 
 	int moduleNum;

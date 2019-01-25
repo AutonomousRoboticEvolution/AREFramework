@@ -36,7 +36,7 @@ public:
 	virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
 	void loadPhenotype(int ind);
-	bool loadGenome(int individualNumber, int sceneNum);
+	bool loadGenome(std::istream& input, int individualNumber);
 	void setGenomeColors();
 	void symmetryMutation(float mutationRate);
 

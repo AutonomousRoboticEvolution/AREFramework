@@ -501,40 +501,31 @@ float ER_LSystem::getFitness() {
 	return fitness;
 }
 
-bool ER_LSystem::loadGenome(int individualNumber, int sceneNum) {
+bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
+{
+	if (settings->verbose) {
+		cout << "loading genome " << individualNumber << "(ER_LSystem)" << endl;
+	}
+
 //	cout << "loading genome " << individualNumber << endl;
-	lGenome = shared_ptr<LGENOME>(new LGENOME);
+	lGenome = std::shared_ptr<LGENOME>(new LGENOME);
 //	lGenome->lParameters.clear();
-//	cout << "lGenome cleared" << endl; 
-
-	//if (!genomeFile) {
-	//	std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-	//	return false;
-	//}
-
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	ifstream genomeFile(genomeFileName.str());
+//	cout << "lGenome cleared" << endl;
 
 	string value;
 	list<string> values;
-	if (genomeFile.is_open()) {
-		while (genomeFile.good()) {
-			getline(genomeFile, value, ',');
-			//		cout << value << ",";
-			if (value.find('\n') != string::npos) {
-				split_line(value, "\n", values);
-			}
-			else {
-				values.push_back(value);
-			}
+	while (genomeInput.good())
+	{
+		getline(genomeInput, value, ',');
+		//		cout << value << ",";
+		if (value.find('\n') != string::npos) {
+			split_line(value, "\n", values);
 		}
-		genomeFile.close();
+		else {
+			values.push_back(value);
+		}
 	}
-	else {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
-	}
+
 	int moduleNum;
 	vector<string> moduleValues;
 	vector<string> controlValues;
