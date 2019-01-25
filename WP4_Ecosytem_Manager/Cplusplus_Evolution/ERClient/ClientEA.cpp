@@ -67,29 +67,7 @@ void ClientEA::initGA() {
 
 bool ClientEA::evaluateNextGen()
 {
-	int tries = 0; 
-	// first connect to port again
-	int amPorts = ports.size();
-	//	cout << "amount ports = " << ports.size() << endl;
-	for (int i = 0; i < ports.size(); i++) {
-		clientIDs.push_back(simxStart(ipNum, ports[i], true, true, 2000, 5));
-		if (clientIDs[i] == -1) {
-			cout << "Port " << ports[i] << " could not be opened" << endl;
-			ports.erase(ports.begin() + i);
-			clientIDs.erase(clientIDs.begin() + i);
-			i--;
-		}
-		else {
-			cout << "Connected to port " << ports[i] << endl;
-			portState.push_back(0);
-			portIndividual.push_back(-1); // this checks which individual the specific port is evaluating
-			portIndividualNum.push_back(-1); // Only used in evaluateNextGen
-		}
-	}
-	if (ports.size() == 0) {
-		cout << "ERROR, PORT SIZE WAS ZERO, QUITTING EA" << endl;
-		exit(0);
-	}
+	int tries = 0;
 
 	// create new genomes
 	ea->settings->indCounter = indCounter;
@@ -98,7 +76,7 @@ bool ClientEA::evaluateNextGen()
 	indCounter += ea->populationGenomes.size();
 	ea->settings->indCounter = indCounter;
 	//indCounter += ea->populationGenomes.size();
-	extApi_sleepMs(100);
+
 	// communicate with all ports
 	int currentEv = 0;
 	bool doneEvaluating = false;
@@ -214,6 +192,7 @@ void ClientEA::quitSimulators()
 	for (int i = 0; i < ports.size(); i++) {
 		cout << "closing simulator " << ports[i] << endl;
 		simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
+		simxFinish(clientIDs[i]);
 	}
 }
 
