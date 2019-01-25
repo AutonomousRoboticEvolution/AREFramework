@@ -39,6 +39,7 @@ Settings::Settings() {
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	savePhenotype = true;
+	sendGenomeAsSignal = false;
 }
 
 Settings::~Settings() {

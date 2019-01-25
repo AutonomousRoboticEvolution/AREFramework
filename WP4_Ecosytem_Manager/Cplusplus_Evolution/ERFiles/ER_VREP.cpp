@@ -365,7 +365,7 @@ bool ER_VREP::loadIndividual(int individualNum)
 
 	if (settings->verbose) {
 		if (signal != nullptr && signalLength != signalLengthVerify) {
-			std::cout << "genome received by signal, but lenght got corrupted, using file." << std::endl;
+			std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
 			std::cout << signalLength << " != " << signalLengthVerify << std::endl;
 		}
 		std::cout << "loading genome " << individualNum << " from ";

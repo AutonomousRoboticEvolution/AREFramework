@@ -111,9 +111,10 @@ bool ClientEA::evaluateNextGen()
 						portIndividualNum[i] = invidividualNumber; // Ensuring loading is done properly. 
 
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
-						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
-						sendGenomeSignal(clientIDs[i], individualGenome);
-
+						if (settings->sendGenomeAsSignal) {
+							const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
+							sendGenomeSignal(clientIDs[i], individualGenome);
+						}
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", invidividualNumber, simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);

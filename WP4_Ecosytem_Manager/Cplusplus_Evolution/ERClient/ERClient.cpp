@@ -97,6 +97,7 @@ int main(int argc, char* argv[])
 			std::cout << "initialized EA " << std::endl;
 		}
 		client->evaluateInitialPop(); // initial generation
+		client->settings->generation += 1;
 		if (client->settings->indNumbers.size() < 1) {
 			for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
 				client->settings->indNumbers.push_back(client->ea->populationGenomes[i]->individualNumber);
@@ -115,6 +116,9 @@ int main(int argc, char* argv[])
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
 		client->settings->generation = i + 1;
 		client->settings->saveSettings();
+		if (client->settings->verbose) {
+
+		}
 		if (client->settings->generation % client->settings->xGenerations == 0) {
 			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
 			break;

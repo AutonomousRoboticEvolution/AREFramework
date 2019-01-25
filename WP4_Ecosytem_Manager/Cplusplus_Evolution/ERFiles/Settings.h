@@ -153,7 +153,7 @@ public:
 
 	int indCounter;
 	int sceneNum;
-
+	bool sendGenomeAsSignal = false;
 	bool client;
 	float mutationRate = 0.1;
 	float morphMutRate = 0.1;
