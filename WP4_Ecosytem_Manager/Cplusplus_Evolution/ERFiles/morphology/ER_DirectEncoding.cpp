@@ -106,6 +106,10 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 			genomeText << "#EndOfModule," << std::endl;
 		//}
 	}
+	if (settings->verbose) {
+		cout << "this is what I save" << endl;
+		cout << genomeText.str() << endl;
+	}
 
 	//genomeFile.close();
 	//if (settings->verbose) {
@@ -428,34 +432,6 @@ int ER_DirectEncoding::initializeGenome(int type) {
 			break;
 		}
 
-		if (i == 0) {
-			if (settings->moduleTypes[i] == 4 || settings->moduleTypes[i] == 9) {
-				genome->moduleParameters[i]->maxChilds = 3;
-			}
-			else if (settings->moduleTypes[i] == 6 || settings->moduleTypes[i] == 3) {
-				genome->moduleParameters[i]->maxChilds = 0;
-			}
-			else if (settings->moduleTypes[i] == 1) {
-				genome->moduleParameters[i]->maxChilds = 5;
-			}
-			else {
-				genome->moduleParameters[i]->maxChilds = 3;
-			}
-		}
-		else {
-			if (settings->moduleTypes[i] == 4 || settings->moduleTypes[i] == 9) {
-				genome->moduleParameters[i]->maxChilds = 3;
-			}
-			else if (settings->moduleTypes[i] == 6 || settings->moduleTypes[i] == 3) {
-				genome->moduleParameters[i]->maxChilds = 0;
-			}
-			else if (settings->moduleTypes[i] == 1) {
-				genome->moduleParameters[i]->maxChilds = 5;
-			}
-			else {
-				genome->moduleParameters[i]->maxChilds = 3;
-			}
-		}
 		genome->moduleParameters[i]->parent = i - 1;
 		genome->moduleParameters[i]->parentSite = 0;
 		genome->moduleParameters[i]->orientation = 0;
@@ -529,12 +505,13 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 				}
 				else {
 					int attachType = genome->moduleParameters[attachModule]->type;
-					if (genome->moduleParameters[attachModule]->childSiteStates.size() < genome->moduleParameters[attachModule]->maxChilds) {
+					int maxCh = getMaxChilds(genome->moduleParameters[attachModule]->type); // placeholder for max childs of parent module
+					if (genome->moduleParameters[attachModule]->childSiteStates.size() < maxCh) {
 						int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
 
 						//bool collideSite = true;
 						int newModuleLocation = 0;
-						newModuleLocation = randomNum->randInt(genome->moduleParameters[attachModule]->maxChilds, 0);
+						newModuleLocation = randomNum->randInt(getMaxChilds(maxCh), 0);
 						if (checkIfLocationIsOccupied(genome->moduleParameters, newModuleLocation, attachModule)) {
 							if (settings->verbose) {
 								cout << "Module location is occupied, not creating new module. " << endl;
@@ -578,7 +555,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 								genome->moduleParameters[theNewModule]->control->mutate(0.5);
 								cf.reset();
 								genome->moduleParameters[theNewModule]->control->mutate(0.8);
-								if (genome->moduleParameters[theNewModule]->type == 1) {
+								/*if (genome->moduleParameters[theNewModule]->type == 1) {
 									genome->moduleParameters[theNewModule]->maxChilds = 5;
 								}
 								else if (genome->moduleParameters[theNewModule]->type == 4) {
@@ -586,7 +563,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 								}
 								else {
 									genome->moduleParameters[theNewModule]->maxChilds = 0;
-								}
+								}*/
 								genome->moduleParameters[theNewModule]->parent = attachModule;
 								genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
 								genome->moduleParameters[theNewModule]->orientation = newOr;

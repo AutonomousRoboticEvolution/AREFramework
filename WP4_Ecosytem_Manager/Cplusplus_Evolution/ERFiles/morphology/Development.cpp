@@ -76,6 +76,29 @@ void Development::init_noMorph() {
 
 }
 
+/*!
+ * Get how many modules can be attached to the child. Should be improved, quick hack.
+ * 
+ * \param t
+ * \return 
+ */
+
+int Development::getMaxChilds(int t) {
+	if (t == 4 || t == 9) {
+		return 3; 
+	}
+	else if (t == 6 || t == 3) {
+		return 0;
+	}
+	else if (t == 1) {
+		return 5;
+	}
+	else {
+		return 3;
+	}
+	
+}
+
 //vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
 	
 //}

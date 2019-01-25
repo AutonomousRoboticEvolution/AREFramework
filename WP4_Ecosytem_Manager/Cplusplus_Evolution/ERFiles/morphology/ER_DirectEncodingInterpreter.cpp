@@ -213,35 +213,45 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				if (parentModulePointer == NULL) {
 					cout << ", null , ";
 				}
-				// cout << "parent = " << modules[i]->parent << endl;
-				// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
-				// cout << "parentModulePointer = " << parentModulePointer << ", ";
-				// cout << "parentSite = " << parentSite << ", ";
-				// cout << " .. " << parentModulePointer->moduleID << ",";
-				// cout << " pType " << parentModulePointer->type << ",";
-				// cout << "orientation " << orien << endl;
+				if (settings->verbose) {
+					cout << "parent = " << modules[i]->parent << endl;
+					cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+					cout << "parentModulePointer = " << parentModulePointer << ", ";
+					cout << "parentSite = " << parentSite << ", ";
+					cout << " .. " << parentModulePointer->moduleID << ",";
+					cout << " pType " << parentModulePointer->type << ",";
+					cout << "orientation " << orien << endl;
+				}
 				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
 				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
-				// cout << " 1 ,";
+				if (settings->verbose) {
+					cout << " 1 ,";
+				}
 				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
-				// cout << " 1.1, ";
+				if (settings->verbose) {
+					cout << " 1.1, ";
+				}	
 				int createdModulesSize = createdModules.size();
 				vector<float> siteConfiguration;
-				// cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
-				// cout << createdModules[createdParentNumber]->type << ",";
-				// cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-
+				if (settings->verbose) {
+					cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
+					cout << createdModules[createdParentNumber]->type << ",";
+					cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
+				}
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
-				// cout << " a ,";
+				if (settings->verbose) {
+					cout << " a ,";
+				}
 				createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
 				createdModulesSize = createdModules.size();
-				// cout << " b ,";
-
+				if (settings->verbose) {
+					cout << " b ,";
+				}
 				// set color
 				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
 

@@ -16,6 +16,7 @@ public:
 	void init();
 	void mutate();
 
+
 	int initializeGenome(int type);
 	void initializeRobot(int type);
 	int mutateERGenome(float mutationRate);
@@ -57,8 +58,7 @@ protected:
 			return make_unique<MODULEPARAMETERS>(*this);
 		};
 		bool expressed = true;
-		int maxChilds; 
-
+	
 		// not stored in genome
 		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
 		float rgb[3];

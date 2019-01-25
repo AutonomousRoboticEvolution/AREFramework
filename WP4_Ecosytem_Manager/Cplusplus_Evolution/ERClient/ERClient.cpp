@@ -86,13 +86,15 @@ int main(int argc, char* argv[])
 		client->init(2);
 	}
 	if (client->settings->generation != 0) {
-		cout << "generation not set to 0????" << endl;
+		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
+		client->indCounter = (int)(client->settings->generation * client->settings->populationSize);
+		std::cout << "Loading Genomes" << std::endl;
 		client->ea->loadPopulationGenomes();
 	}
 	else {
 		client->initGA();
 		if (client->settings->verbose) {
-			cout << "initialized EA " << endl;
+			std::cout << "initialized EA " << std::endl;
 		}
 		client->evaluateInitialPop(); // initial generation
 		if (client->settings->indNumbers.size() < 1) {
@@ -106,6 +108,11 @@ int main(int argc, char* argv[])
 	
 
 	int initialGen = client->settings->generation;
+	if (initialGen != 0) {
+		for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
+			client->settings->indNumbers[i] = client->ea->populationGenomes[i]->individualNumber;
+		}
+	}
 //	sysTime = clock();
 //	for (int i = 0; i < 1000; i++) {
 //		client->evaluateInitialPop();

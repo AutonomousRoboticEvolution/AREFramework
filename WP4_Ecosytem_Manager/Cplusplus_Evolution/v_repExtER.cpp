@@ -255,8 +255,24 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			simQuitSimulator(true);
 		}
 		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
+			// time out when not receiving commands for 5 minutes.  
+			if (!timerOn) {
+				tStart = clock();
+				timeElapsed = 0;
+				timerOn = true;
+			}
+			else {
+				// printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+				timeElapsed = (double)(clock() - tStart) / CLOCKS_PER_SEC;
+				if (timeElapsed > 300) {
+					std::cout << "Didn't receive a signal for 5 minutes. Shutting down server" << std::endl;
+					simQuitSimulator(true);
+				}
+			}
+
 			// wait until command is received
 			if (signal[0] == 1) {
+				timerOn = false;
 				simSetIntegerSignal((simChar*) "simulationState", 8);
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };

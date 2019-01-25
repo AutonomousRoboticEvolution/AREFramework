@@ -30,6 +30,8 @@ int amountMessages = 0;
 int handleMessages = 0; 
 bool initialized = false;
 int timeCount = 0;
+bool timerOn = false;
+double timeElapsed;
 bool startEvolution = true;
 clock_t tStart;
 

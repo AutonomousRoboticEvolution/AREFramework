@@ -20,12 +20,12 @@ Settings::Settings() {
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
 	morphologyType = MODULAR_DIRECT;
 	controlType = ANN_CUSTOM;
-	populationSize = 90;
+	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
-	verbose = false;
+	verbose = true;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
