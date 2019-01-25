@@ -510,14 +510,14 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 //	cout << "loading genome " << individualNumber << endl;
 	lGenome = std::shared_ptr<LGENOME>(new LGENOME);
 //	lGenome->lParameters.clear();
-//	cout << "lGenome cleared" << endl; 
-	
-	std::string value;
-	std::list<std::string> values;
+//	cout << "lGenome cleared" << endl;
+
+	string value;
+	list<string> values;
 	while (genomeInput.good())
 	{
 		getline(genomeInput, value, ',');
-//		cout << value << ",";
+		//		cout << value << ",";
 		if (value.find('\n') != string::npos) {
 			split_line(value, "\n", values);
 		}
@@ -525,6 +525,7 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 			values.push_back(value);
 		}
 	}
+
 	int moduleNum;
 	vector<string> moduleValues;
 	vector<string> controlValues;

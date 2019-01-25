@@ -26,7 +26,7 @@ void ClientEA::init(int amountPorts)
 		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5);
 		if (new_connection == -1) {
 			cout << "Could not connect to V-REP on port" << ports[i] << endl;
-			std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
+			// std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
 			// std::exit(1);
 			// ports.erase(ports.begin() + i);
 			// clientIDs.erase(clientIDs.begin() + i);
@@ -65,8 +65,9 @@ void ClientEA::initGA() {
 	extApi_sleepMs(500);
 }
 
-void ClientEA::evaluateNextGen()
+bool ClientEA::evaluateNextGen()
 {
+	int tries = 0; 
 	// first connect to port again
 	int amPorts = ports.size();
 	//	cout << "amount ports = " << ports.size() << endl;
@@ -82,6 +83,7 @@ void ClientEA::evaluateNextGen()
 			cout << "Connected to port " << ports[i] << endl;
 			portState.push_back(0);
 			portIndividual.push_back(-1); // this checks which individual the specific port is evaluating
+			portIndividualNum.push_back(-1); // Only used in evaluateNextGen
 		}
 	}
 	if (ports.size() == 0) {
@@ -104,6 +106,11 @@ void ClientEA::evaluateNextGen()
 		if (doneEvaluating == true) {
 			break;
 		}
+		if (tries > loadingTrials) {
+			std::cout << "I have told the slaves (server instances) too many times to load the genomes. If they don't want to do it, I'll kill them and myself." << endl;
+			quitSimulators();
+			return false;
+		}
 		for (int i = 0; i < ports.size(); i++) {
 			if (simxGetConnectionId(clientIDs[i]) != -1)
 			{
@@ -114,14 +121,16 @@ void ClientEA::evaluateNextGen()
 					//	cout << state[0] << endl;
 					if (state[0] == 9) {
 						extApi_sleepMs(20);
-						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again." << std::endl;
+						std::cout << "It seems that server in port " << ports[i] << " could not load the genome. Sending it again. (" << portIndividual[i] <<  ")" << std::endl;
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
-						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividual[i], simx_opmode_oneshot);
+						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", portIndividualNum[i], simx_opmode_oneshot);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
+						tries++;
 					}
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
 						int invidividualNumber = ea->nextGenGenomes[currentEv]->individualNumber;
-
+						portIndividualNum[i] = invidividualNumber; // Ensuring loading is done properly. 
+						
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
 						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
 						sendGenomeSignal(clientIDs[i], individualGenome);
@@ -143,7 +152,7 @@ void ClientEA::evaluateNextGen()
 						float phenValue[1] = { 0.0 };
 						simxGetFloatSignal(clientIDs[i], "phenValue", phenValue, simx_opmode_blocking);
 						simxGetFloatSignal(clientIDs[i], "fitness", fitness, simx_opmode_blocking);
-						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
+						cout << "fitness of individual " << portIndividualNum[i] << " was " << fitness[0] << endl;
 			//			cout << "phenValue = " << phenValue[0] << endl;
 						// ea->nextGenFitness[portIndividual[i]] = fitness[0];
 						ea->nextGenGenomes[portIndividual[i]]->fitness = fitness[0];
@@ -172,6 +181,8 @@ void ClientEA::evaluateNextGen()
 			}
 			else {
 				cout << "Connection lost with API " << ports[i] << ", terminating remote API" << endl;
+				cout << "closing simulator " << ports[i] << endl;
+				simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 				ports.erase(ports.begin() + i);
 				simxFinish(clientIDs[i]);
 				clientIDs.erase(clientIDs.begin() + i);
@@ -189,6 +200,7 @@ void ClientEA::evaluateNextGen()
 		ea->replacement();
 		ea->savePopFitness(settings->generation);
 	}
+	return true;
 	//else if (settings->replacementType == settings->PARETOMORPH_REPLACEMENT) {
 	//	ea->replaceNewPopPareto(indCounter, sceneNum, 5);
 	//}
@@ -278,6 +290,8 @@ void ClientEA::evaluateInitialPop()
 			}
 			else {
 				cout << "Connection lost with API " << ports[i] << ", terminating remote API" << endl;
+				cout << "closing simulator " << ports[i] << endl;
+				simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 99, simx_opmode_blocking);
 				ports.erase(ports.begin() + i);
 				simxFinish(clientIDs[i]);
 				clientIDs.erase(clientIDs.begin() + i);

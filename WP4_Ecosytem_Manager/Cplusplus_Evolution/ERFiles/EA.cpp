@@ -138,6 +138,7 @@ void EA::loadPopulationGenomes()
 		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], settings->sceneNum);
 		cout << "Make sure the following is correct" << endl;
 		populationGenomes[i]->fitness;
+		populationGenomes[i]->individualNumber = popIndNumbers[i];
 		//cout << "called fitness = " << popFitness[i] << endl;
 	}
 }

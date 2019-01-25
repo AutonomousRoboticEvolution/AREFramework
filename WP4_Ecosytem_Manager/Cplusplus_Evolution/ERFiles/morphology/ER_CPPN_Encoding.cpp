@@ -334,8 +334,8 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	//	lGenome->lParameters.clear();
 	//	cout << "lGenome cleared" << endl;
 
-	std::string value;
-	std::list<std::string> values;
+	string value;
+	list<string> values;
 	while (genomeInput.good())
 	{
 		getline(genomeInput, value, ',');
@@ -347,6 +347,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 			values.push_back(value);
 		}
 	}
+
 	int moduleNum;
 	vector<string> moduleValues;
 	vector<string> controlValues;

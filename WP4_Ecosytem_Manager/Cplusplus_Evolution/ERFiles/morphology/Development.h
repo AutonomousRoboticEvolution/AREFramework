@@ -67,6 +67,7 @@ public:
 //	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
 	//	ER_LSystem getMultiPurposeLSystemPointer();
 	void init_noMorph();
+	int getMaxChilds(int moduleType);
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
 	// object creators
 	void createAtPosition(float x, float y, float z);

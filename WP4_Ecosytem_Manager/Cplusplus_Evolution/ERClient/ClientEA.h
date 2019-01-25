@@ -38,8 +38,9 @@ public:
 	vector<int> ports;
 	simxChar* ipNum = "127.0.0.1"; // TO DO: should also be one argument
 	vector<int> clientIDs;
-	vector<int> portIndividual;
+	vector<int> portIndividual; // used to say which num of next genomes
 	vector<int> portState;
+	vector<int> portIndividualNum; // actual number for loading genome
 
 	shared_ptr<Settings> settings;
 	shared_ptr<RandNum> randNum;
@@ -52,11 +53,12 @@ public:
 	void initGA();
 	void evaluateInitialPop();
 	void createNextGenGenomes();
-	void evaluateNextGen();
+	bool evaluateNextGen();
 	void quitSimulators();
 
 	int indCounter = 0;
 	int sceneNum = 0;
+	int loadingTrials = 1000;
 
 	ClientEA();
 	~ClientEA();
