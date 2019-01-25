@@ -494,7 +494,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 
 						//bool collideSite = true;
 						int newModuleLocation = 0;
-						newModuleLocation = randomNum->randInt(getMaxChilds(maxCh), 0);
+						newModuleLocation = randomNum->randInt(getMaxChilds(genome->moduleParameters[attachModule]->type), 0);
 						if (checkIfLocationIsOccupied(genome->moduleParameters, newModuleLocation, attachModule)) {
 							if (settings->verbose) {
 								cout << "Module location is occupied, not creating new module. " << endl;
