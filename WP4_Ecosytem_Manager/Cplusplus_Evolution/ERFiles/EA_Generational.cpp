@@ -15,7 +15,6 @@ EA_Generational::~EA_Generational()
 
 void EA_Generational::init()
 {
-	gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	initializePopulation();
 }
 
@@ -37,6 +36,8 @@ void EA_Generational::mutation()
 
 void EA_Generational::initializePopulation()
 {
+	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+
 	if (settings->client) {
 		for (int i = 0; i < settings->populationSize; i++)
 		{
@@ -56,6 +57,7 @@ void EA_Generational::initializePopulation()
 		//	popFitness.push_back(0);
 		//}
 	}
+	gf.reset();
 }
 
 void EA_Generational::selectIndividuals()
@@ -89,8 +91,8 @@ void EA_Generational::createNewGenRandomSelect() {
 		// artefact, use for morphological protection
 		// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
 		// Fix crossover for direct encoding. 
-		//if (settings->morphologyType != settings->MODULAR_DIRECT) { // cannot crossover direct encoding
-		//	if (settings->crossoverRate > 0) {
+		// if (settings->morphologyType != settings->MODULAR_DIRECT) { // cannot crossover direct encoding
+		//	 if (settings->crossoverRate > 0) {
 		//		int otherParent = randNum->randInt(populationGenomes.size(), 0);
 		//		while (otherParent == parent) { /* parents should always be different, this while loop makes sure of that
 		//										* Unless you want to let it mate with itself of course... */
@@ -99,7 +101,7 @@ void EA_Generational::createNewGenRandomSelect() {
 		//		// crossover not working in this version
 		//		// crossoverGenerational(i, otherParent);
 		//	}
-		//}
+		//	}
 	}
 	mutation();
 	for (int i = 0; i < nextGenGenomes.size(); i++) {

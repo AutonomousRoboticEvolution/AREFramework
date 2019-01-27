@@ -111,15 +111,15 @@ void ER_VREP::startOfSimulation(){
 			if (settings->verbose) {
 				cout << "Creating Individual " << settings->indCounter << endl;
 			}
-			if (settings->indCounter < ea->populationGenomes.size()) {		
+			if (settings->indCounter < ea->nextGenGenomes.size()) {		
 				// First generation:
 				currentInd = settings->indCounter;
-				ea->populationGenomes[currentInd]->init();
+				ea->nextGenGenomes[currentInd]->init();
 //				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
+				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
 				//currentGenome->init(); // should not initialize base class
 				currentGenome->create();
 				currentMorphology = currentGenome->morph;
@@ -316,12 +316,12 @@ void ER_VREP::endOfSimulation(){
 					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
 				}
 				// TODO set fitness
-				ea->setFitness(settings->indCounter % ea->populationGenomes.size(), fitness);
+				ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
 				currentGenome->morph->saveGenome(settings->indCounter, fitness);
 				cout << "FITNESS = " << fitness << endl;
 				settings->indCounter++;
 			}
-			if (settings->indCounter % ea->populationGenomes.size() == 0 && settings->indCounter != 0) {
+			if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
 				ea->selection();
 				ea->savePopFitness(generation);

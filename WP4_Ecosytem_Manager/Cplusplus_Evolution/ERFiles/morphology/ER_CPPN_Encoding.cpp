@@ -333,7 +333,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	genome = std::shared_ptr<GENOTYPE>(new GENOTYPE);
 	//	lGenome->lParameters.clear();
 	//	cout << "lGenome cleared" << endl;
-
+	
 	string value;
 	list<string> values;
 	while (genomeInput.good())
@@ -461,7 +461,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	}
 
 	cppn = shared_ptr<CPPN>(new CPPN);
-
+	cppn->settings = settings;
 	cppn->setControlParams(cppnValues);
 
 	// setting color

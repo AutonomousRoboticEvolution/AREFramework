@@ -1,6 +1,10 @@
 #pragma once
 #include "Settings.h"
 
+/*!
+ * The settings that are set in the constructor are mainly for debugging purposes. 
+ * 
+ */
 Settings::Settings() {
 	// set default module parameters
 	moduleTypes.push_back(1);
@@ -18,14 +22,14 @@ Settings::Settings() {
 	maxModuleTypes[0][1] = 100; // one base module
 	maxAmountModules = 20;
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_LSYSTEM;
+	morphologyType = MODULAR_CPPN;
 	controlType = ANN_CUSTOM;
 	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
-	verbose = true;
+	verbose = false;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
@@ -39,7 +43,9 @@ Settings::Settings() {
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	savePhenotype = true;
-	sendGenomeAsSignal = false;
+	sendGenomeAsSignal = true;
+	shouldReopenConnections = true;
+	killWhenNotConnected = true;
 }
 
 Settings::~Settings() {
@@ -499,6 +505,27 @@ void Settings::readSettings() {
 					verbose = true;
 				}
 			}
+			else if (tmp == "#sendGenomeAsSignal") {
+				it++;
+				tmp = *it;
+				if (atoi(tmp.c_str()) == 0) {
+					sendGenomeAsSignal = false;
+				}
+				else {
+					sendGenomeAsSignal = true;
+				}
+			}
+			else if (tmp == "#shouldReopenConnections") {
+				it++;
+				tmp = *it;
+				if (atoi(tmp.c_str()) == 0) {
+					shouldReopenConnections = false;
+				}
+				else {
+					shouldReopenConnections = true;
+				}
+			}
+
 			else if (tmp == "#bestIndividual") {
 				cout << "found best individual" << endl;
 				it++;
@@ -603,7 +630,9 @@ void Settings::saveSettings() {
 	settingsFile << ",#amountModules," << amountModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
 	settingsFile << ",#maxAmountModules," << maxAmountModules << "," << endl;
-	
+	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
+	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
+
 	settingsFile << ",#maxForceModules," << maxForce << "," << endl;
 	settingsFile << ",#maxForceSensorModules," << maxForceSensor << "," << endl;
 	settingsFile << ",#repository," << repository << "," << endl;

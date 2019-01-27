@@ -188,6 +188,9 @@ public:
 	bool verbose = false;
 	Colorization colorization = COLOR_NEURALNETWORK;
 	
+	bool killWhenNotConnected = true;
+	bool shouldReopenConnections = false;
+
 	// neural network parameters
 	int initialInputNeurons = 3;
 	int initialInterNeurons = 1;

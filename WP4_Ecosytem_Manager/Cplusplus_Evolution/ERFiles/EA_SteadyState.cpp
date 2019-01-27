@@ -32,7 +32,6 @@ void EA_SteadyState::split_line(string& line, string delim, list<string>& values
 
 void EA_SteadyState::init()
 {
-	gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	initializePopulation();
 }
 
@@ -43,10 +42,13 @@ void EA_SteadyState::selection()
 
 void EA_SteadyState::replacement()
 {
-	if (nextGenGenomes.size() > 0) {
+	if (populationGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
-		//replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
+		// replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
 		replaceNewRank(); 
+	}
+	else {
+		populationGenomes = nextGenGenomes;
 	}
 }
 
@@ -58,36 +60,14 @@ void EA_SteadyState::mutation() {
 
 void EA_SteadyState::initializePopulation()
 {
-	//if (settings->client) {
-		for (int i = 0; i < settings->populationSize; i++)
-		{
-			populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
-			populationGenomes[i]->fitness = 0;
-			populationGenomes[i]->individualNumber = i;
-			// for easy access of fitness values (used by client-server)
-			//popFitness.push_back(0);
-		}
-	//}
-	//else {
-	//	cout << "Cannot create VREP dependent genome. Use EA_SteadyState_VREP for online evolution" << endl;
-	//}
-}
-
-void EA_SteadyState::selectIndividuals()
-{
-}
-
-void EA_SteadyState::replaceNewIndividual(int indNum, int sceneNum, float fitness) {
-	// random check if individual is better and put it in the population
-	int ind = rand() % populationGenomes.size();
-	if (fitness >= populationGenomes[ind]->fitness) {
-		populationGenomes[ind] = nextGenGenomes[indNum]->clone();
+	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+	for (int i = 0; i < settings->populationSize; i++)
+	{
+		nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));
+		nextGenGenomes[i]->fitness = 0;
+		nextGenGenomes[i]->individualNumber = i;
 	}
-};
-
-
-void EA_SteadyState::replaceIndividuals()
-{
+	gf.reset();
 }
 
 void EA_SteadyState::loadPopulationGenomes(int scenenum)
@@ -96,11 +76,8 @@ void EA_SteadyState::loadPopulationGenomes(int scenenum)
 	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
 		std::cout << "loading individual " << popIndNumbers[i] << std::endl;
-		//populationGenomes[i]->init_noMorph();
-		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
-		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
-		//	populationFitness[i] = populationGenomes[i]->morph->getFitness();
-//		cout << "called fitness = " << popFitness[i] << endl;
+		nextGenGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
+		nextGenGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
 	}
 }
 
@@ -117,8 +94,8 @@ void EA_SteadyState::createNewGenRandomSelect() {
 		else {
 			//nextGenFitness.push_back(-100.0);
 			nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
-			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
 			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());
+			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
 			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
 			// artefact, use for morphological protection
 			// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
@@ -151,22 +128,11 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 	for (int p = 0; p < populationGenomes.size(); p++) {
 		for (int n = 0; n < numAttempts; n++) {
 			int currentInd = randomNum->randInt(populationGenomes.size(), 0);
-			// cout << currentInd << endl;
-			//for (int i = 0; i < populationGenomes.size(); i++) {
-			//	if (populationFitness[i] == 0) {
-			//		currentInd = i;
-			//		break;
-			//	}
-			//}
 			if (nextGenGenomes[p]->fitness >= populationGenomes[currentInd]->fitness) {
 				cout << "replacement: " << nextGenGenomes[p]->individualNumber << " replaces " << populationGenomes[currentInd]->individualNumber << endl;
 				cout << "replacement: " << nextGenGenomes[p]->fitness << " replaces " << populationGenomes[currentInd]->fitness << endl;
-				// save the genome again, but this time save its fitness as well
-				// populationGenomes[currentInd]->morph->saveGenome(nextGenGenomes[p]->individualNumber, sceneNum, nextGenFitness[p]); NO, THIS WILL GO WRONG
 				populationGenomes[currentInd].reset();
 				populationGenomes[currentInd] = nextGenGenomes[p]->clone(); // new DefaultGenome();
-				//populationGenomes[currentInd]->fitness = nextGenGenomes[p]->fitness;
-				//popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
 				break;
 			}
 			else if (n == (numAttempts - 1)) {

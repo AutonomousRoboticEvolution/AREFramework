@@ -248,9 +248,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 		}
 		//	}
-		int signal[1] = { 0 };
-		simGetIntegerSignal((simChar*) "simulationState", signal);
-		if (signal[0] == 99) {
+		int signal = 0;
+		int retVal = simGetIntegerSignal((simChar*) "simulationState", &signal);
+		if (signal == 99) {
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
 		}
@@ -271,15 +271,16 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 
 			// wait until command is received
-			if (signal[0] == 1) {
+			if (signal == 1) {
 				timerOn = false;
 				simSetIntegerSignal((simChar*) "simulationState", 8);
-				int sceneNumber[1] = { 0 };
-				int individual[1] = { 0 };
+				int sceneNumber = 0;
+				int individual = 0;
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
-				simGetIntegerSignal((simChar*) "individual", individual);
-				if (ER->loadIndividual(individual[0]) == false) {
+
+				simGetIntegerSignal((simChar*) "individual", &individual);
+				if (ER->loadIndividual(individual) == false) {
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
 				}
 				else {

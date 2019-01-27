@@ -49,9 +49,9 @@ void DefaultGenome::saveGenome(int indNum) {
 	morph->saveGenome(indNum, 0);
 }
 
-const std::string DefaultGenome::generateGenome(int indNum, int sceneNum) const
+const std::string DefaultGenome::generateGenome() const
 {
-	return morph->generateGenome(indNum, 0);
+	return morph->generateGenome(individualNumber, 0);
 }
 
 void DefaultGenome::checkGenome() {

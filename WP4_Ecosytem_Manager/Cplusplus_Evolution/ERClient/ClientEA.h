@@ -26,40 +26,53 @@ extern "C" {
 
 using namespace std;
 
-struct IND {
-	int nr;
-	int sceneNr;
-	float fitness;
-};
+
 
 class ClientEA
 {
 public:
-	vector<int> ports;
 	simxChar* ipNum = "127.0.0.1"; // TO DO: should also be one argument
-	vector<int> clientIDs;
-	vector<int> portIndividual; // used to say which num of next genomes
-	vector<int> portState;
-	vector<int> portIndividualNum; // actual number for loading genome
+
+	// vector<int> ports;
+	// vector<int> clientIDs;
+	// vector<int> portIndividual; // used to say which num of next genomes
+	// vector<int> portState;
+	// vector<int> portIndividualNum; // actual number for loading genome
 
 	shared_ptr<Settings> settings;
 	shared_ptr<RandNum> randNum;
-	vector<shared_ptr<IND>> queuedInds;
+//	vector<shared_ptr<IND>> queuedInds;
+	// the queued individuals point to the genome array. Not actual number
+	vector<int> queuedInds;
 	//shared_ptr<Population> pop;
 	shared_ptr<EA> ea;
 
 	// functions
-	void init(int amountPorts);
+	bool init(int amountPorts);
 	void initGA();
-	void evaluateInitialPop();
-	void createNextGenGenomes();
-	bool evaluateNextGen();
 	void quitSimulators();
 
-	int indCounter = 0;
-	int sceneNum = 0;
-	int loadingTrials = 1000;
+	int finishConnections();
+	int openConnections();
+	int reopenConnections();
 
+	bool confirmConnections();
+
+	bool evaluatePop(); // replaces evaluate initial and evaluate next
+
+	int loadingTrials = 1000;
+	
+	struct ServerInstance {
+		int portNum; // number assigned
+		int port; // actual port
+		int individual; // current individual in newGenomes
+		int individualNum; // actual individual number
+		int state; // signify what state the connection is in (8 = running, 9 = could not load, 0 = )
+	};
+
+	vector<unique_ptr<ServerInstance>> serverInstances;
+
+	
 	ClientEA();
 	~ClientEA();
 };

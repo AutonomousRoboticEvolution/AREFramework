@@ -14,7 +14,6 @@ public:
 
 	shared_ptr<Settings> settings;
 	shared_ptr<RandNum> randomNum;
-	unique_ptr<GenomeFactory> gf;
 
 	// population storage
 	vector<shared_ptr<Genome>> populationGenomes;

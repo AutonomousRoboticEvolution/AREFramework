@@ -52,13 +52,13 @@ int main(int argc, char* argv[])
 		cout << endl;
 	}
 	else {
-		destination = "files";
+		destination = "files"; // default location
 	}
 	client->settings->setRepository(destination);
 
+	// Just to handle settings
 	if (arguments.size() > 1) {
 		int run = atoi(arguments[1].c_str());
-		client->sceneNum = run; 
 		client->settings->sceneNum = run; // sceneNum will be overridden...
 		client->settings->seed = run; // sceneNum will be overridden...
 		client->settings->readSettings(); // essential, settings need to correspond with server settings
@@ -75,55 +75,64 @@ int main(int argc, char* argv[])
 		// client->randNum->setSeed(0); // not initialized
 		srand(0);
 	}
-	extApi_sleepMs(1000); // wait 5 seconds before connecting to ports
+
+	extApi_sleepMs(20000); // wait 20 seconds before connecting to ports, gives v-rep time to start up.
 	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
 		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;
-		int numberOfNodes = atoi(arguments[2].c_str());
-		client->init(numberOfNodes - 1);
+		int numberOfCores = atoi(arguments[2].c_str());
+		if (!client->init(numberOfCores - 1)) {
+			return -1; // could not properly connect to servers
+		}
 	}
 	else {
 		client->init(2);
 	}
+
+	// load or initialize EA
 	if (client->settings->generation != 0) {
 		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
-		client->indCounter = (int)((client->settings->generation + 1) * client->settings->populationSize);
+		client->settings->indCounter = (int)((client->settings->generation + 1) * client->settings->populationSize); // could be read from settings instead
 		std::cout << "Loading Genomes" << std::endl;
 		client->ea->loadPopulationGenomes();
+		client->ea->selection(); // create the next gen, indCounter needs to be set first
+		client->settings->generation++; // increment because next gen will be evaluated
 	}
 	else {
+		// client->ea->nextGenGenomes.resize(client->settings->populationSize);
 		client->initGA();
+		client->settings->indCounter = 0;
+
 		if (client->settings->verbose) {
 			std::cout << "initialized EA " << std::endl;
 		}
-		client->evaluateInitialPop(); // initial generation
-		client->settings->generation += 1;
-		if (client->settings->indNumbers.size() < 1) {
-			for (int i = 0; i < client->ea->populationGenomes.size(); i++) {
-				client->settings->indNumbers.push_back(client->ea->populationGenomes[i]->individualNumber);
-				client->settings->indFits.push_back(client->ea->populationGenomes[i]->fitness);
-			}
-		}
+		//client->settings->generation += 1;
+		//if (client->settings->indNumbers.size() < 1) {
+		//	for (int i = 0; i < client->ea->nextGenGenomes.size(); i++) {
+		//		client->settings->indNumbers.push_back(client->ea->nextGenGenomes[i]->individualNumber);
+		//		client->settings->indFits.push_back(client->ea->nextGenGenomes[i]->fitness);
+		//	}
+		// }
 	}
-
 	for (int i = client->settings->generation; i < client->settings->maxGeneration; i++) {
 	//	tStart = clock();
 	//	client->ea->agePop(); // should be in update function of EA
-		if (!client->evaluateNextGen()) {
+		if (!client->evaluatePop()) {
 			std::cout << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << endl;
 			break;
 		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-		client->settings->generation = i + 1;
 		client->settings->saveSettings();
 		if (client->settings->verbose) {
 
 		}
-		if (client->settings->generation % client->settings->xGenerations == 0) {
+		if (client->settings->generation % client->settings->xGenerations == 0 && client->settings->generation!=0) {
 			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
 			break;
 		}
-//		saveLog(i);
+		client->settings->indCounter += client->settings->populationSize;
+		client->ea->selection();
+		client->settings->generation = i + 1;
 	}
 
 	extApi_sleepMs(2000);

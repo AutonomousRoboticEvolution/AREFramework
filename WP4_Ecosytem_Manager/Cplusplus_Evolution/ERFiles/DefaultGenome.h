@@ -35,7 +35,7 @@ public:
 	virtual bool loadGenome(int indNum, int sceneNum) override;
 	virtual bool loadGenome(std::istream &input, int indNum) override;
 	virtual void saveGenome(int indNum) override;
-	virtual const std::string generateGenome(int indNum, int sceneNum) const override;
+	virtual const std::string generateGenome() const override;
 	virtual void clearGenome() override;
 	virtual void checkGenome() override;
 	virtual bool loadMorphologyGenome(int indNum, int sceneNum) override;
