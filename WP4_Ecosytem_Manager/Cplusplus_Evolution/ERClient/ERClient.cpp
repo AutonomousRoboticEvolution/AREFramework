@@ -137,6 +137,7 @@ int main(int argc, char* argv[])
 
 	extApi_sleepMs(5000);
 	client->quitSimulators();
+	extApi_sleepMs(5000);
 	std::cout << "Client done, shutting down" << std::endl;
 	return 0;
 }
