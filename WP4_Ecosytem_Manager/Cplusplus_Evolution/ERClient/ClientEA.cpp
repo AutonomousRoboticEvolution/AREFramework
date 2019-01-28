@@ -156,18 +156,26 @@ bool ClientEA::evaluatePop() {
 				std::cout << "i:" << i << ",";
 			}
 			int state;
-			if (serverInstances[i]->state != 10) { // 10 is now the delay state 
-				returnValue = simxGetIntegerSignal(serverInstances[i]->port, "simulationState", &state, simx_opmode_oneshot);
+			if (serverInstances[i]->state == 10 || serverInstances[i]->state == 11) { // 10 is now the delay state 
+				if (serverInstances[i]->state == 10) {
+					// try again in 100 ms. 
+					extApi_sleepMs(pauseTime);
+					serverInstances[i]->state = 0;
+					continue;
+				}
+				else if (serverInstances[i]->state == 11) { // 10 is now the delay state 
+					// try again in 25 ms. 
+					extApi_sleepMs(25);
+					serverInstances[i]->state = 0;
+					continue;
+				}
 			}
 			else {
-				// try again in 100 ms. 
-				extApi_sleepMs(pauseTime);
-				serverInstances[i]->state = 0;
-				continue;
+				returnValue = simxGetIntegerSignal(serverInstances[i]->port, "simulationState", &state, simx_opmode_oneshot);
 			}
 			if (settings->verbose) {
 				// Yeah sorry, if you have verbose on, this we be spammed. 
-				std::cout << "rs: " << returnValue << ",";
+				std::cout << "rs: " << returnValue << "," << std::endl;
 			}
 			// Some debugging code
 			if (returnValue != 0) { // 0 is ok, 1 is fine
@@ -178,8 +186,13 @@ bool ClientEA::evaluatePop() {
 				if (returnValue >= 3) {
 					std::cerr << "Note, the simxGetIntegerSignal function returned " << returnValue << std::endl;
 					std::cerr << "If this message persists, the client is unable to get the simulation state from vrep" << std::endl;
+					serverInstances[i]->state = 10;
 				}
-				if (returnValue >= 16) {
+				else if (returnValue != 0) {
+					// short pause because this return value is not as bad as the others. 
+					serverInstances[i]->state = 11;
+				}
+				if (returnValue >= 8) {
 					tries++;
 				}
 				if (returnValue == 64) {
@@ -207,10 +220,10 @@ bool ClientEA::evaluatePop() {
 					serverInstances[i]->state = 10;
 				}
 				if (tries > 100) {
-					pauseTime = 500;
+					pauseTime = 250;
 				}
 				else {
-					pauseTime = 100;
+					pauseTime = 25;
 				}
 			}
 
