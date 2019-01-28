@@ -29,14 +29,30 @@ bool loadingPossible = true;
 using namespace std;
 unique_ptr<ER_VREP> ER;
 bool initCall = true;
+// TODO: Check with Frank
+/// Variable used but the value is always 0
 int counter = 0;
+// TODO: Check with Frank
+/// Variable not used!
 double simulationTime = 0;
+// TODO: Check with Frank
+/// Variable not used!
 int amountMessages = 0;
+// TODO: Check with Frank
+/// Variable not used!
 int handleMessages = 0;
+// TODO: Check with Frank
+/// Variable not used!
 bool initialized = false;
 int timeCount = 0;
+/// This variable marks the start of evolution.
 bool startEvolution = true;
+// TODO: Check with Frank
+/// Variable not used!
 clock_t tStart;
+// TODO: Check with Frank
+/// Variable not used! Measure simulation time.
+clock_t sysTime;
 
 #ifdef _WIN32
 	#define VREP_DLLEXPORT extern "C" __declspec(dllexport)
@@ -47,17 +63,15 @@ clock_t tStart;
 
 // The 3 required entry points of the plugin:
 /**
-	@brief initialize v-rep plugin
+	@brief Initialize v-rep plugin and starts evolution.
 	@return unsigned char; v-rep version if operation successful, false if not
 */
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt);
 /**
-	@brief release the v-rep lib
+	@brief Release the v-rep lib
 */
 VREP_DLLEXPORT void v_repEnd();
 /**
-	@brief handle different message of simulation
+	@brief Handle different message of simulation
 */
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData);
-
-clock_t sysTime;

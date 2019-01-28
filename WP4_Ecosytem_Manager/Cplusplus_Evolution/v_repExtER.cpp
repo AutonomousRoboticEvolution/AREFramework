@@ -16,7 +16,7 @@
 
 /**
 	@file v_repExtER.cpp
-	@brief Implementation of the plugin
+	@brief Implementation of the plugin.
 */
 
 #include "v_repExtER.h"
@@ -128,8 +128,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ER = unique_ptr<ER_VREP>(new ER_VREP);
 		ER->settings = shared_ptr<Settings>(new Settings);
 
-		// set all arguments
-		// 1: seed and location
+		// Set all arguments
+		// 1: Set seed and location
 		int run = 0;
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
@@ -138,7 +138,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg1_param);
 		}
 
-		// 3: set the repository of the settings file.
+		// 3: Sets the output file-path for the settings file.
 		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
 		if (arg3_param != NULL) {
 			ER->settings->setRepository(arg3_param);
@@ -156,13 +156,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
 		if (arg2_param != NULL) {
 			const int arg2_param_i = atoi(arg2_param);
-
+			// If the second argument passed (arg2_param) is equal to 9, then load best individual and run simulations in local machine
 			if (arg2_param_i == 9)
 			{
-				ER->simSet = RECALLBEST;
+				ER->simSet = RECALLBEST; // Load best indivudal
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
+			// If the second argument passed (arg2_param) is equal to 1, then run the simulations in server-client mode
 			else if (arg2_param_i == 1)
 			{
 				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
@@ -171,7 +172,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg2_param);
 		}
 
-		// sceneNum and seed will not be utilized from the settings file anymore
+		//! sceneNum and seed will not be utilized from the settings file anymore
+		//! TODO: Check with Frank: why lines 151 and 176 are the same?
 		ER->settings->sceneNum = run;
 		ER->settings->seed = run;
 		ER->randNum = shared_ptr<RandNum>(new RandNum(run));
@@ -195,11 +197,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	// version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
 }
 
+// Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
 	unloadVrepLibrary(vrepLib); // release the library
 }
 
+//! Currently not used.
+//! TODO: Check with Frank if this is going to be used.
 void saveLog(int num) {
 	ofstream logFile;
 	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
@@ -212,6 +217,7 @@ void saveLog(int num) {
 	logFile.close();
 }
 
+// Handle different message of simulation
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
 	static bool refreshDlgFlag = true;
@@ -229,14 +235,16 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		}
 	}
 	*///if (initialized == true) {
-
+	// Start evolution if true
 	if (startEvolution == true) {
 		if (message == sim_message_eventcallback_modulehandle) {
+
 			ER->handleSimulation(); // handling the simulation.
 		}
 
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			//tStart = clock();
+			// Initializes population
 			ER->startOfSimulation();
 		}
 
@@ -245,9 +253,12 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			counter = 0;
 			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
 				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER) {
+				// Starts instance of V-rep Simulation
 				simStartSimulation();
 
 			}
+			//! This conditions is doing nothing
+			//! TODO: Check with Frank.
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
 			}
