@@ -428,10 +428,10 @@ int ER_DirectEncoding::initializeGenome(int type) {
 shared_ptr<Morphology> ER_DirectEncoding::clone() const {
 	BaseMorphology::clone();
 	shared_ptr<ER_DirectEncoding> ur = make_unique<ER_DirectEncoding>(*this);
+	ur->genome = this->genome->clone();
 	for (int i = 0; i < ur->genome->moduleParameters.size(); i++) {
-		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
+		ur->genome->moduleParameters[i] = this->genome->moduleParameters[i]->clone();
 	}
-	ur->genome = ur->genome->clone();
 	return ur;
 }
 

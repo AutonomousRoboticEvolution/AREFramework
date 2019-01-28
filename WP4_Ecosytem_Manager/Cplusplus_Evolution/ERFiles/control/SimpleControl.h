@@ -11,7 +11,7 @@ public:
 	~SimpleControl();
 	virtual void init(int input, int inter, int output);
 	virtual vector<float> update(vector<float>);
-	shared_ptr<Control> clone();
+	shared_ptr<Control> clone() const;
 	void deleteControl();
 	void mutate(float mutationRate);
 	stringstream getControlParams(); 

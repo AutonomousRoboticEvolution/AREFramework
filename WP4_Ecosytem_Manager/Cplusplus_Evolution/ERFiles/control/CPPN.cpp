@@ -152,9 +152,21 @@ void CPPN::addNeurons(float mutationRate) {
 	}
 }
 
-shared_ptr<Control> CPPN::clone() {
-	shared_ptr<Control> newANN = make_unique<CPPN>(*this);
-	newANN->makeDependenciesUnique();
+shared_ptr<Control> CPPN::clone() const {
+	shared_ptr<CPPN> newANN = make_unique<CPPN>(*this);
+	newANN->inputLayer.clear();
+	newANN->recurrentLayer.clear();
+	newANN->outputLayer.clear();
+	for (int i = 0; i < this->inputLayer.size(); i++) {
+		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+	}
+	for (int i = 0; i < this->recurrentLayer.size(); i++) {
+		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());
+	}
+	for (int i = 0; i < this->outputLayer.size(); i++) {
+		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
+	}
+	//newANN->makeDependenciesUnique();
 	return newANN;
 }
 

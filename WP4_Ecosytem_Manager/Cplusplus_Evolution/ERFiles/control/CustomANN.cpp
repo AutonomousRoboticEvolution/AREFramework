@@ -161,7 +161,7 @@ void CustomANN::mutate(float mutationRate) {
 //	changeConnectionIDToPointer();
 }
 
-shared_ptr<Control> CustomANN::clone() {
+shared_ptr<Control> CustomANN::clone() const {
 	return shared_ptr<Control>(new CustomANN(*this));
 }
 

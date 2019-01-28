@@ -12,7 +12,7 @@ public:
 	vector<float> update(vector<float>);
 	void mutate(float mutationRate); 
 	void printNeuronValues(); 
-	shared_ptr<Control> clone();
+	shared_ptr<Control> clone() const;
 	int neuronID = 0; 
 	int type = 0; 
 	void checkConnections(); 

@@ -55,7 +55,9 @@ protected:
 	struct MODULEPARAMETERS {
 		// State specific parameters
 		shared_ptr<MODULEPARAMETERS> clone() const {
-			return make_unique<MODULEPARAMETERS>(*this);
+			shared_ptr < MODULEPARAMETERS> mp = make_unique<MODULEPARAMETERS>(*this);
+			mp->control = this->control->clone();
+			return mp;
 		};
 		bool expressed = true;
 	
@@ -77,7 +79,11 @@ protected:
 
 	struct GENOTYPE {
 		shared_ptr<GENOTYPE> clone() const {
-			return make_unique<GENOTYPE>(*this);
+			shared_ptr<GENOTYPE> ug = make_unique<GENOTYPE>(*this);
+			for (int i = 0; i < this->moduleParameters.size(); i++) {
+				ug->moduleParameters[i] = this->moduleParameters[i]->clone();
+			}
+			return ug;
 		};
 		vector<shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state 
 		//HORMONEGENOME hormoneGenome;

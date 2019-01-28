@@ -83,41 +83,27 @@ void EA_SteadyState::loadPopulationGenomes(int scenenum)
 
 void EA_SteadyState::createNewGenRandomSelect() {
 	nextGenGenomes.clear();
-//	nextGenFitness.clear();
+	//	nextGenFitness.clear();
 	shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		int parent = randomNum->randInt(populationGenomes.size(), 0);
-		if (populationGenomes[parent]->fitness < 0) {
-			cout << "The dead cannot reproduce" << endl;
-			i--;
-		}
-		else {
-			//nextGenFitness.push_back(-100.0);
-			nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
-			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());
-			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
-			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
-			// artefact, use for morphological protection
-			// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
-			// cout << "..";
-			// TODO Fix crossover for direct encoding. 
-			//if (settings->morphologyType != settings->MODULAR_DIRECT) { // cannot crossover direct encoding
-			//	if (settings->crossoverRate > 0) {
-			//		int otherParent = randNum->randInt(populationGenomes.size(), 0);
-			//		while (otherParent == parent) { /* parents should always be different, this while loop makes sure of that
-			//										* Unless you want to let it mate with itself of course... */
-			//			otherParent = randNum->randInt(populationGenomes.size(), 0);
-			//		}
-			//		// crossover not working in this version
-			//		// crossoverGenerational(i, otherParent);
-			//	}
-			//}
-		}
+		cout << "Selecting parent " << parent << " with fitness " << populationGenomes[i]->fitness << " individual number is " << populationGenomes[i]->individualNumber << std::endl;
+		cout << "^ will get ind number " << i + settings->indCounter << endl;
+		
+		//nextGenFitness.push_back(-100.0);
+		nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
+		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone()); // deep copy
+		nextGenGenomes[i]->individualNumber = i + settings->indCounter;
+		nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
+		nextGenGenomes[i]->isEvaluated = false; // This should also be set, just to be sure. 
 	}
+	cout << "Mutating next gen genomes of size: " << nextGenGenomes.size() << endl;
 	mutation();
 	// saving genomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
+		// Used to debug
+		// populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
 	}
 	mfact.reset();
 }
@@ -142,7 +128,7 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 				string genomeFileName = ss.str();
 				stringstream ssp;
 				ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[p]->individualNumber << ".csv";
-				string phenotypeFileName = ssp.str();	
+				string phenotypeFileName = ssp.str();
 				//	genomeFileName << indNum << ".csv";
 				cout << "Removing " << nextGenGenomes[p]->individualNumber << endl;
 				remove(genomeFileName.c_str());
@@ -168,7 +154,7 @@ void EA_SteadyState::replaceNewRank()
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		populationGenomesBuffer.push_back(nextGenGenomes[i]);
 	}
-	
+
 	// There were some individuals that got an odd fitness value, this should not happen anymore, but just in case, added a cerr.
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		if (populationGenomesBuffer[i]->fitness > 100) {
@@ -209,7 +195,7 @@ void EA_SteadyState::replaceNewRank()
 			ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[i]->individualNumber << ".csv";
 			string phenotypeFileName = ssp.str();
 			// genomeFileName << indNum << ".csv";
-			cout << "Removing " << nextGenGenomes[i]->individualNumber << endl;
+			// cout << "Removing " << nextGenGenomes[i]->individualNumber << endl;
 			remove(genomeFileName.c_str());
 			remove(phenotypeFileName.c_str());
 		}

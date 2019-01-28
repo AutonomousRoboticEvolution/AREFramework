@@ -460,7 +460,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 		}
 	}
 
-	cppn = shared_ptr<CPPN>(new CPPN);
+	cppn = shared_ptr<Control>(new CPPN);
 	cppn->settings = settings;
 	cppn->setControlParams(cppnValues);
 
@@ -533,13 +533,15 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 shared_ptr<Morphology> ER_CPPN_Encoding::clone() const {
 	BaseMorphology::clone();
 	shared_ptr<ER_CPPN_Encoding> ur = make_unique<ER_CPPN_Encoding>(*this);
+	ur->genome = this->genome->clone();
 	for (int i = 0; i < ur->genome->moduleParameters.size(); i++) {
-		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
+		ur->genome->moduleParameters[i] = this->genome->moduleParameters[i]->clone();
 	}
-	ur->genome = ur->genome->clone();
-	shared_ptr<CPPN> cppnClone = make_unique<CPPN>(*cppn);
-	cppnClone->makeDependenciesUnique();
-	ur->cppn = cppnClone;
+	ur->cppn = this->cppn->clone();
+	//make_unique<CPPN>(this)
+	//shared_ptr<CPPN> cppnClone = make_unique<CPPN>(*cppn);
+//	cppnClone->makeDependenciesUnique();
+//	ur->cppn = cppnClone->clone();
 	return ur;
 }
 

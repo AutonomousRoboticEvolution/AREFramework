@@ -33,7 +33,7 @@ vector<float> SimpleControl::update(vector<float> sensorValues) {
 	return vector<float>();
 }
 
-shared_ptr<Control> SimpleControl::clone() {
+shared_ptr<Control> SimpleControl::clone() const {
 	
 	//return unique_ptr<SimpleControl>(new SimpleControl(const *this));
 	//return new SimpleControl(*this);

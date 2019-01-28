@@ -21,7 +21,7 @@ public:
 	int mutateControlERGenome(float mutationRate);
 	bool queried = false;
 	int maxIterations = 4;
-	shared_ptr<CPPN> cppn;
+	shared_ptr<Control> cppn;
 	void deleteModuleFromGenome(int num);
 
 	void checkControl(int individual, int sceneNum);

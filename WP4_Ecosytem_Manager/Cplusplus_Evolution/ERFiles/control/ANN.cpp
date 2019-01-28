@@ -467,23 +467,21 @@ void ANN::mutate(float mutationRate) {
 //	cout << "ANN MUTATED" << endl;
 }
 
-shared_ptr<Control> ANN::clone() {
-	shared_ptr<Control> newANN = make_unique<ANN>(*this);
-	newANN->makeDependenciesUnique();
+shared_ptr<Control> ANN::clone() const {
+	shared_ptr<ANN> newANN = make_unique<ANN>(*this);
+	newANN->inputLayer.clear();
+	newANN->recurrentLayer.clear();
+	newANN->outputLayer.clear();
+	for (int i = 0; i < this->inputLayer.size(); i++) {
+		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+	}
+	for (int i = 0; i < this->recurrentLayer.size(); i++) {
+		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());
+	}
+	for (int i = 0; i < this->outputLayer.size(); i++) {
+		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
+	}
 	return newANN;
-}
-
-void ANN::makeDependenciesUnique()
-{
-	for (int i = 0; i < inputLayer.size(); i++) {
-		inputLayer[i] = inputLayer[i]->clone();
-	}
-	for (int i = 0; i < recurrentLayer.size(); i++) {
-		recurrentLayer[i] = recurrentLayer[i]->clone();
-	}
-	for (int i = 0; i < outputLayer.size(); i++) {
-		outputLayer[i] = outputLayer[i]->clone();
-	}
 }
 
 void ANN::printNeuronValues() {

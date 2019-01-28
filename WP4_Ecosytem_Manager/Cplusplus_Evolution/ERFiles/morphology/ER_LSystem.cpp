@@ -839,11 +839,10 @@ int ER_LSystem::initializeLGenome(int type) {
 shared_ptr<Morphology> ER_LSystem::clone() const {
 	BaseMorphology::clone();
 	shared_ptr<ER_LSystem> ur = make_unique<ER_LSystem>(*this);
+	ur->lGenome = this->lGenome->clone();
 	for (int i = 0; i < ur->lGenome->lParameters.size(); i++) {
-		ur->lGenome->lParameters[i] = ur->lGenome->lParameters[i]->clone();
+		ur->lGenome->lParameters[i] = this->lGenome->lParameters[i]->clone();
 	}
-	ur->lGenome = ur->lGenome->clone();
-
 	return ur;
 }
 
