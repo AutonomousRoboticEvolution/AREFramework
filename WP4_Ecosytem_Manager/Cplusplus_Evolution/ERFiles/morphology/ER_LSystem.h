@@ -48,7 +48,9 @@ protected:
 	struct LPARAMETERS {
 		// State specific parameters
 		shared_ptr<LPARAMETERS> clone() const {
-			return make_unique<LPARAMETERS>(*this);
+			shared_ptr <LPARAMETERS> lp = make_unique<LPARAMETERS>(*this);
+			lp->control = this->control->clone();
+			return lp;
 		};
 		int currentState;		// The current state of the object
 		int newState;			// The state of the object can change in this particular state. 

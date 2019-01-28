@@ -19,8 +19,7 @@ public:
         FREE = 0,
         EVALUATING = 1,
         // RELOAD_GENOME = 9,
-        LONG_DELAY = 10,
-        DELAY = 11,
+        DELAY = 10,
     };
 
 private:

@@ -149,16 +149,9 @@ bool ClientEA::evaluatePop() {
 		// loop through all servers and send them queued individuals
 		for (auto &slave: serverInstances) {
 			SlaveConnection::State slave_client_state = slave->state();
-			if (slave->state() == SlaveConnection::State::LONG_DELAY || slave->state() == SlaveConnection::State::DELAY) { // 10 is now the delay state 
-				if (slave->state() == SlaveConnection::State::LONG_DELAY) {
-					// try again in 100 ms. 
-					extApi_sleepMs(pauseTime);
-				}
-				else if (slave->state() == SlaveConnection::State::DELAY) { // 10 is now the delay state 
-					// try again in 25 ms. 
-					extApi_sleepMs(25);
-				}
-				slave->setState(SlaveConnection::State::FREE);
+			if (slave_client_state == SlaveConnection::State::DELAY) {
+				// try again in 100 ms. 
+				extApi_sleepMs(pauseTime);
 				continue;
 			}
 

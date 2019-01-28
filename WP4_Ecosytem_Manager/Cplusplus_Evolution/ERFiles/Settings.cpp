@@ -24,7 +24,7 @@ Settings::Settings() {
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
 	morphologyType = MODULAR_DIRECT;
 	controlType = ANN_CUSTOM;
-	populationSize = 5;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
@@ -37,12 +37,12 @@ Settings::Settings() {
 	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.005;
-	mutationRate = 0.005;
+	morphMutRate = 0.04;
+	mutationRate = 0.04;
 	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
-	xGenerations = 10;
+	xGenerations = 50;
 	savePhenotype = true;
 	sendGenomeAsSignal = true;
 	shouldReopenConnections = true;

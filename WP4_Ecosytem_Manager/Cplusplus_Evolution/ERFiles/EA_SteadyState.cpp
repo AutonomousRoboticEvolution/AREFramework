@@ -87,9 +87,10 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		int parent = randomNum->randInt(populationGenomes.size(), 0);
-		cout << "Selecting parent " << parent << " with fitness " << populationGenomes[i]->fitness << " individual number is " << populationGenomes[i]->individualNumber << std::endl;
-		cout << "^ will get ind number " << i + settings->indCounter << endl;
-		
+		if (settings->verbose) {
+			std::cout << "Selecting parent " << parent << " with fitness " << populationGenomes[i]->fitness << " individual number is " << populationGenomes[i]->individualNumber << std::endl;
+			std::cout << "^ will get ind number " << i + settings->indCounter << std::endl;
+		}
 		//nextGenFitness.push_back(-100.0);
 		nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
 		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone()); // deep copy
@@ -97,13 +98,15 @@ void EA_SteadyState::createNewGenRandomSelect() {
 		nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
 		nextGenGenomes[i]->isEvaluated = false; // This should also be set, just to be sure. 
 	}
-	cout << "Mutating next gen genomes of size: " << nextGenGenomes.size() << endl;
+	if (settings->verbose) {
+		std::cout << "Mutating next gen genomes of size: " << nextGenGenomes.size() << std::endl;
+	}
 	mutation();
 	// saving genomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
 		// Used to debug
-		// populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
+		populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
 	}
 	mfact.reset();
 }
@@ -177,7 +180,7 @@ void EA_SteadyState::replaceNewRank()
 
 	// Now delete all nextGenGenomes that didn't make it in the populationGenomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		bool deleteGenome = true;
+		bool deleteGenome = false;
 		for (int j = 0; j < populationGenomes.size(); j++) { // I guess I could just compare pointers instead.
 			if (nextGenGenomes[i]->individualNumber == populationGenomes[j]->individualNumber) {
 				// this particular next genome is in the population so it doesn't need to be deleted. 
