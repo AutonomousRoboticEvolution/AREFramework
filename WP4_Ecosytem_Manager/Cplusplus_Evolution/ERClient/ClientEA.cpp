@@ -1,11 +1,11 @@
 #include "ClientEA.h"
 // #define DO_NOT_USE_SHARED_MEMORY
 
-void sendGenomeSignal(simxInt clientID, const std::string &individualGenome)
+void sendGenomeSignal(std::unique_ptr<SlaveConnection> &slave, const std::string &individualGenome)
 {
 	simxInt individualGenomeLength = individualGenome.size();
-	simxSetStringSignal(clientID, (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenomeLength, simx_opmode_blocking);
-	simxSetIntegerSignal(clientID, (simxChar*) "individualGenomeLenght", individualGenomeLength, simx_opmode_blocking);
+	slave->setStringSignal("individualGenome", individualGenome);
+	slave->setIntegerSignal("individualGenomeLenght", individualGenomeLength);
 }
 
 ClientEA::ClientEA()
@@ -14,22 +14,22 @@ ClientEA::ClientEA()
 ClientEA::~ClientEA()
 {}
 
-bool ClientEA::init(int amountPorts)
+bool ClientEA::init(int amountPorts, int startPort)
 {
 	// initialize serverInstances
 	for (int i = 0; i < amountPorts; i++) {
-		serverInstances.push_back(unique_ptr<ServerInstance>(new ServerInstance({i + 104000, -1,-1,-1 })));
-		std::cout << "Connecting to vrep on port " << serverInstances.back()->portNum << std::endl;
-		int new_connection = simxStart("127.0.0.1", serverInstances.back()->portNum, true, true, 5000, 5);
-		if (new_connection == -1) {
-			std::cerr << "Could not connect to V-REP on port " << serverInstances[serverInstances.size() - 1]->portNum << std::endl;
-			serverInstances.pop_back();// erase(serverInstances.begin() + i);
+		auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + startPort));
+		std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
+		if (new_slave->connect(5000)) {
+			// new_slave->setState(SlaveConnection::State::FREE);
+			serverInstances.push_back(std::move(new_slave));
+		} else {
+			std::cerr << "Could not connect to V-REP on port " << new_slave->port() << std::endl;
 			if (settings->killWhenNotConnected) {
 				return false;
 			}
 			continue; // jump back to beginning loop
 		}
-		serverInstances.back()->port = new_connection;
 	}
 	ea = shared_ptr<EA>(new EA_SteadyState());
 	ea->setSettings(settings, randNum);
@@ -54,28 +54,25 @@ void ClientEA::initGA() {
 
 void ClientEA::quitSimulators()
 {
-	// std::cout << "closing " << clientIDs.size() << " simulators" << std::endl;
-	// std::cout << "closing " << ports.size() << " simulators" << std::endl;
-	for (int i = 0; i < serverInstances.size(); i++) {
-		std::cout << "closing simulator " << serverInstances[i]->port << std::endl;
-		simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "simulationState", 99, simx_opmode_blocking);
-		simxFinish(serverInstances[i]->port);
+	for (auto &slave: serverInstances) {
+		std::cout << "closing simulator " << slave->port() << std::endl;
+		slave->setIntegerSignal("simulationState", 99);
+		slave->disconnect();
 	}
 }
 
 int ClientEA::finishConnections() {
-	for (int i = 0; i < serverInstances.size(); i++) {
-		simxFinish(serverInstances[i]->port);
+	for (auto &slave: serverInstances) {
+		slave->disconnect();
 	}
 	extApi_sleepMs(100);
 	return 0;
 }
 
 int ClientEA::openConnections() {
-	for (int i = 0; i < serverInstances.size(); i++) {
-		std::cout << "Reconnecting to vrep on port " << serverInstances[i]->portNum << std::endl;
-		int new_connection = simxStart("127.0.0.1", serverInstances[i]->portNum, true, true, 5000, 5);
-		serverInstances[i]->port = new_connection;
+	for (auto &slave: serverInstances) {
+		std::cout << "Reconnecting to vrep on port " << slave->port() << std::endl;
+		slave->connect(5000);
 	}
 	extApi_sleepMs(100);
 	return 0;
@@ -89,11 +86,10 @@ int ClientEA::reopenConnections() {
 
 bool ClientEA::confirmConnections() {
 	int tries = 0;
-	for (int i = 0; i < serverInstances.size(); i++) {
-		if (simxGetConnectionId(serverInstances[i]->port) == -1) {
-			std::cerr << "Client could not connect to server in port, trying again " << serverInstances[i]->port << std::endl;
+	for (auto &slave: serverInstances) {
+		if (!slave->status()) {
+			std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
 			tries++;
-			i--;
 			extApi_sleepMs(10);
 		}
 		else {
@@ -151,163 +147,83 @@ bool ClientEA::evaluatePop() {
 			return false;
 		}
 		// loop through all servers and send them queued individuals
-		for (int i = 0; i < serverInstances.size(); i++) {
-			if (settings->verbose) {
-				std::cout << "i:" << i << ",";
-			}
-			int state;
-			if (serverInstances[i]->state == 10 || serverInstances[i]->state == 11) { // 10 is now the delay state 
-				if (serverInstances[i]->state == 10) {
+		for (auto &slave: serverInstances) {
+			SlaveConnection::State slave_client_state = slave->state();
+			if (slave->state() == SlaveConnection::State::LONG_DELAY || slave->state() == SlaveConnection::State::DELAY) { // 10 is now the delay state 
+				if (slave->state() == SlaveConnection::State::LONG_DELAY) {
 					// try again in 100 ms. 
 					extApi_sleepMs(pauseTime);
-					serverInstances[i]->state = 0;
-					continue;
 				}
-				else if (serverInstances[i]->state == 11) { // 10 is now the delay state 
+				else if (slave->state() == SlaveConnection::State::DELAY) { // 10 is now the delay state 
 					// try again in 25 ms. 
 					extApi_sleepMs(25);
-					serverInstances[i]->state = 0;
-					continue;
 				}
+				slave->setState(SlaveConnection::State::FREE);
+				continue;
 			}
-			else {
-				returnValue = simxGetIntegerSignal(serverInstances[i]->port, "simulationState", &state, simx_opmode_oneshot);
-			}
-			if (settings->verbose) {
-				// Yeah sorry, if you have verbose on, this we be spammed. 
-				std::cout << "rs: " << returnValue << "," << std::endl;
-			}
-			// Some debugging code
-			if (returnValue != 0) { // 0 is ok, 1 is fine
-				// TODO: the returnValues can actually be a combination of all of the following. Not sure how to encode this. 
-				if (settings->verbose) {
-					std::cout << "Return value of simxGetIntegerSignal was " << returnValue << std::endl;
-				}
-				if (returnValue >= 3) {
-					std::cerr << "Note, the simxGetIntegerSignal function returned " << returnValue << std::endl;
-					std::cerr << "If this message persists, the client is unable to get the simulation state from vrep" << std::endl;
-					serverInstances[i]->state = 10;
-				}
-				else if (returnValue != 0) {
-					// short pause because this return value is not as bad as the others. 
-					serverInstances[i]->state = 11;
-				}
-				if (returnValue >= 8) {
-					tries++;
-				}
-				if (returnValue == 64) {
-					std::cerr << "Return value of simxGetIntegerSignal was 64, meaning that simxStart was not yet called. This was on port: " << serverInstances[i]->portNum << std::endl;
-				}
-				else if (returnValue == 32) {
-					std::cerr << "Return value of simxGetIntegerSignal was 32, meaning that there is an error no the client side???. This was on port: " << serverInstances[i]->portNum << std::endl;
-				}
-				else if (returnValue == 16) {
-					std::cerr << "The server is still processing a previous command of the same type. Don't send it again please. " << serverInstances[i]->portNum << std::endl;
-					serverInstances[i]->state = 10;
-					// It will loop through all the other server instances first and then start communicating with the faulty one again. 
-				}
-				else if (returnValue == 8) {
-					std::cerr << "The simxGetIntegerSignal cause an error on the server side... I guess I should kill this damn server?" << std::endl;
-					std::cerr << "For now, I'll try to get a message again after a brief pause." << std::endl;
-					serverInstances[i]->state = 10;
-				}
-				else if (returnValue == 4) {
-					std::cerr << "The operation mode for receiving the signal is not supported??? simxGetIntegerSignal is the culprit. Probably linux related issue " << std::endl;
-				}
-				else if (returnValue == 2) {
-					std::cerr << "simxGetIntegerSignal was 8, time out of function at node " << serverInstances[i]->portNum << std::endl;
-					std::cerr << "Trying to receive the signal again in 100 ms" << std::endl;
-					serverInstances[i]->state = 10;
-				}
-				if (tries > 100) {
-					pauseTime = 250;
-				}
-				else {
-					pauseTime = 25;
-				}
-			}
+
+			int	state = slave->getIntegerSignal("simulationState");
 
 			if (state == 9) {
 				extApi_sleepMs(20);
-				std::cout << "It seems that server in port " << serverInstances[i]->port << " could not load the genome. Sending it again. (" << serverInstances[i]->individualNum << ")" << std::endl;
-				//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
-				returnValue = simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "individual", serverInstances[i]->individualNum, simx_opmode_oneshot);
+				std::cout << "It seems that server in port " << slave->port() << " could not load the genome. Sending it again. (" << slave->individualNum() << ")" << std::endl;
+				//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_blocking);
+				slave->setIntegerSignal("individual", slave->individualNum());
 				if (settings->verbose) {
 					std::cout << "returnV ind 9: " << returnValue << std::endl;
 				}
-				returnValue = simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "simulationState", 1, simx_opmode_blocking); 
+				slave->setIntegerSignal("simulationState", 1); 
 				if (settings->verbose) {
 					std::cout << "returnV state 9: " << returnValue << std::endl;
 				}
 				tries++;
 			}
-			if (state == 0 && serverInstances[i]->state == 0 && queuedInds.size() > 0) {
+			if (state == 0 && slave->state() == SlaveConnection::State::FREE && queuedInds.size() > 0) {
 				// state 0 means that the client can send a new individual to the server. 
 				// the individual number of the serverInstance is set to the last queued individual and the vector is popped. 
 				
 				int ind = queuedInds.back();
 				queuedInds.pop_back(); 
-				serverInstances[i]->individual = ind;
+				slave->setIndividual(ind);
 
 				// now set the number in order to load the file properly.
-				int indNum = -1;
-				indNum = ea->nextGenGenomes[ind]->individualNumber;
-				serverInstances[i]->individualNum = indNum;
+				int indNum = ea->nextGenGenomes[ind]->individualNumber;
+				slave->setIndividualNum(indNum);
 
 				// tell simulator to start evaluating genome
 				if (settings->sendGenomeAsSignal) {
 					const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
-					sendGenomeSignal(serverInstances[i]->port, individualGenome);
+					sendGenomeSignal(slave, individualGenome);
 				}
-				returnValue = simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "individual", indNum, simx_opmode_oneshot);
-				if (settings->verbose) {
-					std::cout << "returnV ind: " << returnValue << std::endl;
-				}
-
-				returnValue = simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "simulationState", 1, simx_opmode_blocking);
-				if (settings->verbose) {
-					std::cout << "returnV state set: " << returnValue << std::endl;
-				}
-
-				serverInstances[i]->state = 1;
-				std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << i << std::endl;
+				slave->setIntegerSignal("individual", indNum);
+				slave->setIntegerSignal("simulationState", 1);
+				slave->setState(SlaveConnection::State::EVALUATING);
+				std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
 			}
-			else if (state == 2 && serverInstances[i]->state == 1)
+			else if (state == 2 && slave->state() == SlaveConnection::State::EVALUATING)
 			{
 				// This combination signifies that an individual has been evaluated
 				// First retrieve values. (phenValue is not used in this case but will be used in near future experiments
-				float fitness;
-				float phenValue;
-				returnValue = simxGetFloatSignal(serverInstances[i]->port, "phenValue", &phenValue, simx_opmode_oneshot);
-				if (settings->verbose) {
-					std::cout << "returnV phen: " << returnValue << std::endl;
-				}
-
-				returnValue = simxGetFloatSignal(serverInstances[i]->port, "fitness", &fitness, simx_opmode_blocking);
-				std::cout << "The fitness of individual " << serverInstances[i]->individualNum << " is " << fitness << std::endl;
-				if (settings->verbose) {
-					std::cout << "returnV fit: " << returnValue << std::endl;
-				}
-
+				float phenValue = slave->getFloatSignal("phenValue");
+				float fitness = slave->getFloatSignal("fitness");
+				std::cout << "The fitness of individual " << slave->individualNum() << " is " << fitness << std::endl;
 
 				// set the individual fitness in the ea :: TODO: set phenotype value as well
 				// Make a buffer vector for nextGenGenome and don't switch between the two like I do now. 
-				ea->nextGenGenomes[serverInstances[i]->individual]->fitness = fitness;
+				ea->nextGenGenomes[slave->individual()]->fitness = fitness;
 				
 				// set the simulation state back to 0 so this v-rep instance can receive another genome. 
-				returnValue = simxSetIntegerSignal(serverInstances[i]->port, (simxChar*) "simulationState", 0, simx_opmode_blocking);
-				if (settings->verbose) {
-					std::cout << "returnV state done : " << returnValue << std::endl;
-				}
+				slave->setIntegerSignal("simulationState", 0);
 
 				// set the genome evaluation to true
-				ea->nextGenGenomes[serverInstances[i]->individual]->isEvaluated = true;
+				ea->nextGenGenomes[slave->individual()]->isEvaluated = true;
 
 				// Reset the individual numbers 
-				serverInstances[i]->individual = -1;
-				serverInstances[i]->individualNum = -1;
-				serverInstances[i]->state = 0;
+				slave->setIndividual(-1);
+				slave->setIndividualNum(-1);
+				slave->setState(SlaveConnection::State::FREE);
 			}
+
 			// if all individual have been evaluated, break the while loop. 
 			for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
 				if (ea->nextGenGenomes[z]->isEvaluated == false) {
@@ -338,6 +254,3 @@ bool ClientEA::evaluatePop() {
 	settings->saveSettings();
 	return true;
 }
-
-
-

@@ -5,6 +5,7 @@ find_package(Threads REQUIRED)
 set(SOURCES
     ClientEA.cpp
     ERClient.cpp
+    SlaveConnection.cpp
     "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/remoteApi/extApi.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/remoteApi/extApiPlatform.c"
     "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/common/shared_memory.c"
