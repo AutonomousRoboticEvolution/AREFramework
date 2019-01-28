@@ -76,8 +76,8 @@ void EA_SteadyState::loadPopulationGenomes(int scenenum)
 	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
 		std::cout << "loading individual " << popIndNumbers[i] << std::endl;
-		nextGenGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
-		nextGenGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
+		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
+		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
 	}
 }
 
@@ -153,59 +153,53 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 	cout << "REPLACED POP" << endl;
 }
 
-struct indFit {
-	float fitness;
-	int ind;
-};
-
-bool compareByFitness(const shared_ptr<indFit> a, const shared_ptr<indFit> b)
+bool compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Genome> b)
 {
 	return a->fitness > b->fitness;
 }
 
 void EA_SteadyState::replaceNewRank()
 {
-	// create one big population. 
-	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		populationGenomes.push_back(nextGenGenomes[i]);
-	}
-	// sort population on fitness
-	vector<shared_ptr<indFit>> fitnesses;
-
+	vector<shared_ptr<Genome>> populationGenomesBuffer;
+	// create one big population. Just store the pointers in the buffer. 
 	for (int i = 0; i < populationGenomes.size(); i++) {
-		fitnesses.push_back(shared_ptr<indFit>(new indFit));
-		if (populationGenomes[i]->fitness > 10) {
-			std::cout << "ERROR: The fitness wasn't set correctly" << std::endl;
-			fitnesses[i] = 0;
-		}
-		else {
-			fitnesses[i]->fitness = populationGenomes[i]->fitness;
-		}
-		fitnesses[i]->ind = populationGenomes[i]->individualNumber; // not individual number!
+		populationGenomesBuffer.push_back(populationGenomes[i]);
+	}
+	for (int i = 0; i < nextGenGenomes.size(); i++) {
+		populationGenomesBuffer.push_back(nextGenGenomes[i]);
 	}
 	
-	std::sort(fitnesses.begin(), fitnesses.end(), compareByFitness);
-
-	// remove all individuals on the bottom of the list. 
-	for (int i = settings->populationSize; i < fitnesses.size(); i++) {
-		for (int j = 0; j < populationGenomes.size(); j++) {
-			if (fitnesses[i]->ind == populationGenomes[j]->individualNumber) {
-				populationGenomes[j].reset(); // all objects within class should be deleted since they are smart pointers. 
-				populationGenomes.erase(populationGenomes.begin() + j);
-				break;
-			}
+	// There were some individuals that got an odd fitness value, this should not happen anymore, but just in case, added a cerr.
+	for (int i = 0; i < populationGenomes.size(); i++) {
+		if (populationGenomesBuffer[i]->fitness > 100) {
+			std::cerr << "ERROR: Note that the fitness wasn't set correctly. Giving individual " << populationGenomes[i]->individualNumber << " a fitness of 0" << std::endl;
+			populationGenomesBuffer[i]->fitness = 0;
 		}
 	}
 
-	// remove next gen files that didn't make it. 
+	// sort population on fitness
+	std::sort(populationGenomesBuffer.begin(), populationGenomesBuffer.end(), compareByFitness);
+
+	// remove all individuals on the bottom of the list. 
+	while (populationGenomesBuffer.size() > populationGenomes.size()) {
+		populationGenomesBuffer.pop_back(); 
+	}
+
+	// The buffer can now replace the existing populationGenomes
+	populationGenomes = populationGenomesBuffer;  
+	// ^ This swap should kill all objects no referenced to anymore. Without smart pointers this looks dangerous as hell. 
+
+	// Now delete all nextGenGenomes that didn't make it in the populationGenomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		bool deleteGenome = true;
-		for (int j = 0; j < populationGenomes.size(); j++) {
+		for (int j = 0; j < populationGenomes.size(); j++) { // I guess I could just compare pointers instead.
 			if (nextGenGenomes[i]->individualNumber == populationGenomes[j]->individualNumber) {
+				// this particular next genome is in the population so it doesn't need to be deleted. 
 				deleteGenome = false;
 				break;
 			}
 		}
+		// if the if statement in the previous look was never true, the genome will now be deleted. 
 		if (deleteGenome == true) {
 			// delete genome file
 			stringstream ss;
@@ -214,12 +208,12 @@ void EA_SteadyState::replaceNewRank()
 			stringstream ssp;
 			ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[i]->individualNumber << ".csv";
 			string phenotypeFileName = ssp.str();
-			//	genomeFileName << indNum << ".csv";
+			// genomeFileName << indNum << ".csv";
 			cout << "Removing " << nextGenGenomes[i]->individualNumber << endl;
 			remove(genomeFileName.c_str());
 			remove(phenotypeFileName.c_str());
 		}
 	}
-
+	populationGenomesBuffer.clear();
 	cout << "REPLACED POP RANKED" << endl;
 }
