@@ -162,7 +162,20 @@ void CustomANN::mutate(float mutationRate) {
 }
 
 shared_ptr<Control> CustomANN::clone() const {
-	return shared_ptr<Control>(new CustomANN(*this));
+	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);
+	newANN->inputLayer.clear();
+	newANN->recurrentLayer.clear();
+	newANN->outputLayer.clear();
+	for (int i = 0; i < this->inputLayer.size(); i++) {
+		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+	}
+	for (int i = 0; i < this->recurrentLayer.size(); i++) {
+		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());
+	}
+	for (int i = 0; i < this->outputLayer.size(); i++) {
+		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
+	}
+	return newANN;
 }
 
 void CustomANN::printNeuronValues() {
