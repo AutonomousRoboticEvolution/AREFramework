@@ -106,7 +106,7 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
 		// Used to debug
-		populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
+		// populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
 	}
 	mfact.reset();
 }
@@ -180,7 +180,7 @@ void EA_SteadyState::replaceNewRank()
 
 	// Now delete all nextGenGenomes that didn't make it in the populationGenomes
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		bool deleteGenome = false;
+		bool deleteGenome = true;
 		for (int j = 0; j < populationGenomes.size(); j++) { // I guess I could just compare pointers instead.
 			if (nextGenGenomes[i]->individualNumber == populationGenomes[j]->individualNumber) {
 				// this particular next genome is in the population so it doesn't need to be deleted. 
