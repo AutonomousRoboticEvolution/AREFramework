@@ -21,6 +21,9 @@ void PatternNeuron::setFloatParameters(vector<float> values) {
 
 void PatternNeuron::init(int id) {
 	neuronID = id;
+	amplitude = randomNum->randFloat(-1.0, 1.0);
+	frequency = randomNum->randFloat(-1.0, 1.0);
+	phase = randomNum->randFloat(-1.0, 1.0);
 }
 void PatternNeuron::update() {
 //	if (usePhaseControl && !useAngularFreqControl && !useAmplitudeControl) {

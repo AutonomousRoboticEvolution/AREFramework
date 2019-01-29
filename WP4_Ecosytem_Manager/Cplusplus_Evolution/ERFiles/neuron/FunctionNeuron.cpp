@@ -119,6 +119,8 @@ FunctionNeuron::~FunctionNeuron() {
 void FunctionNeuron::init(int id) {
 	neuronID = id;
 	function_type = randomNum->randInt(14, 0);
+	m_a = randomNum->randFloat(-1.0, 1.0);
+	m_b = randomNum->randFloat(-1.0, 1.0);
 }
 
 void FunctionNeuron::update() {
@@ -150,10 +152,32 @@ void FunctionNeuron::mutate(float mutationRate) {
 		function_type = randomNum->randInt(functionRange, 0);
 	}
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-		m_a += randomNum->randFloat(-1.0 * sigma, 1.0 * sigma);
+		if (randomNum->randFloat(0.0, 1.0) > 0.5) {
+			m_a += randomNum->randFloat(-1.0 * sigma, 1.0 * sigma);
+		}
+		else {
+			m_a += randomNum->randFloat(-1.0, 1.0);
+		}
 	}
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-		m_b += randomNum->randFloat(-1.0 * sigma, 1.0 * sigma);
+		if (randomNum->randFloat(0.0, 1.0) > 0.5) { // local uniform based on sigma
+			m_b += randomNum->randFloat(-1.0 * sigma, 1.0 * sigma);
+		}
+		else { // random
+			m_b += randomNum->randFloat(-1.0, 1.0);
+		}
+	}
+	if (m_a > 1.0) {
+		m_a = 1.0;
+	}
+	else if (m_a < -1.0) {
+		m_a = -1.0;
+	}
+	if (m_b > 1.0) {
+		m_b = 1.0;
+	}
+	else if (m_b < -1.0) {
+		m_b = -1.0;
 	}
 	Neuron::mutate(mutationRate);
 }
