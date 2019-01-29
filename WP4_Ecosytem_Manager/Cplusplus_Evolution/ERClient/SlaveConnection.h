@@ -31,10 +31,11 @@ private:
     State _state;
 
 public:
-    explicit SlaveConnection(const std::string& address, int port);
+	explicit SlaveConnection(const std::string& address, int port);
     SlaveConnection(const SlaveConnection &other);
     SlaveConnection(SlaveConnection &&other);
     virtual ~SlaveConnection();
+	int timeOutReconnectAttempt = 0;
 
     bool connect(int connectionTimeoutMs = CONNECTION_TIMEOUT);
     bool connect(const std::string& address, int port, int connectionTimeoutMs = CONNECTION_TIMEOUT);
@@ -48,7 +49,7 @@ public:
      */
     simxInt getIntegerSignalStreaming(const std::string& signalName, unsigned short msInterval = 0) const;
     /**
-     * @throws VrepRemoteException(1) if there is no value to read in the buffer
+     * @returns -1 if there is no value to read in the buffer
      */
     simxInt getIntegerSignalBuffer(const std::string& signalName) const;
     void setIntegerSignal(const std::string& signalName, simxInt state);

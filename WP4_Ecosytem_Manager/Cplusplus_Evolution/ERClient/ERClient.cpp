@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
 		srand(0);
 	}
 
-	extApi_sleepMs(20000); // wait 20 seconds before connecting to ports, gives v-rep time to start up.
+	extApi_sleepMs(2000); // wait 20 seconds before connecting to ports, gives v-rep time to start up.
 	//cout << "settings read" << endl;
 	if (arguments.size() > 2) {
 		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;

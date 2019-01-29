@@ -9,8 +9,20 @@ extern "C" {
 
 void checkReturnValue(simxInt returnValue)
 {
-    if (returnValue == simx_return_ok) return;
-    throw VrepRemoteException(returnValue);
+	if (returnValue == simx_return_ok) {
+		return;
+	}
+	else if (returnValue == simx_return_timeout_flag) {
+		// Time-out happens, try again (Something is going on in the server)
+		extApi_sleepMs(100);
+		return;
+	}
+	else if (returnValue == simx_return_novalue_flag) {
+		// This is fine. 
+		extApi_sleepMs(10);
+		return; 
+	}
+	throw VrepRemoteException(returnValue);
 }
 
 SlaveConnection::SlaveConnection(const std::string& address, int port)
@@ -94,8 +106,8 @@ simxInt SlaveConnection::getIntegerSignal(const std::string& signalName) const
 {
     simxInt states[1];
     checkReturnValue(
-        simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking)
-    );
+		simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking)
+	);
     return states[0];
 }
 
@@ -109,7 +121,8 @@ simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName
                 (simxChar*) signalName.c_str(),
                 states,
                 simx_opmode_streaming + msInterval
-        ));
+        )
+		);
     } catch (const VrepRemoteException &e) {
         if (e.returnValue & simx_return_novalue_flag) {
             // this is to be expected for streaming mode
@@ -124,10 +137,10 @@ simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName
 simxInt SlaveConnection::getIntegerSignalBuffer(const std::string& signalName) const
 {
     simxInt states[1];
-    checkReturnValue(
+	checkReturnValue(
         simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_buffer)
     );
-    return states[0];
+	return states[0];
 }
 
 void SlaveConnection::setIntegerSignal(const std::string& signalName, simxInt state)

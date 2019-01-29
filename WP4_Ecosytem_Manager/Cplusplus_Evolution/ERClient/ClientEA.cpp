@@ -158,17 +158,19 @@ bool ClientEA::evaluatePop() {
 			}
 
 			int state;
-			try {
-				state = slave->getIntegerSignalBuffer("simulationState");
-			} catch (const VrepRemoteException &e) {
-				if (e.returnValue & simx_return_novalue_flag) {
-					// buffer not yet ready, continue
-					continue;
-				} else {
-					// something else happened, re-throw.
-					throw;
-				}
-			}
+			state = slave->getIntegerSignalBuffer("simulationState");
+
+			//try {
+			// state = slave->getIntegerSignalBuffer("simulationState");
+			//} catch (const VrepRemoteException &e) {
+			//	if (e.returnValue & simx_return_novalue_flag) {
+			//		// buffer not yet ready, continue
+			//		// continue;
+			//	} else {
+			//		// something else happened, re-throw.
+			//		throw;
+			//	}
+			//}
 
 			if (state == 9) {
 				extApi_sleepMs(20);
