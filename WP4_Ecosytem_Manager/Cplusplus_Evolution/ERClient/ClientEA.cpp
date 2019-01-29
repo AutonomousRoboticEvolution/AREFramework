@@ -157,7 +157,18 @@ bool ClientEA::evaluatePop() {
 				continue;
 			}
 
-			int	state = slave->getIntegerSignalBuffer("simulationState");
+			int state;
+			try {
+				state = slave->getIntegerSignalBuffer("simulationState");
+			} catch (const VrepRemoteException &e) {
+				if (e.returnValue & simx_return_novalue_flag) {
+					// buffer not yet ready, continue
+					continue;
+				} else {
+					// something else happened, re-throw.
+					throw;
+				}
+			}
 
 			if (state == 9) {
 				extApi_sleepMs(20);
@@ -218,16 +229,16 @@ bool ClientEA::evaluatePop() {
 				slave->setIndividualNum(-1);
 				slave->setState(SlaveConnection::State::FREE);
 			}
+		} /* end connections loop */
 
-			// if all individual have been evaluated, break the while loop. 
-			for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
-				if (ea->nextGenGenomes[z]->isEvaluated == false) {
-					doneEvaluating = false;
-					break;
-				}
-				else {
-					doneEvaluating = true; 
-				}
+		// if all individual have been evaluated, break the while loop. 
+		for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
+			if (ea->nextGenGenomes[z]->isEvaluated == false) {
+				doneEvaluating = false;
+				break;
+			}
+			else {
+				doneEvaluating = true; 
 			}
 		}
 	}

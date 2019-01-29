@@ -99,13 +99,17 @@ simxInt SlaveConnection::getIntegerSignal(const std::string& signalName) const
     return states[0];
 }
 
-simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName) const
+simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName, unsigned short msInterval) const
 {
     simxInt states[1];
     try {
         checkReturnValue(
-            simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_streaming)
-        );
+            simxGetIntegerSignal(
+                this->_clientID,
+                (simxChar*) signalName.c_str(),
+                states,
+                simx_opmode_streaming + msInterval
+        ));
     } catch (const VrepRemoteException &e) {
         if (e.returnValue & simx_return_novalue_flag) {
             // this is to be expected for streaming mode

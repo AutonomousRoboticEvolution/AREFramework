@@ -42,7 +42,14 @@ public:
     void disconnect();
     bool reconnect();
     simxInt getIntegerSignal(const std::string& signalName) const;
-    simxInt getIntegerSignalStreaming(const std::string& signalName) const;
+    /**
+     * Starts the buffer reading of `signalName`
+     * @param msinterval [0-65535] - interval of ms when to execute the command and save to buffer.
+     */
+    simxInt getIntegerSignalStreaming(const std::string& signalName, unsigned short msInterval = 0) const;
+    /**
+     * @returns -1 if there is no value to read in the buffer
+     */
     simxInt getIntegerSignalBuffer(const std::string& signalName) const;
     void setIntegerSignal(const std::string& signalName, simxInt state);
     simxFloat getFloatSignal(const std::string& signalName) const;
