@@ -48,7 +48,7 @@ public:
      */
     simxInt getIntegerSignalStreaming(const std::string& signalName, unsigned short msInterval = 0) const;
     /**
-     * @returns -1 if there is no value to read in the buffer
+     * @throws VrepRemoteException(1) if there is no value to read in the buffer
      */
     simxInt getIntegerSignalBuffer(const std::string& signalName) const;
     void setIntegerSignal(const std::string& signalName, simxInt state);
