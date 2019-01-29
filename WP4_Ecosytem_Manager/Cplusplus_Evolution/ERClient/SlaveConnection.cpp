@@ -19,8 +19,11 @@ void checkReturnValue(simxInt returnValue)
 	}
 	else if (returnValue == simx_return_novalue_flag) {
 		// This is fine. 
-		extApi_sleepMs(10);
+		extApi_sleepMs(20);
 		return; 
+	}
+	else if (returnValue <= 8) {
+		extApi_sleepMs(100);
 	}
 	throw VrepRemoteException(returnValue);
 }

@@ -122,9 +122,9 @@ int main(int argc, char* argv[])
 			break;
 		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-		client->settings->saveSettings();
+		//client->settings->saveSettings(); // IS IN EVALUATEPOP
 		if (client->settings->verbose) {
-
+			std::cout << "Just saved settings <right aftel evaluate pop>" << endl;
 		}
 		if (client->settings->generation % client->settings->xGenerations == 0 && client->settings->generation!=0) {
 			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 
 	extApi_sleepMs(5000);
 	client->quitSimulators();
-	extApi_sleepMs(5000);
+	extApi_sleepMs(8000);
 	std::cout << "Client done, shutting down" << std::endl;
 	return 0;
 }

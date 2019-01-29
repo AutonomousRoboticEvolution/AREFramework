@@ -92,7 +92,7 @@ bool ClientEA::confirmConnections() {
 		if (!slave->status()) {
 			std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
 			tries++;
-			extApi_sleepMs(10);
+			extApi_sleepMs(20);
 		}
 		else {
 			continue;
@@ -249,6 +249,9 @@ bool ClientEA::evaluatePop() {
 	}
 	ea->replacement();
 	ea->savePopFitness(settings->generation);
+	if (settings->verbose) {
+		std::cout << "Just saved pop fitness " << std::endl;
+	}
 	// save settings after replacement. 
 	if (settings->indNumbers.size() < 1) {
 		settings->indNumbers.resize(ea->populationGenomes.size());
@@ -259,6 +262,9 @@ bool ClientEA::evaluatePop() {
 		settings->indFits[i] = ea->populationGenomes[i]->fitness;
 	}
 	//settings->indFits = ea->popFitness;
+	if (settings->verbose) {
+		std::cout << "Just before saving settings " << std::endl;
+	}
 	settings->saveSettings();
 	return true;
 }

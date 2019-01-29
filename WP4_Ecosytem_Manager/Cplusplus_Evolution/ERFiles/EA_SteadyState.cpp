@@ -93,7 +93,13 @@ void EA_SteadyState::createNewGenRandomSelect() {
 		}
 		//nextGenFitness.push_back(-100.0);
 		nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
+		if (settings->verbose) {
+			std::cout << "About to deep copy genome" << endl;
+		}
 		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone()); // deep copy
+		if (settings->verbose) {
+			std::cout << "Done with deep copy genome" << endl;
+		}
 		nextGenGenomes[i]->individualNumber = i + settings->indCounter;
 		nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
 		nextGenGenomes[i]->isEvaluated = false; // This should also be set, just to be sure. 
