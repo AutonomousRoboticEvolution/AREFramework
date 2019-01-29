@@ -22,6 +22,7 @@ bool ClientEA::init(int amountPorts, int startPort)
 		std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
 		if (new_slave->connect(5000)) {
 			// new_slave->setState(SlaveConnection::State::FREE);
+			new_slave->getIntegerSignalStreaming("simulationState");
 			serverInstances.push_back(std::move(new_slave));
 		} else {
 			std::cerr << "Could not connect to V-REP on port " << new_slave->port() << std::endl;
@@ -73,6 +74,7 @@ int ClientEA::openConnections() {
 	for (auto &slave: serverInstances) {
 		std::cout << "Reconnecting to vrep on port " << slave->port() << std::endl;
 		slave->connect(5000);
+		slave->getIntegerSignalStreaming("simulationState");
 	}
 	extApi_sleepMs(100);
 	return 0;
@@ -155,7 +157,7 @@ bool ClientEA::evaluatePop() {
 				continue;
 			}
 
-			int	state = slave->getIntegerSignal("simulationState");
+			int	state = slave->getIntegerSignalBuffer("simulationState");
 
 			if (state == 9) {
 				extApi_sleepMs(20);

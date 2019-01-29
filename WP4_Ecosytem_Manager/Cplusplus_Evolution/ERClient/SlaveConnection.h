@@ -42,6 +42,8 @@ public:
     void disconnect();
     bool reconnect();
     simxInt getIntegerSignal(const std::string& signalName) const;
+    simxInt getIntegerSignalStreaming(const std::string& signalName) const;
+    simxInt getIntegerSignalBuffer(const std::string& signalName) const;
     void setIntegerSignal(const std::string& signalName, simxInt state);
     simxFloat getFloatSignal(const std::string& signalName) const;
     void setFloatSignal(const std::string& signalName, simxFloat state);
