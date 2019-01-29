@@ -61,7 +61,7 @@ protected:
 		vector<int> childStates; // -1 = no child able
 		int childObjectType; // cube, light-Sensor, sphere
 		int childConnectType; // joint, force sensor
-		int maxChilds; 
+		// int maxChilds; //
 
 		vector<int> attachmentSites;
 		vector<int> attachmentObjects; // corresponds to the object number used to identify a specific object within a state. 0 is the default parent. 
@@ -79,7 +79,11 @@ protected:
 
 	struct LGENOME {
 		shared_ptr<LGENOME> clone() const {
-			return make_unique<LGENOME>(*this);
+			shared_ptr<LGENOME> lg = make_unique<LGENOME>(*this);
+			for (int i = 0; i < this->lParameters.size(); i++) {
+				lg->lParameters[i] = this->lParameters[i]->clone();
+			}
+			return lg;
 		};
 		int amountStates = 5;
 		int maxAmountStates = 10;

@@ -180,7 +180,7 @@ vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis
 		}
 	}
 	if (mirrored.size() != 2) {
-		cout << "ERROR: Mirror mutation not done properly" << endl;
+		cerr << "ERROR: Mirror mutation not be done properly" << endl;
 	}
 	return mirrored;
 }

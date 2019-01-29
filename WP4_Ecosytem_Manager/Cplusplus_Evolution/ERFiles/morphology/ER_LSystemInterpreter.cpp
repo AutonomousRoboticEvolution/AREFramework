@@ -38,16 +38,24 @@ void ER_LSystemInterpreter::printSome() {
 }
 
 void ER_LSystemInterpreter::incrementLSystem() {
-//	cout << "Incrementing" << endl;
+	if (settings->verbose) {
+		std::cout << "Incrementing L-System" << std::endl;
+	}
 	int length_i = createdModules.size();
 //	cout << "length_i = " << length_i << endl; 
 	for (int i = 0; i < length_i; i++) {
 		if (createdModules[i]->handled != true) {
 			createdModules[i]->handled = true;
-			//	cout << "handling module " << i << endl; 
+			if (createdModules.size() >= settings->maxAmountModules) {
+				break;
+			}
+			// cout << "handling module " << i << endl; 
+			// So in the direct encoding I can set the parent site. 
+			// In the L-System however, the parent site contains the information of the children. 
 			vector<int> tempFreeSites;
 			int t_state = createdModules[i]->state; // temp save state
 		//	cout << "t_state = " << t_state << endl; 
+			// I think I used tempFreeSites so things can grow...
 			tempFreeSites = createdModules[i]->getFreeSites(lGenome->lParameters[t_state]->childSites);
 			//	cout << "childSites.length = " << lGenome->lParameters[t_state]->childSites.size() << endl;
 			//	cout << "Amount Free Sites: " << tempFreeSites.size() << endl; 
@@ -56,16 +64,22 @@ void ER_LSystemInterpreter::incrementLSystem() {
 			//	cout << "created module free sites: " << createdModules[i]->freeSites.size() << endl;
 			int newChildAmount = 0;
 			for (int j = 0; j < tempFreeSites.size(); j++) { // should never be more then free sites of module
+				if (createdModules.size() >= settings->maxAmountModules) {
+					break;
+				}
 				for (int k = 0; k < lGenome->lParameters[t_state]->childSites.size(); k++) {
+					if (createdModules.size() >= settings->maxAmountModules) {
+						break;
+					}
 					if (lGenome->lParameters[t_state]->childSites.size() != lGenome->lParameters[t_state]->childSiteStates.size()) {
-						cout << "ERROR: childSiteStates not correct length" << endl;
-						cout << "childSite length = " << lGenome->lParameters[t_state]->childSites.size() << endl;
-						cout << "childSiteStates length = " << lGenome->lParameters[t_state]->childSiteStates.size() << endl;
+						std::cerr << "ERROR: childSiteStates not correct length" << std::endl;
+						std::cerr << "childSite length = " << lGenome->lParameters[t_state]->childSites.size() << std::endl;
+						std::cerr << "childSiteStates length = " << lGenome->lParameters[t_state]->childSiteStates.size() << std::endl;
 					}
 					int childSiteState = lGenome->lParameters[t_state]->childSiteStates[k];
 //					int childType = lGenome->lParameters[childSiteState]->type;
 					int childType = modules[childSiteState]->type;
-					int maxMs = 100;
+					int maxMs = 100; // this is set so it cannot try to create more than 100 modules. TODO: should be defined elsewhere
 					for (int s = 0; s < settings->maxModuleTypes.size(); s++) {
 						if (settings->maxModuleTypes[s][0] == childType) {
 							maxMs = settings->maxModuleTypes[s][1];
@@ -92,6 +106,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 								}
 							}
 							if (par == false) {
+								std::cerr << "The L-system encountered a problem with not being able to find the parent handle" << std::endl;
 								break;
 							}
 			
@@ -245,9 +260,10 @@ bool ER_LSystemInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vecto
 			// checks if collision with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
 			// don't delete this function!
 			//if (createdModules[0]->type == 8) {
-				if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
-					return true;
-				}
+			// ^ TO young Frank, I did delete the function. You could have told me why I shouldn't delete it.  
+			//	if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
+			//		return true;
+			//	}
 			//}
 		}
 	}
@@ -373,7 +389,6 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->childSites.push_back(4);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
 			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();*/
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else if (i == 1) {
 			modules.push_back(mf->createModuleGenome(1, randomNum, settings));
@@ -391,7 +406,6 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			//			lGenome->lParameters[i]->childSites.push_back(2);
 			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
 			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->maxChilds = 3;
 		}
 		else if (i == 2) {
 			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
@@ -399,7 +413,6 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 			lGenome->lParameters[i]->childSites.push_back(3);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
 			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->maxChilds = 3;
 		}
 		else if (i == 3) {
 			modules.push_back(mf->createModuleGenome(11, randomNum, settings));
@@ -411,11 +424,9 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 		}
 		else if (i == 4) {
 			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else {
 			modules.push_back(mf->createModuleGenome(4, randomNum, settings));
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		modules[i]->state = i;
 		modules[i]->moduleColor[0] = lGenome->lParameters[i]->color[0];
@@ -515,7 +526,6 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 			lGenome->lParameters[i]->childSites.push_back(4);
 			lGenome->lParameters[i]->childSiteStates.push_back(1);
 			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();*/
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else if (i == 1) {
 			modules.push_back(moduleFactory->createModuleGenome(10, randomNum, settings));
@@ -528,7 +538,6 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 			//	lGenome->lParameters[i]->childSites.push_back(1);
 			//	lGenome->lParameters[i]->childSiteStates.push_back(3);
 			//	lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->maxChilds = 3;
 		}
 		else if (i == 2) {
 			modules.push_back(moduleFactory->createModuleGenome(10, randomNum, settings));
@@ -544,15 +553,12 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 			lGenome->lParameters[i]->childSites.push_back(0);
 			lGenome->lParameters[i]->childSiteStates.push_back(3);
 			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->maxChilds = 0;
 		}
 		else if (i == 4) {
 			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		else {
 			modules.push_back(moduleFactory->createModuleGenome(4, randomNum, settings));
-			lGenome->lParameters[i]->maxChilds = 5;
 		}
 		lGenome->lParameters[i]->currentState = i;
 		modules[i]->moduleColor[0] = lGenome->lParameters[i]->color[0];
@@ -1108,7 +1114,7 @@ void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
 				int chosenSite = lGenome->lParameters[i]->childSites[chosenOne];
 				int chosenCon = lGenome->lParameters[i]->childConfigurations[chosenOne];
 				int chosenState = lGenome->lParameters[i]->childSiteStates[chosenOne];
-				int newPos = randomNum->randInt(lGenome->lParameters[i]->maxChilds, 0);
+				int newPos = randomNum->randInt(getMaxChilds(lGenome->lParameters[i]->type), 0);
 
 				if (newPos >= amountChilds) {
 					lGenome->lParameters[i]->childSites.push_back(mirrorSite[0]);
