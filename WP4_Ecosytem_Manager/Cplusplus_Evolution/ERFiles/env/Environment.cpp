@@ -16,7 +16,7 @@ void Environment::sceneLoader() {
 
 void Environment::init() {
 	envObjectHandles.clear(); // every time the environment is created, it removes all objects and creates them again
-	simLoadScene("scenes\\DefaultERLight.ttt");
+	simLoadScene("scenes/DefaultERLight.ttt");
 
 	//	simLoadScene("scenes/Cat_Scene2.ttt");
 
