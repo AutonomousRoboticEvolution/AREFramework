@@ -37,8 +37,8 @@ Settings::Settings() {
 	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.04;
-	mutationRate = 0.04;
+	morphMutRate = 0.004;
+	mutationRate = 0.004;
 	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;

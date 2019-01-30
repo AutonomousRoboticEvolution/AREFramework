@@ -158,6 +158,15 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
+			else if (arg2_param_i == 8) {
+				ER->simSet = RECALLBESTFROMGENOME; // should specify genome file as arg3, TODO
+				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+			}
+			else if (arg2_param_i == 7) {
+				ER->simSet = RECALLBEST;
+				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+			}
 			else if (arg2_param_i == 1)
 			{
 				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
@@ -239,13 +248,21 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			initCall = false;
 			counter = 0;
 			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
-				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER) {
+				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER
+				&& atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 7) {
 				simStartSimulation();
 
 			}
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
 			}
+			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 8) { // load specific genotype
+
+			}
+			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 7) { // load specific phenotype
+
+			}
+
 		}
 		//	}
 		int signal[1] = { 0 };

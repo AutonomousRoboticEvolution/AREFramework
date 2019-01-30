@@ -70,19 +70,36 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 {
 	ostringstream genomeFileName;
 
-	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	std::cout << "Loading genome" << genomeFileName.str() << std::endl;
-	ifstream genomeFile(genomeFileName.str());
-	if (!genomeFile) {
-		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
-		return false;
-//		std::exit(1);
-	}
+	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
+		genomeFileName << settings->repository + "/morphologies" << sceneNum << "/phenotype" << individualNumber << ".csv";
+		std::cout << "Loading phenotype" << genomeFileName.str() << std::endl;
+		ifstream genomeFile(genomeFileName.str());
+		if (!genomeFile) {
+			std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+			return false;
+			//		std::exit(1);
+		}
+		bool load = this->loadGenome(genomeFile, individualNumber);
+		return load;
+		genomeFile.close();
 
-	bool load = this->loadGenome(genomeFile, individualNumber);
+	}
+	else {
+		genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
+		std::cout << "Loading genome" << genomeFileName.str() << std::endl;
+		ifstream genomeFile(genomeFileName.str());
+		if (!genomeFile) {
+			std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+			return false;
+			//		std::exit(1);
+		}
+		bool load = this->loadGenome(genomeFile, individualNumber);
+		return load;
+		genomeFile.close();
+
+	}
 	
-	genomeFile.close();
-	return load;
+
 }
 
 bool Development::loadGenome(std::istream &input, int individualNumber)

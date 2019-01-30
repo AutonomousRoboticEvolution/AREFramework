@@ -143,6 +143,10 @@ void ER_VREP::startOfSimulation(){
 			currentGenome->create();
 			currentMorphology = currentGenome->morph;
 		}
+
+		else if (simSet == RECALLBESTFROMGENOME) {
+			// to do 
+		}
 	}
 	currentMorphology->setPhenValue();
 }
