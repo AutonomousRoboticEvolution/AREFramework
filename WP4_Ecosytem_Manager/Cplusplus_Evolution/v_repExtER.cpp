@@ -248,9 +248,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 		}
 		//	}
-		int signal = 0;
-		int retVal = simGetIntegerSignal((simChar*) "simulationState", &signal);
-		if (signal == 99) {
+		int signal[1] = { 0 };
+		int retVal = simGetIntegerSignal((simChar*) "simulationState", signal);
+		if (signal[0] == 99) {
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
 		}
@@ -265,22 +265,26 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				// printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
 				timeElapsed = (double)(clock() - tStart) / CLOCKS_PER_SEC;
 				if (timeElapsed > 300) {
-					std::cout << "Didn't receive a signal for 5 minutes. Shutting down server" << std::endl;
+					std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
 					simQuitSimulator(true);
 				}
 			}
 
 			// wait until command is received
-			if (signal == 1) {
+			if (signal[0] == 1) {
 				timerOn = false;
 				simSetIntegerSignal((simChar*) "simulationState", 8);
-				int sceneNumber = 0;
-				int individual = 0;
+				int sceneNumber[1] = { 0 };
+				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
 
-				simGetIntegerSignal((simChar*) "individual", &individual);
-				if (ER->loadIndividual(individual) == false) {
+				simGetIntegerSignal((simChar*) "individual", individual);
+				if (ER->loadIndividual(individual[0]) == false) {
+					if (ER->settings->verbose) {
+						std::cout << "Server here, I could not load the specified individual: " << individual[0] << std::endl;
+						std::cout << "My signal was " << signal[0] << std::endl;
+					}
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
 				}
 				else {
