@@ -791,12 +791,38 @@ void ER_LSystem::symmetryMutation(float mutationRate) {
 	cout << "This version does not support symmetry mutation, check code" << endl;
 }
 
+int ER_LSystem::getNewSite(int maxCh, int currentSite, vector<int> sites) {
+	if (maxCh == sites.size()) {
+		// all other sites are occupied, so the site cannot be changed. 
+		return currentSite;
+	}
+	int newSite = -1;
+	bool uniqueSite = false;
+	while (uniqueSite == false) {
+		// will never exit the loop until a unique site is found. 
+		newSite = randomNum->randInt(maxCh, 0);
+		uniqueSite = true; // if the site is not unique, it will be set by the next for loop.
+		for (int i = 0; i < sites.size(); i++) {
+			if (sites[i] == newSite) {
+				// this site is already taken so try again
+				uniqueSite = false;
+				break;
+			}
+		}
+
+	}
+	return newSite;
+}
+
 int ER_LSystem::mutateERLGenome(float mutationRate) {
 	if (settings->verbose) {
-		cout << "Mutating L-Genome" << endl;
+		std::cout << "Mutating L-Genome" << std::endl;
 	}
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		// mutate the controller. 
+		if (!lGenome->lParameters[i]->control) {
+			std::cerr << "control = null? Check ER_LSystem.cpp" << std::endl;
+		}
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
 
 		// Resize the rules (Potentially very destructive) 
@@ -806,44 +832,88 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 			if (maxCh != 0) {
 				int newChildSize = randomNum->randInt(maxCh, 0);
 				if (settings->verbose) {
-					cout << "newChildSize = " << newChildSize << endl;
+					std::cout << "newChildSize = " << newChildSize << std::endl;
+					std::cout << "site vector size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
 				}
-				if (childSize < newChildSize) {
-					lGenome->lParameters[i]->childSites.resize(newChildSize);
-					lGenome->lParameters[i]->childSiteStates.resize(newChildSize);
-					lGenome->lParameters[i]->childConfigurations.resize(newChildSize);
-					for (int j = childSize; j < newChildSize; j++) {
-						//		cout << "j = " << j << endl; 
-						lGenome->lParameters[i]->childSites[j] = randomNum->randInt(maxCh, 0);
-						lGenome->lParameters[i]->childSiteStates[j] = randomNum->randInt(lGenome->amountStates, 0);
-						lGenome->lParameters[i]->childConfigurations[j] = randomNum->randInt(4, 0); // 4 sites
+				while (lGenome->lParameters[i]->childSites.size() < newChildSize) {
+					if (settings->verbose) {
+						std::cout << "while" << std::endl;
 					}
+					// TODO make another object containing child site, state and orientation. Struct?
+					vector<int> sitebuffer = lGenome->lParameters[i]->childSites;
+					lGenome->lParameters[i]->childSites.push_back(getNewSite(maxCh, -1, sitebuffer));
+					lGenome->lParameters[i]->childSiteStates.push_back(randomNum->randInt(lGenome->amountStates, 0));
+					lGenome->lParameters[i]->childConfigurations.push_back(randomNum->randInt(4,0));
+					// old code, not working
+					//lGenome->lParameters[i]->childSites.resize(newChildSize);
+					//lGenome->lParameters[i]->childSiteStates.resize(newChildSize);
+					//lGenome->lParameters[i]->childConfigurations.resize(newChildSize);
+					//for (int j = childSize; j < newChildSize; j++) {
+						//		cout << "j = " << j << endl; 
+					//	lGenome->lParameters[i]->childSites[j] = getNewSite(maxCh, -1, lGenome->lParameters[i]->childSites); // -1 because there is no site yet.
+					//	lGenome->lParameters[i]->childSiteStates[j] = randomNum->randInt(lGenome->amountStates, 0); // random state
+					//	lGenome->lParameters[i]->childConfigurations[j] = randomNum->randInt(4, 0); // 4 sites
+					//}
 				}
 				if (settings->verbose) {
-					cout << "size = " << lGenome->lParameters[i]->childSites.size() << endl;
+					std::cout << "size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
 				}
-				else if (childSize > newChildSize) {
+				else if (lGenome->lParameters[i]->childSites.size() > newChildSize) {
+					if (settings->verbose) {
+						std::cout << "erasing" << std::endl;
+					}
 					while (lGenome->lParameters[i]->childSites.size() > newChildSize) { // now removes random site
 						int rSite = randomNum->randInt(lGenome->lParameters[i]->childSites.size(), 0);
 						lGenome->lParameters[i]->childSites.erase(lGenome->lParameters[i]->childSites.begin() + rSite);
-						lGenome->lParameters[i]->childSiteStates.erase(lGenome->lParameters[i]->childSites.begin() + rSite);
-						lGenome->lParameters[i]->childConfigurations.erase(lGenome->lParameters[i]->childSites.begin() + rSite);
+						lGenome->lParameters[i]->childSiteStates.erase(lGenome->lParameters[i]->childSiteStates.begin() + rSite);
+						lGenome->lParameters[i]->childConfigurations.erase(lGenome->lParameters[i]->childConfigurations.begin() + rSite);
 					}
 				}
 			}
 			if (settings->verbose) {
-				cout << "size = " << lGenome->lParameters[i]->childSites.size() << endl;
+				std::cout << "size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
 			}
 			// mutate the sites
 			for (int j = 0; j < lGenome->lParameters[i]->childSites.size(); j++) {
 				if (settings->verbose) {
-					cout << "j = " << j << endl;
+					std::cout << "j = " << j << std::endl;
 				}
 				if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // change child configuration and state at random
 					if (maxCh != 0) {
-						lGenome->lParameters[i]->childSites[j] = (randomNum->randInt(maxCh,0));
-						lGenome->lParameters[i]->childSiteStates[j] = (randomNum->randInt(lGenome->amountStates,0));
-						lGenome->lParameters[i]->childConfigurations[j] = (randomNum->randInt(4, 0));
+						if (settings->verbose) {
+							std::cout << "randomizing" << std::endl;
+						}
+						lGenome->lParameters[i]->childSites[j] = getNewSite(maxCh, lGenome->lParameters[i]->childSites[j], lGenome->lParameters[i]->childSites);
+						lGenome->lParameters[i]->childSiteStates[j] = randomNum->randInt(lGenome->amountStates,0);
+						lGenome->lParameters[i]->childConfigurations[j] = randomNum->randInt(4, 0);
+					}
+				}
+				if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // swap sites
+					if (maxCh >= 2) {
+						int swapCandidate = randomNum->randInt(lGenome->lParameters[i]->childSites.size(), 0);
+						if (j != swapCandidate) { 
+							if (settings->verbose) {
+								std::cout << "swapping" << std::endl;
+							}
+							// Guys, I know, there is a way more efficient way to do this. Trust me, I know, it will be done soon. s
+							int siteSwapCandidateBuffer = lGenome->lParameters[i]->childSites[swapCandidate];
+							int stateSwapCandidateBuffer = lGenome->lParameters[i]->childSiteStates[swapCandidate];
+							int configurationSwapCandidateBuffer = lGenome->lParameters[i]->childConfigurations[swapCandidate];
+							if (settings->verbose) {
+								std::cout << "changing candidate" << std::endl;
+							}
+							// change swapCandidate
+							lGenome->lParameters[i]->childSites[swapCandidate] = lGenome->lParameters[i]->childSites[j];
+							lGenome->lParameters[i]->childSiteStates[swapCandidate] = lGenome->lParameters[i]->childSiteStates[j];
+							lGenome->lParameters[i]->childConfigurations[swapCandidate] = lGenome->lParameters[i]->childConfigurations[j];
+							if (settings->verbose) {
+								std::cout << "changing j" << std::endl;
+							}
+							// change j for swapCandidate using buffer. 
+							lGenome->lParameters[i]->childSites[j] = siteSwapCandidateBuffer;
+							lGenome->lParameters[i]->childSiteStates[j] = stateSwapCandidateBuffer;
+							lGenome->lParameters[i]->childConfigurations[j] = configurationSwapCandidateBuffer;
+						}
 					}
 				}
 			}

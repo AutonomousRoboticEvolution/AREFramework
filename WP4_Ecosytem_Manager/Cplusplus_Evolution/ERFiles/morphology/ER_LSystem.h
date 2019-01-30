@@ -32,7 +32,9 @@ public:
 	virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
 	bool loadGenome(std::istream &input, int individualNumber);
-	void symmetryMutation(float mutationRate); 
+	void symmetryMutation(float mutationRate);
+	int getNewSite(int maxCh, int currentSite, vector<int> sites);
+
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 protected:
 	enum OBJECTTYPE {
