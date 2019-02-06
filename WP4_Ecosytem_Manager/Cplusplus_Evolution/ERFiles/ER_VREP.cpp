@@ -1,6 +1,10 @@
+/**
+	@file ER_VREP.cpp
+	@brief ER_REP manages the communication between the server and the client.
+*/
+
 
 #include "ER_VREP.h"
-
 //#include <afxwin.h> ;
 //***************************************************************************************//
 ER_VREP::ER_VREP(){
@@ -10,47 +14,15 @@ ER_VREP::~ER_VREP(){
 
 }
 
-/**
- 	@brief Initializes ER as a server to accept genomes from client.
- */
-void ER_VREP::initializeServer() {
-	// create the environment
-	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
-	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
-	// EA is not present on the server anymore. Genomes are directly loaded in ER
-	// unique_ptr<EA_Factory> eaf(new EA_Factory);
-	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
-	// ea->randomNum = randNum;
-	// ea->settings = settings;
-	// ea->init();
-	// initNewGenome(settings, 0);
-	//ea->initializePopulation(settings, false);
-	environment->init();
-	// eaf.reset();
-
-}
-
-
-void ER_VREP::initializeSimulation() {
-	// simSet = RECALLBEST;
-	// set env
-	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
-	genomeFactory->randomNum = randNum;
-	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
-	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
-	unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
-	ea->randomNum = randNum;
-	ea->init();
-	// ea->initializePopulation(settings, false);
-	environment->init();
-	eaf.reset();
-
-}
-
+// This method reads the instanceType member from settings class.
+// According to its value ER initializes as a server or as server-client.
 void ER_VREP::initialize() {
+	// TODO: Check with FV if this is the correct description
+	/* initialize the settings class; it will read a settings file or it
+	 * will use default parameters if it cannot read a settings file.
+	 * A random number class will also be created and all other files
+	 * refer to this class.
+	 */
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
 		cout << "Regular Evolution" << endl;
@@ -70,6 +42,47 @@ void ER_VREP::initialize() {
 	//simSet = RECALLBEST;
 }
 
+// Initializes ER as a server to accept genomes from client.
+void ER_VREP::initializeServer() {
+	// create the environment
+	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+	environment = environmentFactory->createNewEnvironment(settings);
+	environmentFactory.reset();
+	// EA is not present on the server anymore. Genomes are directly loaded in ER
+	// unique_ptr<EA_Factory> eaf(new EA_Factory);
+	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
+	// ea->randomNum = randNum;
+	// ea->settings = settings;
+	// ea->init();
+	// initNewGenome(settings, 0);
+	//ea->initializePopulation(settings, false);
+	environment->init();
+	// eaf.reset();
+
+}
+
+// This method instatiates genome factory, enviroment and EA.
+// Also the settings for the enviroment and EA are loaded.
+// Finally, this method initializes EA and environment.
+void ER_VREP::initializeSimulation() {
+	// simSet = RECALLBEST;
+	// set env
+	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
+	genomeFactory->randomNum = randNum;
+	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+	environment = environmentFactory->createNewEnvironment(settings);
+	environmentFactory.reset();
+	unique_ptr<EA_Factory> eaf(new EA_Factory);
+	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
+	ea->randomNum = randNum;
+	ea->init();
+	// ea->initializePopulation(settings, false);
+	environment->init();
+	eaf.reset();
+
+}
+
+// Initializes ER as a server to accept genomes from client. If framework is server than just hold information for one genome. Else, initilizes the first population of individuals.
 void ER_VREP::startOfSimulation(){
 
 	/* When V-REP starts, this function is called. Depending on the settings,
@@ -140,14 +153,9 @@ void ER_VREP::startOfSimulation(){
 	currentMorphology->setPhenValue();
 }
 
+// This function is called every simulation step. Note that the behavior of the robot drastically changes when slowing down the simulation since this function will be called more often. All simulated individuals will be updated until the maximum simulation time, as specified in the environment class, is reached.
 void ER_VREP::handleSimulation() {
 
-	/* This function is called every simulation step. Note that the behavior of
-	* the robot drastically changes when slowing down the simulation since this
-	* function will be called more often. All simulated individuals will be
-	* updated until the maximum simulation time, as specified in the environment
-	* class, is reached.
-	*/
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		simStopSimulation();
 		return;
@@ -264,10 +272,8 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph) {
 
 }
 
+// At the end of the simulation the fitness value of the simulated individual is retrieved and stored in the appropriate files.
 void ER_VREP::endOfSimulation(){
-	/* At the end of the simulation the fitness value of the simulated individual
-	* is retrieved and stored in the appropriate files.
-	*/
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
 	}
@@ -346,16 +352,7 @@ shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 	return shared_ptr<Morphology>();
 }
 
-bool ER_VREP::loadIndividual(int individualNum) {
-	cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
-	currentGenome = genomeFactory->createGenome(0, randNum, settings);
-	bool load = currentGenome->loadGenome(individualNum, settings->sceneNum);
-	currentGenome->individualNumber = individualNum;
-	cout << "loaded" << endl;
-	return load;
-}
-
-
+// Log information about the fitness of each individual, best individual and list of individuals.
 void ER_VREP::saveSettings(){
 	cout << "saving" << endl;
 	settings->generation = generation;
@@ -382,6 +379,17 @@ void ER_VREP::saveSettings(){
 	cout << "Settings saved" << endl;
 }
 
+// Loads specific individual.
+bool ER_VREP::loadIndividual(int individualNum) {
+	cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
+	currentGenome = genomeFactory->createGenome(0, randNum, settings);
+	bool load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+	currentGenome->individualNumber = individualNum;
+	cout << "loaded" << endl;
+	return load;
+}
+
+// Loads the best individual of a specific scene.
 void ER_VREP::loadBestIndividualGenome(int sceneNum)
 {
 	vector<int> individuals;
