@@ -85,13 +85,13 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-		CUSTOM_MODULAR_MORPHOLOGY = 6, // not working 
+		CUSTOM_MODULAR_MORPHOLOGY = 6, // not working
 		QUADRUPED_GENERATIVE = 7, // head missing
-		QUADRUPED_DIRECT = 8, // not working. 
+		QUADRUPED_DIRECT = 8, // not working.
 		CUSTOM_SOLAR_GENERATIVE = 9,
 		EDGARSAMAZINGMORPHOLOGY = 10,
 		MODULAR_PHENOTYPE = 11,
-	
+
 	};
 
 	enum ControlType {
@@ -185,9 +185,10 @@ public:
 	float energyDissipationRate = 0.00;
 	int lIncrements = 3;
 	int bestIndividual = 0;
+	/// Output info 
 	bool verbose = false;
 	Colorization colorization = COLOR_NEURALNETWORK;
-	
+
 	// neural network parameters
 	int initialInputNeurons = 3;
 	int initialInterNeurons = 1;
@@ -210,7 +211,7 @@ public:
 	// SETTERS
 	void setRepository(std::string repository)
 	{
-		this->repository = repository; 
+		this->repository = repository;
 		std::cout << "setting repository to " << repository << std::endl;
 	}
 

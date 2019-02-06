@@ -73,7 +73,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 #elif defined (__APPLE__)
 	temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
-  
+
 	vrepLib = loadVrepLibrary(temp.c_str());
 	if (vrepLib == NULL)
 	{
@@ -173,10 +173,10 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		}
 
 		//! sceneNum and seed will not be utilized from the settings file anymore
-		//! TODO: Check with Frank: why lines 151 and 176 are the same?
+		//! TODO: Check with Frank: why lines 151 and 177 are the same?
 		ER->settings->sceneNum = run;
 		ER->settings->seed = run;
-		ER->randNum = shared_ptr<RandNum>(new RandNum(run));
+		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number
 
 		// Actual initialization of ER
 		ER->initialize();
@@ -186,7 +186,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		}
 	}
 	int signal[1] = { 0 };
-	simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //TODO: Check with Frank: set the signal back to vrep??
 	//cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
 	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)

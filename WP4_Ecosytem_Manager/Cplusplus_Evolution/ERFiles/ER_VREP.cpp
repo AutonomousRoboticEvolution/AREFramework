@@ -10,10 +10,8 @@ ER_VREP::~ER_VREP(){
 
 }
 
-
-/*!
- * Initializes ER as a server to accept genomes from client. 
- * 
+/**
+ 	@brief Initializes ER as a server to accept genomes from client.
  */
 void ER_VREP::initializeServer() {
 	// create the environment
@@ -53,11 +51,6 @@ void ER_VREP::initializeSimulation() {
 }
 
 void ER_VREP::initialize() {
-	/* initialize the settings class; it will read a settings file or it 
-	 * will use default parameters if it cannot read a settings file. 
-	 * A random number class will also be created and all other files
-	 * refer to this class. 
-	 */
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
 		cout << "Regular Evolution" << endl;
@@ -78,7 +71,7 @@ void ER_VREP::initialize() {
 }
 
 void ER_VREP::startOfSimulation(){
-	
+
 	/* When V-REP starts, this function is called. Depending on the settings,
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.
@@ -92,26 +85,26 @@ void ER_VREP::startOfSimulation(){
 
 	// set the random seed
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
-	
+
 	// old code snippet to be removed after evaluation:
 	// environment->initialPos.clear();
 	// environment->init();
-	
+
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		// If the simulation is a server. It just holds information for one genome for now. 
+		// If the simulation is a server. It just holds information for one genome for now.
 		// currentGenome should be created, double check
 		currentGenome->create();
 		// OLD CODE:
-		// ea->newGenome->create(); 
-		// new genome should be initialized through api command. 
+		// ea->newGenome->create();
+		// new genome should be initialized through api command.
 		currentMorphology = currentGenome->morph;
 	}
 	else {
-		if (simSet != RECALLBEST) { 
+		if (simSet != RECALLBEST) {
 			if (settings->verbose) {
 				cout << "Creating Individual " << settings->indCounter << endl;
 			}
-			if (settings->indCounter < ea->populationGenomes.size()) {		
+			if (settings->indCounter < ea->populationGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->populationGenomes[currentInd]->init();
@@ -148,7 +141,7 @@ void ER_VREP::startOfSimulation(){
 }
 
 void ER_VREP::handleSimulation() {
-	
+
 	/* This function is called every simulation step. Note that the behavior of
 	* the robot drastically changes when slowing down the simulation since this
 	* function will be called more often. All simulated individuals will be
@@ -267,13 +260,13 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph) {
 		}
 
 		return fitness;
-	
+
 
 }
 
 void ER_VREP::endOfSimulation(){
 	/* At the end of the simulation the fitness value of the simulated individual
-	* is retrieved and stored in the appropriate files. 
+	* is retrieved and stored in the appropriate files.
 	*/
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
@@ -337,7 +330,7 @@ void ER_VREP::endOfSimulation(){
 			cout << "fitness = " << fitness << endl;
 			cout << "-----------------------------------" << endl;
 		}
-		
+
 		// following uncommented code was necessary when V-REP itself contained a memory leak.
 		// if (newGenerations == settings->xGenerations) { // close v-rep every x generations
 		//	string lightName = "Light"; // +to_string(sceneNum);
@@ -443,4 +436,3 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	currentGenome->init();	//	cout << "loading" << endl;
 	currentGenome->loadMorphologyGenome(bestInd, settings->sceneNum);
 }
-
