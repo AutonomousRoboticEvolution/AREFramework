@@ -83,6 +83,7 @@ void ER_VREP::initializeSimulation() {
 }
 
 // Initializes ER as a server to accept genomes from client. If framework is server than just hold information for one genome. Else, initilizes the first population of individuals.
+//Ask Frank: Create only one genome?
 void ER_VREP::startOfSimulation(){
 
 	/* When V-REP starts, this function is called. Depending on the settings,
@@ -162,6 +163,8 @@ void ER_VREP::handleSimulation() {
 	}
 	simulationTime += simGetSimulationTimeStep();
 	environment->updateEnv(currentMorphology);
+
+	//Ask Frank: Is this if-else redundant
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		currentGenome->update();
 		if (simGetSimulationTime() > environment->maxTime) {
@@ -281,7 +284,7 @@ void ER_VREP::endOfSimulation(){
 		float fitness = environment->fitnessFunction(currentMorphology);
 		// Environment independent fitness function:
 		// float fitness = fit->fitnessFunction(currentMorphology);
-		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm. Not sure how it work
 		cout << "fitness = " << fitness << endl;
 		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
 		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection

@@ -41,13 +41,13 @@ public:
 	unique_ptr<EA> ea; // can be changed to another ea. Factory pattern?
 
 	void saveSettings();
-	void initialize();
-	void initializeSimulation(); 
+	void initialize();  //Is it used?
+	void initializeSimulation();
 
 	// parameters
 	int currentInd = 0;
 	int generation = 0;
-	int newGenerations = 0; 
+	int newGenerations = 0;
 	bool _initialize = true;
 
 	void loadIndividual(int individualNum, int sceneNum);

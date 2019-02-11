@@ -19,7 +19,7 @@ public:
 	/**
 		@brief This method reads the instanceType member from settings class. According to its value ER initializes as a server or as server-client.
 	*/
-	void initialize();
+	void initialize();  //Check with Frank: is the same function used in CER class?? What is the difference between server or server-client?
 
 	/**
 		@brief This method Instatiates genome factory, enviroment and EA. Also settings for the enviroment and EA are loaded. Finally, this method initializes EA and environment.
@@ -51,16 +51,25 @@ public:
 	*/
 	void endOfSimulation();
 
+	/**
+		@brief Calculate the fitness value of the robot
+		@param morph The pointer of the robot morphology
+	*/
 	float fitnessFunction(MorphologyPointer morph);
 
+	///mark the simulation time step
 	float simulationTime = 0;
+	///Pointer to the Environment class
 	shared_ptr<Environment> environment;
 
 	// To keep track of the position of the robot
 	string mainHandleName;
 	shared_ptr<Morphology> currentMorphology;
 
-
+	/**
+		@brief Get the morphology reference
+		@param g the reference of the Genome
+	*/
 	shared_ptr<Morphology> getMorphology(Genome* g);
 
 	shared_ptr<EA> ea;
