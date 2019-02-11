@@ -46,7 +46,7 @@ void EA_SteadyState::replacement()
 	if (nextGenGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
 		//replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
-		replaceNewRank(); 
+		replaceNewRank();
 	}
 }
 
@@ -77,11 +77,11 @@ void EA_SteadyState::selectIndividuals()
 {
 }
 
+/// random check if individual is better and put it in the population
 void EA_SteadyState::replaceNewIndividual(int indNum, int sceneNum, float fitness) {
-	// random check if individual is better and put it in the population
 	int ind = rand() % populationGenomes.size();
 	if (fitness >= populationGenomes[ind]->fitness) {
-		populationGenomes[ind] = nextGenGenomes[indNum]->clone();
+		populationGenomes[ind] = nextGenGenomes[indNum]->clone();  //Check with Frank: comment on this line
 	}
 };
 
@@ -119,12 +119,12 @@ void EA_SteadyState::createNewGenRandomSelect() {
 			//nextGenFitness.push_back(-100.0);
 			nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
 			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
-			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());
-			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero. 
+			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());  //why copy?
+			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero.
 			// artefact, use for morphological protection
 			// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
 			// cout << "..";
-			// TODO Fix crossover for direct encoding. 
+			// TODO Fix crossover for direct encoding.
 			//if (settings->morphologyType != settings->MODULAR_DIRECT) { // cannot crossover direct encoding
 			//	if (settings->crossoverRate > 0) {
 			//		int otherParent = randNum->randInt(populationGenomes.size(), 0);
@@ -170,14 +170,14 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 				//popIndNumbers[currentInd] = nextGenGenomes[p]->individualNumber;
 				break;
 			}
-			else if (n == (numAttempts - 1)) {
+			else if (n == (numAttempts - 1)) {  //Check with Frank: correct?
 				// delete genome file
 				stringstream ss;
 				ss << settings->repository + "/morphologies" << settings->sceneNum << "/genome" << nextGenGenomes[p]->individualNumber << ".csv";
 				string genomeFileName = ss.str();
 				stringstream ssp;
 				ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << nextGenGenomes[p]->individualNumber << ".csv";
-				string phenotypeFileName = ssp.str();	
+				string phenotypeFileName = ssp.str();
 				//	genomeFileName << indNum << ".csv";
 				cout << "Removing " << nextGenGenomes[p]->individualNumber << endl;
 				remove(genomeFileName.c_str());
@@ -188,6 +188,7 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 	cout << "REPLACED POP" << endl;
 }
 
+///Put in the header file??
 struct indFit {
 	float fitness;
 	int ind;
@@ -200,7 +201,7 @@ bool compareByFitness(const shared_ptr<indFit> a, const shared_ptr<indFit> b)
 
 void EA_SteadyState::replaceNewRank()
 {
-	// create one big population. 
+	// create one big population.
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		populationGenomes.push_back(nextGenGenomes[i]);
 	}
@@ -218,21 +219,21 @@ void EA_SteadyState::replaceNewRank()
 		}
 		fitnesses[i]->ind = populationGenomes[i]->individualNumber; // not individual number!
 	}
-	
+
 	std::sort(fitnesses.begin(), fitnesses.end(), compareByFitness);
 
-	// remove all individuals on the bottom of the list. 
+	// remove all individuals on the bottom of the list.
 	for (int i = settings->populationSize; i < fitnesses.size(); i++) {
 		for (int j = 0; j < populationGenomes.size(); j++) {
 			if (fitnesses[i]->ind == populationGenomes[j]->individualNumber) {
-				populationGenomes[j].reset(); // all objects within class should be deleted since they are smart pointers. 
+				populationGenomes[j].reset(); // all objects within class should be deleted since they are smart pointers.
 				populationGenomes.erase(populationGenomes.begin() + j);
 				break;
 			}
 		}
 	}
 
-	// remove next gen files that didn't make it. 
+	// remove next gen files that didn't make it.
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		bool deleteGenome = true;
 		for (int j = 0; j < populationGenomes.size(); j++) {

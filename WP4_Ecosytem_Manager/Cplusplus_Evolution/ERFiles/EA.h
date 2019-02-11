@@ -16,9 +16,10 @@ public:
 	shared_ptr<RandNum> randomNum;
 	unique_ptr<GenomeFactory> gf;
 
-	// population storage
+	/// container of current population genomes
 	vector<shared_ptr<Genome>> populationGenomes;
-	vector<shared_ptr<Genome>> nextGenGenomes; // creating the next generation
+	/// container of next generation genomes
+	vector<shared_ptr<Genome>> nextGenGenomes;
 
 	// storage vectors
 	// This genome will be evaluated so needs to be assigned
@@ -29,34 +30,60 @@ public:
 	vector<int> popNextIndNumbers;
 
 
-	// base functions of EA
+	/**
+		@brief This method initilizes setting for EA and random number generator seed
+	*/
 	void setSettings(shared_ptr<Settings> st, shared_ptr<RandNum> rn);
-
+	/**
+		@brief This method sets the fitness value of an individual
+	*/
 	void setFitness(int individual, float fitness);
 
-	// Initialization
+	/**
+		@brief This method initilizes a population of genomes
+	*/
 	virtual void init() = 0;
-	// Selection operator
-	virtual void selection() = 0; 
-	// Replacement operator
-	virtual void replacement() = 0; 
-	// Mutation operator
+	/**
+		@brief Selection operator
+	*/
+	virtual void selection() = 0;
+	/**
+		@brief Replacement operator
+	*/
+	virtual void replacement() = 0;
+	/**
+		@brief Mutation operator
+	*/
 	virtual void mutation() = 0;
-	
-	// Creates the individual in VREP
+	/**
+		@brief Creates the individual in VREP
+		@param indNum the ID of the individual
+	*/
 	void createIndividual(int indNum);
-
-
-	
-	// Load an individual	
+	/**
+		@brief Load an individual
+		@param individualNum the ID of the individual
+		@param sceneNum ID of environment scene?
+	*/
 	void loadIndividual(int individualNum, int sceneNum);
-	// Save the population fitness values
+	/**
+		@brief Save the population fitness values
+		@param generation: current generation
+		@param vector<float> popfit a vector of fitness value
+	*/
 	void savePopFitness(int generation, vector<float> popfit);
-	// Alternative function
+	/**
+		@brief Save the population fitness values
+		@param generation: current generation
+	*/
 	void savePopFitness(int generation);
-	// Load the best individual based on the evolutionary progression document. Make sure sceneNum is correct.
+	/**
+		@brief Load the best individual based on the evolutionary progression documen
+		@param sceneNum: ID of environment scene
+	*/
 	void loadBestIndividualGenome(int sceneNum);
-	// To continue evolution
+	/**
+		@brief Load all the population genomes?
+	*/
 	void loadPopulationGenomes();
 };
-

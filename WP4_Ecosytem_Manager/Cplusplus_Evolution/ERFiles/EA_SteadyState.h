@@ -10,23 +10,27 @@ public:
 
 	void split_line(string & line, string delim, list<string>& values);
 
-	
+
 	// base functions of EA
 	void init();
 	void selection();
 	void replacement();
 	void mutation();
 
-	// unique functions
+	/**
+		@brief This method initilizes a population of genomes
+	*/
 	void initializePopulation();
-	void selectIndividuals(); // random tournament
-	void replaceIndividuals(); // random
+	void selectIndividuals(); // random tournament, empty function?
+	void replaceIndividuals(); // random empty function?
 	void replaceNewIndividual(int indNum, int sceneNum, float fitness);
-	
+
+	/**
+		@brief This method creates a new morphology base on a randomly selected parent (copy)
+	*/
 	void createNewGenRandomSelect();
-	
+
 	void replaceNewPopRandom(int numAttempts);
 	void replaceNewRank();
 	void loadPopulationGenomes(int scenenum);
 };
-
