@@ -22,7 +22,7 @@ Settings::Settings() {
 	maxModuleTypes[0][1] = 100; // one base module
 	maxAmountModules = 20;
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_DIRECT;
+	morphologyType = TISSUE_DIRECT;
 	controlType = ANN_CUSTOM;
 	populationSize = 20;
 	energyDissipationRate = 0.0;
@@ -43,10 +43,11 @@ Settings::Settings() {
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	xGenerations = 50;
-	savePhenotype = true;
+	savePhenotype = false;
 	sendGenomeAsSignal = true;
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;
+	colorization = COLOR_LSYSTEM;
 }
 
 Settings::~Settings() {

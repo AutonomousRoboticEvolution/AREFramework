@@ -10,7 +10,8 @@
 #include "CAT.h"
 #include "ER_DirectEncoding.h"
 #include "CustomMorphology.h"
-#include "EdgarsAmazingMorphologyClass.h"
+#include "Tissue_DirectBars.h"
+#include "Tissue_GMX.h"
 #include "ER_CPPN_Encoding.h"
 
 

@@ -74,14 +74,20 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
 		morph->settings = st;
 		return morph;
 	}
-	case 10: {
-		shared_ptr<Morphology> morph(new EdgarsAmazingMorphologyClass);
+	case 11: {
+		shared_ptr<Morphology> morph(new ER_DirectEncoding);
 		morph->randomNum = rn;
 		morph->settings = st;
 		return morph;
 	}
-	case 11: {
-		shared_ptr<Morphology> morph(new ER_DirectEncoding);
+	case 20: {
+		shared_ptr<Morphology> morph(new Tissue_DirectBars);
+		morph->randomNum = rn;
+		morph->settings = st;
+		return morph;
+	}
+	case 21: {
+		shared_ptr<Morphology> morph(new Tissue_GMX);
 		morph->randomNum = rn;
 		morph->settings = st;
 		return morph;

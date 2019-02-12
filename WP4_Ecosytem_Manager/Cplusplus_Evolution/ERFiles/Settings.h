@@ -90,6 +90,8 @@ public:
 		QUADRUPED_DIRECT = 8, // not working. 
 		CUSTOM_SOLAR_GENERATIVE = 9,
 		EDGARSAMAZINGMORPHOLOGY = 10,
+		TISSUE_DIRECT = 20,
+		TISSUE_GMX = 21,
 		MODULAR_PHENOTYPE = 11,
 	
 	};
@@ -185,6 +187,7 @@ public:
 	float energyDissipationRate = 0.00;
 	int lIncrements = 3;
 	int bestIndividual = 0;
+	int loadInd = 0;
 	bool verbose = false;
 	Colorization colorization = COLOR_NEURALNETWORK;
 	

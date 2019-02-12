@@ -769,7 +769,7 @@ void ER_LSystemInterpreter::update() {
 	if (createdModules.size() < 2) {
 		simStopSimulation();
 	}
-	updateColors();
+	//updateColors();
 	checkForceSensors(); 
 }
 

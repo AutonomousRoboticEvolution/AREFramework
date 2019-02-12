@@ -9,7 +9,8 @@
 #include "v_repLib.h"
 #include "MorphologyFactory.h"
 #include "ER_DirectEncodingInterpreter.h"
-#include "EdgarsAmazingMorphologyClassVREP.h"
+#include "Tissue_DirectBarsVREP.h"
+#include "Tissue_GMX_VREP.h"
 #include "ER_CPPN_Interpreter.h"
 
 class MorphologyFactoryVREP : public MorphologyFactory

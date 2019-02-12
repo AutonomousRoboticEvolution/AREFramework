@@ -115,8 +115,14 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
 		m_morph->settings = st;
 		return m_morph;
 	}
-	case 10: {
-		shared_ptr<Morphology> m_morph(new EdgarsAmazingMorphologyClassVREP);
+	case 20: {
+		shared_ptr<Morphology> m_morph(new Tissue_DirectBarsVREP);
+		m_morph->randomNum = rn;
+		m_morph->settings = st;
+		return m_morph;
+	}
+	case 21: {
+		shared_ptr<Morphology> m_morph(new Tissue_GMX_VREP);
 		m_morph->randomNum = rn;
 		m_morph->settings = st;
 		return m_morph;
@@ -220,6 +226,16 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 		return castObject;
 	}
 	case 5: { // st->CUSTOM_MORPHOLOGY:
+		std::shared_ptr<CustomMorphologyVREP> placeHolder;
+		placeHolder = std::static_pointer_cast<CustomMorphologyVREP>(morph);
+
+		shared_ptr<CustomMorphologyVREP> castObject;
+		castObject = make_shared<CustomMorphologyVREP>();
+		//castObject->genome = placeHolder->genome;
+		castObject->randomNum = placeHolder->randomNum;
+		castObject->settings = placeHolder->settings;
+		return castObject;
+
 		shared_ptr<Morphology> morph(new CustomMorphologyVREP);
 		cout << "ERROR: NO TRANSFORM OF 'CustomMorphology' to 'CustomMorphologyVREP' made yet" << endl;
 		return morph;
@@ -241,16 +257,32 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 	case 9: {
 
 	}
-	case 10: {
+	case 20: {
 		// transform ER_CPPN_Encoding to ER_CPPN_Interpreter
 		// first save do a static cast to access ER_CPPN_Encoding values
-		std::shared_ptr<EdgarsAmazingMorphologyClassVREP> placeHolder;
-		placeHolder = std::static_pointer_cast<EdgarsAmazingMorphologyClassVREP>(morph);
+		std::shared_ptr<Tissue_DirectBarsVREP> placeHolder;
+		placeHolder = std::static_pointer_cast<Tissue_DirectBarsVREP>(morph);
+		shared_ptr<Tissue_DirectBarsVREP> castObject;
+		castObject = make_shared<Tissue_DirectBarsVREP>();
+		castObject->genome = placeHolder->genome;
+		castObject->randomNum = placeHolder->randomNum;
+		castObject->settings = placeHolder->settings;
+		return castObject;
+
+		//shared_ptr<Morphology> m_morph(new EdgarsAmazingMorphologyClassVREP);
+		//EdgarsAmazingMorphologyClass 
+		//return m_morph;
+	}
+	case 21: {
+		// transform ER_CPPN_Encoding to ER_CPPN_Interpreter
+		// first save do a static cast to access ER_CPPN_Encoding values
+		std::shared_ptr<Tissue_DirectBarsVREP> placeHolder;
+		placeHolder = std::static_pointer_cast<Tissue_DirectBarsVREP>(morph);
 
 		// Make a 
-		shared_ptr<EdgarsAmazingMorphologyClassVREP> castObject;
-		castObject = make_shared<EdgarsAmazingMorphologyClassVREP>();
-		// castObject->genome = placeHolder->genome;
+		shared_ptr<Tissue_DirectBarsVREP> castObject;
+		castObject = make_shared<Tissue_DirectBarsVREP>();
+		castObject->genome = placeHolder->genome;
 		castObject->randomNum = placeHolder->randomNum;
 		castObject->settings = placeHolder->settings;
 		return castObject;
