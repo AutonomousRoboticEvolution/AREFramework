@@ -12,19 +12,22 @@ public:
 	Genome();
 	virtual ~Genome();
 
-	shared_ptr<Settings> settings;
+	shared_ptr<Settings> settings;     //Is the setting shared by genome and EA?
 	shared_ptr<RandNum> randomNum;
 	shared_ptr<Morphology> morph;
 	shared_ptr<Control> control;
 
-	// make vector for multi-objective
+	/// fitness value; make vector for multi-objective
 	float fitness;
-	bool isEvaluated = false; // for client server 
+	bool isEvaluated = false; // for client server
 
 	int individualNumber;
 	virtual void init() = 0;
 	virtual void create() = 0;
 	virtual void update() = 0;
+	/**
+		@brief This method clone the genome
+	*/
 	virtual shared_ptr<Genome> clone() const = 0;
 	virtual void mutate() = 0;
 
@@ -32,10 +35,9 @@ public:
 
 	virtual bool loadGenome(int indNum, int sceneNum) = 0;
 	virtual void saveGenome(int indNum) = 0;
-	virtual const std::string generateGenome(int indNum, int sceneNum) const = 0; 
+	virtual const std::string generateGenome(int indNum, int sceneNum) const = 0;
 	virtual void clearGenome() = 0;
 	virtual void checkGenome() = 0; // for debugging
 	virtual bool loadMorphologyGenome(int indNum, int sceneNum) = 0;
 
 };
-
