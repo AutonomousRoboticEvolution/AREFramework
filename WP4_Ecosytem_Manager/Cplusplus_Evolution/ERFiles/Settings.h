@@ -154,7 +154,7 @@ public:
 	int indCounter;
 	int sceneNum;
 
-	bool client;
+	bool client;  ///variable indicating whether client-server mode or regular mode
 	float mutationRate = 0.1;
 	float morphMutRate = 0.1;
 	int generation = 0;
@@ -165,9 +165,9 @@ public:
 	int crossover = 0;
 	float crossoverRate = 0;
 	int ageInds = 0;
-	int maxAge = 0; // generations
-	int minAge = 0; // age after which death can occur
-	float deathProb = 0; // by default no death
+	int maxAge = 0; /// generations
+	int minAge = 0; /// age after which death can occur
+	float deathProb = 0; /// by default no death
 	vector<int> indNumbers;
 	vector<float> indFits;
 	int seed = 0;
@@ -185,7 +185,7 @@ public:
 	float energyDissipationRate = 0.00;
 	int lIncrements = 3;
 	int bestIndividual = 0;
-	/// Output info 
+	/// Output info
 	bool verbose = false;
 	Colorization colorization = COLOR_NEURALNETWORK;
 
@@ -208,7 +208,9 @@ public:
 	void saveSettings();
 	bool portOpen = false;
 
-	// SETTERS
+	/**
+		@brief Set the repository for saving data
+	*/
 	void setRepository(std::string repository)
 	{
 		this->repository = repository;

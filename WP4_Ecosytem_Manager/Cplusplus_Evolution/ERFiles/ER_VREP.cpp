@@ -74,18 +74,17 @@ void ER_VREP::initializeSimulation() {
 	environmentFactory.reset();
 	unique_ptr<EA_Factory> eaf(new EA_Factory);
 	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
-	ea->randomNum = randNum;
-	ea->init();
+	ea->randomNum = randNum;  //set the random number generator class for EA
+	ea->init();  //initialise the EA population: genomes, fitness and ID
 	// ea->initializePopulation(settings, false);
 	environment->init();
-	eaf.reset();
+	eaf.reset();  //destroy the pointer
 
 }
 
 // Initializes ER as a server to accept genomes from client. If framework is server than just hold information for one genome. Else, initilizes the first population of individuals.
-//Ask Frank: Create only one genome?
+//In server mode, each v-rep simulation handle one genome
 void ER_VREP::startOfSimulation(){
-
 	/* When V-REP starts, this function is called. Depending on the settings,
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.

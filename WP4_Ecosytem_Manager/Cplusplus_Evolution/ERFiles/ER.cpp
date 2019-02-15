@@ -63,18 +63,17 @@ void CER::loadIndividual(int individualNum, int sceneNum)
 
 }
 
-
+/**
+   @brief initialize the settings class; it will read a settings file or it
+ * will use default parameters if it cannot read a settings file.
+ * A random number class will also be created and all other files
+ * refer to this class.
+ */
 void CER::initialize() {
-	/* initialize the settings class; it will read a settings file or it
-	 * will use default parameters if it cannot read a settings file.
-	 * A random number class will also be created and all other files
-	 * refer to this class.
-	 */
-
 	settings = shared_ptr<Settings>(new Settings);
 	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
 	randNum = newRandNum;
-	newRandNum.reset();
+	newRandNum.reset(); //destroy the pointer
 	settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));  //pass the setting number from argument
 	settings->readSettings();
 
@@ -83,8 +82,9 @@ void CER::initialize() {
 	ea->setSettings(settings, randNum);  //specify the setting and random number for EA
 	ea->init();
 
-	initializeSimulation();
+	initializeSimulation();  //empty function?
 }
+
 
 //save the genome and fitness
 void CER::saveSettings() {

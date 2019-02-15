@@ -125,7 +125,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	if (startEvolution == true) {
 
 		// Construct classes
-		ER = unique_ptr<ER_VREP>(new ER_VREP);
+		ER = unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
 		ER->settings = shared_ptr<Settings>(new Settings);
 
 		// Set all arguments
@@ -147,7 +147,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		else {
 			std::cout << "Argument 3 was NULL" << endl;
 		}
-		// Read the settings file
+		// Read the settings file; specify the ID of experimental run
 		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();
 
@@ -160,13 +160,13 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			if (arg2_param_i == 9)
 			{
 				ER->simSet = RECALLBEST; // Load best indivudal
-				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
 			// If the second argument passed (arg2_param) is equal to 1, then run the simulations in server-client mode
 			else if (arg2_param_i == 1)
 			{
-				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
+				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
 			}
 
 			simReleaseBuffer(arg2_param);
@@ -174,8 +174,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 		//! sceneNum and seed will not be utilized from the settings file anymore
 		//! TODO: Check with Frank: why lines 151 and 177 are the same?
-		ER->settings->sceneNum = run;
-		ER->settings->seed = run;
+		ER->settings->sceneNum = run;   //sceneNum is not used desprete; should be loaded through readSettings function
+		ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
 		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number
 
 		// Actual initialization of ER
@@ -186,7 +186,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		}
 	}
 	int signal[1] = { 0 };
-	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //TODO: Check with Frank: set the signal back to vrep??
+	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client
 	//cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
 	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
@@ -204,7 +204,7 @@ VREP_DLLEXPORT void v_repEnd()
 }
 
 //! Currently not used.
-//! TODO: Check with Frank if this is going to be used.
+//! TODO: Check with Frank if this is going to be used. memory leak check
 void saveLog(int num) {
 	ofstream logFile;
 	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
@@ -245,7 +245,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			//tStart = clock();
 			// Initializes population
-			ER->startOfSimulation();
+			ER->startOfSimulation();  //start from here after simStartSimulation is called
 		}
 
 		if (initCall == true) {
@@ -254,16 +254,18 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
 				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER) {
 				// Starts instance of V-rep Simulation
-				simStartSimulation();
+				simStartSimulation();  //handle the start of vrep
 
 			}
 			//! This conditions is doing nothing
-			//! TODO: Check with Frank.
+			//! TODO: Check with Frank?
+
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
 			}
 		}
 		//	}
+		//client and v-rep plugin communicates using signal and remote api
 		int signal[1] = { 0 };
 		simGetIntegerSignal((simChar*) "simulationState", signal);
 		if (signal[0] == 99) {
@@ -278,7 +280,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
-				simGetIntegerSignal((simChar*) "individual", individual);
+				simGetIntegerSignal((simChar*) "individual", individual);     //ask Frank: individual is handle by client??
 				if (ER->loadIndividual(individual[0]) == false) {
 					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
 				}
@@ -305,7 +307,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		//	}
 			timeCount++;
 			ER->endOfSimulation();
-			loadingPossible = true;
+			loadingPossible = true;   //start another simulation
 		}
 	}
 

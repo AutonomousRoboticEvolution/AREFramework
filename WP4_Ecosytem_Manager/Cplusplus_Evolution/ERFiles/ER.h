@@ -37,12 +37,12 @@ public:
 	void split_line(string& line, string delim, list<string>& values);
 
 	simulationSetup simSet = DEFAULT_SETUP;
-	shared_ptr<Settings> settings;
-	unique_ptr<EA> ea; // can be changed to another ea. Factory pattern?
+	shared_ptr<Settings> settings;  ///pointer to settting of EA
+	unique_ptr<EA> ea; ///can be changed to another ea. Factory pattern?
 
 	void saveSettings();
-	void initialize();  //Is it used?
-	void initializeSimulation();
+	void initialize();  ///Is this method used?
+	void initializeSimulation();  ///Is this method used?
 
 	// parameters
 	int currentInd = 0;
