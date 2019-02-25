@@ -81,13 +81,13 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
 		return morph;
 	}
 	case 20: {
-		shared_ptr<Morphology> morph(new Tissue_DirectBars);
+		shared_ptr<Morphology> morph(new Tissue_DirectBarsVREP);
 		morph->randomNum = rn;
 		morph->settings = st;
 		return morph;
 	}
 	case 21: {
-		shared_ptr<Morphology> morph(new Tissue_GMX);
+		shared_ptr<Morphology> morph(new Tissue_GMX_VREP);
 		morph->randomNum = rn;
 		morph->settings = st;
 		return morph;

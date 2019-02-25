@@ -11,6 +11,15 @@ Tissue_GMX_VREP::~Tissue_GMX_VREP()
 {
 }
 
+shared_ptr<Morphology> Tissue_GMX_VREP::clone() const {
+	// shared_ptr<Morphology>()
+	shared_ptr<Tissue_GMX_VREP> tissue_gmx = make_unique<Tissue_GMX_VREP>(*this);
+	tissue_gmx->organs = this->organs;
+	tissue_gmx->gaussians = this->gaussians;
+	//tissue_directbars->control = control->clone();
+	return tissue_gmx;
+}
+
 vector<int> Tissue_GMX_VREP::getObjectHandles(int parentHandle)
 {
 	return vector<int>();
@@ -76,224 +85,200 @@ struct sRobotMorphology
 
 
 int Tissue_GMX_VREP::createRobot() {
+    std::cout << "State: CREATE ROBOT!" << std::endl;
+    int iNumberOfSamples = 333;
 
-	std::cout << "State: CREATE ROBOT!" << std::endl;
+    std::vector< std::vector<float> > mean(3);
+    std::vector< std::vector<float> > sigma(3);
 
+    // Get this information from genome
+    // First gaussian
+    mean.at(0) = {gaussians[0].medians[0], gaussians[0].medians[1], gaussians[0].medians[2]};
+    sigma.at(0) = {gaussians[0].sigmas[0], gaussians[0].sigmas[1], gaussians[0].sigmas[2]};
+    // Second gaussian
+    mean.at(1) = {gaussians[1].medians[0], gaussians[1].medians[1], gaussians[1].medians[2]};
+    sigma.at(1) = {gaussians[1].sigmas[0], gaussians[1].sigmas[1], gaussians[1].sigmas[2]};
+    // Second gaussian
+    mean.at(2) = {gaussians[2].medians[0], gaussians[2].medians[1], gaussians[2].medians[2]};
+    sigma.at(2) = {gaussians[2].sigmas[0], gaussians[2].sigmas[1], gaussians[2].sigmas[2]};
 
+    // Generate samples for each distribution
+    Eigen::MatrixXd samplesA = getSamples(iNumberOfSamples, mean.at(0), sigma.at(0));
+    Eigen::MatrixXd samplesB = getSamples(iNumberOfSamples, mean.at(1), sigma.at(1));
+    Eigen::MatrixXd samplesC = getSamples(iNumberOfSamples, mean.at(2), sigma.at(2));
 
-	// Create robot
-	// TODO: Check if this necessary with WL
-	int nextRobotMorphologyHandle = 0;
-	int handle = -1;
-	sRobotMorphology RobotMorphology;
-	handle = nextRobotMorphologyHandle++;
-	RobotMorphology.handle = handle;
+    // Collect the samples from all the distributions into a single matrix
+    Eigen::MatrixXd allSamples(samplesA.rows(), samplesA.cols()+samplesB.cols()+samplesC.cols());
+    allSamples << samplesA, samplesB, samplesC;
+    // std::cout << "DEBUGG Samples: " << allSamples << std::endl;
 
-	// Importing motor organs
-	int motorOrgan1 = simLoadModel("models/motorOrgan2.ttm");
-	int motorOrgan2 = simLoadModel("models/motorOrgan2.ttm");
-	int brainOrgan = simLoadModel("models/brainOrgan.ttm");
+    // Get list of coordinates of each voxel
+    Eigen::MatrixXd listOfCoordinates = createVoxelsFromPoints(allSamples);
 
-	// Create force sensors to place organs
-	int pamsArg1[] = { 0,0,0,0,0 };
-	float pamsArg2[] = { 0,0,0,0,0 };
-	int forceSensor1 = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
-	int forceSensor2 = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
-	int forceSensor3 = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
+    // Create robot
+    // TODO: Check if this necessary with WL
+    int nextRobotMorphologyHandle = 0;
+    int handle = -1;
+    sRobotMorphology RobotMorphology;
+    handle = nextRobotMorphologyHandle++;
+    RobotMorphology.handle = handle;
 
-	// TODO: EB to Create dummies
+    // Importing motor organs
+    int motorOrgan1 = simLoadModel("models/motorOrgan.ttm");
+    int motorOrgan2 = simLoadModel("models/motorOrgan.ttm");
+    int brainOrgan = simLoadModel("models/brainOrgan.ttm");
 
-	// Create voxels
-	std::vector <int> cubeHandles;
+    // Create force sensors to place organs
+    int pamsArg1[] = {0,0,0,0,0};
+    float pamsArg2[] = {0,0,0,0,0};
+    int forceSensor1 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
+    int forceSensor2 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
+    int forceSensor3 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
 
-	float organ1_pos[] = { organs[0].coordinates[0] / 100, organs[0].coordinates[1] / 100, organs[0].coordinates[2] / 100 };
-	float organ2_pos[] = { organs[1].coordinates[0] / 100, organs[1].coordinates[1] / 100, organs[1].coordinates[2] / 100 };
-	float organ3_pos[] = { 0.1, 0.1, 0.0 };
+    // TODO: EB to Create dummies
 
-	float organ1_angle[] = { 1.57080, 0, -1.57080 };
-	float organ2_angle[] = { 1.57080, 0, 1.57080 }; // 3.151516 for second orientation
-	float organ3_angle[] = { 0, 1.57080, 0 };
-
-	// Create voxel
-	int temp_voxel_handle;
-	float columnWidth = 0.015;
-	float columnHeight = 0.015;
-	float magnitude;
-	float angle;
-	float voxel_size[3];
-	float voxel_pos[3];
-	float voxel_ori[3];
-	float voxel_color[3];
-
-	// Organ 1
-
-	magnitude = sqrt(pow(organ1_pos[0] - organ3_pos[0], 2) + pow(organ1_pos[1] - organ3_pos[1], 2)) + columnWidth;
-	angle = atan2(organ1_pos[1] - organ3_pos[1], organ1_pos[0] - organ3_pos[0]);
-
-	voxel_size[0] = magnitude;
-	voxel_size[1] = columnWidth;
-	voxel_size[2] = columnHeight;
-	temp_voxel_handle = simCreatePureShape(0, 8, voxel_size, 1, NULL);
-
-	RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-	voxel_pos[0] = organ3_pos[0] + (organ1_pos[0] - organ3_pos[0]) / 2;
-	voxel_pos[1] = organ3_pos[1] + (organ1_pos[1] - organ3_pos[1]) / 2;
-	voxel_pos[2] = 0;
-	simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
+    // Open tissue file
+    // TODO: Move file generation to a different place
+    ofstream tissueFile;
+    ostringstream tissueFileName;
+    tissueFileName << settings->repository + "/stl0"  << "/stl" << ".csv";
+    tissueFile.open(tissueFileName.str());
+    // First coordinates reserved for organs.
+    tissueFile << organs[0].coordinates[0] << ',' << organs[0].coordinates[1] << ',' << organs[0].coordinates[2] << std::endl;
+    tissueFile << organs[1].coordinates[0] << ',' << organs[1].coordinates[1] << ',' << organs[1].coordinates[2] << std::endl;
+    tissueFile << organs[2].coordinates[0] << ',' << organs[2].coordinates[1] << ',' << organs[2].coordinates[2] << std::endl;
 
 
-	voxel_ori[0] = 0;
-	voxel_ori[1] = 0;
-	voxel_ori[2] = angle;
-	simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-	voxel_color[0] = 0;
-	voxel_color[1] = 1;
-	voxel_color[2] = 0;
-	simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-	// Second column
-
-	voxel_size[0] = columnWidth;
-	voxel_size[1] = columnHeight;
-	voxel_size[2] = abs(organ1_pos[2] - organ3_pos[2] - columnWidth);
-	temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
-	RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-	voxel_pos[0] = organ1_pos[0];
-	voxel_pos[1] = organ1_pos[1];
-	voxel_pos[2] = organ3_pos[2] + (organ1_pos[2] - organ3_pos[2]) / 2;
-	simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-	voxel_ori[0] = 0;
-	voxel_ori[1] = 0;
-	voxel_ori[2] = angle;
-	simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-	voxel_color[0] = 0;
-	voxel_color[1] = 1;
-	voxel_color[2] = 0;
-	simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-	// Organ 2
-
-	magnitude = sqrt(pow(organ2_pos[0] - organ3_pos[0], 2) + pow(organ2_pos[1] - organ2_pos[1], 2)) + columnWidth;
-	angle = atan2(organ2_pos[1] - organ3_pos[1], organ2_pos[0] - organ3_pos[0]);
-
-	voxel_size[0] = magnitude;
-	voxel_size[1] = columnWidth;
-	voxel_size[2] = columnHeight;
-	temp_voxel_handle = simCreatePureShape(0, 8, voxel_size, 1, NULL);
-
-	RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-	voxel_pos[0] = organ3_pos[0] + (organ2_pos[0] - organ3_pos[0]) / 2;
-	voxel_pos[1] = organ3_pos[1] + (organ2_pos[1] - organ3_pos[1]) / 2;
-	voxel_pos[2] = 0;
-	simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
+    // Create voxels
+    std::vector <int> cubeHandles;
+    for (int i = 0; i < listOfCoordinates.rows(); i++) {
 
 
-	voxel_ori[0] = 0;
-	voxel_ori[1] = 0;
-	voxel_ori[2] = angle;
-	simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
+        // 48 Static object
+        // 00 Dynamic not respondable
+        // 08 Dynamic respondable
+        //std::cout << "Voxel: " << listOfCoordinates(i,0)/100 << " " << listOfCoordinates(i,1)/100 << " " << listOfCoordinates(i,2)/100 << std::endl;
+        // TODO EB to write method for this keepVoxel(int organType, int list of coordinates);
+        // Motor 1
+        if(listOfCoordinates(i,0)/100 > organs[0].coordinates[0]/100 - (0.0451/2) // Original 0.0351
+           && listOfCoordinates(i,0)/100 < organs[0].coordinates[0]/100 + (0.0451/2)
+           && listOfCoordinates(i,1)/100 > organs[0].coordinates[1]/100 - (0.04574/2)  // Original 0.03574
+           && listOfCoordinates(i,1)/100 < organs[0].coordinates[1]/100 + (0.04574/2)
+           && listOfCoordinates(i,2)/100 > organs[0].coordinates[2]/100 - (0.0433/2) // Original 0.0283
+           && listOfCoordinates(i,2)/100 < organs[0].coordinates[2]/100 + 0.1 + (0.0433/2)){
+            continue;
+        }
 
-	voxel_color[0] = 0;
-	voxel_color[1] = 1;
-	voxel_color[2] = 0;
-	simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
+        if(listOfCoordinates(i,0)/100 > organs[1].coordinates[0]/100 - (0.0451/2)
+           && listOfCoordinates(i,0)/100 < organs[1].coordinates[0]/100 + (0.0451/2)
+           && listOfCoordinates(i,1)/100 > organs[1].coordinates[1]/100 - (0.04574/2)
+           && listOfCoordinates(i,1)/100 < organs[1].coordinates[1]/100 + (0.04574/2)
+           && listOfCoordinates(i,2)/100 > organs[1].coordinates[2]/100 - (0.0433/2)
+           && listOfCoordinates(i,2)/100 < organs[1].coordinates[2]/100 + 0.1 + (0.0433/2)){
+            continue;
+        }
 
-	// Second column
+        // Wheel 1
+        if(listOfCoordinates(i,0)/100 > organs[0].coordinates[0]/100 - (0.07/2) // Original 0.05
+           && listOfCoordinates(i,0)/100 < organs[0].coordinates[0]/100 + (0.07/2)
+           && listOfCoordinates(i,1)/100 > organs[0].coordinates[1]/100 + 0.03 - (0.03/2)  // Original 0.05
+           && listOfCoordinates(i,1)/100 < organs[0].coordinates[1]/100 + 0.03 + (0.03/2)
+           && listOfCoordinates(i,2)/100 > organs[0].coordinates[2]/100 - (0.07/2) // Original 0.01
+           && listOfCoordinates(i,2)/100 < organs[0].coordinates[2]/100 + 0.1 + (0.07/2)){
+            continue;
+        }
+        // Wheel 2
+        if(listOfCoordinates(i,0)/100 > organs[1].coordinates[0]/100 - (0.07/2) // Original 0.05
+           && listOfCoordinates(i,0)/100 < organs[1].coordinates[0]/100 + (0.07/2)
+           && listOfCoordinates(i,1)/100 > organs[1].coordinates[1]/100 + 0.03 - (0.03/2)  // Original 0.05
+           && listOfCoordinates(i,1)/100 < organs[1].coordinates[1]/100 + 0.03 + (0.03/2)
+           && listOfCoordinates(i,2)/100 > organs[1].coordinates[2]/100 - (0.07/2) // Original 0.01
+           && listOfCoordinates(i,2)/100 < organs[1].coordinates[2]/100 + 0.1 + (0.07/2)){
+            continue;
+        }
+        // Brain
+        if(listOfCoordinates(i,0)/100 > organs[2].coordinates[0]/100 - (0.044/2)  // Original 0.024
+           && listOfCoordinates(i,0)/100 < organs[2].coordinates[0]/100 + (0.044/2)
+           && listOfCoordinates(i,1)/100 > organs[2].coordinates[1]/100 - (0.092/2) // Original 0.072
+           && listOfCoordinates(i,1)/100 < organs[2].coordinates[1]/100 + (0.092/2)
+           && listOfCoordinates(i,2)/100 > organs[2].coordinates[2]/100 - (0.056/2) // Original 0.036
+           && listOfCoordinates(i,2)/100 < organs[2].coordinates[2]/100 + 0.1 + (0.056/2)){
+            continue;
+        }
+        // Create voxel
 
-	voxel_size[0] = columnWidth;
-	voxel_size[1] = columnHeight;
-	voxel_size[2] = abs(organ2_pos[2] - organ3_pos[2] - columnWidth);
-	temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
-	RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
+        int temp_voxel_handle;
+        //float voxel_size[] = {0.005, 0.005, 0.005};
+        float voxel_size[] = {0.01, 0.01, 0.01};
+        temp_voxel_handle = simCreatePureShape(0, 8, voxel_size, 1, NULL);
+        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
+        float voxel_pos[] = {listOfCoordinates(i, 0) / 100, listOfCoordinates(i, 1) / 100,
+                             listOfCoordinates(i, 2) / 100};
+        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
+        float voxel_color[] = {0, 1, 0};
+        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
+        tissueFile << listOfCoordinates(i,0) << ',' << listOfCoordinates(i,1) << ',' << listOfCoordinates(i,2) << std::endl;
+    }
+    // Close tissue file
+    tissueFile.close();
 
-	voxel_pos[0] = organ2_pos[0];
-	voxel_pos[1] = organ2_pos[1];
-	voxel_pos[2] = organ3_pos[2] + (organ2_pos[2] - organ3_pos[2]) / 2;
-	simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
+    // Set organs position
+    float organ1_pos[] = {organs[0].coordinates[0] / 100, organs[0].coordinates[1] / 100, organs[0].coordinates[2] / 100};
+    simSetObjectPosition(motorOrgan1, -1, organ1_pos);
+    simSetObjectPosition(forceSensor1, -1, organ1_pos);
+    float organ2_pos[] = {organs[1].coordinates[0] / 100, organs[1].coordinates[1] / 100, organs[1].coordinates[2] / 100};
+    simSetObjectPosition(motorOrgan2, -1, organ2_pos);
+    simSetObjectPosition(forceSensor2, -1, organ2_pos);
+    float organ3_pos[] = {organs[2].coordinates[0] / 100, organs[2].coordinates[1] / 100, organs[2].coordinates[2] / 100};
+    simSetObjectPosition(brainOrgan, -1, organ3_pos);
+    simSetObjectPosition(forceSensor3, -1, organ3_pos);
 
-	voxel_ori[0] = 0;
-	voxel_ori[1] = 0;
-	voxel_ori[2] = angle;
-	simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
+    // Set organs orientation
+    float organ1_angle[] = { 1.57080, 0, -1.57080 };
+    float organ2_angle[] = { 1.57080, 0, 1.57080 }; // 3.151516 for second orientation
+    float organ3_angle[] = { 0, 1.57080, 0 };
+    simSetObjectOrientation(motorOrgan1, -1, organ1_angle);
+    simSetObjectOrientation(motorOrgan2, -1, organ2_angle);
+    simSetObjectOrientation(brainOrgan, -1, organ3_angle);
+    simSetObjectOrientation(forceSensor1, -1, organ1_angle);
+    simSetObjectOrientation(forceSensor2, -1, organ2_angle);
+    simSetObjectOrientation(forceSensor3, -1, organ3_angle);
 
-	voxel_color[0] = 0;
-	voxel_color[1] = 1;
-	voxel_color[2] = 0;
-	simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
+    int* a = RobotMorphology.cubeHandles.data();
+    int body = simGroupShapes(a, RobotMorphology.cubeHandles.size());
+    simSetObjectName(body, "robotShape");
 
-	//	// Set organs position
-	organ1_pos[2] = organ1_pos[2] + 0.01;
-	simSetObjectPosition(motorOrgan1, -1, organ1_pos);
-	simSetObjectPosition(forceSensor1, -1, organ1_pos);
-	organ2_pos[2] = organ2_pos[2] + 0.01;
-	simSetObjectPosition(motorOrgan2, -1, organ2_pos);
-	simSetObjectPosition(forceSensor2, -1, organ2_pos);
-	organ3_pos[2] = 0.03;
-	simSetObjectPosition(brainOrgan, -1, organ3_pos);
-	simSetObjectPosition(forceSensor3, -1, organ3_pos);
-	//
-	//	// Set organs orientation
-	simSetObjectOrientation(motorOrgan1, -1, organ1_angle);
-	simSetObjectOrientation(motorOrgan2, -1, organ2_angle);
-	simSetObjectOrientation(brainOrgan, -1, organ3_angle);
-	simSetObjectOrientation(forceSensor1, -1, organ1_angle);
-	simSetObjectOrientation(forceSensor2, -1, organ2_angle);
-	simSetObjectOrientation(forceSensor3, -1, organ3_angle);
+    // Set parents
+    simSetObjectParent(forceSensor1, body, 1);
+    simSetObjectParent(forceSensor2, body, 1);
+    simSetObjectParent(forceSensor3, body, 1);
+    simSetObjectParent(motorOrgan1, forceSensor1, 1);
+    simSetObjectParent(motorOrgan2, forceSensor2, 1);
+    simSetObjectParent(brainOrgan, forceSensor3, 1);
 
-	int* a = RobotMorphology.cubeHandles.data();
-	int body = simGroupShapes(a, RobotMorphology.cubeHandles.size());
-	printf("size: %d\n", RobotMorphology.cubeHandles.size());
-	simSetObjectName(body, "robotShape");
-
-	//    // Set parents
-	simSetObjectParent(forceSensor1, body, 1);
-	simSetObjectParent(forceSensor2, body, 1);
-	simSetObjectParent(forceSensor3, body, 1);
-	simSetObjectParent(motorOrgan1, forceSensor1, 1);
-	simSetObjectParent(motorOrgan2, forceSensor2, 1);
-	simSetObjectParent(brainOrgan, forceSensor3, 1);
-
-	// Create collection
-	int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
-	simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
-
-	ofstream coordinatesFile;
-	ostringstream coordinatesFileName;
-	coordinatesFileName << settings->repository + "/stl0" << "/stl" << ".csv";
-	coordinatesFile.open(coordinatesFileName.str());
-	// First coordinates reserved for organs.
-	coordinatesFile << organs[0].coordinates[0] << ',' << organs[0].coordinates[1] << ',' << organs[0].coordinates[2] << std::endl;
-	coordinatesFile << organs[1].coordinates[0] << ',' << organs[1].coordinates[1] << ',' << organs[1].coordinates[2] << std::endl;
-	coordinatesFile << 10.0 << ',' << 10.0 << ',' << 0.0 << std::endl;
-	// Close tissue file
-	coordinatesFile.close();
-
-
-	return simGetObjectHandle("robotShape");
+    // Create collection
+    int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
+    simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
+    return simGetObjectHandle("robotShape");
 }
 
 void Tissue_GMX_VREP::create()
 {
 	std::cout << "State: CREATE!" << std::endl;
+    mutate();
 	mainHandle = createRobot();
 }
 
 void Tissue_GMX_VREP::init() {
 	std::cout << "State: INIT!" << std::endl;
 	initMorphology();
-	mutate();
+	//mutate();
 	//	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	//	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	//	controlFactory.reset();
 	//	control->init(2, 50, 2);
 	//	control->mutate(0.5);
-	create();
+	//create();
 }
 void Tissue_GMX_VREP::mutate()
 {
@@ -302,15 +287,15 @@ void Tissue_GMX_VREP::mutate()
 	//        control->mutate(settings->mutationRate);
 	//    }
 	//Tissue_GMX_VREP(settings->morphMutRate); (Frank has no clue what's going on here ???)
+	mutateMorphology(settings->morphMutRate);
 }
 
-void Tissue_GMX_VREP::saveGenome(int indNum, int sceneNum, float fitness)
+void Tissue_GMX_VREP::saveGenome(int indNum, float fitness)
 {
 	std::cout << "State: SAVE GENOME!" << std::endl;
 	std::cout << "saving direct genome " << std::endl << "-------------------------------- " << std::endl;
 	//	int evolutionType = 0; // regular evolution, will be changed in the future.
 	std::cout << settings->repository << std::endl;
-	std::cout << sceneNum << std::endl;
 	ofstream genomeFile;
 	ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies0" << "/genome" << indNum << ".csv";
@@ -483,6 +468,7 @@ void Tissue_GMX_VREP::initMorphology() {
 }
 // Mutate parameters for Moorphology
 void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
+    // Generate gaussians
 	for (int i = 0; i < gaussians.size(); i++) {
 		for (int j = 0; j < gaussians[i].medians.size(); j++) {
 			if (mutationRate < randomNum->randFloat(0, 1)) {
@@ -491,7 +477,7 @@ void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
 		}
 		for (int j = 0; j < gaussians[i].sigmas.size(); j++) {
 			if (mutationRate < randomNum->randFloat(0, 1)) {
-				gaussians[i].sigmas[j] = randomNum->randFloat(0.0, 10.0);
+				gaussians[i].sigmas[j] = randomNum->randFloat(0.0, 4.0);
 			}
 		}
 	}
@@ -499,11 +485,12 @@ void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
 		bool isOrganColliding;
 		do {
 			isOrganColliding = false;
+			// Generate coordinates for organs
 			for (int j = 0; j < organs[i].coordinates.size(); j++) {
 				//if (mutationRate < randomNum->randFloat(0, 1)) {
 				if (0.0 < randomNum->randFloat(0, 1)) {
-					organs[i].coordinates[j] = randomNum->randFloat(0.0, 20);
-					std::cout << organs[i].coordinates[j] << std::endl;
+					organs[i].coordinates[j] = randomNum->randFloat(0.0, 6.0);
+					//std::cout << organs[i].coordinates[j] << std::endl;
 				}
 			}
 			if (i > 0) {
@@ -516,12 +503,12 @@ void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
 					&& organs[i].coordinates[2] / 100 < organs[1].coordinates[2] / 100 + (0.07 / 2)) {
 					true;
 				}
-				if (organs[i].coordinates[0] / 100 > organs[2].coordinates[0] / 100 - (0.07 / 2) // Original 0.05
-					&& organs[i].coordinates[0] / 100 < organs[2].coordinates[0] / 100 + (0.07 / 2)
-					&& organs[i].coordinates[1] / 100 > organs[2].coordinates[1] / 100 - 05574 - (0.03 / 2)  // Original 0.05
-					&& organs[i].coordinates[1] / 100 < organs[2].coordinates[1] / 100 + 0.035 + (0.03 / 2)
-					&& organs[i].coordinates[2] / 100 > organs[2].coordinates[2] / 100 - (0.07 / 2) // Original 0.01
-					&& organs[i].coordinates[2] / 100 < organs[2].coordinates[2] / 100 + (0.07 / 2)) {
+				if (organs[i].coordinates[0] / 100 > organs[2].coordinates[0] / 100 - (0.044 / 2) // Original 0.05
+					&& organs[i].coordinates[0] / 100 < organs[2].coordinates[0] / 100 + (0.044 / 2)
+					&& organs[i].coordinates[1] / 100 > organs[2].coordinates[1] / 100 - (0.092 / 2)  // Original 0.05
+					&& organs[i].coordinates[1] / 100 < organs[2].coordinates[1] / 100 + (0.092 / 2)
+					&& organs[i].coordinates[2] / 100 > organs[2].coordinates[2] / 100 - (0.056 / 2) // Original 0.01
+					&& organs[i].coordinates[2] / 100 < organs[2].coordinates[2] / 100 + (0.056 / 2)) {
 					true;
 				}
 			}

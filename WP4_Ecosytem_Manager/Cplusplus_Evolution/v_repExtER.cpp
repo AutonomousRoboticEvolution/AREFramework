@@ -133,15 +133,15 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg1_param);
 		}
 
-		// 3: set the repository of the settings file. 
-		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
-		if (arg3_param != NULL) {
-			ER->settings->setRepository(arg3_param);
-			simReleaseBuffer(arg3_param);
-		}
-		else {
-			std::cout << "Argument 3 was NULL" << endl;
-		}
+//		// 3: set the repository of the settings file.
+//		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
+//		if (arg3_param != NULL) {
+//			ER->settings->setRepository(arg3_param);
+//			simReleaseBuffer(arg3_param);
+//		}
+//		else {
+//			std::cout << "Argument 3 was NULL" << endl;
+//		}
 		// Read the settings file
 		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();

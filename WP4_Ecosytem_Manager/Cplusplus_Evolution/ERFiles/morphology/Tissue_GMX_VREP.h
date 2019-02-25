@@ -24,6 +24,8 @@ public:
 	void update();
 	virtual int getMainHandle();
 
+	shared_ptr<Morphology> clone() const;
+
 	struct Gaussians {
 		vector<float> medians;
 		vector<float> sigmas;
@@ -41,7 +43,7 @@ public:
 
 	void mutate();
 
-	void saveGenome(int indNum, int sceneNum, float fitness);
+	void saveGenome(int indNum, float fitness);
 	// this loads genome
 	bool loadGenome(int individualNumber, int sceneNum);
 

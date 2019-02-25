@@ -33,7 +33,6 @@ public:
 	void create();
 
 	void init();
-
 	struct Genome {
 		// Placeholder for mutable parameters
 	};

@@ -12,6 +12,8 @@
 #include "CustomMorphology.h"
 #include "Tissue_DirectBars.h"
 #include "Tissue_GMX.h"
+#include "Tissue_DirectBarsVREP.h"
+#include "Tissue_GMX_VREP.h"
 #include "ER_CPPN_Encoding.h"
 
 

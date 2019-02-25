@@ -48,6 +48,7 @@ Settings::Settings() {
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;
 	colorization = COLOR_LSYSTEM;
+	//repository="files";
 }
 
 Settings::~Settings() {

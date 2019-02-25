@@ -82,6 +82,10 @@ _OBJ = ERFiles/VREPUI/VREPUI.o \
 	ERFiles/morphology/CustomMorphology.o \
 	ERFiles/morphology/CustomMorphologyVREP.o \
 	ERFiles/morphology/MorphologyFactory.o \
+  ERFiles/morphology/Tissue_DirectBars.o \
+  ERFiles/morphology/Tissue_GMX.o \
+  ERFiles/morphology/Tissue_DirectBarsVREP.o \
+  ERFiles/morphology/Tissue_GMX_VREP.o \
 	ERFiles/neuron/CPGNeuron.o \
 	ERFiles/neuron/FunctionNeuron.o \
 	ERFiles/neuron/InputNeuron.o \

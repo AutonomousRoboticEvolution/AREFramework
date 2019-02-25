@@ -1,26 +1,10 @@
 #pragma once
 #include "Tissue_DirectBars.h"
 
-
-//struct Vector3 {
-//    float x;
-//    float y;
-//    float z;
-//};
-
-struct Gaussians {
-	vector<float> medians;
-	vector<float> sigmas;
-};
-
 struct Organs {
 	vector<float> coordinates;
+	vector<float> orientations;
 };
-
-//struct Sensors {
-//    Vector3 coordinates;
-//};
-
 
 class Tissue_DirectBarsVREP : public Tissue_DirectBars
 {
@@ -30,6 +14,8 @@ public:
 	virtual vector<int> getObjectHandles(int parentHandle);
 	virtual vector<int> getJointHandles(int parentHandle);
 	void update();
+	shared_ptr<Morphology> clone() const;
+
 	virtual int getMainHandle();
 
 	int createRobot();
@@ -40,7 +26,7 @@ public:
 
 	void mutate();
 
-	void saveGenome(int indNum, int sceneNum, float fitness);
+	void saveGenome(int indNum, float fitness);
 	// this loads genome
 	bool loadGenome(int individualNumber, int sceneNum);
 
@@ -52,7 +38,6 @@ public:
 	vector<int> outputValues;
 
 	vector<Organs> organs;
-	vector<Gaussians> gaussians;
 
 	float fitness; //TODO Do I need this variable?
 
