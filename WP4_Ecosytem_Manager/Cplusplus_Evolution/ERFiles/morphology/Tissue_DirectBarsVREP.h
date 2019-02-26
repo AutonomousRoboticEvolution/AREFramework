@@ -34,6 +34,8 @@ public:
 
 	void mutateMorphology(float mutationRate);
 
+	bool viabilityTest(int robotHandle);
+
 	vector<int> outputHandles;
 	vector<int> outputValues;
 

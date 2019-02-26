@@ -176,7 +176,7 @@ int Tissue_DirectBarsVREP::createRobot() {
 
         // Place organs
         // TODO: Try to remove these temporal variables.
-        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.01};
+        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.01}; // 0.02 Prevent organs colliding with tissue;
         simSetObjectPosition(motorOrgan[i], -1, tempPos);
         simSetObjectPosition(forceSensor[i], -1, tempPos);
         float tempOri[] = {organs[i].orientations[0],organs[i].orientations[1],organs[i].orientations[2]};
@@ -205,6 +205,11 @@ int Tissue_DirectBarsVREP::createRobot() {
     simSetObjectParent(forceSensor3, body, 1);
 	simSetObjectParent(brainOrgan, forceSensor3, 1);
 
+	int objectsNumber;
+	int *objectHandles;
+	objectHandles = simGetObjectsInTree(body, sim_handle_all, 0, &objectsNumber);
+    std::cout << "Objects Number: " << objectsNumber << std::endl;
+    std::cout << "Object 0: " << objectHandles[0] << std::endl;
 	// Create collection
 	int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
 	simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
@@ -216,7 +221,9 @@ void Tissue_DirectBarsVREP::create(){
 	std::cout << "State: CREATE!" << std::endl;
 	mutate();
 	mainHandle = createRobot();
-	std::cout << "Organs number: " << organsNumber << std::endl;
+	bool testResult;
+    testResult = viabilityTest(mainHandle); // True: passed, False: Failed
+    std::cout << "Viability: " << testResult << std::endl;
 }
 
 void Tissue_DirectBarsVREP::init() {
@@ -407,10 +414,10 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
-                    organs[i].coordinates[j] = randomNum->randFloat(-10.0, 10.0); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(-25.0, 25.0); // 3D printer build volumen
                 }
                 else{
-                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 20.0); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 50.0); // 3D printer build volumen
                 }
             }
         }
@@ -420,4 +427,60 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
             }
         }
 	}
+}
+
+bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
+    simAddObjectToSelection(sim_handle_tree, robotHandle);
+    int selectionSize = simGetObjectSelectionSize();
+    int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
+    vector<int> jointHandles;
+    vector<int> shapesHandles;
+    //s_objectAmount = selectionSize;
+    simGetObjectSelection(tempObjectHandles);
+    int objectCounter = 0;
+
+    for (size_t i = 0; i < selectionSize; i++)
+    {
+        if (simGetObjectType(tempObjectHandles[i]) == sim_object_joint_type) {
+            jointHandles.push_back(tempObjectHandles[i]);
+        }
+        if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
+            shapesHandles.push_back(tempObjectHandles[i]);
+            std::cout << simGetObjectName(tempObjectHandles[i]) << std::endl;
+        }
+    }
+
+    bool testResult = true;
+    // Test volume build size
+    float position[3];
+    float euclDisOrigin; // Distance between origin and organ
+    for(int i = 0; i < jointHandles.size(); i++){
+        // Get position of each motor
+        simGetObjectPosition(jointHandles[i],-1,position);
+        //std::cout << position[0] << "," << position[1] << "," << position[2] << std::endl;
+        euclDisOrigin = sqrt(pow(position[0],2)+pow(position[1],2)+pow(position[2],2));
+        // std::cout << "Distance from origin: " << euclDisOrigin << std::endl;
+        if(euclDisOrigin > 0.25){
+           std::cout << simGetObjectName(jointHandles[i]) << " outside of the build volume" << std::endl;
+           testResult = false;
+        }
+    }
+    for(int i = 0; i < shapesHandles.size(); i++){
+        if(simCheckCollision(shapesHandles[1],shapesHandles[i])){
+            std::cout << simGetObjectName(shapesHandles[1]) << " and " << simGetObjectName(shapesHandles[i]) << " are colliding. " << std::endl;
+            testResult = false;
+        }
+
+    }
+    // Test colliding organs
+//    vector<int> shapesHandles;
+//    for (size_t i = 0; i < selectionSize; i++)    {
+//        if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
+//            shapesHandles.push_back(tempObjectHandles[i]);
+//            std::cout << simGetObjectName(tempObjectHandles[i]) << std::endl;
+//        }
+//    }
+
+    simRemoveObjectFromSelection(sim_handle_all, -1);
+    return testResult;
 }
