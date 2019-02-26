@@ -37,7 +37,9 @@ public:
 	vector<int> outputHandles;
 	vector<int> outputValues;
 
-	vector<Organs> organs;
+	// Mutable parameters
+	vector<Organs> organs; // Coordinates and orientations
+	int organsNumber;
 
 	float fitness; //TODO Do I need this variable?
 
