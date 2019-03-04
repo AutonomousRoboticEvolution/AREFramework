@@ -28,6 +28,7 @@ public:
 
 	void saveGenome(int indNum, float fitness);
 	// this loads genome
+    //bool loadGenome(std::istream &genomeInput, int individualNumber);
 	bool loadGenome(int individualNumber, int sceneNum);
 
 	void initMorphology();
@@ -38,6 +39,8 @@ public:
 
 	vector<int> outputHandles;
 	vector<int> outputValues;
+
+	bool viabilityResult;
 
 	// Mutable parameters
 	vector<Organs> organs; // Coordinates and orientations

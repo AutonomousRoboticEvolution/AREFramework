@@ -92,15 +92,10 @@ int Tissue_GMX_VREP::createRobot() {
     std::vector< std::vector<float> > sigma(3);
 
     // Get this information from genome
-    // First gaussian
-    mean.at(0) = {gaussians[0].medians[0], gaussians[0].medians[1], gaussians[0].medians[2]};
-    sigma.at(0) = {gaussians[0].sigmas[0], gaussians[0].sigmas[1], gaussians[0].sigmas[2]};
-    // Second gaussian
-    mean.at(1) = {gaussians[1].medians[0], gaussians[1].medians[1], gaussians[1].medians[2]};
-    sigma.at(1) = {gaussians[1].sigmas[0], gaussians[1].sigmas[1], gaussians[1].sigmas[2]};
-    // Second gaussian
-    mean.at(2) = {gaussians[2].medians[0], gaussians[2].medians[1], gaussians[2].medians[2]};
-    sigma.at(2) = {gaussians[2].sigmas[0], gaussians[2].sigmas[1], gaussians[2].sigmas[2]};
+    for(int i=0; i < mean.size(); i++){
+		mean.at(i) = {gaussians[i].medians[0], gaussians[i].medians[1], gaussians[i].medians[2]};
+		sigma.at(i) = {gaussians[i].sigmas[0], gaussians[i].sigmas[1], gaussians[i].sigmas[2]};
+    }
 
     // Generate samples for each distribution
     Eigen::MatrixXd samplesA = getSamples(iNumberOfSamples, mean.at(0), sigma.at(0));
@@ -124,16 +119,31 @@ int Tissue_GMX_VREP::createRobot() {
     RobotMorphology.handle = handle;
 
     // Importing motor organs
-    int motorOrgan1 = simLoadModel("models/motorOrgan.ttm");
-    int motorOrgan2 = simLoadModel("models/motorOrgan.ttm");
     int brainOrgan = simLoadModel("models/brainOrgan.ttm");
-
+    int motorOrgan[organsNumber];
     // Create force sensors to place organs
     int pamsArg1[] = {0,0,0,0,0};
     float pamsArg2[] = {0,0,0,0,0};
-    int forceSensor1 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
-    int forceSensor2 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
+    int forceSensor[organsNumber];
     int forceSensor3 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
+
+    // Set organs position and orientation
+    for(int i = 0; i < organsNumber; i++){
+        motorOrgan[i] = simLoadModel("models/motorOrgan2.ttm");
+        forceSensor[i] = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
+        float tempPos[3] = {organs[i].coordinates[0] / 100, organs[i].coordinates[1] / 100, organs[i].coordinates[2] / 100};
+        simSetObjectPosition(motorOrgan[i], -1, tempPos);
+        simSetObjectPosition(forceSensor[i], -1, tempPos);
+        float tempOri[3] = {organs[i].orientations[0] / 100, organs[i].orientations[1] / 100, organs[i].orientations[2] / 100};
+        simSetObjectOrientation(motorOrgan[i], -1, tempOri);
+        simSetObjectOrientation(forceSensor[i], -1, tempOri);
+    }
+    float organ3_pos[] = {organs[2].coordinates[0] / 100, organs[2].coordinates[1] / 100, organs[2].coordinates[2] / 100};
+    float organ3_ori[] = {0, 1.57080, 0};
+    simSetObjectPosition(brainOrgan, -1, organ3_pos);
+    simSetObjectPosition(forceSensor3, -1, organ3_pos);
+    simSetObjectOrientation(brainOrgan, -1, organ3_ori);
+    simSetObjectOrientation(forceSensor3, -1, organ3_ori);
 
     // TODO: EB to Create dummies
 
@@ -222,38 +232,16 @@ int Tissue_GMX_VREP::createRobot() {
     // Close tissue file
     tissueFile.close();
 
-    // Set organs position
-    float organ1_pos[] = {organs[0].coordinates[0] / 100, organs[0].coordinates[1] / 100, organs[0].coordinates[2] / 100};
-    simSetObjectPosition(motorOrgan1, -1, organ1_pos);
-    simSetObjectPosition(forceSensor1, -1, organ1_pos);
-    float organ2_pos[] = {organs[1].coordinates[0] / 100, organs[1].coordinates[1] / 100, organs[1].coordinates[2] / 100};
-    simSetObjectPosition(motorOrgan2, -1, organ2_pos);
-    simSetObjectPosition(forceSensor2, -1, organ2_pos);
-    float organ3_pos[] = {organs[2].coordinates[0] / 100, organs[2].coordinates[1] / 100, organs[2].coordinates[2] / 100};
-    simSetObjectPosition(brainOrgan, -1, organ3_pos);
-    simSetObjectPosition(forceSensor3, -1, organ3_pos);
-
-    // Set organs orientation
-    float organ1_angle[] = { 1.57080, 0, -1.57080 };
-    float organ2_angle[] = { 1.57080, 0, 1.57080 }; // 3.151516 for second orientation
-    float organ3_angle[] = { 0, 1.57080, 0 };
-    simSetObjectOrientation(motorOrgan1, -1, organ1_angle);
-    simSetObjectOrientation(motorOrgan2, -1, organ2_angle);
-    simSetObjectOrientation(brainOrgan, -1, organ3_angle);
-    simSetObjectOrientation(forceSensor1, -1, organ1_angle);
-    simSetObjectOrientation(forceSensor2, -1, organ2_angle);
-    simSetObjectOrientation(forceSensor3, -1, organ3_angle);
-
     int* a = RobotMorphology.cubeHandles.data();
     int body = simGroupShapes(a, RobotMorphology.cubeHandles.size());
     simSetObjectName(body, "robotShape");
 
     // Set parents
-    simSetObjectParent(forceSensor1, body, 1);
-    simSetObjectParent(forceSensor2, body, 1);
+    for(int i = 0; i < organsNumber; i++){
+        simSetObjectParent(forceSensor[i], body, 1);
+        simSetObjectParent(motorOrgan[i], forceSensor[i], 1);
+    }
     simSetObjectParent(forceSensor3, body, 1);
-    simSetObjectParent(motorOrgan1, forceSensor1, 1);
-    simSetObjectParent(motorOrgan2, forceSensor2, 1);
     simSetObjectParent(brainOrgan, forceSensor3, 1);
 
     // Create collection
@@ -410,69 +398,63 @@ bool Tissue_GMX_VREP::loadGenome(int individualNumber, int sceneNum) {
 		std::cout << morphologyValues[i] << std::endl;
 	}
 
-
-	gaussians[0].medians[0] = stof(morphologyValues[1]);
-	gaussians[0].medians[1] = stof(morphologyValues[3]);
-	gaussians[0].medians[2] = stof(morphologyValues[5]);
-	gaussians[0].sigmas[0] = stof(morphologyValues[7]);
-	gaussians[0].sigmas[1] = stof(morphologyValues[9]);
-	gaussians[0].sigmas[2] = stof(morphologyValues[11]);
-	gaussians[1].medians[0] = stof(morphologyValues[13]);
-	gaussians[1].medians[1] = stof(morphologyValues[15]);
-	gaussians[1].medians[2] = stof(morphologyValues[17]);
-	gaussians[1].sigmas[0] = stof(morphologyValues[19]);
-	gaussians[1].sigmas[1] = stof(morphologyValues[21]);
-	gaussians[1].sigmas[2] = stof(morphologyValues[23]);
-	gaussians[2].medians[0] = stof(morphologyValues[25]);
-	gaussians[2].medians[1] = stof(morphologyValues[27]);
-	gaussians[2].medians[2] = stof(morphologyValues[29]);
-	gaussians[2].sigmas[0] = stof(morphologyValues[31]);
-	gaussians[2].sigmas[1] = stof(morphologyValues[33]);
-	gaussians[2].sigmas[2] = stof(morphologyValues[35]);
-	//TODO: Remove unnecessary organs
-	organs[0].coordinates[0] = stof(morphologyValues[37]);
-	organs[0].coordinates[1] = stof(morphologyValues[39]);
-	organs[0].coordinates[2] = stof(morphologyValues[41]);
-	organs[1].coordinates[0] = stof(morphologyValues[43]);
-	organs[1].coordinates[1] = stof(morphologyValues[45]);
-	organs[1].coordinates[2] = stof(morphologyValues[47]);
-	organs[2].coordinates[0] = stof(morphologyValues[49]);
-	organs[2].coordinates[1] = stof(morphologyValues[51]);
-	organs[2].coordinates[2] = stof(morphologyValues[53]);
-	organs[3].coordinates[0] = stof(morphologyValues[55]);
-	organs[3].coordinates[1] = stof(morphologyValues[57]);
-	organs[3].coordinates[2] = stof(morphologyValues[59]);
-	organs[4].coordinates[0] = stof(morphologyValues[61]);
-	organs[4].coordinates[1] = stof(morphologyValues[63]);
-	organs[4].coordinates[2] = stof(morphologyValues[65]);
+	// Load values
+	int genomeCounter = 1; //
+	organsNumber = stof(morphologyValues[genomeCounter]);
+	genomeCounter += 2;
+	for (int i = 0; i < gaussians.size(); i++) {
+		for (int j = 0; j < gaussians[i].medians.size(); j++) {
+			gaussians[i].medians[j] = stof(morphologyValues[genomeCounter]);
+			genomeCounter += 2;
+		}
+		for (int j = 0; j < gaussians[i].sigmas.size(); j++) {
+			gaussians[i].sigmas[j] = stof(morphologyValues[genomeCounter]);
+			genomeCounter += 2;
+		}
+	}
+	for (int i = 0; i < organsNumber; i++) {
+		for (int j = 0; j < organs[i].coordinates.size(); j++) {
+			organs[i].coordinates[j] = stof(morphologyValues[genomeCounter]);
+			genomeCounter += 2;
+		}
+		for (int j = 0; j < organs[i].orientations.size(); j++) {
+			organs[i].orientations[j] = stof(morphologyValues[genomeCounter]);
+			genomeCounter += 2;
+		}
+	}
 	return true; // TODO: Change this to only return true when genome is correctly loaded
 }
 // Initialize variables for morphology
 void Tissue_GMX_VREP::initMorphology() {
 	// Number of gaussians
+
 	gaussians.resize(3);
-	gaussians[0].medians.resize(3);
-	gaussians[0].sigmas.resize(3);
-	gaussians[1].medians.resize(3);
-	gaussians[1].sigmas.resize(3);
-	gaussians[2].medians.resize(3);
-	gaussians[2].sigmas.resize(3);
+	for(int i = 0; i < gaussians.size(); i++){
+		gaussians[i].medians.resize(3);
+		gaussians[i].sigmas.resize(3);
+	}
 	//TODO: Remove unnecessary organs
 	// Number of organs
-	organs.resize(5);
-	organs[0].coordinates.resize(3);
-	organs[1].coordinates.resize(3);
-	organs[2].coordinates.resize(3);
-	organs[3].coordinates.resize(3);
-	organs[4].coordinates.resize(3);
+	organs.resize(10);
+	for (int i = 0; i < organs.size(); i++) {
+		organs[i].coordinates.resize(3);
+		organs[i].orientations.resize(3);
+	}
 }
 // Mutate parameters for Moorphology
 void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
     // Generate gaussians
+    organsNumber = 2;
 	for (int i = 0; i < gaussians.size(); i++) {
 		for (int j = 0; j < gaussians[i].medians.size(); j++) {
 			if (mutationRate < randomNum->randFloat(0, 1)) {
-				gaussians[i].medians[j] = randomNum->randFloat(0.0, 5);
+                if(j!=2){ // Make sure to generate coordinates above the ground
+                    gaussians[i].medians[j] = randomNum->randFloat(-5.0, 5.0);
+                }
+                else{
+                    gaussians[i].medians[j] = randomNum->randFloat(0.0, 10.0);
+                }
+
 			}
 		}
 		for (int j = 0; j < gaussians[i].sigmas.size(); j++) {
@@ -482,47 +464,24 @@ void Tissue_GMX_VREP::mutateMorphology(float mutationRate) {
 		}
 	}
 	for (int i = 0; i < organs.size(); i++) {
-		bool isOrganColliding;
-		do {
-			isOrganColliding = false;
-			// Generate coordinates for organs
-			for (int j = 0; j < organs[i].coordinates.size(); j++) {
-				//if (mutationRate < randomNum->randFloat(0, 1)) {
-				if (0.0 < randomNum->randFloat(0, 1)) {
-					organs[i].coordinates[j] = randomNum->randFloat(0.0, 6.0);
-					//std::cout << organs[i].coordinates[j] << std::endl;
+		for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
+			if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
+				if(j!=2){ // Make sure to generate coordinates above the ground
+					organs[i].coordinates[j] = randomNum->randFloat(-5.0, 5.0); // 3D printer build volumen
+				}
+				else{
+					organs[i].coordinates[j] = randomNum->randFloat(0.0, 10.0); // 3D printer build volumen
 				}
 			}
-			if (i > 0) {
-				// Wheel 1
-				if (organs[i].coordinates[0] / 100 > organs[1].coordinates[0] / 100 - (0.07 / 2) // Original 0.05
-					&& organs[i].coordinates[0] / 100 < organs[1].coordinates[0] / 100 + (0.07 / 2)
-					&& organs[i].coordinates[1] / 100 > organs[1].coordinates[1] / 100 - 0.035 - (0.02 / 2)  // Original 0.05
-					&& organs[i].coordinates[1] / 100 < organs[1].coordinates[1] / 100 + 05574 + (0.02 / 2)
-					&& organs[i].coordinates[2] / 100 > organs[1].coordinates[2] / 100 - (0.07 / 2) // Original 0.01
-					&& organs[i].coordinates[2] / 100 < organs[1].coordinates[2] / 100 + (0.07 / 2)) {
-					true;
-				}
-				if (organs[i].coordinates[0] / 100 > organs[2].coordinates[0] / 100 - (0.044 / 2) // Original 0.05
-					&& organs[i].coordinates[0] / 100 < organs[2].coordinates[0] / 100 + (0.044 / 2)
-					&& organs[i].coordinates[1] / 100 > organs[2].coordinates[1] / 100 - (0.092 / 2)  // Original 0.05
-					&& organs[i].coordinates[1] / 100 < organs[2].coordinates[1] / 100 + (0.092 / 2)
-					&& organs[i].coordinates[2] / 100 > organs[2].coordinates[2] / 100 - (0.056 / 2) // Original 0.01
-					&& organs[i].coordinates[2] / 100 < organs[2].coordinates[2] / 100 + (0.056 / 2)) {
-					true;
-				}
-			}
-		} while (isOrganColliding);
-		// DEBUG
-//        organs[0].coordinates[0] = 8;
-//        organs[0].coordinates[1] = 8;
-//        organs[0].coordinates[2] = 3;
-//        organs[1].coordinates[0] = 0;
-//        organs[1].coordinates[1] = 8;
-//        organs[1].coordinates[2] = 3;
-//        organs[2].coordinates[0] = 8;
-//        organs[2].coordinates[1] = 0;
-//        organs[2].coordinates[2] = 3;
+		}
+//		for (int j = 0; j < organs[i].orientations.size(); j++) { // Mutate orientations
+//			if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
+//				organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
+//			}
+//		}
+        organs[i].orientations[0] = 1.57080;
+        organs[i].orientations[2] = 0.0;
+        organs[i].orientations[2] = -1.57080;
 	}
 }
 // Create list of voxels from points

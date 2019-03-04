@@ -33,6 +33,7 @@ public:
 
 	struct Organs {
 		vector<float> coordinates;
+		vector<float> orientations;
 	};
 
 	int createRobot();
@@ -54,8 +55,10 @@ public:
 	vector<int> outputHandles;
 	vector<int> outputValues;
 
+	// Mutable parameters
 	vector<Organs> organs;
 	vector<Gaussians> gaussians;
+	int organsNumber;
 
 	float fitness; //TODO Do I need this variable?
 

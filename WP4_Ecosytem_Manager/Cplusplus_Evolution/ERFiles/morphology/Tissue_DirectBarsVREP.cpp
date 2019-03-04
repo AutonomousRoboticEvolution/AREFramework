@@ -58,15 +58,21 @@ vector<int> Tissue_DirectBarsVREP::getJointHandles(int parentHandle)
 }
 
 void Tissue_DirectBarsVREP::update() {
-	if (control) {
-		vector<float> input; // get sensor parameters, not set in this case
-		vector<float> output = control->update(input);
-		//		cout << output[0] << endl;
-		for (int i = 0; i < output.size(); i++) {
-			simSetJointTargetVelocity(outputHandles[i], output[i] * 1000);// output[i]);
-			//simSetJointTargetPosition(outputHandles[i], output[i]);
-		}
-	}
+//	if (control) {
+//		vector<float> input; // get sensor parameters, not set in this case
+//		vector<float> output = control->update(input);
+//		//		cout << output[0] << endl;
+//		for (int i = 0; i < output.size(); i++) {
+//			simSetJointTargetVelocity(outputHandles[i], output[i] * 1000);// output[i]);
+//			//simSetJointTargetPosition(outputHandles[i], output[i]);
+//		}
+//	}
+    // If robot fails viability test stop simulation
+    // TODO change fitness to zero
+    if(viabilityResult == false){
+        std::cout << "Robot failed viability test. Stop simulation" << std::endl;
+        //simStopSimulation();
+    }
 }
 
 int Tissue_DirectBarsVREP::getMainHandle()
@@ -94,13 +100,13 @@ int Tissue_DirectBarsVREP::createRobot() {
 	RobotMorphology.handle = handle;
 
 	// Importing motor organs
-	int motorOrgan[organs.size()];
+	int motorOrgan[organsNumber];
 	int brainOrgan = simLoadModel("models/brainOrgan.ttm");
 
 	// Create force sensors to place organs
 	int pamsArg1[] = { 0,0,0,0,0 };
 	float pamsArg2[] = { 0,0,0,0,0 };
-    int forceSensor[organs.size()];
+    int forceSensor[organsNumber];
 	int forceSensor3 = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
 
 	// TODO: EB to Create dummies
@@ -115,7 +121,7 @@ int Tissue_DirectBarsVREP::createRobot() {
 	// Create voxel
 	int temp_voxel_handle;
 	float columnWidth = 0.015;
-	float columnHeight = 0.015;
+	float columnHeight = 0.010; // Wheel not touching floor decrease height
 	float magnitude;
 	float angle;
 	float voxel_size[3];
@@ -123,8 +129,15 @@ int Tissue_DirectBarsVREP::createRobot() {
 	float voxel_ori[3];
 	float voxel_color[3];
 
-	for(int i = 0; i < organs.size(); i++){
-        motorOrgan[i] = simLoadModel("models/motorOrgan2.ttm");
+	for(int i = 0; i < organsNumber; i++){
+        // motorOrgan[i] = simLoadModel("models/motorOrgan2_bigWheel.ttm");
+        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
+//	    if(i % 2 == 0 ){
+//            motorOrgan[i] = simLoadModel("models/motorOrgan2.ttm");
+//	    }
+//        else{
+//            motorOrgan[i] = simLoadModel("models/sensorOrgan.ttm");
+//        }
         forceSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
 
         magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
@@ -155,7 +168,7 @@ int Tissue_DirectBarsVREP::createRobot() {
 
         voxel_size[0] = columnWidth;
         voxel_size[1] = columnHeight;
-        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - columnWidth);
+        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - columnHeight);
         temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
         RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
 
@@ -176,7 +189,7 @@ int Tissue_DirectBarsVREP::createRobot() {
 
         // Place organs
         // TODO: Try to remove these temporal variables.
-        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.01}; // 0.02 Prevent organs colliding with tissue;
+        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.02}; // 0.0225 Wheels barely touching floor but more room to rotate;
         simSetObjectPosition(motorOrgan[i], -1, tempPos);
         simSetObjectPosition(forceSensor[i], -1, tempPos);
         float tempOri[] = {organs[i].orientations[0],organs[i].orientations[1],organs[i].orientations[2]};
@@ -198,7 +211,7 @@ int Tissue_DirectBarsVREP::createRobot() {
 	simSetObjectName(body, "robotShape");
 
 	//  Set parents
-    for(int i = 0; i < organs.size(); i++){
+    for(int i = 0; i < organsNumber; i++){
         simSetObjectParent(forceSensor[i], body, 1);
         simSetObjectParent(motorOrgan[i], forceSensor[i], 1);
     }
@@ -221,9 +234,9 @@ void Tissue_DirectBarsVREP::create(){
 	std::cout << "State: CREATE!" << std::endl;
 	mutate();
 	mainHandle = createRobot();
-	bool testResult;
-    testResult = viabilityTest(mainHandle); // True: passed, False: Failed
-    std::cout << "Viability: " << testResult << std::endl;
+	viabilityResult;
+    viabilityResult = viabilityTest(mainHandle); // True: passed, False: Failed
+    std::cout << "Viability: " << viabilityResult << std::endl;
 }
 
 void Tissue_DirectBarsVREP::init() {
@@ -259,9 +272,9 @@ void Tissue_DirectBarsVREP::saveGenome(int indNum, float fitness){
 	genomeFile.open(genomeFileName.str());
 	genomeFile << "#Individual:" << indNum << endl;
 	genomeFile << "#Fitness:," << fitness << endl;
-
 	genomeFile << "#MorphologyParams:," << endl;
-	for (int i = 0; i < organs.size(); i++) {
+    genomeFile << organsNumber << ",\n";
+	for (int i = 0; i < organsNumber; i++) {
 		//genomeFile << "\t" << "#Organ" << i << "," << std::endl;
 		for (int j = 0; j < organs[i].coordinates.size(); j++) {
 			//genomeFile << "\t\t" << "#Coordinate" << j << ',' << organs[i].coordinates[j] << "," << std::endl;
@@ -284,7 +297,7 @@ void Tissue_DirectBarsVREP::saveGenome(int indNum, float fitness){
     phenotypeFileName << settings->repository + "/morphologies0" << "/phenotype" << indNum << ".csv";
     phenotypeFile.open(phenotypeFileName.str());
     phenotypeFile << 0.0 << ',' << 0.0 << ',' << 0.0 << ',' << 0.0 << ',' << 0.0 << ',' << 0.0 << std::endl;
-    for(int i = 0; i < organs.size(); i++){
+    for(int i = 0; i < organsNumber; i++){
         for (int j = 0; j < organs[i].coordinates.size(); j++) {
             phenotypeFile << organs[i].coordinates[j] << ',';
         }
@@ -296,9 +309,9 @@ void Tissue_DirectBarsVREP::saveGenome(int indNum, float fitness){
     // Close tissue file
     phenotypeFile.close();
 }
+//bool Tissue_DirectBarsVREP::loadGenome(std::istream &genomeInput, int individualNumber){
 bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
 	std::cout << "State: LOAD GENOME!" << std::endl;
-	cout << "loading cat genome " << individualNumber << endl;
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
@@ -347,7 +360,6 @@ bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
 	vector<string> morphologyValues;
 	bool checkingMorphology = false;
 
-
 	for (it = values.begin(); it != values.end(); it++) {
 		string tmp = *it;
 		if (checkingMorphology == true) {
@@ -368,13 +380,11 @@ bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
 			checkingMorphology = false;
 		}
 	}
-	std::cout << "Print!" << std::endl;
-	for (int i = 0; i < 30; i++) {
-		std::cout << morphologyValues[i] << std::endl;
-	}
     // Load values
-    int genomeCounter = 13; // Ignore brain
-    for (int i = 0; i < organs.size(); i++) {
+    int genomeCounter = 1; //
+    organsNumber = stof(morphologyValues[genomeCounter]);
+    genomeCounter += 2;
+    for (int i = 0; i < organsNumber; i++) {
         for (int j = 0; j < organs[i].coordinates.size(); j++) {
             organs[i].coordinates[j] = stof(morphologyValues[genomeCounter]);
             genomeCounter += 2;
@@ -392,8 +402,7 @@ void Tissue_DirectBarsVREP::initMorphology() {
 
     std::cout << "Init Morph!" << std::endl;
     //TODO: Remove unnecessary organs
-    organsNumber = 4;
-	organs.resize(organsNumber);
+	organs.resize(10);
 	// Initialize coordinates and orientations
     for (int i = 0; i < organs.size(); i++) {
         organs[i].coordinates.resize(3);
@@ -404,28 +413,41 @@ void Tissue_DirectBarsVREP::initMorphology() {
 void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     std::cout << "Mutate morphology!" << std::endl;
     // Mutate number of organs
+    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
+        organsNumber = (int)randomNum->randFloat(1, 4);
+//        organsNumber = 1;
+    }
 //    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
-//        if(organsNumber > 1) organsNumber--;
+//        if(genome->organsNumber > 1) genome->organsNumber--;
 //    }
 //    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Increment number of organs;
-//        if(organsNumber < 10) organsNumber++;
+//        if(genome->organsNumber < 10) genome->organsNumber++;
 //    }
-	for (int i = 0; i < organs.size(); i++) { // Mutate organs
+	for (int i = 0; i < organsNumber; i++) { // Mutate organs
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
-                    organs[i].coordinates[j] = randomNum->randFloat(-25.0, 25.0); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(-19.0, 19.0); // 3D printer build volumen
                 }
                 else{
-                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 50.0); // 3D printer build volumen
+                  organs[i].coordinates[j] = 0.0; // Motors close to ground
+//                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 5.0);
                 }
             }
         }
+//        organs[i].coordinates[0] = 0.0;
+//        organs[i].coordinates[1] = 8.0;
         for (int j = 0; j < organs[i].orientations.size(); j++) { // Mutate orientations
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
-                organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
+                if(j == 1){
+                    organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
+                }
+                //organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
             }
         }
+        organs[i].orientations[0] = 1.57080;
+//        organs[i].orientations[1] = 0.0;
+        organs[i].orientations[2] = -1.57080;
 	}
 }
 
@@ -435,14 +457,13 @@ bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
     int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
     vector<int> jointHandles;
     vector<int> shapesHandles;
-    //s_objectAmount = selectionSize;
     simGetObjectSelection(tempObjectHandles);
-    int objectCounter = 0;
 
     for (size_t i = 0; i < selectionSize; i++)
     {
         if (simGetObjectType(tempObjectHandles[i]) == sim_object_joint_type) {
             jointHandles.push_back(tempObjectHandles[i]);
+            simSetJointTargetVelocity(jointHandles[i], 5.0);
         }
         if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
             shapesHandles.push_back(tempObjectHandles[i]);
@@ -451,7 +472,13 @@ bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
     }
 
     bool testResult = true;
-    // Test volume build size
+    // Test 1: Organs number
+    // The number of organs cannot be greater than 5
+    if(organsNumber > 4){
+        return false;
+    }
+    // Test 1: Volume build size
+    // Check if an organ is outside of the 3D printing volume
     float position[3];
     float euclDisOrigin; // Distance between origin and organ
     for(int i = 0; i < jointHandles.size(); i++){
@@ -462,24 +489,29 @@ bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
         // std::cout << "Distance from origin: " << euclDisOrigin << std::endl;
         if(euclDisOrigin > 0.25){
            std::cout << simGetObjectName(jointHandles[i]) << " outside of the build volume" << std::endl;
-           testResult = false;
+           // testResult = false;
+           return false;
         }
     }
+    // Test 3: No organs above brain (direct bars exclusive restriction)
+    // No organs can be above the brain
+    for(int i = 0; i < jointHandles.size(); i++){
+        simGetObjectPosition(jointHandles[i],-1,position);
+        euclDisOrigin = sqrt(pow(position[0],2)+pow(position[1],2));
+        if(euclDisOrigin < 0.036){
+            // testResult = false;
+            return false;
+        }
+    }
+    // Test 2: Prevent colliding organs
+    // Check if any organs are colliding with the tissue
     for(int i = 0; i < shapesHandles.size(); i++){
         if(simCheckCollision(shapesHandles[1],shapesHandles[i])){
             std::cout << simGetObjectName(shapesHandles[1]) << " and " << simGetObjectName(shapesHandles[i]) << " are colliding. " << std::endl;
-            testResult = false;
+            //testResult = false;
+            return false;
         }
-
     }
-    // Test colliding organs
-//    vector<int> shapesHandles;
-//    for (size_t i = 0; i < selectionSize; i++)    {
-//        if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
-//            shapesHandles.push_back(tempObjectHandles[i]);
-//            std::cout << simGetObjectName(tempObjectHandles[i]) << std::endl;
-//        }
-//    }
 
     simRemoveObjectFromSelection(sim_handle_all, -1);
     return testResult;
