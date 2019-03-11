@@ -35,7 +35,6 @@ public:
 	void init();
 	struct Genome {
 		// Placeholder for mutable parameters
-		int organsNumber = 1;
 	};
 	shared_ptr<Genome> genome;
 

@@ -71,7 +71,7 @@ void Tissue_DirectBarsVREP::update() {
     // TODO change fitness to zero
     if(viabilityResult == false){
         std::cout << "Robot failed viability test. Stop simulation" << std::endl;
-        //simStopSimulation();
+        simStopSimulation();
     }
 }
 
@@ -131,13 +131,13 @@ int Tissue_DirectBarsVREP::createRobot() {
 
 	for(int i = 0; i < organsNumber; i++){
         // motorOrgan[i] = simLoadModel("models/motorOrgan2_bigWheel.ttm");
-        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
-//	    if(i % 2 == 0 ){
-//            motorOrgan[i] = simLoadModel("models/motorOrgan2.ttm");
-//	    }
-//        else{
-//            motorOrgan[i] = simLoadModel("models/sensorOrgan.ttm");
-//        }
+//        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
+	    if(i % 2 == 0 ){
+            motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
+	    }
+        else{
+            motorOrgan[i] = simLoadModel("models/sensorOrgan.ttm");
+        }
         forceSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
 
         magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
@@ -302,7 +302,7 @@ void Tissue_DirectBarsVREP::saveGenome(int indNum, float fitness){
             phenotypeFile << organs[i].coordinates[j] << ',';
         }
         for (int j = 0; j < organs[i].orientations.size(); j++) {
-            phenotypeFile << organs[i].orientations[j] << ',';
+            phenotypeFile << organs[i].orientations[j]*180.0/3.1516 << ',';
         }
         phenotypeFile << std::endl;
     }
@@ -390,7 +390,7 @@ bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
             genomeCounter += 2;
         }
         for (int j = 0; j < organs[i].orientations.size(); j++) {
-            organs[i].orientations[j] = stof(morphologyValues[genomeCounter]);
+            organs[i].orientations[j] = stof(morphologyValues[genomeCounter])*3.1415/180.0;
             genomeCounter += 2;
         }
     }
@@ -414,8 +414,8 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     std::cout << "Mutate morphology!" << std::endl;
     // Mutate number of organs
     if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
-        organsNumber = (int)randomNum->randFloat(1, 4);
-//        organsNumber = 1;
+//        organsNumber = (int)randomNum->randFloat(1, 9);
+        organsNumber = 4;
     }
 //    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
 //        if(genome->organsNumber > 1) genome->organsNumber--;
@@ -427,27 +427,34 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
-                    organs[i].coordinates[j] = randomNum->randFloat(-19.0, 19.0); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(-10.0, 10.0); // 3D printer build volumen
                 }
                 else{
-                  organs[i].coordinates[j] = 0.0; // Motors close to ground
-//                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 5.0);
+//                  organs[i].coordinates[j] = 0.0; // Motors close to ground
+                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 10.0);
                 }
             }
         }
 //        organs[i].coordinates[0] = 0.0;
 //        organs[i].coordinates[1] = 8.0;
         for (int j = 0; j < organs[i].orientations.size(); j++) { // Mutate orientations
-            if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
-                if(j == 1){
-                    organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
-                }
-                //organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
+            if (settings->morphMutRate < randomNum->randFloat(0, 1)){
+                organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
             }
         }
-        organs[i].orientations[0] = 1.57080;
-//        organs[i].orientations[1] = 0.0;
-        organs[i].orientations[2] = -1.57080;
+        if(i % 2 == 0 ){
+            organs[i].orientations[0] = 1.57080;
+//          organs[i].orientations[1] = 0.0;
+            organs[i].orientations[2] = -1.57080;
+        }
+        else{
+            organs[i].orientations[0] = 1.57;
+//          organs[i].orientations[1] = 0.0;
+            organs[i].orientations[2] = 0.0;
+        }
+//        organs[i].orientations[0] = 1.57080; // Y-axis
+////        organs[i].orientations[1] = 0.0; // Z-axis
+//        organs[i].orientations[2] = -1.57080; // X-axis along motor axis. No mutation required
 	}
 }
 
@@ -463,7 +470,7 @@ bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
     {
         if (simGetObjectType(tempObjectHandles[i]) == sim_object_joint_type) {
             jointHandles.push_back(tempObjectHandles[i]);
-            simSetJointTargetVelocity(jointHandles[i], 5.0);
+            simSetJointTargetVelocity(jointHandles[i], 10.0);
         }
         if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
             shapesHandles.push_back(tempObjectHandles[i]);
