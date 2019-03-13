@@ -35,7 +35,7 @@ void ER_CPPN_Encoding::init() {
 		// not used in CPPN
 		cout << "CPPN encoding cannot yet create a quadruped" << endl;
 	}
-	
+
 }
 
 int ER_CPPN_Encoding::initializeGenome(int type) {
@@ -45,13 +45,13 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 		cout << "initializing CPPN Encoding Genome" << endl;
 	}
 	morphFitness = 0;
-	
+
 
 
 	// CPPN currently takes the increment and position as inputs
 	cppn = shared_ptr<CPPN>(new CPPN);
 	cppn->settings = settings;
-	cppn->init(8, 8, 6); // output is type, orientation and activation of sin 
+	cppn->init(8, 8, 6); // output is type, orientation and activation of sin
 	// cppn->mutate(settings->morphMutRate);
 	cppn->mutate(0.5);
 
@@ -63,16 +63,16 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 	//	// currently everything has a neural network...
 	//	genome->moduleParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	//	if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
-	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr 
+	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr
 	//		cout << "initializing both!!!" << endl;
 	//		//			cout << "OUTPUTSIZE = " << genome->moduleParameters[i]->control-> outputLayer.size() << endl;
 
 	//	}
 	//	else if (settings->controlType == settings->ANN_DISTRIBUTED_UP) {
-	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr 
+	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr
 	//	}
 	//	else if (settings->controlType == settings->ANN_DISTRIBUTED_DOWN) {
-	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr 
+	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr
 	//	}
 	//	else {
 	//		genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
@@ -99,10 +99,10 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 	cppn->mutate(settings->morphMutRate);
 
 	//cout << "mutating direct" << endl;
-	//// 1) add module, 
+	//// 1) add module,
 	//// 2) mutate morphology
 	//// 3) mutate control
-	//// 4) prune 
+	//// 4) prune
 	//// 5) symmetry
 
 	//for (int am = 0; am < 5; am++) {
@@ -242,10 +242,10 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 
 
 void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
-		
+
 	shared_ptr<ER_CPPN_Encoding>morpho(static_pointer_cast<ER_CPPN_Encoding>(partnerMorph));   //*partnerMorph(ER_CPPN_Encoding()));
 	shared_ptr<GENOTYPE> tempGenome;
-	tempGenome = morpho->genome->clone(); 
+	tempGenome = morpho->genome->clone();
 
 	bool cross = false;
 	for (int i = 0; i < genome->amountModules; i++) {
@@ -271,7 +271,7 @@ void ER_CPPN_Encoding::printSome() {
 
 /*!
  * Temporary function for future use
- * 
+ *
  * \param type
  */
 void ER_CPPN_Encoding::initializeQuadruped(int type)
@@ -294,7 +294,7 @@ void ER_CPPN_Encoding::initializeQuadruped(int type)
 
 /*!
  * Generating the genome
- * 
+ *
  * \param indNum
  * \param fitness
  */
@@ -305,14 +305,14 @@ const std::string ER_CPPN_Encoding::generateGenome(int indNum, float fitness) co
 
 	int amountStates = genome->moduleParameters.size();
 	stringstream cppndata = cppn->getControlParams();
-	
+
 	ostringstream genomeText;
 	genomeText << "#CPPN Genome" << endl;
 	genomeText << "#Individual:" << indNum << "," << endl;
 	genomeText << "#Fitness:," << fitness << "," << endl;
 	genomeText << "#phenValue;," << phenValue << endl;
 	genomeText << "#AmountStates:," << amountStates << "," << endl << endl;
-	
+
 	genomeText << "#CPPN_Start," << endl;
 	genomeText << cppndata.str() << endl;
 	genomeText << "#CPPN_End," << endl;
@@ -325,13 +325,14 @@ float ER_CPPN_Encoding::getFitness() {
 	return fitness;
 }
 
+//this is where the genome is loaded 
 bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 	if (settings->verbose) {
 		cout << "loading genome " << individualNumber << "(ER_Direct)" << endl;
 	}
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	//	lGenome->lParameters.clear();
-	//	cout << "lGenome cleared" << endl; 
+	//	cout << "lGenome cleared" << endl;
 	//if (!genomeFile) {
 	//	std::cerr << "Could not load " << genomeFileName.str() << std::endl;
 	//	return false;
@@ -390,7 +391,7 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 			it++;
 			tmp = *it;
 			fitness = atof(tmp.c_str());
-			//		cout << "Fitness was " << fitness << endl; 
+			//		cout << "Fitness was " << fitness << endl;
 		}
 		if (tmp == "#phenValue;") {
 			it++;
@@ -410,7 +411,7 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 			tmp = *it;
 			moduleNum = atoi(tmp.c_str());
 			checkingModule = true;
-			//		cout << "moduleNum set to " << moduleNum << endl; 
+			//		cout << "moduleNum set to " << moduleNum << endl;
 		}
 		else if (tmp == "#AmountChilds:") {
 			it++;
@@ -443,7 +444,7 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 		else if (tmp == "#ModuleType:") {
 			it++;
 			tmp = *it;
-			//		cout << "creating module of type: " << atoi(tmp.c_str()) << endl; 
+			//		cout << "creating module of type: " << atoi(tmp.c_str()) << endl;
 			genome->moduleParameters[moduleNum]->type = atoi(tmp.c_str());
 			//		cout << "state = " << lGenome->lParameters[moduleNum].module->state << endl;
 		}
@@ -457,7 +458,7 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 			checkingControl = true;
 		}
 		else if (tmp == "#EndOfModule") {
-			// this is not right: change it 
+			// this is not right: change it
 //			lGenome->lParameters[moduleNum]->module->setModuleParams(moduleValues);
 			moduleValues.clear();
 			if (checkingControl == true) {
@@ -491,7 +492,7 @@ bool ER_CPPN_Encoding::loadGenome(int individualNumber, int sceneNum) {
 	float grey[3] = { 0.45,0.45,0.45 };
 
 	//	lGenome->lParameters.resize(lGenome->amountStates);
-	//	cout << "amount of states = " << lGenome->amountStates << endl; 
+	//	cout << "amount of states = " << lGenome->amountStates << endl;
 	morphFitness = 0;
 	for (int i = 0; i < genome->amountModules; i++) {
 		switch (i) {
@@ -569,7 +570,7 @@ void ER_CPPN_Encoding::symmetryMutation(float mutationRate) {
 int ER_CPPN_Encoding::mutateControlERGenome(float mutationRate) {
 	cout << "mutating l-genome" << endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		//		cout << "i = " << i << endl; 
+		//		cout << "i = " << i << endl;
 		genome->moduleParameters[i]->control->mutate(mutationRate);
 	}
 	return 1;
@@ -618,13 +619,13 @@ void ER_CPPN_Encoding::checkGenome(int individualNumber, int sceneNum) {
 		if (checkingControl == true) {
 			controlValues.push_back(tmp);
 		}
-		
+
 		if (tmp == "#Module:") {
 			it++;
 			tmp = *it;
 			moduleNum = atoi(tmp.c_str());
 			checkingModule = true;
-			//		cout << "moduleNum set to " << moduleNum << endl; 
+			//		cout << "moduleNum set to " << moduleNum << endl;
 		}
 		if (tmp == "#ControlParams:") {
 			checkingControl = true;

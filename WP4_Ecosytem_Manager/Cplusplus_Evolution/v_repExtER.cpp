@@ -203,7 +203,7 @@ VREP_DLLEXPORT void v_repEnd()
 	unloadVrepLibrary(vrepLib); // release the library
 }
 
-//! Currently not used.
+//! Currently not used...
 //! TODO: Check with Frank if this is going to be used. memory leak check
 void saveLog(int num) {
 	ofstream logFile;

@@ -34,24 +34,11 @@ bool initCall = true;
 int counter = 0;
 // TODO: Check with Frank
 /// Variable not used!
-double simulationTime = 0;
-// TODO: Check with Frank
-/// Variable not used!
-int amountMessages = 0;
-// TODO: Check with Frank
-/// Variable not used!
-int handleMessages = 0;
-// TODO: Check with Frank
-/// Variable not used!
 bool initialized = false;
 int timeCount = 0;
 /// This variable marks the start of evolution.
 bool startEvolution = true;
-// TODO: Check with Frank
-/// Variable not used!
-clock_t tStart;
-// TODO: Check with Frank
-/// Variable not used! Measure simulation time.
+/// Measure simulation time.
 clock_t sysTime;
 
 #ifdef _WIN32
