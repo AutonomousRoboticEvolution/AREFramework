@@ -26,9 +26,6 @@
 #include "v_repLib.h"
 
 using namespace std;
-//CCatContainer* catContainer = NULL;
-//CCreatureCreator* creatureCreator = NULL;
-//CUserInterface* userInterfaceCreator = NULL;
 
 #ifdef _WIN32
 	#ifdef QT_COMPIL
@@ -47,6 +44,19 @@ using namespace std;
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 LIBRARY vrepLib;
+
+///save time log
+void saveLog(int num) {
+	ofstream logFile;
+	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
+	clock_t now = clock();
+//	double deltaSysTime = difftime((double) time(0), sysTime) ;
+	int deltaSysTime = now - sysTime;
+	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
+	sysTime = clock() ;
+	counter = 0;
+	logFile.close();
+}
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 { // This is called just once, at the start of V-REP.
@@ -96,31 +106,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		unloadVrepLibrary(vrepLib);
 		return(0); // Means error, V-REP will unload this plugin
 	}
-
-	// make sure necessary folders are in place // doesn't work on linux
-	//string OutputFolder = "interfaceFiles";
-	//if (CreateDirectory(OutputFolder.c_str(), NULL))
-	//{
-	//	// CopyFile(...)
-	//	cout << "interfaceFiles made" << endl;
-	//}
-	//else
-	//{
-	//	cout << "interfaceFiles already exists" << endl;
-	//	// Failed to create directory.
-	//}
-
-	//OutputFolder = "interfaceFiles/morphologies0";
-	//if (CreateDirectory(OutputFolder.c_str(), NULL))
-	//{
-	//	// CopyFile(...)
-	//	cout << "interfaceFiles made" << endl;
-	//}
-	//else
-	//{
-	//	cout << "interfaceFiles already exists" << endl;
-	//	// Failed to create directory.
-	//}
 
 	if (startEvolution == true) {
 
@@ -203,20 +188,6 @@ VREP_DLLEXPORT void v_repEnd()
 	unloadVrepLibrary(vrepLib); // release the library
 }
 
-//! Currently not used...
-//! TODO: Check with Frank if this is going to be used. memory leak check
-void saveLog(int num) {
-	ofstream logFile;
-	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
-	clock_t now = clock();
-//	double deltaSysTime = difftime((double) time(0), sysTime) ;
-	int deltaSysTime = now - sysTime;
-	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
-	sysTime = clock() ;
-	counter = 0;
-	logFile.close();
-}
-
 // Handle different message of simulation
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
@@ -226,16 +197,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
 	void* retVal = NULL;
 
-	/*if (GetAsyncKeyState(VK_SPACE) & 0x80000000) {
-		if (initialized == true) {
-			initialized = false;
-		}
-		else {
-			initialized = true;
-		}
-	}
-	*///if (initialized == true) {
-	// Start evolution if true
 	if (startEvolution == true) {
 		if (message == sim_message_eventcallback_modulehandle) {
 
@@ -258,8 +219,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 
 			}
 			//! This conditions is doing nothing
-			//! TODO: Check with Frank?
-
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
 			}
@@ -278,7 +237,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				simSetIntegerSignal((simChar*) "simulationState", 8);
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };
-				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
+				//cout << "Repository should be files and is " << ER->settings->repository << endl;
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 				simGetIntegerSignal((simChar*) "individual", individual);     //ask Frank: individual is handle by client??
 				if (ER->loadIndividual(individual[0]) == false) {
@@ -295,16 +254,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
-			initCall = true; // this restarts the simulation
-		//	printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-		//	if (timeCount % 10 == 0) {
-			//	ofstream file;
-			//	ostringstream fileName;
-			//	fileName << "timeLog.txt";
-			//	file.open(fileName.str(), ios::out | ios::ate | ios::app);
-			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
-			//	file.close();
-		//	}
+			initCall = true;  		  // this restarts the simulation
 			timeCount++;
 			ER->endOfSimulation();
 			loadingPossible = true;   //start another simulation

@@ -25,16 +25,17 @@
 #include <memory>
 #include "ERFiles/ER_VREP.h"
 
-bool loadingPossible = true;
 using namespace std;
+
+/// Indicate whether the plugin is ready to accept/load genome sent from client
+bool loadingPossible = true;
+/// an uniqure pointer to ER_VREP class
 unique_ptr<ER_VREP> ER;
+/// Mark the end of simulation and ready for next start 
 bool initCall = true;
-// TODO: Check with Frank
-/// Variable used but the value is always 0
+/// mark the time step of simulation 
 int counter = 0;
-// TODO: Check with Frank
-/// Variable not used!
-bool initialized = false;
+/// mark the time step of simulation 
 int timeCount = 0;
 /// This variable marks the start of evolution.
 bool startEvolution = true;

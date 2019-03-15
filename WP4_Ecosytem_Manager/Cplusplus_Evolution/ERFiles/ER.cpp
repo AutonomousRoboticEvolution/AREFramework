@@ -33,7 +33,6 @@ CER::~CER(){
 
 }
 
-// for reading text files
 void CER::split_line(string& line, string delim, list<string>& values)
 {
 	size_t pos = 0;
@@ -63,12 +62,6 @@ void CER::loadIndividual(int individualNum, int sceneNum)
 
 }
 
-/**
-   @brief initialize the settings class; it will read a settings file or it
- * will use default parameters if it cannot read a settings file.
- * A random number class will also be created and all other files
- * refer to this class.
- */
 void CER::initialize() {
 	settings = shared_ptr<Settings>(new Settings);
 	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
@@ -85,8 +78,6 @@ void CER::initialize() {
 	initializeSimulation();  //empty function?
 }
 
-
-//save the genome and fitness
 void CER::saveSettings() {
 	if (settings->verbose) {
 		cout << "Saving settings" << endl;

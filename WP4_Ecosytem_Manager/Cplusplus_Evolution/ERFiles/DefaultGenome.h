@@ -29,6 +29,7 @@ public:
 	float parentPhenValue;
 
 	void savePhenotype(int indNum, int sceneNum);
+	
 	virtual void init() override;
 	virtual void create() override;
 	virtual void update() override;

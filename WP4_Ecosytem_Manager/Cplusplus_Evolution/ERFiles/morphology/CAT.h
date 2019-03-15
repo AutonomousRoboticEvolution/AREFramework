@@ -11,7 +11,7 @@ public:
 	virtual	void init();
 	virtual void grow(int);
 	void update() {};
-	void create() {};
+	void create() {};  //empty function
 
 
 //	virtual void mutate(float mutationRate){};

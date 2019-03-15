@@ -45,20 +45,11 @@ void ER_VREP::initialize() {
 // Initializes ER as a server to accept genomes from client.
 void ER_VREP::initializeServer() {
 	// create the environment
+	// EA is not present on the server anymore. Genomes are directly loaded in ER
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
-	// EA is not present on the server anymore. Genomes are directly loaded in ER
-	// unique_ptr<EA_Factory> eaf(new EA_Factory);
-	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
-	// ea->randomNum = randNum;
-	// ea->settings = settings;
-	// ea->init();
-	// initNewGenome(settings, 0);
-	//ea->initializePopulation(settings, false);
 	environment->init();
-	// eaf.reset();
-
 }
 
 // This method instatiates genome factory, enviroment and EA.
@@ -120,14 +111,14 @@ void ER_VREP::startOfSimulation(){
 			if (settings->indCounter < ea->populationGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
-				ea->populationGenomes[currentInd]->init();
+				ea->populationGenomes[currentInd]->init();  //create a morph type
 //				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
 				//currentGenome->init(); // should not initialize base class
-				currentGenome->create();
+				currentGenome->create();  //create a genome/morph
 				currentMorphology = currentGenome->morph;
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}

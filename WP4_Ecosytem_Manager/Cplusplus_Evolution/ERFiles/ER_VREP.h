@@ -19,7 +19,7 @@ public:
 	/**
 		@brief This method reads the instanceType member from settings class. According to its value ER initializes as a server or as server-client.
 	*/
-	void initialize();  //Check with Frank: is the same function used in CER class?? What is the difference between server or server-client?
+	void initialize();  //Check with Frank: is this the same function used in CER class?? 
 
 	/**
 		@brief This method Instatiates genome factory, enviroment and EA. Also settings for the enviroment and EA are loaded. Finally, this method initializes EA and environment.

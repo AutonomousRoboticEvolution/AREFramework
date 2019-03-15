@@ -34,23 +34,47 @@ public:
 	CER();
 	virtual ~CER();
 
+	/**
+       @brief This method reads text files
+	*/
 	void split_line(string& line, string delim, list<string>& values);
-
+	/// simulation setup detemining which genome to load for start
 	simulationSetup simSet = DEFAULT_SETUP;
-	shared_ptr<Settings> settings;  ///pointer to settting of EA
-	unique_ptr<EA> ea; ///can be changed to another ea. Factory pattern?
+	///pointer to settting of EA
+	shared_ptr<Settings> settings;  
+	///pointer to EA
+	unique_ptr<EA> ea;               
+	///pointer to random number generator of EA
+	shared_ptr<RandNum> randNum;
 
-	void saveSettings();
-	void initialize();  ///Is this method used?
-	void initializeSimulation();  ///Is this method used?
-
-	// parameters
+	/// ID of the genome
 	int currentInd = 0;
+	/// generation of ER
 	int generation = 0;
 	int newGenerations = 0;
+	/// mark the initialization of ER
 	bool _initialize = true;
 
-	void loadIndividual(int individualNum, int sceneNum);
+    /**
+	   @brief This method saves the genome and fitness 
+	 */ 
+	void saveSettings();
+	/**
+		 @brief initialize the settings class; it will read a settings file or it
+		  will use default parameters if it cannot read a settings file.
+		  A random number class will also be created and all other files
+		  refer to this class.
+	*/
+	void initialize();  		   ///Is this method used?
 
-	shared_ptr<RandNum> randNum;
+	/**
+	   @brief Empty method
+	 */ 
+	void initializeSimulation();   ///Is this method used?
+
+	/**
+		@brief This method load the genome 
+	*/
+	void loadIndividual(int individualNum, int sceneNum);
 };
+
