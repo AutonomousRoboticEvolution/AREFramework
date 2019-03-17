@@ -23,6 +23,7 @@ void ER_VREP::initialize() {
 	 * A random number class will also be created and all other files
 	 * refer to this class.
 	 */
+	//record the number of individuals
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
 		cout << "Regular Evolution" << endl;
@@ -46,6 +47,8 @@ void ER_VREP::initialize() {
 void ER_VREP::initializeServer() {
 	// create the environment
 	// EA is not present on the server anymore. Genomes are directly loaded in ER
+	///In client-server mode, the environment for individual emulation must be the same, 
+	///so the server create environment
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
@@ -58,6 +61,7 @@ void ER_VREP::initializeServer() {
 void ER_VREP::initializeSimulation() {
 	// simSet = RECALLBEST;
 	// set env
+	//create environment and ea
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
@@ -97,6 +101,7 @@ void ER_VREP::startOfSimulation(){
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		// If the simulation is a server. It just holds information for one genome for now.
 		// currentGenome should be created, double check
+		// produce the corresponding morphology of a genome
 		currentGenome->create();
 		// OLD CODE:
 		// ea->newGenome->create();
@@ -111,11 +116,14 @@ void ER_VREP::startOfSimulation(){
 			if (settings->indCounter < ea->populationGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
+				//initialize morph
+				//in morph class, initialize control
 				ea->populationGenomes[currentInd]->init();  //create a morph type
 //				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
+				//convert morph to morphVREP
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
 				//currentGenome->init(); // should not initialize base class
 				currentGenome->create();  //create a genome/morph
@@ -152,10 +160,12 @@ void ER_VREP::handleSimulation() {
 		return;
 	}
 	simulationTime += simGetSimulationTimeStep();
+	//get the current position
 	environment->updateEnv(currentMorphology);
 
 	//Ask Frank: Is this if-else redundant
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
+		//update the control based on position then update the position
 		currentGenome->update();
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
@@ -298,6 +308,7 @@ void ER_VREP::endOfSimulation(){
 				}
 				ea->populationGenomes[currentInd]->morph->saveGenome(settings->indCounter, fitness);
 				ea->populationGenomes[currentInd]->individualNumber = settings->indCounter;
+				//update indCounter
 				settings->indCounter++;
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
@@ -311,12 +322,15 @@ void ER_VREP::endOfSimulation(){
 				ea->setFitness(settings->indCounter % ea->populationGenomes.size(), fitness);
 				currentGenome->morph->saveGenome(settings->indCounter, fitness);
 				cout << "FITNESS = " << fitness << endl;
+				//update indCounter
 				settings->indCounter++;
 			}
+			//will not be called until the beginning of a new generation
 			if (settings->indCounter % ea->populationGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
 				ea->selection();
 				ea->savePopFitness(generation);
+				//update generation
 				generation++;
 				saveSettings();
 				newGenerations++;
