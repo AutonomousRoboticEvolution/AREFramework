@@ -69,10 +69,10 @@ void Tissue_DirectBarsVREP::update() {
 //	}
     // If robot fails viability test stop simulation
     // TODO change fitness to zero
-    if(viabilityResult == false){
-        std::cout << "Robot failed viability test. Stop simulation" << std::endl;
-        simStopSimulation();
-    }
+//    if(viabilityResult == false){
+//        std::cout << "Robot failed viability test. Stop simulation" << std::endl;
+//        simStopSimulation();
+//    }
 }
 
 int Tissue_DirectBarsVREP::getMainHandle()
@@ -89,16 +89,55 @@ struct sRobotMorphology
 
 
 int Tissue_DirectBarsVREP::createRobot() {
+//    -- Import shape
+//    handle=sim.importShape(3, "models/Towers_v02_SmallerChaffer_.stl", 0, 1.0, 0.001);
+//    print(handle);
+//    -- Object collidable
+//            result=sim.setObjectSpecialProperty(handle,sim.objectspecialproperty_collidable);
+//    print(result);
+//    -- Object is dynamic
+//            result=sim.setObjectInt32Parameter(handle,sim.shapeintparam_static,0);
+//    print(result);
+//    -- Object is respondable
+//            result=sim.setObjectInt32Parameter(handle,sim.shapeintparam_respondable,1);
+//    print(result);
+//    -- Convex decomposition
+//            -- Example 1 - Rough edges
+//            --handle = sim.convexDecompose(handle, 3, {1,500,100,0,0,10000,20,4,4,20},{0.001,30,0.25,0.0,0.0,0.0025,0.05,0.05,0.00125,0.0001});
+//    -- Example 2 - Better edges with higher number of triangles and vertices
+//            --handle = sim.convexDecompose(handle, 1, {1,1000000,1000000,0,0,10000,20,4,4,20},{0.001,30,0.25,0.0,0.0,0.0025,0.05,0.05,0.00125,0.0001});
+//    -- Example 3 - Best model added faces and points
+//    handle = sim.convexDecompose(handle, 25, {1,1000000,1000000,0,0,10000,20,4,4,20},{0.001,30,0.25,0.0,0.0,0.0025,0.05,0.05,0.00125,0.0001});
+//    -- Remove visibility
+//            result = sim.setModelProperty(handle,sim.modelproperty_not_visible);
+//    --result = sim.setObjectSpecialProperty(handle, sim.objectspecialproperty_renderable, 0);
+//    -- Appearance
+//    handleAppearance=sim.importShape(3, "models/Towers_v02_SmallerChaffer_.stl", 0, 1.0, 0.001);
+//    -- Parent
+//    result = sim.setObjectParent(handle, handleAppearance, true);
+//    -- TODO make robot detectable
+//    -- TODO make robot detectable
+
+    // Import shape from stl file
+    int shapeHandle = -1;
+    int shapeDynHandle = -1;
+    int convDecomIntPams[] = {1,500,100,0,0,10000,20,4,4,20};
+    float convDecomFloatPams[] = {0.001,30,0.25,0.0,0.0,0.0025,0.05,0.05,0.00125,0.0001};
+
+    shapeDynHandle = simImportShape(3, "models/Towers_v02_SmallerChaffer_.stl", 3, 0.0, 0.001); // Import dynamic model
+    simSetObjectSpecialProperty(shapeDynHandle, sim_objectspecialproperty_collidable); // Object is collidable
+    simSetObjectInt32Parameter(shapeDynHandle,sim_shapeintparam_static,0); // Object is dynamic
+    simSetObjectInt32Parameter(shapeDynHandle,sim_shapeintparam_respondable,1); // Object is respondalbe
+    simSetObjectInt32Parameter(shapeDynHandle,sim_shapeintparam_convex,1);
+    // TODO: object is detectable
+    //shapeDynHandle = simConvexDecompose(shapeDynHandle, 3, convDecomIntPams, convDecomFloatPams); // Convex decomposition
+    simSetModelProperty(shapeDynHandle,sim_modelproperty_not_visible); // Object not visible
+    shapeHandle = simImportShape(3, "models/Towers_v02_SmallerChaffer_.stl", 3, 0.0, 0.001); // Import appearance
+    simSetObjectParent(shapeDynHandle, shapeHandle, true);
+
 
 	std::cout << "State: CREATE ROBOT!" << std::endl;
 	// Create robot
-	// TODO: Check if this necessary with WL
-	int nextRobotMorphologyHandle = 0;
-	int handle = -1;
-	sRobotMorphology RobotMorphology;
-	handle = nextRobotMorphologyHandle++;
-	RobotMorphology.handle = handle;
-
 	// Importing motor organs
 	int motorOrgan[organsNumber];
 	int brainOrgan = simLoadModel("models/brainOrgan.ttm");
@@ -114,82 +153,16 @@ int Tissue_DirectBarsVREP::createRobot() {
 	// Create voxels
 	std::vector <int> cubeHandles;
 	float brainPos[] = { 0.0, 0.0, 0.0 };
-//	float organ1_angle[] = { 1.57080, 0, -1.57080 };
-//	float organ2_angle[] = { 1.57080, 0, 1.57080 }; // 3.151516 for second orientation
 	float brainOri[] = { 0, 1.57080, 0 };
-
-	// Create voxel
-	int temp_voxel_handle;
-	float columnWidth = 0.015;
-	float columnHeight = 0.010; // Wheel not touching floor decrease height
-	float magnitude;
-	float angle;
-	float voxel_size[3];
-	float voxel_pos[3];
-	float voxel_ori[3];
-	float voxel_color[3];
 
 	for(int i = 0; i < organsNumber; i++){
         // motorOrgan[i] = simLoadModel("models/motorOrgan2_bigWheel.ttm");
-//        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
-	    if(i % 2 == 0 ){
-            motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
-	    }
-        else{
-            motorOrgan[i] = simLoadModel("models/sensorOrgan.ttm");
-        }
+        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
         forceSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
-
-        magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
-        angle = atan2(organs[i].coordinates[1] / 100 - brainPos[1], organs[i].coordinates[0] / 100 - brainPos[0]);
-
-        voxel_size[0] = magnitude;
-        voxel_size[1] = columnWidth;
-        voxel_size[2] = columnHeight;
-        temp_voxel_handle = simCreatePureShape(0, 8, voxel_size, 1, NULL);
-        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-        voxel_pos[0] = brainPos[0] + (organs[i].coordinates[0] / 100 - brainPos[0]) / 2;
-        voxel_pos[1] = brainPos[1] + (organs[i].coordinates[1] / 100 - brainPos[1]) / 2;
-        voxel_pos[2] = 0;
-        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-        voxel_ori[0] = 0;
-        voxel_ori[1] = 0;
-        voxel_ori[2] = angle;
-        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-        voxel_color[0] = 0;
-        voxel_color[1] = 1;
-        voxel_color[2] = 0;
-        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-        // Second column
-
-        voxel_size[0] = columnWidth;
-        voxel_size[1] = columnHeight;
-        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - columnHeight);
-        temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
-        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-        voxel_pos[0] = organs[i].coordinates[0] / 100;
-        voxel_pos[1] = organs[i].coordinates[1] / 100;
-        voxel_pos[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2]) / 2;
-        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-        voxel_ori[0] = 0;
-        voxel_ori[1] = 0;
-        voxel_ori[2] = angle;
-        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-        voxel_color[0] = 0;
-        voxel_color[1] = 1;
-        voxel_color[2] = 0;
-        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
 
         // Place organs
         // TODO: Try to remove these temporal variables.
-        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.02}; // 0.0225 Wheels barely touching floor but more room to rotate;
+        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.12};
         simSetObjectPosition(motorOrgan[i], -1, tempPos);
         simSetObjectPosition(forceSensor[i], -1, tempPos);
         float tempOri[] = {organs[i].orientations[0],organs[i].orientations[1],organs[i].orientations[2]};
@@ -198,34 +171,31 @@ int Tissue_DirectBarsVREP::createRobot() {
 	}
 
 	// Set organs position
-	brainPos[2] = 0.03;
+	brainPos[2] = 0.1225;
 	simSetObjectPosition(brainOrgan, -1, brainPos);
 	simSetObjectPosition(forceSensor3, -1, brainPos);
 
 	// Set organs orientation
 	simSetObjectOrientation(brainOrgan, -1, brainOri);
 	simSetObjectOrientation(forceSensor3, -1, brainOri);
-
-	int* a = RobotMorphology.cubeHandles.data();
-	int body = simGroupShapes(a, RobotMorphology.cubeHandles.size());
-	simSetObjectName(body, "robotShape");
+    simSetObjectName(shapeHandle, "robotShape");
 
 	//  Set parents
     for(int i = 0; i < organsNumber; i++){
-        simSetObjectParent(forceSensor[i], body, 1);
+        simSetObjectParent(forceSensor[i], shapeHandle, 1);
         simSetObjectParent(motorOrgan[i], forceSensor[i], 1);
     }
-    simSetObjectParent(forceSensor3, body, 1);
+    simSetObjectParent(forceSensor3, shapeHandle, 1);
 	simSetObjectParent(brainOrgan, forceSensor3, 1);
 
 	int objectsNumber;
 	int *objectHandles;
-	objectHandles = simGetObjectsInTree(body, sim_handle_all, 0, &objectsNumber);
+    objectHandles = simGetObjectsInTree(shapeHandle, sim_handle_all, 0, &objectsNumber);
     std::cout << "Objects Number: " << objectsNumber << std::endl;
     std::cout << "Object 0: " << objectHandles[0] << std::endl;
 	// Create collection
 	int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
-	simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
+    simAddObjectToCollection(collection_handle, shapeHandle, sim_handle_single, 0);
 
 	return simGetObjectHandle("robotShape");
 }
@@ -442,19 +412,19 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
                 organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
             }
         }
-        if(i % 2 == 0 ){
-            organs[i].orientations[0] = 1.57080;
-//          organs[i].orientations[1] = 0.0;
-            organs[i].orientations[2] = -1.57080;
-        }
-        else{
-            organs[i].orientations[0] = 1.57;
-//          organs[i].orientations[1] = 0.0;
-            organs[i].orientations[2] = 0.0;
-        }
-//        organs[i].orientations[0] = 1.57080; // Y-axis
-////        organs[i].orientations[1] = 0.0; // Z-axis
-//        organs[i].orientations[2] = -1.57080; // X-axis along motor axis. No mutation required
+//        if(i % 2 == 0 ){
+//            organs[i].orientations[0] = 1.57080;
+////          organs[i].orientations[1] = 0.0;
+//            organs[i].orientations[2] = -1.57080;
+//        }
+//        else{
+//            organs[i].orientations[0] = 1.57;
+////          organs[i].orientations[1] = 0.0;
+//            organs[i].orientations[2] = 0.0;
+//        }
+        organs[i].orientations[0] = 1.57080; // Y-axis
+//        organs[i].orientations[1] = 0.0; // Z-axis
+        organs[i].orientations[2] = -1.57080; // X-axis along motor axis. No mutation required
 	}
 }
 
