@@ -111,7 +111,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 		// Construct classes
 		ER = unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
-		ER->settings = shared_ptr<Settings>(new Settings);
+		ER->settings = shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
 
 		// Set all arguments
 		// 1: Set seed and location
@@ -134,7 +134,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		}
 		// Read the settings file; specify the ID of experimental run
 		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-		ER->settings->readSettings();
+		ER->settings->readSettings(); // load the settings if the *.csv exists
 
 		// Override settings parameters if argument 2
 		// 2:
@@ -161,17 +161,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		//! TODO: Check with Frank: why lines 151 and 177 are the same?
 		ER->settings->sceneNum = run;   //sceneNum is not used desprete; should be loaded through readSettings function
 		ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number
+		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		// Actual initialization of ER
-		ER->initialize();
+		ER->initialize(); 
 		//	ER->environment->sceneLoader();
 		if (ER->settings->verbose) {
 			cout << "ER initialized" << endl;
 		}
 	}
 	int signal[1] = { 0 };
-	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client
+	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
 	//cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
 	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
@@ -218,7 +218,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				simStartSimulation();  //handle the start of vrep
 
 			}
-			//! This conditions is doing nothing
+			//! This conditions is doing nothing; check
 			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 				// simStartSimulation();
 			}
@@ -226,7 +226,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		//	}
 		//client and v-rep plugin communicates using signal and remote api
 		int signal[1] = { 0 };
-		simGetIntegerSignal((simChar*) "simulationState", signal);
+		simGetIntegerSignal((simChar*) "simulationState", signal);  
 		if (signal[0] == 99) {
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
@@ -239,22 +239,22 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int individual[1] = { 0 };
 				//cout << "Repository should be files and is " << ER->settings->repository << endl;
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
-				simGetIntegerSignal((simChar*) "individual", individual);     //ask Frank: individual is handle by client??
-				if (ER->loadIndividual(individual[0]) == false) {
-					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
+				simGetIntegerSignal((simChar*) "individual", individual);     //individual is handle by client
+				if (ER->loadIndividual(individual[0]) == false) {     		  //load a genome
+					simSetIntegerSignal((simChar*) "simulationState", 9);     // 9 is now the error state
 				}
-				else {
+				else {                                
 					// old function:
 					//ER->ea->loadIndividual(individual[0], sceneNumber[0]);
 					//saveLog(1);
 					//cout << "Not loaded: see this comment in code to adjust" << endl;
-					simStartSimulation();
+					simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
 					loadingPossible = false;
 				}
 			}
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
-			initCall = true;  		  // this restarts the simulation
+			initCall = true;  		  // this restarts the simulation, and load a new genome 
 			timeCount++;
 			ER->endOfSimulation();
 			loadingPossible = true;   //start another simulation

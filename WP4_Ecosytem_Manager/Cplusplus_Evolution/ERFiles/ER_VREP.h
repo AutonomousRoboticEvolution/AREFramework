@@ -73,7 +73,9 @@ public:
 	shared_ptr<Morphology> getMorphology(Genome* g);
 
 	shared_ptr<EA> ea;
+	///store the current genome
 	shared_ptr<Genome> currentGenome;
+	///used to create a genome
 	shared_ptr<GenomeFactoryVREP> genomeFactory;
 
 	/**

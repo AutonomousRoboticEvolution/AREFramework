@@ -12,8 +12,11 @@ public:
 
 	void split_line(string & line, string delim, list<string>& values);
 
-	shared_ptr<Settings> settings;
+	///set the environment type, evolution type...
+	shared_ptr<Settings> settings; 
+	///random number generator for EA
 	shared_ptr<RandNum> randomNum;
+	///used to create genome
 	unique_ptr<GenomeFactory> gf;
 
 	/// container of current population genomes
@@ -21,8 +24,8 @@ public:
 	/// container of next generation genomes
 	vector<shared_ptr<Genome>> nextGenGenomes;
 
-	// storage vectors
-	// This genome will be evaluated so needs to be assigned
+	/// storage vectors
+	/// This genome will be evaluated so needs to be assigned
 	// shared_ptr<Genome> newGenome; // for creating one genome at a time
 	// vector<int> popIndNumbers;
 	// vector<float> popFitness; // used by client-server

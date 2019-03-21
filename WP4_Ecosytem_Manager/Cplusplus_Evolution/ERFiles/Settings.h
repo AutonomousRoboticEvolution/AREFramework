@@ -142,7 +142,7 @@ public:
 	InstanceType instanceType = INSTANCE_REGULAR;
 	EvolutionType evolutionType = STEADY_STATE;//EMPTY_RUN; // STEADY_STATE; //STEADY_STATE;//EMBODIED;
 	FitnessType fitnessType = MOVE;
-	EnvironmentType environmentType = DEFAULT_ENV;
+	EnvironmentType environmentType = DEFAULT_ENV;  //default environment type
 	MoveDirection moveDirection = DISTANCE_XY;
 	MorphologyType morphologyType = CAT_MORPHOLOGY; // CUSTOM_MODULAR_MORPHOLOGY; //MODULAR_LSYSTEM;//CAT_MORPHOLOGY;// MODULAR_LSYSTEM;
 	ControlType controlType = ANN_DEFAULT;
@@ -151,7 +151,9 @@ public:
 
 //	EvolutionType evolutionType = GENERATIONAL; // not implemented yet
 
+	/// record the number of individuals
 	int indCounter;
+	/// Experiment ID
 	int sceneNum;
 
 	bool client;  ///variable indicating whether client-server mode or regular mode

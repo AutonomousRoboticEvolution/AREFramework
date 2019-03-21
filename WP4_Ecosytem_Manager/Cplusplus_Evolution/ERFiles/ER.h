@@ -51,6 +51,7 @@ public:
 	int currentInd = 0;
 	/// generation of ER
 	int generation = 0;
+  /// the same as generation?
 	int newGenerations = 0;
 	/// mark the initialization of ER
 	bool _initialize = true;

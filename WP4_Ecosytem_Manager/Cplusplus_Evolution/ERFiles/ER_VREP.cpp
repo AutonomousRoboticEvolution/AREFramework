@@ -25,11 +25,13 @@ void ER_VREP::initialize() {
 	 */
 	//record the number of individuals
 	settings->indCounter = 0;
+	//regular mode
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
 		cout << "Regular Evolution" << endl;
 		settings->client = true;
 		initializeSimulation();
 	}
+	// client-server mode
 	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
 		cout << "Initializing Server" << endl;
 		settings->client = false;
@@ -44,6 +46,7 @@ void ER_VREP::initialize() {
 }
 
 // Initializes ER as a server to accept genomes from client.
+// Only initialize the environment as EA is handled by client
 void ER_VREP::initializeServer() {
 	// create the environment
 	// EA is not present on the server anymore. Genomes are directly loaded in ER
@@ -63,7 +66,7 @@ void ER_VREP::initializeSimulation() {
 	// set env
 	//create environment and ea
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
-	genomeFactory->randomNum = randNum;
+	genomeFactory->randomNum = randNum;  //where is randNum set??
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
@@ -77,7 +80,7 @@ void ER_VREP::initializeSimulation() {
 
 }
 
-// Initializes ER as a server to accept genomes from client. If framework is server than just hold information for one genome. Else, initilizes the first population of individuals.
+//Initializes ER as a server to accept genomes from client. If framework is server then just hold information for one genome. Else, initilizes the first population of individuals.
 //In server mode, each v-rep simulation handle one genome
 void ER_VREP::startOfSimulation(){
 	/* When V-REP starts, this function is called. Depending on the settings,
@@ -100,9 +103,10 @@ void ER_VREP::startOfSimulation(){
 
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		// If the simulation is a server. It just holds information for one genome for now.
-		// currentGenome should be created, double check
+		// currentGenome should be created (which means the genome is passed from client to server), double check
 		// produce the corresponding morphology of a genome
-		currentGenome->create();
+		// currentGenome is updated through (ER->loadIndividual(individual[0]) in v_repExtER.cpp
+		currentGenome->create();  //this create the morphology in v-rep
 		// OLD CODE:
 		// ea->newGenome->create();
 		// new genome should be initialized through api command.
@@ -118,15 +122,15 @@ void ER_VREP::startOfSimulation(){
 				currentInd = settings->indCounter;
 				//initialize morph
 				//in morph class, initialize control
-				ea->populationGenomes[currentInd]->init();  //create a morph type
+				ea->populationGenomes[currentInd]->init();  //create a morph type (genetype) and its control
 //				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
-				//convert morph to morphVREP
+				//convert morph to morphVREP (genotype to phenotype)
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
 				//currentGenome->init(); // should not initialize base class
-				currentGenome->create();  //create a genome/morph
+				currentGenome->create();  //create a morph (phenotype)
 				currentMorphology = currentGenome->morph;
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}
@@ -134,7 +138,7 @@ void ER_VREP::startOfSimulation(){
 				// != first generation
 				// ea->selection(); // selection done in end
 				// ea->newGenome->init();
-				currentInd = settings->indCounter % settings->populationSize;
+				currentInd = settings->indCounter % settings->populationSize;  //set the currentInd into 0?
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
 				currentGenome->create();
 				currentMorphology = currentGenome->morph; // essential function... But for what? I forgot...
@@ -143,13 +147,13 @@ void ER_VREP::startOfSimulation(){
 
 		else if (simSet == RECALLBEST) {
 
-			loadBestIndividualGenome(settings->sceneNum);
+			loadBestIndividualGenome(settings->sceneNum);  //currentGenome is created/assigned
 			currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
 			currentGenome->create();
 			currentMorphology = currentGenome->morph;
 		}
 	}
-	currentMorphology->setPhenValue();
+	currentMorphology->setPhenValue();  //not used?
 }
 
 // This function is called every simulation step. Note that the behavior of the robot drastically changes when slowing down the simulation since this function will be called more often. All simulated individuals will be updated until the maximum simulation time, as specified in the environment class, is reached.
@@ -166,7 +170,7 @@ void ER_VREP::handleSimulation() {
 	//Ask Frank: Is this if-else redundant
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		//update the control based on position then update the position
-		currentGenome->update();
+		currentGenome->update();  //update in each time step
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
@@ -287,7 +291,7 @@ void ER_VREP::endOfSimulation(){
 		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm. Not sure how it work
 		cout << "fitness = " << fitness << endl;
 		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection (not used)
 		int signal[1] = { 2 };
 		simSetIntegerSignal((simChar*) "simulationState", signal[0]);
 		if (settings->savePhenotype) {
