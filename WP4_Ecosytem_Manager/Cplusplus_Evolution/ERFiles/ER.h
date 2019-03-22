@@ -66,12 +66,12 @@ public:
 		  A random number class will also be created and all other files
 		  refer to this class.
 	*/
-	void initialize();  		   ///Is this method used?
+	void initialize();  		   ///not used
 
 	/**
 	   @brief Empty method
 	 */ 
-	void initializeSimulation();   ///Is this method used?
+	void initializeSimulation();   ///not used
 
 	/**
 		@brief This method load the genome 

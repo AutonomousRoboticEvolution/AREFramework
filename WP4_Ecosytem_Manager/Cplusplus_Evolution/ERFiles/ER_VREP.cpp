@@ -80,7 +80,7 @@ void ER_VREP::initializeSimulation() {
 
 }
 
-//Initializes ER as a server to accept genomes from client. If framework is server then just hold information for one genome. Else, initilizes the first population of individuals.
+//Initializes ER as a server to accept genomes from client. If framework is server then just hold information for one genome. Else, initilizes the first genome of individuals.
 //In server mode, each v-rep simulation handle one genome
 void ER_VREP::startOfSimulation(){
 	/* When V-REP starts, this function is called. Depending on the settings,
@@ -128,8 +128,9 @@ void ER_VREP::startOfSimulation(){
 					cout << "creating individual" << endl;
 				}
 				//convert morph to morphVREP (genotype to phenotype)
+				//copy a current genome and create a morph in v-rep
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
-				//currentGenome->init(); // should not initialize base class
+				//currentGenome->init();  // should not initialize base class
 				currentGenome->create();  //create a morph (phenotype)
 				currentMorphology = currentGenome->morph;
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
@@ -153,7 +154,7 @@ void ER_VREP::startOfSimulation(){
 			currentMorphology = currentGenome->morph;
 		}
 	}
-	currentMorphology->setPhenValue();  //not used?
+	currentMorphology->setPhenValue();  //not used
 }
 
 // This function is called every simulation step. Note that the behavior of the robot drastically changes when slowing down the simulation since this function will be called more often. All simulated individuals will be updated until the maximum simulation time, as specified in the environment class, is reached.
@@ -293,7 +294,7 @@ void ER_VREP::endOfSimulation(){
 		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
 		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection (not used)
 		int signal[1] = { 2 };
-		simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+		simSetIntegerSignal((simChar*) "simulationState", signal[0]);   //mark the end of simulation and send the signal back to the client
 		if (settings->savePhenotype) {
 			currentGenome->fitness = fitness;
 			currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);

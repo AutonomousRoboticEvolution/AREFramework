@@ -60,12 +60,12 @@ int main(int argc, char* argv[])
 		int run = atoi(arguments[1].c_str());
 		client->sceneNum = run; 
 		client->settings->sceneNum = run; // sceneNum will be overridden...
-		client->settings->seed = run; // sceneNum will be overridden...
+		client->settings->seed = run; // seed will be overridden...
 		client->settings->readSettings(); // essential, settings need to correspond with server settings
 		// needs to be fixed at some point
 		client->settings->sceneNum = run;
 		client->settings->seed = run;
-		client->randNum = shared_ptr<RandNum>(new RandNum(run));
+		client->randNum = shared_ptr<RandNum>(new RandNum(run));  //random number generator
 		// client->randNum->setSeed(atoi(arguments[1].c_str()));
 		srand(run);
 	}
@@ -77,17 +77,17 @@ int main(int argc, char* argv[])
 	}
 	extApi_sleepMs(1000); // wait 5 seconds before connecting to ports
 	//cout << "settings read" << endl;
-	if (arguments.size() > 2) {
+	if (arguments.size() > 2) {   //if open more than 2 ports
 		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;
 		int numberOfNodes = atoi(arguments[2].c_str());
-		client->init(numberOfNodes - 1);
+		client->init(numberOfNodes - 1);  //open a number of ports
 	}
 	else {
 		client->init(2);
 	}
 	if (client->settings->generation != 0) {
 		cout << "generation not set to 0????" << endl;
-		client->ea->loadPopulationGenomes();
+		client->ea->loadPopulationGenomes();  //load the current generation of genomes (both morph and control)
 	}
 	else {
 		client->initGA();

@@ -99,7 +99,7 @@ void EdgarsAmazingMorphologyClass::saveGenome(int indNum, float fitness)
  * \param individualNumber
  * \param sceneNum
  */
-
+//load both the morphlogy and control 
 bool EdgarsAmazingMorphologyClass::loadGenome(int individualNumber, int sceneNum)
 {
 	randomNum->getSeed(); // setSeed(individualNumber);

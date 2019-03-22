@@ -32,15 +32,19 @@ struct IND {
 	float fitness;
 };
 
+///this class manages the EA
 class ClientEA
 {
 public:
 	vector<int> ports;
 	simxChar* ipNum = "127.0.0.1"; // TO DO: should also be one argument
 	vector<int> clientIDs;
-	vector<int> portIndividual; // used to say which num of next genomes
+	/// used to say which num of next genomes
+	vector<int> portIndividual; 
+	/// for sync between client and v-rep?
 	vector<int> portState;
-	vector<int> portIndividualNum; // actual number for loading genome
+	/// actual number for loading genome
+	vector<int> portIndividualNum; 
 
 	shared_ptr<Settings> settings;
 	shared_ptr<RandNum> randNum;
@@ -50,9 +54,18 @@ public:
 
 	// functions
 	void init(int amountPorts);
+	/**
+		@brief This method initialize a population of GA
+	*/
 	void initGA();
 	void evaluateInitialPop();
+	/**
+		@brief This method creates the genomes for next generation
+	*/
 	void createNextGenGenomes();
+	/**
+		@brief This method evaluates next generation
+	*/
 	bool evaluateNextGen();
 	void quitSimulators();
 

@@ -19,7 +19,7 @@ void ClientEA::init(int amountPorts)
 	simxFinish(-1);
 	for (int i = 0; i < ports.size(); i++) {
 		std::cout << "Connecting to vrep on port " << ports[i] << std::endl;
-		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5);
+		int new_connection = simxStart("127.0.0.1", ports[i], true, true, 5000, 5); //start the connection
 		if (new_connection == -1) {
 			cout << "Could not connect to V-REP on port" << ports[i] << endl;
 			// std::cerr << "Connection to vrep on port " << ports[i] << " could not be opened" << std::endl;
@@ -40,7 +40,7 @@ void ClientEA::init(int amountPorts)
 
 	ea = shared_ptr<EA>(new EA_SteadyState());
 	ea->setSettings(settings, randNum);
-	ea->init();
+	ea->init();  //initialise the EA population: genomes, fitness and ID
 }
 
 void ClientEA::initGA() {
@@ -49,7 +49,7 @@ void ClientEA::initGA() {
 	for (int i = 0; i < ea->populationGenomes.size(); i++) {
 		// ea->initializePopulation();
 		// ea->initializeIndividual(i);
-		ea->populationGenomes[i]->init();
+		ea->populationGenomes[i]->init();  //create a morph genome and its control
 		ea->populationGenomes[i]->morph->saveGenome(indCounter, -1);
 		ea->populationGenomes[i]->individualNumber = i;
 		shared_ptr<IND> nIND = shared_ptr<IND>(new IND);
@@ -128,7 +128,7 @@ bool ClientEA::evaluateNextGen()
 						portIndividualNum[i] = invidividualNumber; // Ensuring loading is done properly.
 						// const std::string individualGenome = ea->populationGenomes[currentEv]->generateGenome();
 						const std::string individualGenome = ea->nextGenGenomes[currentEv]->generateGenome(invidividualNumber, 0);
-						//pass the genome to plugin
+						//pass the genome to plugin as a stream
 						//save this in a file or stream for the plug-in to read
 						simxSetStringSignal(clientIDs[i], (simxChar*) "individualGenome", (simxUChar*) individualGenome.c_str(), individualGenome.size(), simx_opmode_blocking);
 						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
@@ -138,7 +138,7 @@ bool ClientEA::evaluateNextGen()
 						portIndividual[i] = currentEv;
 						// tells the simulator to start evaluating the genome
 						//	cout << "setting integer signal" << endl;
-						currentEv++;
+						currentEv++;  //increase the individual ID/counter
 						portState[i] = 1;  //for sync of simulation state signal
 					}
 					else if (state[0] == 2 && portState[i] == 1) //finish evaluation and save fitness
@@ -152,7 +152,7 @@ bool ClientEA::evaluateNextGen()
 			//			cout << "phenValue = " << phenValue[0] << endl;
 						// ea->nextGenFitness[portIndividual[i]] = fitness[0];
 						ea->nextGenGenomes[portIndividual[i]]->fitness = fitness[0];
-						ea->nextGenGenomes[portIndividual[i]]->morph->phenValue = phenValue[0]; //for measurement
+						ea->nextGenGenomes[portIndividual[i]]->morph->phenValue = phenValue[0]; //for measurement (not used)
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 0, simx_opmode_oneshot);
 						ea->nextGenGenomes[portIndividual[i]]->isEvaluated = true;
 						portIndividual[i] = -1;
@@ -225,7 +225,7 @@ void ClientEA::evaluateInitialPop()
 		if (doneEvaluating == true) {
 			break;
 		}
-		for (int i = 0; i < ports.size(); i++) {
+		for (int i = 0; i < ports.size(); i++) {       //multiple instances of v-rep?
 			if (simxGetConnectionId(clientIDs[i]) != -1)
 			{
 				if (clientIDs[i] != -1)
@@ -240,7 +240,8 @@ void ClientEA::evaluateInitialPop()
 					}
 					//	cout << state[0] << endl;
 					if (state[0] == 0 && portState[i] == 0 && currentEv < ea->populationGenomes.size()) {
-						// simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
+						//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_oneshot);
+						//send the ID (currentEv) to individual 
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "individual", currentEv, simx_opmode_blocking);
 						simxSetIntegerSignal(clientIDs[i], (simxChar*) "simulationState", 1, simx_opmode_oneshot);
 						cout << "evaluating:  " << currentEv << " in port " << i << endl;
@@ -254,6 +255,7 @@ void ClientEA::evaluateInitialPop()
 					{
 						portState[i] = 0;
 						float fitness[1];
+						//get the fitness from v-rep plugin
 						simxGetFloatSignal(clientIDs[i], "fitness", fitness, simx_opmode_blocking);
 						cout << "fitness of individual " << portIndividual[i] << " was " << fitness[0] << endl;
 						// ea->popFitness[portIndividual[i]] = fitness[0];
