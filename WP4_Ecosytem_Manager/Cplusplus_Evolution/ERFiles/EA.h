@@ -22,7 +22,7 @@ public:
 	/// container of current population genomes
 	vector<shared_ptr<Genome>> populationGenomes;
 	/// container of next generation genomes
-	vector<shared_ptr<Genome>> nextGenGenomes;
+	vector<shared_ptr<Genome>> nextGenGenomes;  //after mutation
 
 	/// storage vectors
 	/// This genome will be evaluated so needs to be assigned
@@ -31,8 +31,6 @@ public:
 	// vector<float> popFitness; // used by client-server
 	// vector<float> nextGenFitness; // used by client-server
 	vector<int> popNextIndNumbers;
-
-
 	/**
 		@brief This method initilizes setting for EA and random number generator seed
 	*/

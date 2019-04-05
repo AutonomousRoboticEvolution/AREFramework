@@ -131,7 +131,7 @@ void ER_VREP::startOfSimulation(){
 				//copy a current genome and create a morph in v-rep
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->populationGenomes[settings->indCounter]);
 				//currentGenome->init();  // should not initialize base class
-				currentGenome->create();  //create a morph (phenotype)
+				currentGenome->create();  //create a morph (phenotype) in vrep
 				currentMorphology = currentGenome->morph;
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}
@@ -332,7 +332,7 @@ void ER_VREP::endOfSimulation(){
 			}
 			//will not be called until the beginning of a new generation
 			if (settings->indCounter % ea->populationGenomes.size() == 0 && settings->indCounter != 0) {
-				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
+				ea->replacement();//random replacement
 				ea->selection();
 				ea->savePopFitness(generation);
 				//update generation

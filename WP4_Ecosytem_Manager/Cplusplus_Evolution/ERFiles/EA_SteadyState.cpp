@@ -119,7 +119,7 @@ void EA_SteadyState::createNewGenRandomSelect() {
 			//nextGenFitness.push_back(-100.0);
 			nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
 			nextGenGenomes[i]->individualNumber = i + settings->indCounter;
-			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());  //why copy?
+			nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());  //copy the genome of populationGenomes into next nextGenGenomes
 			nextGenGenomes[i]->fitness = 0; // Ensure the fitness is set to zero.
 			// artefact, use for morphological protection
 			// nextGenGenomes[i]->parentPhenValue = populationGenomes[parent]->morph->phenValue;
@@ -203,7 +203,7 @@ void EA_SteadyState::replaceNewRank()
 {
 	// create one big population.
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		populationGenomes.push_back(nextGenGenomes[i]);
+		populationGenomes.push_back(nextGenGenomes[i]);   //create a copy of the next generation of genomes
 	}
 	// sort population on fitness
 	vector<shared_ptr<indFit>> fitnesses;

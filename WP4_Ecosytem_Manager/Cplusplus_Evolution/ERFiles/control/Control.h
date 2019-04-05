@@ -11,11 +11,33 @@ class Control
 public:
 	Control(){};
 	virtual ~Control();
+	/**
+		@brief This method initilizes the control
+		@param input Number of input
+		@param input Number of internal (speccific for ANN?)
+		@param input Number of output
+	*/
 	virtual void init(int input, int inter, int output) = 0; 
-	virtual vector<float> update(vector<float> sensorValues) = 0; // takes sensorInput and returns output 
-	virtual void mutate(float mutationRate) = 0; 
+	/**
+		@brief This method takes sensorInput and returns output 
+	*/
+	virtual vector<float> update(vector<float> sensorValues) = 0;
+	/**
+		@brief This method mutates the controller
+		@param mutationRate mutation rate 
+	*/ 
+	virtual void mutate(float mutationRate) = 0;
+	/**
+		@brief This method clone the parameters of the controller 
+	*/ 
 	virtual shared_ptr<Control> clone() = 0;
+	/**
+		@brief This method returns the parameters of the controller as a string 
+	*/
 	virtual stringstream getControlParams() = 0; 
+	/**
+		@brief This method sets the parameters of the controller
+	*/
 	virtual void setControlParams(vector<string>) = 0; 
 	virtual void cloneControlParameters(shared_ptr<Control> parent) = 0;
 	virtual bool checkControl(vector<string> values) = 0;

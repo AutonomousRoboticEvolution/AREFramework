@@ -45,10 +45,13 @@ public:
 	};*/
 
 	vector<float> in;
-	vector<float> out; 
+	vector<float> out;
+	/// vector of input neuron 
 	vector<shared_ptr<Neuron>> inputLayer;
+	/// vector of output neuron
 	vector<shared_ptr<Neuron>> outputLayer;
-	// TODO recurrentLayer -> vector<vector<shared_ptr<Neuron>>> interLayer 
+	// TODO recurrentLayer -> vector<vector<shared_ptr<Neuron>>> interLayer
+	/// vector of hidden neuron 
 	vector<shared_ptr<Neuron>> recurrentLayer;
 //	vector<shared_ptr<Neuron>> allNeurons; 
 	//vector<Connection> connections;

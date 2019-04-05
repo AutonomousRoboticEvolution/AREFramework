@@ -11,19 +11,29 @@ class Genome
 public:
 	Genome();
 	virtual ~Genome();
-
-	shared_ptr<Settings> settings;     //Is the setting shared by genome and EA?
+    ///simulation setting shared by genome and EA
+	shared_ptr<Settings> settings;     
+	///random number generator
 	shared_ptr<RandNum> randomNum;
+	///morph is part of genome
 	shared_ptr<Morphology> morph;
+	///not used
 	shared_ptr<Control> control;
 
 	/// fitness value; make vector for multi-objective
 	float fitness;
-	bool isEvaluated = false; // for client server
+	/// mark the end of evaluation for a generation
+	bool isEvaluated = false; 
 
+	///mark the ID of inidividual
 	int individualNumber;
+	/**
+	@brief Initialize the morph and its control 
+	*/
 	virtual void init() = 0;
+
 	virtual void create() = 0;
+
 	virtual void update() = 0;
 	/**
 		@brief This method clone the genome

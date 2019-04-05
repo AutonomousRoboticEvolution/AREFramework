@@ -76,7 +76,7 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
 	}
 	case 10: {
 		shared_ptr<Morphology> morph(new EdgarsAmazingMorphologyClass);
-		morph->randomNum = rn;
+		morph->randomNum = rn;    //rn is initialized in the default genome class
 		morph->settings = st;
 		return morph;
 	}
