@@ -38,10 +38,16 @@ public:
 	/**
 		@brief This method sets the parameters of the controller
 	*/
-	virtual void setControlParams(vector<string>) = 0; 
+	virtual void setControlParams(vector<string>) = 0;
+	/**
+		@brief This method clone the parameters of the parent controller
+	*/ 
 	virtual void cloneControlParameters(shared_ptr<Control> parent) = 0;
 	virtual bool checkControl(vector<string> values) = 0;
 	virtual void reset() = 0;
+	/**
+		@brief This method make the reference unique
+	*/ 
 	virtual void makeDependenciesUnique() = 0;
 	virtual void addInput(vector<float> input) = 0;
 	float cf = 1.0;
