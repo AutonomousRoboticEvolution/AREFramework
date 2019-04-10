@@ -19,7 +19,6 @@ public:
 	shared_ptr<RandNum> randomNum;
 	virtual shared_ptr<Morphology> clone() const = 0;
 	vector<shared_ptr<ER_Module> > createdModules;
-
 	/**
 		@brief This method initialize the morph
 	*/

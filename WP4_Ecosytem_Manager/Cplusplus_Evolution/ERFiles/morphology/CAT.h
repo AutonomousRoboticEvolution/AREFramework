@@ -8,8 +8,14 @@ public:
 	~CAT();
 	float fitness;
 	void init_noMorph();
+	/**
+		@brief This method creates the morphology and its control
+	*/
 	virtual	void init();
 	virtual void grow(int);
+	/**
+		@brief This method updates the control and its position
+	*/
 	void update() {};
 	void create() {};  //empty function
 
@@ -21,6 +27,9 @@ public:
 	bool loadGenome(int individualNumber, int sceneNum);
 	int catHandle;
 	shared_ptr<Morphology> clone() const;
+	/**
+		@brief This method mutates the controller
+	*/
 	void mutate();
 	int floorHandle;
 	vector <int> feet;
