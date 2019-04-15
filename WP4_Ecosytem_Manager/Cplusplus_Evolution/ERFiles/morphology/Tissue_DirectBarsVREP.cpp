@@ -147,6 +147,7 @@ int Tissue_DirectBarsVREP::createRobot() {
         organClips[i] = simLoadModel("models/clipConnector.ttm");
         clipsSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
 
+        // Horizontal bar
         magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
         angle = atan2(organs[i].coordinates[1] / 100 - brainPos[1], organs[i].coordinates[0] / 100 - brainPos[0]);
 
@@ -171,11 +172,10 @@ int Tissue_DirectBarsVREP::createRobot() {
         voxel_color[2] = 0;
         simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
 
-        // Second column
-
-        voxel_size[0] = columnWidth*1.5; // Revert changes.
+        // Vertical bar
+        voxel_size[0] = columnWidth;
         voxel_size[1] = columnHeight;
-        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - columnHeight);
+        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2]);
         temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
         RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
 
@@ -186,6 +186,28 @@ int Tissue_DirectBarsVREP::createRobot() {
 
         voxel_ori[0] = 0;
         voxel_ori[1] = 0;
+        voxel_ori[2] = angle;
+        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
+
+        voxel_color[0] = 0;
+        voxel_color[1] = 1;
+        voxel_color[2] = 0;
+        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
+
+        // Chamfer
+        voxel_size[0] = columnWidth;
+        voxel_size[1] = columnWidth;
+        voxel_size[2] = columnWidth;
+        temp_voxel_handle = simCreatePureShape(1, 8, voxel_size, 1, NULL);
+        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
+
+        voxel_pos[0] = organs[i].coordinates[0] / 100 - cos(angle) * 0.005;
+        voxel_pos[1] = organs[i].coordinates[1] / 100 - sin(angle) * 0.005;
+        voxel_pos[2] = columnWidth/2.0;
+        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
+
+        voxel_ori[0] = 0.0;
+        voxel_ori[1] = 0.0; //0.785398
         voxel_ori[2] = angle;
         simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
 
@@ -253,110 +275,17 @@ int Tissue_DirectBarsVREP::createRobot() {
     objectHandles = simGetObjectsInTree(body, sim_handle_all, 0, &objectsNumber);
     std::cout << "Objects Number: " << objectsNumber << std::endl;
     std::cout << "Object 0: " << objectHandles[0] << std::endl;
+
     // Create collection
     int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
     simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
 
     // Export stl
-//    simFloat** vertices=new simFloat*[2];
-//    simInt* verticesSizes=new simInt[2];
-//    simInt** indices=new simInt*[2];
-//    simInt* indicesSizes=new simInt[2];
-//    std::cout << "Creating objects" << std::endl;
-//    simFloat* vert;
-//    simInt vertS;
-//    simInt* ind;
-//    simInt indS;
-//    simGetShapeMesh(body,&vert,&vertS,&ind,&indS,NULL);
-//    std::cout << "Get mesh" << std::endl;
-//    vertices[0]=vert;
-//    verticesSizes[0]=vertS;
-//    indices[0]=ind;
-//    indicesSizes[0]=indS;
-//    simFloat m[12];
-//    simGetObjectMatrix(body,-1,m);
-//    for (simInt i=0;i<vertS/3;i++)
-//    {
-//        simFloat v[3]={vert[3*i+0],vert[3*i+1],vert[3*i+2]};
-//        simTransformVector(m,v);
-//        vert[3*i+0]=v[0];
-//        vert[3*i+1]=v[1];
-//        vert[3*i+2]=v[2];
-//    }
-//    simExportMesh(3,"models/experiment01.stl",0,1,1,vertices,
-//                  verticesSizes,indices,indicesSizes,NULL,NULL);
-//    std::cout << "Export mesh" << std::endl;
-//    simReleaseBuffer((simChar*)vertices);
-//    simReleaseBuffer((simChar*)indices);
-//    delete[] vertices;
-//    delete[] verticesSizes;
-//    delete[] indices;
-//    delete[] indicesSizes;
-
-//    simInt shapeCount=0;
-//    while (simGetObjects(shapeCount++,sim_object_shape_type)!=-1);
-//    shapeCount--;
-//    simFloat** vertices=new simFloat*[shapeCount];
-//    simInt* verticesSizes=new simInt[shapeCount];
-//    simInt** indices=new simInt*[shapeCount];
-//    simInt* indicesSizes=new simInt[shapeCount];
-//    simInt index=0;
-//    while (true)
-//    {
-//        simInt shapeHandle=simGetObjects(index++,sim_object_shape_type);
-//        if (shapeHandle<0)
-//            break;
-//        simFloat* vert;
-//        simInt vertS;
-//        simInt* ind;
-//        simInt indS;
-//        int getShapeMeshResult = -1;
-//        getShapeMeshResult = simGetShapeMesh(shapeHandle,&vert,&vertS,&ind,&indS,NULL);
-//        std::cout << getShapeMeshResult << std::endl;
-//        vertices[index-1]=vert;
-//        std::cout << vert << std::endl;
-//        std::cout << vertS << std::endl;
-//        std::cout << ind << std::endl;
-//        std::cout << indS << std::endl;
-//        verticesSizes[index-1]=vertS;
-//        indices[index-1]=ind;
-//        indicesSizes[index-1]=indS;
-//        simFloat m[12];
-//        simGetObjectMatrix(shapeHandle,-1,m);
-//        for (simInt i=0;i<vertS/3;i++)
-//        {
-//            simFloat v[3]={vert[3*i+0],vert[3*i+1],vert[3*i+2]};
-//            simTransformVector(m,v);
-//            vert[3*i+0]=v[0];
-//            vert[3*i+1]=v[1];
-//            vert[3*i+2]=v[2];
-//            //std::cout << vert[3*i+0] << "," << vert[3*i+1] << "," << vert[3*i+2] << std::endl;
-//        }
-//    }
-//    std::cout << "Before export mesh" << std::endl;
-//    //
-//    std::cout << shapeCount << std::endl;
-//    int success;
-//    success = simExportMesh(3,"models/example.stl",0,1,shapeCount,vertices,
-//                  verticesSizes,indices,indicesSizes,NULL,NULL);
-//    std::cout << "After export mesh" << std::endl;
-//    for (simInt i=0;i<shapeCount;i++)
-//    {
-//        simReleaseBuffer((simChar*)vertices[i]);
-//        simReleaseBuffer((simChar*)indices[i]);
-//    }
-//    delete[] vertices;
-//    delete[] verticesSizes;
-//    delete[] indices;
-//    delete[] indicesSizes;
-
-    simInt shapeCount=0;
-    shapeCount = organsNumber+1;
+    simInt shapeCount = 0;
+    int skeletonsNumber = 0;
+    shapeCount = skeletonsNumber + 1;
     int tempHandles[shapeCount];
     tempHandles[0] = body;
-    for(int i = 0; i < organsNumber; i++){
-        tempHandles[i+1] = organClips[i];
-    }
     simFloat** vertices=new simFloat*[shapeCount];
     simInt* verticesSizes=new simInt[shapeCount];
     simInt** indices=new simInt*[shapeCount];
@@ -371,10 +300,6 @@ int Tissue_DirectBarsVREP::createRobot() {
         getShapeMeshResult = simGetShapeMesh(tempHandles[j],&vert,&vertS,&ind,&indS,NULL);
         std::cout << getShapeMeshResult << std::endl;
         vertices[j]=vert;
-        std::cout << vert << std::endl;
-        std::cout << vertS << std::endl;
-        std::cout << ind << std::endl;
-        std::cout << indS << std::endl;
         verticesSizes[j]=vertS;
         indices[j]=ind;
         indicesSizes[j]=indS;
@@ -677,7 +602,7 @@ bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
         euclDisOrigin = sqrt(pow(position[0],2)+pow(position[1],2)+pow(position[2],2));
         // std::cout << "Distance from origin: " << euclDisOrigin << std::endl;
         if(euclDisOrigin > 0.25){
-            std::cout << simGetObjectName(jointHandles[i]) << " outside of the build volume" << std::endl;
+            //std::cout << simGetObjectName(jointHandles[i]) << " outside of the build volume" << std::endl;
             // testResult = false;
             return false;
         }
