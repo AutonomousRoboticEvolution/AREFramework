@@ -27,7 +27,10 @@ int Module_Cube::mutate(float mutationRate) {
 }
 
 int Module_Cube::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
-
+	/*
+		create order:
+		parent(if parent != -1)---ForceSensor---CUBE
+	*/
 	int fsParams[5];
 	fsParams[0] = 1;
 	fsParams[1] = 5;
@@ -94,6 +97,9 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 //	simSetObjectPosition(cube, parentHandle, objectOrigin);
 //	simSetObjectOrientation(cube, parentHandle, orientation);
 	
+	/*
+		define CUBE's children's position, orientation and parent
+	*/
 	vector<shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
 		site1.push_back(shared_ptr<SITE>(new SITE));
@@ -184,7 +190,7 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	//	return-1;
 	}
 	if (parentHandle == -1) {
-		simRemoveObject(fs);
+		simRemoveObject(fs);//dont't need parentHandle when parentHandle = -1
 	}
 	for (int j = 0; j < objectHandles.size(); j++) {
 		simSetObjectSpecialProperty(objectHandles[j], sim_objectspecialproperty_detectable_all);

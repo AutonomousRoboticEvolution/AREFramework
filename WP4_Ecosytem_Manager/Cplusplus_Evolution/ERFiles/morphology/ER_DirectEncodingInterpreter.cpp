@@ -164,7 +164,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	configuration[3] = 0;
 	configuration[4] = 0;
 	configuration[5] = 0;
-	createdModules[0]->createModule(configuration, -1, parentHandle);
+	createdModules[0]->createModule(configuration, -1, parentHandle);//create a CUBE
 
 	/* old 
 	for (int i = 1; i < modules.size(); i++) {
@@ -185,11 +185,11 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 		modules[i]->moduleID = i;
 	}
 
-	for (int i = 1; i < modules.size(); i++) {
+	for (int i = 1; i < modules.size(); i++) {//loop start from cube's children
 		if (i < settings->maxAmountModules) {
 			int parentNr = genome->moduleParameters[i]->parent;
-			int parentSite = genome->moduleParameters[i]->parentSite;
-			int orien = genome->moduleParameters[i]->orientation;
+			int parentSite = genome->moduleParameters[i]->parentSite;//the child's position
+			int orien = genome->moduleParameters[i]->orientation;//the child's orientation
 			int createdParentNumber = -1;
 			for (int n = 0; n < createdModules.size(); n++)
 			{
@@ -223,14 +223,16 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
 				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
 				// cout << " 1 ,";
-				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));//add the module to createdModules
 				// cout << " 1.1, ";
 				int createdModulesSize = createdModules.size();
 				vector<float> siteConfiguration;
 				// cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
 				// cout << createdModules[createdParentNumber]->type << ",";
 				// cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-
+				/*
+					create module according to siteConfiguration
+				*/
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
 				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
@@ -246,6 +248,9 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
 
 				vector<int> exception;
+				/*
+					check if the new module conficts with the old module,if so,remove the new module
+				*/
 				exception.push_back(parentHandle);
 				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
@@ -496,7 +501,7 @@ void ER_DirectEncodingInterpreter::create() {
 	modules.clear();
 //	cout << "modules cleared" << endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		modules.push_back(mf->createModuleGenome(genome->moduleParameters[i]->type, randomNum, settings));
+		modules.push_back(mf->createModuleGenome(genome->moduleParameters[i]->type, randomNum, settings));//convert moduleParameters to real module
 		modules[i]->state = i;
 		modules[i]->type = genome->moduleParameters[i]->type;
 		modules[i]->control = genome->moduleParameters[i]->control;
