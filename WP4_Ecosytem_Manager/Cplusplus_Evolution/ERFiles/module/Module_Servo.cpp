@@ -611,7 +611,7 @@ void Module_Servo::controlModule(float input) {
 	//	cout << "ERROR:: output size is not 1, but should be" << endl;
 //	}
 //	cout << "output[0] = " << input << endl;
-	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);
+	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);//update servo's position
 //	return output;
 }
 

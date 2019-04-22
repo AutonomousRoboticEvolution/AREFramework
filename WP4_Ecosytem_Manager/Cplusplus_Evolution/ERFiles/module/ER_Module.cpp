@@ -204,7 +204,7 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 //	}
 //	cout << "energy = " << energy << endl;
 	if (control) {
-		addInput(input);
+		addInput(input);//update input accoring to new input
 	}
 	if (settings->environmentType == settings->SUN_BASIC
 		|| settings->environmentType == settings->SUN_CONSTRAINED
@@ -217,7 +217,7 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 	vector<float> output = input;
 
 	if (broken == false) {
-		output = control->update(input);
+		output = control->update(input);//update inputLayer, recurrentLayer and outputLayer
 		for (int i = 0; i < output.size(); i++) {
 			if (output[i] > 1.0) {
 				output[i] = 1.0;

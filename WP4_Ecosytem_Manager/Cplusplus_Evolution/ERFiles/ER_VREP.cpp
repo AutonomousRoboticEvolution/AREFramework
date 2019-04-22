@@ -171,6 +171,10 @@ void ER_VREP::handleSimulation() {
 	//Ask Frank: Is this if-else redundant
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		//update the control based on position then update the position
+		/*
+			The Genome class holds the point of the morphology class and
+			update of the Genome is the update of the morphology
+		*/
 		currentGenome->update();  //update in each time step
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
@@ -257,9 +261,11 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph) {
 				pEnd.push_back(pos[1]);
 				if (pOne.size() < 1) {
 					//			cout << "Note, pOne never set" << endl;
+					
 					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
 				}
 				else {
+					
 					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
 				}
 				int brokenModules = morph->getAmountBrokenModules();
