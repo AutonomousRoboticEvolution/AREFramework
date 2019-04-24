@@ -1,7 +1,8 @@
 #pragma once
 #include "Tissue_DirectBars.h"
 
-struct Organs {
+struct Organs{
+    int organType;
 	vector<float> coordinates;
 	vector<float> orientations;
 };
@@ -18,7 +19,7 @@ public:
 
 	virtual int getMainHandle();
 
-	int createRobot();
+	int createMorphology();
 
 	void create();
 
@@ -35,17 +36,27 @@ public:
 
 	void mutateMorphology(float mutationRate);
 
-	bool viabilityTest(int robotHandle);
+	void createOrgan(int counter, int* organHandle, int* sensorHandle);
+	int createSkeleton();
 
+	// Viability functions
+    struct viabilityStruct {
+        // This method checks if there is at least one organ of each type
+        int checkOrgansType(vector<Organs> organs);
+        int printVolume(vector<float> coordinates);
+        int collisionDetector(vector<int> allComponents, int componentHandle);
+        int createTemporalGripper(Organs organ);
+        void destroyTemporalGripper(int gripperHandle);
+    } viability;
 	vector<int> outputHandles;
 	vector<int> outputValues;
-
-	bool viabilityResult;
 
 	// Mutable parameters
 	vector<Organs> organs; // Coordinates and orientations
 	int organsNumber;
 
 	float fitness; //TODO Do I need this variable?
+
+
 
 };

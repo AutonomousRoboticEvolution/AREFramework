@@ -80,269 +80,52 @@ int Tissue_DirectBarsVREP::getMainHandle()
     return mainHandle;
 }
 
-struct sRobotMorphology
-{
-    int handle;
-    int sensorHandles[2];
-    std::vector<int> cubeHandles;
-};
+int Tissue_DirectBarsVREP::createMorphology() {
 
+    std::cout << "STATE: Creating morphology!" << std::endl;
+    int robotHandle = -1;
+    // Before robot generation checks
+    bool viabilityResult = false;
+    viabilityResult = viability.checkOrgansType(organs);
+    if(viabilityResult == true){
+        // Importing motor organs
+        int organHandle[organsNumber];
+        int skeletonHandle;
+        int forceSensor[organsNumber];
+        vector<int> componentHandles;
 
-int Tissue_DirectBarsVREP::createRobot() {
+        // Create skeleton
+        skeletonHandle = createSkeleton();
+        componentHandles.push_back(skeletonHandle);
+        //  Create components and set parents
+        for(int i = 1; i < organsNumber; i++){
+            createOrgan(i, &organHandle[i], &forceSensor[i]);
+            componentHandles.push_back(organHandle[i]);
+            simSetObjectParent(forceSensor[i], skeletonHandle, 1);
+            // During robot generation checks
+            viabilityResult = viability.printVolume(organs[i].coordinates);
+            if(viabilityResult == false) break;
 
-    std::cout << "State: CREATE ROBOT!" << std::endl;
-    // Create robot
-    // TODO: Check if this necessary with WL
-    int nextRobotMorphologyHandle = 0;
-    int handle = -1;
-    sRobotMorphology RobotMorphology;
-    handle = nextRobotMorphologyHandle++;
-    RobotMorphology.handle = handle;
+            viabilityResult = viability.collisionDetector(componentHandles, organHandle[i]);
+            if(viabilityResult == false) break;
 
-    // Importing motor organs
-    int motorOrgan[organsNumber];
-    int brainOrgan = simLoadModel("models/brainOrgan.ttm");
-//    int brainConnector = simLoadModel("models/brainConnector.ttm");
-    int organClips[organsNumber];
+            int gripperHandle;
+            gripperHandle = viability.createTemporalGripper(organs[i]);
+            //viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
+            simRemoveModel(gripperHandle);
+            //if(viabilityResult == false) break;
 
-    // Create force sensors to place organs
-    int pamsArg1[] = { 0,0,0,0,0 };
-    float pamsArg2[] = { 0,0,0,0,0 };
-    int forceSensor[organsNumber];
-    int forceSensor3 = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL); // Brain
-    int clipsSensor[organsNumber];
-//    int forceBC = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL); // Brain connector
-    // TODO: EB to Create dummies
-
-    // Create voxels
-    std::vector <int> cubeHandles;
-    float brainPos[] = { 0.0, 0.0, 0.0 };
-//	float organ1_angle[] = { 1.57080, 0, -1.57080 };
-//	float organ2_angle[] = { 1.57080, 0, 1.57080 }; // 3.151516 for second orientation
-    float brainOri[] = { 0, 1.57080, 0 };
-
-    // Create voxel
-    int temp_voxel_handle;
-    float columnWidth = 0.015;
-    float columnHeight = 0.010; // Wheel not touching floor decrease height
-    float magnitude;
-    float angle;
-    float voxel_size[3];
-    float voxel_pos[3];
-    float voxel_ori[3];
-    float voxel_color[3];
-
-    for(int i = 0; i < organsNumber; i++){
-        // motorOrgan[i] = simLoadModel("models/motorOrgan2_bigWheel.ttm");
-//        motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
-        if(i % 2 == 0 ){
-            motorOrgan[i] = simLoadModel("models/motorOrgan3_massFixed.ttm");
         }
-        else{
-            motorOrgan[i] = simLoadModel("models/sensorOrgan.ttm");
-        }
-        forceSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
-
-        // Connectors
-        organClips[i] = simLoadModel("models/clipConnector.ttm");
-        clipsSensor[i] = simCreateForceSensor(0, pamsArg1, pamsArg2, NULL);
-
-        // Horizontal bar
-        magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
-        angle = atan2(organs[i].coordinates[1] / 100 - brainPos[1], organs[i].coordinates[0] / 100 - brainPos[0]);
-
-        voxel_size[0] = magnitude;
-        voxel_size[1] = columnWidth;
-        voxel_size[2] = columnHeight;
-        temp_voxel_handle = simCreatePureShape(0, 8, voxel_size, 1, NULL);
-        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-        voxel_pos[0] = brainPos[0] + (organs[i].coordinates[0] / 100 - brainPos[0]) / 2;
-        voxel_pos[1] = brainPos[1] + (organs[i].coordinates[1] / 100 - brainPos[1]) / 2;
-        voxel_pos[2] = 0;
-        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-        voxel_ori[0] = 0;
-        voxel_ori[1] = 0;
-        voxel_ori[2] = angle;
-        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-        voxel_color[0] = 0;
-        voxel_color[1] = 1;
-        voxel_color[2] = 0;
-        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-        // Vertical bar
-        voxel_size[0] = columnWidth;
-        voxel_size[1] = columnHeight;
-        voxel_size[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2]);
-        temp_voxel_handle = simCreatePureShape(2, 8, voxel_size, 1, NULL);
-        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-        voxel_pos[0] = organs[i].coordinates[0] / 100;
-        voxel_pos[1] = organs[i].coordinates[1] / 100;
-        voxel_pos[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2]) / 2;
-        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-        voxel_ori[0] = 0;
-        voxel_ori[1] = 0;
-        voxel_ori[2] = angle;
-        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-        voxel_color[0] = 0;
-        voxel_color[1] = 1;
-        voxel_color[2] = 0;
-        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-        // Chamfer
-        voxel_size[0] = columnWidth;
-        voxel_size[1] = columnWidth;
-        voxel_size[2] = columnWidth;
-        temp_voxel_handle = simCreatePureShape(1, 8, voxel_size, 1, NULL);
-        RobotMorphology.cubeHandles.push_back(temp_voxel_handle);
-
-        voxel_pos[0] = organs[i].coordinates[0] / 100 - cos(angle) * 0.005;
-        voxel_pos[1] = organs[i].coordinates[1] / 100 - sin(angle) * 0.005;
-        voxel_pos[2] = columnWidth/2.0;
-        simSetObjectPosition(temp_voxel_handle, -1, voxel_pos);
-
-        voxel_ori[0] = 0.0;
-        voxel_ori[1] = 0.0; //0.785398
-        voxel_ori[2] = angle;
-        simSetObjectOrientation(temp_voxel_handle, -1, voxel_ori);
-
-        voxel_color[0] = 0;
-        voxel_color[1] = 1;
-        voxel_color[2] = 0;
-        simSetShapeColor(temp_voxel_handle, NULL, sim_colorcomponent_ambient_diffuse, voxel_color);
-
-        // Place organs
-        // TODO: Try to remove these temporal variables.
-        float tempPos[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
-        simSetObjectPosition(motorOrgan[i], -1, tempPos);
-        simSetObjectPosition(forceSensor[i], -1, tempPos);
-        float tempOri[] = {organs[i].orientations[0],organs[i].orientations[1],organs[i].orientations[2]};
-        //float tempOri[] = {0.0,0.0,0.0};
-        simSetObjectOrientation(motorOrgan[i], -1, tempOri);
-        simSetObjectOrientation(forceSensor[i], -1, tempOri);
-
-        //float tempPosClips[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100}; // 0.0225 Wheels barely touching floor but more room to rotate;
-        float tempPosClips[] = {organs[i].coordinates[0]/100, organs[i].coordinates[1]/100, organs[i].coordinates[2]/100 + 0.003}; // 0.0225 Wheels barely touching floor but more room to rotate;
-        simSetObjectPosition(organClips[i], -1, tempPosClips);
-        simSetObjectPosition(clipsSensor[i], -1, tempPosClips);
-        //float tempOriClips[] = {organs[i].orientations[0],organs[i].orientations[1],organs[i].orientations[2]};
-        float tempOriClips[] = {0.0, 0.0, 0.0};
-        simSetObjectOrientation(organClips[i], -1, tempOriClips);
-        simSetObjectOrientation(clipsSensor[i], -1, tempOriClips);
+        robotHandle = simCreateCollection("robot", 1); // This has to be before simAddObjectToCollection
+        simAddObjectToCollection(robotHandle, skeletonHandle, sim_handle_single, 0);
     }
-
-    // Set brain position
-    brainPos[2] = 0.03;
-    simSetObjectPosition(brainOrgan, -1, brainPos);
-    simSetObjectPosition(forceSensor3, -1, brainPos);
-
-    // Set brain orientation
-    simSetObjectOrientation(brainOrgan, -1, brainOri);
-    simSetObjectOrientation(forceSensor3, -1, brainOri);
-
-    // Set brain connector
-    float tempBrainConnectorPos[] = {0.0, 0.0, 0.0};
-    float tempBrainConnectorOri[] = {0.0, 0.0, 0.0};
-//    simSetObjectPosition(brainConnector, -1, tempBrainConnectorPos);
-//    simSetObjectPosition(forceBC, -1, tempBrainConnectorPos);
-//    simSetObjectOrientation(brainConnector, -1, tempBrainConnectorOri);
-//    simSetObjectOrientation(forceBC, -1, tempBrainConnectorOri);
-
-    int* a = RobotMorphology.cubeHandles.data();
-    int body = simGroupShapes(a, RobotMorphology.cubeHandles.size());
-    simSetObjectName(body, "robotShape");
-
-    //  Set parents
-    for(int i = 0; i < organsNumber; i++){
-        simSetObjectParent(forceSensor[i], body, 1);
-        simSetObjectParent(motorOrgan[i], forceSensor[i], 1);
-        simSetObjectParent(clipsSensor[i], body, 1);
-        simSetObjectParent(organClips[i], clipsSensor[i], 1);
-    }
-    simSetObjectParent(forceSensor3, body, 1);
-    simSetObjectParent(brainOrgan, forceSensor3, 1);
-
-//    simSetObjectParent(forceBC, body, 1);
-//    simSetObjectParent(brainConnector, forceBC, 1);
-
-    int objectsNumber;
-    int *objectHandles;
-    objectHandles = simGetObjectsInTree(body, sim_handle_all, 0, &objectsNumber);
-    std::cout << "Objects Number: " << objectsNumber << std::endl;
-    std::cout << "Object 0: " << objectHandles[0] << std::endl;
-
-    // Create collection
-    int collection_handle = simCreateCollection("robotShape", 1); // This has to be before simAddObjectToCollection
-    simAddObjectToCollection(collection_handle, body, sim_handle_single, 0);
-
-    // Export stl
-    simInt shapeCount = 0;
-    int skeletonsNumber = 0;
-    shapeCount = skeletonsNumber + 1;
-    int tempHandles[shapeCount];
-    tempHandles[0] = body;
-    simFloat** vertices=new simFloat*[shapeCount];
-    simInt* verticesSizes=new simInt[shapeCount];
-    simInt** indices=new simInt*[shapeCount];
-    simInt* indicesSizes=new simInt[shapeCount];
-    simInt index=0;
-    for(int j = 0; j < shapeCount; j++){
-        simFloat* vert;
-        simInt vertS;
-        simInt* ind;
-        simInt indS;
-        int getShapeMeshResult = -1;
-        getShapeMeshResult = simGetShapeMesh(tempHandles[j],&vert,&vertS,&ind,&indS,NULL);
-        std::cout << getShapeMeshResult << std::endl;
-        vertices[j]=vert;
-        verticesSizes[j]=vertS;
-        indices[j]=ind;
-        indicesSizes[j]=indS;
-        simFloat m[12];
-        simGetObjectMatrix(tempHandles[j],-1,m);
-        for (simInt i=0;i<vertS/3;i++)
-        {
-            simFloat v[3]={vert[3*i+0],vert[3*i+1],vert[3*i+2]};
-            simTransformVector(m,v);
-            vert[3*i+0]=v[0];
-            vert[3*i+1]=v[1];
-            vert[3*i+2]=v[2];
-            //std::cout << vert[3*i+0] << "," << vert[3*i+1] << "," << vert[3*i+2] << std::endl;
-        }
-    }
-    std::cout << "Before export mesh" << std::endl;
-    //
-    std::cout << shapeCount << std::endl;
-    int success;
-    success = simExportMesh(3,"models/example.stl",0,1,shapeCount,vertices,
-                  verticesSizes,indices,indicesSizes,NULL,NULL);
-    std::cout << "After export mesh" << std::endl;
-    for (simInt i=0;i<shapeCount;i++)
-    {
-        simReleaseBuffer((simChar*)vertices[i]);
-        simReleaseBuffer((simChar*)indices[i]);
-    }
-    delete[] vertices;
-    delete[] verticesSizes;
-    delete[] indices;
-    delete[] indicesSizes;
-
-
-    return simGetObjectHandle("robotShape");
+    return robotHandle;
 }
 
 void Tissue_DirectBarsVREP::create(){
     std::cout << "State: CREATE!" << std::endl;
     mutate();
-    mainHandle = createRobot();
-    viabilityResult;
-    viabilityResult = viabilityTest(mainHandle); // True: passed, False: Failed
-    std::cout << "Viability: " << viabilityResult << std::endl;
+    mainHandle = createMorphology();
 }
 
 void Tissue_DirectBarsVREP::init() {
@@ -508,8 +291,8 @@ bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
 void Tissue_DirectBarsVREP::initMorphology() {
 
     std::cout << "Init Morph!" << std::endl;
-    //TODO: Remove unnecessary organs
-    organs.resize(10);
+    organsNumber = 5; //TODO move from here!
+    organs.resize(organsNumber);
     // Initialize coordinates and orientations
     for (int i = 0; i < organs.size(); i++) {
         organs[i].coordinates.resize(3);
@@ -519,114 +302,252 @@ void Tissue_DirectBarsVREP::initMorphology() {
 // Mutate parameters for Moorphology
 void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     std::cout << "Mutate morphology!" << std::endl;
-    // Mutate number of organs
-    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
-//        organsNumber = (int)randomNum->randFloat(1, 9);
-        organsNumber = 4;
+    organsNumber = 5;
+    // Brain organ
+    organs[0].organType = 0; // Motor organ type
+    for (int j = 0; j < organs[0].coordinates.size(); j++) { // Mutate coordinates
+        organs[0].coordinates[0] = 0.0; // 3D printer build volumen
     }
-//    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Decrease number of organs
-//        if(genome->organsNumber > 1) genome->organsNumber--;
-//    }
-//    if (settings->morphMutRate < randomNum->randFloat(0, 1)) { // Increment number of organs;
-//        if(genome->organsNumber < 10) genome->organsNumber++;
-//    }
-    for (int i = 0; i < organsNumber; i++) { // Mutate organs
+    organs[0].coordinates[2] = 0.0;
+    for (int j = 0; j < organs[0].orientations.size(); j++) { // Mutate orientations
+        organs[0].orientations[j] = 0.0;
+    }
+    organs[0].orientations[1] = 1.57080; //TODO change orientation in model!
+    // Mutate non-organs
+    for (int i = 1; i < organsNumber; i++) { // Mutate organs
+        organs[i].organType = 1; // Motor organ type
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
                     organs[i].coordinates[j] = randomNum->randFloat(-10.0, 10.0); // 3D printer build volumen
                 }
                 else{
-//                  organs[i].coordinates[j] = 0.0; // Motors close to ground
                     organs[i].coordinates[j] = randomNum->randFloat(0.0, 10.0);
                 }
             }
         }
-//        organs[i].coordinates[0] = 0.0;
-//        organs[i].coordinates[1] = 8.0;
         for (int j = 0; j < organs[i].orientations.size(); j++) { // Mutate orientations
             if (settings->morphMutRate < randomNum->randFloat(0, 1)){
                 organs[i].orientations[j] = randomNum->randFloat(0.0, 6.28319);
             }
+            // TODO Just for testing!!!
+            organs[i].orientations[j] = 0.0;
         }
-        if(i % 2 == 0 ){
-            organs[i].orientations[0] = 1.57080;
-//          organs[i].orientations[1] = 0.0;
-            organs[i].orientations[2] = -1.57080;
-        }
-        else{
-            organs[i].orientations[0] = 1.57;
-//          organs[i].orientations[1] = 0.0;
-            organs[i].orientations[2] = 0.0;
-        }
-//        organs[i].orientations[0] = 1.57080; // Y-axis
-////        organs[i].orientations[1] = 0.0; // Z-axis
-//        organs[i].orientations[2] = -1.57080; // X-axis along motor axis. No mutation required
+        organs[i].orientations[0] = 3.1415;
+        //organs[i].orientations[1] = 1.0;
+        //organs[i].orientations[2] = 1.5708;
     }
 }
+// Create organ
+void Tissue_DirectBarsVREP::createOrgan(int counter, int* organHandle, int* sensorHandle) {
+    int forSenPamsArg1[] = {0, 0, 0, 0, 0};
+    float forSenPamsArg2[] = {0, 0, 0, 0, 0};
+    float organPosition[3] = {organs[counter].coordinates[0]/100, organs[counter].coordinates[1]/100, organs[counter].coordinates[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
+    float organOrientation[3] = {organs[counter].orientations[0],organs[counter].orientations[1],organs[counter].orientations[2]};
 
-bool Tissue_DirectBarsVREP::viabilityTest(int robotHandle){
-    simAddObjectToSelection(sim_handle_tree, robotHandle);
-    int selectionSize = simGetObjectSelectionSize();
-    int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
-    vector<int> jointHandles;
-    vector<int> shapesHandles;
-    simGetObjectSelection(tempObjectHandles);
+    // Create organ and sensor
+    switch(organs[counter].organType){
+        case 0:
+            *organHandle = simLoadModel("models/brainOrgan.ttm");
+            break;
+        case 1:
+            *organHandle = simLoadModel("models/motorOrgan3_massFixed.ttm");
+            break;
+        case 2:
+            *organHandle = simLoadModel("models/sensorOrgan.ttm");
+            break;
+        default:
+            std::cout << "WARNING: Organ type does not exist" << std::endl;
+            break;
+    }
+    *sensorHandle = simCreateForceSensor(0, forSenPamsArg1, forSenPamsArg2, NULL);
+    // Set positions and orientations
+    simSetObjectPosition(*organHandle, -1, organPosition);
+    simSetObjectPosition(*sensorHandle, -1, organPosition);
+    simSetObjectOrientation(*organHandle, -1, organOrientation);
+    simSetObjectOrientation(*sensorHandle, -1, organOrientation);
+    // Set parenthood
+    simSetObjectParent(*organHandle, *sensorHandle, 1);
+}
+// Create body
+int Tissue_DirectBarsVREP::createSkeleton() {
+    std::vector<int> primitiveHandles;
+    int skeletonHandle;
+    int temp_primitive_handle;
+    float columnWidth = 0.015;
+    float columnHeight = 0.010; // Wheel not touching floor decrease height
+    float magnitude;
+    float angle;
+    float primitiveSize[3];
+    float primitivePosition[3];
+    float primitiveOrientation[3];
+    float primitiveColour[3];
+    //TODO remove this variable from here
+    float brainPos[] = { 0.0, 0.0, 0.0 };
 
-    for (size_t i = 0; i < selectionSize; i++)
-    {
-        if (simGetObjectType(tempObjectHandles[i]) == sim_object_joint_type) {
-            jointHandles.push_back(tempObjectHandles[i]);
-            simSetJointTargetVelocity(jointHandles[i], 10.0);
-        }
-        if (simGetObjectType(tempObjectHandles[i]) == sim_object_shape_type) {
-            shapesHandles.push_back(tempObjectHandles[i]);
-            std::cout << simGetObjectName(tempObjectHandles[i]) << std::endl;
-        }
-    }
+    for(int i = 1; i < organsNumber; i++){
+        // Horizontal bar
+        magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
+        angle = atan2(organs[i].coordinates[1] / 100 - brainPos[1], organs[i].coordinates[0] / 100 - brainPos[0]);
 
-    bool testResult = true;
-    // Test 1: Organs number
-    // The number of organs cannot be greater than 5
-    if(organsNumber > 4){
-        return false;
-    }
-    // Test 2: Volume build size
-    // Check if an organ is outside of the 3D printing volume
-    float position[3];
-    float euclDisOrigin; // Distance between origin and organ
-    for(int i = 0; i < jointHandles.size(); i++){
-        // Get position of each motor
-        simGetObjectPosition(jointHandles[i],-1,position);
-        //std::cout << position[0] << "," << position[1] << "," << position[2] << std::endl;
-        euclDisOrigin = sqrt(pow(position[0],2)+pow(position[1],2)+pow(position[2],2));
-        // std::cout << "Distance from origin: " << euclDisOrigin << std::endl;
-        if(euclDisOrigin > 0.25){
-            //std::cout << simGetObjectName(jointHandles[i]) << " outside of the build volume" << std::endl;
-            // testResult = false;
-            return false;
-        }
-    }
-    // Test 3: No organs above brain (direct bars exclusive restriction)
-    // No organs can be above the brain
-    for(int i = 0; i < jointHandles.size(); i++){
-        simGetObjectPosition(jointHandles[i],-1,position);
-        euclDisOrigin = sqrt(pow(position[0],2)+pow(position[1],2));
-        if(euclDisOrigin < 0.036){
-            // testResult = false;
-            return false;
-        }
-    }
-    // Test 2: Prevent colliding organs
-    // Check if any organs are colliding with the tissue
-    for(int i = 0; i < shapesHandles.size(); i++){
-        if(simCheckCollision(shapesHandles[1],shapesHandles[i])){
-            std::cout << simGetObjectName(shapesHandles[1]) << " and " << simGetObjectName(shapesHandles[i]) << " are colliding. " << std::endl;
-            //testResult = false;
-            return false;
-        }
-    }
+        primitiveSize[0] = magnitude;
+        primitiveSize[1] = columnWidth;
+        primitiveSize[2] = columnHeight;
+        temp_primitive_handle = simCreatePureShape(0, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
 
-    simRemoveObjectFromSelection(sim_handle_all, -1);
-    return testResult;
+        primitivePosition[0] = brainPos[0] + (organs[i].coordinates[0] / 100 - brainPos[0]) / 2;
+        primitivePosition[1] = brainPos[1] + (organs[i].coordinates[1] / 100 - brainPos[1]) / 2;
+        primitivePosition[2] = 0;
+        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
+
+        primitiveOrientation[0] = 0;
+        primitiveOrientation[1] = 0;
+        primitiveOrientation[2] = angle;
+        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+
+        // Vertical bar
+        primitiveSize[0] = columnWidth;
+        primitiveSize[1] = columnHeight;
+        primitiveSize[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2]);
+        temp_primitive_handle = simCreatePureShape(2, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
+
+        primitivePosition[0] = organs[i].coordinates[0] / 100;
+        primitivePosition[1] = organs[i].coordinates[1] / 100;
+        primitivePosition[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2]) / 2;
+        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
+
+        primitiveOrientation[0] = 0;
+        primitiveOrientation[1] = 0;
+        primitiveOrientation[2] = angle;
+        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+
+        // Chamfer
+        primitiveSize[0] = columnWidth;
+        primitiveSize[1] = columnWidth;
+        primitiveSize[2] = columnWidth;
+        temp_primitive_handle = simCreatePureShape(1, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
+
+        primitivePosition[0] = organs[i].coordinates[0] / 100 - cos(angle) * 0.005;
+        primitivePosition[1] = organs[i].coordinates[1] / 100 - sin(angle) * 0.005;
+        primitivePosition[2] = columnWidth/2.0;
+        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
+
+        primitiveOrientation[0] = 0.0;
+        primitiveOrientation[1] = 0.0; //0.785398
+        primitiveOrientation[2] = angle;
+        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+    }
+    int* array = primitiveHandles.data();
+    skeletonHandle = simGroupShapes(array, primitiveHandles.size());
+    simSetObjectName(skeletonHandle, "robotShape");
+    return skeletonHandle;
+}
+
+// This method checks if there is at least one organ of each type
+int Tissue_DirectBarsVREP::viabilityStruct::checkOrgansType(vector<Organs> organs) {
+    bool result = true;
+    int organTypesCounter = 0;
+    for(int i = 0; i < 3; i++){
+        for(int j = 0; j < organs.size(); j++){
+            if(organs[j].organType == i){
+                organTypesCounter++;
+                break;
+            }
+        }
+    }
+    // If there are at least 2 different organs.
+    if(organTypesCounter != 2){
+        result = false;
+        std::cout << "WARNING: There is an organ type missing!" << std::endl;
+    }
+    return result;
+
+}
+// This method checks whether if an organ is inside of outside of the 3D print volume
+int Tissue_DirectBarsVREP::viabilityStruct::printVolume(vector<float> coordinates) {
+    bool result = true;
+    if(coordinates[0] > 140 || coordinates[0] < -140 ||
+        coordinates[1] > 140 || coordinates[1] < -140 ||
+        coordinates[2] > 250 || coordinates[2] < 0){
+        result = false;
+        std::cout << "WARNING: There is an organ outside the print volume!" << std::endl;
+    }
+    return result;
+}
+// Detect whether the organ is colliding with anything
+int Tissue_DirectBarsVREP::viabilityStruct::collisionDetector(vector<int> allComponents, int componentHandle) {
+    int result = true;
+    for(int i = 0; i < allComponents.size(); i++){
+        if(simCheckCollision(allComponents[i], componentHandle)){
+            std::cout << simGetObjectName(allComponents[1]) << " and " << simGetObjectName(componentHandle) << " are colliding. " << std::endl;
+            std::cout << "WARNING: An organ is colliding!" << std::endl;
+            result = false;
+            break;
+        }
+    }
+    return result;
+}
+// Create temporal gripper
+int Tissue_DirectBarsVREP::viabilityStruct::createTemporalGripper(Organs organ) {
+    int gripperHandle;
+    float gripperPosition[3] = {0.0, 0.0, 0.0};
+    float gripperOrientation[3] = {organ.orientations[0], organ.orientations[1], organ.orientations[2]};
+
+    float offSetX = 0;
+    float offSetY = 0;
+    float offSetZ = -0.08;
+    float tempX = 0;
+    float tempY = 0;
+    float tempZ = 0;
+
+    gripperHandle = simLoadModel("models/gripper.ttm");
+
+    tempX = offSetX;
+    tempY = offSetY * cos(organ.orientations[0]) - offSetZ * sin(organ.orientations[0]);
+    tempZ = offSetY * sin(organ.orientations[0]) + offSetZ * cos(organ.orientations[0]);
+    offSetX = tempX;
+    offSetY = tempY;
+    offSetZ = tempZ;
+    // 2nd rotation
+    // TODO Why minus here!!!
+    tempX = offSetX * cos(organ.orientations[1]) - offSetZ * sin(organ.orientations[1]);
+    tempY = offSetY;
+    tempZ = offSetX * sin(organ.orientations[1]) + offSetZ * cos(organ.orientations[1]);
+    offSetX = tempX;
+    offSetY = tempY;
+    offSetZ = tempZ;
+    // 3nd rotation
+    tempX = offSetX * cos(organ.orientations[2]) - offSetY * sin(organ.orientations[2]);
+    tempY = offSetX * sin(organ.orientations[2]) + offSetY * cos(organ.orientations[2]);
+    tempZ = offSetZ;
+    offSetX = tempX;
+    offSetY = tempY;
+    offSetZ = tempZ;
+    gripperPosition[0] = (organ.coordinates[0]/100) + offSetX;
+    gripperPosition[1] = (organ.coordinates[1]/100) + offSetY;
+    gripperPosition[2] = (organ.coordinates[2]/100) + offSetZ + 0.05;
+
+    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
+    simSetObjectPosition(gripperHandle, -1, gripperPosition);
+    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1);
+
+    return gripperHandle;
 }
