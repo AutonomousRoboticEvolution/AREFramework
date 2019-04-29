@@ -62,6 +62,7 @@ set(SOURCES
     ERFiles/morphology/Tissue_DirectBarsVREP.cpp
     ERFiles/morphology/Tissue_GMX.cpp
     ERFiles/morphology/Tissue_GMX_VREP.cpp
+	ERFiles/morphology/Viability.cpp
     ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
     ERFiles/neuron/InputNeuron.cpp
