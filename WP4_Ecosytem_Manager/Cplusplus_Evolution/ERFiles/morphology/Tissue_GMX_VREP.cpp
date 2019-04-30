@@ -120,11 +120,11 @@ int Tissue_GMX_VREP::createRobot() {
 
     // Importing motor organs
     int brainOrgan = simLoadModel("models/brainOrgan.ttm");
-    int motorOrgan[organsNumber];
+    vector<int> motorOrgan(organsNumber,-1);
     // Create force sensors to place organs
     int pamsArg1[] = {0,0,0,0,0};
     float pamsArg2[] = {0,0,0,0,0};
-    int forceSensor[organsNumber];
+    vector<int> forceSensor(organsNumber,-1);
     int forceSensor3 = simCreateForceSensor(0,pamsArg1,pamsArg2,NULL);
 
     // Set organs position and orientation

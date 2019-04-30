@@ -89,9 +89,9 @@ int Tissue_DirectBarsVREP::createMorphology() {
     viabilityResult = viability.checkOrgansType(organs);
     if(viabilityResult == true){
         // Importing motor organs
-        int organHandle[organsNumber];
+        vector<int> organHandle(organsNumber,-1);
         int skeletonHandle;
-        int forceSensor[organsNumber];
+		vector<int> forceSensor(organsNumber,-1);
         vector<int> componentHandles;
 
         // Create skeleton
@@ -497,7 +497,8 @@ int Tissue_DirectBarsVREP::viabilityStruct::collisionDetector(vector<int> allCom
     int result = true;
     for(int i = 0; i < allComponents.size(); i++){
         if(simCheckCollision(allComponents[i], componentHandle)){
-            std::cout << simGetObjectName(allComponents[1]) << " and " << simGetObjectName(componentHandle) << " are colliding. " << std::endl;
+			//std::cout << simGetObjectName(allComponents[1]) << " and ";
+			//std::cout << simGetObjectName(componentHandle) << " are colliding. " << std::endl;
             std::cout << "WARNING: An organ is colliding!" << std::endl;
             result = false;
             break;

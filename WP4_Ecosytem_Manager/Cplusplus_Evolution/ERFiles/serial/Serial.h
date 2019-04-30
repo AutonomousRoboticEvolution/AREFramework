@@ -6,7 +6,7 @@
 //#include <windows.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../dynamixel/c++/src/dynamixel_sdk.h"
+//#include "../../dynamixel/c++/src/dynamixel_sdk.h"
 
 class Serial
 {

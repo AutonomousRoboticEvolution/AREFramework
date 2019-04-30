@@ -4,6 +4,6 @@
     <LocalDebuggerCommandArguments>-g10 -g0 -gfiles</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommand>C:\Program Files\V-REP3\V-REP_PRO_EDU\vrep.exe</LocalDebuggerCommand>
-    <LocalDebuggerWorkingDirectory>..\..</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>C:\Program Files\V-REP3\V-REP_PRO_EDU\</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
 </Project>

@@ -103,11 +103,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;DO_NOT_USE_SHARED_MEMORY;MAX_EXT_API_CONNECTIONS=255;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Boost\boost_1_70_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\remoteApi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,17 +146,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\remoteApi\extApi.c" />
-    <ClCompile Include="..\..\remoteApi\extApiPlatform.c" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_read.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_write.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\packet_handler.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\port_handler.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol2_packet_handler.cpp" />
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp" />
+    <ClCompile Include="..\..\..\..\common\v_repLib.cpp" />
+    <ClCompile Include="..\..\..\..\remoteApi\extApi.c" />
+    <ClCompile Include="..\..\..\..\remoteApi\extApiPlatform.c" />
     <ClCompile Include="..\ERfiles\control\ANN.cpp" />
     <ClCompile Include="..\ERfiles\control\Control.cpp" />
     <ClCompile Include="..\ERfiles\control\ControlFactory.cpp" />
@@ -181,6 +174,10 @@
     <ClCompile Include="..\ERfiles\morphology\FixedBaseMorphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\Morphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\MorphologyFactory.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBars.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Tissue_GMX.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Tissue_GMX_VREP.cpp" />
     <ClCompile Include="..\ERfiles\neuron\CPGNeuron.cpp" />
     <ClCompile Include="..\ERFiles\neuron\FunctionNeuron.cpp" />
     <ClCompile Include="..\ERfiles\neuron\InputNeuron.cpp" />
@@ -194,20 +191,12 @@
     <ClCompile Include="..\RandNum.cpp" />
     <ClCompile Include="ClientEA.cpp" />
     <ClCompile Include="ERClient.cpp" />
+    <ClCompile Include="SlaveConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\remoteApi\extApi.h" />
-    <ClInclude Include="..\..\remoteApi\extApiPlatform.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_read.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_write.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_read.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_write.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\packet_handler.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\port_handler.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol1_packet_handler.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol2_packet_handler.h" />
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk_windows\port_handler_windows.h" />
+    <ClInclude Include="..\..\..\..\remoteApi\extApi.h" />
+    <ClInclude Include="..\..\..\..\remoteApi\extApiInternal.h" />
+    <ClInclude Include="..\..\..\..\remoteApi\extApiPlatform.h" />
     <ClInclude Include="..\ERfiles\control\ANN.h" />
     <ClInclude Include="..\ERfiles\control\Control.h" />
     <ClInclude Include="..\ERfiles\control\ControlFactory.h" />
@@ -233,6 +222,10 @@
     <ClInclude Include="..\ERfiles\morphology\FixedBaseMorphology.h" />
     <ClInclude Include="..\ERfiles\morphology\Morphology.h" />
     <ClInclude Include="..\ERfiles\morphology\MorphologyFactory.h" />
+    <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBars.h" />
+    <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.h" />
+    <ClInclude Include="..\ERFiles\morphology\Tissue_GMX.h" />
+    <ClInclude Include="..\ERFiles\morphology\Tissue_GMX_VREP.h" />
     <ClInclude Include="..\ERfiles\neuron\CPGNeuron.h" />
     <ClInclude Include="..\ERFiles\neuron\FunctionNeuron.h" />
     <ClInclude Include="..\ERfiles\neuron\InputNeuron.h" />
@@ -245,6 +238,7 @@
     <ClInclude Include="..\ERFiles\SettingsERClient.h" />
     <ClInclude Include="..\RandNum.h" />
     <ClInclude Include="ClientEA.h" />
+    <ClInclude Include="SlaveConnection.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

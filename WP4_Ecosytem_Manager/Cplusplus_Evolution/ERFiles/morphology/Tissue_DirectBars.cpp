@@ -56,5 +56,5 @@ void Tissue_DirectBars::saveGenome(int indNum, float fitness)
 
 bool Tissue_DirectBars::loadGenome(int individualNumber, int sceneNum)
 {
-
+	return false;
 }
