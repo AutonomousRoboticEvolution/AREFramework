@@ -6,15 +6,15 @@ set(SOURCES
     ClientEA.cpp
     ERClient.cpp
     SlaveConnection.cpp
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/remoteApi/extApi.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/remoteApi/extApiPlatform.c"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/common/shared_memory.c"
+    "${VREP_FOLDER}/programming/remoteApi/extApi.c"
+    "${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c"
+    "${VREP_FOLDER}/programming/common/shared_memory.c"
 )
 
 add_executable(ERClient ${SOURCES})
 target_include_directories(ERClient PUBLIC 
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../vrep-programming/include"
+    "${VREP_FOLDER}/programming"
+    "${VREP_FOLDER}/programming/include"
 )
 target_link_libraries(ERClient
     ER_library

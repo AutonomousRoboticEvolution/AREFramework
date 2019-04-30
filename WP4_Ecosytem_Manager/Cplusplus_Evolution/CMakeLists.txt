@@ -1,6 +1,23 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
+if (NOT VREP_FOLDER)
+    message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
+else()
+    if (WIN32)
+        set(VREP_EXE "${VREP_FOLDER}/vrep.exe")
+    elseif(APPLE)
+        set(VREP_EXE "${VREP_FOLDER}/vrep.app/Contents/MacOS/vrep")
+    else()
+        set(VREP_EXE "${VREP_FOLDER}/vrep.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "VREP_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+endif()
+
+
 set(SOURCES
     ERFiles/CollisionDetector.cpp
     ERFiles/control/ANN.cpp
@@ -73,7 +90,7 @@ set(SOURCES
     ERFiles/Settings.cpp
     ERFiles/VREPUI/VREPUI.cpp
     RandNum.cpp
-    "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/common/v_repLib.cpp"
+    "${VREP_FOLDER}/programming/common/v_repLib.cpp"
     #	ERFiles/control/Hormones.cpp
     #	ERFiles/control/TransferNetwork.cpp
     #	ERFiles/module/Module_Bend.cpp
@@ -86,7 +103,7 @@ add_library(ER_library STATIC ${SOURCES})
 
 
 target_include_directories(ER_library PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/include"
+    "${VREP_FOLDER}/programming/include"
 )
 
 set_target_properties(ER_library PROPERTIES 
@@ -102,7 +119,7 @@ add_library(v_repExtER SHARED
 target_link_libraries(v_repExtER ER_library)
 
 target_include_directories(v_repExtER PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/vrep-programming/include"
+    "${VREP_FOLDER}/programming/include"
 )
 
 set_target_properties(v_repExtER PROPERTIES 
