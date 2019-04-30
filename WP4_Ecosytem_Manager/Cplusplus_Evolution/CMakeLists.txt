@@ -5,10 +5,13 @@ if (NOT VREP_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
 else()
     if (WIN32)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
         set(VREP_EXE "${VREP_FOLDER}/vrep.exe")
     elseif(APPLE)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}/vrep.app/Contents/MacOS/")
         set(VREP_EXE "${VREP_FOLDER}/vrep.app/Contents/MacOS/vrep")
     else()
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
         set(VREP_EXE "${VREP_FOLDER}/vrep.sh")
     endif()
 
@@ -128,6 +131,8 @@ set_target_properties(v_repExtER PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
+install(TARGETS v_repExtER DESTINATION ${VREP_LIB_FOLDER})
+
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(v_repExtER PUBLIC "__WINDOWS__")
     target_compile_definitions(ER_library PUBLIC "__WINDOWS__")
@@ -141,3 +146,4 @@ endif()
 
 add_subdirectory(ERClient)
 add_subdirectory(MPI)
+add_subdirectory(VREP_Files)
