@@ -55,5 +55,5 @@ void Tissue_GMX::saveGenome(int indNum, float fitness)
 
 bool Tissue_GMX::loadGenome(int individualNumber, int sceneNum)
 {
-
+	return false;
 }

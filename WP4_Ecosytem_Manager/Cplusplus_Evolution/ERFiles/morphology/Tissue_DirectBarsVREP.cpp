@@ -90,9 +90,9 @@ int Tissue_DirectBarsVREP::createMorphology() {
     viabilityResult = viability.checkOrgansType(organs);
     if(viabilityResult == true){
         // Importing motor organs
-        int organHandle[organsNumber];
+        vector<int> organHandle(organsNumber,-1);
         int skeletonHandle;
-        int forceSensor[organsNumber];
+		vector<int> forceSensor(organsNumber,-1);
         vector<int> componentHandles;
 
         // Create skeleton

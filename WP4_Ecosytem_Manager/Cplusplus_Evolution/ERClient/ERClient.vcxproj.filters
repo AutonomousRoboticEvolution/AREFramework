@@ -1,8 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="..\..\remoteApi\extApi.c" />
-    <ClCompile Include="..\..\remoteApi\extApiPlatform.c" />
     <ClCompile Include="ERClient.cpp" />
     <ClCompile Include="..\RandNum.cpp">
       <Filter>GA</Filter>
@@ -89,33 +87,6 @@
     <ClCompile Include="..\ERFiles\morphology\ER_DirectEncoding.cpp">
       <Filter>GA\Morphology</Filter>
     </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_bulk_write.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_read.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\group_sync_write.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\packet_handler.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\port_handler.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
-    <ClCompile Include="..\dynamixel\c++\src\dynamixel_sdk\protocol2_packet_handler.cpp">
-      <Filter>dynamixel</Filter>
-    </ClCompile>
     <ClCompile Include="..\ERFiles\EA.cpp">
       <Filter>GA</Filter>
     </ClCompile>
@@ -140,10 +111,24 @@
     <ClCompile Include="..\ERFiles\morphology\ER_CPPN_Encoding.cpp">
       <Filter>GA\Morphology</Filter>
     </ClCompile>
+    <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBars.cpp">
+      <Filter>GA\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ERFiles\morphology\Tissue_GMX.cpp">
+      <Filter>GA\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.cpp">
+      <Filter>GA\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ERFiles\morphology\Tissue_GMX_VREP.cpp">
+      <Filter>GA\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\common\v_repLib.cpp" />
+    <ClCompile Include="..\..\..\..\remoteApi\extApi.c" />
+    <ClCompile Include="..\..\..\..\remoteApi\extApiPlatform.c" />
+    <ClCompile Include="SlaveConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\remoteApi\extApi.h" />
-    <ClInclude Include="..\..\remoteApi\extApiPlatform.h" />
     <ClInclude Include="..\RandNum.h">
       <Filter>GA</Filter>
     </ClInclude>
@@ -229,36 +214,6 @@
     <ClInclude Include="..\ERFiles\morphology\ER_DirectEncoding.h">
       <Filter>GA\Morphology</Filter>
     </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk_windows\port_handler_windows.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_read.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_bulk_write.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_read.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\group_sync_write.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\packet_handler.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\port_handler.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol1_packet_handler.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
-    <ClInclude Include="..\dynamixel\c++\include\dynamixel_sdk\protocol2_packet_handler.h">
-      <Filter>dynamixel</Filter>
-    </ClInclude>
     <ClInclude Include="..\ERFiles\EA.h">
       <Filter>GA</Filter>
     </ClInclude>
@@ -283,6 +238,22 @@
     <ClInclude Include="..\ERFiles\morphology\ER_CPPN_Encoding.h">
       <Filter>GA\Morphology</Filter>
     </ClInclude>
+    <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBars.h">
+      <Filter>GA\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ERFiles\morphology\Tissue_GMX.h">
+      <Filter>GA\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.h">
+      <Filter>GA\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\ERFiles\morphology\Tissue_GMX_VREP.h">
+      <Filter>GA\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\remoteApi\extApi.h" />
+    <ClInclude Include="..\..\..\..\remoteApi\extApiInternal.h" />
+    <ClInclude Include="..\..\..\..\remoteApi\extApiPlatform.h" />
+    <ClInclude Include="SlaveConnection.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GA">

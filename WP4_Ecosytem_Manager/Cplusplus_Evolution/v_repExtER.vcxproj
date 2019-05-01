@@ -85,7 +85,7 @@
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
-    <OutDir>..\..</OutDir>
+    <OutDir>..\..\..\..</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
@@ -130,7 +130,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Libraries\boost_1_60_0;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;C:\Boost\boost_1_70_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Libraries\boost_1_60_0;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -149,6 +149,7 @@
       </ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -207,16 +208,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\common\v_repLib.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\group_bulk_read.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\group_bulk_write.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\group_sync_read.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\group_sync_write.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\packet_handler.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\port_handler.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk\protocol2_packet_handler.cpp" />
-    <ClCompile Include="dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.cpp" />
+    <ClCompile Include="..\..\..\common\v_repLib.cpp" />
     <ClCompile Include="ERfiles\control\ANN.cpp" />
     <ClCompile Include="ERfiles\control\Control.cpp" />
     <ClCompile Include="ERfiles\control\ControlFactory.cpp" />
@@ -269,6 +261,10 @@
     <ClCompile Include="ERfiles\morphology\Morphology.cpp" />
     <ClCompile Include="ERfiles\morphology\MorphologyFactory.cpp" />
     <ClCompile Include="ERFiles\morphology\MorphologyFactoryVREP.cpp" />
+    <ClCompile Include="ERFiles\morphology\Tissue_DirectBars.cpp" />
+    <ClCompile Include="ERFiles\morphology\Tissue_DirectBarsVREP.cpp" />
+    <ClCompile Include="ERFiles\morphology\Tissue_GMX.cpp" />
+    <ClCompile Include="ERFiles\morphology\Tissue_GMX_VREP.cpp" />
     <ClCompile Include="ERfiles\neuron\CPGNeuron.cpp" />
     <ClCompile Include="ERFiles\neuron\FunctionNeuron.cpp" />
     <ClCompile Include="ERfiles\neuron\InputNeuron.cpp" />
@@ -277,7 +273,6 @@
     <ClCompile Include="ERfiles\neuron\OutputNeuron.cpp" />
     <ClCompile Include="ERFiles\neuron\PatternNeuron.cpp" />
     <ClCompile Include="ERfiles\neuron\SimpleNeuron.cpp" />
-    <ClCompile Include="ERFiles\serial\Serial.cpp" />
     <ClCompile Include="ERFiles\Settings.cpp" />
     <ClCompile Include="ERfiles\VREPFunctions.cpp" />
     <ClCompile Include="ERFiles\VREPUI\VREPUI.cpp" />
@@ -286,17 +281,7 @@
     <ClCompile Include="v_repExtER.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\v_repLib.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\group_bulk_read.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\group_bulk_write.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\group_sync_read.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\group_sync_write.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\packet_handler.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\port_handler.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\protocol1_packet_handler.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk\protocol2_packet_handler.h" />
-    <ClInclude Include="dynamixel\c++\src\dynamixel_sdk_windows\port_handler_windows.h" />
+    <ClInclude Include="..\..\..\include\v_repLib.h" />
     <ClInclude Include="ERfiles\control\ANN.h" />
     <ClInclude Include="ERfiles\control\Control.h" />
     <ClInclude Include="ERfiles\control\ControlFactory.h" />
@@ -349,6 +334,10 @@
     <ClInclude Include="ERfiles\morphology\Morphology.h" />
     <ClInclude Include="ERfiles\morphology\MorphologyFactory.h" />
     <ClInclude Include="ERFiles\morphology\MorphologyFactoryVREP.h" />
+    <ClInclude Include="ERFiles\morphology\Tissue_DirectBars.h" />
+    <ClInclude Include="ERFiles\morphology\Tissue_DirectBarsVREP.h" />
+    <ClInclude Include="ERFiles\morphology\Tissue_GMX.h" />
+    <ClInclude Include="ERFiles\morphology\Tissue_GMX_VREP.h" />
     <ClInclude Include="ERfiles\neuron\CPGNeuron.h" />
     <ClInclude Include="ERFiles\neuron\FunctionNeuron.h" />
     <ClInclude Include="ERfiles\neuron\InputNeuron.h" />
@@ -358,7 +347,6 @@
     <ClInclude Include="ERFiles\neuron\PatternNeuron.h" />
     <ClInclude Include="ERfiles\neuron\SimpleNeuron.h" />
     <ClInclude Include="ERfiles\resource.h" />
-    <ClInclude Include="ERFiles\serial\Serial.h" />
     <ClInclude Include="ERfiles\Settings.h" />
     <ClInclude Include="ERfiles\stdafx.h" />
     <ClInclude Include="ERfiles\VREPFunctions.h" />
