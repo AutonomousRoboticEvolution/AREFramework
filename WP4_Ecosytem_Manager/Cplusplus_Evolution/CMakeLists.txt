@@ -82,6 +82,7 @@ set(SOURCES
     ERFiles/morphology/Tissue_DirectBarsVREP.cpp
     ERFiles/morphology/Tissue_GMX.cpp
     ERFiles/morphology/Tissue_GMX_VREP.cpp
+        ERFiles/morphology/Organ.cpp
 	ERFiles/morphology/Viability.cpp
     ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
@@ -146,5 +147,5 @@ elseif(UNIX)
 endif()
 
 add_subdirectory(ERClient)
-add_subdirectory(MPI)
+# add_subdirectory(MPI)
 add_subdirectory(VREP_Files)

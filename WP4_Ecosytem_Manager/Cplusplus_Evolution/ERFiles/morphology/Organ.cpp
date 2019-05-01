@@ -13,7 +13,7 @@ void Organ::createOrgan(int type, vector<float> coordinate, vector<float> orient
             *organHandle = simLoadModel("models/brainOrgan.ttm");
             break;
         case 1:
-            *organHandle = simLoadModel("models/motorOrgan3_massFixed.ttm");
+            *organHandle = simLoadModel("models/motorOrgan.ttm");
             break;
         case 2:
             *organHandle = simLoadModel("models/sensorOrgan.ttm");
