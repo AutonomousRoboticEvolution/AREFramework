@@ -1,6 +1,14 @@
 #include "Viability.h"
 #include <iostream>
 
+Viability::Viability()
+{
+}
+
+Viability::~Viability()
+{
+}
+
 // This method checks if there is at least one organ of each type
 int Viability::checkOrgansType(vector<Organ> organs) {
     bool result = true;

@@ -81,11 +81,11 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Libraries;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;C:\Libraries;$(IncludePath)</IncludePath>
     <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
     <LibraryPath>$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
     <ReferencePath>$(VC_ReferencesPath_x64);</ReferencePath>
-    <OutDir>..\..\..\..</OutDir>
+    <OutDir>..\..\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\$(Configuration)\</OutDir>
@@ -130,7 +130,7 @@
     </Midl>
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;C:\Boost\boost_1_70_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Libraries\boost_1_60_0;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\boost\boost_1_69_0;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;C:\boost\boost_1_70_0;C:\eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Libraries\boost_1_60_0;../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -208,7 +208,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\common\v_repLib.cpp" />
+    <ClCompile Include="..\common\v_repLib.cpp" />
     <ClCompile Include="ERfiles\control\ANN.cpp" />
     <ClCompile Include="ERfiles\control\Control.cpp" />
     <ClCompile Include="ERfiles\control\ControlFactory.cpp" />
@@ -239,6 +239,7 @@
     <ClCompile Include="ERfiles\module\Module_Cube.cpp" />
     <ClCompile Include="ERfiles\module\Module_Leaf.cpp" />
     <ClCompile Include="ERfiles\module\Module_LeafChloe.cpp" />
+    <ClCompile Include="ERFiles\module\Module_Misc.cpp" />
     <ClCompile Include="ERFiles\module\Module_Servo.cpp" />
     <ClCompile Include="ERFiles\module\Module_Solar.cpp" />
     <ClCompile Include="ERfiles\morphology\BaseMorphology.cpp" />
@@ -261,10 +262,12 @@
     <ClCompile Include="ERfiles\morphology\Morphology.cpp" />
     <ClCompile Include="ERfiles\morphology\MorphologyFactory.cpp" />
     <ClCompile Include="ERFiles\morphology\MorphologyFactoryVREP.cpp" />
+    <ClCompile Include="ERFiles\morphology\Organ.cpp" />
     <ClCompile Include="ERFiles\morphology\Tissue_DirectBars.cpp" />
     <ClCompile Include="ERFiles\morphology\Tissue_DirectBarsVREP.cpp" />
     <ClCompile Include="ERFiles\morphology\Tissue_GMX.cpp" />
     <ClCompile Include="ERFiles\morphology\Tissue_GMX_VREP.cpp" />
+    <ClCompile Include="ERFiles\morphology\Viability.cpp" />
     <ClCompile Include="ERfiles\neuron\CPGNeuron.cpp" />
     <ClCompile Include="ERFiles\neuron\FunctionNeuron.cpp" />
     <ClCompile Include="ERfiles\neuron\InputNeuron.cpp" />
@@ -281,7 +284,7 @@
     <ClCompile Include="v_repExtER.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\v_repLib.h" />
+    <ClInclude Include="..\include\v_repLib.h" />
     <ClInclude Include="ERfiles\control\ANN.h" />
     <ClInclude Include="ERfiles\control\Control.h" />
     <ClInclude Include="ERfiles\control\ControlFactory.h" />
@@ -312,6 +315,7 @@
     <ClInclude Include="ERfiles\module\Module_Cube.h" />
     <ClInclude Include="ERfiles\module\Module_Leaf.h" />
     <ClInclude Include="ERfiles\module\Module_LeafChloe.h" />
+    <ClInclude Include="ERFiles\module\Module_Misc.h" />
     <ClInclude Include="ERFiles\module\Module_Servo.h" />
     <ClInclude Include="ERFiles\module\Module_Solar.h" />
     <ClInclude Include="ERfiles\morphology\BaseMorphology.h" />
@@ -334,10 +338,12 @@
     <ClInclude Include="ERfiles\morphology\Morphology.h" />
     <ClInclude Include="ERfiles\morphology\MorphologyFactory.h" />
     <ClInclude Include="ERFiles\morphology\MorphologyFactoryVREP.h" />
+    <ClInclude Include="ERFiles\morphology\Organ.h" />
     <ClInclude Include="ERFiles\morphology\Tissue_DirectBars.h" />
     <ClInclude Include="ERFiles\morphology\Tissue_DirectBarsVREP.h" />
     <ClInclude Include="ERFiles\morphology\Tissue_GMX.h" />
     <ClInclude Include="ERFiles\morphology\Tissue_GMX_VREP.h" />
+    <ClInclude Include="ERFiles\morphology\Viability.h" />
     <ClInclude Include="ERfiles\neuron\CPGNeuron.h" />
     <ClInclude Include="ERFiles\neuron\FunctionNeuron.h" />
     <ClInclude Include="ERfiles\neuron\InputNeuron.h" />

@@ -2,7 +2,7 @@
 
 Tissue_DirectBarsVREP::Tissue_DirectBarsVREP()
 {
-    viability = Viability();
+	viability = shared_ptr<Viability>(new Viability);
 }
 
 
@@ -87,7 +87,7 @@ int Tissue_DirectBarsVREP::createMorphology() {
     int robotHandle = -1;
     // Before robot generation checks
     bool viabilityResult = false;
-    viabilityResult = viability.checkOrgansType(organs);
+    viabilityResult = viability->checkOrgansType(organs);
     if(viabilityResult == true){
         // Importing motor organs
         vector<int> organHandle(organsNumber,-1);
@@ -104,14 +104,14 @@ int Tissue_DirectBarsVREP::createMorphology() {
             componentHandles.push_back(organHandle[i]);
             simSetObjectParent(forceSensor[i], skeletonHandle, 1);
             // During robot generation checks
-            viabilityResult = viability.printVolume(organs[i].coordinates);
+            viabilityResult = viability->printVolume(organs[i].coordinates);
             if(viabilityResult == false) break;
 
-            viabilityResult = viability.collisionDetector(componentHandles, organHandle[i]);
+            viabilityResult = viability->collisionDetector(componentHandles, organHandle[i]);
             if(viabilityResult == false) break;
 
             int gripperHandle;
-            gripperHandle = viability.createTemporalGripper(organs[i]);
+            gripperHandle = viability->createTemporalGripper(organs[i]);
             //viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
             simRemoveModel(gripperHandle);
             //if(viabilityResult == false) break;

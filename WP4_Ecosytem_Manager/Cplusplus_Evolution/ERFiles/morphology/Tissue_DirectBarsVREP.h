@@ -46,7 +46,7 @@ public:
 	vector<int> outputHandles;
 	vector<int> outputValues;
 
-	Viability viability;
+	shared_ptr<Viability> viability;
 	// Mutable parameters
 	vector<Organ> organs; // Coordinates and orientations
 	int organsNumber;
