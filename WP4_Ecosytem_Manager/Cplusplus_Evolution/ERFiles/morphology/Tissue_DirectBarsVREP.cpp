@@ -86,40 +86,49 @@ int Tissue_DirectBarsVREP::createMorphology() {
     int robotHandle = -1;
     // Before robot generation checks
     bool viabilityResult = false;
+    vector<Skeleton> skeleton;
+    skeleton.resize(organsNumber);
     viabilityResult = viability.checkOrgansType(organs);
     if(viabilityResult == true){
         // Importing motor organs
-        vector<int> organHandle(organsNumber,-1);
         int skeletonHandle;
-		vector<int> forceSensor(organsNumber,-1);
         vector<int> componentHandles;
 
         // Create skeleton
         skeletonHandle = createSkeleton();
+
         componentHandles.push_back(skeletonHandle);
         //  Create components and set parents
-        for(int i = 1; i < organsNumber; i++){
-            //std::cout << "Creating organ!" << std::endl;
-            organs[i].createOrgan(organs[i].organType, organs[i].coordinates, organs[i].orientations, &organHandle[i], &forceSensor[i]);
-            componentHandles.push_back(organHandle[i]);
-            simSetObjectParent(forceSensor[i], skeletonHandle, 1);
+        for(int i = 0; i < organsNumber; i++){
+            // Create organ
+            organs[i].createOrgan();
+            componentHandles.push_back(organs[i].organHandle);
+            simSetObjectParent(organs[i].forceSensorHandle, skeletonHandle, 1);
+            // Create skeleton
+//            if(i!=0){
+//                skeleton[i-1].skeletonType = BARS;
+//                skeleton[i-1].parentHandle = organs[0].organHandle;
+//                skeleton[i-1].childHandle = organs[i].organHandle;
+//                skeleton[i-1].createSkeleton();
+//            }
             // During robot generation checks
             viabilityResult = viability.printVolume(organs[i].coordinates);
             if(viabilityResult == false) break;
 
-            viabilityResult = viability.collisionDetector(componentHandles, organHandle[i]);
+            viabilityResult = viability.collisionDetector(componentHandles, organs[i].organHandle);
             if(viabilityResult == false) break;
 
             int gripperHandle;
             gripperHandle = viability.createTemporalGripper(organs[i]);
             //viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
-            simRemoveModel(gripperHandle);
+            //simRemoveModel(gripperHandle);
             //if(viabilityResult == false) break;
 
         }
         robotHandle = simCreateCollection("robot", 1); // This has to be before simAddObjectToCollection
         simAddObjectToCollection(robotHandle, skeletonHandle, sim_handle_single, 0);
     }
+
     return robotHandle;
 }
 
@@ -306,7 +315,7 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     std::cout << "Mutate morphology!" << std::endl;
     organsNumber = 5;
     // Brain organ
-    organs[0].organType = 0; // Motor organ type
+    organs[0].organType = BRAINORGAN; // Motor organ type
     for (int j = 0; j < organs[0].coordinates.size(); j++) { // Mutate coordinates
         organs[0].coordinates[0] = 0.0; // 3D printer build volumen
     }
@@ -314,10 +323,11 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     for (int j = 0; j < organs[0].orientations.size(); j++) { // Mutate orientations
         organs[0].orientations[j] = 0.0;
     }
-    organs[0].orientations[1] = 1.57080; //TODO change orientation in model!
+    organs[0].orientations[1] = 0.0; //TODO change orientation in model!
     // Mutate non-organs
     for (int i = 1; i < organsNumber; i++) { // Mutate organs
-        organs[i].organType = 1; // Motor organ type
+        organs[i].organType = MOTORORGAN; // Motor organ type
+        organs[i].organType = MOTORORGAN; // Motor organ type
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
@@ -335,7 +345,7 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
             // TODO Just for testing!!!
             organs[i].orientations[j] = 0.0;
         }
-        organs[i].orientations[0] = 3.1415;
+        organs[i].orientations[0] = 0.0;
         //organs[i].orientations[1] = 1.0;
         //organs[i].orientations[2] = 1.5708;
     }

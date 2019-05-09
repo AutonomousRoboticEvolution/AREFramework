@@ -78,12 +78,13 @@ set(SOURCES
     ERFiles/morphology/Morphology.cpp
     ERFiles/morphology/MorphologyFactory.cpp
     ERFiles/morphology/MorphologyFactoryVREP.cpp
+    ERFiles/morphology/Skeleton.cpp
     ERFiles/morphology/Tissue_DirectBars.cpp
     ERFiles/morphology/Tissue_DirectBarsVREP.cpp
     ERFiles/morphology/Tissue_GMX.cpp
     ERFiles/morphology/Tissue_GMX_VREP.cpp
-        ERFiles/morphology/Organ.cpp
-	ERFiles/morphology/Viability.cpp
+    ERFiles/morphology/Organ.cpp
+	  ERFiles/morphology/Viability.cpp
     ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
     ERFiles/neuron/InputNeuron.cpp

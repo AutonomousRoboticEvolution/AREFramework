@@ -1,6 +1,7 @@
 #pragma once
 #include "Tissue_DirectBars.h"
 #include "Organ.h"
+#include "Skeleton.h"
 #include "Viability.h"
 
 class Tissue_DirectBarsVREP : public Tissue_DirectBars

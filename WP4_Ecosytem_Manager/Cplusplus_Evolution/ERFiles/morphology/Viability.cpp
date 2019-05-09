@@ -53,12 +53,12 @@ int Viability::createTemporalGripper(Organ organ) {
 
     float offSetX = 0;
     float offSetY = 0;
-    float offSetZ = -0.08;
+    float offSetZ = 0.08;
     float tempX = 0;
     float tempY = 0;
     float tempZ = 0;
 
-    gripperHandle = simLoadModel("models/gripper.ttm");
+    gripperHandle = simLoadModel("models/C_Gripper.ttm");
 
     tempX = offSetX;
     tempY = offSetY * cos(organ.orientations[0]) - offSetZ * sin(organ.orientations[0]);

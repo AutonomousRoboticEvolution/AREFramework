@@ -1,33 +1,40 @@
 #include "Organ.h"
 
 // Create organ
-void Organ::createOrgan(int type, vector<float> coordinate, vector<float> orientation, int* organHandle, int* sensorHandle) {
+void Organ::createOrgan() {
+    // Argument variables
     int forSenPamsArg1[] = {0, 0, 0, 0, 0};
     float forSenPamsArg2[] = {0, 0, 0, 0, 0};
-    float organPosition[3] = {coordinate[0]/100, coordinate[1]/100, coordinate[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
-    float organOrientation[3] = {orientation[0],orientation[1],orientation[2]};
 
+    float organPosition[3] = {this->coordinates[0]/100, this->coordinates[1]/100, this->coordinates[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
+    float organOrientation[3] = {this->orientations[0], this->orientations[1], this->orientations[2]};
     // Create organ and sensor
-    switch(type){
-        case 0:
-            *organHandle = simLoadModel("models/brainOrgan.ttm");
+    loadOrganModel();
+    this->forceSensorHandle = simCreateForceSensor(0, forSenPamsArg1, forSenPamsArg2, NULL);
+    // Set positions and orientations
+    simSetObjectPosition(this->organHandle, -1, organPosition);
+    simSetObjectPosition(this->forceSensorHandle, -1, organPosition);
+    simSetObjectOrientation(this->organHandle, -1, organOrientation);
+    simSetObjectOrientation(this->forceSensorHandle, -1, organOrientation);
+    // Set parenthood
+    simSetObjectParent(this->organHandle, this->forceSensorHandle, 1);
+}
+void Organ::loadOrganModel() {
+    switch(this->organType){
+        case BRAINORGAN:
+            this->organHandle = simLoadModel("models/C_Brain.ttm");
             break;
-        case 1:
-            *organHandle = simLoadModel("models/motorOrgan.ttm");
+        case MOTORORGAN:
+            this->organHandle = simLoadModel("models/C_Wheel.ttm");
             break;
-        case 2:
-            *organHandle = simLoadModel("models/sensorOrgan.ttm");
+        case SENSORORGAN:
+            this->organHandle = simLoadModel("models/C_Sensor.ttm");
+            break;
+        case JOINTORGAN:
+            std::cout << "WARNING: Organ JOINT does not exist" << std::endl;
             break;
         default:
             std::cout << "WARNING: Organ type does not exist" << std::endl;
             break;
     }
-    *sensorHandle = simCreateForceSensor(0, forSenPamsArg1, forSenPamsArg2, NULL);
-    // Set positions and orientations
-    simSetObjectPosition(*organHandle, -1, organPosition);
-    simSetObjectPosition(*sensorHandle, -1, organPosition);
-    simSetObjectOrientation(*organHandle, -1, organOrientation);
-    simSetObjectOrientation(*sensorHandle, -1, organOrientation);
-    // Set parenthood
-    simSetObjectParent(*organHandle, *sensorHandle, 1);
 }

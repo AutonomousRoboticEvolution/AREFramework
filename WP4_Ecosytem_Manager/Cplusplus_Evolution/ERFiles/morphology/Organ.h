@@ -2,16 +2,27 @@
 
 #include "Component.h"
 #include <vector>
-using namespace std;
+
+enum OrganType{
+    BRAINORGAN = 0,
+    MOTORORGAN = 1,
+    SENSORORGAN = 2,
+    JOINTORGAN = 3,
+};
 
 class Organ : public Component
 {
-    public:
-        int organType;
-	    vector<float> coordinates;
-	    vector<float> orientations;    
+public:
+    int organType;
+    int organHandle;
+    int forceSensorHandle;
+    int parentHandle;
+    vector<float> coordinates;
+    vector<float> orientations;
+    void createOrgan();
 
-    void createOrgan(int type, vector<float> coordinates, vector<float> orientations, int* organHandle, int* sensorHandle);
+private:
+    void loadOrganModel();
 };
 
 
