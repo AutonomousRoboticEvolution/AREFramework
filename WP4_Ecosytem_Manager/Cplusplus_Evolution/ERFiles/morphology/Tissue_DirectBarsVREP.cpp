@@ -2,6 +2,7 @@
 
 Tissue_DirectBarsVREP::Tissue_DirectBarsVREP()
 {
+    viability = Viability();
 }
 
 
@@ -98,8 +99,7 @@ int Tissue_DirectBarsVREP::createMorphology() {
         skeletonHandle = createSkeleton();
         componentHandles.push_back(skeletonHandle);
         //  Create components and set parents
-        for(int i = 1; i < organsNumber; i++){
-            //std::cout << "Creating organ!" << std::endl;
+        for(int i = 0; i < organsNumber; i++){
             organs[i].createOrgan(organs[i].organType, organs[i].coordinates, organs[i].orientations, &organHandle[i], &forceSensor[i]);
             componentHandles.push_back(organHandle[i]);
             simSetObjectParent(forceSensor[i], skeletonHandle, 1);

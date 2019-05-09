@@ -7,7 +7,7 @@ using namespace std;
 
 class Viability {
     public:
-        //Viability();
+        Viability();
         int checkOrgansType(vector<Organ> organs);
         int printVolume(vector<float> coordinates);
         int collisionDetector(vector<int> allComponents, int componentHandle);
