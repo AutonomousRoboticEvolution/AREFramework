@@ -33,17 +33,6 @@ public:
 
 	void mutateMorphology(float mutationRate);
 
-	int createSkeleton();
-
-	// Viability functions
-    // struct viabilityStruct {
-    //     // This method checks if there is at least one organ of each type
-    //     int checkOrgansType(vector<Organ> organs);
-    //     int printVolume(vector<float> coordinates);
-    //     int collisionDetector(vector<int> allComponents, int componentHandle);
-    //     int createTemporalGripper(Organ organ);
-    //     void destroyTemporalGripper(int gripperHandle);
-    // } viability;
 	vector<int> outputHandles;
 	vector<int> outputValues;
 

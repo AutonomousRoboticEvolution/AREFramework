@@ -101,13 +101,6 @@ int Tissue_DirectBarsVREP::createMorphology() {
             organs[i].createOrgan();
             componentHandles.push_back(organs[i].organHandle);
             simSetObjectParent(organs[i].forceSensorHandle, skeleton.skeletonHandle, 1);
-            // Create skeleton
-//            if(i!=0){
-//                skeleton[i-1].skeletonType = BARS;
-//                skeleton[i-1].parentHandle = organs[0].organHandle;
-//                skeleton[i-1].childHandle = organs[i].organHandle;
-//                skeleton[i-1].createSkeleton();
-//            }
             // During robot generation checks
             viabilityResult = viability.printVolume(organs[i].coordinates);
             if(viabilityResult == false) break;
@@ -319,7 +312,6 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     for (int i = 0; i < organs[0].orientations.size(); i++) { // Mutate orientations
         organs[0].orientations[i] = 0.0;
     }
-    organs[0].orientations[1] = 0.0; //TODO change orientation in model!
     // Mutate non-organs
     for (int i = 1; i < organsNumber; i++) { // Mutate organs
         organs[i].organType = MOTORORGAN; // Motor organ type
@@ -342,97 +334,5 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
             organs[i].orientations[j] = 0.0;
         }
     }
-}
-
-// Create body
-int Tissue_DirectBarsVREP::createSkeleton() {
-    std::vector<int> primitiveHandles;
-    int skeletonHandle;
-    int temp_primitive_handle;
-    float columnWidth = 0.015;
-    float columnHeight = 0.010; // Wheel not touching floor decrease height
-    float magnitude;
-    float angle;
-    float primitiveSize[3];
-    float primitivePosition[3];
-    float primitiveOrientation[3];
-    float primitiveColour[3];
-    //TODO remove this variable from here
-    float brainPos[] = { 0.0, 0.0, 0.0 };
-
-    for(int i = 1; i < organsNumber; i++){
-        // Horizontal bar
-        magnitude = sqrt(pow(organs[i].coordinates[0] / 100 - brainPos[0], 2) + pow(organs[i].coordinates[1] / 100 - brainPos[1], 2)) + columnWidth;
-        angle = atan2(organs[i].coordinates[1] / 100 - brainPos[1], organs[i].coordinates[0] / 100 - brainPos[0]);
-
-        primitiveSize[0] = magnitude;
-        primitiveSize[1] = columnWidth;
-        primitiveSize[2] = columnHeight;
-        temp_primitive_handle = simCreatePureShape(0, 8, primitiveSize, 1, NULL);
-        primitiveHandles.push_back(temp_primitive_handle);
-
-        primitivePosition[0] = brainPos[0] + (organs[i].coordinates[0] / 100 - brainPos[0]) / 2;
-        primitivePosition[1] = brainPos[1] + (organs[i].coordinates[1] / 100 - brainPos[1]) / 2;
-        primitivePosition[2] = 0;
-        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
-
-        primitiveOrientation[0] = 0;
-        primitiveOrientation[1] = 0;
-        primitiveOrientation[2] = angle;
-        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
-
-        primitiveColour[0] = 0;
-        primitiveColour[1] = 1;
-        primitiveColour[2] = 0;
-        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
-
-        // Vertical bar
-        primitiveSize[0] = columnWidth;
-        primitiveSize[1] = columnHeight;
-        primitiveSize[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - 0.025);
-        temp_primitive_handle = simCreatePureShape(2, 8, primitiveSize, 1, NULL);
-        primitiveHandles.push_back(temp_primitive_handle);
-
-        primitivePosition[0] = organs[i].coordinates[0] / 100;
-        primitivePosition[1] = organs[i].coordinates[1] / 100;
-        primitivePosition[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2] - 0.025) / 2;
-        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
-
-        primitiveOrientation[0] = 0;
-        primitiveOrientation[1] = 0;
-        primitiveOrientation[2] = angle;
-        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
-
-        primitiveColour[0] = 0;
-        primitiveColour[1] = 1;
-        primitiveColour[2] = 0;
-        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
-
-        // Chamfer
-        primitiveSize[0] = columnWidth;
-        primitiveSize[1] = columnWidth;
-        primitiveSize[2] = columnWidth;
-        temp_primitive_handle = simCreatePureShape(1, 8, primitiveSize, 1, NULL);
-        primitiveHandles.push_back(temp_primitive_handle);
-
-        primitivePosition[0] = organs[i].coordinates[0] / 100 - cos(angle) * 0.005;
-        primitivePosition[1] = organs[i].coordinates[1] / 100 - sin(angle) * 0.005;
-        primitivePosition[2] = columnWidth/2.0;
-        simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
-
-        primitiveOrientation[0] = 0.0;
-        primitiveOrientation[1] = 0.0; //0.785398
-        primitiveOrientation[2] = angle;
-        simSetObjectOrientation(temp_primitive_handle, -1, primitiveOrientation);
-
-        primitiveColour[0] = 0;
-        primitiveColour[1] = 1;
-        primitiveColour[2] = 0;
-        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
-    }
-    int* array = primitiveHandles.data();
-    skeletonHandle = simGroupShapes(array, primitiveHandles.size());
-    simSetObjectName(skeletonHandle, "robotShape");
-    return skeletonHandle;
 }
 

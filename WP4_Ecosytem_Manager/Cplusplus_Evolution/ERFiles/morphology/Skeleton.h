@@ -22,4 +22,5 @@ public:
     void createSkeleton();
 private:
     void createBars();
+    void createCube();
 };
