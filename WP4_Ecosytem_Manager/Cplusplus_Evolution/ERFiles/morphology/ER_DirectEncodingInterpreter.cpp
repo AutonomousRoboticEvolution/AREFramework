@@ -295,10 +295,11 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 		}
 		
 	}
-
-//	cout << "shifting robot position" << endl;
+	if (settings->verbose) {
+		cout << "shifting robot position" << endl;
+	}
 	if (createdModules[0]->type != 8) {
-		shiftRobotPosition();
+		//shiftRobotPosition();
 	}
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);

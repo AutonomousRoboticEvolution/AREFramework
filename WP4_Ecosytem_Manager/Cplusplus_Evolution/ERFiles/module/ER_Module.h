@@ -44,7 +44,9 @@ public:
 	bool checkControlParams(vector<string>);
 	bool handled = false;
 
-
+	string filename = "default";
+	void setFileName(string filename);
+	// sets the module in and outputs by looping through parts
 	void colorModule(float color[3], float alpha);
 	float moduleColor[3];
 	// L-System info
@@ -79,7 +81,8 @@ public:
 	vector<int> objectHandles;
 	vector<int> attachHandles; 
 	vector<int> attachRefHandles;
-	vector<int> controlHandles; \
+	vector<int> controlHandles; 
+	vector<int> inputHandles;
 	void addInput(vector<float>);
 
 //	vector<vector<float>> dragFacet; // four points for each face with drag. 

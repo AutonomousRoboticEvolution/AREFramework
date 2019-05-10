@@ -60,12 +60,15 @@ void ER_VREP::initialize() {
 	 */
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
-		cout << "Regular Evolution" << endl;
+		std::cout << "Regular Evolution" << std::endl;
 		settings->client = true;
+		if (settings->verbose) {
+			std::cout << "initializing evolution" << std::endl;
+		}
 		initializeSimulation();
 	}
 	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
-		cout << "Initializing Server" << endl;
+		std::cout << "Initializing Server" << std::endl;
 		settings->client = false;
 		initializeServer();
 	}

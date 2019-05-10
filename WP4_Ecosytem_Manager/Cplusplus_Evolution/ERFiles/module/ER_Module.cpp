@@ -4,6 +4,9 @@
 
 ER_Module::ER_Module()
 {
+	moduleColor[0] = 0.5;
+	moduleColor[1] = 0.5;
+	moduleColor[2] = 0.5;
 }
 
 
@@ -66,6 +69,10 @@ bool ER_Module::checkControlParams(vector<string> values) {
 	}
 }
 
+void ER_Module::setFileName(string f)
+{
+	filename = f;
+}
 
 
 

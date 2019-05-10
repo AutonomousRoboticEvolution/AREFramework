@@ -130,6 +130,12 @@ int Development::getMaxChilds(int t) {
 	else if (t == 1) {
 		return 5;
 	}
+	else if (t == 13 || t == 14 || t == 15) {
+		return 0;
+	}
+	else if (t == 16) {
+		return 1;
+	}
 	else {
 		return 3;
 	}

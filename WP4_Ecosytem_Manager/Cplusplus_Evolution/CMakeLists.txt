@@ -59,6 +59,7 @@ set(SOURCES
     ERFiles/module/Module_Servo.cpp
     ERFiles/module/Module_Solar.cpp
     ERFiles/module/ModuleFactory.cpp
+    ERFiles/module/Module_Misc.cpp
     ERFiles/morphology/BaseMorphology.cpp
     ERFiles/morphology/CAT.cpp
     ERFiles/morphology/CATVREP.cpp

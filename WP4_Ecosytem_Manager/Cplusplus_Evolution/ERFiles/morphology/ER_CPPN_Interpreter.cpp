@@ -183,9 +183,12 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 				createdParentNumber = n;
 			}
 		}
+		if (settings->verbose) {
+			cout << "i: " << i << endl;
+		}
 		if (createdModules.size() < settings->maxAmountModules) {
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-				if (genome->moduleParameters[parentNr]->expressed == true) {
+				if (genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
 					if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
 					//	cout << "state " << createdModules[createdParentNumber]->state << ",";
 					//	cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
@@ -382,19 +385,8 @@ void ER_CPPN_Interpreter::init() {
 						genome->moduleParameters[genome->moduleParameters.size() - 1]->type = mt;
 						//genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
 						int mn = genome->moduleParameters.size() - 1;
-						//cout << "GHerp: " << mn << endl;
-						if (settings->moduleTypes[typeM] == 4 || settings->moduleTypes[typeM] == 9) {
-							genome->moduleParameters[mn]->maxChilds = 3;
-						}
-						else if (settings->moduleTypes[typeM] == 6 || settings->moduleTypes[typeM] == 3) {
-							genome->moduleParameters[mn]->maxChilds = 0;
-						}
-						else if (settings->moduleTypes[typeM] == 1) {
-							genome->moduleParameters[mn]->maxChilds = 5;
-						}
-						else {
-							genome->moduleParameters[mn]->maxChilds = 3;
-						}
+						genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
+
 						//						genome->moduleParameters[mn]->currentState = n;
 						genome->moduleParameters[mn]->parent = n;
 						genome->moduleParameters[mn]->parentSite = m;

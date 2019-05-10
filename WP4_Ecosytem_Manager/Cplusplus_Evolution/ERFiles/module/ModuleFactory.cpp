@@ -132,6 +132,47 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
 		return module;
 	}
 */
+	case 13:
+	{
+		shared_ptr<ER_Module> module(new Module_Misc);
+		module->randomNum = rn;
+		module->settings = st;
+		module->type = 13;
+		module->createControl();
+		module->filename = "C_Brain.ttm";
+		return module;
+	}
+	case 14:
+	{
+		shared_ptr<ER_Module> module(new Module_Misc);
+		module->randomNum = rn;
+		module->settings = st;
+		module->type = 14;
+		module->createControl();
+		module->filename = "C_Wheel.ttm";
+		return module;
+	}
+	case 15:
+	{
+		shared_ptr<ER_Module> module(new Module_Misc);
+		module->randomNum = rn;
+		module->settings = st;
+		module->type = 15;
+		module->createControl();
+		module->filename = "C_Sensor.ttm";
+		return module;
+	}
+	case 16:
+	{
+		shared_ptr<ER_Module> module(new Module_Misc);
+		module->randomNum = rn;
+		module->settings = st;
+		module->type = 16;
+		module->createControl();
+		module->filename = "C_Servo.ttm";
+		return module;
+	}
+
 	default:
 	{
 		cout << "ERROR: Module type not specified, returning NULL" << endl; 
