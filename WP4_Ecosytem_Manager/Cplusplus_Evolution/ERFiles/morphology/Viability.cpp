@@ -24,9 +24,9 @@ int Viability::checkOrgansType(vector<Organ> organs) {
 // This method checks whether if an organ is inside of outside of the 3D print volume
 int Viability::printVolume(vector<float> coordinates) {
     bool result = true;
-    if(coordinates[0] > 140 || coordinates[0] < -140 ||
-        coordinates[1] > 140 || coordinates[1] < -140 ||
-        coordinates[2] > 250 || coordinates[2] < 0){
+    if(coordinates[0] > 0.14 || coordinates[0] < -0.14 ||
+        coordinates[1] > 0.14 || coordinates[1] < -0.14 ||
+        coordinates[2] > 0.25 || coordinates[2] < 0){
         result = false;
         std::cout << "WARNING: There is an organ outside the print volume!" << std::endl;
     }
@@ -53,7 +53,7 @@ int Viability::createTemporalGripper(Organ organ) {
 
     float offSetX = 0;
     float offSetY = 0;
-    float offSetZ = 0.03;
+    float offSetZ = 0.08; // Distance between the centre of the gripper and the centre of the organ
     float tempX = 0;
     float tempY = 0;
     float tempZ = 0;
@@ -81,9 +81,9 @@ int Viability::createTemporalGripper(Organ organ) {
     offSetX = tempX;
     offSetY = tempY;
     offSetZ = tempZ;
-    gripperPosition[0] = (organ.coordinates[0]/100) + offSetX;
-    gripperPosition[1] = (organ.coordinates[1]/100) + offSetY;
-    gripperPosition[2] = (organ.coordinates[2]/100) + offSetZ + 0.05;
+    gripperPosition[0] = (organ.coordinates[0]) + offSetX;
+    gripperPosition[1] = (organ.coordinates[1]) + offSetY;
+    gripperPosition[2] = (organ.coordinates[2]) + offSetZ;
 
     simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
     simSetObjectPosition(gripperHandle, -1, gripperPosition);

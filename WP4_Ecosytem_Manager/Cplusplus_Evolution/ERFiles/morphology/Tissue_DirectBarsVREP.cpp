@@ -111,7 +111,7 @@ int Tissue_DirectBarsVREP::createMorphology() {
             int gripperHandle;
             gripperHandle = viability.createTemporalGripper(organs[i]);
             viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
-            simRemoveModel(gripperHandle);
+            //simRemoveModel(gripperHandle);
             if(viabilityResult == false) break;
 
         }
@@ -308,7 +308,7 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     for (int i = 0; i < organs[0].coordinates.size(); i++) { // Mutate coordinates
         organs[0].coordinates[i] = 0.0; // 3D printer build volumen
     }
-    organs[0].coordinates[2] = 2.5;
+    organs[0].coordinates[2] = 0.025;
     for (int i = 0; i < organs[0].orientations.size(); i++) { // Mutate orientations
         organs[0].orientations[i] = 0.0;
     }
@@ -319,10 +319,10 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
-                    organs[i].coordinates[j] = randomNum->randFloat(-10.0, 10.0); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(-0.1, 0.1); // 3D printer build volumen
                 }
                 else{
-                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 10.0);
+                    organs[i].coordinates[j] = randomNum->randFloat(0.0, 0.1);
                 }
             }
         }
