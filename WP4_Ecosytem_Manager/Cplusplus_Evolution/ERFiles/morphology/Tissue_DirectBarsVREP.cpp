@@ -86,24 +86,21 @@ int Tissue_DirectBarsVREP::createMorphology() {
     int robotHandle = -1;
     // Before robot generation checks
     bool viabilityResult = false;
-    vector<Skeleton> skeleton;
-    skeleton.resize(organsNumber);
+    // Create skeleton - direct bars
+    Skeleton skeleton;
+    skeleton.organs = organs;
+    skeleton.skeletonType = BARS;
     viabilityResult = viability.checkOrgansType(organs);
+    skeleton.createSkeleton();
     if(viabilityResult == true){
-        // Importing motor organs
-        int skeletonHandle;
         vector<int> componentHandles;
-
-        // Create skeleton
-        skeletonHandle = createSkeleton();
-
-        componentHandles.push_back(skeletonHandle);
+        componentHandles.push_back(skeleton.skeletonHandle);
         //  Create components and set parents
         for(int i = 0; i < organsNumber; i++){
             // Create organ
             organs[i].createOrgan();
             componentHandles.push_back(organs[i].organHandle);
-            simSetObjectParent(organs[i].forceSensorHandle, skeletonHandle, 1);
+            simSetObjectParent(organs[i].forceSensorHandle, skeleton.skeletonHandle, 1);
             // Create skeleton
 //            if(i!=0){
 //                skeleton[i-1].skeletonType = BARS;
@@ -126,9 +123,8 @@ int Tissue_DirectBarsVREP::createMorphology() {
 
         }
         robotHandle = simCreateCollection("robot", 1); // This has to be before simAddObjectToCollection
-        simAddObjectToCollection(robotHandle, skeletonHandle, sim_handle_single, 0);
+        simAddObjectToCollection(robotHandle, skeleton.skeletonHandle, sim_handle_single, 0);
     }
-
     return robotHandle;
 }
 

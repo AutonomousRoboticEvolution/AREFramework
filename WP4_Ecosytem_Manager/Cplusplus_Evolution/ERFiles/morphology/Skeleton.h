@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Component.h"
+#include "Organ.h"
 #include <vector>
 
 enum SkeletonType{
@@ -17,6 +18,7 @@ public:
     int skeletonHandle;
     int parentHandle;
     int childHandle;
+    vector<Organ> organs;
     void createSkeleton();
 private:
     void createBars();
