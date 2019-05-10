@@ -49,7 +49,7 @@ Settings::Settings() {
 	sendGenomeAsSignal = true;
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;
-	colorization = COLOR_LSYSTEM;
+	colorization = COLOR_NEURALNETWORK;
 	//repository="files";
 }
 
@@ -655,7 +655,7 @@ void Settings::saveSettings() {
 	} settingsFile << endl;
 
 	settingsFile << ",#maxAmountModulesTypes,";
-	for (int i = 0; i < moduleTypes.size(); i++) {
+	for (int i = 0; i < maxModuleTypes.size(); i++) {
 		settingsFile << maxModuleTypes[i][1] << ",";
 	}	settingsFile << endl;
 

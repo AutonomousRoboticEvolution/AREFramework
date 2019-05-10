@@ -830,7 +830,7 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // randomly change amount childs, very destructive mutation
 			int maxCh = getMaxChilds(lGenome->lParameters[i]->type);
 			if (maxCh != 0) {
-				int newChildSize = randomNum->randInt(maxCh, 0);
+				int newChildSize = randomNum->randInt(maxCh + 1, 0);
 				if (settings->verbose) {
 					std::cout << "newChildSize = " << newChildSize << std::endl;
 					std::cout << "site vector size = " << lGenome->lParameters[i]->childSites.size() << std::endl;

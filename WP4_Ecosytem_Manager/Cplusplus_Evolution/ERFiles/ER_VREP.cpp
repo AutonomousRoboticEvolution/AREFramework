@@ -30,7 +30,6 @@ void ER_VREP::initializeServer() {
 	//ea->initializePopulation(settings, false);
 	environment->init();
 	// eaf.reset();
-
 }
 
 
