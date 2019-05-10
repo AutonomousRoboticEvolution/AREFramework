@@ -6,7 +6,7 @@ void Organ::createOrgan() {
     int forSenPamsArg1[] = {0, 0, 0, 0, 0};
     float forSenPamsArg2[] = {0, 0, 0, 0, 0};
 
-    float organPosition[3] = {this->coordinates[0]/100, this->coordinates[1]/100, this->coordinates[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
+    float organPosition[3] = {this->coordinates[0]/100, this->coordinates[1]/100, this->coordinates[2]/100}; // 0.0225 Wheels barely touching floor but more room to rotate;
     float organOrientation[3] = {this->orientations[0], this->orientations[1], this->orientations[2]};
     // Create organ and sensor
     loadOrganModel();

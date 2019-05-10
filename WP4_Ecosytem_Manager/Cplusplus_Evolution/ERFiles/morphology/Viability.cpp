@@ -53,7 +53,7 @@ int Viability::createTemporalGripper(Organ organ) {
 
     float offSetX = 0;
     float offSetY = 0;
-    float offSetZ = 0.08;
+    float offSetZ = 0.03;
     float tempX = 0;
     float tempY = 0;
     float tempZ = 0;

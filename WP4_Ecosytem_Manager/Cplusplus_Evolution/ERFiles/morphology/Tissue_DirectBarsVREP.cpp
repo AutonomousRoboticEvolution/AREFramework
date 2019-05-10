@@ -120,9 +120,9 @@ int Tissue_DirectBarsVREP::createMorphology() {
 
             int gripperHandle;
             gripperHandle = viability.createTemporalGripper(organs[i]);
-            //viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
-            //simRemoveModel(gripperHandle);
-            //if(viabilityResult == false) break;
+            viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
+            simRemoveModel(gripperHandle);
+            if(viabilityResult == false) break;
 
         }
         robotHandle = simCreateCollection("robot", 1); // This has to be before simAddObjectToCollection
@@ -316,12 +316,12 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     organsNumber = 5;
     // Brain organ
     organs[0].organType = BRAINORGAN; // Motor organ type
-    for (int j = 0; j < organs[0].coordinates.size(); j++) { // Mutate coordinates
-        organs[0].coordinates[0] = 0.0; // 3D printer build volumen
+    for (int i = 0; i < organs[0].coordinates.size(); i++) { // Mutate coordinates
+        organs[0].coordinates[i] = 0.0; // 3D printer build volumen
     }
-    organs[0].coordinates[2] = 0.0;
-    for (int j = 0; j < organs[0].orientations.size(); j++) { // Mutate orientations
-        organs[0].orientations[j] = 0.0;
+    organs[0].coordinates[2] = 2.5;
+    for (int i = 0; i < organs[0].orientations.size(); i++) { // Mutate orientations
+        organs[0].orientations[i] = 0.0;
     }
     organs[0].orientations[1] = 0.0; //TODO change orientation in model!
     // Mutate non-organs
@@ -345,9 +345,6 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
             // TODO Just for testing!!!
             organs[i].orientations[j] = 0.0;
         }
-        organs[i].orientations[0] = 0.0;
-        //organs[i].orientations[1] = 1.0;
-        //organs[i].orientations[2] = 1.5708;
     }
 }
 
@@ -396,13 +393,13 @@ int Tissue_DirectBarsVREP::createSkeleton() {
         // Vertical bar
         primitiveSize[0] = columnWidth;
         primitiveSize[1] = columnHeight;
-        primitiveSize[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2]);
+        primitiveSize[2] = abs(organs[i].coordinates[2] / 100 - brainPos[2] - 0.025);
         temp_primitive_handle = simCreatePureShape(2, 8, primitiveSize, 1, NULL);
         primitiveHandles.push_back(temp_primitive_handle);
 
         primitivePosition[0] = organs[i].coordinates[0] / 100;
         primitivePosition[1] = organs[i].coordinates[1] / 100;
-        primitivePosition[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2]) / 2;
+        primitivePosition[2] = brainPos[2] + (organs[i].coordinates[2] / 100 - brainPos[2] - 0.025) / 2;
         simSetObjectPosition(temp_primitive_handle, -1, primitivePosition);
 
         primitiveOrientation[0] = 0;
