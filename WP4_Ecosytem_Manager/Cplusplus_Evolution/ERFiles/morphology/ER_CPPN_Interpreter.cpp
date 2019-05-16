@@ -370,31 +370,33 @@ void ER_CPPN_Interpreter::init() {
 					inputs.push_back(genome->moduleParameters[n]->orientation / 4);
 					inputs.push_back(genome->moduleParameters[n]->parentSite / genome->moduleParameters[n]->maxChilds);
 					inputs.push_back(i / maxIterations);
-					//cout << "updating cppn" << endl;
+					// cout << "updating cppn" << endl;
 					vector<float> moduleTypeFloat = cppn->update(inputs);
-					//cout << "cppn updated" << endl;
+					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
 						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
 						if (typeM < 0) {
 							typeM = 0;
 						}
-						//cout << "typeM:  " << typeM << endl;
+						// cout << "typeM:  " << typeM << endl;
 						int mt = settings->moduleTypes[typeM];
 						genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 						genome->moduleParameters[genome->moduleParameters.size() - 1]->type = mt;
-						//genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
+						// genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
 						int mn = genome->moduleParameters.size() - 1;
-						genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
+						if (settings->moduleTypes[typeM] != 17) {
+							genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
+						}
 
-						//						genome->moduleParameters[mn]->currentState = n;
+						// genome->moduleParameters[mn]->currentState = n;
 						genome->moduleParameters[mn]->parent = n;
 						genome->moduleParameters[mn]->parentSite = m;
 						int ori = (int)(floor(moduleTypeFloat[1] * 3.99));
 						if (ori < 0) { 
 							ori = 0; 
 						}
-						//cout << "ORI:" << ori << endl;
+						// cout << "ORI:" << ori << endl;
 						genome->moduleParameters[mn]->orientation = ori;
 						genome->moduleParameters[mn]->control = cf->createNewControlGenome(1, randomNum, settings);
 						genome->moduleParameters[mn]->control->init(1, 1, 1);

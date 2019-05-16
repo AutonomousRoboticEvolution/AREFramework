@@ -136,10 +136,12 @@ int Development::getMaxChilds(int t) {
 	else if (t == 16) {
 		return 1;
 	}
+	else if (t == 17) {
+		return 5;
+	}
 	else {
 		return 3;
 	}
-	
 }
 
 //vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
