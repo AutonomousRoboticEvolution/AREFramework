@@ -30,6 +30,10 @@ class Viability {
             * @brief This method destroys temporal gripper.
         */
         void destroyTemporalGripper(int gripperHandle);
+        /**
+            * @brief This method checks that the robot has not obstructed sensor.
+        */
+        int obstructedSensor(vector<int> allComponents);
 };
 
 

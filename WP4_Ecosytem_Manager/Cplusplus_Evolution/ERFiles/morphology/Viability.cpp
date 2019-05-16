@@ -14,7 +14,7 @@ int Viability::checkOrgansType(vector<Organ> organs) {
         }
     }
     // If there are at least 2 different organs.
-    if(organTypesCounter != 2){
+    if(organTypesCounter < 2){
         result = false;
         std::cout << "WARNING: There is an organ type missing!" << std::endl;
     }
@@ -68,9 +68,9 @@ int Viability::createTemporalGripper(Organ organ) {
     offSetZ = tempZ;
     // 2nd rotation
     // TODO Why minus here!!!
-    tempX = offSetX * cos(organ.orientations[1]) - offSetZ * sin(organ.orientations[1]);
+    tempX = offSetX * cos(organ.orientations[1]) + offSetZ * sin(organ.orientations[1]);
     tempY = offSetY;
-    tempZ = offSetX * sin(organ.orientations[1]) + offSetZ * cos(organ.orientations[1]);
+    tempZ = -offSetX * sin(organ.orientations[1]) + offSetZ * cos(organ.orientations[1]);
     offSetX = tempX;
     offSetY = tempY;
     offSetZ = tempZ;
