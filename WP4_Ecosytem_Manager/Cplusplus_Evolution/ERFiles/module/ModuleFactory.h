@@ -13,6 +13,7 @@
 #include "Module_Solar.h"
 //#include "Module_Head.h"
 #include "Module_Misc.h"
+#include "Module_Bone.h"
 #include <memory>
 //#include "../../dynamixel/c++/src/dynamixel_sdk.h"
 

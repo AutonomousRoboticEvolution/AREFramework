@@ -8,11 +8,11 @@
 Settings::Settings() {
 	// set default module parameters
 	moduleTypes.push_back(1);
-	moduleTypes.push_back(16);
+	moduleTypes.push_back(17);
 //	moduleTypes.push_back(4);
-	moduleTypes.push_back(16);
-	moduleTypes.push_back(16);
-	moduleTypes.push_back(16);
+	moduleTypes.push_back(17);
+	moduleTypes.push_back(17);
+	moduleTypes.push_back(17);
 //	moduleTypes.push_back(16);
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
@@ -24,7 +24,7 @@ Settings::Settings() {
 	maxModuleTypes[0][1] = 100; // one base module
 	maxAmountModules = 20;
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_CPPN;
+	morphologyType = MODULAR_DIRECT;
 	controlType = ANN_CUSTOM;
 	populationSize = 20;
 	energyDissipationRate = 0.0;

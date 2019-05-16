@@ -33,6 +33,7 @@ set(SOURCES
     ERFiles/DefaultGenomeVREP.cpp
     ERFiles/EA_Factory.cpp
     ERFiles/EA_Generational.cpp
+    ERFiles/EA_Dynamic.cpp
     ERFiles/EA_SteadyState.cpp
     ERFiles/EA_VREP.cpp
     ERFiles/EA.cpp
@@ -54,9 +55,11 @@ set(SOURCES
     ERFiles/module/ER_Module.cpp
     ERFiles/module/Module_APlantBase.cpp
     ERFiles/module/Module_Cube.cpp
+    ERFiles/module/Module_Bone.cpp
     ERFiles/module/Module_Leaf.cpp
     ERFiles/module/Module_LeafChloe.cpp
     ERFiles/module/Module_Servo.cpp
+    ERFiles/module/Module_Misc.cpp
     ERFiles/module/Module_Solar.cpp
     ERFiles/module/ModuleFactory.cpp
     ERFiles/module/Module_Misc.cpp

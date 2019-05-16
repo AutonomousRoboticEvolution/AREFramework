@@ -488,7 +488,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 					int maxCh = getMaxChilds(genome->moduleParameters[attachModule]->type); // placeholder for max childs of parent module
 					if (genome->moduleParameters[attachModule]->childSiteStates.size() < maxCh) {
 						int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
-
 						//bool collideSite = true;
 						int newModuleLocation = 0;
 						newModuleLocation = randomNum->randInt(getMaxChilds(genome->moduleParameters[attachModule]->type), 0);
@@ -498,7 +497,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 							}
 						}
 						else {
-
 							// Check module to be created
 							int moduleAmount = 0;
 							int typeLoc = -1; // should always be assigned
@@ -513,7 +511,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 									}
 								}
 							}
-
 
 							if (moduleAmount > settings->maxModuleTypes[typeLoc][1]) {
 

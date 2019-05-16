@@ -70,7 +70,6 @@ protected:
 		shared_ptr<Control> control;
 		float moduleColor[3];
 		int type = -1; // cube, servo, leaf, etc.
-
 		// for direct encoding
 		int parent;
 		int parentSite; 

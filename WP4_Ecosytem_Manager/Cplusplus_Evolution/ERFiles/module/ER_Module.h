@@ -65,7 +65,6 @@ public:
 		int relativePosHandle;
 	};
 	vector<vector<shared_ptr<SITE>> > siteConfigurations;
-
 	virtual vector<int> getFreeSites(vector<int>) = 0;
 	vector<float> moduleInput; 
 	vector<float> moduleOutput; 
@@ -77,6 +76,7 @@ public:
 	vector<shared_ptr<ER_Module>> childModulePointers; // not used  
 
 	float phenV = 0;
+	int maxChilds; // A value only used by the bone module. Needs to be assigned. 
 	// object info
 	vector<int> objectHandles;
 	vector<int> attachHandles; 

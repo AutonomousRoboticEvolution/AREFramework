@@ -44,6 +44,7 @@ public:
 	void saveSettings();
 	void initialize();
 	void initializeSimulation(); 
+	bool startRun = true;
 
 	// parameters
 	int currentInd = 0;
