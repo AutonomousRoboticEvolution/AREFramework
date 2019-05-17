@@ -118,6 +118,7 @@ int Tissue_DirectBarsVREP::createMorphology() {
         robotHandle = simCreateCollection("robot", 1); // This has to be before simAddObjectToCollection
         simAddObjectToCollection(robotHandle, skeleton.skeletonHandle, sim_handle_single, 0);
     }
+    viabilityResult = viability.obstructedSensor(robotHandle);
     return robotHandle;
 }
 
@@ -314,11 +315,11 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
     }
     // Mutate non-organs
     for (int i = 1; i < organsNumber; i++) { // Mutate organs
-        organs[i].organType = MOTORORGAN; // Motor organ type
+        organs[i].organType = SENSORORGAN; // Motor organ type
         for (int j = 0; j < organs[i].coordinates.size(); j++) { // Mutate coordinates
             if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
                 if(j!=2){ // Make sure to generate coordinates above the ground
-                    organs[i].coordinates[j] = randomNum->randFloat(-0.1, 0.1); // 3D printer build volumen
+                    organs[i].coordinates[j] = randomNum->randFloat(-0.1, 0.1); // 3D printer build volume
                 }
                 else{
                     organs[i].coordinates[j] = randomNum->randFloat(0.0, 0.1);
@@ -333,6 +334,5 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
             organs[i].orientations[j] = 0.0;
         }
     }
-    organs[2].organType = SENSORORGAN; // Motor organ type
 }
 

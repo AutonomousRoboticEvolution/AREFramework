@@ -91,3 +91,26 @@ int Viability::createTemporalGripper(Organ organ) {
 
     return gripperHandle;
 }
+
+int Viability::obstructedSensor(int robotHandle) {
+    int result = true;
+    simAddObjectToSelection(sim_handle_all, robotHandle);
+    //simAddObjectToSelection(sim_handle_tree, robotHandle);
+    //TODO sim_handle_tree not working! why?
+    int selectionSize = simGetObjectSelectionSize();
+    int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
+    simGetObjectSelection(tempObjectHandles);
+    // Variable for proximity sensor
+    float detectedPoint[3];
+    int detectedObjectHandle;
+    //std::cout.precision(0);
+    for (size_t i = 0; i < selectionSize; i++){
+        if(simGetObjectType(tempObjectHandles[i]) == sim_object_proximitysensor_type) {
+            std::cout << "SENSOR FOUND: " << tempObjectHandles[i] << std::endl;
+            simReadProximitySensor(tempObjectHandles[i], detectedPoint, &detectedObjectHandle, NULL);
+            std::cout << "X = " << detectedPoint[0] << " Y = " << detectedPoint[1] << " Z = " << detectedPoint[2] <<
+            " Handle = " << detectedObjectHandle << std::endl;
+        }
+    }
+    return result;
+}

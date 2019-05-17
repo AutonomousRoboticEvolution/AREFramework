@@ -33,7 +33,7 @@ class Viability {
         /**
             * @brief This method checks that the robot has not obstructed sensor.
         */
-        int obstructedSensor(vector<int> allComponents);
+        int obstructedSensor(int robotHandle);
 };
 
 
