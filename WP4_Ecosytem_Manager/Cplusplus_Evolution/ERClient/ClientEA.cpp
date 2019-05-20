@@ -253,13 +253,15 @@ bool ClientEA::evaluatePop() {
 		std::cout << "Just saved pop fitness " << std::endl;
 	}
 	// save settings after replacement. 
-	if (settings->indNumbers.size() < 1) {
-		settings->indNumbers.resize(ea->populationGenomes.size());
-		settings->indFits.resize(ea->populationGenomes.size());
-	}
+	settings->indNumbers.clear();
+	settings->indFits.clear();
 	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		settings->indNumbers[i] = ea->populationGenomes[i]->individualNumber;
-		settings->indFits[i] = ea->populationGenomes[i]->fitness;
+		if (settings->verbose) {
+			std::cout << "nr of " << i << " is " << ea->populationGenomes[i]->individualNumber << std::endl;
+			std::cout << "fitness of " << i << " is " << ea->populationGenomes[i]->fitness << std::endl;
+		}
+		settings->indNumbers.push_back(ea->populationGenomes[i]->individualNumber);
+		settings->indFits.push_back(ea->populationGenomes[i]->fitness);
 	}
 	//settings->indFits = ea->popFitness;
 	if (settings->verbose) {
