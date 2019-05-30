@@ -270,7 +270,7 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 		cout << "shifting robot position" << endl;
 	}
 	if (createdModules[0]->type != 8) {
-		shiftRobotPosition();
+		Development::shiftRobotPosition();
 	}
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
@@ -645,95 +645,6 @@ float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
 	return (1 / areaX * areaBound);
 }
 
-void ER_CPPN_Interpreter::shiftRobotPosition() {
-	float minimumObjectPos = 5.0;
-	for (int i = 0; i < createdModules.size(); i++) {
-		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
-			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
-				float objectOrigin[3];
-				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
-				float size[3];
-				float rotationOrigin[3] = { 0,0,0 };
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
-				}
-
-				vector<vector<float>> cubeVertex; // 8 points in 3d space
-				vector<vector<float>> points;
-				points.resize(8);
-
-				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
-
-				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
-				//for (int i = 0; i < 12; i++) {
-				//	cout << objectMatrix[i] << ", ";
-				//} cout << endl;
-
-				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				vector<vector<float>> rotatedPoints;
-				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
-					}
-				}
-			}
-		}
-	}
-	float tmpPos[3];
-	float newRobotPos[3];
-	mainHandle = getMainHandle();
-	simGetObjectPosition(mainHandle, -1, tmpPos);
-	newRobotPos[0] = tmpPos[0];
-	newRobotPos[1] = tmpPos[1];
-	newRobotPos[2] = -minimumObjectPos + 0.001;
-	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
-	float postpos[3];
-	simGetObjectPosition(mainHandle, -1, postpos);
-	if (settings->verbose) {
-		cout << "postpos: " << postpos[2] << endl;
-	}
-}
 
 bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];

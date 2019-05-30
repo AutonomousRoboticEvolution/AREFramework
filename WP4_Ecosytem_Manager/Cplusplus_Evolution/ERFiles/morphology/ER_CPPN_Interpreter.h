@@ -13,7 +13,6 @@ class ER_CPPN_Interpreter : public ER_CPPN_Encoding
 public:
 	ER_CPPN_Interpreter();
 	~ER_CPPN_Interpreter();
-	vector<shared_ptr<ER_Module> > createdModules;
 
 	void init();
 	void create();
@@ -49,7 +48,7 @@ public:
 	vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
-	void shiftRobotPosition();
+	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;

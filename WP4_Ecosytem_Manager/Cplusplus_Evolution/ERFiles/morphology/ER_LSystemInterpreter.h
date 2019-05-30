@@ -57,7 +57,7 @@ public:
 	vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
-	void shiftRobotPosition();
+	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;

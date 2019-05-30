@@ -14,7 +14,6 @@ public:
 	ER_DirectEncodingInterpreter();
 	~ER_DirectEncodingInterpreter();
 	bool checkJointModule();
-	vector<shared_ptr<ER_Module> > createdModules;
 
 	void init();
 	void create();
@@ -47,7 +46,7 @@ public:
 	vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
-	void shiftRobotPosition();
+	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;
