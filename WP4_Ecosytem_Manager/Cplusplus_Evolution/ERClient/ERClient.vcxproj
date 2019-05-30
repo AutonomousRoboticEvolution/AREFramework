@@ -74,6 +74,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <ExecutablePath>$(VC_ExecutablePath_x64);$(WindowsSDK_ExecutablePath);$(VS_ExecutablePath);$(MSBuild_ExecutablePath);$(SystemRoot)\SysWow64;$(FxCopDir);$(PATH);</ExecutablePath>
+    <IncludePath>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;C:\Libraries;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -146,9 +148,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\common\v_repLib.cpp" />
-    <ClCompile Include="..\..\..\..\remoteApi\extApi.c" />
-    <ClCompile Include="..\..\..\..\remoteApi\extApiPlatform.c" />
     <ClCompile Include="..\ERfiles\control\ANN.cpp" />
     <ClCompile Include="..\ERfiles\control\Control.cpp" />
     <ClCompile Include="..\ERfiles\control\ControlFactory.cpp" />
@@ -194,9 +193,6 @@
     <ClCompile Include="SlaveConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\remoteApi\extApi.h" />
-    <ClInclude Include="..\..\..\..\remoteApi\extApiInternal.h" />
-    <ClInclude Include="..\..\..\..\remoteApi\extApiPlatform.h" />
     <ClInclude Include="..\ERfiles\control\ANN.h" />
     <ClInclude Include="..\ERfiles\control\Control.h" />
     <ClInclude Include="..\ERfiles\control\ControlFactory.h" />

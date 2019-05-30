@@ -187,7 +187,6 @@
     <ClCompile Include="ERFiles\morphology\ER_CPPN_Interpreter.cpp">
       <Filter>ERFiles\Encodings</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\common\v_repLib.cpp" />
     <ClCompile Include="ERFiles\morphology\Tissue_DirectBars.cpp">
       <Filter>ERFiles\Morphology</Filter>
     </ClCompile>
@@ -199,6 +198,13 @@
     </ClCompile>
     <ClCompile Include="ERFiles\morphology\Tissue_GMX_VREP.cpp">
       <Filter>ERFiles\Morphology</Filter>
+    </ClCompile>
+    <ClCompile Include="..\common\v_repLib.cpp" />
+    <ClCompile Include="ERFiles\module\Module_Misc.cpp" />
+    <ClCompile Include="ERFiles\morphology\Organ.cpp" />
+    <ClCompile Include="ERFiles\morphology\Viability.cpp" />
+    <ClCompile Include="ERFiles\module\Module_Bone.cpp">
+      <Filter>ERFiles\Modules</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -390,7 +396,6 @@
     <ClInclude Include="ERFiles\morphology\ER_CPPN_Interpreter.h">
       <Filter>ERFiles\Encodings</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\v_repLib.h" />
     <ClInclude Include="ERFiles\morphology\Tissue_DirectBars.h">
       <Filter>ERFiles\Morphology</Filter>
     </ClInclude>
@@ -402,6 +407,13 @@
     </ClInclude>
     <ClInclude Include="ERFiles\morphology\Tissue_GMX_VREP.h">
       <Filter>ERFiles\Morphology</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\v_repLib.h" />
+    <ClInclude Include="ERFiles\module\Module_Misc.h" />
+    <ClInclude Include="ERFiles\morphology\Organ.h" />
+    <ClInclude Include="ERFiles\morphology\Viability.h" />
+    <ClInclude Include="ERFiles\module\Module_Bone.h">
+      <Filter>ERFiles\Modules</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

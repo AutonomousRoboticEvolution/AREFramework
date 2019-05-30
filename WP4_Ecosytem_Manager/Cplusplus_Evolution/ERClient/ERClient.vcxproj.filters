@@ -123,9 +123,6 @@
     <ClCompile Include="..\ERFiles\morphology\Tissue_GMX_VREP.cpp">
       <Filter>GA\Morphology</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\common\v_repLib.cpp" />
-    <ClCompile Include="..\..\..\..\remoteApi\extApi.c" />
-    <ClCompile Include="..\..\..\..\remoteApi\extApiPlatform.c" />
     <ClCompile Include="SlaveConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -250,9 +247,6 @@
     <ClInclude Include="..\ERFiles\morphology\Tissue_GMX_VREP.h">
       <Filter>GA\Morphology</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\remoteApi\extApi.h" />
-    <ClInclude Include="..\..\..\..\remoteApi\extApiInternal.h" />
-    <ClInclude Include="..\..\..\..\remoteApi\extApiPlatform.h" />
     <ClInclude Include="SlaveConnection.h" />
   </ItemGroup>
   <ItemGroup>

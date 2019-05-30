@@ -442,12 +442,7 @@ void Development::shiftRobotPosition() {
 	float newRobotPos[3];
 	mainHandle = getMainHandle();
 	simGetObjectPosition(mainHandle, -1, tmpPos);
-	if (settings->environmentType == settings->TRAINING_ENVIRONMENT) {
-		newRobotPos[0] = (-minimumXObjectPosition) + 0.6;
-		newRobotPos[1] = tmpPos[1];
-		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.1;
-	}
-	else if (settings->environmentType == settings->ROUGH) {
+	if (settings->environmentType == settings->ROUGH) {
 		//	cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
 		newRobotPos[0] = tmpPos[0];
 		newRobotPos[1] = tmpPos[1];
