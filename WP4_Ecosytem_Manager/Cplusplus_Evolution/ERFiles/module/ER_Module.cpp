@@ -460,7 +460,12 @@ vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis
 	return mirrored;
 }
 
+void ER_Module::updateParentModuleMorphology(int num) {
+	parentModulePointer->updateMorph(num);
+}
 
+void ER_Module::updateMorph(int num) {
+}
 
 vector<float> ER_Module::updateModule(vector<float> input) {
 //	energy = energy - energyDissipationRate;

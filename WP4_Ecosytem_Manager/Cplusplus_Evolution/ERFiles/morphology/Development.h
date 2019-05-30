@@ -20,6 +20,7 @@ public:
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
+	vector<shared_ptr<ER_Module> > createdModules;
 
 	struct BASEMODULEPARAMETERS {
 		// State specific parameters
@@ -80,6 +81,10 @@ public:
 	// delete functions below???
 	void printSome();
 	int getMainHandle();
+
+	void updateCreatedModules();
+
+	void shiftRobotPosition();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 

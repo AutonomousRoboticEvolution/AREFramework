@@ -139,8 +139,17 @@ int Development::getMaxChilds(int t) {
 	else if (t == 17) {
 		return 5;
 	}
+	else if (t == 31) {
+		return 1;
+	}
+	else if (t == 34) {
+		return 1;
+	}
+	else if (t == 35) {
+		return 1;
+	}
 	else {
-		return 3;
+		return 0;
 	}
 }
 
@@ -333,6 +342,129 @@ int Development::getMainHandle() {
 	else {
 		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
 	}
+}
+
+void Development::updateCreatedModules() {
+	// TODO temporary location of function below
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->parentModulePointer) {
+			createdModules[i]->parentModulePointer->updateMorph(createdModules[i]->parentSite);
+		}
+	}
+}
+
+void Development::shiftRobotPosition() {
+	updateCreatedModules();
+
+	float minimumObjectPos = 50.0;
+	float minimumYObjectPosition = 50.0;
+	float minimumXObjectPosition = 50.0;
+	for (int i = 0; i < createdModules.size(); i++) {
+		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
+			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
+				float objectOrigin[3];
+				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
+				float size[3];
+				float rotationOrigin[3] = { 0,0,0 };
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
+				for (int i = 0; i < 3; i++) {
+					size[i] = size[i] * 2;
+				}
+
+				vector<vector<float>> cubeVertex; // 8 points in 3d space
+				vector<vector<float>> points;
+				points.resize(8);
+
+				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
+
+				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
+				//for (int i = 0; i < 12; i++) {
+				//	cout << objectMatrix[i] << ", ";
+				//} cout << endl;
+
+				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				vector<vector<float>> rotatedPoints;
+				rotatedPoints.resize(8);
+				for (int i = 0; i < 8; i++) {
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
+					rotatedPoints[i][0] += objectOrigin[0];
+					rotatedPoints[i][1] += objectOrigin[1];
+					rotatedPoints[i][2] += objectOrigin[2];
+					if (rotatedPoints[i][2] < minimumObjectPos) {
+						minimumObjectPos = rotatedPoints[i][2];
+					}
+					if (rotatedPoints[i][1] < minimumYObjectPosition) {
+						minimumYObjectPosition = rotatedPoints[i][1];
+					}
+					if (rotatedPoints[i][0] < minimumXObjectPosition) {
+						minimumXObjectPosition = rotatedPoints[i][0];
+					}
+				}
+			}
+		}
+	}
+	float tmpPos[3];
+	float newRobotPos[3];
+	mainHandle = getMainHandle();
+	simGetObjectPosition(mainHandle, -1, tmpPos);
+	if (settings->environmentType == settings->TRAINING_ENVIRONMENT) {
+		newRobotPos[0] = (-minimumXObjectPosition) + 0.6;
+		newRobotPos[1] = tmpPos[1];
+		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.1;
+	}
+	else if (settings->environmentType == settings->ROUGH) {
+		//	cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+		newRobotPos[0] = tmpPos[0];
+		newRobotPos[1] = tmpPos[1];
+		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.35;
+		cout << "newRobotPos = " << newRobotPos[2] << endl;
+		cout << "obPos = " << minimumObjectPos << endl;
+	}
+	else {
+		newRobotPos[0] = tmpPos[0];
+		newRobotPos[1] = tmpPos[1];
+		newRobotPos[2] = -minimumObjectPos + 0.001;
+	}
+
+	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
+	//	float postpos[3];
+	//	simGetObjectPosition(mainHandle, -1, postpos);
+	//	cout << "postpos: " << postpos[2] << endl;
 }
 
 vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles) {

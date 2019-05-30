@@ -36,7 +36,9 @@ public:
 	float energy = 0.0;
 	float energyDissipationRate = 0.0;
 	float deathThreshold = 0.5; 
-	vector<int> getMirrorSite(int site, int configuration, int mirrorAxis); 
+	vector<int> getMirrorSite(int site, int configuration, int mirrorAxis);
+	void updateParentModuleMorphology(int num);
+
 	virtual shared_ptr<ER_Module> clone() = 0; 
 	void diffuseEnergy();
 	void directDiffuseEnergy();
@@ -68,6 +70,10 @@ public:
 	virtual vector<int> getFreeSites(vector<int>) = 0;
 	vector<float> moduleInput; 
 	vector<float> moduleOutput; 
+	
+	virtual void updateMorph(int num);
+
+
 	virtual vector<float> updateModule(vector<float> input) = 0; // should return output
 	int moduleID = 0; 
 	void setModuleID(int id);
