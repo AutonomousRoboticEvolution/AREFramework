@@ -75,7 +75,6 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 //	cout << "Creating Cube Module" << endl;
 	float size[3] = { 0.055, 0.055, 0.055 };
 	int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
-	cout << "CUBEEEE: " << cube << endl;
 
 	objectOrigin[0] = configuration[0];
 	objectOrigin[1] = configuration[1];

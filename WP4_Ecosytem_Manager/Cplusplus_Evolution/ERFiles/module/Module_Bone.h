@@ -8,7 +8,6 @@ public:
 	Module_Bone();
 	~Module_Bone();
 
-
 	int init();
 	int mutate(float mutationRate);
 	vector<int> createBone(vector<float> configuration, int relativePosHandle, int parentHandle);
@@ -31,6 +30,7 @@ public:
 	vector<float> getPosition();
 	virtual stringstream getControlParams();
 	float previousPosition = -1;
+	void updateMorph(int num) { /* TODO */ };
 
 private:
 	int objectPhysics = 8;
