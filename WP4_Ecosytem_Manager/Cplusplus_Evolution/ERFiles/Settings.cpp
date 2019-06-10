@@ -14,9 +14,9 @@ Settings::Settings() {
 //	moduleTypes.push_back(17);
 //	moduleTypes.push_back(17);
 	moduleTypes.push_back(16);  //servo
-	moduleTypes.push_back(17);  //brain skeletons
+// 	moduleTypes.push_back(17);  //brain skeletons
     moduleTypes.push_back(14);  //wheel
-    moduleTypes.push_back(15);  //sensor  
+ //   moduleTypes.push_back(15);  //sensor  
     
 
 	for (int i = 0; i < moduleTypes.size(); i++) {

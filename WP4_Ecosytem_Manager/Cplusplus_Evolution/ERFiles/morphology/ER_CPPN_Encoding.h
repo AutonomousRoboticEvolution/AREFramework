@@ -16,7 +16,7 @@ public:
 	void init();
 	void mutate();
 
-	int initializeGenome(int type); 
+	int initializeGenome(int type);
 	int mutateCPPN(float mutationRate);
 	int mutateControlERGenome(float mutationRate);
 	bool queried = false;

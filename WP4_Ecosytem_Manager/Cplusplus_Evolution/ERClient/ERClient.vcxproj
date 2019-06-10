@@ -105,7 +105,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;DO_NOT_USE_SHARED_MEMORY;MAX_EXT_API_CONNECTIONS=255;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Boost\boost_1_70_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Boost\boost_1_70_0;C:\eigen\;C:\boost\boost_1_69_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -148,6 +148,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\common\v_repLib.cpp" />
+    <ClCompile Include="..\..\remoteApi\extApi.c" />
+    <ClCompile Include="..\..\remoteApi\extApiPlatform.c" />
     <ClCompile Include="..\ERfiles\control\ANN.cpp" />
     <ClCompile Include="..\ERfiles\control\Control.cpp" />
     <ClCompile Include="..\ERfiles\control\ControlFactory.cpp" />
@@ -165,7 +168,6 @@
     <ClCompile Include="..\ERFiles\morphology\CAT.cpp" />
     <ClCompile Include="..\ERFiles\morphology\CustomMorphology.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Development.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_CPPN.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_CPPN_Encoding.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_DirectEncoding.cpp" />
@@ -173,10 +175,13 @@
     <ClCompile Include="..\ERfiles\morphology\FixedBaseMorphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\Morphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\MorphologyFactory.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Organ.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Skeleton.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBars.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Tissue_GMX.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Tissue_GMX_VREP.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Viability.cpp" />
     <ClCompile Include="..\ERfiles\neuron\CPGNeuron.cpp" />
     <ClCompile Include="..\ERFiles\neuron\FunctionNeuron.cpp" />
     <ClCompile Include="..\ERfiles\neuron\InputNeuron.cpp" />
@@ -193,6 +198,9 @@
     <ClCompile Include="SlaveConnection.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\remoteApi\extApi.h" />
+    <ClInclude Include="..\..\remoteApi\extApiInternal.h" />
+    <ClInclude Include="..\..\remoteApi\extApiPlatform.h" />
     <ClInclude Include="..\ERfiles\control\ANN.h" />
     <ClInclude Include="..\ERfiles\control\Control.h" />
     <ClInclude Include="..\ERfiles\control\ControlFactory.h" />
@@ -210,7 +218,6 @@
     <ClInclude Include="..\ERFiles\morphology\CAT.h" />
     <ClInclude Include="..\ERFiles\morphology\CustomMorphology.h" />
     <ClInclude Include="..\ERFiles\morphology\Development.h" />
-    <ClInclude Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_CPPN.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_CPPN_Encoding.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_DirectEncoding.h" />
@@ -218,10 +225,13 @@
     <ClInclude Include="..\ERfiles\morphology\FixedBaseMorphology.h" />
     <ClInclude Include="..\ERfiles\morphology\Morphology.h" />
     <ClInclude Include="..\ERfiles\morphology\MorphologyFactory.h" />
+    <ClInclude Include="..\ERFiles\morphology\Organ.h" />
+    <ClInclude Include="..\ERFiles\morphology\Skeleton.h" />
     <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBars.h" />
     <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBarsVREP.h" />
     <ClInclude Include="..\ERFiles\morphology\Tissue_GMX.h" />
     <ClInclude Include="..\ERFiles\morphology\Tissue_GMX_VREP.h" />
+    <ClInclude Include="..\ERFiles\morphology\Viability.h" />
     <ClInclude Include="..\ERfiles\neuron\CPGNeuron.h" />
     <ClInclude Include="..\ERFiles\neuron\FunctionNeuron.h" />
     <ClInclude Include="..\ERfiles\neuron\InputNeuron.h" />

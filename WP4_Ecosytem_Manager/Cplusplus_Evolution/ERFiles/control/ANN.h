@@ -10,18 +10,7 @@ class ANN :
 public:
 	ANN();
 	~ANN();
-	/**
-		@brief This method initilizes the control
-		@param input Number of input of ANN
-		@param inter Number of internal of ANN
-		@param output Number of output of ANN
-	*/
 	void init(int input, int inter, int output);
-	/**
-		@brief This method update the ANN
-		@param input Number of input of ANN
-		@return a vector  
-	*/
 	vector<float> update(vector<float>);
 	void mutate(float mutationRate); 
 	void printNeuronValues(); 
@@ -56,13 +45,10 @@ public:
 	};*/
 
 	vector<float> in;
-	vector<float> out;
-	/// vector of input neuron 
+	vector<float> out; 
 	vector<shared_ptr<Neuron>> inputLayer;
-	/// vector of output neuron
 	vector<shared_ptr<Neuron>> outputLayer;
-	// TODO recurrentLayer -> vector<vector<shared_ptr<Neuron>>> interLayer
-	/// vector of hidden neuron 
+	// TODO recurrentLayer -> vector<vector<shared_ptr<Neuron>>> interLayer 
 	vector<shared_ptr<Neuron>> recurrentLayer;
 //	vector<shared_ptr<Neuron>> allNeurons; 
 	//vector<Connection> connections;

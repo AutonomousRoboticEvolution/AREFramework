@@ -25,16 +25,24 @@ void ANN::init(int input, int inter, int output) {
 		neuronID++;
 	}
 	for (int i = 0; i < inter; i++) {
-		if (randomNum->randFloat(0, 1) < 0.5) { // change this 
-			recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates CPG
-			recurrentLayer[i]->init(neuronID);
-			neuronID++;
+		if (settings->createPatternNeurons) {
+			if (randomNum->randFloat(0, 1) < 0.5) { // change this 
+				recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates CPG
+				recurrentLayer[i]->init(neuronID);
+				neuronID++;
+			}
+			else {
+				recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(0, settings)); // creates simpleNeuron
+				recurrentLayer[i]->init(neuronID);
+				neuronID++;
+			}
 		}
 		else {
 			recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(0, settings)); // creates simpleNeuron
 			recurrentLayer[i]->init(neuronID);
 			neuronID++;
 		}
+
 	}
 	for (int i = 0; i < output; i++) {
 		outputLayer.push_back(neuronFactory->createNewNeuronGenome(2, settings));

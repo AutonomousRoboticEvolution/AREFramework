@@ -99,9 +99,6 @@
     <ClCompile Include="..\ERFiles\morphology\CustomMorphology.cpp">
       <Filter>GA\Morphology</Filter>
     </ClCompile>
-    <ClCompile Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.cpp">
-      <Filter>GA\Morphology</Filter>
-    </ClCompile>
     <ClCompile Include="..\ERFiles\EA_Generational.cpp">
       <Filter>GA</Filter>
     </ClCompile>
@@ -124,6 +121,12 @@
       <Filter>GA\Morphology</Filter>
     </ClCompile>
     <ClCompile Include="SlaveConnection.cpp" />
+    <ClCompile Include="..\..\common\v_repLib.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Viability.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Organ.cpp" />
+    <ClCompile Include="..\ERFiles\morphology\Skeleton.cpp" />
+    <ClCompile Include="..\..\remoteApi\extApi.c" />
+    <ClCompile Include="..\..\remoteApi\extApiPlatform.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\RandNum.h">
@@ -223,9 +226,6 @@
     <ClInclude Include="..\ERFiles\morphology\CustomMorphology.h">
       <Filter>GA\Morphology</Filter>
     </ClInclude>
-    <ClInclude Include="..\ERFiles\morphology\EdgarsAmazingMorphologyClass.h">
-      <Filter>GA\Morphology</Filter>
-    </ClInclude>
     <ClInclude Include="..\ERFiles\EA_Generational.h">
       <Filter>GA</Filter>
     </ClInclude>
@@ -248,6 +248,12 @@
       <Filter>GA\Morphology</Filter>
     </ClInclude>
     <ClInclude Include="SlaveConnection.h" />
+    <ClInclude Include="..\ERFiles\morphology\Viability.h" />
+    <ClInclude Include="..\ERFiles\morphology\Organ.h" />
+    <ClInclude Include="..\ERFiles\morphology\Skeleton.h" />
+    <ClInclude Include="..\..\remoteApi\extApi.h" />
+    <ClInclude Include="..\..\remoteApi\extApiInternal.h" />
+    <ClInclude Include="..\..\remoteApi\extApiPlatform.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="GA">

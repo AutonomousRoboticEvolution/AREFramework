@@ -225,17 +225,6 @@ VREP_DLLEXPORT void v_repEnd()
 	unloadVrepLibrary(vrepLib); // release the library
 }
 
-void saveLog(int num) {
-	ofstream logFile;
-	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
-	clock_t now = clock();
-//	double deltaSysTime = difftime((double) time(0), sysTime) ;
-	int deltaSysTime = now - sysTime;
-	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
-	sysTime = clock() ;
-	counter = 0; 
-	logFile.close();
-}
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
@@ -299,13 +288,13 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
 			// time out when not receiving commands for 5 minutes.  
 			if (!timerOn) {
-				tStart = clock();
+				sysTime = clock();
 				timeElapsed = 0;
 				timerOn = true;
 			}
 			else {
 				// printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-				timeElapsed = (double)(clock() - tStart) / CLOCKS_PER_SEC;
+				timeElapsed = (double)(clock() - sysTime) / CLOCKS_PER_SEC;
 				if (timeElapsed > 300) {
 					std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
 					simQuitSimulator(true);

@@ -25,11 +25,15 @@ bool ER_LSystemInterpreter::checkJointModule() {
 void ER_LSystemInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
-	setColors();
+	//setColors();
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeLSystem(settings->lIncrements, position); // / amount increment is not in genome anymore
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+//	initializeLSystem(settings->lIncrements, position); // / amount increment is not in genome anymore
 }
 
 void ER_LSystemInterpreter::printSome() {

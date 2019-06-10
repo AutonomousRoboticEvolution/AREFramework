@@ -25,11 +25,16 @@ bool ER_DirectEncodingInterpreter::checkJointModule() {
 void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
-	setColors();
+
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeDirectEncoding(position); // / amount increment is not in genome anymore
+
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+	//initializeDirectEncoding(position); // / amount increment is not in genome anymore
 }
 
 void ER_DirectEncodingInterpreter::printSome() {
@@ -76,6 +81,21 @@ bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module
 					//}
 				}
 			}
+			// check to see if positions are not the same
+			float handleNPos[3];
+			float handleIJPos[3];
+			simGetObjectPosition(module->objectHandles[n], -1, handleNPos);
+			for (int i = 0; i < createdModules.size() - 1; i++) {
+				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
+					simGetObjectPosition(createdModules[i]->objectHandles[j], -1, handleIJPos);
+					if (handleNPos[0] > handleIJPos[0] - 0.001 && handleNPos[0] < handleIJPos[0] + 0.001
+						&& handleNPos[1] > handleIJPos[1] - 0.001 && handleNPos[1] < handleIJPos[1] + 0.001
+						&& handleNPos[2] > handleIJPos[2] - 0.001 && handleNPos[2] < handleIJPos[2] + 0.001) {
+						//		cout << "modules are at the same position" << endl; 
+						return true;
+					}
+				}
+			}
 
 			// checks if collition with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
 			// don't delete this function!
@@ -94,7 +114,7 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 		if (createdModules[i]->broken != true) {
 			for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
 				if (simGetObjectType(createdModules[i]->objectHandles[j]) == sim_object_forcesensor_type) {
-					int force = simReadForceSensor(createdModules[i]->objectHandles[j], nullptr, nullptr);
+					int force = simReadForceSensor(createdModules[i]->objectHandles[j], NULL, NULL);
 					if (force != 0 && force != -1) {
 						if (force == 3) {
 							cout << "force sensor is broken" << endl;
@@ -151,7 +171,6 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	configuration[4] = 0;
 	configuration[5] = 0;
 	createdModules[0]->createModule(configuration, -1, parentHandle);
-	cout << "handle of module is : " <<createdModules[0] << endl;
 
 	/* old 
 	for (int i = 1; i < modules.size(); i++) {
@@ -243,9 +262,6 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
 
 				vector<int> exception;
-				/*
-					check if the new module conficts with the old module,if so,remove the new module
-				*/
 				exception.push_back(parentHandle);
 				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);

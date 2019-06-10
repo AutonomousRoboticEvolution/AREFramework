@@ -174,12 +174,6 @@
     <ClCompile Include="ERFiles\EA_SteadyState.cpp">
       <Filter>ERFiles\GA</Filter>
     </ClCompile>
-    <ClCompile Include="ERFiles\morphology\EdgarsAmazingMorphologyClass.cpp">
-      <Filter>ERFiles\Morphology</Filter>
-    </ClCompile>
-    <ClCompile Include="ERFiles\morphology\EdgarsAmazingMorphologyClassVREP.cpp">
-      <Filter>ERFiles\Morphology</Filter>
-    </ClCompile>
     <ClCompile Include="FitnessFunctions.cpp" />
     <ClCompile Include="ERFiles\morphology\ER_CPPN_Encoding.cpp">
       <Filter>ERFiles\Encodings</Filter>
@@ -382,12 +376,6 @@
     </ClInclude>
     <ClInclude Include="ERFiles\EA_SteadyState.h">
       <Filter>ERFiles\GA</Filter>
-    </ClInclude>
-    <ClInclude Include="ERFiles\morphology\EdgarsAmazingMorphologyClass.h">
-      <Filter>ERFiles\Morphology</Filter>
-    </ClInclude>
-    <ClInclude Include="ERFiles\morphology\EdgarsAmazingMorphologyClassVREP.h">
-      <Filter>ERFiles\Morphology</Filter>
     </ClInclude>
     <ClInclude Include="FitnessFunctions.h" />
     <ClInclude Include="ERFiles\morphology\ER_CPPN_Encoding.h">

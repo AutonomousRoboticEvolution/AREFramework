@@ -20,7 +20,11 @@ void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+//	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
 }
 
 bool ER_CPPN_Interpreter::checkJointModule() {

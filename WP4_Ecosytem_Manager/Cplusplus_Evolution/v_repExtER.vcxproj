@@ -249,8 +249,6 @@
     <ClCompile Include="ERFiles\morphology\CustomMorphology.cpp" />
     <ClCompile Include="ERFiles\morphology\CustomMorphologyVREP.cpp" />
     <ClCompile Include="ERFiles\morphology\Development.cpp" />
-    <ClCompile Include="ERFiles\morphology\EdgarsAmazingMorphologyClass.cpp" />
-    <ClCompile Include="ERFiles\morphology\EdgarsAmazingMorphologyClassVREP.cpp" />
     <ClCompile Include="ERFiles\morphology\ER_CPPN.cpp" />
     <ClCompile Include="ERFiles\morphology\ER_CPPN_Encoding.cpp" />
     <ClCompile Include="ERFiles\morphology\ER_CPPN_Interpreter.cpp" />
@@ -326,8 +324,6 @@
     <ClInclude Include="ERFiles\morphology\CustomMorphology.h" />
     <ClInclude Include="ERFiles\morphology\CustomMorphologyVREP.h" />
     <ClInclude Include="ERFiles\morphology\Development.h" />
-    <ClInclude Include="ERFiles\morphology\EdgarsAmazingMorphologyClass.h" />
-    <ClInclude Include="ERFiles\morphology\EdgarsAmazingMorphologyClassVREP.h" />
     <ClInclude Include="ERFiles\morphology\ER_CPPN.h" />
     <ClInclude Include="ERFiles\morphology\ER_CPPN_Encoding.h" />
     <ClInclude Include="ERFiles\morphology\ER_CPPN_Interpreter.h" />

@@ -13,6 +13,7 @@ class Viability {
         int printVolume(vector<float> coordinates);
         int collisionDetector(vector<int> allComponents, int componentHandle);
         int createTemporalGripper(Organ organ);
+		int obstructedSensor(int robotHandle);
         void destroyTemporalGripper(int gripperHandle);
 };
 
