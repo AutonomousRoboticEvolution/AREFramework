@@ -14,14 +14,22 @@
 //
 // This file was automatically created for V-REP release V3.2.1 on May 3rd 2015
 
+/**
+	@file v_repExtER.h
+	@brief Class declaration of the plugin
+*/
+
 #pragma once
 
 #include <ctime>
 #include <memory>
 #include "ERFiles/ER_VREP.h"
 
-bool loadingPossible = true;
 using namespace std;
+
+/// Indicate whether the plugin is ready to accept/load genome sent from client
+bool loadingPossible = true;
+/// an uniqure pointer to ER_VREP class
 unique_ptr<ER_VREP> ER;
 bool initCall = true; 
 int counter = 0; 
@@ -32,8 +40,10 @@ bool initialized = false;
 int timeCount = 0;
 bool timerOn = false;
 double timeElapsed;
+/// This variable marks the start of evolution.
 bool startEvolution = true;
-clock_t tStart;
+/// Measure simulation time.
+clock_t sysTime;
 
 #ifdef _WIN32
 	#define VREP_DLLEXPORT extern "C" __declspec(dllexport)
@@ -43,9 +53,16 @@ clock_t tStart;
 #endif /* __linux || __APPLE__ */
 
 // The 3 required entry points of the plugin:
+/**
+	@brief Initialize v-rep plugin and starts evolution.
+	@return unsigned char; v-rep version if operation successful, false if not
+*/
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt);
+/**
+	@brief Release the v-rep lib
+*/
 VREP_DLLEXPORT void v_repEnd();
+/**
+	@brief Handle different message of simulation
+*/
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData);
-
-clock_t sysTime; 
-

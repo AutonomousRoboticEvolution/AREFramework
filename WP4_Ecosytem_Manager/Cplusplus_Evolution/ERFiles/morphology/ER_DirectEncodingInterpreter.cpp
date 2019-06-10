@@ -243,6 +243,9 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
 
 				vector<int> exception;
+				/*
+					check if the new module conficts with the old module,if so,remove the new module
+				*/
 				exception.push_back(parentHandle);
 				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);

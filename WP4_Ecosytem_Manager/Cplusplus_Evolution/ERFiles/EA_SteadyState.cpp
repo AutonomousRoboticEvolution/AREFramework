@@ -123,6 +123,9 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 	for (int p = 0; p < populationGenomes.size(); p++) {
 		for (int n = 0; n < numAttempts; n++) {
 			int currentInd = randomNum->randInt(populationGenomes.size(), 0);
+			// Within this loop a new individual is evaluated. When the 
+			// number of attempts is reached, and the new individual did not
+			// replace an individual in the existing population, it's genome is deleted.			
 			if (nextGenGenomes[p]->fitness >= populationGenomes[currentInd]->fitness) {
 				cout << "replacement: " << nextGenGenomes[p]->individualNumber << " replaces " << populationGenomes[currentInd]->individualNumber << endl;
 				cout << "replacement: " << nextGenGenomes[p]->fitness << " replaces " << populationGenomes[currentInd]->fitness << endl;

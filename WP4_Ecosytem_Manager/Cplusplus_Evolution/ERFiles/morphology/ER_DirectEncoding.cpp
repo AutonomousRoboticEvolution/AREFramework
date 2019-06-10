@@ -647,6 +647,7 @@ int ER_DirectEncoding::checkTreeDepth(int attachModule, int increment) {
 	}
 }
 
+//mutate the control
 int ER_DirectEncoding::mutateControlERGenome(float mutationRate) {
 	cout << "mutating l-genome" << endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
@@ -665,6 +666,7 @@ void ER_DirectEncoding::deleteModuleFromGenome(int num)
 	}
 }
 
+///mutate the morph
 void ER_DirectEncoding::mutate() {
 	//cout << "mutating lmorph" << endl;
 	mutateERGenome(settings->morphMutRate);

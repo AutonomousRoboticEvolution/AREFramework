@@ -55,5 +55,3 @@ protected:
 	// virtual functions to extend with simulator specific classes
 	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory();
 };
-
-

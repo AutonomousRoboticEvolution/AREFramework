@@ -18,7 +18,7 @@ public:
 	vector<float> updateModule(vector<float> input);
 	stringstream getModuleParams();
 	void setModuleParams(vector<string>);
-	void createControl() {};
+	void createControl() {};//define the function
 	vector<float> getPosition();
 	virtual stringstream getControlParams();
 	

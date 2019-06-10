@@ -155,7 +155,9 @@ public:
 
 //	EvolutionType evolutionType = GENERATIONAL; // not implemented yet
 
+	/// record the number of individuals
 	int indCounter;
+	/// Experiment ID
 	int sceneNum;
 	bool sendGenomeAsSignal = false;
 	bool client;
@@ -169,9 +171,9 @@ public:
 	int crossover = 0;
 	float crossoverRate = 0;
 	int ageInds = 0;
-	int maxAge = 0; // generations
-	int minAge = 0; // age after which death can occur
-	float deathProb = 0; // by default no death
+	int maxAge = 0; /// generations
+	int minAge = 0; /// age after which death can occur
+	float deathProb = 0; /// by default no death
 	vector<int> indNumbers;
 	vector<float> indFits;
 	int seed = 0;
@@ -215,7 +217,9 @@ public:
 	void saveSettings();
 	bool portOpen = false;
 
-	// SETTERS
+	/**
+		@brief Set the repository for saving data
+	*/
 	void setRepository(std::string repository)
 	{
 		this->repository = repository; 

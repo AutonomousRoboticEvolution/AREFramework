@@ -14,6 +14,11 @@
 //
 // This file was automatically created for V-REP release V3.2.1 on May 3rd 2015
 
+/**
+	@file v_repExtER.cpp
+	@brief Implementation of the plugin.
+*/
+
 #include "v_repExtER.h"
 //#include "luaFunctionData.h"
 #include <iostream>
@@ -42,6 +47,19 @@ using namespace std;
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 LIBRARY vrepLib;
+
+///save time log
+void saveLog(int num) {
+	ofstream logFile;
+	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
+	clock_t now = clock();
+//	double deltaSysTime = difftime((double) time(0), sysTime) ;
+	int deltaSysTime = now - sysTime;
+	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
+	sysTime = clock() ;
+	counter = 0;
+	logFile.close();
+}
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 { // This is called just once, at the start of V-REP.
@@ -120,11 +138,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	if (startEvolution == true) {
 
 		// Construct classes
-		ER = unique_ptr<ER_VREP>(new ER_VREP);
-		ER->settings = shared_ptr<Settings>(new Settings);
+		ER = unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
+		ER->settings = shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
 
-		// set all arguments
-		// 1: seed and location
+		// Set all arguments
+		// 1: Set seed and location
 		int run = 0;
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
@@ -133,29 +151,29 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg1_param);
 		}
 
-//		// 3: set the repository of the settings file.
-//		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
-//		if (arg3_param != NULL) {
-//			ER->settings->setRepository(arg3_param);
-//			simReleaseBuffer(arg3_param);
-//		}
-//		else {
-//			std::cout << "Argument 3 was NULL" << endl;
-//		}
-		// Read the settings file
+		// 3: Sets the output file-path for the settings file.
+		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
+		if (arg3_param != NULL) {
+			ER->settings->setRepository(arg3_param);
+			simReleaseBuffer(arg3_param);
+		}
+		else {
+			std::cout << "Argument 3 was NULL" << endl;
+		}
+		// Read the settings file; specify the ID of experimental run
 		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-		ER->settings->readSettings();
+		ER->settings->readSettings(); // load the settings if the *.csv exists
 
 		// Override settings parameters if argument 2
-		// 2: 
+		// 2:
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
 		if (arg2_param != NULL) {
 			const int arg2_param_i = atoi(arg2_param);
-
+			// If the second argument passed (arg2_param) is equal to 9, then load best individual and run simulations in local machine
 			if (arg2_param_i == 9)
 			{
-				ER->simSet = RECALLBEST;
-				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+				ER->simSet = RECALLBEST; // Load best indivudal
+				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
 			else if (arg2_param_i == 8) {
@@ -167,38 +185,41 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
+			// If the second argument passed (arg2_param) is equal to 1, then run the simulations in server-client mode
 			else if (arg2_param_i == 1)
 			{
-				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;
+				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
 			}
 
 			simReleaseBuffer(arg2_param);
 		}
 
-		// sceneNum and seed will not be utilized from the settings file anymore
-		ER->settings->sceneNum = run;
-		ER->settings->seed = run;
-		ER->randNum = shared_ptr<RandNum>(new RandNum(run));
+		//! sceneNum and seed will not be utilized from the settings file anymore
+		//! TODO: Check with Frank: why lines 151 and 177 are the same?
+		ER->settings->sceneNum = run;   //sceneNum is not used desprete; should be loaded through readSettings function
+		ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
+		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		// Actual initialization of ER
-		ER->initialize();
+		ER->initialize(); 
 		//	ER->environment->sceneLoader();
 		if (ER->settings->verbose) {
 			cout << "ER initialized" << endl;
 		}
 	}
 	int signal[1] = { 0 };
-	simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
 	//cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
 	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
 	// version 1 was for V-REP versions before V-REP 2.5.12
 	// version 2 was for V-REP versions before V-REP 2.6.0
-	// version 5 was for V-REP versions before V-REP 3.1.0 
+	// version 5 was for V-REP versions before V-REP 3.1.0
 	// version 6 is for V-REP versions after V-REP 3.1.3
 	// version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
 }
 
+// Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
 	unloadVrepLibrary(vrepLib); // release the library
@@ -236,12 +257,14 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	
 	if (startEvolution == true) {
 		if (message == sim_message_eventcallback_modulehandle) {
-			ER->handleSimulation(); // handling the simulation. 
+
+			ER->handleSimulation(); // handling the simulation.
 		}
 
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			//tStart = clock();
-			ER->startOfSimulation();
+			// Initializes population
+			ER->startOfSimulation();  //start from here after simStartSimulation is called
 		}
 
 		if (initCall == true) {
@@ -265,8 +288,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 
 		}
 		//	}
+		//client and v-rep plugin communicates using signal and remote api
 		int signal[1] = { 0 };
 		int retVal = simGetIntegerSignal((simChar*) "simulationState", signal);
+		simGetIntegerSignal((simChar*) "simulationState", signal);  
 		if (signal[0] == 99) {
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
@@ -309,7 +334,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 					//ER->ea->loadIndividual(individual[0], sceneNumber[0]);
 					//saveLog(1);
 					//cout << "Not loaded: see this comment in code to adjust" << endl;
-					simStartSimulation();
+					simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
 					loadingPossible = false;
 				}
 			}
@@ -327,7 +352,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		//	}	
 			timeCount++;
 			ER->endOfSimulation();
-			loadingPossible = true;
+			loadingPossible = true;   //start another simulation
 		}
 	}
 

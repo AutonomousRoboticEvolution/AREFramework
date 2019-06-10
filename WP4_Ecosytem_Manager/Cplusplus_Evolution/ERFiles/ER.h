@@ -35,11 +35,18 @@ public:
 	CER();
 	virtual ~CER();
 
+	/**
+       @brief This method reads text files
+	*/
 	void split_line(string& line, string delim, list<string>& values);
-
+	/// simulation setup detemining which genome to load for start
 	simulationSetup simSet = DEFAULT_SETUP;
-	shared_ptr<Settings> settings;
-	unique_ptr<EA> ea; // can be changed to another ea. Factory pattern?
+	///pointer to settting of EA
+	shared_ptr<Settings> settings;  
+	///pointer to EA
+	unique_ptr<EA> ea;               
+	///pointer to random number generator of EA
+	shared_ptr<RandNum> randNum;
 
 	void saveSettings();
 	void initialize();
@@ -48,11 +55,12 @@ public:
 
 	// parameters
 	int currentInd = 0;
+	/// generation of ER
 	int generation = 0;
+	/// When recalling an evolutionary run, not only the generation is counted, but also the newGenerations. This allows the user to run evolution with generational intervals. 
 	int newGenerations = 0; 
 	bool _initialize = true;
 
 	void loadIndividual(int individualNum, int sceneNum);
 
-	shared_ptr<RandNum> randNum;
 };

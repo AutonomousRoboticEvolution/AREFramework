@@ -14,7 +14,7 @@ public:
 	void update();
 	int catHandle;
 	shared_ptr<Morphology> clone() const;
-	void create();
+	void create();  ///create a actual cat in v-rep
 	vector <float> catInputs();
 	vector <float> vestibularUpdate();
 	vector <float> tactileUpdate();
