@@ -8,9 +8,18 @@ public:
 	Module_Bone();
 	~Module_Bone();
 
+
 	int init();
 	int mutate(float mutationRate);
+
 	vector<int> createBone(vector<float> configuration, int relativePosHandle, int parentHandle);
+	// Create cube
+	vector<int> createCube(vector<float> configuration, int relativePosHandle, int parentHandle);
+	// Create bar
+    vector<int> createBars(vector<float> configuration, int relativePosHandle, int parentHandle);
+    // Create diagonals
+    vector<int> createDiagonals(vector<float> configuration, int relativePosHandle, int parentHandle);
+
 	int createModule(vector<float> configuration, int relativePosHandle, int parentHandle);
 	vector<int> getFreeSites(vector<int>);
 	vector<int> getObjectHandles();
@@ -30,7 +39,9 @@ public:
 	vector<float> getPosition();
 	virtual stringstream getControlParams();
 	float previousPosition = -1;
-	void updateMorph(int num) { /* TODO */ };
+
+    //void updateMorph(int num) override;
+    void updateMorph(int num) override { cout << "TODO : " << num << endl;/* TODO */ };
 
 private:
 	int objectPhysics = 8;

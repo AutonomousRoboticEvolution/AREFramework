@@ -30,93 +30,9 @@ vector<int> Module_Bone::createBone(vector<float> configuration, int relativePos
 		cout << "Creating Bone" << endl;
 	}
 	vector<int> partHandles;
-	// all functionality of the bone should be added here. 
-	int dummy = simCreateDummy(0.1, NULL);
-	float dR[3];
-	dR[0] = configuration[3];
-	dR[1] = configuration[4];
-	dR[2] = configuration[5];
-	float zeroOrigin[3] = { 0,0,0 };
-	// force sensor position (+0.0001 away from z direction of previous)
-	float dPos[3];
-	dPos[0] = 0.0;
-	dPos[1] = 0.0;
-	dPos[2] = configuration[2] + 0.0001;
-	float zeroPos[3];
-	zeroPos[0] = 0.0;
-	zeroPos[1] = 0.0;
-	zeroPos[2] = 0.0;
-
-	simSetObjectPosition(dummy, relativePosHandle, zeroPos);
-	simSetObjectOrientation(dummy, relativePosHandle, dR);
-	simSetObjectPosition(dummy, dummy, dPos);
-	simSetObjectParent(dummy, parentHandle, true);
-
-	float size[3] = { 0.055, 0.055, 0.055 };
-	int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
-	float objectOrigin[3];
-	objectOrigin[0] = configuration[0];
-	objectOrigin[1] = configuration[1];
-	objectOrigin[2] = configuration[2] + 0.02751;
-
-
-	float rotationOrigin[3];
-	rotationOrigin[0] = configuration[3];
-	rotationOrigin[1] = configuration[4];
-	rotationOrigin[2] = configuration[5];
-
-	simSetObjectPosition(cube, relativePosHandle, zeroOrigin);
-	simSetObjectOrientation(cube, relativePosHandle, rotationOrigin);
-	simSetObjectPosition(cube, cube, objectOrigin);
-	simSetObjectParent(cube, dummy, true);
-
-	partHandles.push_back(dummy);
-	partHandles.push_back(cube);
-
-	// create dummies specified by maximum children 
-	vector<int> dummies;
-	for (int i = 0; i < 5; i++) {
-		dummies.push_back(simCreateDummy(0.01,0));
-	}
-	// note, maxChilds is a variable parameter for the modules. 
-	// all dummies need to be correctly positioned when creating this bone part. 
-
-	float d1[3] = { 0.0,0.0, 0.02751 };
-	float d1R[3] = { 0.0,0.0, 0.0 };
-	float d2[3] = { 0.0,0.0, 0.0 };
-	float d2R[3] = { 0.5 * M_PI,0.0, 0.0 };
-	float d3[3] = { 0.0,0.0, 0.0 };
-	float d3R[3] = { -0.5 * M_PI,0.0, 0.0 };
-	float d4[3] = { 0.0,0.0, 0.0 };
-	float d4R[3] = { -0.5 * M_PI,0.5 * M_PI, 0.0 };
-	float d5[3] = { 0.0,0.0, 0.0 };
-	float d5R[3] = { 0.5 * M_PI,-0.5 * M_PI, 0.0 };
-
-	simSetObjectPosition(dummies[0], cube, d1);
-	simSetObjectOrientation(dummies[0], cube, d1R);
-
-	simSetObjectPosition(dummies[1], cube, d2);
-	simSetObjectOrientation(dummies[1], cube, d2R);
-	simSetObjectPosition(dummies[1], dummies[1], d1);
-
-	simSetObjectPosition(dummies[2], cube, d3);
-	simSetObjectOrientation(dummies[2], cube, d3R);
-	simSetObjectPosition(dummies[2], dummies[2], d1);
-
-	simSetObjectPosition(dummies[3], cube, d4);
-	simSetObjectOrientation(dummies[3], cube, d4R);
-	simSetObjectPosition(dummies[3], dummies[3], d1);
-
-	simSetObjectPosition(dummies[4], cube, d5);
-	simSetObjectOrientation(dummies[4], cube, d5R);
-	simSetObjectPosition(dummies[4], dummies[4], d1);
-
-	simSetObjectParent(dummy, parentHandle, true);
-	simSetObjectParent(cube, dummy, true);
-	for (int i = 0; i < dummies.size(); i++) {
-		simSetObjectParent(dummies[i], cube, true);
-		partHandles.push_back(dummies[i]);
-	}
+    //partHandles = createCube(configuration, relativePosHandle, parentHandle);
+    partHandles = createBars(configuration, relativePosHandle, parentHandle);
+    //partHandles = createDiagonals(configuration, relativePosHandle, parentHandle);
 	return partHandles;
 }
 
@@ -416,4 +332,336 @@ stringstream Module_Bone::getControlParams() {
 	ss << "#EndControl," << endl;
 	ss << endl;
 	return ss;
+}
+
+vector<int> Module_Bone::createCube(vector<float> configuration, int relativePosHandle, int parentHandle) {
+    // All functionality of the bone should be added here.
+    vector<int> partHandles;
+    // Create parent dummy
+    int dummy = simCreateDummy(0.1, NULL);
+    float dR[3];
+    dR[0] = configuration[3];
+    dR[1] = configuration[4];
+    dR[2] = configuration[5];
+    float zeroOrigin[3] = { 0,0,0 };
+    float dPos[3];
+    dPos[0] = 0.0;
+    dPos[1] = 0.0;
+    dPos[2] = configuration[2] + 0.0001;
+    float zeroPos[3];
+    zeroPos[0] = 0.0;
+    zeroPos[1] = 0.0;
+    zeroPos[2] = 0.0;
+    simSetObjectPosition(dummy, relativePosHandle, zeroPos);
+    simSetObjectOrientation(dummy, relativePosHandle, dR);
+    simSetObjectPosition(dummy, dummy, dPos);
+    simSetObjectParent(dummy, parentHandle, true);
+    // Create cube
+    float cubeSize = 0.05;
+    float size[3] = { cubeSize, cubeSize, cubeSize };
+    int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
+    float objectOrigin[3];
+    objectOrigin[0] = configuration[0];
+    objectOrigin[1] = configuration[1];
+    objectOrigin[2] = configuration[2] + cubeSize * 0.5;
+    float rotationOrigin[3];
+    rotationOrigin[0] = configuration[3];
+    rotationOrigin[1] = configuration[4];
+    rotationOrigin[2] = configuration[5];
+    simSetObjectPosition(cube, relativePosHandle, zeroOrigin);
+    simSetObjectOrientation(cube, relativePosHandle, rotationOrigin);
+    simSetObjectPosition(cube, cube, objectOrigin);
+    simSetObjectParent(cube, dummy, true);
+
+    partHandles.push_back(dummy);
+    partHandles.push_back(cube);
+
+    // Create children dummies
+    vector<int> dummies;
+    for (int i = 0; i < 5; i++) {
+        dummies.push_back(simCreateDummy(0.01,0));
+    }
+    float d1[3] = { 0.0,0.0, cubeSize * 0.5 };
+    float d1R[3] = { 0.0,0.0, 0.0 };
+    float d2[3] = { 0.0,0.0, 0.0 };
+    float d2R[3] = { 0.5 * M_PI,0.0, 0.0 };
+    float d3[3] = { 0.0,0.0, 0.0 };
+    float d3R[3] = { -0.5 * M_PI,0.0, 0.0 };
+    float d4[3] = { 0.0,0.0, 0.0 };
+    float d4R[3] = { -0.5 * M_PI,0.5 * M_PI, 0.0 };
+    float d5[3] = { 0.0,0.0, 0.0 };
+    float d5R[3] = { 0.5 * M_PI,-0.5 * M_PI, 0.0 };
+
+    simSetObjectPosition(dummies[0], cube, d1);
+    simSetObjectOrientation(dummies[0], cube, d1R);
+
+    simSetObjectPosition(dummies[1], cube, d2);
+    simSetObjectOrientation(dummies[1], cube, d2R);
+    simSetObjectPosition(dummies[1], dummies[1], d1);
+
+    simSetObjectPosition(dummies[2], cube, d3);
+    simSetObjectOrientation(dummies[2], cube, d3R);
+    simSetObjectPosition(dummies[2], dummies[2], d1);
+
+    simSetObjectPosition(dummies[3], cube, d4);
+    simSetObjectOrientation(dummies[3], cube, d4R);
+    simSetObjectPosition(dummies[3], dummies[3], d1);
+
+    simSetObjectPosition(dummies[4], cube, d5);
+    simSetObjectOrientation(dummies[4], cube, d5R);
+    simSetObjectPosition(dummies[4], dummies[4], d1);
+
+    for (int i = 0; i < dummies.size(); i++) {
+        simSetObjectParent(dummies[i], cube, true);
+        partHandles.push_back(dummies[i]);
+    }
+    // Return all handles
+    return partHandles;
+}
+
+vector<int> Module_Bone::createBars(vector<float> configuration, int relativePosHandle, int parentHandle) {
+    // All functionality of the bone should be added here.
+    vector<int> partHandles;
+    // Create parent dummy
+    int dummy = simCreateDummy(0.1, NULL);
+    float dR[3];
+    dR[0] = configuration[3];
+    dR[1] = configuration[4];
+    dR[2] = configuration[5];
+    float zeroOrigin[3] = { 0,0,0 };
+    float dPos[3];
+    dPos[0] = 0.0;
+    dPos[1] = 0.0;
+    dPos[2] = configuration[2] + 0.0001;
+    float zeroPos[3];
+    zeroPos[0] = 0.0;
+    zeroPos[1] = 0.0;
+    zeroPos[2] = 0.0;
+    simSetObjectPosition(dummy, relativePosHandle, zeroPos);
+    simSetObjectOrientation(dummy, relativePosHandle, dR);
+    simSetObjectPosition(dummy, dummy, dPos);
+    simSetObjectParent(dummy, parentHandle, true);
+    partHandles.push_back(dummy);
+
+    // Generate random coordinates
+    std::cout << "Coordinates for each organ: " << std::endl;
+    float coordinates[5][3];
+    for (int i = 0; i < 5; i++) { // Mutate coordinates
+        for (int j = 0; j < 3; j++) { // Mutate coordinates
+            //if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
+                if (j != 2) { // Make sure to generate coordinates above the ground
+                    coordinates[i][j] = randomNum->randFloat(0.0, 0.1); // 3D printer build volumen
+                    std::cout << coordinates[i][j] << ", ";
+                } else {
+                    coordinates[i][j] = randomNum->randFloat(0.0, 0.1);
+                    std::cout << coordinates[i][j] << ", ";
+                }
+            //}
+        }
+        std::cout << std::endl;
+    }
+    //coordinates[0][0] = 0.05;
+    // Get parent position
+    float parentPosition[3] = {0, 0, 0};
+    //simGetObjectPosition(relativePosHandle, -1, parentPosition);
+    std::cout << "Parent position: " << std::endl;
+    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
+    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
+    // Create skeleton
+    int skeletonHandle;
+    std::vector<int> primitiveHandles;
+    int temp_primitive_handle;
+    float columnWidth = 0.015;
+    float columnHeight = 0.010; // Wheel not touching floor decrease height
+    float magnitude;
+    float angle;
+    float primitiveSize[3];
+    float primitivePosition[3];
+    float primitiveOrientation[3];
+    float primitiveColour[3];
+
+    for(int i = 0; i < 5; i++){
+        // Horizontal bar
+        magnitude = sqrt(pow(coordinates[i][0] - parentPosition[0], 2) + pow(coordinates[i][1] - parentPosition[1], 2)) + columnWidth;
+        angle = atan2(coordinates[i][1] - parentPosition[1], coordinates[i][0] - parentPosition[0]);
+
+        primitiveSize[0] = magnitude;
+        primitiveSize[1] = columnWidth;
+        primitiveSize[2] = columnHeight;
+        temp_primitive_handle = simCreatePureShape(0, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
+
+        primitivePosition[0] = parentPosition[0] + (coordinates[i][0] - parentPosition[0]) / 2;
+        primitivePosition[1] = parentPosition[1] + (coordinates[i][1] - parentPosition[1]) / 2;
+        primitivePosition[2] = 0;
+        simSetObjectPosition(temp_primitive_handle, relativePosHandle, primitivePosition);
+
+        primitiveOrientation[0] = 0;
+        primitiveOrientation[1] = 0;
+        primitiveOrientation[2] = angle;
+        simSetObjectOrientation(temp_primitive_handle, relativePosHandle, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+
+        // Vertical bar
+        primitiveSize[0] = columnWidth;
+        primitiveSize[1] = columnHeight;
+        primitiveSize[2] = abs(coordinates[i][2] - parentPosition[2]);
+        temp_primitive_handle = simCreatePureShape(2, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
+
+        primitivePosition[0] = coordinates[i][0];
+        primitivePosition[1] = coordinates[i][1];
+        primitivePosition[2] = parentPosition[2] + (coordinates[i][2] - parentPosition[2]) / 2;
+        simSetObjectPosition(temp_primitive_handle, relativePosHandle, primitivePosition);
+
+        primitiveOrientation[0] = 0;
+        primitiveOrientation[1] = 0;
+        primitiveOrientation[2] = angle;
+        simSetObjectOrientation(temp_primitive_handle, relativePosHandle, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+    }
+    int* array = primitiveHandles.data();
+    skeletonHandle = simGroupShapes(array, primitiveHandles.size());
+    simSetObjectParent(skeletonHandle, dummy, true);
+    partHandles.push_back(skeletonHandle);
+    // Create children dummies
+    vector<int> dummies;
+    float dummiesOrientation[3] = {0, 0, 0};
+    float dummiesPosition[3] = {coordinates[0][0], coordinates[0][1], coordinates[0][2]};
+    for (int i = 0; i < 5; i++) {
+        dummiesPosition[0] = coordinates[i][0];
+        dummiesPosition[1] = coordinates[i][1];
+        dummiesPosition[2] = coordinates[i][2] + 0.01;
+        dummies.push_back(simCreateDummy(0.01,0));
+        simSetObjectPosition(dummies[i], relativePosHandle, dummiesPosition);
+        simSetObjectOrientation(dummies[i], relativePosHandle, dummiesOrientation);
+    }
+    for (int i = 0; i < dummies.size(); i++) {
+        simSetObjectParent(dummies[i], skeletonHandle, true);
+        partHandles.push_back(dummies[i]);
+    }
+    // Return all handles
+    return partHandles;
+}
+// Create diagonals
+vector<int> Module_Bone::createDiagonals(vector<float> configuration, int relativePosHandle, int parentHandle){
+    // All functionality of the bone should be added here.
+    vector<int> partHandles;
+    // Create parent dummy
+    int dummy = simCreateDummy(0.1, NULL);
+    float dR[3];
+    dR[0] = configuration[3];
+    dR[1] = configuration[4];
+    dR[2] = configuration[5];
+    float zeroOrigin[3] = { 0,0,0 };
+    float dPos[3];
+    dPos[0] = 0.0;
+    dPos[1] = 0.0;
+    dPos[2] = configuration[2] + 0.0001;
+    float zeroPos[3];
+    zeroPos[0] = 0.0;
+    zeroPos[1] = 0.0;
+    zeroPos[2] = 0.0;
+    simSetObjectPosition(dummy, relativePosHandle, zeroPos);
+    simSetObjectOrientation(dummy, relativePosHandle, dR);
+    simSetObjectPosition(dummy, dummy, dPos);
+    simSetObjectParent(dummy, parentHandle, true);
+    partHandles.push_back(dummy);
+
+    // Generate random coordinates
+    std::cout << "Coordinates for each organ: " << std::endl;
+    float coordinates[5][3];
+    for (int i = 0; i < 5; i++) { // Mutate coordinates
+        for (int j = 0; j < 3; j++) { // Mutate coordinates
+            //if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
+            if (j != 2) { // Make sure to generate coordinates above the ground
+                coordinates[i][j] = randomNum->randFloat(0.0, 0.1); // 3D printer build volumen
+                std::cout << coordinates[i][j] << ", ";
+            } else {
+                coordinates[i][j] = randomNum->randFloat(0.0, 0.1);
+                std::cout << coordinates[i][j] << ", ";
+            }
+            //}
+        }
+        std::cout << std::endl;
+    }
+    //coordinates[0][0] = 0.05;
+    // Get parent position
+    float parentPosition[3] = {0, 0, 0};
+    //simGetObjectPosition(relativePosHandle, -1, parentPosition);
+    std::cout << "Parent position: " << std::endl;
+    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
+    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
+    // Create skeleton
+    int skeletonHandle;
+    std::vector<int> primitiveHandles;
+    int temp_primitive_handle;
+    float columnWidth = 0.015;
+    float columnHeight = 0.010; // Wheel not touching floor decrease height
+    float magnitude;
+    float angle1;
+    float angle2;
+    float primitiveSize[3];
+    float primitivePosition[3];
+    float primitiveOrientation[3];
+    float primitiveColour[3];
+
+    for(int i = 0; i < 5; i++){
+
+        magnitude = sqrt(pow(coordinates[i][0] - parentPosition[0], 2) + pow(coordinates[i][1] - parentPosition[1], 2)
+                + pow(coordinates[i][2] - parentPosition[2], 2)) + columnWidth;
+        angle1 = acos((coordinates[i][2] - parentPosition[2])/magnitude);
+        angle2 = atan2(coordinates[i][1] - parentPosition[1], coordinates[i][0] - parentPosition[0]);
+
+        primitiveSize[0] = magnitude;
+        primitiveSize[1] = columnWidth;
+        primitiveSize[2] = columnHeight;
+        temp_primitive_handle = simCreatePureShape(0, 8, primitiveSize, 1, NULL);
+        primitiveHandles.push_back(temp_primitive_handle);
+
+        primitivePosition[0] = (coordinates[i][0] - parentPosition[0]) / 2;
+        primitivePosition[1] = (coordinates[i][1] - parentPosition[1]) / 2;
+        primitivePosition[2] = (coordinates[i][2] - parentPosition[2]) / 2;
+        simSetObjectPosition(temp_primitive_handle, relativePosHandle, primitivePosition);
+
+        primitiveOrientation[0] = 0;
+        primitiveOrientation[1] = angle1;
+        primitiveOrientation[2] = angle2;
+        simSetObjectOrientation(temp_primitive_handle, relativePosHandle, primitiveOrientation);
+
+        primitiveColour[0] = 0;
+        primitiveColour[1] = 1;
+        primitiveColour[2] = 0;
+        simSetShapeColor(temp_primitive_handle, NULL, sim_colorcomponent_ambient_diffuse, primitiveColour);
+    }
+    int* array = primitiveHandles.data();
+    skeletonHandle = simGroupShapes(array, primitiveHandles.size());
+    simSetObjectParent(skeletonHandle, dummy, true);
+    partHandles.push_back(skeletonHandle);
+    // Create children dummies
+    vector<int> dummies;
+    float dummiesOrientation[3] = {0, 0, 0};
+    float dummiesPosition[3] = {coordinates[0][0], coordinates[0][1], coordinates[0][2]};
+    for (int i = 0; i < 5; i++) {
+        dummiesPosition[0] = coordinates[i][0];
+        dummiesPosition[1] = coordinates[i][1];
+        dummiesPosition[2] = coordinates[i][2];
+        dummies.push_back(simCreateDummy(0.01,0));
+        simSetObjectPosition(dummies[i], relativePosHandle, dummiesPosition);
+        simSetObjectOrientation(dummies[i], relativePosHandle, dummiesOrientation);
+    }
+    for (int i = 0; i < dummies.size(); i++) {
+        simSetObjectParent(dummies[i], skeletonHandle, true);
+        partHandles.push_back(dummies[i]);
+    }
+    // Return all handles
+    return partHandles;
 }
