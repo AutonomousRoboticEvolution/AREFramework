@@ -7,13 +7,17 @@
  */
 Settings::Settings() {
 	// set default module parameters
-	moduleTypes.push_back(1);
-	moduleTypes.push_back(17);
-//	moduleTypes.push_back(4);
-	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-//	moduleTypes.push_back(16);
+	moduleTypes.push_back(1);  //brain
+	//moduleTypes.push_back(17);
+	//moduleTypes.push_back(4);
+//	moduleTypes.push_back(17);
+//	moduleTypes.push_back(17);
+//	moduleTypes.push_back(17);
+	moduleTypes.push_back(16);  //servo
+	moduleTypes.push_back(17);  //brain skeletons
+    moduleTypes.push_back(14);  //wheel
+    moduleTypes.push_back(15);  //sensor  
+    
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -39,8 +43,8 @@ Settings::Settings() {
 	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.004;
-	mutationRate = 0.004;
+	morphMutRate = 0.4;
+	mutationRate = 0.4;
 	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
