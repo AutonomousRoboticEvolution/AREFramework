@@ -245,15 +245,30 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	*///if (initialized == true) {
 	
 	if (startEvolution == true) {
-		if (message == sim_message_eventcallback_modulehandle) {
-
-			ER->handleSimulation(); // handling the simulation.
-		}
-
+		
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			//tStart = clock();
 			// Initializes population
 			ER->startOfSimulation();  //start from here after simStartSimulation is called
+		}
+		else if (message == sim_message_eventcallback_modulehandle) {
+
+			ER->handleSimulation(); // handling the simulation.
+		}
+		else if (message == sim_message_eventcallback_simulationended) {
+			initCall = true; // this restarts the simulation
+		//	printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+		//	if (timeCount % 10 == 0) {
+			//	ofstream file;
+			//	ostringstream fileName;
+			//	fileName << "timeLog.txt";
+			//	file.open(fileName.str(), ios::out | ios::ate | ios::app);
+			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
+			//	file.close();
+		//	}	
+			timeCount++;
+			ER->endOfSimulation();
+			loadingPossible = true;   //start another simulation
 		}
 
 		if (initCall == true) {
@@ -328,21 +343,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				}
 			}
 		}
-		else if (message == sim_message_eventcallback_simulationended) {
-			initCall = true; // this restarts the simulation
-		//	printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-		//	if (timeCount % 10 == 0) {
-			//	ofstream file;
-			//	ostringstream fileName;
-			//	fileName << "timeLog.txt";
-			//	file.open(fileName.str(), ios::out | ios::ate | ios::app);
-			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
-			//	file.close();
-		//	}	
-			timeCount++;
-			ER->endOfSimulation();
-			loadingPossible = true;   //start another simulation
-		}
+
 	}
 
 	//	simSetIntegerParameter(sim_intparam_error_report_mode, errorModeSaved); // restore previous settings
