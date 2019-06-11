@@ -69,8 +69,6 @@ set(SOURCES
     ERFiles/morphology/CustomMorphology.cpp
     ERFiles/morphology/CustomMorphologyVREP.cpp
     ERFiles/morphology/Development.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClass.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClassVREP.cpp
     ERFiles/morphology/ER_CPPN_Encoding.cpp
     ERFiles/morphology/ER_CPPN_Interpreter.cpp
     ERFiles/morphology/ER_CPPN.cpp
