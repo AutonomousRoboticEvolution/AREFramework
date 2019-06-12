@@ -250,10 +250,14 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			//tStart = clock();
 			// Initializes population
 			ER->startOfSimulation();  //start from here after simStartSimulation is called
+			if (ER->settings->verbose) {
+				cout << "SIMULATION ABOUT TO START" << endl;
+			}
 		}
 		else if (message == sim_message_eventcallback_modulehandle) {
 
 			ER->handleSimulation(); // handling the simulation.
+			timeCount = 0;
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
 			initCall = true; // this restarts the simulation
@@ -266,12 +270,22 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
 			//	file.close();
 		//	}	
-			timeCount++;
+
 			ER->endOfSimulation();
 			loadingPossible = true;   //start another simulation
+			if (ER->settings->verbose) {
+				cout << "SIMULATION ENDED" << endl;
+			}
+		}
+		else if (message == 316 ){
+			timeCount++;
+			if (ER->settings->verbose) {
+				cout << timeCount << endl;
+			}
 		}
 
-		if (initCall == true) {
+		if (initCall == true && timeCount > 5) {
+			timeCount = 0;
 			initCall = false;
 			counter = 0;
 			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
