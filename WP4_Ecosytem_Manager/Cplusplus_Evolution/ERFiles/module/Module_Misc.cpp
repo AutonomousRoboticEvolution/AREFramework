@@ -270,10 +270,11 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	vector<int> sensors;
 	// select all objects in tree
 	simAddObjectToSelection(sim_handle_tree, miscHandle);
+	int selectionSize = simGetObjectSelectionSize();
 	// store all these objects (max 20 shapes)
-	int shapesStorage[20]; // stores up to 20 shapes
+	int shapesStorage[50]; // stores up to 20 shapes
 	simGetObjectSelection(shapesStorage);
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
 			shapes.push_back(shapesStorage[i]);

@@ -2,7 +2,7 @@
 #include <iostream>
 #define _USE_MATH_DEFINES
 #include <cmath>
-
+#include <math.h>
 using namespace std;
 
 Module_Bone::Module_Bone()
@@ -53,7 +53,8 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	// store all these objects (max 20 shapes)
 	int shapesStorage[100]; // stores up to 20 shapes
 	simGetObjectSelection(shapesStorage);
-	for (int i = 0; i < 20; i++) {
+	int selectionSize = simGetObjectSelectionSize();
+	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
 			shapes.push_back(shapesStorage[i]);

@@ -269,9 +269,10 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	vector<int> shapes;
 	vector<int> joints;
 	simAddObjectToSelection(sim_handle_tree, rdr);
+	int selectionSize = simGetObjectSelectionSize();
 	int shapesStorage[10]; // stores up to 10 shapes
 	simGetObjectSelection(shapesStorage);//add servo module to shapesStorage
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
 			shapes.push_back(shapesStorage[i]);

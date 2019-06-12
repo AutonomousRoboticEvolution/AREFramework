@@ -246,21 +246,7 @@ bool ER_LSystemInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vecto
 					//}
 				}
 			}
-			// check to see if positions are not the same
-			float handleNPos[3];
-			float handleIJPos[3];
-			simGetObjectPosition(module->objectHandles[n], -1, handleNPos);
-			for (int i = 0; i < createdModules.size() - 1; i++) {
-				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					simGetObjectPosition(createdModules[i]->objectHandles[j], -1, handleIJPos);
-					if (handleNPos[0] > handleIJPos[0] - 0.001 && handleNPos[0] < handleIJPos[0] + 0.001
-						&& handleNPos[1] > handleIJPos[1] - 0.001 && handleNPos[1] < handleIJPos[1] + 0.001
-						&& handleNPos[2] > handleIJPos[2] - 0.001 && handleNPos[2] < handleIJPos[2] + 0.001) {
-						//		cout << "modules are at the same position" << endl; 
-						return true;
-					}
-				}
-			}
+
 
 			// checks if collision with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
 			// don't delete this function!

@@ -7,17 +7,19 @@
  */
 Settings::Settings() {
 	// set default module parameters
-	moduleTypes.push_back(1);  //brain
-	//moduleTypes.push_back(17);
-	//moduleTypes.push_back(4);
-//	moduleTypes.push_back(17);
-//	moduleTypes.push_back(17);
-//	moduleTypes.push_back(17);
-	moduleTypes.push_back(16);  //servo
-// 	moduleTypes.push_back(17);  //brain skeletons
-    moduleTypes.push_back(14);  //wheel
- //   moduleTypes.push_back(15);  //sensor  
-    
+	// 1: Cube
+	// 4: Servo Module
+	// 13: Brain (not very useful now)
+	// 14: wheel
+	// 15: sensor 
+	// 16: servo
+	// 17: bone
+	moduleTypes.push_back(1);  
+	moduleTypes.push_back(14);  
+	moduleTypes.push_back(15);  
+	moduleTypes.push_back(16); 
+	moduleTypes.push_back(1);  
+	
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;

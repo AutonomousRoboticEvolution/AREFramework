@@ -280,7 +280,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		else if (message == 316 ){
 			timeCount++;
 			if (ER->settings->verbose) {
-				cout << timeCount << endl;
+				//cout << timeCount << endl;
 			}
 		}
 
