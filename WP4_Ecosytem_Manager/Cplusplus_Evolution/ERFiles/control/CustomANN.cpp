@@ -175,6 +175,8 @@ shared_ptr<Control> CustomANN::clone() const {
 	for (int i = 0; i < this->outputLayer.size(); i++) {
 		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
 	}
+	newANN->checkConnections();
+	newANN->changeConnectionIDToPointer();
 	return newANN;
 }
 
