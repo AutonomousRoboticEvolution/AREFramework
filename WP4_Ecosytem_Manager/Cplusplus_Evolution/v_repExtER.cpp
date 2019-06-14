@@ -190,6 +190,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			{
 				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
 			}
+			else if (arg2_param_i == 0){
+				ER->startRun = true;
+			}
 			else {
 				cout << "No second argument so not running evolution" << endl;
 				ER->startRun = false;
@@ -279,14 +282,14 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				cout << "SIMULATION ENDED" << endl;
 			}
 		}
-		else if (message == 316 ){
+		if (message = sim_message_eventcallback_modulehandle) {
 			timeCount++;
 			if (ER->settings->verbose) {
 				//cout << timeCount << endl;
 			}
 		}
 
-		if (initCall == true && timeCount > 5) {
+		if (initCall == true && timeCount > 10) {
 			timeCount = 0;
 			initCall = false;
 			counter = 0;
