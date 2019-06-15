@@ -61,5 +61,7 @@ void DefaultGenomeVREP::init() {
 
 shared_ptr<Genome> DefaultGenomeVREP::clone() const
 {
-	return make_unique<DefaultGenomeVREP>(*this);
+	shared_ptr<DefaultGenomeVREP> p = make_unique<DefaultGenomeVREP>(*this);
+	p->morph = this->morph->clone();
+	return p;
 }

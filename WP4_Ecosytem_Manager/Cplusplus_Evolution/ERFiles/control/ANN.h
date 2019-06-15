@@ -31,7 +31,7 @@ public:
 	void reset();
 	void addInput(vector<float> input);
 	void leaky(float leakRate);
-	
+	void flush();
 	void mutateConnections(float mutationRate);
 	void addNeurons(float mutationRate);
 	void removeNeurons(float mutationRate);

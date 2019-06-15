@@ -17,6 +17,7 @@ public:
 	void mutate(float mutationRate);
 	float cycleSpeed = 0.1f;
 	float cycleRange = 1.0f; 
+	virtual void flush();
 	bool dir = true; 
 	stringstream getNeuronParams(); 
 //	void setNeuronParams(vector<string>);

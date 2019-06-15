@@ -60,3 +60,9 @@ void InputNeuron::setNeuronParams(vector<string> values) {
 bool InputNeuron::checkNeuron(vector<string> values) {
 	return Neuron::checkNeuron(values);
 }
+
+void InputNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+}

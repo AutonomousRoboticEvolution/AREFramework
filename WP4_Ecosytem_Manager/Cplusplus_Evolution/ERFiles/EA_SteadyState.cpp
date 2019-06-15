@@ -48,7 +48,9 @@ void EA_SteadyState::replacement()
 		replaceNewRank(); 
 	}
 	else {
-		populationGenomes = nextGenGenomes;
+		for (int i = 0; i < nextGenGenomes.size(); i++) {
+			populationGenomes.push_back(nextGenGenomes[i]->clone());
+		}
 	}
 }
 
@@ -96,7 +98,7 @@ void EA_SteadyState::createNewGenRandomSelect() {
 		if (settings->verbose) {
 			std::cout << "About to deep copy genome" << endl;
 		}
-		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone()); // deep copy
+		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph); // deep copy
 		if (settings->verbose) {
 			std::cout << "Done with deep copy genome" << endl;
 		}

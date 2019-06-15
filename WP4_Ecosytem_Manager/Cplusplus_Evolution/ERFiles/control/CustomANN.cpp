@@ -13,6 +13,18 @@ CustomANN::~CustomANN()
 
 }
 
+void CustomANN::flush() {
+	for (int i = 0; i < inputLayer.size(); i++) {
+		inputLayer[i]->flush();
+	}
+	for (int i = 0; i < recurrentLayer.size(); i++) {
+		recurrentLayer[i]->flush();
+	}
+	for (int i = 0; i < outputLayer.size(); i++) {
+		outputLayer[i]->flush();
+	}
+}
+
 void CustomANN::init(int input, int inter, int output) {
 	unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 	neuronID = 0;
@@ -177,6 +189,7 @@ shared_ptr<Control> CustomANN::clone() const {
 	}
 	newANN->checkConnections();
 	newANN->changeConnectionIDToPointer();
+	newANN->flush(); // flush
 	return newANN;
 }
 

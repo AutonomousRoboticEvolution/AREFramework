@@ -123,7 +123,7 @@ void ER_VREP::startOfSimulation(){
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
 				//currentGenome->init(); // should not initialize base class
 				currentGenome->create();
-				currentMorphology = currentGenome->morph;
+				currentMorphology = currentGenome->morph->clone();
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
@@ -133,7 +133,7 @@ void ER_VREP::startOfSimulation(){
 				currentInd = settings->indCounter % settings->populationSize;
 				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
 				currentGenome->create();
-				currentMorphology = currentGenome->morph; // essential function... But for what? I forgot...
+				currentMorphology = currentGenome->morph->clone(); // essential function... But for what? I forgot...
 			}
 		}
 
@@ -150,6 +150,7 @@ void ER_VREP::startOfSimulation(){
 		}
 	}
 	currentMorphology->setPhenValue();
+
 }
 
 void ER_VREP::handleSimulation() {
@@ -351,6 +352,7 @@ void ER_VREP::endOfSimulation(){
 		//	simQuitSimulator(false);
 		// }
 	}
+
 }
 
 shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)

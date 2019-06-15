@@ -5,7 +5,8 @@
 
 
 PatternNeuron::PatternNeuron() {
-	reset();
+	input = 0.0;
+	output = 0.0;
 }
 
 PatternNeuron::~PatternNeuron() {
@@ -24,6 +25,9 @@ void PatternNeuron::init(int id) {
 	amplitude = randomNum->randFloat(-1.0, 1.0);
 	frequency = randomNum->randFloat(-1.0, 1.0);
 	phase = randomNum->randFloat(-1.0, 1.0);
+	frequency = roundf(frequency * 10000) / 10000;
+	amplitude = roundf(amplitude * 10000) / 10000;
+	phase = roundf(phase * 10000) / 10000;
 }
 void PatternNeuron::update() {
 //	if (usePhaseControl && !useAngularFreqControl && !useAmplitudeControl) {
@@ -78,8 +82,7 @@ void PatternNeuron::reset() {
 
 shared_ptr<Neuron> PatternNeuron::clone() {
 	shared_ptr<PatternNeuron> thisNeuron = make_unique<PatternNeuron>(*this);
-	thisNeuron->input = 0;
-	thisNeuron->output = 0;
+	thisNeuron->flush();
 	return thisNeuron;
 }
 
@@ -126,6 +129,9 @@ void PatternNeuron::mutate(float mutationRate) {
 			}
 		}
 	}
+	frequency = roundf(frequency * 10000) / 10000;
+	amplitude = roundf(amplitude * 10000) / 10000;
+	phase = roundf(phase * 10000) / 10000;
 	if (settings->controlType != settings->ANN_CUSTOM) {
 		Neuron::mutate(mutationRate);
 	}
@@ -135,9 +141,10 @@ stringstream PatternNeuron::getNeuronParams() {
 	stringstream ss; 
 	ss << "5," << endl; // 5 = PatternNeuron
 	ss << Neuron::getNeuronParams().str(); 
-	ss << "\t" << ",#Frequency," << to_string(frequency) << "," << endl;
-	ss << "\t" << ",#Amplitude," << to_string(amplitude) << "," << endl;
-	ss << "\t" << ",#Phase," << to_string(phase) << "," << endl;
+	// TODO: to_string is wrong???
+	ss << "\t" << ",#Frequency," << frequency << "," << endl;
+	ss << "\t" << ",#Amplitude," << amplitude << "," << endl;
+	ss << "\t" << ",#Phase," << phase << "," << endl;
 //	ss << "\t" << "#time: " << time << endl;
 //	ss << "\t" << "#output: " << output << endl;
 //	ss << "\t" << "#input: " << input << endl;
@@ -189,4 +196,11 @@ bool PatternNeuron::checkNeuron(vector<string> values) {
 		}
 	}
 	return Neuron::checkNeuron(values);
+}
+
+void PatternNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+	time = 0.0;
 }

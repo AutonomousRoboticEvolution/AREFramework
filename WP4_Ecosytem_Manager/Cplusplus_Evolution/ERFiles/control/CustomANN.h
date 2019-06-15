@@ -25,7 +25,7 @@ public:
 	bool checkControl(vector<string> values);
 	void changeConnectionPointerToID();
 	void reset();
-	
+	void flush();
 	void mutateConnections(float mutationRate);
 	void addNeurons(float mutationRate);
 	void setFloatParameters(vector<float> values);

@@ -206,7 +206,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				}
 				if (settings->verbose) {
 					cout << "parent = " << modules[i]->parent << endl;
-					cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+					// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
 					cout << "parentModulePointer = " << parentModulePointer << ", ";
 					cout << "parentSite = " << parentSite << ", ";
 					cout << " .. " << parentModulePointer->moduleID << ",";
@@ -252,7 +252,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
 				}
 
-				if (false && checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
+				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
 					createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
 					//		genome->moduleParameters[i]->expressed = false;
 				}

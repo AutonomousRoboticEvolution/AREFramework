@@ -197,7 +197,7 @@ public:
 	
 	bool killWhenNotConnected = true;
 	bool shouldReopenConnections = false;
-	bool createPatternNeurons = true;
+	bool createPatternNeurons = false;
 
 	// neural network parameters
 	int initialInputNeurons = 3;

@@ -15,11 +15,10 @@ Settings::Settings() {
 	// 16: servo
 	// 17: bone
 	moduleTypes.push_back(1);  
-	moduleTypes.push_back(14);  
-	moduleTypes.push_back(15);  
-	moduleTypes.push_back(16); 
-	moduleTypes.push_back(1);  
-	
+	moduleTypes.push_back(4);  
+	moduleTypes.push_back(4);  
+	moduleTypes.push_back(4); 
+	moduleTypes.push_back(4);  
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -30,9 +29,9 @@ Settings::Settings() {
 	maxModuleTypes[0][1] = 100; // one base module
 	maxAmountModules = 20;
 	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_DIRECT;
+	morphologyType = MODULAR_LSYSTEM;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	environmentType = ENV_SWITCHOBJECTIVE;
@@ -45,8 +44,8 @@ Settings::Settings() {
 	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.4;
-	mutationRate = 0.4;
+	morphMutRate = 0.1;
+	mutationRate = 0.1;
 	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
@@ -56,6 +55,7 @@ Settings::Settings() {
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;
 	colorization = COLOR_NEURALNETWORK;
+	createPatternNeurons = false;
 	//repository="files";
 }
 

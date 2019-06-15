@@ -77,3 +77,10 @@ void SimpleNeuron::setNeuronParams(vector<string> values) {
 bool SimpleNeuron::checkNeuron(vector<string> values) {
 	return Neuron::checkNeuron(values);
 }
+
+void SimpleNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+
+}

@@ -20,6 +20,7 @@ public:
 	virtual void cloneControlParameters(shared_ptr<Control> parent) = 0;
 	virtual bool checkControl(vector<string> values) = 0;
 	virtual void reset() = 0;
+	virtual void flush() = 0;
 	//virtual void makeDependenciesUnique() = 0;
 	virtual void addInput(vector<float> input) = 0;
 	float cf = 1.0;

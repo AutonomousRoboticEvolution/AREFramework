@@ -9,6 +9,7 @@ public:
 	void init(int input, int inter, int output);
 	void mutate(float mutationRate);
 	void addNeurons(float mutationRate);
+	void flush();
 	shared_ptr<Control> clone() const;
 	vector<float> update(vector<float> inputs);
 };

@@ -24,7 +24,9 @@ DefaultGenome::~DefaultGenome() {
 
 shared_ptr<Genome> DefaultGenome::clone() const
 {
-	return make_unique<DefaultGenome>(*this);
+	shared_ptr<DefaultGenome> genome = make_unique<DefaultGenome>(*this);
+	genome->morph = this->morph->clone();
+	return genome;
 }
 
 void DefaultGenome::createInitialMorphology(int individualNumber) {

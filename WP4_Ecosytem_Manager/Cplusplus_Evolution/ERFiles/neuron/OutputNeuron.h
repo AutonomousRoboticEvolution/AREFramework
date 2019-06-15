@@ -20,7 +20,7 @@ public:
 	void setNeuronParams(vector<string>);
 	bool checkNeuron(vector<string>);
 	void setFloatParameters(vector<float> values) {};
-
+	virtual void flush();
 
 };
 

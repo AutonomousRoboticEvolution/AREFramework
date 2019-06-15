@@ -33,6 +33,7 @@ public:
 	int neuronID;
 	int sceneNum;
 	bool conserved = false;
+	virtual void flush() = 0;
 protected:
 	
 };

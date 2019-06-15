@@ -166,7 +166,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 
 		shared_ptr<CATVREP> castObject;
 		castObject = make_shared<CATVREP>();
-		castObject->control = placeHolder->control;
+		castObject->control = placeHolder->control->clone();
 		castObject->randomNum = placeHolder->randomNum;
 		castObject->settings = placeHolder->settings;
 		return castObject;

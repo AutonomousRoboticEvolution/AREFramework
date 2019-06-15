@@ -196,6 +196,19 @@ void ANN::leaky(float lr) {
 	}
 }
 
+void ANN::flush()
+{
+	for (int i = 0; i < inputLayer.size(); i++) {
+		inputLayer[i]->flush();
+	}
+	for (int i = 0; i < recurrentLayer.size(); i++) {
+		recurrentLayer[i]->flush();
+	}
+	for (int i = 0; i < outputLayer.size(); i++) {
+		outputLayer[i]->flush();
+	}
+}
+
 void ANN::mutateConnections(float mutationRate) {
 	for (int i = 0; i < inputLayer.size(); i++) {
 		int amountCon = inputLayer[i]->connections.size();
@@ -491,6 +504,7 @@ shared_ptr<Control> ANN::clone() const {
 	}
 	newANN->checkConnections();
 	newANN->changeConnectionIDToPointer();
+	newANN->flush();
 	return newANN;
 }
 

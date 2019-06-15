@@ -187,6 +187,12 @@ void FunctionNeuron::setFloatParameters(vector<float> values) {
 	
 }
 
+void FunctionNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+}
+
 stringstream FunctionNeuron::getNeuronParams() {
 	stringstream ss;
 	ss << "4," << endl;
