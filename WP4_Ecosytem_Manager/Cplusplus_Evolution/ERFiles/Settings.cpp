@@ -28,13 +28,13 @@ Settings::Settings() {
 	}
 	maxModuleTypes[0][1] = 100; // one base module
 	maxAmountModules = 20;
-	// morphologyType = CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	morphologyType = MODULAR_LSYSTEM;
+	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
+	morphologyType = CUSTOM_MORPHOLOGY;
+	environmentType = ENV_PHOTOTAXIS;
 	controlType = ANN_CUSTOM;
 	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
-//	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
 	verbose = true;
 	//verbose = true;
