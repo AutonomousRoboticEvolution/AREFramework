@@ -58,6 +58,11 @@ shared_ptr<Environment> EnvironmentFactory::createNewEnvironment(shared_ptr<Sett
 		waterEnv->settings = st;
 		return waterEnv;
 	}
+	else if (st->environmentType == st->ENV_PHOTOTAXIS) {
+		shared_ptr<Environment> env(new EnvPhototaxis);
+		env->settings = st;
+		return env;
+	}
 	//else if (st->environmentType == st->SUN_BLOCKED) {
 	//	shared_ptr<Environment> env(new BlockingSunEnv);
 	//	env->settings = st;

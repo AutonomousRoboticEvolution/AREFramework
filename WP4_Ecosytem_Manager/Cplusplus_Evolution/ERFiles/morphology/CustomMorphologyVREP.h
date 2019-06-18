@@ -14,8 +14,10 @@ public:
 	int createWei();
 	void create();
 
-	void init();
 
+	shared_ptr<Morphology> clone() const;
+
+	vector<int> sensorHandles;
 	vector<int> outputHandles;
 	vector<int> outputValues;
 

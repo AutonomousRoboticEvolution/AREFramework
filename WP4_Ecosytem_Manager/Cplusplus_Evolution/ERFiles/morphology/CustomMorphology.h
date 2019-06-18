@@ -11,8 +11,13 @@ public:
 	virtual int getMainHandle();
 	void create();
 
-	void init();
+	void mutate();
 
+	void saveGenome(int indNum, float fitness);
+
+	void init();
+	shared_ptr<Morphology> clone() const;
+	string name;
 	vector<int> outputHandles;
 	vector<int> outputValues;
 

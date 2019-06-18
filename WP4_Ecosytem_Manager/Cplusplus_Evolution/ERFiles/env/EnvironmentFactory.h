@@ -3,6 +3,7 @@
 #include "MoveEnv.h"
 #include "RoughMoveEnv.h"
 #include "WaterEnv.h"
+#include "EnvPhototaxis.h"
 #include <memory>
 
 class EnvironmentFactory
