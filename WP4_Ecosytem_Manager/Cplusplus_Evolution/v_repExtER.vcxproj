@@ -224,6 +224,7 @@
     <ClCompile Include="ERFiles\EA_VREP.cpp" />
     <ClCompile Include="ERfiles\env\Environment.cpp" />
     <ClCompile Include="ERfiles\env\EnvironmentFactory.cpp" />
+    <ClCompile Include="ERFiles\env\EnvPhototaxis.cpp" />
     <ClCompile Include="ERfiles\env\MoveEnv.cpp" />
     <ClCompile Include="ERfiles\env\RoughMoveEnv.cpp" />
     <ClCompile Include="ERfiles\env\WaterEnv.cpp" />
@@ -299,6 +300,7 @@
     <ClInclude Include="ERFiles\EA_VREP.h" />
     <ClInclude Include="ERfiles\env\Environment.h" />
     <ClInclude Include="ERfiles\env\EnvironmentFactory.h" />
+    <ClInclude Include="ERFiles\env\EnvPhototaxis.h" />
     <ClInclude Include="ERfiles\env\MoveEnv.h" />
     <ClInclude Include="ERfiles\env\RoughMoveEnv.h" />
     <ClInclude Include="ERfiles\env\WaterEnv.h" />

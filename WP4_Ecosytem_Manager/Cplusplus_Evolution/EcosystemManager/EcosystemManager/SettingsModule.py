@@ -43,6 +43,7 @@ class Settings(Frame):
 		f6 =  ttk.Frame(self.nb)
 		f7 =  ttk.Frame(self.nb)
 		f8 =  ttk.Frame(self.nb)
+		f9 =  ttk.Frame(self.nb)
 		self.nb.add(f1, text="General")
 		self.nb.add(f2, text="EA")
 		self.nb.add(f3, text="Morphology")
@@ -51,8 +52,11 @@ class Settings(Frame):
 		self.nb.add(f6, text="Environment")
 		self.nb.add(f7, text="Controller")
 		self.nb.add(f8, text="Components")
+		self.nb.add(f9, text="Viability")
 		self.saveSettingsButton = Button(parent, text="Save Settings", command=self.saveCSV)
+		self.saveSettingsButton_R = Button(parent, text="Save Settings Real World", command=self.saveCSV_R)
 		self.saveSettingsButton.grid(column=1, row=0);
+		self.saveSettingsButton_R.grid(column=1, row=1);
 				
 		self.generalParameters = GeneralParameters(f1, self.directory)
 		self.ea = EAParameters(f2)
@@ -62,6 +66,7 @@ class Settings(Frame):
 		self.environment = EnvironmentParameters(f6)
 		self.control = ControlParameters(f7)
 		self.component = ComponentParameters(f8)
+		self.viability = ViabilityParameters(f9)
 		self.nb.select(f2)
 		self.nb.enable_traversal()
 		self.nb.grid(column=0, row=1);
@@ -80,6 +85,21 @@ class Settings(Frame):
 			print(dat)
 		repo = self.directory + '/files/'
 		with open(repo + "settings0.csv", 'w') as csvfile: 
+			csvwriter = csv.writer(csvfile, delimiter=',')
+			csvwriter.writerows(data)
+	def saveCSV_R(self):
+		# open csv
+		data = self.generalParameters.getSettings()
+		data += self.ea.getSettings()
+		data += self.morphology.getSettings()
+		data += self.encoding.getSettings()
+		data += self.module.getSettings()
+		data += self.environment.getSettings()
+		data += self.control.getSettings()
+		for dat in data:
+			print(dat)
+		repo = self.directory + '/files/'
+		with open(repo + "settings98.csv", 'w') as csvfile: 
 			csvwriter = csv.writer(csvfile, delimiter=',')
 			csvwriter.writerows(data)
 
@@ -120,18 +140,50 @@ class EnvironmentParameters(Frame):
 		if (self.envVar.get() == 'plane'):
 			row.append('0')
 		else:
-			row.append('NAN')
+			row.append('5')
 		data.append(row)
 		return data
+
+class ViabilityParameters(Frame):
+	def __init__(self,parent):
+		self.manLabel = Label(parent,text="Manufacturability")
+		self.manLabel.grid(column = 0, row = 0)
+		self.manCheckVar = IntVar()
+		self.manCheck = Checkbutton(parent, variable = self.manCheckVar)
+		self.manCheck.grid(column = 1, row = 0)
+		
+		self.esLabel = Label(parent,text="Essential Organ")
+		self.esLabel.grid(column = 0, row = 1)
+		self.esCheckVar = IntVar()
+		self.esCheck = Checkbutton(parent, variable = self.esCheckVar)
+		self.esCheck.grid(column = 1, row = 1)
+
+		self.printVolLabel = Label(parent,text="Max Print Volume")
+		self.printVolLabel.grid(column = 0, row = 2)
+		self.printVolVar = IntVar(parent,3)
+		#self.printVolVar.trace("w", self.moduleSizeChanged)
+		self.printVolScale = Scale(parent, from_=0, to=10, orient=HORIZONTAL,resolution=1, variable = self.printVolVar)
+		self.printVolScale.grid(column = 1, row = 2)
+		self.printVolText=Entry(parent, textvariable = self.printVolVar)
+		self.printVolText.grid(column = 2, row = 2)
+
+		self.orgInLabel = Label(parent,text="Organ Insertion Sequence")
+		self.orgInLabel.grid(column = 0, row = 3)
+
+		self.behaviorTestLabel = Label(parent,text="Behavior Test")
+		self.behaviorTestLabel.grid(column = 0, row = 4)
+		self.beCheckVar = IntVar()
+		self.beCheck = Checkbutton(parent, variable = self.beCheckVar)
+		self.beCheck.grid(column = 1, row = 4)
+
 
 class ComponentParameters(Frame):
 	def __init__(self,parent):
 		self.parent = parent
 		# component list
 		
-		self.maxNModulesTypesLabel = Label(parent,text="Max components")
+		self.maxNModulesTypesLabel = Label(parent,text="Component Types")
 		self.maxNModulesTypesLabel.grid(column = 0, row = 0)
-		
 		
 		self.mmVar = IntVar(parent,3)
 		self.mmVar.trace("w", self.moduleSizeChanged)
@@ -616,7 +668,7 @@ class EAParameters(Frame):
 
 		row = []
 		row.append('#generationInterval')
-		row.append('NAN')
+		row.append(str(self.maxGenVar.get()))
 		data.append(row)
 
 		row = []
