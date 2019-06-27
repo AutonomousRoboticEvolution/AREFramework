@@ -14,6 +14,7 @@ public:
 	void selection();
 	void replacement();
 	void mutation();
+	void update() {}; // not used in this class
 
 	void initializePopulation();
 	void selectIndividuals(); // random tournament
@@ -21,6 +22,9 @@ public:
 	void replaceNewIndividual(int indNum, int sceneNum, float fitness);
 	void createIndividual(int indNum);
 	
+	void end() {}; // not used in this class
+
+
 	void createNewGenRandomSelect();
 	void replaceNewPopRandom();
 };

@@ -1,24 +1,231 @@
-#include "ER_CPPN_Interpreter.h"
+#include "NEAT_CPPN_Encoding.h"
 #include <iostream>
+#include <sstream>
 #include <cmath>
 
 
-
-
-ER_CPPN_Interpreter::ER_CPPN_Interpreter()
+NEAT_CPPN_Encoding::NEAT_CPPN_Encoding()
 {
+	// cout << "CREATED CPPN ENCODING" << endl;
 	modular = true;
 }
 
-ER_CPPN_Interpreter::~ER_CPPN_Interpreter()
+
+NEAT_CPPN_Encoding::~NEAT_CPPN_Encoding()
 {
-	createdModules.clear();
+	//if (genome) {
+	//	for (int i = 0; i < genome->moduleParameters.size(); i++) {
+	//		if (genome->moduleParameters[i]->control) {
+	//			genome->moduleParameters[i]->control->~Control();
+	//		}
+	//		genome->moduleParameters[i].reset();
+	//	}
+	//	genome->moduleParameters.clear();
+	//	genome.reset();
+	//}
 }
 
-void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
-	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
+void NEAT_CPPN_Encoding::init() {
+	// This function should only be called once when using NEAT
+	robot_genome = shared_ptr<GENOTYPE>(new GENOTYPE);
+	maxModuleTypes = settings->maxModuleTypes;
+	initializeGenome(0);	
+
+	// from the CPPN create a robot
+	if (settings->verbose) {
+		cout << "creating CPPN robot" << endl;
+	}
+	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
+	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
+	robot_genome->moduleParameters.clear();
+	int moduleAmount = settings->moduleTypes.size();
+	// create axiom module
+	robot_genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+	robot_genome->moduleParameters[0]->type = settings->initialModuleType;
+	robot_genome->moduleParameters[0]->maxChilds = 5;
+	robot_genome->moduleParameters[0]->parent = -1;
+	robot_genome->moduleParameters[0]->parentSite = -1;
+	robot_genome->moduleParameters[0]->orientation = 0;
+	// create axiom module control which is actually not used... 
+	robot_genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
+	robot_genome->moduleParameters[0]->control->init(1, 1, 1);
+	if (settings->verbose) {
+		cout << "quereuing cppn" << endl;
+	}
+	for (int i = 0; i < maxIterations; i++)
+	{
+		// query CPPN a few times. 
+		if (settings->verbose) {
+			cout << "query: " << i << endl;
+		}
+		int sizeIt = robot_genome->moduleParameters.size();
+		for (int n = 0; n < sizeIt; n++) {
+			if (robot_genome->moduleParameters[n]->queried == false) {
+				robot_genome->moduleParameters[n]->queried = true;
+				for (int m = 0; m < robot_genome->moduleParameters[n]->maxChilds; m++) {
+					vector<float> inputs;
+					inputs.push_back(robot_genome->moduleParameters[n]->type / 10);
+					if (robot_genome->moduleParameters[n]->orientation < 0.5) {
+						inputs.push_back(1);
+						inputs.push_back(0);
+						inputs.push_back(0);
+						inputs.push_back(0);
+					}
+					else if (robot_genome->moduleParameters[n]->orientation < 1.5) {
+						inputs.push_back(0);
+						inputs.push_back(1);
+						inputs.push_back(0);
+						inputs.push_back(0);
+					}
+					else if (robot_genome->moduleParameters[n]->orientation < 2.5) {
+						inputs.push_back(0);
+						inputs.push_back(0);
+						inputs.push_back(1);
+						inputs.push_back(0);
+					}
+					else {
+						inputs.push_back(0);
+						inputs.push_back(0);
+						inputs.push_back(0);
+						inputs.push_back(1);
+					}
+					inputs.push_back(robot_genome->moduleParameters[n]->orientation / 4);
+					inputs.push_back(robot_genome->moduleParameters[n]->parentSite / robot_genome->moduleParameters[n]->maxChilds);
+					inputs.push_back(i / maxIterations);
+					// cout << "updating cppn" << endl;
+					vector<float> moduleTypeFloat = cppn->update(inputs);
+					// cout << "cppn updated" << endl;
+					if (moduleTypeFloat[5] > 0.5) {
+						// only create module if output is above certain threshold
+						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
+						if (typeM < 0) {
+							typeM = 0;
+						}
+						// cout << "typeM:  " << typeM << endl;
+						int mt = settings->moduleTypes[typeM];
+						robot_genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+						robot_genome->moduleParameters[robot_genome->moduleParameters.size() - 1]->type = mt;
+						// genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
+						int mn = robot_genome->moduleParameters.size() - 1;
+						if (settings->moduleTypes[typeM] != 17) {
+							robot_genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
+						}
+
+						// genome->moduleParameters[mn]->currentState = n;
+						robot_genome->moduleParameters[mn]->parent = n;
+						robot_genome->moduleParameters[mn]->parentSite = m;
+						int ori = (int)(floor(moduleTypeFloat[1] * 3.99));
+						if (ori < 0) {
+							ori = 0;
+						}
+						// cout << "ORI:" << ori << endl;
+						robot_genome->moduleParameters[mn]->orientation = ori;
+						robot_genome->moduleParameters[mn]->control = cf->createNewControlGenome(1, randomNum, settings);
+						robot_genome->moduleParameters[mn]->control->init(1, 1, 1);
+						vector<float> controlValues;
+						controlValues.push_back(moduleTypeFloat[2]);
+						controlValues.push_back(moduleTypeFloat[3]);
+						controlValues.push_back(moduleTypeFloat[4]);
+						robot_genome->moduleParameters[mn]->control->setFloatParameters(controlValues);
+					}
+				}
+			}
+		}
+	}
+	if (settings->verbose) {
+		cout << "Done querying" << endl;
+	}
+	mf.reset();
+	cf.reset();
+}
+
+int NEAT_CPPN_Encoding::initializeGenome(int type) {
+	// The NEAT CPPN has nothing to initialize since it receives the genome from NEAT. 
+	// However, keeping the function here in case something needs initialization. 	
+	morphFitness = 0;
+	return 1;
+}
+
+void NEAT_CPPN_Encoding::mutate() {
+	// Not done here // though could be done here if the EA from NEAT is not used. // TODO
+}
+
+int NEAT_CPPN_Encoding::mutateCPPN(float mutationRate) {
+	// not used
+	return 1;
+}
+
+
+void NEAT_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+	// not used		
+}
+
+void NEAT_CPPN_Encoding::printSome() {
+	BaseMorphology::printSome();
+	cout << "printing some from NEAT_CPPN_Encoding : Use this function for debugging" << endl;
+}
+
+/*!
+ * Generating the genome
+ * 
+ * \param indNum
+ * \param fitness
+ */
+const std::string NEAT_CPPN_Encoding::generateGenome(int indNum, float fitness) const {
+	// not used in NEAT_CPPN_Encoding (yet) // TODO
+	if (settings->verbose) {
+		cout << "No NEAT_CPPN genome to generate. " << endl;
+	}
+	// parameters to be potentially saved when using a different EA
+	ostringstream genomeText;
+	genomeText << "#Nothing to save for the NEAT_CPPN_Encoding yet" << endl;
+	return genomeText.str();
+}
+
+float NEAT_CPPN_Encoding::getFitness() {
+	return fitness;
+}
+
+bool NEAT_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumber)
+{
+	// This function should be used... How? Not sure yet. // TODO
+	if (settings->verbose) {
+		cout << "loading genome " << individualNumber << "(NEAT_CPPN_Encoding)" << endl;
+	}
+	cout << "No function for loading the NEAT_CPPN_Encoding genome directly" << endl;
+	// can use : neat_NN->Load("datafile");
+	return false;
+}
+
+void NEAT_CPPN_Encoding::symmetryMutation(float mutationRate) {
+	cout << "This version does not support symmetry mutation, check code" << endl;
+}
+
+
+int NEAT_CPPN_Encoding::mutateControlERGenome(float mutationRate) {
+	// not used
+	return 1;
+}
+
+void NEAT_CPPN_Encoding::deleteModuleFromGenome(int num)
+{
+	// can only be used in direct encoding. 
+}
+
+
+
+void NEAT_CPPN_Encoding::checkGenome(int individualNumber, int sceneNum) {
+	// no genome
+}
+
+void NEAT_CPPN_Encoding::checkControl(int individual, int sceneNum) {
+	// not used
+}
+
+void NEAT_CPPN_Encoding::createAtPosition(float x, float y, float z) {
+	cout << "x, y, z: " << x << ", " << y << ", " << z << endl;
 	float position[3];
-	setColors();
+	// setColors(); // TODO
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
@@ -26,28 +233,13 @@ void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
 	positionFirstObject[1] = y;
 	positionFirstObject[2] = z;
 	create();
-//	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
+	// initializeCPPNEncoding(position); // amount increment is not in genome anymore
 }
 
-bool ER_CPPN_Interpreter::checkJointModule() {
-	for (int i = 0; i < createdModules.size(); i++) {
-		if (createdModules[i]->type == 4) {
-			return true;
-		}
-	}
-	simStopSimulation();
-	return false;
-}
-
-void ER_CPPN_Interpreter::printSome() {
-	BaseMorphology::printSome();
-	cout << "printing some from ER_CPPN_Interpreter" << endl;
-}
-
-bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
+bool NEAT_CPPN_Encoding::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
 	bool collision = true;
-//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
-//	cout << "createdModules.size = " << createdModules.size()  << endl;
+	//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
+	//	cout << "createdModules.size = " << createdModules.size()  << endl;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {
@@ -107,10 +299,11 @@ bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<
 			}
 		}
 	}
-	return false; 
+	return false;
 }
 
-void ER_CPPN_Interpreter::checkForceSensors() {
+
+void NEAT_CPPN_Encoding::checkForceSensors() {
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken != true) {
 			for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
@@ -131,33 +324,18 @@ void ER_CPPN_Interpreter::checkForceSensors() {
 
 
 
-bool ER_CPPN_Interpreter::loadGenome(std::istream &input, int individualNumber)
-{
-	bool load = ER_CPPN_Encoding::loadGenome(input, individualNumber);
-	cout << "ADJUSTING CPPN GENOME" << endl;
-	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		shared_ptr<ER_Module> mod = mf->createModuleGenome(genome->moduleParameters[i]->type,randomNum,settings);
-		mod->state = i; 
-//		mod->type = settings->moduleTypes[i];
-		mod->control = genome->moduleParameters[i]->control;
-		modules.push_back(mod);
-	}
-	cout << "Loaded all modules" << endl;
-	mf.reset();
-	return load;
-}
 
-int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
-//	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
+int NEAT_CPPN_Encoding::initializeCPPNEncoding(float initialPosition[3]) {
+	//	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
+	unique_ptr<ModuleFactory> moduleFactory = unique_ptr<ModuleFactory>(new ModuleFactory);
 	if (settings->verbose) {
-		cout << "initializing CPPN encoding interpreter" << endl;
+		cout << "initializing NEAT CPPN encoding interpreter" << endl;
 	}
 	createdModules.clear();
-	for (int i = 1; i < genome->moduleParameters.size(); i++) {
-		genome->moduleParameters[i]->expressed = false;
+	for (int i = 1; i < robot_genome->moduleParameters.size(); i++) {
+		robot_genome->moduleParameters[i]->expressed = false;
 	}
-	createdModules.push_back(moduleFactory->copyModuleGenome(modules[0]));
+	createdModules.push_back(moduleFactory->copyModuleGenome(modules[0])); // make sure module[0] has been created.
 	int parentHandle = -1;
 	vector<float> configuration;
 	configuration.resize(6);
@@ -179,9 +357,10 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 	}
 	//cout << "looping through modules" << endl;
 	for (int i = 1; i < modules.size(); i++) {
-		int parentNr = genome->moduleParameters[i]->parent;
-		int parentSite = genome->moduleParameters[i]->parentSite;
-		int orien = genome->moduleParameters[i]->orientation;
+		cout << "If you see this message something went wrong with the CPPN. You should only see this in the direct encoding" << endl;
+		int parentNr = robot_genome->moduleParameters[i]->parent;
+		int parentSite = robot_genome->moduleParameters[i]->parentSite;
+		int orien = robot_genome->moduleParameters[i]->orientation;
 		int createdParentNumber = -1;
 		for (int n = 0; n < createdModules.size(); n++)
 		{
@@ -194,11 +373,11 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 		}
 		if (createdModules.size() < settings->maxAmountModules) {
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-				if (genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
+				if (robot_genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
 					if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
-					//	cout << "state " << createdModules[createdParentNumber]->state << ",";
-					//	cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
-						//	cout << "id " << createdModules[parentNr]-> << endl;
+						//	cout << "state " << createdModules[createdParentNumber]->state << ",";
+						//	cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
+							//	cout << "id " << createdModules[parentNr]-> << endl;
 					}
 					// parentHandle = createdModules[i]->parentModulePointer->;
 					//cout << "should create module : " << i << ",";
@@ -259,18 +438,18 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 								modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
 							}
 						}
-						genome->moduleParameters[i]->expressed = true;
+						robot_genome->moduleParameters[i]->expressed = true;
 					}
 					//cout << "created Module" << endl;
 				}
 			}
 		}
 		else {
-			for (int j = 0; j < genome->moduleParameters.size(); j++) {
-			//	cout << "pi: " << genome->moduleParameters[j]->parent << endl;
+			for (int j = 0; j < robot_genome->moduleParameters.size(); j++) {
+				//	cout << "pi: " << genome->moduleParameters[j]->parent << endl;
 			}
 			// cout << "ERROR: " << "No parent Module Pointer or module not actually created" << endl;
-		} 
+		}
 	}
 	if (settings->verbose) {
 		cout << "shifting robot position" << endl;
@@ -278,186 +457,57 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 	if (createdModules[0]->type != 8) {
 		Development::shiftRobotPosition();
 	}
-//	float pos[3];
-//	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
-//	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;
-//	update();
+	//	float pos[3];
+	//	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
+	//	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;
+	//	update();
 	return 1;
 }
 
-float ER_CPPN_Interpreter::getFitness() {
-//	environment->fitnessFunction(*this) = 0;
-	return fitness;
-}
 
-void ER_CPPN_Interpreter::init_noMorph() {
+void NEAT_CPPN_Encoding::init_noMorph() {
 
 }
 
 
-void ER_CPPN_Interpreter::setPhenValue() {
+void NEAT_CPPN_Encoding::setPhenValue() {
 	float val = 0.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		float pos[3];
-	//	cout << "phenValNOW = " << createdModules[i]->phenV << endl;
+		//	cout << "phenValNOW = " << createdModules[i]->phenV << endl;
 		val += createdModules[i]->phenV;
-//		simGetObjectPosition(createdModules[i]->phenV), -1, pos);
-//		val += pos[0];
-//		val += pos[1];
-//		val += pos[2];
-	//	cout << "val: " << val <<  endl;
+		//		simGetObjectPosition(createdModules[i]->phenV), -1, pos);
+		//		val += pos[0];
+		//		val += pos[1];
+		//		val += pos[2];
+			//	cout << "val: " << val <<  endl;
 	}
-	phenValue = val; 
+	phenValue = val;
 }
 
-void ER_CPPN_Interpreter::init() { 
-	if (ER_CPPN_Encoding::genome == NULL) {
-		// only initialize when this hasn't been done already
-		ER_CPPN_Encoding::init();
-	}
-	// from the CPPN create a robot
-	if (settings->verbose) {
-		cout << "creating CPPN robot" << endl;
-	}
-	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-	genome->moduleParameters.clear();
-	int moduleAmount = settings->moduleTypes.size();
-	// create axiom module
-	genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-	genome->moduleParameters[0]->type = settings->initialModuleType;
-	genome->moduleParameters[0]->maxChilds = 5;
-	genome->moduleParameters[0]->parent = -1;
-	genome->moduleParameters[0]->parentSite = -1;
-	genome->moduleParameters[0]->orientation = 0;
-	// create axiom module control which is actually not used... 
-	genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
-	genome->moduleParameters[0]->control->init(1, 1, 1);
-	if (settings->verbose) {
-		cout << "quereuing cppn" << endl;
-	}
-	for (int i = 0; i < maxIterations; i++)
-	{
-		// query CPPN a few times. 
-		if (settings->verbose) {
-			cout << "query: " << i << endl;
-		}
-		int sizeIt = genome->moduleParameters.size();
-		for (int n = 0; n < sizeIt; n++) {
-			if (genome->moduleParameters[n]->queried == false) {
-				genome->moduleParameters[n]->queried = true;
-				for (int m = 0; m < genome->moduleParameters[n]->maxChilds; m++) {
-					vector<float> inputs;
-					inputs.push_back(genome->moduleParameters[n]->type / 10);
-					if (genome->moduleParameters[n]->orientation < 0.5) {
-						inputs.push_back(1);
-						inputs.push_back(0);
-						inputs.push_back(0);
-						inputs.push_back(0);
-					}
-					else if (genome->moduleParameters[n]->orientation < 1.5) {
-						inputs.push_back(0);
-						inputs.push_back(1);
-						inputs.push_back(0);
-						inputs.push_back(0);
-					}
-					else if (genome->moduleParameters[n]->orientation < 2.5) {
-						inputs.push_back(0);
-						inputs.push_back(0);
-						inputs.push_back(1);
-						inputs.push_back(0);
-					}
-					else {
-						inputs.push_back(0);
-						inputs.push_back(0);
-						inputs.push_back(0);
-						inputs.push_back(1);
-					}
-					inputs.push_back(genome->moduleParameters[n]->orientation / 4);
-					inputs.push_back(genome->moduleParameters[n]->parentSite / genome->moduleParameters[n]->maxChilds);
-					inputs.push_back(i / maxIterations);
-					// cout << "updating cppn" << endl;
-					vector<float> moduleTypeFloat = cppn->update(inputs);
-					// cout << "cppn updated" << endl;
-					if (moduleTypeFloat[5] > 0.5) {
-						// only create module if output is above certain threshold
-						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
-						if (typeM < 0) {
-							typeM = 0;
-						}
-						// cout << "typeM:  " << typeM << endl;
-						int mt = settings->moduleTypes[typeM];
-						genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-						genome->moduleParameters[genome->moduleParameters.size() - 1]->type = mt;
-						// genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
-						int mn = genome->moduleParameters.size() - 1;
-						if (settings->moduleTypes[typeM] != 17) {
-							genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
-						}
-
-						// genome->moduleParameters[mn]->currentState = n;
-						genome->moduleParameters[mn]->parent = n;
-						genome->moduleParameters[mn]->parentSite = m;
-						int ori = (int)(floor(moduleTypeFloat[1] * 3.99));
-						if (ori < 0) { 
-							ori = 0; 
-						}
-						// cout << "ORI:" << ori << endl;
-						genome->moduleParameters[mn]->orientation = ori;
-						genome->moduleParameters[mn]->control = cf->createNewControlGenome(1, randomNum, settings);
-						genome->moduleParameters[mn]->control->init(1, 1, 1);
-						vector<float> controlValues;
-						controlValues.push_back(moduleTypeFloat[2]);
-						controlValues.push_back(moduleTypeFloat[3]);
-						controlValues.push_back(moduleTypeFloat[4]);
-						genome->moduleParameters[mn]->control->setFloatParameters(controlValues);
-					}
-				}
-			}
-		}
-
-	}
-	if (settings->verbose) {
-		cout << "Done querying" << endl;
-	}
-	/*for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		modules.push_back(mf->createModuleGenome(genome->moduleParameters[i]->type, randomNum, settings));
-		modules[i]->state = i;
-		modules[i]->type = genome->moduleParameters[i]->type;
-		modules[i]->control = genome->moduleParameters[i]->control;
-		modules[i]->parent = genome->moduleParameters[i]->parent;
-		modules[i]->parentSite = genome->moduleParameters[i]->parentSite;
-		modules[i]->orientation = genome->moduleParameters[i]->orientation;
-	}*/
-	mf.reset();
-	cf.reset();
-	//initializeCPPNEncoding(positionFirstObject); 	
-	//setPhenValue(); // temp test function
+void NEAT_CPPN_Encoding::initCustomMorphology() {
+	//initializeGenomeCustom(0);
+	//float position[3] = { 0, 0, 0.1 };
+	//initializeCPPNEncoding(position); // amount increment is not in genome anymore
 }
 
-void ER_CPPN_Interpreter::initCustomMorphology() {
-	initializeGenomeCustom(0);
-	float position[3] = { 0, 0, 0.1 };
-	initializeCPPNEncoding(position); // amount increment is not in genome anymore
-}
-
-shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
+shared_ptr<Morphology> NEAT_CPPN_Encoding::clone() const {
 	BaseMorphology::clone();
 	// shouldn't clone this?
-	shared_ptr<ER_CPPN_Interpreter> ur = make_unique<ER_CPPN_Interpreter>(*this);
-	for (int i = 0; i < ur->genome->moduleParameters.size(); i++) {
-		ur->genome->moduleParameters[i] = ur->genome->moduleParameters[i]->clone();
+	shared_ptr<NEAT_CPPN_Encoding> ur = make_unique<NEAT_CPPN_Encoding>(*this);
+	for (int i = 0; i < ur->robot_genome->moduleParameters.size(); i++) {
+		ur->robot_genome->moduleParameters[i] = ur->robot_genome->moduleParameters[i]->clone();
 	}
-	ur->genome = ur->genome->clone();
+	ur->robot_genome = ur->robot_genome->clone();
 	return ur;
 }
 
-void ER_CPPN_Interpreter::update() {	
-//	vector<float> input;
-//	for (int i = 0; i < createdModules.size(); i++) {
-//		createdModules[i]->updateModule(input);
-//	}
-//	checkForceSensors(); 
+void NEAT_CPPN_Encoding::update() {
+	//	vector<float> input;
+	//	for (int i = 0; i < createdModules.size(); i++) {
+	//		createdModules[i]->updateModule(input);
+	//	}
+	//	checkForceSensors(); 
 	vector<float> input;
 	for (int i = 0; i < createdModules.size(); i++) {
 		//float outputModule = 
@@ -497,11 +547,11 @@ void ER_CPPN_Interpreter::update() {
 		}
 
 	}
-//	updateColors();
+	//	updateColors();
 	checkForceSensors();
 }
 
-void ER_CPPN_Interpreter::updateColors() {
+void NEAT_CPPN_Encoding::updateColors() {
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
 		float alpha = createdModules[0]->energy;
@@ -512,12 +562,12 @@ void ER_CPPN_Interpreter::updateColors() {
 			alpha = 0.4;
 		}
 		//	cout << "alpha = " << alpha << endl;
-		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, alpha);
+		createdModules[i]->colorModule(robot_genome->moduleParameters[createdModules[i]->state]->color, alpha);
 	}
 }
 
-void ER_CPPN_Interpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+void NEAT_CPPN_Encoding::setColors() {
+	for (int i = 0; i < robot_genome->amountModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -530,66 +580,76 @@ void ER_CPPN_Interpreter::setColors() {
 		switch (i) {
 		case 0:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = red[j];
+				robot_genome->moduleParameters[i]->rgb[j] = red[j];
 			}
 			break;
 		case 1:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = blue[j];
+				robot_genome->moduleParameters[i]->rgb[j] = blue[j];
 			}
 			break;
 		case 2:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = yellow[j];
+				robot_genome->moduleParameters[i]->rgb[j] = yellow[j];
 			}
 			break;
 		case 3:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = green[j];
+				robot_genome->moduleParameters[i]->rgb[j] = green[j];
 			}
 			break;
 		case 4:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = orange[j];
+				robot_genome->moduleParameters[i]->rgb[j] = orange[j];
 			}
 			break;
 		case 5:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = orangePlus[j];
+				robot_genome->moduleParameters[i]->rgb[j] = orangePlus[j];
 			}
 			break;
 		default:
 			for (int j = 0; j < 3; j++) {
-				genome->moduleParameters[i]->rgb[j] = grey[j];
+				robot_genome->moduleParameters[i]->rgb[j] = grey[j];
 			}
 			break;
 		}
 	}
 }
 
-void ER_CPPN_Interpreter::create() {
+void NEAT_CPPN_Encoding::create() {
 	init();
-//	cout << "creating" << endl;
-	setColors();
-//	cout << "color set" << endl;
+	//	cout << "creating" << endl;
+	// setColors();
+	//	cout << "color set" << endl;
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
 	modules.clear();
-//	cout << "modules cleared" << endl;
-	for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		modules.push_back(mf->createModuleGenome(genome->moduleParameters[i]->type, randomNum, settings));
+	//	cout << "modules cleared" << endl;
+	for (int i = 0; i < robot_genome->moduleParameters.size(); i++) {
+		modules.push_back(mf->createModuleGenome(robot_genome->moduleParameters[i]->type, randomNum, settings));
 		modules[i]->state = i;
-		modules[i]->type = genome->moduleParameters[i]->type;
-		modules[i]->control = genome->moduleParameters[i]->control;
-		modules[i]->parent = genome->moduleParameters[i]->parent;
-		modules[i]->parentSite = genome->moduleParameters[i]->parentSite;
-		modules[i]->orientation = genome->moduleParameters[i]->orientation;
+		modules[i]->type = robot_genome->moduleParameters[i]->type;
+		modules[i]->control = robot_genome->moduleParameters[i]->control;
+		modules[i]->parent = robot_genome->moduleParameters[i]->parent;
+		modules[i]->parentSite = robot_genome->moduleParameters[i]->parentSite;
+		modules[i]->orientation = robot_genome->moduleParameters[i]->orientation;
 	}
 	mf.reset();
 	initializeCPPNEncoding(positionFirstObject); // amount increment is not in genome anymore
-	checkJointModule(); // quits simulator when no joint found. 
+	checkJointModule(); // stops simulator when no joint found. 
 }
 
-int ER_CPPN_Interpreter::getMainHandle() {
+bool NEAT_CPPN_Encoding::checkJointModule() {
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->type == 4) {
+			return true;
+		}
+	}
+	simStopSimulation();
+	return false;
+}
+
+int NEAT_CPPN_Encoding::getMainHandle() {
 	if (createdModules.size() > 0) {
 		return createdModules[0]->objectHandles[1];
 	}
@@ -598,7 +658,7 @@ int ER_CPPN_Interpreter::getMainHandle() {
 	}
 }
 
-void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
+void NEAT_CPPN_Encoding::savePhenotype(int ind, float fitness)
 {
 	// change createdModules back to a moduleParameters array. 
 	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
@@ -613,7 +673,7 @@ void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
 	Development::savePhenotype(bmp, ind, fitness);
 }
 
-int ER_CPPN_Interpreter::getAmountBrokenModules() {
+int NEAT_CPPN_Encoding::getAmountBrokenModules() {
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken == true) {
@@ -623,7 +683,7 @@ int ER_CPPN_Interpreter::getAmountBrokenModules() {
 	return amountBrokenModules;
 }
 
-float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
+float NEAT_CPPN_Encoding::checkArea(float interSection[3], float pps[4][3]) {
 
 	float alphaD = sqrt(powf((pps[0][0] - pps[1][0]), 2) + powf((pps[0][1] - pps[1][1]), 2) + powf((pps[0][2] - pps[1][2]), 2));
 	float betaD = sqrt(powf((pps[0][0] - pps[2][0]), 2) + powf((pps[0][1] - pps[2][1]), 2) + powf((pps[0][2] - pps[2][2]), 2));
@@ -652,7 +712,7 @@ float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
 }
 
 
-bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
+bool NEAT_CPPN_Encoding::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);
 	float size[3];
@@ -717,38 +777,9 @@ bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 		rotatedPoints[i][1] += objectOrigin[1];
 		rotatedPoints[i][2] += objectOrigin[2];
 		if (rotatedPoints[i][2] < minimumHeight) {
-			return true; 
+			return true;
 		}
 	}
-	return false; 
+	return false;
 }
 
-void ER_CPPN_Interpreter::symmetryMutation(float mutationRate) {
-	/*for (int i = 0; i < genome->moduleParameters.size(); i++) {
-		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-			int amountChilds = genome->moduleParameters[i]->childSites.size();
-			if (amountChilds != 0) {
-				int chosenOne = randomNum->randInt(amountChilds, 0);
-				int mirrorType = randomNum->randInt(3, 0);
-				vector<int> mirrorSite = modules[i]->getMirrorSite(genome->moduleParameters[i]->childSites[chosenOne], genome->moduleParameters[i]->childConfigurations[chosenOne], mirrorType);
-				int chosenSite = genome->moduleParameters[i]->childSites[chosenOne];
-				int chosenCon = genome->moduleParameters[i]->childConfigurations[chosenOne];
-				int chosenState = genome->moduleParameters[i]->childSiteStates[chosenOne];
-				int newPos = randomNum->randInt(genome->moduleParameters[i]->maxChilds, 0);
-
-				if (newPos >= amountChilds) {
-					genome->moduleParameters[i]->childSites.push_back(mirrorSite[0]);
-					genome->moduleParameters[i]->childConfigurations.push_back(mirrorSite[1]);
-					genome->moduleParameters[i]->childSiteStates.push_back(genome->moduleParameters[i]->childSiteStates[chosenOne]);
-				}
-				else {
-					genome->moduleParameters[i]->childSites[newPos] = mirrorSite[0];
-					genome->moduleParameters[i]->childConfigurations[newPos] = mirrorSite[1];
-					genome->moduleParameters[i]->childSiteStates[newPos] = genome->moduleParameters[i]->childSiteStates[chosenOne];
-				}
-				genome->moduleParameters[i]->amountChilds = genome->moduleParameters[i]->childSites.size();
-			}
-		}
-	}*/
-	cout << "Done with symmetry mutation" << endl;
-}

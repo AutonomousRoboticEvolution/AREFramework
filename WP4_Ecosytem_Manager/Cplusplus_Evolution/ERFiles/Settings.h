@@ -38,7 +38,7 @@ public:
 		CONSTRAINED_MOVING_SUN = 8,
 		ENV_FOURSUNS = 9,
 		ENV_SWITCHOBJECTIVE = 10,
-		ENV_PHOTOTAXIS = 11
+		ENV_PHOTOTAXIS
 		//		DEFAULT = 0,
 		//		WALLS = 2,
 		//		MOVEMENT = 3,
@@ -120,6 +120,7 @@ public:
 		RANDOM_SEARCH = 0,
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
+		EA_NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
 		EMPTY_RUN = 5,
 		AFPO
@@ -160,12 +161,14 @@ public:
 	int indCounter;
 	/// Experiment ID
 	int sceneNum;
+	// Whether the genome is send as a signal through V-REP or as a 
 	bool sendGenomeAsSignal = false;
 	bool client;
 	float mutationRate = 0.1;
 	float morphMutRate = 0.1;
 	int generation = 0;
 	int maxGeneration = 1000;
+	// generation interval
 	int xGenerations = 4;
 	int populationSize = 3;
 	int individualCounter = 0;
@@ -178,26 +181,42 @@ public:
 	vector<int> indNumbers;
 	vector<float> indFits;
 	int seed = 0;
-	// modular parameters
+	// Number of module types (wrong use of the word amount, I know, you get the point)
 	int amountModules = 5;
+	// DEPRECATED
 	int useVarModules = 0;
+	// Specifying the maximum force allow
 	float maxForce = 1.5;
 	float maxForceSensor = 80; // N*m
 	int consecutiveThresholdViolations = 10;
+	// total maximum number of modules
 	int maxAmountModules = 20;
+	// The module types
 	vector<int> moduleTypes;
+	// The maximum number of modules of each type
 	vector<vector<int> > maxModuleTypes;
+	// The storage of data
 	string repository = "files";
-	int initialModuleType = 1; // initial module for direct encoding, similar to axiom of L-System
+	// initial module for direct encoding, similar to axiom of L-System
+	int initialModuleType = 1; 
+	// Used to equal movement of servos with energy consumption
 	float energyDissipationRate = 0.00;
+	// The number of layers of the robot
 	int lIncrements = 3;
+	// Keeping track of the best individual
 	int bestIndividual = 0;
+	// By default, individual 0 is loaded unless another is specified
 	int loadInd = 0;
+	// initial module for direct encoding, similar to axiom of L-System
 	bool verbose = false;
+	// Can be set to color the robot in different ways : note, not sure if the other options still work
 	Colorization colorization = COLOR_NEURALNETWORK;
-	
+
+	// This is for the ER Client, the applications will be killed when not connected
 	bool killWhenNotConnected = true;
+	// This was for debugging, sometimes connections with server instances was lost, this indicates that the client should continuously reopen the connections
 	bool shouldReopenConnections = false;
+	// Indicating whether to use pattern neurons in the neural network. These neurons ignore an input and output sinusoidal wave functions. 
 	bool createPatternNeurons = false;
 
 	// neural network parameters
@@ -205,12 +224,20 @@ public:
 	int initialInterNeurons = 1;
 	int initialOutputNeurons = 3;
 	int initialAmountConnectionsNeurons = 3;
+
+	// This is the maximum number of neurons that can be added once the mutation operator of a neural network is called
 	int	maxAddedNeurons = 4;
+	// Specifies whether the phenotype file will be saved
 	bool savePhenotype = true;
+	// DEPRECATED: This stores all the object handles present in the environment.
 	vector<int> envObjectHandles;
 
+	// DEPRECATED: Used for connecting to robot. 
 	void openPort();
 
+	bool loadFromQueue = false;
+
+//  DEPRECATED:
 //	dynamixel::PacketHandler *packetHandler1;
 //	dynamixel::PacketHandler *packetHandler2;
 //	dynamixel::PortHandler *portHandler;

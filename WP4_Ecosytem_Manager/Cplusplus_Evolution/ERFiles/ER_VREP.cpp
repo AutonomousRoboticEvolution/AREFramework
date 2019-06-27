@@ -19,35 +19,23 @@ void ER_VREP::initializeServer() {
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
-	// EA is not present on the server anymore. Genomes are directly loaded in ER
-	// unique_ptr<EA_Factory> eaf(new EA_Factory);
-	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
-	// ea->randomNum = randNum;
-	// ea->settings = settings;
-	// ea->init();
-	// initNewGenome(settings, 0);
-	//ea->initializePopulation(settings, false);
 	environment->init();
-	// eaf.reset();
 }
 
 
 void ER_VREP::initializeSimulation() {
 	// simSet = RECALLBEST;
-	// set env
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
 	unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
+	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
-	// ea->initializePopulation(settings, false);
 	environment->init();
 	eaf.reset();
-
 }
 
 void ER_VREP::initialize() {
@@ -108,32 +96,42 @@ void ER_VREP::startOfSimulation(){
 		currentMorphology = currentGenome->morph;
 	}
 	else {
-		if (simSet != RECALLBEST) { 
+		if (simSet != RECALLBEST) {
 			if (settings->verbose) {
 				cout << "Creating Individual " << settings->indCounter << endl;
 			}
-			if (settings->indCounter < ea->nextGenGenomes.size()) {		
+			if (settings->indCounter < ea->nextGenGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->nextGenGenomes[currentInd]->init();
-//				ea->popIndNumbers.push_back(settings->indCounter);
+				//				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
-				//currentGenome->init(); // should not initialize base class
-				currentGenome->create();
-				currentMorphology = currentGenome->morph->clone();
+				if (settings->evolutionType == settings->EA_NEAT) {
+					ea->createIndividual(-1);
+				}
+				else {
+					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
+					//currentGenome->init(); // should not initialize base class
+					currentGenome->create();
+					currentMorphology = currentGenome->morph->clone();
+				}
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
 				// != first generation
 				// ea->selection(); // selection done in end
 				// ea->newGenome->init();
-				currentInd = settings->indCounter % settings->populationSize;
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
-				currentGenome->create();
-				currentMorphology = currentGenome->morph->clone(); // essential function... But for what? I forgot...
+				if (settings->evolutionType == settings->EA_NEAT) {
+					ea->createIndividual(-1);
+				}
+				else {
+					currentInd = settings->indCounter % settings->populationSize;
+					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
+					currentGenome->create();
+					currentMorphology = currentGenome->morph->clone(); // essential function... But for what? I forgot...
+				}
 			}
 		}
 
@@ -146,10 +144,12 @@ void ER_VREP::startOfSimulation(){
 		}
 
 		else if (simSet == RECALLBESTFROMGENOME) {
-			// to do 
+			// TODO 
 		}
 	}
-	currentMorphology->setPhenValue();
+	if (settings->evolutionType != settings->EA_NEAT) {
+		currentMorphology->setPhenValue();
+	}
 
 }
 
@@ -166,7 +166,12 @@ void ER_VREP::handleSimulation() {
 		return;
 	}
 	simulationTime += simGetSimulationTimeStep();
-	environment->updateEnv(currentMorphology);
+	if (settings->evolutionType == settings->EA_NEAT) {
+		ea->end(); // needs the position of the robot.
+	}
+	else {
+		environment->updateEnv(currentMorphology);
+	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		currentGenome->update();
 		if (simGetSimulationTime() > environment->maxTime) {
@@ -174,7 +179,12 @@ void ER_VREP::handleSimulation() {
 		}
 	}
 	else {
-		currentGenome->update();
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->update();
+		}
+		else {
+			currentGenome->update();
+		}
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
@@ -182,99 +192,96 @@ void ER_VREP::handleSimulation() {
 }
 
 float ER_VREP::fitnessFunction(MorphologyPointer morph) {
-	vector <float> pStart;
-	vector <float> pOne;
-	vector <float> pEnd;
+	vector <float> pStart; // start position of the robot
+	vector <float> pOne; // position after x time
+	vector <float> pEnd; // end position of the robot
 	float fitness = 0;
 
-		//	int mainHandle = morph->getMainHandle();
-		//	float pos[3];
-		//	simGetObjectPosition(mainHandle, -1, pos);
-		//	return pos[0];
-		if (settings->moveDirection == settings->FORWARD_Y) {
-			if (morph->modular == false) {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				pOne.clear();
-				pEnd.clear();
+	//	int mainHandle = morph->getMainHandle();
+	//	float pos[3];
+	//	simGetObjectPosition(mainHandle, -1, pos);
+	//	return pos[0];
+	if (settings->moveDirection == settings->FORWARD_Y) {
+		if (morph->modular == false) {
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = -pos[1];
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(-pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
+				fitness = fitness + pOne[1];
 			}
+			pOne.clear();
+			pEnd.clear();
 		}
 		else {
-			if (morph->modular == false) {
-				//		cout << "getting main handle" << endl;
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				pOne.clear();
-				pEnd.clear();
-				//	fitness = 0; // no fixed morphology that can absorb light
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = -pos[1];
+			pEnd.push_back(-pos[1]);
+			if (pOne.size() < 1) {
+				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
-				// to do: pEnd - pOne
-
-			//	vector<shared_ptr<ER_Module> > createdModules = morph->getCreatedModules();
-			//	vector<float> pos = createdModules[0]->getPosition();
-			//	fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+				fitness = fitness + pOne[1];
 			}
+			int brokenModules = morph->getAmountBrokenModules();
+			fitness = fitness * pow(0.8, brokenModules);
+			pOne.clear();
+			pEnd.clear();
 		}
+	}
+	else {
+		if (morph->modular == false) {
+			//		cout << "getting main handle" << endl;
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+			pEnd.push_back(pos[0]);
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//			cout << "Note, pOne never set" << endl;
+				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
+			}
+			else {
+				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
+			}
+			pOne.clear();
+			pEnd.clear();
+			//	fitness = 0; // no fixed morphology that can absorb light
+		}
+		else {
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
 
-		return fitness;
-	
+			pEnd.push_back(pos[0]);
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//			cout << "Note, pOne never set" << endl;
+				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
+			}
+			else {
+				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
+			}
+			int brokenModules = morph->getAmountBrokenModules();
 
+			fitness = fitness * pow(0.8, brokenModules);
+			pOne.clear();
+			pEnd.clear();
+			// to do: pEnd - pOne
+
+		//	vector<shared_ptr<ER_Module> > createdModules = morph->getCreatedModules();
+		//	vector<float> pos = createdModules[0]->getPosition();
+		//	fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+		}
+	}
+	return fitness;
 }
 
 void ER_VREP::endOfSimulation(){

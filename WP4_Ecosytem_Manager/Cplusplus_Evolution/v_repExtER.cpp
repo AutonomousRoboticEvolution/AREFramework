@@ -362,7 +362,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				}
 			}
 		}
-
 	}
 
 	//	simSetIntegerParameter(sim_intparam_error_report_mode, errorModeSaved); // restore previous settings

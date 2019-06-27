@@ -27,21 +27,23 @@ Settings::Settings() {
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
 	maxModuleTypes[0][1] = 100; // one base module
+	
 	maxAmountModules = 20;
-	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
+	
+	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
 	morphologyType = CUSTOM_MORPHOLOGY;
-	environmentType = ENV_PHOTOTAXIS;
 	controlType = ANN_CUSTOM;
 	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
+	environmentType = ENV_PHOTOTAXIS;
 //	controlType = ANN_DEFAULT;
 	verbose = true;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
-	evolutionType = STEADY_STATE;
+	evolutionType = EA_NEAT;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;

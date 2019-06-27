@@ -18,6 +18,7 @@ public:
 	/// morph is part of genome
 	shared_ptr<Morphology> morph;
 	shared_ptr<Control> control;
+	bool initialized = false;
 
 	/// fitness value; make vector for multi-objective
 	float fitness;

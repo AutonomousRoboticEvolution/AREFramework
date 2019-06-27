@@ -1,6 +1,7 @@
 #include "InputNeuron.h"
 #include <iostream>
 
+
 InputNeuron::InputNeuron() {
 	threshold = 0.0;
 	input = 0.0;
@@ -15,13 +16,10 @@ void InputNeuron::init(int id) {
 	neuronID = id;
 }
 void InputNeuron::update() {
-//	cout << "input = " << input << endl, 
 	output = input;// * transformValue; 
-//	cout << "output = " << output << endl; 
 	for (int i = 0; i < connections.size(); i++) {
 		connections[i]->input += (output * connectionWeights[i]);
 	}
-//	input = 0;
 }
 void InputNeuron::reset() {
 	input = 0.0;

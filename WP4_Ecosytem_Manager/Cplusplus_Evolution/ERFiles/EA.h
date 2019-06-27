@@ -9,18 +9,18 @@ class EA
 public:
 	EA();
 	virtual ~EA();
-
 	void split_line(string & line, string delim, list<string>& values);
 
 	///set the environment type, evolution type...
 	shared_ptr<Settings> settings; 
 	///random number generator for EA
 	shared_ptr<RandNum> randomNum;
-
 	/// container of current population genomes
 	vector<shared_ptr<Genome>> populationGenomes;
 	/// container of next generation genomes
-	vector<shared_ptr<Genome>> nextGenGenomes;  //after mutation
+	vector<shared_ptr<Genome>> nextGenGenomes;  
+
+	virtual void update() = 0;  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible. 
 
 	/// storage vectors
 	/// This genome will be evaluated so needs to be assigned
@@ -37,28 +37,19 @@ public:
 		@brief This method sets the fitness value of an individual
 	*/
 	void setFitness(int individual, float fitness);
-
 	/**
 		@brief This method initilizes a population of genomes
 	*/
 	virtual void init() = 0;
-	/**
-		@brief Selection operator
-	*/
-	virtual void selection() = 0;
-	/**
-		@brief Replacement operator
-	*/
-	virtual void replacement() = 0;
-	/**
-		@brief Mutation operator
-	*/
-	virtual void mutation() = 0;
+	virtual void selection() = 0; // selection operator
+	virtual void replacement() = 0; // replacement operator
+	virtual void mutation() = 0; // mutation operator
+	virtual void end() = 0; // last call to the EA, when simulation stops
 	/**
 		@brief Creates the individual in VREP
 		@param indNum the ID of the individual
 	*/
-	void createIndividual(int indNum);
+	virtual void createIndividual(int indNum) = 0;
 	/**
 		@brief Load an individual
 		@param individualNum the ID of the individual

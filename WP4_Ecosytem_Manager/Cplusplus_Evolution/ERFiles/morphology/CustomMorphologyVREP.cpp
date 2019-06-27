@@ -56,13 +56,8 @@ void CustomMorphologyVREP::update() {
 	if (control) {
 		vector<float> input; // get sensor parameters, not set in this case
 		if (name == "Pioneer_p3dx") {
+//			cout << "controlling pioneer" << endl;
 			int lightHandle = simGetObjectHandle("Light");
-			if (settings->verbose == true) {
-				cout << "controlling pioneer" << endl;
-				cout << "Sensor handles size = " << sensorHandles.size() << endl;
-				cout << "LightHandle = " << lightHandle << endl;
-				cout << "Output handles size = " << outputHandles.size() << endl;
-			}
 			float sunPos[3];
 			for (int i = 0; i < sensorHandles.size(); i++) {
 				simGetObjectPosition(lightHandle, -1, sunPos);
@@ -76,9 +71,7 @@ void CustomMorphologyVREP::update() {
 				ax = ax / a;
 				ay = ay / a;
 				az = az / a;
-				if (settings->verbose == true) {
-					cout << "magnitude = " << sqrt(((ax * ax) + (ay * ay) + (az * az))) << endl;
-				}
+				//		cout << "magnitude = " << sqrt(((ax * ax) + (ay * ay) + (az * az))) << endl; 
 				vector<float> normalizedRayVector;
 
 				normalizedRayVector.push_back(ax);
@@ -109,11 +102,13 @@ void CustomMorphologyVREP::update() {
 
 				int doh[1]; // detected object handle
 				simHandleProximitySensor(sensorHandles[i], NULL, doh, NULL);
+				//	cout << "doh : " << doh[0] << endl;
 				float pt[4];
 				float vecs[3];
 				simHandleProximitySensor(sensorHandles[i], pt, doh, vecs);
+				//	cout << "doh : " << doh[0] << endl;
 				int det = simReadProximitySensor(sensorHandles[i], pt, doh, vecs);
-				if (det == 0) { // for measuring if the proximity sensor collided
+				if (det == 0) {
 					// notCollidedProxSensors.push_back(sensorHandles[i]);
 					//	cout << "read doh? : " << doh[0] << " but " << det << endl;
 					//	cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
@@ -123,21 +118,17 @@ void CustomMorphologyVREP::update() {
 				simGetObjectOrientation(sensorHandles[i], sParent, sOr);
 				input.push_back(sOr[2]);
 			}
+
 		}
 		vector<float> output = control->update(input);
+		//cout << output[0] << endl;
 		for (int i = 0; i < output.size(); i++) {
-			if (settings->verbose) {
-				cout << "output " << i << " = " << output[i] << endl;
-			}
 			//if (i < outputHandles.size()) {
 				//simSetJointTargetVelocity(outputHandles[i], output[i] * 1000);// output[i]);
 				//simSetJointTargetPosition(outputHandles[i], output[i]);
 				simSetJointTargetVelocity(outputHandles[i], output[i]);
 			//}
 		}
-	}
-	else {
-		std::cout << "No controller present... " << endl;
 	}
 }
 
