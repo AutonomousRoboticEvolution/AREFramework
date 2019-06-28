@@ -164,9 +164,9 @@ void EA_NEAT::init()
 	params.GenomeTraits["y"] = tps;
 	params.NeuronTraits["z"] = tp3;
 
-	NEAT::Genome s(0, 1,
-		1,
-		1,
+	NEAT::Genome s(0, 8,
+		8,
+		8,
 		false,
 		NEAT::UNSIGNED_SIGMOID,
 		NEAT::UNSIGNED_SIGMOID,
@@ -175,11 +175,13 @@ void EA_NEAT::init()
 		2);
 
 	population = shared_ptr<NEAT::Population>(new NEAT::Population(s, params, true, 1.0, randomNum->getSeed()));
-
 	// Initialize the genome placeholder with all the information of the robot
-	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
-	currentGenome = gf->createGenome(settings->morphologyType, randomNum, settings);
-	gf.reset();
+	// unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+	// currentGenome = gf->createGenome(settings->morphologyType, randomNum, settings);
+	// gf.reset();
+	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
+	neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
+	mf.reset();
 	std::cout << "Initialized NEAT" << std::endl;
 		
 }
@@ -207,6 +209,11 @@ void EA_NEAT::end()
 {
 	// get position of the phenotype
 
+}
+
+shared_ptr<Morphology> EA_NEAT::getMorph()
+{
+	return neat_morph;
 }
 
 void EA_NEAT::selection() // This will be used instead of the Epoch used in NEAT (To keep EAs consistent)
@@ -257,7 +264,11 @@ void EA_NEAT::createIndividual(int ind) {
 			currentNeatIndividual = &population->m_Species[i].m_Individuals[j]; // shallow copy
 			if (currentNeatIndividual->IsEvaluated() == false) {
 				// Not sure if I need to make the phenotype of the network
-				// currentNet = unique_ptr<NEAT::NeuralNetwork>(new NEAT::NeuralNetwork());
+				currentNet.reset();
+				currentNet = shared_ptr<NEAT::NeuralNetwork>(new NEAT::NeuralNetwork());
+				currentNeatIndividual->BuildPhenotype(*currentNet);
+				neat_morph->neat_net = currentNet;
+				neat_morph->create();
 				currentNeatIndividual->PrintAllTraits();
 				break; // break from for loop to evaluate this genome
 			}

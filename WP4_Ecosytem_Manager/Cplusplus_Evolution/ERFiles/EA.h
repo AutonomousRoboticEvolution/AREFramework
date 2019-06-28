@@ -76,4 +76,5 @@ public:
 		@brief Load all the population genomes?
 	*/
 	void loadPopulationGenomes();
+	virtual shared_ptr<Morphology> getMorph() = 0;
 };

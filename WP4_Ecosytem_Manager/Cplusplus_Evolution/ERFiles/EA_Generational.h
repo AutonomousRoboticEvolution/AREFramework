@@ -23,7 +23,7 @@ public:
 	void createIndividual(int indNum);
 	
 	void end() {}; // not used in this class
-
+	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
 
 	void createNewGenRandomSelect();
 	void replaceNewPopRandom();

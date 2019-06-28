@@ -12,6 +12,7 @@
 #include "Tissue_DirectBarsVREP.h"
 #include "Tissue_GMX_VREP.h"
 #include "ER_CPPN_Interpreter.h"
+#include "NEAT_CPPN_Encoding.h"
 
 class MorphologyFactoryVREP : public MorphologyFactory
 {

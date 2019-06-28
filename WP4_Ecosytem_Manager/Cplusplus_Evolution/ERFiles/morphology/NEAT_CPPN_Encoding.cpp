@@ -63,7 +63,7 @@ void NEAT_CPPN_Encoding::init() {
 			if (robot_genome->moduleParameters[n]->queried == false) {
 				robot_genome->moduleParameters[n]->queried = true;
 				for (int m = 0; m < robot_genome->moduleParameters[n]->maxChilds; m++) {
-					vector<float> inputs;
+					vector<double> inputs;
 					inputs.push_back(robot_genome->moduleParameters[n]->type / 10);
 					if (robot_genome->moduleParameters[n]->orientation < 0.5) {
 						inputs.push_back(1);
@@ -93,7 +93,8 @@ void NEAT_CPPN_Encoding::init() {
 					inputs.push_back(robot_genome->moduleParameters[n]->parentSite / robot_genome->moduleParameters[n]->maxChilds);
 					inputs.push_back(i / maxIterations);
 					// cout << "updating cppn" << endl;
-					vector<float> moduleTypeFloat = cppn->update(inputs);
+					neat_net->Input(inputs);
+					vector<double> moduleTypeFloat = neat_net->Output();
 					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
@@ -634,6 +635,7 @@ void NEAT_CPPN_Encoding::create() {
 		modules[i]->parentSite = robot_genome->moduleParameters[i]->parentSite;
 		modules[i]->orientation = robot_genome->moduleParameters[i]->orientation;
 	}
+	createdModules;
 	mf.reset();
 	initializeCPPNEncoding(positionFirstObject); // amount increment is not in genome anymore
 	checkJointModule(); // stops simulator when no joint found. 

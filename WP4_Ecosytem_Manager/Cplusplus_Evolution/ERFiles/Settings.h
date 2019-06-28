@@ -95,6 +95,7 @@ public:
 		TISSUE_GMX = 21,
 		INTEGRATION = 22,
 		MODULAR_PHENOTYPE = 11,
+		CPPN_NEAT_MORPH = 12
 
 	
 	};

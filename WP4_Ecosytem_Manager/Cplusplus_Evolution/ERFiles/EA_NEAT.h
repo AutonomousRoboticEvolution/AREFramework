@@ -2,6 +2,7 @@
 
 #include "EA.h"
 #include "NEAT_LIB\Genome.h"
+#include "morphology\MorphologyFactoryVREP.h"
 
 class EA_NEAT : public EA
 {
@@ -12,10 +13,12 @@ public:
 	void split_line(string & line, string delim, list<string>& values);
 	vector<NEAT::Genome*> genomeBuffer; // stores the pointers to the NEAT 
 	NEAT::Genome* currentNeatIndividual;
-	unique_ptr<NEAT::NeuralNetwork> currentNet; 
+	shared_ptr<NEAT::NeuralNetwork> currentNet;
 	shared_ptr<NEAT::Population> population;
 	
-	shared_ptr<Genome> currentGenome; // This will hold the robot information created by the CPPN etc.
+	// shared_ptr<Genome> currentGenome; // This will hold the robot information created by the CPPN etc.
+	shared_ptr<Morphology> neat_morph; // This will hold the robot information created by the CPPN etc.
+
 	// base functions of EA
 	void init();
 	vector<float> Evaluate(NEAT::Genome genome);
@@ -26,6 +29,7 @@ public:
 	void end(); // last call to get the fitness of the individual
 
 	shared_ptr<Genome> er_genome; // ER genome not NEAT
+	virtual shared_ptr<Morphology> getMorph();
 
 	// unique functions
 	void initializePopulation();

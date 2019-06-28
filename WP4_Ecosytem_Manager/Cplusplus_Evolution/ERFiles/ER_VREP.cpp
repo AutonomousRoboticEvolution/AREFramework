@@ -110,6 +110,7 @@ void ER_VREP::startOfSimulation(){
 				}
 				if (settings->evolutionType == settings->EA_NEAT) {
 					ea->createIndividual(-1);
+					currentMorphology = ea->getMorph();
 				}
 				else {
 					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
@@ -125,6 +126,7 @@ void ER_VREP::startOfSimulation(){
 				// ea->newGenome->init();
 				if (settings->evolutionType == settings->EA_NEAT) {
 					ea->createIndividual(-1);
+					currentMorphology = ea->getMorph();
 				}
 				else {
 					currentInd = settings->indCounter % settings->populationSize;
@@ -150,7 +152,6 @@ void ER_VREP::startOfSimulation(){
 	if (settings->evolutionType != settings->EA_NEAT) {
 		currentMorphology->setPhenValue();
 	}
-
 }
 
 void ER_VREP::handleSimulation() {
@@ -323,16 +324,21 @@ void ER_VREP::endOfSimulation(){
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
 				float fitness = environment->fitnessFunction(currentMorphology);
-				currentGenome->fitness = fitness;
-				if (settings->savePhenotype) {
-					currentGenome->fitness = fitness;
-					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
+				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+					ea->setFitness(-1,fitness);
 				}
-				// TODO set fitness
-				ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
-				currentGenome->morph->saveGenome(settings->indCounter, fitness);
-				cout << "FITNESS = " << fitness << endl;
-				settings->indCounter++;
+				else {
+					currentGenome->fitness = fitness;
+					if (settings->savePhenotype) {
+						currentGenome->fitness = fitness;
+						currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
+					}
+					// TODO set fitness
+					ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
+					currentGenome->morph->saveGenome(settings->indCounter, fitness);
+					cout << "FITNESS = " << fitness << endl;
+					settings->indCounter++;
+				}
 			}
 			if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);

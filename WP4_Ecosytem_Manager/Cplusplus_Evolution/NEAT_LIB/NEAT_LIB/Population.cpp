@@ -91,7 +91,11 @@ Population::Population(const Genome& a_Seed, const Parameters& a_Parameters,
 
         //m_Genomes[i].CalculateDepth();
     }
- 
+	// Initialize
+	Speciate();
+	m_BestGenome = m_Species[0].GetLeader();
+	Sort();
+
 }
 
 

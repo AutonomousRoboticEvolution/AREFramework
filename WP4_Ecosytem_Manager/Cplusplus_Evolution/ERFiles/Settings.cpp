@@ -31,7 +31,7 @@ Settings::Settings() {
 	maxAmountModules = 20;
 	
 	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
-	morphologyType = CUSTOM_MORPHOLOGY;
+	morphologyType = CPPN_NEAT_MORPH;
 	controlType = ANN_CUSTOM;
 	populationSize = 10;
 	energyDissipationRate = 0.0;
