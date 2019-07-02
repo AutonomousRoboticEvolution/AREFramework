@@ -42,7 +42,7 @@ public:
 	virtual shared_ptr<ER_Module> clone() = 0; 
 	void diffuseEnergy();
 	void directDiffuseEnergy();
-	int maxAmountModules = 100; 
+	int maxNumberModules = 100; 
 	bool checkControlParams(vector<string>);
 	bool handled = false;
 

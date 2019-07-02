@@ -82,7 +82,7 @@ protected:
 		vector<shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state 
 		//HORMONEGENOME hormoneGenome;
 		
-		int amountModules = 1; // initial amount of modules
+		int numberOfModules = 1; // initial amount of modules
 		int mask1 = 65281;
 		int mask2 = 65282;
 		int maxIt = 200;

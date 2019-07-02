@@ -27,7 +27,7 @@ Settings::Settings() {
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
 	maxModuleTypes[0][1] = 100; // one base module
-	maxAmountModules = 20;
+	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
 	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = ENV_PHOTOTAXIS;
@@ -561,20 +561,20 @@ void Settings::readSettings() {
 				energyDissipationRate = atof(tmp.c_str());
 			}
 
-			else if (tmp == "#amountModules") {
+			else if (tmp == "#numberOfModules") {
 				it++;
 				tmp = *it;
-				amountModules = atoi(tmp.c_str());
+				numberOfModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#useVarModules") {
 				it++;
 				tmp = *it;
 				useVarModules = atoi(tmp.c_str());
 			}
-			else if (tmp == "#maxAmountModules") {
+			else if (tmp == "#maxNumberModules") {
 				it++;
 				tmp = *it;
-				maxAmountModules = atoi(tmp.c_str());
+				maxNumberModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#maxForceModules") {
 				cout << "found max force modules" << endl;
@@ -590,7 +590,7 @@ void Settings::readSettings() {
 			}
 			else if (tmp == "#moduleTypes") {
 				moduleTypes.clear();
-				for (int i = 0; i < amountModules; i++) {
+				for (int i = 0; i < numberOfModules; i++) {
 					it++;
 					tmp = *it;
 					moduleTypes.push_back(atoi(tmp.c_str()));
@@ -600,7 +600,7 @@ void Settings::readSettings() {
 				maxModuleTypes.clear();
 				vector<int> tmpTypes;
 
-				for (int i = 0; i < amountModules; i++) {
+				for (int i = 0; i < numberOfModules; i++) {
 					it++;
 					tmp = *it;
 					vector<int> tmpMaxMods;
@@ -645,9 +645,9 @@ void Settings::saveSettings() {
 	settingsFile << ",#bestIndividual," << bestIndividual << endl; // set when saving
 	settingsFile << ",#initialSeed," << seed << "," << endl;
 	settingsFile << ",#verbose," << verbose << "," << endl;
-	settingsFile << ",#amountModules," << amountModules << "," << endl; // not used
+	settingsFile << ",#numberOfModules," << numberOfModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
-	settingsFile << ",#maxAmountModules," << maxAmountModules << "," << endl;
+	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << endl;
 	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
 	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
 

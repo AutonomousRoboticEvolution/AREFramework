@@ -50,7 +50,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 	for (int i = 0; i < length_i; i++) {
 		if (createdModules[i]->handled != true) {
 			createdModules[i]->handled = true;
-			if (createdModules.size() >= settings->maxAmountModules) {
+			if (createdModules.size() >= settings->maxNumberModules) {
 				break;
 			}
 			// cout << "handling module " << i << endl; 
@@ -68,11 +68,11 @@ void ER_LSystemInterpreter::incrementLSystem() {
 			//	cout << "created module free sites: " << createdModules[i]->freeSites.size() << endl;
 			int newChildAmount = 0;
 			for (int j = 0; j < tempFreeSites.size(); j++) { // should never be more then free sites of module
-				if (createdModules.size() >= settings->maxAmountModules) {
+				if (createdModules.size() >= settings->maxNumberModules) {
 					break;
 				}
 				for (int k = 0; k < lGenome->lParameters[t_state]->childSites.size(); k++) {
-					if (createdModules.size() >= settings->maxAmountModules) {
+					if (createdModules.size() >= settings->maxNumberModules) {
 						break;
 					}
 					if (lGenome->lParameters[t_state]->childSites.size() != lGenome->lParameters[t_state]->childSiteStates.size()) {
@@ -668,7 +668,7 @@ void ER_LSystemInterpreter::init() { // should use create instead
 		ER_LSystem::init();
 	}
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	for (int i = 0; i < settings->amountModules; i++) {
+	for (int i = 0; i < settings->numberOfModules; i++) {
 		modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 		modules[i]->state = i;
 		modules[i]->type = settings->moduleTypes[i];
@@ -833,7 +833,7 @@ void ER_LSystemInterpreter::create() {
 	setColors();
 	init();
 	//unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	//for (int i = 0; i < settings->amountModules; i++) {
+	//for (int i = 0; i < settings->numberOfModules; i++) {
 	//	modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 	//	modules[i]->state = i;
 	//	if (i > 3) {

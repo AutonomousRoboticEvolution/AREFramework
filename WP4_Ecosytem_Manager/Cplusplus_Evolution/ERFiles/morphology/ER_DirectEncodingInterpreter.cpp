@@ -177,7 +177,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	}
 
 	for (int i = 1; i < modules.size(); i++) {
-		if (i < settings->maxAmountModules) {
+		if (i < settings->maxNumberModules) {
 			int parentNr = genome->moduleParameters[i]->parent;
 			int parentSite = genome->moduleParameters[i]->parentSite;
 			int orien = genome->moduleParameters[i]->orientation;
@@ -279,7 +279,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 		}
 		else {
 			if (settings->verbose) {
-				cout << "Already created " << settings->maxAmountModules << endl;
+				cout << "Already created " << settings->maxNumberModules << endl;
 			}			
 			break;
 		}
@@ -440,7 +440,7 @@ void ER_DirectEncodingInterpreter::updateColors() {
 }
 
 void ER_DirectEncodingInterpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };

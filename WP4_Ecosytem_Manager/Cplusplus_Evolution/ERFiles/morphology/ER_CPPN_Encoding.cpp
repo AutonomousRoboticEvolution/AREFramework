@@ -56,7 +56,7 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 	cppn->mutate(0.5);
 
 	// make a temporary storage for phenotype based on genotypic information
-	//for (int i = 0; i < genome->amountModules; i++) {
+	//for (int i = 0; i < genome->numberOfModules; i++) {
 	//	genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 	//	genome->moduleParameters[i]->type = settings->initialModuleType;
 	//	vector<float>tempVector;
@@ -171,7 +171,7 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 	//					genome->moduleParameters[theNewModule]->parent = attachModule;
 	//					genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
 	//					genome->moduleParameters[theNewModule]->orientation = newOr;
-	//					genome->amountModules = genome->moduleParameters.size();
+	//					genome->numberOfModules = genome->moduleParameters.size();
 	//				}
 	//			}
 	//		}
@@ -219,7 +219,7 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 	//			cout << "module params size = " << genome->moduleParameters.size() << endl;
 	//			genome->moduleParameters.erase(genome->moduleParameters.begin() + (deleteModules[i]));
 	//			cout << "removed one from module parameters" << endl;
-	//			genome->amountModules -= 1;
+	//			genome->numberOfModules -= 1;
 	//			for (int j = 0; j < genome->moduleParameters.size(); j++) {
 	//				cout << "j: " << j << endl;
 	//				if (genome->moduleParameters[j]->parent >= deleteModules[i] - dCounter) {
@@ -248,7 +248,7 @@ void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) 
 	tempGenome = morpho->genome->clone(); 
 
 	bool cross = false;
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		if (randomNum->randFloat(0, 1) < cr) {
 			if (cross == false) {
 				cross = true;
@@ -386,8 +386,8 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 		else if (tmp == "#AmountStates:") {
 			it++;
 			tmp = *it;
-			genome->amountModules = atoi(tmp.c_str());
-			for (int i = 0; i < genome->amountModules; i++) {
+			genome->numberOfModules = atoi(tmp.c_str());
+			for (int i = 0; i < genome->numberOfModules; i++) {
 				genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 			}
 		}
@@ -479,7 +479,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	//	lGenome->lParameters.resize(lGenome->amountStates);
 	//	cout << "amount of states = " << lGenome->amountStates << endl; 
 	morphFitness = 0;
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		switch (i) {
 		case 0:
 			for (int j = 0; j < 3; j++) {

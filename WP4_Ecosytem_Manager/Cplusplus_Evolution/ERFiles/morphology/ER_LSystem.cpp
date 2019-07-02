@@ -705,8 +705,8 @@ void ER_LSystem::init() {
 int ER_LSystem::initializeLGenome(int type) {
 	//first read settings
 	lGenome->amountIncrement = settings->lIncrements;
-	lGenome->amountStates = settings->amountModules;
-	lGenome->maxAmountStates = settings->maxAmountModules; // states *
+	lGenome->amountStates = settings->numberOfModules;
+	lGenome->maxAmountStates = settings->maxNumberModules; // states *
 
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };

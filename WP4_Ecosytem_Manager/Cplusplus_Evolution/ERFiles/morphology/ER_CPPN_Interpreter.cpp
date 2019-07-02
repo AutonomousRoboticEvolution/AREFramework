@@ -190,7 +190,7 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 		if (settings->verbose) {
 			cout << "i: " << i << endl;
 		}
-		if (createdModules.size() < settings->maxAmountModules) {
+		if (createdModules.size() < settings->maxNumberModules) {
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
 				if (genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
 					if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
@@ -515,7 +515,7 @@ void ER_CPPN_Interpreter::updateColors() {
 }
 
 void ER_CPPN_Interpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };
