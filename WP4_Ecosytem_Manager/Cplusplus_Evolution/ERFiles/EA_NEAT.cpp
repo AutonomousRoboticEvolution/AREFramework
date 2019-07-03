@@ -174,8 +174,13 @@ void EA_NEAT::init()
 		params,
 		2);
 
-	population = shared_ptr<NEAT::Population>(new NEAT::Population(s, params, true, 1.0, randomNum->getSeed()));
-	population->Epoch();
+	if (settings->simulationType == settings->RECALLPOP) {// load population if specified
+		population = shared_ptr<NEAT::Population>(new NEAT::Population((settings->repository + "/testNEAT").c_str()));
+	}
+	else {
+		population = shared_ptr<NEAT::Population>(new NEAT::Population(s, params, true, 1.0, randomNum->getSeed()));
+		population->Epoch();
+	}
 	// Initialize the genome placeholder with all the information of the robot
 	// unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	// currentGenome = gf->createGenome(settings->morphologyType, randomNum, settings);
@@ -218,6 +223,7 @@ shared_ptr<Morphology> EA_NEAT::getMorph()
 
 void EA_NEAT::selection() // This will be used instead of the Epoch used in NEAT (To keep EAs consistent)
 {
+	cout << "selection operator is never called" << endl;
 	genomeBuffer.clear();
 	// epoch used in NEAT. This should replace the previous existing population. 
 	population->Epoch();
@@ -269,7 +275,9 @@ void EA_NEAT::createIndividual(int ind) {
 		}
 	}
 	if (shouldEpoch == true) {
+		population->Save((settings->repository + "/testNEAT").c_str());
 		population->Epoch();
+
 	}
 
 	for (int i = 0; i < population->m_Species.size(); i++) {

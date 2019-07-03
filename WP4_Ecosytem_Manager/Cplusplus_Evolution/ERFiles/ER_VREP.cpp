@@ -24,7 +24,7 @@ void ER_VREP::initializeServer() {
 
 
 void ER_VREP::initializeSimulation() {
-	// simSet = RECALLBEST;
+	// simulationType = RECALLBEST;
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
@@ -53,7 +53,7 @@ void ER_VREP::initialize() {
 		}
 		initializeSimulation();
 	}
-	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
+	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && settings->simulationType != settings->RECALLBEST) {
 		std::cout << "Initializing Server" << std::endl;
 		settings->client = false;
 		initializeServer();
@@ -63,7 +63,7 @@ void ER_VREP::initialize() {
 		// initializeSimulation();
 		// initializeRobot();
 	}
-	//simSet = RECALLBEST;
+	//simulationType = RECALLBEST;
 }
 
 void ER_VREP::startOfSimulation(){
@@ -96,7 +96,7 @@ void ER_VREP::startOfSimulation(){
 		currentMorphology = currentGenome->morph;
 	}
 	else {
-		if (simSet != RECALLBEST) {
+		if (settings->simulationType != settings->RECALLBEST) {
 			if (settings->verbose) {
 				cout << "Creating Individual " << settings->indCounter << endl;
 			}
@@ -138,7 +138,7 @@ void ER_VREP::startOfSimulation(){
 			}
 		}
 
-		else if (simSet == RECALLBEST) {
+		else if (settings->simulationType == settings->RECALLBEST) {
 
 			loadBestIndividualGenome(settings->sceneNum);
 			currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
@@ -146,7 +146,7 @@ void ER_VREP::startOfSimulation(){
 			currentMorphology = currentGenome->morph;
 		}
 
-		else if (simSet == RECALLBESTFROMGENOME) {
+		else if (settings->simulationType == settings->RECALLBESTFROMGENOME) {
 			// TODO 
 		}
 	}
@@ -310,7 +310,7 @@ void ER_VREP::endOfSimulation(){
 	}
 	else {
 		cout << "settings->indCounter = " << settings->indCounter << endl;
-		if (simSet != RECALLBEST) {
+		if (settings->simulationType != settings->RECALLBEST) {
 			if (settings->indCounter < ea->populationGenomes.size()) {
 				float fitness = environment->fitnessFunction(currentMorphology);
 				ea->populationGenomes[currentInd]->fitness = fitness;
@@ -353,7 +353,7 @@ void ER_VREP::endOfSimulation(){
 				newGenerations++;
 			}
 		}
-		if (simSet == RECALLBEST) {
+		if (settings->simulationType == settings->RECALLBEST) {
 			float fitness = environment->fitnessFunction(currentMorphology);
 			currentGenome.reset();
 			cout << "-----------------------------------" << endl;

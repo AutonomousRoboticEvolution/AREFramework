@@ -138,6 +138,14 @@ public:
 		LINUX
 	};
 
+	enum simulationSetup
+	{
+		DEFAULT_SETUP,
+		RECALLBEST,
+		RECALLPOP,
+		RECALLBESTFROMGENOME
+	};
+
 	/*enum LSystemType{
 	DEFAULT_LSYSTEM = 0,
 	CUBE_LSYSTEM = 1,
@@ -155,7 +163,7 @@ public:
 	ControlType controlType = ANN_DEFAULT;
 	SelectionType selectionType = RANDOM_SELECTION;
 	ReplacementType replacementType = RANDOM_REPLACEMENT;
-
+	simulationSetup simulationType = DEFAULT_SETUP;
 //	EvolutionType evolutionType = GENERATIONAL; // not implemented yet
 
 	/// record the number of individuals
@@ -219,6 +227,8 @@ public:
 	bool shouldReopenConnections = false;
 	// Indicating whether to use pattern neurons in the neural network. These neurons ignore an input and output sinusoidal wave functions. 
 	bool createPatternNeurons = false;
+
+
 
 	// neural network parameters
 	int initialInputNeurons = 3;

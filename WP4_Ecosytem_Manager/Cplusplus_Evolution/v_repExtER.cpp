@@ -172,16 +172,16 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			// If the second argument passed (arg2_param) is equal to 9, then load best individual and run simulations in local machine
 			if (arg2_param_i == 9)
 			{
-				ER->simSet = RECALLBEST; // Load best indivudal
+				ER->settings->simulationType = ER->settings->RECALLBEST; // Load best indivudal
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
 			else if (arg2_param_i == 8) {
-				ER->simSet = RECALLBESTFROMGENOME; // should specify genome file as arg3, TODO
+				ER->settings->simulationType = ER->settings->RECALLBESTFROMGENOME; // should specify genome file as arg3, TODO
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 			}
 			else if (arg2_param_i == 7) {
-				ER->simSet = RECALLBEST;
+				ER->settings->simulationType = ER->settings->RECALLBEST;
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}

@@ -370,7 +370,7 @@ int NEAT_CPPN_Encoding::initializeCPPNEncoding(float initialPosition[3]) {
 	}
 	//cout << "looping through modules" << endl;
 	for (int i = 1; i < modules.size(); i++) {
-		cout << "If you see this message something went wrong with the CPPN. You should only see this in the direct encoding" << endl;
+		// cout << "If you see this message something went wrong with the CPPN. You should only see this in the direct encoding" << endl;
 		int parentNr = robot_genome->moduleParameters[i]->parent;
 		int parentSite = robot_genome->moduleParameters[i]->parentSite;
 		int orien = robot_genome->moduleParameters[i]->orientation;

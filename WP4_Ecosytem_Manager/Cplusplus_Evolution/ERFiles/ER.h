@@ -21,13 +21,7 @@
 
 using namespace std;
 
-enum simulationSetup
-{
-	DEFAULT_SETUP,
-	RECALLBEST,
-	RECALLPOP,
-	RECALLBESTFROMGENOME
-};
+
 
 class CER
 {
@@ -39,8 +33,7 @@ public:
        @brief This method reads text files
 	*/
 	void split_line(string& line, string delim, list<string>& values);
-	/// simulation setup detemining which genome to load for start
-	simulationSetup simSet = DEFAULT_SETUP;
+
 	///pointer to settting of EA
 	shared_ptr<Settings> settings;  
 	///pointer to EA

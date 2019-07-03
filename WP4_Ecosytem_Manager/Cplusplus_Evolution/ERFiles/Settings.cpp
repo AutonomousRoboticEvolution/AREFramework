@@ -58,6 +58,7 @@ Settings::Settings() {
 	killWhenNotConnected = true;
 	colorization = COLOR_NEURALNETWORK;
 	createPatternNeurons = false;
+
 	//repository="files";
 }
 

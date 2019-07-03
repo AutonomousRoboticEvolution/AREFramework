@@ -50,7 +50,7 @@ void CER::split_line(string& line, string delim, list<string>& values)
 void CER::initializeSimulation() {
 
 	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-	//	simSet = RECALLBEST;
+	//	simulationType = RECALLBEST;
 	// }
 }
 
