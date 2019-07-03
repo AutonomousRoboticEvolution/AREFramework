@@ -36,11 +36,7 @@ void EA::setSettings(shared_ptr<Settings> st, shared_ptr<RandNum> rn)
 	randomNum = rn;
 }
 
-void EA::setFitness(int individual, float fitness)
-{
-	nextGenGenomes[individual]->fitness = fitness;
-//	nextGenFitness[individual] = fitness;
-}
+
 
 void EA::init()
 {

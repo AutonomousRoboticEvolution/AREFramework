@@ -33,12 +33,12 @@ Settings::Settings() {
 	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
 	morphologyType = CPPN_NEAT_MORPH;
 	controlType = ANN_CUSTOM;
-	populationSize = 10;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
-	environmentType = ENV_PHOTOTAXIS;
+	environmentType = DEFAULT_ENV;
 //	controlType = ANN_DEFAULT;
-	verbose = true;
+	verbose = false;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;

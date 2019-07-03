@@ -29,6 +29,7 @@ public:
 	void replaceNewIndividual(int indNum, int sceneNum, float fitness);
 	virtual shared_ptr<Genome> initNewGenome();
 	virtual void saveGenome(shared_ptr<Genome>);
+	void setFitness(int individual, float fitness);
 	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
 
 	void createNewGenRandomSelect();

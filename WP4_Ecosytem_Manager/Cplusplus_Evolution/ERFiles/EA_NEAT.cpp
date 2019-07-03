@@ -41,14 +41,14 @@ void EA_NEAT::init()
 
 	params.SpeciesMaxStagnation = 15;
 	params.OldAgeTreshold = 35;
-	params.OldAgePenalty = 0.1;
+	params.OldAgePenalty = 0.2;
 	params.MinSpecies = 2;
 	params.MaxSpecies = 4;
 	params.RouletteWheelSelection = false;
-	params.RecurrentProb = 0.0;
-	params.OverallMutationRate = 0.4;
+	params.RecurrentProb = 0.1;
+	params.OverallMutationRate = 0.9;
 
-	params.MutateWeightsProb = 0.0;
+	params.MutateWeightsProb = 0.4;
 
 	params.WeightMutationMaxPower = 2.5;
 	params.WeightReplacementMaxPower = 5.0;
@@ -57,15 +57,15 @@ void EA_NEAT::init()
 
 	params.MaxWeight = 8;
 
-	params.MutateAddNeuronProb = 0.003;
-	params.MutateAddLinkProb = 0.05;
-	params.MutateRemLinkProb = 0.0;
+	params.MutateAddNeuronProb = 0.3;
+	params.MutateAddLinkProb = 0.25;
+	params.MutateRemLinkProb = 0.01;
 
 	params.MinActivationA = 4.9;
 	params.MaxActivationA = 4.9;
 
-	params.ActivationFunction_SignedSigmoid_Prob = 0.0;
-	params.ActivationFunction_UnsignedSigmoid_Prob = 1.0;
+	params.ActivationFunction_SignedSigmoid_Prob = 0.5;
+	params.ActivationFunction_UnsignedSigmoid_Prob = 0.5;
 	params.ActivationFunction_Tanh_Prob = 0.0;
 	params.ActivationFunction_SignedStep_Prob = 0.0;
 
@@ -77,7 +77,7 @@ void EA_NEAT::init()
 	params.AllowLoops = false;
 	params.DontUseBiasNeuron = true;
 
-	params.MutateNeuronTraitsProb = 0.2;
+	params.MutateNeuronTraitsProb = 0.6;
 	params.MutateLinkTraitsProb = 0.2;
 
 	params.ArchiveEnforcement = true;
@@ -94,7 +94,7 @@ void EA_NEAT::init()
 	itp1.min = -5;
 	itp1.max = 5;
 	itp1.mut_power = 1;
-	itp1.mut_replace_prob = 0.1;
+	itp1.mut_replace_prob = 0.5;
 	tp1.m_Details = itp1;
 
 	NEAT::TraitParameters tp2;
@@ -175,6 +175,7 @@ void EA_NEAT::init()
 		2);
 
 	population = shared_ptr<NEAT::Population>(new NEAT::Population(s, params, true, 1.0, randomNum->getSeed()));
+	population->Epoch();
 	// Initialize the genome placeholder with all the information of the robot
 	// unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	// currentGenome = gf->createGenome(settings->morphologyType, randomNum, settings);
@@ -182,8 +183,7 @@ void EA_NEAT::init()
 	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
 	neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
 	mf.reset();
-	std::cout << "Initialized NEAT" << std::endl;
-		
+	std::cout << "Initialized NEAT" << std::endl;	
 }
 
 vector<float> EA_NEAT::Evaluate(NEAT::Genome genome)
@@ -202,13 +202,13 @@ vector<float> EA_NEAT::Evaluate(NEAT::Genome genome)
 
 
 void EA_NEAT::update() {
-	cout << "updating EA_NEAT" << endl;
+	// cout << "updating EA_NEAT" << endl;
+	neat_morph->update();
 }
 
 void EA_NEAT::end()
 {
 	// get position of the phenotype
-
 }
 
 shared_ptr<Morphology> EA_NEAT::getMorph()
@@ -258,6 +258,20 @@ bool EA_NEAT::compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Geno
 }
 
 void EA_NEAT::createIndividual(int ind) {
+	// Check if new generation of individuals should be created
+	bool shouldEpoch = true;
+	for (int i = 0; i < population->m_Species.size(); i++) {
+		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
+			if (population->m_Species[i].m_Individuals[j].IsEvaluated() == false) {
+				shouldEpoch = false;
+				break;
+			}
+		}
+	}
+	if (shouldEpoch == true) {
+		population->Epoch();
+	}
+
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
 			// check if the genomes have been evaluated.
@@ -269,9 +283,17 @@ void EA_NEAT::createIndividual(int ind) {
 				currentNeatIndividual->BuildPhenotype(*currentNet);
 				neat_morph->neat_net = currentNet;
 				neat_morph->create();
-				currentNeatIndividual->PrintAllTraits();
+				if (settings->verbose) {
+					currentNeatIndividual->PrintAllTraits();
+				}
 				break; // break from for loop to evaluate this genome
 			}
 		}
 	}
+}
+
+void EA_NEAT::setFitness(int ind, float fit)
+{
+	currentNeatIndividual->SetFitness(fit);
+	currentNeatIndividual->SetEvaluated();
 }

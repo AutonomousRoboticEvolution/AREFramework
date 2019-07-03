@@ -50,7 +50,7 @@ void NEAT_CPPN_Encoding::init() {
 	robot_genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	robot_genome->moduleParameters[0]->control->init(1, 1, 1);
 	if (settings->verbose) {
-		cout << "quereuing cppn" << endl;
+		cout << "querying cppn" << endl;
 	}
 	for (int i = 0; i < maxIterations; i++)
 	{
@@ -94,11 +94,21 @@ void NEAT_CPPN_Encoding::init() {
 					inputs.push_back(i / maxIterations);
 					// cout << "updating cppn" << endl;
 					neat_net->Input(inputs);
+					neat_net->Activate();
 					vector<double> moduleTypeFloat = neat_net->Output();
+					if (settings->verbose) {
+						cout << "output: " << endl;
+						for each (double var in moduleTypeFloat)
+						{
+							cout << var << ",";
+						}
+						cout << endl;
+					}
+
 					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
-						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
+						int typeM = (int) (moduleTypeFloat[0] * (moduleAmount - 1));
 						if (typeM < 0) {
 							typeM = 0;
 						}
@@ -328,10 +338,12 @@ void NEAT_CPPN_Encoding::checkForceSensors() {
 
 int NEAT_CPPN_Encoding::initializeCPPNEncoding(float initialPosition[3]) {
 	//	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
+	// Create factory pattern for creating modules
 	unique_ptr<ModuleFactory> moduleFactory = unique_ptr<ModuleFactory>(new ModuleFactory);
 	if (settings->verbose) {
 		cout << "initializing NEAT CPPN encoding interpreter" << endl;
 	}
+	// Ensure createdModules is empty
 	createdModules.clear();
 	for (int i = 1; i < robot_genome->moduleParameters.size(); i++) {
 		robot_genome->moduleParameters[i]->expressed = false;

@@ -111,6 +111,7 @@ void ER_VREP::startOfSimulation(){
 				if (settings->evolutionType == settings->EA_NEAT) {
 					ea->createIndividual(-1);
 					currentMorphology = ea->getMorph();
+					currentMorphology->create();
 				}
 				else {
 					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
@@ -323,6 +324,9 @@ void ER_VREP::endOfSimulation(){
 				settings->indCounter++;
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
+				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+					currentMorphology = ea->getMorph();
+				}
 				float fitness = environment->fitnessFunction(currentMorphology);
 				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
 					ea->setFitness(-1,fitness);
@@ -340,7 +344,7 @@ void ER_VREP::endOfSimulation(){
 					settings->indCounter++;
 				}
 			}
-			if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
+			if (settings->evolutionType != settings->EA_NEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
 				ea->selection();
 				ea->savePopFitness(generation);

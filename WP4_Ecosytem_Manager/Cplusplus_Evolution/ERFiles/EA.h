@@ -36,7 +36,7 @@ public:
 	/**
 		@brief This method sets the fitness value of an individual
 	*/
-	void setFitness(int individual, float fitness);
+	virtual void setFitness(int individual, float fitness) = 0;
 	/**
 		@brief This method initilizes a population of genomes
 	*/

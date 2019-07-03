@@ -124,6 +124,12 @@ void EA_SteadyState::saveGenome(shared_ptr<Genome> g)
 	g->morph->saveGenome(settings->indCounter, g->fitness);
 }
 
+void EA_SteadyState::setFitness(int individual, float fitness)
+{
+	nextGenGenomes[individual]->fitness = fitness;
+	//	nextGenFitness[individual] = fitness;
+}
+
 void EA_SteadyState::createNewGenRandomSelect() {
 	vector<int> additionalInds;
 	// start

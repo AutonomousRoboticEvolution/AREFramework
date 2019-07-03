@@ -8,6 +8,8 @@ public:
 	EA_Generational();
 	~EA_Generational();
 
+	void setFitness(int individual, float fitness);
+
 	
 	// base functions of EA
 	void init();
