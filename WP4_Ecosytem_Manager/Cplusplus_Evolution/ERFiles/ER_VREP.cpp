@@ -140,10 +140,18 @@ void ER_VREP::startOfSimulation(){
 
 		else if (settings->simulationType == settings->RECALLBEST) {
 
-			loadBestIndividualGenome(settings->sceneNum);
-			currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
-			currentGenome->create();
-			currentMorphology = currentGenome->morph;
+			if (settings->evolutionType == settings->EA_NEAT) {
+				ea->loadBestIndividualGenome(settings->sceneNum); // loads from ea
+				ea->createIndividual(-1);
+				currentMorphology = ea->getMorph();
+
+			}
+			else {
+				loadBestIndividualGenome(settings->sceneNum);
+				currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
+				currentGenome->create();
+				currentMorphology = currentGenome->morph;
+			}
 		}
 
 		else if (settings->simulationType == settings->RECALLBESTFROMGENOME) {

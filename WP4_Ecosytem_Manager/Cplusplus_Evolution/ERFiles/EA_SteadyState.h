@@ -31,7 +31,7 @@ public:
 	virtual void saveGenome(shared_ptr<Genome>);
 	void setFitness(int individual, float fitness);
 	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
-
+	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used here
 	void createNewGenRandomSelect();
 	
 	void replaceNewPopRandom(int numAttempts);

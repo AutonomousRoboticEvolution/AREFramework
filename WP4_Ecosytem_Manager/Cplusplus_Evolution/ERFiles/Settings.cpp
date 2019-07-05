@@ -33,7 +33,7 @@ Settings::Settings() {
 	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
 	morphologyType = CPPN_NEAT_MORPH;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 	environmentType = DEFAULT_ENV;

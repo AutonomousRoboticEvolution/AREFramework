@@ -26,7 +26,7 @@ public:
 	
 	void end() {}; // not used in this class
 	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
-
+	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used
 	void createNewGenRandomSelect();
 	void replaceNewPopRandom();
 };

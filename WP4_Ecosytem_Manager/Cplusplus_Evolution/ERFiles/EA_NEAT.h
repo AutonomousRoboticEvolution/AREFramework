@@ -36,6 +36,7 @@ public:
 	bool compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Genome> b);
 	void createIndividual(int ind);
 	void setFitness(int ind, float fit);
-	void loadPopulationGenomes(int scenenum);
+	void loadPopulationGenomes(int scenenum);	
+	void loadBestIndividualGenome(int scenenum);
 };
 

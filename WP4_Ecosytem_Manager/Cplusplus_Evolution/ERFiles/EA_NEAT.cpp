@@ -174,7 +174,7 @@ void EA_NEAT::init()
 		params,
 		2);
 
-	if (settings->simulationType == settings->RECALLPOP) {// load population if specified
+	if (settings->simulationType == settings->RECALLBEST) {// load population if specified
 		population = shared_ptr<NEAT::Population>(new NEAT::Population((settings->repository + "/testNEAT").c_str()));
 	}
 	else {
@@ -185,9 +185,6 @@ void EA_NEAT::init()
 	// unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	// currentGenome = gf->createGenome(settings->morphologyType, randomNum, settings);
 	// gf.reset();
-	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
-	neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
-	mf.reset();
 	std::cout << "Initialized NEAT" << std::endl;	
 }
 
@@ -225,11 +222,26 @@ void EA_NEAT::selection() // This will be used instead of the Epoch used in NEAT
 {
 	cout << "selection operator is never called" << endl;
 	genomeBuffer.clear();
+	NEAT::Genome * bestGenome = population->GetBestGenomePointer();
+	settings->bestIndividual = bestGenome->GetID();
+	settings->indFits.clear();
+	settings->indNumbers.clear();
+	for (int i = 0; i < population->m_Species.size(); i++) {
+		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
+			settings->indFits.push_back(population->m_Species[i].m_Individuals[j].GetFitness());
+			settings->indNumbers.push_back(population->m_Species[i].m_Individuals[j].GetID());
+		}
+	}
+	// save the settings with the most recent individuals of the neat population
+	settings->saveSettings();
+	savePopFitness(population->GetGeneration(), settings->indFits, settings->indNumbers);
+
 	// epoch used in NEAT. This should replace the previous existing population. 
 	population->Epoch();
 	// Note that this function accepts that all the genomes have been evaluated
 	std::cout << "Generation:" << settings->generation << endl;
 	// Add individuals to the population buffer. Should this be a deep copy?
+	// not used 
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
 			genomeBuffer.push_back(&population->m_Species[i].m_Individuals[j]);
@@ -265,6 +277,10 @@ bool EA_NEAT::compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Geno
 
 void EA_NEAT::createIndividual(int ind) {
 	// Check if new generation of individuals should be created
+	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
+	neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
+	mf.reset();
+
 	bool shouldEpoch = true;
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
@@ -276,7 +292,8 @@ void EA_NEAT::createIndividual(int ind) {
 	}
 	if (shouldEpoch == true) {
 		population->Save((settings->repository + "/testNEAT").c_str());
-		population->Epoch();
+		selection();
+		//population->Epoch();
 
 	}
 
@@ -304,4 +321,23 @@ void EA_NEAT::setFitness(int ind, float fit)
 {
 	currentNeatIndividual->SetFitness(fit);
 	currentNeatIndividual->SetEvaluated();
+}
+
+void EA_NEAT::loadBestIndividualGenome(int sceneNum) {
+	// assumes that the NEAT population has been loaded 
+	// NEAT doesn't store fitness values in genome so after loading the genomes need there fitness values again
+	int c = 0;
+	for (int i = 0; i < population->m_Species.size(); i++) {
+		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
+			population->m_Species[i].m_Individuals[j].SetFitness(settings->indFits[c]);
+			c++;
+		}
+	}
+	currentNeatIndividual = &population->GetBestGenome();
+	cout << "loaded individual number " << currentNeatIndividual->GetID() << " that had a fitness of " << currentNeatIndividual->GetFitness() << endl;
+	for (int i = 0; i < population->m_Species.size(); i++) {
+		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
+			cout << "fit " << i << "," << j << " = " << population->m_Species[i].m_Individuals[j].GetFitness() << endl;
+		}
+	}
 }

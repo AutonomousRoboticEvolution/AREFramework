@@ -208,7 +208,25 @@ public:
         return m_Species[idx_species].m_Individuals[idx_genome];
     }
 
-
+	Genome* GetBestGenomePointer()
+	{
+		double best = std::numeric_limits<double>::min();
+		int idx_species = 0;
+		int idx_genome = 0;
+		for (unsigned int i = 0; i < m_Species.size(); i++)
+		{
+			for (unsigned int j = 0; j < m_Species[i].m_Individuals.size(); j++)
+			{
+				if (m_Species[i].m_Individuals[j].GetFitness() > best)
+				{
+					best = m_Species[i].m_Individuals[j].GetFitness();
+					idx_species = i;
+					idx_genome = j;
+				}
+			}
+		}
+		return &(m_Species[idx_species].m_Individuals.at(idx_genome));
+	}
     
 
     unsigned int GetStagnation() const { return m_GensSinceBestFitnessLastChanged; }

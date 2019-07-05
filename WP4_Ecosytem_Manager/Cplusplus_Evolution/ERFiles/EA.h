@@ -40,11 +40,11 @@ public:
 	/**
 		@brief This method initilizes a population of genomes
 	*/
-	virtual void init() = 0;
-	virtual void selection() = 0; // selection operator
-	virtual void replacement() = 0; // replacement operator
-	virtual void mutation() = 0; // mutation operator
-	virtual void end() = 0; // last call to the EA, when simulation stops
+	virtual void init() = 0;			// initializes EA
+	virtual void selection() = 0;		// selection operator
+	virtual void replacement() = 0;		// replacement operator
+	virtual void mutation() = 0;		// mutation operator
+	virtual void end() = 0;				// last call to the EA, when simulation stops
 	/**
 		@brief Creates the individual in VREP
 		@param indNum the ID of the individual
@@ -59,9 +59,10 @@ public:
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
-		@param vector<float> popfit a vector of fitness value
+		@param vector<float> popfit is a vector containing the fitness valus of the population
+		@param vector<float> popIndividuals is a vector containing the ID's of the individuals
 	*/
-	void savePopFitness(int generation, vector<float> popfit);
+	void savePopFitness(int generation, vector<float> popfit, vector<int> popInividuals);
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
@@ -71,7 +72,7 @@ public:
 		@brief Load the best individual based on the evolutionary progression documen
 		@param sceneNum: ID of environment scene
 	*/
-	void loadBestIndividualGenome(int sceneNum);
+	virtual void loadBestIndividualGenome(int sceneNum) = 0; 
 	/**
 		@brief Load all the population genomes?
 	*/
