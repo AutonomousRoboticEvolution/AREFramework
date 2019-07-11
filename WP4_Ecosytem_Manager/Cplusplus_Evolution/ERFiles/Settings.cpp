@@ -15,23 +15,12 @@ Settings::Settings() {
 	// 16: servo
 	// 17: bone
 	// 18: example
-	moduleTypes.push_back(1);
-	moduleTypes.push_back(4);
-	moduleTypes.push_back(15);
+	moduleTypes.push_back(13);
 	moduleTypes.push_back(14);
-	moduleTypes.push_back(18);
-
-
-	bool autoDeleteSettings = true;
-    bool fileExists = false;
-    if (autoDeleteSettings == true){
-        // check if settings file exists and delete if present
-        ofstream settingsFile;
-        settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
-        fileExists = settingsFile.good();
-        settingsFile.close();
-        std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
-    }
+	moduleTypes.push_back(14);
+	moduleTypes.push_back(16);
+	moduleTypes.push_back(17);
+	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -101,6 +90,18 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 
 void Settings::readSettings() {
 	bool fileExists = false;
+	if (autoDeleteSettings == true) {
+		// check if settings file exists and delete if present
+		ofstream settingsFile;
+		settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
+		fileExists = settingsFile.good();
+		settingsFile.close();
+		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
+		return;
+	}
+
+
+	fileExists = false;
 	std::cout << "sceneNum = " << sceneNum << std::endl;
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;

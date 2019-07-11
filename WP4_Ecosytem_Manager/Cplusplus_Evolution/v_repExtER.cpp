@@ -161,8 +161,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			std::cout << "Argument 3 was NULL" << endl;
 		}
 		// Read the settings file; specify the ID of experimental run
-		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-		ER->settings->readSettings(); // load the settings if the *.csv exists
+		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
+		ER->settings->readSettings();	// load the settings if the *.csv exists
         ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
         ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 

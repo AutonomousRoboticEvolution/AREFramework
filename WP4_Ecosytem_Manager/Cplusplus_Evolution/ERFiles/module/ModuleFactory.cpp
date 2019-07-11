@@ -46,7 +46,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             module->settings = st;
             module->type = 13;
             module->createControl();
-            module->filename = "C_Brain.ttm";
+            module->filename = "C_BrainC.ttm";
             return module;
         }
         case WHEEL: {

@@ -254,6 +254,7 @@ public:
 
 	void readSettings();			// Reading a .csv settings file
 	void saveSettings();			// Saving a .csv settings file
+	bool autoDeleteSettings = true;
 
 	/**
 		@brief Set the repository for saving data

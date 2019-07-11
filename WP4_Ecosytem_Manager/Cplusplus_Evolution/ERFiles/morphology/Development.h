@@ -77,6 +77,7 @@ public:
 
 	void updateCreatedModules();
 
+	/// Function that loops through all vertices of shapes and moves robot upward based on the lowest point of the robot.
 	void shiftRobotPosition();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };

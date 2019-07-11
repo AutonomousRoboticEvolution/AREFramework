@@ -361,7 +361,7 @@ int ER_DirectEncoding::initializeGenome(int type) {
 	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
 	for (int i = 0; i < genome->numberOfModules; i++) {
 		genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-		genome->moduleParameters[i]->type = settings->initialModuleType;
+		genome->moduleParameters[i]->type = settings->moduleTypes[0];// settings->initialModuleType;
 		vector<float>tempVector;
 		// currently everything has a neural network...
 		genome->moduleParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
