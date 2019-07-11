@@ -134,7 +134,7 @@ void EA::loadPopulationGenomes()
 	for (int i = 0; i < settings->indNumbers.size(); i++) {
 		cout << "loading individual " << settings->indNumbers[i] << endl;
 		populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
-		populationGenomes[i]->loadMorphologyGenome(settings->indNumbers[i], settings->sceneNum);
+		populationGenomes[i]->loadGenome(settings->indNumbers[i], settings->sceneNum);
 		//cout << "Make sure the following is correct" << endl;
 		populationGenomes[i]->fitness = settings->indFits[i];
 		populationGenomes[i]->individualNumber = settings->indNumbers[i];

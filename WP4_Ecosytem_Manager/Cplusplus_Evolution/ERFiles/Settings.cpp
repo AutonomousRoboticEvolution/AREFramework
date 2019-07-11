@@ -14,11 +14,24 @@ Settings::Settings() {
 	// 15: sensor 
 	// 16: servo
 	// 17: bone
-	moduleTypes.push_back(1);  
-	moduleTypes.push_back(4);  
-	moduleTypes.push_back(4);  
-	moduleTypes.push_back(4); 
-	moduleTypes.push_back(4);  
+	// 18: example
+	moduleTypes.push_back(1);
+	moduleTypes.push_back(4);
+	moduleTypes.push_back(15);
+	moduleTypes.push_back(14);
+	moduleTypes.push_back(18);
+
+
+	bool autoDeleteSettings = true;
+    bool fileExists = false;
+    if (autoDeleteSettings == true){
+        // check if settings file exists and delete if present
+        ofstream settingsFile;
+        settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
+        fileExists = settingsFile.good();
+        settingsFile.close();
+        std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
+    }
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -29,10 +42,10 @@ Settings::Settings() {
 	maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = CUSTOM_MORPHOLOGY;
-	environmentType = ENV_PHOTOTAXIS;
+	morphologyType = MODULAR_LSYSTEM;
+	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 10;
+	populationSize = 4;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -56,6 +69,9 @@ Settings::Settings() {
 	killWhenNotConnected = true;
 	colorization = COLOR_NEURALNETWORK;
 	createPatternNeurons = false;
+	maxTorque_ForceSensor = 1000000;
+	maxForce_ForceSensor = 1000000;
+	consecutiveThresholdViolations = 1000;
 	//repository="files";
 }
 
@@ -82,26 +98,6 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 	}
 }
 
-void Settings::openPort() {
-	// deprecated
-	//packetHandler1 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION1);
-	//packetHandler2 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION2);
-	//char *dev_name = (char*)DEVICENAME;
-	//portHandler = dynamixel::PortHandler::getPortHandler(dev_name);
-
-	//if (portHandler->openPort())
-	//{
-	//	printf("Succeeded to open the port!\n\n");
-	//	printf(" - Device Name : %s\n", dev_name);
-	//	printf(" - Baudrate    : %d\n\n", portHandler->getBaudRate());
-	//}
-	//else
-	//{
-	//	printf("Failed to open the port! [%s]\n", dev_name);
-	//	printf("Press any key to terminate...\n");
-	//	//		getch();
-	//}
-}
 
 void Settings::readSettings() {
 	bool fileExists = false;
@@ -678,4 +674,9 @@ void Settings::saveSettings() {
 	settingsFile << endl;
 
 	settingsFile.close();
+}
+
+void Settings::setRepository(std::string repository) {
+    this->repository = repository;
+    std::cout << "setting repository to " << repository << std::endl;
 }

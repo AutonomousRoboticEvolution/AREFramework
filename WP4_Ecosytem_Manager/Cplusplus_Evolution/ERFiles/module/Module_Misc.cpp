@@ -264,15 +264,19 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	// this possibly causes a leak, advice to use simAddObjectsToSelection with sim_handle_tree
 	// then get simGetObjectSelection to get the object types. 
 	/**/
+	// All object handles of the module
 	vector<int> shapes;
+	// all joint handles of the module
 	vector<int> joints;
+	// all dummy handles of the module
 	vector<int> dummies;
+	// all sensor handles of the module
 	vector<int> sensors;
 	// select all objects in tree
 	simAddObjectToSelection(sim_handle_tree, miscHandle);
 	int selectionSize = simGetObjectSelectionSize();
-	// store all these objects (max 20 shapes)
-	int shapesStorage[50]; // stores up to 20 shapes
+	// store all these objects (max 50 shapes)
+	int shapesStorage[50]; // stores up to 50 shapes
 	simGetObjectSelection(shapesStorage);
 	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
@@ -286,6 +290,7 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 			// attachment location
 			dummies.push_back(shapesStorage[i]);
 		}
+		// TODO: Other sensors might need to be added as well
 		else if (objectType == sim_object_proximitysensor_type) {
 			// sensor
 			sensors.push_back(shapesStorage[i]);
@@ -295,21 +300,19 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	simRemoveObjectFromSelection(sim_handle_all, miscHandle);
 
 	// get the difference between the parent attachment configurations and the main handle of the object?
-
-
-	if (settings->verbose) {
+    if (settings->verbose) {
 		cout << "creating force sensor" << endl;
 	}
 	int fsParams[5];
 	fsParams[0] = 0;
 	fsParams[1] = 1;
-	fsParams[2] = 20; // settings->consecutiveThresholdViolations;
+	fsParams[2] = settings->consecutiveThresholdViolations;
 	fsParams[3] = 0;
 	fsParams[4] = 0;
 	float fsFParams[5];
 	fsFParams[0] = 0.005;
-	fsFParams[1] = 800; //settings->maxForceSensor;
-	fsFParams[2] = 1000;// 1.7; //settings->maxForceSensor; // change torque
+	fsFParams[1] = settings->maxForce_ForceSensor;
+	fsFParams[2] = settings->maxTorque_ForceSensor; // change torque
 	fsFParams[3] = 0;
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
@@ -324,24 +327,38 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	float fsPos[3];
 	fsPos[0] = 0.0;
 	fsPos[1] = 0.0;
-	fsPos[2] = configuration[2] + 0.0001;
+    if (parentHandle != -1) {
+        fsPos[2] = configuration[2] + 0.0001;
+    }
+    else{
+        fsPos[2] = 1.0;
+    }
 	float zeroPos[3]; 
 	zeroPos[0] = 0.0;
 	zeroPos[1] = 0.0;
 	zeroPos[2] = 0.0;
 
-	simSetObjectPosition(fs, relativePosHandle, zeroPos);
-	simSetObjectOrientation(fs, relativePosHandle, fsR);
-	simSetObjectPosition(fs, fs, fsPos);
-	simSetObjectParent(fs, parentHandle, true);
+    if (parentHandle == -1) {
+        // TODO: Change function below in comments
+        //simSetObjectPosition(miscHandle, NULL, zeroPos);
+        //simSetObjectOrientation(miscHandle, NULL, fsR);
+    }
+    else{
+        simSetObjectPosition(fs, relativePosHandle, zeroPos);
+        simSetObjectOrientation(fs, relativePosHandle, fsR);
+        simSetObjectPosition(fs, fs, fsPos);
+        simSetObjectParent(fs, parentHandle, true);
+        simSetObjectPosition(miscHandle, fs, zeroPos);
+        simSetObjectOrientation(miscHandle, relativePosHandle, fsR);
+    }
 
-	simSetObjectPosition(miscHandle, fs, zeroPos);
-	simSetObjectOrientation(miscHandle, relativePosHandle, fsR);
-	
+
 	simRemoveObject(miscHandle);
 	dummies.erase(dummies.begin());
 	miscHandle = shapes[0];
-	simSetObjectParent(miscHandle, fs, true);
+    if (parentHandle != -1) {
+        simSetObjectParent(miscHandle, fs, true);
+    }
 	
 	// get dummy position and orientation
 //	float dummyPos[3];
@@ -438,6 +455,9 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	if (settings->verbose) {
 		cout << "Done creating misc module" << endl;
 	}
+    if (parentHandle == -1) {
+        simRemoveObject(fs); //dont't need force sensor when parentHandle = -1
+    }
 	return miscHandle;
 }
 
@@ -479,30 +499,6 @@ vector<float> Module_Misc::updateModule(vector<float> input) {
 	float pos[3];
 	if (controlHandles.size() > 0) {
 		if (previousPosition == -1) {
-			simGetJointPosition(controlHandles[0], pos);
-			previousPosition = pos[0];
-		}
-		else {
-			simGetJointPosition(controlHandles[0], pos);
-			float currentPos = pos[0];
-			float distanceDifference = (sqrt((currentPos*currentPos) - (previousPosition*previousPosition)));
-			//	cout << "distanceDifference " << distanceDifference << endl;
-			float energyLost = 0;
-			if (distanceDifference > 0.01) {
-				energyLost = (settings->energyDissipationRate * distanceDifference);
-			}
-
-			//		cout << "pos: " << currentPos << ", " << previousPosition << endl;
-			if (energyLost < 0) {
-				energyLost = 0;
-			}
-			if (energyLost > 1000) {
-				energyLost = 1000;
-			}
-			//		cout << "energy dissipation rate = " << settings->energyDissipationRate << endl;
-			//		cout << "energy lost = " << energyLost << endl;
-			energy = energy - energyLost;
-			//		cout << "energy = " << energy << endl;
 			simGetJointPosition(controlHandles[0], pos);
 			previousPosition = pos[0];
 		}

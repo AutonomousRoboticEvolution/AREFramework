@@ -52,21 +52,14 @@ public:
 	vector<shared_ptr<BASEMODULEPARAMETERS>> loadBasePhenotype(int indNum);
 	void loadPhenotype(int ind) {}; 
 
-
 	void init();
 	void mutate();
 	void create();
-	float callFitness();
-	void update();
-
-//	void checkForceSensors();
-//	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
+    void update();
 
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
-//	vector<float> checkCollisionReturnPos(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
-//	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
-	//	ER_LSystem getMultiPurposeLSystemPointer();
+
 	void init_noMorph();
 	int getMaxChilds(int moduleType);
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);

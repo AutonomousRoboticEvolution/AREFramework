@@ -47,7 +47,7 @@ void EA_SteadyState::replacement()
 		// replaceNewPopRandom(1); // int is amount trials comparing offspring to existing population
 		replaceNewRank(); 
 	}
-	else {
+	else { // Should only happen in generation 0
 		for (int i = 0; i < nextGenGenomes.size(); i++) {
 			populationGenomes.push_back(nextGenGenomes[i]->clone());
 		}
@@ -78,14 +78,13 @@ void EA_SteadyState::loadPopulationGenomes(int scenenum)
 	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
 		std::cout << "loading individual " << popIndNumbers[i] << std::endl;
-		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
-		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
+		populationGenomes[i]->loadGenome(popIndNumbers[i], scenenum);
+		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now.
 	}
 }
 
 void EA_SteadyState::createNewGenRandomSelect() {
 	nextGenGenomes.clear();
-	//	nextGenFitness.clear();
 	shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		int parent = randomNum->randInt(populationGenomes.size(), 0);
@@ -186,7 +185,10 @@ void EA_SteadyState::replaceNewRank()
 	}
 
 	// The buffer can now replace the existing populationGenomes
-	populationGenomes = populationGenomesBuffer;  
+	//for (int i = 0; i < populationGenomes.size(); i++) {
+	//    populationGenomes[i] = populationGenomesBuffer[i]->clone();
+	//}
+	populationGenomes = populationGenomesBuffer;  // TODO: double check this doesn's cause a memory leak
 	// ^ This swap should kill all objects no referenced to anymore. Without smart pointers this looks dangerous as hell. 
 
 	// Now delete all nextGenGenomes that didn't make it in the populationGenomes
@@ -215,5 +217,5 @@ void EA_SteadyState::replaceNewRank()
 		}
 	}
 	populationGenomesBuffer.clear();
-	cout << "REPLACED POP RANKED" << endl;
+	std::cout << "REPLACED POP RANKED" << std::endl;
 }

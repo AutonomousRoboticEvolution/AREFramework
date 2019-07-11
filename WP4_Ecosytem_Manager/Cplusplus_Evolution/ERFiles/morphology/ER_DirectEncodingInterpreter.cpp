@@ -101,9 +101,9 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 				if (simGetObjectType(createdModules[i]->objectHandles[j]) == sim_object_forcesensor_type) {
 					int force = simReadForceSensor(createdModules[i]->objectHandles[j], NULL, NULL);
 					if (force != 0 && force != -1) {
-						if (force == 3) {
-							cout << "force sensor is broken" << endl;
-							cout << "module " << i << " is broken" << endl;
+						if (force == 3) { // TODO: change with flag
+							std::cout << "force sensor is broken" << std::endl;
+                            std::cout << "module " << i << " is broken" << std::endl;
 							createdModules[i]->broken = true;
 						}
 					}
@@ -376,14 +376,8 @@ shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const {
 }
 
 void ER_DirectEncodingInterpreter::update() {	
-//	vector<float> input;
-//	for (int i = 0; i < createdModules.size(); i++) {
-//		createdModules[i]->updateModule(input);
-//	}
-//	checkForceSensors(); 
 	vector<float> input;
 	for (int i = 0; i < createdModules.size(); i++) {
-		//float outputModule = 
 		vector<float> moduleInput;
 		if (settings->controlType == settings->ANN_CUSTOM) {
 			createdModules[i]->updateModule(input);
@@ -420,22 +414,13 @@ void ER_DirectEncodingInterpreter::update() {
 		}
 
 	}
-//	updateColors();
 	checkForceSensors();
 }
 
 void ER_DirectEncodingInterpreter::updateColors() {
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
-		float alpha = createdModules[0]->energy;
-		if (alpha > 1.0) {
-			alpha = 1.0;
-		}
-		else if (alpha < 0.4) {
-			alpha = 0.4;
-		}
-		//	cout << "alpha = " << alpha << endl;
-		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, alpha);
+		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 

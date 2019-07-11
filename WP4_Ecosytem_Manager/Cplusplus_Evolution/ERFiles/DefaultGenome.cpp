@@ -9,8 +9,6 @@ DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 	randomNum = rn;
 	settings = st;
 	genomeFitness = 0;
-	maxAge = settings->maxAge;
-	age = 0;
 }
 
 DefaultGenome::~DefaultGenome() {

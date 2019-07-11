@@ -31,11 +31,11 @@ using namespace std;
 bool loadingPossible = true;
 /// an uniqure pointer to ER_VREP class
 unique_ptr<ER_VREP> ER;
-bool initCall = true; 
+// Used to indicate the initial call
+// It shouldn't matter, maybe it didn;t update
+bool initCall = true; // hello
+// Arbitrary counter
 int counter = 0; 
-double simulationTime = 0; 
-int amountMessages = 0; 
-int handleMessages = 0; 
 bool initialized = false;
 int timeCount = 0;
 bool timerOn = false;

@@ -22,7 +22,6 @@ endif()
 
 
 set(SOURCES
-    ERFiles/CollisionDetector.cpp
     ERFiles/control/ANN.cpp
     ERFiles/control/Control.cpp
     ERFiles/control/ControlFactory.cpp
@@ -37,30 +36,21 @@ set(SOURCES
     ERFiles/EA_SteadyState.cpp
     ERFiles/EA_VREP.cpp
     ERFiles/EA.cpp
-    ERFiles/env/BasicSunEnv.cpp
-    ERFiles/env/BlockingSunEnv.cpp
-    ERFiles/env/ConstrainedSunEnv.cpp
     ERFiles/env/Environment.cpp
     ERFiles/env/EnvironmentFactory.cpp
-    ERFiles/env/MoveAndSun.cpp
     ERFiles/env/MoveEnv.cpp
-    ERFiles/env/MovingSunEnv.cpp
+    ERFiles/env/EnvPhototaxis.cpp
     ERFiles/env/RoughMoveEnv.cpp
-    ERFiles/env/WaterEnv.cpp
     ERFiles/ER_VREP.cpp
     ERFiles/ER.cpp
     ERFiles/Genome.cpp
     ERFiles/GenomeFactory.cpp
     ERFiles/GenomeFactoryVREP.cpp
     ERFiles/module/ER_Module.cpp
-    ERFiles/module/Module_APlantBase.cpp
     ERFiles/module/Module_Cube.cpp
     ERFiles/module/Module_Bone.cpp
-    ERFiles/module/Module_Leaf.cpp
-    ERFiles/module/Module_LeafChloe.cpp
     ERFiles/module/Module_Servo.cpp
     ERFiles/module/Module_Misc.cpp
-    ERFiles/module/Module_Solar.cpp
     ERFiles/module/ModuleFactory.cpp
     ERFiles/module/Module_Misc.cpp
     ERFiles/morphology/BaseMorphology.cpp

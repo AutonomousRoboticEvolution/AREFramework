@@ -19,24 +19,16 @@ void ER_VREP::initializeServer() {
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
-	// EA is not present on the server anymore. Genomes are directly loaded in ER
-	// unique_ptr<EA_Factory> eaf(new EA_Factory);
-	// ea = eaf->createEA(randNum, settings); // TODO Should not be the EA class
-	// ea->randomNum = randNum;
-	// ea->settings = settings;
-	// ea->init();
-	// initNewGenome(settings, 0);
-	//ea->initializePopulation(settings, false);
+	// initialize the environment
 	environment->init();
-	// eaf.reset();
 }
 
 
 void ER_VREP::initializeSimulation() {
-	// simSet = RECALLBEST;
-	// set env
+    // Initialize a genome factory to create genomes when the simulation is running
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
+	// Environment factory is used to create the environment
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
@@ -44,10 +36,8 @@ void ER_VREP::initializeSimulation() {
 	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
-	// ea->initializePopulation(settings, false);
 	environment->init();
 	eaf.reset();
-
 }
 
 void ER_VREP::initialize() {
@@ -58,24 +48,23 @@ void ER_VREP::initialize() {
 	 */
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
-		std::cout << "Regular Evolution" << std::endl;
-		settings->client = true;
+		if (settings->verbose) {
+		    std::cout << "Regular Evolution" << std::endl;
+		}
+		settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
 		if (settings->verbose) {
 			std::cout << "initializing evolution" << std::endl;
 		}
+		// initialize simulation
 		initializeSimulation();
 	}
 	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
-		std::cout << "Initializing Server" << std::endl;
-		settings->client = false;
+		if (settings->verbose){
+		    std::cout << "Initializing Server" << std::endl;
+		}
+		settings->client = false; // V-REP plugin will receive genomes from ea client
 		initializeServer();
 	}
-	else {
-		// used to initialize robot connected to V-REP
-		// initializeSimulation();
-		// initializeRobot();
-	}
-	//simSet = RECALLBEST;
 }
 
 void ER_VREP::startOfSimulation(){
@@ -84,27 +73,16 @@ void ER_VREP::startOfSimulation(){
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.
 	*/
-	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
-		return;
-	}
 	if (settings->verbose) {
 		std::cout << "Starting" << std::endl;
 	}
 
 	// set the random seed
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
-	
-	// old code snippet to be removed after evaluation:
-	// environment->initialPos.clear();
-	// environment->init();
-	
+
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
 		// If the simulation is a server. It just holds information for one genome for now. 
-		// currentGenome should be created, double check
-		currentGenome->create();
-		// OLD CODE:
-		// ea->newGenome->create(); 
-		// new genome should be initialized through api command. 
+		currentGenome->create(); // creates the phenotype of the robot
 		currentMorphology = currentGenome->morph;
 	}
 	else {
@@ -488,6 +466,6 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	currentGenome.reset();
 	currentGenome = genomeFactory->createGenome(1, randNum, settings);
 	currentGenome->init();	//	cout << "loading" << endl;
-	currentGenome->loadMorphologyGenome(bestInd, settings->sceneNum);
+	currentGenome->loadGenome(bestInd, settings->sceneNum);
 }
 

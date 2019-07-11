@@ -10,8 +10,9 @@ public:
 
 	void split_line(string & line, string delim, list<string>& values);
 
-
-	// base functions of EA
+	/**
+	 * @brief
+	 */
 	void init();
 	void selection();
 	void replacement();

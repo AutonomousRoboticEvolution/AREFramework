@@ -20,35 +20,58 @@ class Settings
 public:
 	Settings();
 	virtual ~Settings();
+    /// Type of fitness function
 	enum FitnessType {
+        /// Movement
 		MOVE = 0,
+		/// Deprecated
 		SOLAR = 1,
+        /// Deprecated
 		SWIM = 2,
+        /// Deprecated
 		MOVE_AND_SOLAR = 3,
+        /// Deprecated
 		FITNESS_JUMP = 4
 	};
 
+    enum StartingCondition {
+        COND_LOAD_BEST,
+        COND_RUN_EVOLUTION_CLIENT,
+        COND_RUN_EVOLUTION_SERVER,
+        COND_LOAD_SPECIFIC_INDIVIDUAL
+    };
+
+    /// This enum defines which environment is loaded
 	enum EnvironmentType {
+	    /// Default environment
 		DEFAULT_ENV = 0,
-		SUN_BASIC = 1,
-		SUN_CONSTRAINED = 2,
+        /// Deprecated
+        SUN_BASIC = 1,
+        /// Deprecated
+        SUN_CONSTRAINED = 2,
+        /// Deprecated
 		SUN_BLOCKED = 7,
+        /// Deprecated
 		SUN_MOVING = 3,
+        /// Deprecated
 		SUN_CONSTRAINED_AND_MOVING = 4,
+        /// Deprecated
 		WATER_ENV = 6,
+		/// Loads an environment with a heightmap
 		ROUGH = 5,
-		CONSTRAINED_MOVING_SUN = 8,
+        /// Deprecated
+        CONSTRAINED_MOVING_SUN = 8,
+        /// Deprecated
 		ENV_FOURSUNS = 9,
+        /// Deprecated
 		ENV_SWITCHOBJECTIVE = 10,
+        /// Used for the phototaxis scenario
 		ENV_PHOTOTAXIS = 11
-		//		DEFAULT = 0,
-		//		WALLS = 2,
-		//		MOVEMENT = 3,
-		//		JUMP = 4
 	};
 
+	/// Enum defining the selection method used by the EA
 	enum SelectionType {
-		RANDOM_SELECTION,
+        RANDOM_SELECTION,
 		PROPORTIONATE_SELECTION
 	};
 
@@ -58,12 +81,16 @@ public:
 		PARETOMORPH_REPLACEMENT = 2
 	};
 
+	/// Can be used to color the modules
 	enum Colorization {
+	    /// This colors the robot based on the L-System genotypes expressed
 		COLOR_LSYSTEM = 0,
+		/// Colors modules based on the outputs of the neural networks
 		COLOR_NEURALNETWORK = 1,
-		COLOR_NEURALNETWORKANDLSYSTEM = 2
+        /// Deprecated
+        COLOR_NEURALNETWORKANDLSYSTEM = 2
 	};
-
+    /// Specify which direction the fitness function should look at.
 	enum MoveDirection {
 		DISTANCE_X = 0,
 		DISTANCE_Y = 1,
@@ -79,7 +106,7 @@ public:
 		FORWARD_NEGY = 11,
 		FORWARD_NEGXY = 12
 	};
-
+    /// Used to define which morphology to evolve
 	enum MorphologyType
 	{
 		CAT_MORPHOLOGY = 0,
@@ -88,54 +115,67 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-		CUSTOM_MODULAR_MORPHOLOGY = 6, // not working 
-		QUADRUPED_GENERATIVE = 7, // head missing
-		QUADRUPED_DIRECT = 8, // not working. 
+        /// Deprecated
+        CUSTOM_MODULAR_MORPHOLOGY = 6, // not working
+        /// Deprecated
+        QUADRUPED_GENERATIVE = 7, // head missing
+        /// Deprecated
+		QUADRUPED_DIRECT = 8, // not working.
+        /// Deprecated
 		CUSTOM_SOLAR_GENERATIVE = 9,
 		TISSUE_DIRECT = 20,
 		TISSUE_GMX = 21,
 		INTEGRATION = 22,
+		/// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
 		MODULAR_PHENOTYPE = 11,
 	};
 
 	enum ControlType {
+	    /// Neural network that changes the topology of the network as well
 		ANN_DEFAULT = 0,
+		/// Neural network that doesn't change it's topology
 		ANN_CUSTOM = 1,
+		/// Compositional pattern producing network as interpreted by Frank; not original implementation from stanley (2007)
 		ANN_CPPN = 2,
 	//	ANN_NEAT = 4,
+	    /// Used to define the directionality of communication between neural networks of neighbouring modules
 		ANN_DISTRIBUTED_UP = 3,
+        /// Used to define the directionality of communication between neural networks of neighbouring modules
 		ANN_DISTRIBUTED_DOWN = 4,
+        /// Used to define the directionality of communication between neural networks of neighbouring modules
 		ANN_DISTRIBUTED_BOTH = 5,
-		ANN_NEAT = 6
-		//old
-//		DEFAULT_CONTROL = 1,
-//		STATIONARY_CONTROL = 2,
-//		DEFAULT_ANN_CONTROL = 3,
-//		LEAKY_ANN_CONTROL = 4,
-//		NEAT_CONTROL = 5
+        /// Should be used for calling the ANN used in NEAT
+		ANN_NEAT = 6,
+		/// Can be used to specify leaky integrators in the ANN
+		LEAKY_ANN_CONTROL = 7  // TODO: adjustable leakiness parameter
 	};
 
 	enum EvolutionType {
+	    /// deprecated
 		RANDOM_SEARCH = 0,
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
+        /// deprecated
 		EMBODIED_EVOLUTION = 4,
-		EMPTY_RUN = 5,
-		AFPO
 	};
 
+	/// Instance type defines in what mode the "Evolutionary Robotics" plugin runs // TODO: define name
 	enum InstanceType {
+	    /// Single thread (local)
 		INSTANCE_REGULAR = 0,
+		/// Waits for genome signals for using in parallel execution
 		INSTANCE_SERVER = 1,
-		INSTANCE_DEBUGGING = 2
+        /// deprecated
+        INSTANCE_DEBUGGING = 2
 	};
 	
-	// Can be used when there are differences between operating systems. Not encountered yet.
+	/// Can be used when there are differences between operating systems. Not encountered yet.
 	enum OS {
 		WINDOWS,
 		LINUX
 	};
 
+    StartingCondition startingCondition = COND_RUN_EVOLUTION_CLIENT;
 	InstanceType instanceType = INSTANCE_REGULAR;		// Whether the code runs in client or server mode
 	EvolutionType evolutionType = STEADY_STATE;			// Type of evolutionary algorithm used
 	FitnessType fitnessType = MOVE;						// Fitness type
@@ -174,8 +214,12 @@ public:
 	int useVarModules = 0;			// There was an option to mutate the number of modules in the L-System (TODO: DELETE : DEPRECATED)
 	float maxForce = 1.5;			// Maximum force to be set on all joints
 	float maxForceSensor = 80;		// Maximum force set on all force sensors (N*m)
-	int consecutiveThresholdViolations = 10; // Determining how many consecutive force sensor threshold violations will lead to the module breaking
-	int maxNumberModules = 20;		// Maximum number of modules allowed
+    float maxForce_ForceSensor = 0.01;// Maximum force set on all force sensors (by default) TODO: should replace maxForceSensor
+    float maxTorque_ForceSensor = 1000;    // Maximum torque set on all force sensors (by default)
+
+
+    int consecutiveThresholdViolations = 10; // Determining how many consecutive force sensor threshold violations will lead to the module breaking
+	int maxNumberModules = 20;		// Maximum number of modules allowed in phenotype
 	vector<int> moduleTypes;		// Vector storing the module types
 	vector<vector<int> > maxModuleTypes; /* Vector storing how many of each module type can be expressed 
 										 NOTE: this takes into account how many times the module type is expressed in total! So if you choose to append module 
@@ -208,26 +252,13 @@ public:
 	bool savePhenotype = true;		// Whether to save the phenotype or not
 	vector<int> envObjectHandles;	// Object handles of the environment objects (TODO: DELETE : DEPRECATED)
 
-	void openPort();				// Opening serial port (TODO: DELETE: DEPRECATED)
-
-	/* Duynamixel artefact: useful in experimental version 
-//	dynamixel::PacketHandler *packetHandler1;
-//	dynamixel::PacketHandler *packetHandler2;
-//	dynamixel::PortHandler *portHandler;
-	*/
-
 	void readSettings();			// Reading a .csv settings file
 	void saveSettings();			// Saving a .csv settings file
-	bool portOpen = false;			// (TODO: DELETE : DEPRECATED)
 
 	/**
 		@brief Set the repository for saving data
 	*/
-	void setRepository(std::string repository)
-	{
-		this->repository = repository; 
-		std::cout << "setting repository to " << repository << std::endl;
-	}
+    void setRepository(std::string repository);
 
 private:
 	void split_line(string& line, string delim, list<string>& values);

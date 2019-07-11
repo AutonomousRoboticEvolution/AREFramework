@@ -31,6 +31,8 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 		create order:
 		parent(if parent != -1)---ForceSensor---CUBE
 	*/
+
+	// Force sensor parameters start >>>>>>>>>>>>>>>>>>>>>>>
 	int fsParams[5];
 	fsParams[0] = 1;
 	fsParams[1] = 5;
@@ -39,12 +41,13 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	fsParams[4] = 0;
 	float fsFParams[5];
 	fsFParams[0] = 0.01;
-	fsFParams[1] = 0.001;
-	fsFParams[2] = 0.001;
+	fsFParams[1] = settings->maxForce_ForceSensor;
+	fsFParams[2] = settings->maxTorque_ForceSensor;
 	fsFParams[3] = 0;
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(0, fsParams, fsFParams, NULL);
 
+	// force sensor orientation
 	float fsR[3];
 	fsR[0] = configuration[3];
 	fsR[1] = configuration[4];
@@ -55,51 +58,45 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	fsPos[1] = configuration[1];
 	fsPos[2] = configuration[2];
 
+	// force sensor parameters end <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+
 	float objectOrigin[3]; 
 	float zeroOrigin[3] = { 0,0,0 };
 
 	float relPos[3];
 	simGetObjectPosition(relativePosHandle, NULL, relPos);
-	phenV = 0;
-	phenV += relPos[0];
-	phenV += relPos[1];
-	phenV += relPos[2];
-	if (phenV > 1000) {
-		phenV = 1000;
-	}
-	else if (phenV < -1000) {
-		phenV = -1000;
-	}
 
+	// connect the previously created force sensor to the parent object
 	simSetObjectParent(fs, parentHandle, false);
 	simSetObjectOrientation(fs, relativePosHandle, fsR);
 	simSetObjectPosition(fs, fs, fsPos);
 
-//	cout << "Creating Cube Module" << endl;
+    if (settings->verbose) {
+        cout << "Creating Cube Module" << endl;
+    }
 	float size[3] = { 0.055, 0.055, 0.055 };
 	int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
-
+    //configuration: position and orientation of the relative position handle (e.g. dummy)
 	objectOrigin[0] = configuration[0];
 	objectOrigin[1] = configuration[1];
-	objectOrigin[2] = configuration[2] + 0.02751;
-
+	objectOrigin[2] = configuration[2] + (size[2]/2) + 0.00001; // equals 0.055/5
 
 	float rotationOrigin[3];
 	rotationOrigin[0] = configuration[3];
 	rotationOrigin[1] = configuration[4];
 	rotationOrigin[2] = configuration[5];
 
+	// Cube will be set exactly to the position of the dummy
 	simSetObjectPosition(cube, relativePosHandle, zeroOrigin);
+	// Change the orientation of the cube so the z directional
+	// vector of the cube and the dummy are the same
 	simSetObjectOrientation(cube, relativePosHandle, rotationOrigin);
+	// Just move up the cube based on the objectOrigin which moves the
+	// object 0.055/2 meter up
 	simSetObjectPosition(cube, cube, objectOrigin);
 	simSetObjectParent(cube, fs, true);
 
-//	simSetObjectPosition(cube, parentHandle, objectOrigin);
-//	simSetObjectOrientation(cube, parentHandle, orientation);
-	
-	/*
-		define CUBE's children's position, orientation and parent
-	*/
+	//	define CUBE's children's position, orientation and parent
 	vector<shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
 		site1.push_back(shared_ptr<SITE>(new SITE));
@@ -124,7 +121,7 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	for (int i = 0; i < 4; i++) {
 		site1[i]->x = 0.0;
 		site1[i]->y = 0.0;
-		site1[i]->z = 0.02751;
+		site1[i]->z = (size[2] / 2) + 0.00001;
 		site1[i]->rX = 0.0 * M_PI;
 		site1[i]->rY = 0.0 * M_PI;
 		site1[i]->rZ = (0.0 + (0.5 *i)) * M_PI;
@@ -186,16 +183,16 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	objectHandles.push_back(cube);
 	attachHandles.push_back(cube);
 	if (simCheckCollision(cube, sim_handle_all) == true) {
-	//	cout << "cube collided" << endl; 
-	//	return-1;
+	    if (settings->verbose){
+	        cout << "cube collided" << endl;
+	    }
 	}
 	if (parentHandle == -1) {
-		simRemoveObject(fs);//dont't need parentHandle when parentHandle = -1
+		simRemoveObject(fs); //dont't need force sensor when parentHandle = -1
 	}
 	for (int j = 0; j < objectHandles.size(); j++) {
 		simSetObjectSpecialProperty(objectHandles[j], sim_objectspecialproperty_detectable_all);
 	}
-
 	return cube;
 }
 
@@ -229,9 +226,11 @@ shared_ptr<ER_Module> Module_Cube::clone() {
 }
 
 vector<float> Module_Cube::updateModule(vector<float> input) {
-	input = ER_Module::updateModule(input);
-	return input;
+    // input.append(sensor->getInput());
+    vector<float> output = ER_Module::updateModule(input);
+	return output;
 }
+
 
 stringstream Module_Cube::getModuleParams() {
 	// needs to save variables of the module

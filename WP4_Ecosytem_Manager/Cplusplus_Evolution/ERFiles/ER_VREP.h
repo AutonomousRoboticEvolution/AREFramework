@@ -16,10 +16,8 @@ public:
 	virtual ~ER_VREP();
 	typedef shared_ptr<Morphology> MorphologyPointer;
 
-	/**
-		@brief This method reads the instanceType member from settings class. According to its value ER initializes as a server or as server-client.
-	*/
-	void initialize();  //Check with Frank: is this the same function used in CER class?? 
+	/// This method reads the instanceType member from settings class. According to its value ER initializes as a server or as server-client.
+	void initialize();  // This function overrides the CER function
 
 	/**
 		@brief This method Instatiates genome factory, enviroment and EA. Also settings for the enviroment and EA are loaded. Finally, this method initializes EA and environment.
@@ -59,12 +57,16 @@ public:
 
 	///mark the simulation time step
 	float simulationTime = 0;
-	///Pointer to the Environment class
+	/// Pointer to the Environment class
 	shared_ptr<Environment> environment;
 
 	// To keep track of the position of the robot
+    /// deprecated
 	string mainHandleName;
+    /// Reference to a morphology object that can be updated in V-REP (phenotype)
 	shared_ptr<Morphology> currentMorphology;
+    /// store the current genome
+    shared_ptr<Genome> currentGenome;
 
 	/**
 		@brief Get the morphology reference
@@ -73,9 +75,7 @@ public:
 	shared_ptr<Morphology> getMorphology(Genome* g);
 
 	shared_ptr<EA> ea;
-	///store the current genome
-	shared_ptr<Genome> currentGenome;
-	///used to create a genome
+	/// used to create a genome
 	shared_ptr<GenomeFactoryVREP> genomeFactory;
 
 	/**
