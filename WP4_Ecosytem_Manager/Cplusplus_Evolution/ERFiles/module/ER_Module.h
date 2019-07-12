@@ -99,7 +99,7 @@ public:
 	int moduleID = 0;
 	void setModuleID(int id);
 
-
+    int moduleHandle;
 	shared_ptr<ER_Module> parentModulePointer;
 	vector<shared_ptr<ER_Module>> childModulePointers;
 

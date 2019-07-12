@@ -44,6 +44,7 @@ void ER_DirectEncodingInterpreter::printSome() {
 
 bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
 	bool collision = true;
+	return false;
 //	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
 //	cout << "createdModules.size = " << createdModules.size()  << endl;
 	
@@ -496,14 +497,7 @@ void ER_DirectEncodingInterpreter::create() {
 	checkJointModule(); // quits simulator when no joint found.
 }
 
-int ER_DirectEncodingInterpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
-	}
-}
+
 
 int ER_DirectEncodingInterpreter::getAmountBrokenModules() {
 	int amountBrokenModules = 0;

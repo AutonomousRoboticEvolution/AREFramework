@@ -33,7 +33,6 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	if (miscHandle < 0) {
 		std::cerr << "Error models/"+filename << std::endl;
 	}
-	int shapeAmount[1];
 
 	if (settings->verbose) {
 		std::cout << "creating " + filename << std::endl;
@@ -95,6 +94,9 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
 
+	if (filename == "C_Wheel.ttm") {
+	    cout << "Wheely wheel" << endl;
+	}
 	// force sensor rotation. (should be orientation)
 	float fsR[3];
 	fsR[0] = configuration[3];
@@ -236,6 +238,7 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
     if (parentHandle == -1) {
         simRemoveObject(fs); //dont't need force sensor when parentHandle = -1
     }
+    moduleHandle = miscHandle;
 	return miscHandle;
 }
 

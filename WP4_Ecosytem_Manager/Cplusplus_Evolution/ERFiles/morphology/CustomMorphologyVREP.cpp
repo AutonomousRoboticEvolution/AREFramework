@@ -119,9 +119,10 @@ void CustomMorphologyVREP::update() {
 					//	cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
 				}
 				int sParent = simGetObjectParent(sensorHandles[i]);
-				float sOr[3];
-				simGetObjectOrientation(sensorHandles[i], sParent, sOr);
-				input.push_back(sOr[2]);
+				float sOr[12];
+				simGetObjectMatrix(sensorHandles[i],sParent, sOr);
+				// simGetObjectOrientation(sensorHandles[i], sParent, sOr);
+				input.push_back(sOr[10]);
 			}
 		}
 		vector<float> output = control->update(input);

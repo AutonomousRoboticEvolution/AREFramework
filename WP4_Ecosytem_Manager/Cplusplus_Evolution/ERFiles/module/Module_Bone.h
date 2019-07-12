@@ -17,6 +17,8 @@ public:
 	vector<int> createCube(vector<float> configuration, int relativePosHandle, int parentHandle);
 	// Create bar
     vector<int> createBars(vector<float> configuration, int relativePosHandle, int parentHandle);
+    // Create horizontal bar
+    vector<int> createHorizontalBar(vector<float> configuration, int relativePosHandle, int parentHandle);
     // Create diagonals
     vector<int> createDiagonals(vector<float> configuration, int relativePosHandle, int parentHandle);
 

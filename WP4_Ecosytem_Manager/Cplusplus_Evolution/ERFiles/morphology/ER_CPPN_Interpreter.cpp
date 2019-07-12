@@ -573,14 +573,6 @@ void ER_CPPN_Interpreter::create() {
 	checkJointModule(); // quits simulator when no joint found. 
 }
 
-int ER_CPPN_Interpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
-	}
-}
 
 void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
 {

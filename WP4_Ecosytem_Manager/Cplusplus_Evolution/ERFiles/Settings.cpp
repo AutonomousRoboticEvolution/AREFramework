@@ -16,22 +16,27 @@ Settings::Settings() {
 	// 17: bone
 	// 18: example
 	moduleTypes.push_back(13);
-	moduleTypes.push_back(14);
-	moduleTypes.push_back(14);
-	moduleTypes.push_back(16);
+	moduleTypes.push_back(17);
+	moduleTypes.push_back(17);
+	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
 	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
 		tmpMaxModuleTypes.push_back(moduleTypes[i]);
-		tmpMaxModuleTypes.push_back(50);
+		if (i == 0) {
+            tmpMaxModuleTypes.push_back(0);
+        }
+		else {
+            tmpMaxModuleTypes.push_back(50);
+        }
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
-	maxModuleTypes[0][1] = 100; // one base module
+	//maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = MODULAR_LSYSTEM;
+	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
 	populationSize = 4;

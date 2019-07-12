@@ -32,7 +32,6 @@ public:
 	shared_ptr<Morphology> clone() const;
 
 	void printSome();
-	int getMainHandle();
 
 	void savePhenotype(int ind, float fitness);
 

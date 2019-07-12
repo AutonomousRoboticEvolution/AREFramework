@@ -134,7 +134,7 @@ int Development::getMaxChilds(int t) {
 		return 1;
 	}
 	else if (t == 17) {
-		return 5;
+		return 1;
 	}
 	else if (t == 13) {
 		return 4;
@@ -326,15 +326,6 @@ void Development::mutate() {
 	mutateERLGenome(settings->morphMutRate);
 }
 
-int Development::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
-	}
-}
-
 void Development::updateCreatedModules() {
 	// TODO temporary location of function below
 	for (int i = 0; i < createdModules.size(); i++) {
@@ -352,6 +343,10 @@ void Development::shiftRobotPosition() {
 	float minimumXObjectPosition = 50.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
+		    if (createdModules[i]->type == 13){
+		        cout << "This is the wheel" << endl;
+		        cout << createdModules[i]->objectHandles.size() << endl;
+		    }
 			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
 				float objectOrigin[3];
 				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
@@ -434,8 +429,10 @@ void Development::shiftRobotPosition() {
 	mainHandle = getMainHandle();
 	simGetObjectPosition(mainHandle, -1, tmpPos);
 	if (settings->environmentType == settings->ROUGH) {
-		//	cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		newRobotPos[0] = tmpPos[0];
+		if (settings->verbose) {
+            cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+        }
+	    newRobotPos[0] = tmpPos[0];
 		newRobotPos[1] = tmpPos[1];
 		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.35;
 		cout << "newRobotPos = " << newRobotPos[2] << endl;
@@ -451,6 +448,15 @@ void Development::shiftRobotPosition() {
 	//	float postpos[3];
 	//	simGetObjectPosition(mainHandle, -1, postpos);
 	//	cout << "postpos: " << postpos[2] << endl;
+}
+
+int Development::getMainHandle() {
+    if (createdModules.size() > 0) {
+        return createdModules[0]->moduleHandle;
+    }
+    else {
+        std::cerr << "ERROR: No module could be created, check initial position of the first module. " << endl;
+    }
 }
 
 vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles) {

@@ -21,7 +21,7 @@ public:
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
 	vector<shared_ptr<ER_Module> > createdModules;
-
+    int getMainHandle();
 	struct BASEMODULEPARAMETERS {
 		// State specific parameters
 		shared_ptr<BASEMODULEPARAMETERS> clone() const {
@@ -73,7 +73,6 @@ public:
 	float fitness;
 	// delete functions below???
 	void printSome();
-	int getMainHandle();
 
 	void updateCreatedModules();
 

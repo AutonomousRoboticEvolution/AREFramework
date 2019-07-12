@@ -833,15 +833,6 @@ void ER_LSystemInterpreter::create() {
 }
 
 
-int ER_LSystemInterpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module." << endl;
-	}
-}
-
 int ER_LSystemInterpreter::getAmountBrokenModules() {
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {

@@ -32,7 +32,6 @@ public:
 	shared_ptr<Morphology> clone() const;
 
 	void printSome();
-	int getMainHandle();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();
