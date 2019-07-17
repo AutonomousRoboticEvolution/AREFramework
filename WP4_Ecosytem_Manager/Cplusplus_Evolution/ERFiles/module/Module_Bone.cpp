@@ -667,56 +667,28 @@ vector<int> Module_Bone::createHorizontalBar(vector<float> configuration, int re
     simSetObjectParent(dummy, parentHandle, true);
     partHandles.push_back(dummy);
 
-    // Generate random coordinates
+    // Generate coordinates for children
     std::cout << "Coordinates for each organ: " << std::endl;
     float coordinates[3];
-    for (int j = 0; j < 3; j++) { // Mutate coordinates
-        //if (settings->morphMutRate < randomNum->randFloat(0, 1)) {
-        if (j != 2) { // Make sure to generate coordinates above the ground
-            coordinates[j] = randomNum->randFloat(0.0, 0.1); // 3D printer build volumen
-            std::cout << coordinates[j] << ", ";
-        } else {
-            coordinates[j] = randomNum->randFloat(0.0, 0.1);
-            std::cout << coordinates[j] << ", ";
-        }
-        //}
-    }
-    std::cout << std::endl;
+    coordinates[0] = 0.015;
+    coordinates[1] = 0.01;
+    coordinates[2] = 0.05;
 
-    //coordinates[0][0] = 0.05;
     // Get parent position
     float parentPosition[3] = {0, 0, 0};
-    //simGetObjectPosition(relativePosHandle, -1, parentPosition);
-    std::cout << "Parent position: " << std::endl;
-    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
-    std::cout << parentPosition[0] << ", " << parentPosition[1] << ", " << parentPosition[2] << ", " << std::endl;
-    // Create skeleton
-    int skeletonHandle;
     std::vector<int> primitiveHandles;
     int temp_primitive_handle;
-    float columnWidth = 0.015;
-    float columnHeight = 0.010; // Wheel not touching floor decrease height
-    float magnitude;
-    float angle;
-    float primitiveSize[3];
+    float angle = 0;
     float primitivePosition[3];
     float primitiveOrientation[3];
     float primitiveColour[3];
 
-
-    // Horizontal bar
-    magnitude = sqrt(pow(coordinates[0] - parentPosition[0], 2) + pow(coordinates[1] - parentPosition[1], 2)) + columnWidth;
-    angle = atan2(coordinates[1] - parentPosition[1], coordinates[0] - parentPosition[0]);
-
-    primitiveSize[0] = magnitude;
-    primitiveSize[1] = columnWidth;
-    primitiveSize[2] = columnHeight;
-    temp_primitive_handle = simCreatePureShape(0, 8, primitiveSize, 1, NULL);
+    temp_primitive_handle = simCreatePureShape(0, 8, coordinates, 1, NULL);
     primitiveHandles.push_back(temp_primitive_handle);
 
-    primitivePosition[0] = parentPosition[0] + (coordinates[0] - parentPosition[0]) / 2;
-    primitivePosition[1] = parentPosition[1] + (coordinates[1] - parentPosition[1]) / 2;
-    primitivePosition[2] = 0;
+    primitivePosition[0] = 0.0;
+    primitivePosition[1] = 0.0;
+    primitivePosition[2] = coordinates[2] / 2;
     simSetObjectPosition(temp_primitive_handle, relativePosHandle, primitivePosition);
 
     primitiveOrientation[0] = 0;
@@ -733,14 +705,11 @@ vector<int> Module_Bone::createHorizontalBar(vector<float> configuration, int re
     // Create children dummies
     vector<int> dummies;
     float dummiesOrientation[3] = {0, 0, 0};
-    float dummiesPosition[3] = {coordinates[0], coordinates[1], coordinates[2]};
-        dummiesPosition[0] = coordinates[0];
-        dummiesPosition[1] = coordinates[1];
-        dummiesPosition[2] = coordinates[2];
-        dummies.push_back(simCreateDummy(0.01,0));
-        simSetObjectPosition(dummies[0], relativePosHandle, dummiesPosition);
-        // simSetObjectOrientation(dummies[0], relativePosHandle, dummiesOrientation);
-        simSetObjectOrientation(dummies[0], relativePosHandle, primitiveOrientation );
+    float dummiesPosition[3] = {0, 0, coordinates[2]};
+    dummies.push_back(simCreateDummy(0.01,0));
+    simSetObjectPosition(dummies[0], relativePosHandle, dummiesPosition);
+    // simSetObjectOrientation(dummies[0], relativePosHandle, dummiesOrientation);
+    simSetObjectOrientation(dummies[0], relativePosHandle, primitiveOrientation );
 
     for (int i = 0; i < dummies.size(); i++) {
         simSetObjectParent(dummies[i], temp_primitive_handle, true);

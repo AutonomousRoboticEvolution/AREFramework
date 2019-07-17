@@ -16,11 +16,11 @@ Settings::Settings() {
 	// 17: bone
 	// 18: example
 	moduleTypes.push_back(13);
+	moduleTypes.push_back(14);
+	moduleTypes.push_back(14);
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-	autoDeleteSettings = true;
+	autoDeleteSettings = false;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -104,9 +104,6 @@ void Settings::readSettings() {
 		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
 		return;
 	}
-
-
-	fileExists = false;
 	std::cout << "sceneNum = " << sceneNum << std::endl;
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;
