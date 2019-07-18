@@ -83,20 +83,16 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	int fsParams[5];
 	fsParams[0] = 0;
 	fsParams[1] = 1;
-	fsParams[2] = settings->consecutiveThresholdViolations;
+	fsParams[2] = 1000000;
 	fsParams[3] = 0;
 	fsParams[4] = 0;
 	float fsFParams[5];
 	fsFParams[0] = 0.005;
-	fsFParams[1] = settings->maxForce_ForceSensor;
-	fsFParams[2] = settings->maxTorque_ForceSensor; // change torque
+	fsFParams[1] = 10000000;
+	fsFParams[2] = 10000000; // change torque
 	fsFParams[3] = 0;
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
-
-	if (filename == "C_Wheel.ttm") {
-	    cout << "Wheely wheel" << endl;
-	}
 	// force sensor rotation. (should be orientation)
 	float fsR[3];
 	fsR[0] = configuration[3];

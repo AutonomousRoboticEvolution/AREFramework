@@ -44,19 +44,13 @@ void ER_DirectEncodingInterpreter::printSome() {
 
 bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
 	bool collision = true;
-	return false;
-//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
-//	cout << "createdModules.size = " << createdModules.size()  << endl;
 	
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {
 				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
 					if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
 						for (int k = 0; k < exceptionHandles.size(); k++) {
-							//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
 							if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
 								return true;
 							}
@@ -65,11 +59,9 @@ bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module
 				}
 			}
 			// check collision with environment
-//			cout << "objectHandles.size() = " << environment->envObjectHandles.size() << endl;
 			for (int i = 0; i < settings->envObjectHandles.size(); i++) {
 				if (module->objectHandles[n] != settings->envObjectHandles[i]) {
 					for (int k = 0; k < exceptionHandles.size(); k++) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
 						if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
 							if (createdModules[i]->objectHandles[n] != exceptionHandles[k]) {
 								return true;
@@ -146,6 +138,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	for (int i = 1; i < genome->moduleParameters.size(); i++) {
 		genome->moduleParameters[i]->expressed = false;
 	}
+    // From here the brain organ is created
 	createdModules.push_back(mf->copyModuleGenome(modules[0]));
 	int parentHandle = -1;
 	vector<float> configuration;
@@ -158,16 +151,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	configuration[5] = 0;
 	createdModules[0]->createModule(configuration, -1, parentHandle);
 
-	/* old 
-	for (int i = 1; i < modules.size(); i++) {
-		for (int j = 0; j < modules.size(); j++) {
-			int parentNR = modules[i]->parent;
-			if (j == parentNR) {
-				modules[i]->parentModulePointer = createdModules[j];
-			}
-		}
-	}*/
-
+	// From here the rest of the organs are created from the tree
 	for (int i = 1; i < modules.size(); i++) {
 		if (modules[i]->parent == 0) {
 			modules[i]->parentModulePointer = createdModules[0];
@@ -183,6 +167,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 			int parentSite = genome->moduleParameters[i]->parentSite;
 			int orien = genome->moduleParameters[i]->orientation;
 			int createdParentNumber = -1;
+			// TODO: EB: What's going here?
 			for (int n = 0; n < createdModules.size(); n++)
 			{
 				if (createdModules[n]->moduleID == parentNr) {

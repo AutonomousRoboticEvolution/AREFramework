@@ -43,7 +43,7 @@ void ER_CPPN_Interpreter::printSome() {
 }
 
 bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
-	bool collision = false;
+	bool collision = true;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {

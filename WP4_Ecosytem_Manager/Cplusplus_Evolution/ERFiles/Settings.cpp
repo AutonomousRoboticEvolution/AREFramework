@@ -39,7 +39,7 @@ Settings::Settings() {
 	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 4;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;

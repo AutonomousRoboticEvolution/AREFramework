@@ -134,7 +134,7 @@ int Development::getMaxChilds(int t) {
 		return 1;
 	}
 	else if (t == 17) {
-		return 1;
+		return 5;
 	}
 	else if (t == 13) {
 		return 4;
@@ -343,10 +343,6 @@ void Development::shiftRobotPosition() {
 	float minimumXObjectPosition = 50.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
-		    if (createdModules[i]->type == 13){
-		        cout << "This is the wheel" << endl;
-		        cout << createdModules[i]->objectHandles.size() << endl;
-		    }
 			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
 				float objectOrigin[3];
 				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
@@ -366,9 +362,6 @@ void Development::shiftRobotPosition() {
 				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
 
 				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
-				//for (int i = 0; i < 12; i++) {
-				//	cout << objectMatrix[i] << ", ";
-				//} cout << endl;
 
 				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
 				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
