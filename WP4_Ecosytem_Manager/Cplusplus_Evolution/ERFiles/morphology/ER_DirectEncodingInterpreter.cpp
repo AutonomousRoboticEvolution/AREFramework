@@ -200,6 +200,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 					cout << "orientation " << orien << endl;
 				}
 				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
+				std::cout << "NAME: " << simGetObjectName(parentHandle) << std::endl;
 				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
 				if (settings->verbose) {
 					cout << " 1 ,";

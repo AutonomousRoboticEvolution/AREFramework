@@ -200,7 +200,14 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 			site[i]->rX = 0;
 			site[i]->rY = 0;
 			site[i]->rZ = (0.0 + (0.5*i)) * M_PI;
-			site[i]->parentHandle = shapes[shapes.size()-1];
+			// TODO: EB: Quick hack! This prevents assigning the wrong parent in this case for the brain organ.
+			// TODO: Otherwise The parent assigned will be just the visual and not the physical object which causes problems
+            if (parentHandle != -1) {
+                site[i]->parentHandle = shapes[shapes.size()-1];
+            }else{
+                site[i]->parentHandle = shapes[0];
+            }
+
 			site[i]->relativePosHandle = dummies[n];
 		}
 		siteConfigurations.push_back(site);
