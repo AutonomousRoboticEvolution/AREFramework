@@ -8,7 +8,7 @@ public:
 	CustomMorphologyVREP();
 	~CustomMorphologyVREP();
 	virtual vector<int> getObjectHandles(int parentHandle);
-	virtual vector<int> getJointHandles(int parentHandle);
+//	virtual vector<int> getJointHandles(int parentHandle);
 	void update();
 	virtual int getMainHandle();
 	int createWei();

@@ -174,7 +174,7 @@ void CustomANN::mutate(float mutationRate) {
 }
 
 shared_ptr<Control> CustomANN::clone() const {
-	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);
+	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);  //make_unique
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();

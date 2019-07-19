@@ -56,7 +56,7 @@ void saveLog(int num) {
 //	double deltaSysTime = difftime((double) time(0), sysTime) ;
 	int deltaSysTime = now - sysTime;
 	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
-	sysTime = clock() ;
+	sysTime = clock();
 	counter = 0;
 	logFile.close();
 }
