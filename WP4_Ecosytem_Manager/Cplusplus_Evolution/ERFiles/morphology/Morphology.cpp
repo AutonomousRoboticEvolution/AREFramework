@@ -3,9 +3,9 @@
 
 Morphology::~Morphology(){
 //	cout << endl << "DELETED MORPHOLOGY" << endl << endl; 
-	if (control) {
-		control->~Control();
-	}
+//	if (control) {
+//		control->~Control();
+//	}
 };
 
 vector<shared_ptr<ER_Module>> Morphology::getCreatedModules() {
