@@ -99,7 +99,6 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 			genomeText << "#ModuleParent:," << genome->moduleParameters[i]->parent << std::endl;
 			genomeText << "#ParentSite:," << genome->moduleParameters[i]->parentSite << std::endl;
 			genomeText << "#Orientation:," << genome->moduleParameters[i]->orientation << std::endl;
-			
 			genomeText << "#ControlParams:," << std::endl;
 			genomeText << genome->moduleParameters[i]->control->getControlParams().str();
 			genomeText << "#EndControlParams" << std::endl;

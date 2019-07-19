@@ -173,6 +173,7 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	if (settings->verbose) {
 		cout << "Done creating misc module" << endl;
 	}
+	moduleHandle = miscHandle;
 	return miscHandle;
 }
 
@@ -350,6 +351,9 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     simSetObjectOrientation(cube, relativePosHandle, rotationOrigin);
     simSetObjectPosition(cube, cube, objectOrigin);
     simSetObjectParent(cube, dummy, true);
+
+    simGetObjectPosition(cube, -1, absPos);
+    simGetObjectOrientation(cube, -1, absOri);
 
     partHandles.push_back(dummy);
     partHandles.push_back(cube);

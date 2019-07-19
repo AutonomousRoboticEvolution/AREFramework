@@ -137,7 +137,7 @@ int Development::getMaxChilds(int t) {
 		return 5;
 	}
 	else if (t == 13) {
-		return 4;
+		return 20;
 	}
 	else {
 		return 0;

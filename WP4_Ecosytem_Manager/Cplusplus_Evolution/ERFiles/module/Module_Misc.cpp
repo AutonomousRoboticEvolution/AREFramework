@@ -132,6 +132,8 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	simRemoveObject(miscHandle);
 	dummies.erase(dummies.begin());
 	miscHandle = shapes[0];
+    simGetObjectPosition(miscHandle, -1, absPos);
+    simGetObjectOrientation(miscHandle, -1, absOri);
     if (parentHandle != -1) {
         simSetObjectParent(miscHandle, fs, true);
     }
@@ -188,7 +190,7 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	for (int n = 0; n < dummies.size(); n++) {
 		// add a connection site for every dummy object in the model
 		vector<shared_ptr<SITE>> site;
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 19; i++) {
 			site.push_back(shared_ptr<SITE>(new SITE));
 			//float pos[3];
 			//float orien[3];

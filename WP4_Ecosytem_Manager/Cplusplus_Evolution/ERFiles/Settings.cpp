@@ -20,7 +20,7 @@ Settings::Settings() {
 	moduleTypes.push_back(14);
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
-	autoDeleteSettings = false;
+	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -39,7 +39,7 @@ Settings::Settings() {
 	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -609,6 +609,28 @@ void Settings::readSettings() {
 					tmpMaxMods.clear();
 				}
 			}
+            else if (tmp == "#collidingorgans") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bCollidingOrgans = false;
+                }
+                else {
+                    bCollidingOrgans = true;
+                }
+                std::cout << "Viability: Colliding organs - " << bCollidingOrgans << std::endl;
+            }
+            else if (tmp == "#organsbelowprintingbed") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bOrgansAbovePrintingBed = false;
+                }
+                else {
+                    bOrgansAbovePrintingBed = true;
+                }
+                std::cout << "Viability: Organs above printing bed - " << bOrgansAbovePrintingBed << std::endl;
+            }
 			fileExists = true;
 		}
 	}

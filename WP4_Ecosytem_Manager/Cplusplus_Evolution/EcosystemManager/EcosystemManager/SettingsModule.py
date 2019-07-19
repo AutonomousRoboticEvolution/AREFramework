@@ -81,6 +81,7 @@ class Settings(Frame):
 		data += self.module.getSettings()
 		data += self.environment.getSettings()
 		data += self.control.getSettings()
+		data += self.viability.getSettings()
 		for dat in data:
 			print(dat)
 		repo = self.directory + '/files/'
@@ -158,23 +159,47 @@ class ViabilityParameters(Frame):
 		self.esCheck = Checkbutton(parent, variable = self.esCheckVar)
 		self.esCheck.grid(column = 1, row = 1)
 
+		self.gndLabel = Label(parent,text="Organs below printing bed")
+		self.gndLabel.grid(column = 0, row = 2)
+		self.esCheckGndVar = IntVar()
+		self.esCheckGnd = Checkbutton(parent, variable = self.esCheckGndVar)
+		self.esCheckGnd.grid(column = 1, row = 2)
+
+		self.collLabel = Label(parent,text="Colliding organs")
+		self.collLabel.grid(column = 0, row = 3)
+		self.esCheckCollVar = IntVar()
+		self.esCheckColl = Checkbutton(parent, variable = self.esCheckCollVar)
+		self.esCheckColl.grid(column = 1, row = 3)
+
 		self.printVolLabel = Label(parent,text="Max Print Volume")
-		self.printVolLabel.grid(column = 0, row = 2)
+		self.printVolLabel.grid(column = 0, row = 4)
 		self.printVolVar = IntVar(parent,3)
 		#self.printVolVar.trace("w", self.moduleSizeChanged)
 		self.printVolScale = Scale(parent, from_=0, to=10, orient=HORIZONTAL,resolution=1, variable = self.printVolVar)
-		self.printVolScale.grid(column = 1, row = 2)
+		self.printVolScale.grid(column = 1, row = 4)
 		self.printVolText=Entry(parent, textvariable = self.printVolVar)
-		self.printVolText.grid(column = 2, row = 2)
+		self.printVolText.grid(column = 2, row = 4)
 
 		self.orgInLabel = Label(parent,text="Organ Insertion Sequence")
-		self.orgInLabel.grid(column = 0, row = 3)
+		self.orgInLabel.grid(column = 0, row = 5)
 
 		self.behaviorTestLabel = Label(parent,text="Behavior Test")
-		self.behaviorTestLabel.grid(column = 0, row = 4)
+		self.behaviorTestLabel.grid(column = 0, row = 6)
 		self.beCheckVar = IntVar()
 		self.beCheck = Checkbutton(parent, variable = self.beCheckVar)
-		self.beCheck.grid(column = 1, row = 4)
+		self.beCheck.grid(column = 1, row = 6)
+
+	def getSettings(self):
+		data = []
+		row = []
+		row.append("#collidingorgans")
+		row.append(self.esCheckGndVar.get())
+		data.append(row)
+		row = []
+		row.append("#organsbelowprintingbed")
+		row.append(self.esCheckCollVar.get())
+		data.append(row)
+		return data
 
 
 class ComponentParameters(Frame):

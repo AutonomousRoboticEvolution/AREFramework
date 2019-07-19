@@ -43,8 +43,8 @@ void ER_DirectEncodingInterpreter::printSome() {
 }
 
 bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
-	bool collision = true;
-	
+	// TODO EB: Implement a way to ignore visuals.
+    bool collision = true;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {
@@ -152,6 +152,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	createdModules[0]->createModule(configuration, -1, parentHandle);
 
 	// From here the rest of the organs are created from the tree
+	// TODO: EB: what's going here?
 	for (int i = 1; i < modules.size(); i++) {
 		if (modules[i]->parent == 0) {
 			modules[i]->parentModulePointer = createdModules[0];
@@ -238,21 +239,36 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
 				}
-
-				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-					createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-					//		genome->moduleParameters[i]->expressed = false;
+                // TODO: EB: Viability goes here?
+                // Check for collisions. If there is a colliding object, remove it from the genome representaion.
+				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans == true) {
+                    if (settings->verbose) {
+                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+                    }
+                    // If object is above the ground, it can be created
+                    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed == true){
+                        if (settings->verbose) {
+                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED." << endl;
+                        }
+                        for (int n = 0; n < modules.size(); n++) {
+                            if (modules[n]->parent == i) {
+                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                            }
+                        }
+                        genome->moduleParameters[i]->expressed = true;
+                    }
+				    else{
+                        if (settings->verbose) {
+                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+                        }
+                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+				    }
 				}
 				else {
-					for (int n = 0; n < modules.size(); n++) {
-						if (modules[n]->parent == i) {
-							modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-						}
-					}
-					genome->moduleParameters[i]->expressed = true;
-				}
-				if (settings->verbose) {
-					cout << "created Module" << endl;
+                    if (settings->verbose) {
+                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+                    }
+                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
 				}
 			}
 			else {
@@ -523,7 +539,7 @@ float ER_DirectEncodingInterpreter::checkArea(float interSection[3], float pps[4
 	return (1 / areaX * areaBound);
 }
 
-
+// TODO: EB: What is this for?
 bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);

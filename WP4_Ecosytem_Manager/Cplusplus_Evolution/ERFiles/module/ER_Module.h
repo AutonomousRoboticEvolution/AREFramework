@@ -127,7 +127,12 @@ public:
 	// color
 	bool broken = false;
 	bool sleepMode = false; // should limit energy update
-	bool battery = false; // define module as a battery module. Currently, the first module can only be the parent. 
+	bool battery = false; // define module as a battery module. Currently, the first module can only be the parent.
+
+	// Stores the absolute position and orientation of the component iself.
+	float absPos[3];
+	float absOri[3];
+
 	virtual void setModuleColor() = 0; 
 	
 };

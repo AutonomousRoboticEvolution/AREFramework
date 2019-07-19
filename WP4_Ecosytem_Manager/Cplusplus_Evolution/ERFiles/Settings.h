@@ -256,6 +256,11 @@ public:
 	void saveSettings();			// Saving a .csv settings file
 	bool autoDeleteSettings = true;
 
+	/// Viability variables
+	// Allow organs above printing bed
+	bool bOrgansAbovePrintingBed = false;
+    bool bCollidingOrgans = false;
+
 	/**
 		@brief Set the repository for saving data
 	*/
