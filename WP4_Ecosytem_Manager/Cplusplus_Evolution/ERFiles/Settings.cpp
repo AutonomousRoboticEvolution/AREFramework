@@ -16,11 +16,11 @@ Settings::Settings() {
 	// 17: bone
 	// 18: example
 	moduleTypes.push_back(13);
+	moduleTypes.push_back(14);
+	moduleTypes.push_back(14);
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
-	autoDeleteSettings = true;
+	autoDeleteSettings = false;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -39,7 +39,7 @@ Settings::Settings() {
 	morphologyType = CAT_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 4;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -104,9 +104,6 @@ void Settings::readSettings() {
 		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
 		return;
 	}
-
-
-	fileExists = false;
 	std::cout << "sceneNum = " << sceneNum << std::endl;
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;

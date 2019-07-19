@@ -20,7 +20,7 @@ public:
     // Create horizontal bar
     vector<int> createHorizontalBar(vector<float> configuration, int relativePosHandle, int parentHandle);
     // Create diagonals
-    vector<int> createDiagonals(vector<float> configuration, int relativePosHandle, int parentHandle);
+    vector<int> createDiagonalBar(vector<float> configuration, int relativePosHandle, int parentHandle);
 
 	int createModule(vector<float> configuration, int relativePosHandle, int parentHandle);
 	vector<int> getFreeSites(vector<int>);
