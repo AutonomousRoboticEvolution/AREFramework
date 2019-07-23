@@ -36,10 +36,10 @@ Settings::Settings() {
 	//maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = CAT_MORPHOLOGY;
+	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 100;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -57,7 +57,7 @@ Settings::Settings() {
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	xGenerations = 50;
-	savePhenotype = false;
+	savePhenotype = true;
 	sendGenomeAsSignal = true;
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;

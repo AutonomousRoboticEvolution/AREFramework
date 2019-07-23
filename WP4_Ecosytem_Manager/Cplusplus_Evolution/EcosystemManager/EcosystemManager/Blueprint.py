@@ -56,7 +56,8 @@ class Blueprint:
 				self.addModuleBlueprint(id,tp,coor)
 
 	def saveBP(self, path, name): # stores mbps
-		with open(path + "\\" + str(name) + ".csv", 'w') as csvfile:
+		with open(path + "/" + str(name) + ".csv", 'w') as csvfile:
+			print(csvfile)
 			writer = csv.writer(csvfile, delimiter=',')
 			for m in self.mbps:
 				writer.writerow(m.getSpecifications())

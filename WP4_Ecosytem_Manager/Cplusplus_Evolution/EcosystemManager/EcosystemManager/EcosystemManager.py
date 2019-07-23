@@ -508,6 +508,7 @@ class RealWorldFrame(Frame):
 	def saveBlueprint(self):
 		print("Currently selected: " + str(self.selectedInd))
 		ind = int(self.selectedInd[0])
+		print(self.popQueue.individuals[ind].num)
 		self.popQueue.individuals[ind].blueprint.init() # TODO
 		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), ind)
 	

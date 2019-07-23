@@ -337,6 +337,9 @@ void ER_DirectEncodingInterpreter::savePhenotype(int ind, float fitness)
 		bmp[i]->parent = createdModules[i]->parent;
 		bmp[i]->parentSite = createdModules[i]->parentSite;
 		bmp[i]->orientation = createdModules[i]->orientation;
+        for (int j = 0; j < 3; ++j) {
+            bmp[i]->absPos[j] = createdModules[i]->absPos[j];
+        }
 	}
 	Development::savePhenotype(bmp, ind, fitness);
 }

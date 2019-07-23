@@ -156,32 +156,36 @@ void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> created
 	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountExpressedModules = createdModules.size();
 	
-	ofstream genomeFile;
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
+	ofstream phenotypeFile;
+	ostringstream phenotypeFileName;
+	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
 
-	genomeFile.open(genomeFileName.str());
-	genomeFile << "#Individual:" << indNum << endl;
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
+	phenotypeFile.open(phenotypeFileName.str());
+	phenotypeFile << "#Individual:" << indNum << endl;
+	phenotypeFile << "#Fitness:," << fitness << endl;
+	phenotypeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
 	//	cout << "#AmountStates:," << amountStates << "," << endl << endl;
 
-	genomeFile << "Module Parameters Start Here: ," << endl << endl;
+	phenotypeFile << "Module Parameters Start Here: ," << endl << endl;
 	for (int i = 0; i < createdModules.size(); i++) {
-		genomeFile << "#Module:," << i << endl;
-		genomeFile << "#ModuleType:," << createdModules[i]->type << endl;
+		phenotypeFile << "#Module:," << i << endl;
+		phenotypeFile << "#ModuleType:," << createdModules[i]->type << endl;
 		
-		genomeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
-		genomeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
-		genomeFile << "#Orientation:," << createdModules[i]->orientation << endl;
+		phenotypeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
+		phenotypeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
+		phenotypeFile << "#Orientation:," << createdModules[i]->orientation << endl;
 
-		genomeFile << "#ControlParams:," << endl;
-		genomeFile << createdModules[i]->control->getControlParams().str();
-		genomeFile << "#EndControlParams" << endl;
-		genomeFile << "#EndOfModule," << endl << endl;
+
+        phenotypeFile << "#AbsPostion:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
+        phenotypeFile << "#AbsOrientation:," << createdModules[i]->absOri[0] << "," << createdModules[i]->absOri[1] << "," << createdModules[i]->absOri[2] << std::endl;
+
+		phenotypeFile << "#ControlParams:," << endl;
+		phenotypeFile << createdModules[i]->control->getControlParams().str();
+		phenotypeFile << "#EndControlParams" << endl;
+		phenotypeFile << "#EndOfModule," << endl << endl;
 	}
-	genomeFile << "End Module Parameters" << endl;
-	genomeFile.close();
+	phenotypeFile << "End Module Parameters" << endl;
+	phenotypeFile.close();
 }
 
 std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
@@ -189,15 +193,15 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 	cout << "loading direct phenotype genome " << endl << "-------------------------------- " << endl;
 
 	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
-	//	genomeFileName << "files/morphologies0/genome9137.csv";
-	cout << genomeFileName.str() << endl;
-	ifstream genomeFile(genomeFileName.str());
+	ostringstream phenotypeFileName;
+	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
+	//	phenotypeFileName << "files/morphologies0/genome9137.csv";
+	cout << phenotypeFileName.str() << endl;
+	ifstream phenotypeFile(phenotypeFileName.str());
 	string value;
 	list<string> values;
-	while (genomeFile.good()) {
-		getline(genomeFile, value, ',');
+	while (phenotypeFile.good()) {
+		getline(phenotypeFile, value, ',');
 		//		cout << value << ",";
 		if (value.find('\n') != string::npos) {
 			split_line(value, "\n", values);

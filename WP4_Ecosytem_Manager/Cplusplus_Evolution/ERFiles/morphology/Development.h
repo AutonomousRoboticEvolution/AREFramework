@@ -44,6 +44,8 @@ public:
 		int parent;
 		int parentSite;
 		int orientation;
+		float absPos[3];
+        float absOri[3];
 	};
 	
 	void savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
