@@ -95,7 +95,6 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 		//if (genome->moduleParameters[i]->expressed == true) {
 			genomeText << "#Module:," << i << std::endl;
 			genomeText << "#ModuleType:," << genome->moduleParameters[i]->type << std::endl;
-            genomeText << "#ModuleType:," << genome->moduleParameters[i]->type << std::endl;
 			genomeText << "#ModuleParent:," << genome->moduleParameters[i]->parent << std::endl;
 			genomeText << "#ParentSite:," << genome->moduleParameters[i]->parentSite << std::endl;
 			genomeText << "#Orientation:," << genome->moduleParameters[i]->orientation << std::endl;

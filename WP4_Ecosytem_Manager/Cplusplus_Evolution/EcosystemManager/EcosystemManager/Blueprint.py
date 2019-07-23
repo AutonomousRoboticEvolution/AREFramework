@@ -1,6 +1,5 @@
 import csv
 from enum import Enum
-import random
 
 class Type(Enum):
 	SENSOR = 0
@@ -11,33 +10,23 @@ class Type(Enum):
 
 
 class ModuleBlueprintParameters:
-	def __init__(self, id, tp, coor):
+	def __init__(self, id, moduleType, absPos, absOri):
 		self.ID = id
-		self.type = tp
-		self.coordinates = coor
+		self.moduleType = moduleType
+		self.absPos = absPos
+		self.absOri = absOri
 	def getSpecifications(self):
-		return self.ID, self.type, float(self.coordinates[0]), float(self.coordinates[1]), float(self.coordinates[2]), float(self.coordinates[3]), float(self.coordinates[4]), float(self.coordinates[5])
+		return self.ID, self.moduleType, self.absPos[0], self.absPos[1], self.absPos[2], self.absOri[0], self.absOri[1], self.absOri[2]
 
 class Blueprint:
 	def __init__(self, name):
 		self.name = name 
 		self.mbps = [] # stores module blueprint parameters (list)
 
-	def init(self): # TODO change to actual robot bp
-		# create 3 random modules
-		n_joints = 0
-		for i in range(10):
-			id = n_joints
-			tp = random.randint(0,2)#
-			if (tp == 2):
-				n_joints+=1
-			coor = []
-			for j in range(6):
-				if (j < 2):
-					coor.append(random.uniform(-9.0,9.0))
-				else:
-					coor.append(0)
-			self.mbps.append(ModuleBlueprintParameters(id, tp, coor))
+	def init(self,moduleType,absPos,absOri): # TODO change to actual robot bp
+		for i in range(len(moduleType)):
+			id = 0
+			self.mbps.append(ModuleBlueprintParameters(id, moduleType[i], absPos[i], absOri[i]))
 
 	def addModuleBlueprint(self, id, tp, coor):
 		mbps.append(ModuleBlueprintParameters(id,tp,coor))
@@ -56,8 +45,7 @@ class Blueprint:
 				self.addModuleBlueprint(id,tp,coor)
 
 	def saveBP(self, path, name): # stores mbps
-		with open(path + "/" + str(name) + ".csv", 'w') as csvfile:
-			print(csvfile)
+		with open(path + "/Blueprint" + str(name) + ".csv", 'w') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')
 			for m in self.mbps:
 				writer.writerow(m.getSpecifications())

@@ -176,7 +176,7 @@ void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> created
 		phenotypeFile << "#Orientation:," << createdModules[i]->orientation << endl;
 
 
-        phenotypeFile << "#AbsPostion:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
+        phenotypeFile << "#AbsPosition:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
         phenotypeFile << "#AbsOrientation:," << createdModules[i]->absOri[0] << "," << createdModules[i]->absOri[1] << "," << createdModules[i]->absOri[2] << std::endl;
 
 		phenotypeFile << "#ControlParams:," << endl;

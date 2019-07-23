@@ -43,9 +43,33 @@ class Individual:
 		self.genome = np.random.rand(1,10)
 		self.genomeInformation = []
 		self.blueprint = bp.Blueprint(num)
+		## This information is going to be used in the blueprint
+		self.componentType = []
+		self.componentAbsPos = []
+		self.componentAbsOri = []
 	def save(self, path):
 		# TODO open csv 
 		a = 0
+	## This method is going to load parameters from the specified phenotype file
+	def load(self):
+		# File path
+		pathGen = directory + '/' + fileRepository + '/morphologies98/' + 'phenotype' + str(self.num) +'.csv'
+		print(pathGen)
+		# Open csv
+		data = []
+		with open(pathGen, 'rt') as csvfile:
+			csvreader = csv.reader(csvfile, delimiter=',')
+			for row in csvreader:
+				data.append(row)
+				#print(row)
+				if row:
+					# Store information for blueprint
+					if row[0] == '#ModuleType:':
+						self.componentType.append(int(row[1]))
+					if row[0] == '#AbsPosition:':
+						self.componentAbsPos.append(list(map(float,row[1:4])))
+					if row[0] == '#AbsOrientation:':
+						self.componentAbsOri.append(list(map(float,row[1:4])))
 
 class PopulationQueue:
 	def __init__(self):
@@ -321,6 +345,7 @@ class SimulationFrame(Frame):
 			os.mkdir(path)
 		# copy files in the population queueto this folder
 		copyfile(directory + "/files/morphologies0/genome"+str(indNum) + ".csv", directory + "/files/morphologies98/genome"+str(indNum)+".csv")
+		copyfile(directory + "/files/morphologies0/phenotype"+str(indNum) + ".csv", directory + "/files/morphologies98/phenotype"+str(indNum)+".csv")
 	def insertQueue(self):
 		self.insertReal()
 		# update Queue List
@@ -509,8 +534,9 @@ class RealWorldFrame(Frame):
 		print("Currently selected: " + str(self.selectedInd))
 		ind = int(self.selectedInd[0])
 		print(self.popQueue.individuals[ind].num)
-		self.popQueue.individuals[ind].blueprint.init() # TODO
-		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), ind)
+		self.popQueue.individuals[ind].load()
+		self.popQueue.individuals[ind].blueprint.init(self.popQueue.individuals[ind].componentType,self.popQueue.individuals[ind].componentAbsPos,self.popQueue.individuals[ind].componentAbsOri) # TODO
+		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), self.popQueue.individuals[ind].num)
 	
 	def clickRun(self):
 		#self.repository.configure(text=directory)
