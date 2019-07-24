@@ -159,6 +159,66 @@ Population::Population(const char *a_FileName)
 }
 
 
+void Population::loadPopulation(const char *a_FileName)
+{
+	m_BestFitnessEver = 0.0;
+
+	m_Generation = 0;
+	m_NumEvaluations = 0;
+	m_NextSpeciesID = 1;
+	m_GensSinceBestFitnessLastChanged = 0;
+	m_GensSinceMPCLastChanged = 0;
+
+	std::ifstream t_DataFile(a_FileName);
+	if (!t_DataFile.is_open())
+		throw std::exception();
+	std::string t_str;
+
+	// Load the parameters
+	m_Parameters.Load(t_DataFile);
+
+	// Load the innovation database
+	m_InnovationDatabase.Init(t_DataFile);
+
+	// Load all genomes
+	for (unsigned int i = 0; i < m_Parameters.PopulationSize; i++)
+	{
+		Genome t_genome(t_DataFile);
+		m_Genomes.push_back(t_genome);
+	}
+	t_DataFile.close();
+
+	m_NextGenomeID = 0;
+	for (unsigned int i = 0; i < m_Genomes.size(); i++)
+	{
+		if (m_Genomes[i].GetID() > m_NextGenomeID)
+		{
+			m_NextGenomeID = m_Genomes[i].GetID();
+		}
+	}
+	m_NextGenomeID++;
+
+	// Initialize
+	Speciate();
+	m_BestGenome = m_Species[0].GetLeader();
+
+	Sort();
+
+	// Set up the phased search variables
+	CalculateMPC();
+	m_BaseMPC = m_CurrentMPC;
+	m_OldMPC = m_BaseMPC;
+	if (m_Parameters.PhasedSearching)
+	{
+		m_SearchMode = COMPLEXIFYING;
+	}
+	else
+	{
+		m_SearchMode = BLENDED;
+	}
+}
+
+
 // Save a whole population to a file
 void Population::Save(const char* a_FileName)
 {

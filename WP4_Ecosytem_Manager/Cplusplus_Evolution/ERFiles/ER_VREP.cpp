@@ -20,6 +20,11 @@ void ER_VREP::initializeServer() {
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
 	environment->init();
+	unique_ptr<EA_Factory> eaf(new EA_Factory);
+	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+	ea->randomNum = randNum;
+	ea->init();
+	eaf.reset();
 }
 
 
@@ -87,13 +92,21 @@ void ER_VREP::startOfSimulation(){
 	// environment->init();
 	
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		// If the simulation is a server. It just holds information for one genome for now. 
-		// currentGenome should be created, double check
-		currentGenome->create();
-		// OLD CODE:
-		// ea->newGenome->create(); 
-		// new genome should be initialized through api command. 
-		currentMorphology = currentGenome->morph;
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->createIndividual(individualToBeLoaded); // this actually sets the NEAT genome
+			// ea->createIndividual(-1);
+			currentMorphology = ea->getMorph();
+			currentMorphology->create();
+		}
+		else {
+			// If the simulation is a server. It just holds information for one genome for now. 
+			// currentGenome should be created, double check
+			currentGenome->create();
+			// OLD CODE:
+			// ea->newGenome->create(); 
+			// new genome should be initialized through api command. 
+			currentMorphology = currentGenome->morph;
+		}
 	}
 	else {
 		if (settings->simulationType != settings->RECALLBEST) {
@@ -142,7 +155,7 @@ void ER_VREP::startOfSimulation(){
 
 			if (settings->evolutionType == settings->EA_NEAT) {
 				ea->loadBestIndividualGenome(settings->sceneNum); // loads from ea
-				ea->createIndividual(-1);
+				ea->createIndividual(-2);
 				currentMorphology = ea->getMorph();
 
 			}
@@ -177,13 +190,19 @@ void ER_VREP::handleSimulation() {
 	}
 	simulationTime += simGetSimulationTimeStep();
 	if (settings->evolutionType == settings->EA_NEAT) {
-		ea->end(); // needs the position of the robot.
+		// ea->end(); // needs the position of the robot.
+		environment->updateEnv(currentMorphology);
 	}
 	else {
 		environment->updateEnv(currentMorphology);
 	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		currentGenome->update();
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->update();
+		}
+		else {
+			currentGenome->update();
+		}
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
@@ -298,22 +317,43 @@ void ER_VREP::endOfSimulation(){
 	/* At the end of the simulation the fitness value of the simulated individual
 	* is retrieved and stored in the appropriate files. 
 	*/
+	if (settings->verbose) {
+		std::cout << "End of simulation" << endl;
+	}
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
 	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		float fitness = environment->fitnessFunction(currentMorphology);
-		// Environment independent fitness function:
-		// float fitness = fit->fitnessFunction(currentMorphology);
-		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-		cout << "fitness = " << fitness << endl;
-		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-		int signal[1] = { 2 };
-		simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-		if (settings->savePhenotype) {
-			currentGenome->fitness = fitness;
-			currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+		if (settings->evolutionType == settings->EA_NEAT) {
+			currentMorphology = ea->getMorph();
+			float fitness = environment->fitnessFunction(currentMorphology);
+			ea->setFitness(-1, fitness);
+
+			// Environment independent fitness function:
+			// float fitness = fit->fitnessFunction(currentMorphology);
+			float phenValue = 0.0; // not used in CPPN-NEAT
+			cout << "fitness = " << fitness << endl;
+			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+			int signal[1] = { 2 };
+			simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+		}
+		
+		
+		else {
+			float fitness = environment->fitnessFunction(currentMorphology);
+			// Environment independent fitness function:
+			// float fitness = fit->fitnessFunction(currentMorphology);
+			float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+			cout << "fitness = " << fitness << endl;
+			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+			int signal[1] = { 2 };
+			simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+			if (settings->savePhenotype) {
+				currentGenome->fitness = fitness;
+				currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+			}
 		}
 	}
 	else {
@@ -415,14 +455,21 @@ bool ER_VREP::loadIndividual(int individualNum)
 		std::istringstream individualGenomeStream(individualGenome);
 		load = currentGenome->loadGenome(individualGenomeStream, individualNum);
 	} 
-	else 
+	else
 	{
 		// load from file
 		if (settings->verbose) {
 			std::cout << " file." << std::endl;
 		}
-		
-		load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->loadPopulationGenomes();
+			// ea->createIndividual(individualNum); // this actually sets the NEAT genome
+			individualToBeLoaded = individualNum;
+			load = true;
+		}
+		else {
+			load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+		}
 	}
 
 	if (signal != nullptr) {

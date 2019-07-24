@@ -12,9 +12,8 @@ public:
 
 	void split_line(string & line, string delim, list<string>& values);
 	vector<NEAT::Genome*> genomeBuffer; // stores the pointers to the NEAT 
-	NEAT::Genome* currentNeatIndividual;
+	NEAT::Genome* currentNeatIndividual; // placeholder for a pointer to a NEAT genome that needs to be evaluated
 	shared_ptr<NEAT::NeuralNetwork> currentNet;
-	shared_ptr<NEAT::Population> population;
 	
 	// shared_ptr<Genome> currentGenome; // This will hold the robot information created by the CPPN etc.
 	shared_ptr<Morphology> neat_morph; // This will hold the robot information created by the CPPN etc.

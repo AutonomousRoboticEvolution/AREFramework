@@ -19,6 +19,10 @@ public:
 	vector<shared_ptr<Genome>> populationGenomes;
 	/// container of next generation genomes
 	vector<shared_ptr<Genome>> nextGenGenomes;  
+	/// used in NEAT
+	shared_ptr<NEAT::Population> population;
+	string neatSaveFile = "/testNEAT";
+
 
 	virtual void update() = 0;  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible. 
 

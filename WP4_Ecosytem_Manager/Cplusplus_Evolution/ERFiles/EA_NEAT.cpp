@@ -220,7 +220,7 @@ shared_ptr<Morphology> EA_NEAT::getMorph()
 
 void EA_NEAT::selection() // This will be used instead of the Epoch used in NEAT (To keep EAs consistent)
 {
-	cout << "selection operator is never called" << endl;
+	// cout << "selection operator is never called" << endl;
 	genomeBuffer.clear();
 	NEAT::Genome * bestGenome = population->GetBestGenomePointer();
 	settings->bestIndividual = bestGenome->GetID();
@@ -239,6 +239,7 @@ void EA_NEAT::selection() // This will be used instead of the Epoch used in NEAT
 	// epoch used in NEAT. This should replace the previous existing population. 
 	population->Epoch();
 	// Note that this function accepts that all the genomes have been evaluated
+	settings->generation += 1;
 	std::cout << "Generation:" << settings->generation << endl;
 	// Add individuals to the population buffer. Should this be a deep copy?
 	// not used 
@@ -266,7 +267,13 @@ void EA_NEAT::initializePopulation()
 
 void EA_NEAT::loadPopulationGenomes(int scenenum)
 {
-
+	cout << "Loading NEAT genomes" << endl;
+	if (!population) {
+		population->loadPopulation((settings->repository + neatSaveFile).c_str());
+	}
+	else {
+		population = shared_ptr<NEAT::Population>(new NEAT::Population((settings->repository + neatSaveFile).c_str()));
+	}
 }
 
 
@@ -276,6 +283,53 @@ bool EA_NEAT::compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Geno
 }
 
 void EA_NEAT::createIndividual(int ind) {
+	cout << "Should create NEAT individual" << endl;
+	if (ind < -1) { // load best
+		unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
+		neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
+		mf.reset();
+		currentNeatIndividual = population->GetBestGenomePointer(); // shallow copy
+		// currentNet = &population->GetBestGenomePointer();
+		// Not sure if I need to make the phenotype of the network
+		currentNet.reset();
+		currentNet = shared_ptr<NEAT::NeuralNetwork>(new NEAT::NeuralNetwork());
+		// currentNet = make_shared<NEAT::NeuralNetwork>(new NEAT::NeuralNetwork(currentNeatIndividual));
+		// currentNet = &currentNeatIndividual;
+		currentNeatIndividual->BuildPhenotype(*currentNet);
+		// currentNeatIndividual->BuildPhenotype(*currentNet);
+		neat_morph->neat_net = currentNet; //  make_shared<NEAT::NeuralNetwork>(currentNeatIndividual);
+		neat_morph->create();
+		if (settings->verbose) {
+			currentNeatIndividual->PrintAllTraits();
+		}
+		return;
+	}
+	else if (ind > -1) // load individual with the given ID
+	{
+		cout << "Creating ind " << ind << endl;
+		unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
+		neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
+		mf.reset();
+		for (int i = 0; i < population->m_Species.size(); i++) {
+			for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
+				if (population->m_Species[i].m_Individuals[j].GetID() == ind) {
+					// this is the individual that should be created
+					currentNeatIndividual = &population->m_Species[i].m_Individuals[j]; // set the individual pointer
+					cout << "Found the NEAT individual that needs to be loaded" << endl;
+				}
+			}
+		}
+		// set the NN 
+		currentNet.reset();
+		currentNet = shared_ptr<NEAT::NeuralNetwork>(new NEAT::NeuralNetwork());
+		currentNeatIndividual->BuildPhenotype(*currentNet);
+		neat_morph->neat_net = currentNet; //  make_shared<NEAT::NeuralNetwork>(currentNeatIndividual);
+		neat_morph->create();
+		if (settings->verbose) {
+			currentNeatIndividual->PrintAllTraits();
+		}
+		return;
+	}
 	// Check if new generation of individuals should be created
 	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
 	neat_morph = mf->createMorphologyGenome(settings->morphologyType, randomNum, settings);
@@ -308,6 +362,7 @@ void EA_NEAT::createIndividual(int ind) {
 				currentNeatIndividual->BuildPhenotype(*currentNet);
 				neat_morph->neat_net = currentNet;
 				neat_morph->create();
+				neat_morph->savePhenotype(currentNeatIndividual->GetID(), 0.0);
 				if (settings->verbose) {
 					currentNeatIndividual->PrintAllTraits();
 				}
@@ -333,11 +388,11 @@ void EA_NEAT::loadBestIndividualGenome(int sceneNum) {
 			c++;
 		}
 	}
-	currentNeatIndividual = &population->GetBestGenome();
+	currentNeatIndividual = population->GetBestGenomePointer();
 	cout << "loaded individual number " << currentNeatIndividual->GetID() << " that had a fitness of " << currentNeatIndividual->GetFitness() << endl;
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
-			cout << "fit " << i << "," << j << " = " << population->m_Species[i].m_Individuals[j].GetFitness() << endl;
+			cout << "fitness of individual " << i << "," << j << " = " << population->m_Species[i].m_Individuals[j].GetFitness() << endl;
 		}
 	}
 }

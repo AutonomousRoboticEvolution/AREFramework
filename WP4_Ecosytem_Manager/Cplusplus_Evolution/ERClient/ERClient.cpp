@@ -47,9 +47,9 @@ int main(int argc, char* argv[])
 		destination = arguments[0];
 		cout << "arguments are: ";
 		for (int i = 0; i < arguments.size(); i++) {
-			cout << arguments[i] << ", ";
+			std:cout << arguments[i] << ", ";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	else {
 		destination = "files"; // default location

@@ -65,7 +65,7 @@ public:
 	// To keep track of the position of the robot
 	string mainHandleName;
 	shared_ptr<Morphology> currentMorphology;
-
+	int individualToBeLoaded = -1;
 	/**
 		@brief Get the morphology reference
 		@param g the reference of the Genome
