@@ -541,7 +541,7 @@ class RealWorldFrame(Frame):
 		# Save blueprint file
 		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), self.popQueue.individuals[ind].num)
 		# Generate mesh file
-		subprocess.call(os.getcwd() + '/meshGeneratorScript.sh')
+		subprocess.call([os.getcwd() + '/meshGeneratorScript.sh', str(self.popQueue.individuals[ind].num)])
 
 	def clickRun(self):
 		#self.repository.configure(text=directory)
