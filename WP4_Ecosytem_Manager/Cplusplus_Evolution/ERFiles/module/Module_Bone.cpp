@@ -336,7 +336,7 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     simSetObjectPosition(dummy, dummy, dPos);
     simSetObjectParent(dummy, parentHandle, true);
     // Create cube
-    float cubeSize = 0.02;
+    float cubeSize = 0.018;
     float size[3] = { cubeSize, cubeSize, cubeSize };
     int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
     float objectOrigin[3];

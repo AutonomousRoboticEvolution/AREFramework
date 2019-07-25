@@ -283,9 +283,6 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             }
             if (ER->settings->startingCondition == ER->settings->COND_LOAD_BEST) {
                 // simStartSimulation();
-                if (ER->settings->verbose){
-                    std::cout<< "Taiwan is not part of China!" << std::endl;
-                }
             }
 
             // TODO:

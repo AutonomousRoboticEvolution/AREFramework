@@ -23,7 +23,8 @@ class Blueprint:
 		self.name = name 
 		self.mbps = [] # stores module blueprint parameters (list)
 
-	def init(self,moduleType,absPos,absOri): # TODO change to actual robot bp
+	## Loads component type, position and orientation
+	def init(self,moduleType,absPos,absOri):
 		for i in range(len(moduleType)):
 			id = 0
 			self.mbps.append(ModuleBlueprintParameters(id, moduleType[i], absPos[i], absOri[i]))
@@ -43,7 +44,7 @@ class Blueprint:
 				tp = row[1]
 				coor = row[2:]
 				self.addModuleBlueprint(id,tp,coor)
-
+	## Save BP file.
 	def saveBP(self, path, name): # stores mbps
 		with open(path + "/Blueprint" + str(name) + ".csv", 'w') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')

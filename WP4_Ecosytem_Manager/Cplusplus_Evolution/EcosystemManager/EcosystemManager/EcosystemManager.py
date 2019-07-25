@@ -534,10 +534,15 @@ class RealWorldFrame(Frame):
 		print("Currently selected: " + str(self.selectedInd))
 		ind = int(self.selectedInd[0])
 		print(self.popQueue.individuals[ind].num)
+		# Load parameters from phenotype file
 		self.popQueue.individuals[ind].load()
+		# Initialize blueprint with parameters
 		self.popQueue.individuals[ind].blueprint.init(self.popQueue.individuals[ind].componentType,self.popQueue.individuals[ind].componentAbsPos,self.popQueue.individuals[ind].componentAbsOri) # TODO
+		# Save blueprint file
 		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), self.popQueue.individuals[ind].num)
-	
+		# Generate mesh file
+		subprocess.call(os.getcwd() + '/meshGeneratorScript.sh')
+
 	def clickRun(self):
 		#self.repository.configure(text=directory)
 		# change population size in the settings file
