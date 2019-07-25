@@ -671,9 +671,6 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 			}
 			break;
 		}
-		lGenome->lParameters[i]->moduleColor[0] = lGenome->lParameters[i]->color[0];
-		lGenome->lParameters[i]->moduleColor[1] = lGenome->lParameters[i]->color[1];
-		lGenome->lParameters[i]->moduleColor[2] = lGenome->lParameters[i]->color[2];
 	}
 	return true;
 //	cout << "loaded L-System genome" << endl;
@@ -703,10 +700,8 @@ void ER_LSystem::init() {
 
 
 int ER_LSystem::initializeLGenome(int type) {
-	//first read settings
-	lGenome->amountIncrement = settings->lIncrements;
-	lGenome->amountStates = settings->amountModules;
-	lGenome->maxAmountStates = settings->maxAmountModules; // states *
+	/// first read settings
+	lGenome->amountStates = settings->numberOfModules;
 
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
@@ -724,7 +719,9 @@ int ER_LSystem::initializeLGenome(int type) {
 		lGenome->lParameters.push_back(shared_ptr<LPARAMETERS>(new LPARAMETERS));
 		lGenome->lParameters[i]->type = settings->moduleTypes[i];
 		vector<float>tempVector;
-		// cout << "Initializing state modules" << endl; 
+		if (settings->verbose) {
+            std::cout << "Initializing state modules" << std::endl;
+        }
 		// currently everything has a neural network...
 		lGenome->lParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 		if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
@@ -775,14 +772,13 @@ int ER_LSystem::initializeLGenome(int type) {
 			}
 			break;
 		}
-
 		lGenome->lParameters[i]->currentState = i;
-
 	}
+	// Randomly mutate for initial population
 	mutateERLGenome(0.5);
 	mutateControlERLGenome(0.5);
-	cf.reset();
 
+	cf.reset();
 	return 1;
 }
 

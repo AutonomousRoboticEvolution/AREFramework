@@ -143,7 +143,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 		// Set all arguments
 		// 1: Set seed and location
-		int run = 0;
+		int run = 0; // evolutionary run
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
 			run = atoi(arg1_param);
@@ -161,36 +161,43 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			std::cout << "Argument 3 was NULL" << endl;
 		}
 		// Read the settings file; specify the ID of experimental run
-		ER->settings->sceneNum = run; // sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-		ER->settings->readSettings(); // load the settings if the *.csv exists
+		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
+		ER->settings->readSettings();	// load the settings if the *.csv exists
+        ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
+        ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		// Override settings parameters if argument 2
 		// 2:
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
-		if (arg2_param != NULL) {
+		if (arg2_param != NULL || arg2_param == 0) {
 			const int arg2_param_i = atoi(arg2_param);
 			// If the second argument passed (arg2_param) is equal to 9, then load best individual and run simulations in local machine
 			if (arg2_param_i == 9)
 			{
-				ER->settings->simulationType = ER->settings->RECALLBEST; // Load best indivudal
+				ER->simSet = RECALLBEST; // Load best indivudal
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
+				ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
 				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
 			}
 			else if (arg2_param_i == 8) {
-				ER->settings->simulationType = ER->settings->RECALLBESTFROMGENOME; // should specify genome file as arg3, TODO
+				ER->simSet = RECALLBESTFROMGENOME; // should specify genome file as arg3, TODO
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
 			}
 			else if (arg2_param_i == 7) {
-				ER->settings->simulationType = ER->settings->RECALLBEST;
+				ER->simSet = RECALLBEST; // TODO remove simSet
 				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
 				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
-			}
+                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+            }
 			// If the second argument passed (arg2_param) is equal to 1, then run the simulations in server-client mode
 			else if (arg2_param_i == 1)
 			{
-				ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
+                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
+                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
 			}
-			else if (arg2_param_i == 0){
+			else if (arg2_param_i == 2){
+                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
 				ER->startRun = true;
 			}
 			else {
@@ -200,11 +207,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg2_param);
 		}
 
-		//! sceneNum and seed will not be utilized from the settings file anymore
-		//! TODO: Check with Frank: why lines 151 and 177 are the same?
-		ER->settings->sceneNum = run;   //sceneNum is not used desprete; should be loaded through readSettings function
-		ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-		ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		// Actual initialization of ER
 		ER->initialize(); 
@@ -240,19 +242,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
 	void* retVal = NULL;
 
-	/*if (GetAsyncKeyState(VK_SPACE) & 0x80000000) {
-		if (initialized == true) {
-			initialized = false;
-		}
-		else {
-			initialized = true;
-		}
-	}
-	*///if (initialized == true) {
-	
 	if (ER->startRun == true) {
 		if (message == sim_message_eventcallback_simulationabouttostart) {
-			//tStart = clock();
+			// tStart = clock();
 			// Initializes population
 			ER->startOfSimulation();  //start from here after simStartSimulation is called
 			if (ER->settings->verbose) {
@@ -265,19 +257,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			timeCount = 0;
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
-			initCall = true; // this restarts the simulation
-		//	printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-		//	if (timeCount % 10 == 0) {
-			//	ofstream file;
-			//	ostringstream fileName;
-			//	fileName << "timeLog.txt";
-			//	file.open(fileName.str(), ios::out | ios::ate | ios::app);
-			//	file << "Time taken at " << timeCount << ": " << (double)(clock() - tStart) / CLOCKS_PER_SEC << endl;
-			//	file.close();
-		//	}	
-
+			initCall = true; // this tells the main loop to restart the simulation
 			ER->endOfSimulation();
-			loadingPossible = true;   //start another simulation
+			loadingPossible = true;  // start another simulation
 			if (ER->settings->verbose) {
 				cout << "SIMULATION ENDED" << endl;
 			}
@@ -290,37 +272,41 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		}
 
 		if (initCall == true && timeCount > 10) {
-			timeCount = 0;
-			initCall = false;
-			counter = 0;
-			if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION && atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 9
-				&& ER->settings->instanceType != ER->settings->INSTANCE_SERVER
-				&& atoi(simGetStringParameter(sim_stringparam_app_arg2)) != 7) {
-				simStartSimulation();
+            timeCount = 0;
+            initCall = false;
+            counter = 0;
+            if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION
+                && ER->settings->startingCondition != ER->settings->COND_LOAD_BEST
+                && ER->settings->instanceType != ER->settings->INSTANCE_SERVER
+                && ER->settings->startingCondition != ER->settings->COND_LOAD_SPECIFIC_INDIVIDUAL) {
+                simStartSimulation();
+            }
+            if (ER->settings->startingCondition == ER->settings->COND_LOAD_BEST) {
+                // simStartSimulation();
+                if (ER->settings->verbose){
+                    std::cout<< "Taiwan is not part of China!" << std::endl;
+                }
+            }
 
-			}
-			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-				// simStartSimulation();
-			}
-			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 8) { // load specific genotype
+            // TODO:
+            //if (simulationSettings == 8) { // load specific genotype
+            //
+            //}
+            //if (simulationSettings == 7) { // load specific phenotype
+            //
+            //}
 
-			}
-			if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 7) { // load specific phenotype
-
-			}
-
-		}
-		//	}
-		//client and v-rep plugin communicates using signal and remote api
+        }
+		// client and v-rep plugin communicates using signal and remote api
 		int signal[1] = { 0 };
-		int retVal = simGetIntegerSignal((simChar*) "simulationState", signal);
-		simGetIntegerSignal((simChar*) "simulationState", signal);  
+		int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
+		simGetIntegerSignal((simChar*) "simulationState", signal);
 		if (signal[0] == 99) {
 			cout << "should quit the simulator" << endl;
 			simQuitSimulator(true);
 		}
 		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
-			// time out when not receiving commands for 5 minutes.  
+			// time out when not receiving commands for 5 minutes.
 			if (!timerOn) {
 				sysTime = clock();
 				timeElapsed = 0;
@@ -342,7 +328,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				int sceneNumber[1] = { 0 };
 				int individual[1] = { 0 };
 				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
-				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used. 
+				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 
 				simGetIntegerSignal((simChar*) "individual", individual);
 				if (ER->loadIndividual(individual[0]) == false) {
@@ -362,6 +348,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				}
 			}
 		}
+
 	}
 
 	//	simSetIntegerParameter(sim_intparam_error_report_mode, errorModeSaved); // restore previous settings

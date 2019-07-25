@@ -80,7 +80,6 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
 		morph->settings = st;
 		return morph;
 	}
-
 	case 20: {
 		shared_ptr<Morphology> morph(new Tissue_DirectBarsVREP);
 		morph->randomNum = rn;

@@ -26,6 +26,7 @@ void EA_VREP::mutation()
 {
 }
 
+
 void EA_VREP::initializePopulation(shared_ptr<Settings> st, bool client)
 {
 	settings = st;

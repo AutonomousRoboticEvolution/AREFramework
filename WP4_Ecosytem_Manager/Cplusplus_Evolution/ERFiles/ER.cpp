@@ -47,13 +47,6 @@ void CER::split_line(string& line, string delim, list<string>& values)
 	}
 }
 
-void CER::initializeSimulation() {
-
-	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-	//	simulationType = RECALLBEST;
-	// }
-}
-
 void CER::loadIndividual(int individualNum, int sceneNum)
 {
 	cout << "ERROR:" << endl;
@@ -62,21 +55,6 @@ void CER::loadIndividual(int individualNum, int sceneNum)
 
 }
 
-void CER::initialize() {
-	settings = shared_ptr<Settings>(new Settings);
-	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
-	randNum = newRandNum;
-	newRandNum.reset(); //destroy the pointer
-	settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));  //pass the setting number from argument
-	settings->readSettings();
-
-	//TODO : Factory
-	ea = unique_ptr<EA>(new EA_SteadyState); // default evolutionary algorithm
-	ea->setSettings(settings, randNum);  //specify the setting and random number for EA
-	ea->init();
-
-	initializeSimulation();  //empty function?
-}
 
 void CER::saveSettings() {
 	if (settings->verbose) {

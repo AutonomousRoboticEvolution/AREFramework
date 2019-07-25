@@ -104,13 +104,13 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;DO_NOT_USE_SHARED_MEMORY;MAX_EXT_API_CONNECTIONS=255;_USE_MATH_DEFINES;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Integration\NEAT_LIB;C:\Boost\boost_1_70_0;C:\eigen\;C:\boost\boost_1_69_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;NON_MATLAB_PARSING;DO_NOT_USE_SHARED_MEMORY;MAX_EXT_API_CONNECTIONS=255;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Boost\boost_1_70_0;C:\eigen\;C:\boost\boost_1_69_0;C:\Eigen\;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\v_repExtER_Minimal\vrep-programming;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\include;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>C:\boost\boost_1_69_0\bin.v2\libs\serialization\build\msvc-14.1\debug\address-model-64\link-static\runtime-link-static\threading-multi;C:\boost\boost_1_69_0\bin.v2\libs\serialization\build\msvc-14.1\debug\address-model-64\link-static\threading-multi;C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\remoteApi;C:\boost\boost_1_69_0\bin.v2\libs;C:\boost\boost_1_69_0\stage\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Program Files\V-REP3\V-REP_PRO_EDU\programming\remoteApi;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -160,45 +160,21 @@
     <ClCompile Include="..\ERfiles\control\SimpleControl.cpp" />
     <ClCompile Include="..\ERFiles\DefaultGenome.cpp" />
     <ClCompile Include="..\ERFiles\EA.cpp" />
-    <ClCompile Include="..\ERFiles\EA_Factory.cpp" />
     <ClCompile Include="..\ERFiles\EA_Generational.cpp" />
-    <ClCompile Include="..\ERFiles\EA_NEAT.cpp" />
     <ClCompile Include="..\ERFiles\EA_SteadyState.cpp" />
     <ClCompile Include="..\ERFiles\Genome.cpp" />
     <ClCompile Include="..\ERFiles\GenomeFactory.cpp" />
-    <ClCompile Include="..\ERFiles\module\ER_Module.cpp" />
-    <ClCompile Include="..\ERFiles\module\ModuleFactory.cpp" />
-    <ClCompile Include="..\ERFiles\module\ModuleGenotype.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_APlantBase.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Bend.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Bone.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Cube.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Head.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Leaf.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_LeafChloe.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Misc.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Rectangle.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Servo.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Solar.cpp" />
-    <ClCompile Include="..\ERFiles\module\Module_Spring.cpp" />
     <ClCompile Include="..\ERfiles\morphology\BaseMorphology.cpp" />
     <ClCompile Include="..\ERFiles\morphology\CAT.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\CATVREP.cpp" />
     <ClCompile Include="..\ERFiles\morphology\CustomMorphology.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\CustomMorphologyVREP.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Development.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_CPPN.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_CPPN_Encoding.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\ER_CPPN_Interpreter.cpp" />
     <ClCompile Include="..\ERFiles\morphology\ER_DirectEncoding.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\ER_DirectEncodingInterpreter.cpp" />
     <ClCompile Include="..\ERfiles\morphology\ER_LSystem.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\ER_LSystemInterpreter.cpp" />
     <ClCompile Include="..\ERfiles\morphology\FixedBaseMorphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\Morphology.cpp" />
     <ClCompile Include="..\ERfiles\morphology\MorphologyFactory.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\MorphologyFactoryVREP.cpp" />
-    <ClCompile Include="..\ERFiles\morphology\NEAT_CPPN_Encoding.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Organ.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Skeleton.cpp" />
     <ClCompile Include="..\ERFiles\morphology\Tissue_DirectBars.cpp" />
@@ -216,7 +192,6 @@
     <ClCompile Include="..\ERfiles\neuron\SimpleNeuron.cpp" />
     <ClCompile Include="..\ERFiles\Settings.cpp" />
     <ClCompile Include="..\ERFiles\SettingsERClient.cpp" />
-    <ClCompile Include="..\ERFiles\VREPUI\VREPUI.cpp" />
     <ClCompile Include="..\RandNum.cpp" />
     <ClCompile Include="ClientEA.cpp" />
     <ClCompile Include="ERClient.cpp" />
@@ -235,45 +210,21 @@
     <ClInclude Include="..\ERfiles\control\SimpleControl.h" />
     <ClInclude Include="..\ERFiles\DefaultGenome.h" />
     <ClInclude Include="..\ERFiles\EA.h" />
-    <ClInclude Include="..\ERFiles\EA_Factory.h" />
     <ClInclude Include="..\ERFiles\EA_Generational.h" />
-    <ClInclude Include="..\ERFiles\EA_NEAT.h" />
     <ClInclude Include="..\ERFiles\EA_SteadyState.h" />
     <ClInclude Include="..\ERFiles\Genome.h" />
     <ClInclude Include="..\ERFiles\GenomeFactory.h" />
-    <ClInclude Include="..\ERFiles\module\ER_Module.h" />
-    <ClInclude Include="..\ERFiles\module\ModuleFactory.h" />
-    <ClInclude Include="..\ERFiles\module\ModuleGenotype.h" />
-    <ClInclude Include="..\ERFiles\module\Module_APlantBase.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Bend.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Bone.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Cube.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Head.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Leaf.h" />
-    <ClInclude Include="..\ERFiles\module\Module_LeafChloe.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Misc.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Rectangle.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Servo.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Solar.h" />
-    <ClInclude Include="..\ERFiles\module\Module_Spring.h" />
     <ClInclude Include="..\ERfiles\morphology\BaseMorphology.h" />
     <ClInclude Include="..\ERFiles\morphology\CAT.h" />
-    <ClInclude Include="..\ERFiles\morphology\CATVREP.h" />
     <ClInclude Include="..\ERFiles\morphology\CustomMorphology.h" />
-    <ClInclude Include="..\ERFiles\morphology\CustomMorphologyVREP.h" />
     <ClInclude Include="..\ERFiles\morphology\Development.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_CPPN.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_CPPN_Encoding.h" />
-    <ClInclude Include="..\ERFiles\morphology\ER_CPPN_Interpreter.h" />
     <ClInclude Include="..\ERFiles\morphology\ER_DirectEncoding.h" />
-    <ClInclude Include="..\ERFiles\morphology\ER_DirectEncodingInterpreter.h" />
     <ClInclude Include="..\ERfiles\morphology\ER_LSystem.h" />
-    <ClInclude Include="..\ERFiles\morphology\ER_LSystemInterpreter.h" />
     <ClInclude Include="..\ERfiles\morphology\FixedBaseMorphology.h" />
     <ClInclude Include="..\ERfiles\morphology\Morphology.h" />
     <ClInclude Include="..\ERfiles\morphology\MorphologyFactory.h" />
-    <ClInclude Include="..\ERFiles\morphology\MorphologyFactoryVREP.h" />
-    <ClInclude Include="..\ERFiles\morphology\NEAT_CPPN_Encoding.h" />
     <ClInclude Include="..\ERFiles\morphology\Organ.h" />
     <ClInclude Include="..\ERFiles\morphology\Skeleton.h" />
     <ClInclude Include="..\ERFiles\morphology\Tissue_DirectBars.h" />
@@ -291,18 +242,9 @@
     <ClInclude Include="..\ERfiles\neuron\SimpleNeuron.h" />
     <ClInclude Include="..\ERFiles\Settings.h" />
     <ClInclude Include="..\ERFiles\SettingsERClient.h" />
-    <ClInclude Include="..\ERFiles\VREPUI\VREPUI.h" />
     <ClInclude Include="..\RandNum.h" />
     <ClInclude Include="ClientEA.h" />
     <ClInclude Include="SlaveConnection.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\NEAT_LIB\NEAT_LIB\NEAT_LIB.vcxproj">
-      <Project>{f68a37b9-cf2f-442d-8f99-3569c3659745}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="..\ERFiles\module\Module_Cube.cpp.rej" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

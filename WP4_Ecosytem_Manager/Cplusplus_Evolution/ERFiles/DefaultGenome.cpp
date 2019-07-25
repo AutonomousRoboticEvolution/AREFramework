@@ -9,8 +9,6 @@ DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 	randomNum = rn;
 	settings = st;
 	genomeFitness = 0;
-	maxAge = settings->maxAge;
-	age = 0;
 }
 
 DefaultGenome::~DefaultGenome() {
@@ -32,6 +30,7 @@ shared_ptr<Genome> DefaultGenome::clone() const
 void DefaultGenome::createInitialMorphology(int individualNumber) {
 }
 
+///update what?
 void DefaultGenome::update() {
 	// This can only be called if the phenotype is created
 	morph->update();

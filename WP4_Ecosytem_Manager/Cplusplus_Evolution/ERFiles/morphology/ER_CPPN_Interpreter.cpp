@@ -3,8 +3,6 @@
 #include <cmath>
 
 
-
-
 ER_CPPN_Interpreter::ER_CPPN_Interpreter()
 {
 	modular = true;
@@ -192,7 +190,7 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 		if (settings->verbose) {
 			cout << "i: " << i << endl;
 		}
-		if (createdModules.size() < settings->maxAmountModules) {
+		if (createdModules.size() < settings->maxNumberModules) {
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
 				if (genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
 					if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
@@ -334,7 +332,7 @@ void ER_CPPN_Interpreter::init() {
 	genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	genome->moduleParameters[0]->control->init(1, 1, 1);
 	if (settings->verbose) {
-		cout << "querying cppn" << endl;
+		cout << "quereuing cppn" << endl;
 	}
 	for (int i = 0; i < maxIterations; i++)
 	{
@@ -381,7 +379,7 @@ void ER_CPPN_Interpreter::init() {
 					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
-						int typeM = (int)(moduleTypeFloat[0] * (moduleAmount - 1));
+						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
 						if (typeM < 0) {
 							typeM = 0;
 						}
@@ -452,33 +450,27 @@ shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
 	return ur;
 }
 
-void ER_CPPN_Interpreter::update() {	
-//	vector<float> input;
-//	for (int i = 0; i < createdModules.size(); i++) {
-//		createdModules[i]->updateModule(input);
-//	}
-//	checkForceSensors(); 
-	vector<float> input;
+void ER_CPPN_Interpreter::update() {
+	vector<float> input; /// You can add any input values to this vector if needed
 	for (int i = 0; i < createdModules.size(); i++) {
-		//float outputModule = 
-		vector<float> moduleInput;
+		vector<float> moduleOutput;
 		if (settings->controlType == settings->ANN_CUSTOM) {
 			createdModules[i]->updateModule(input);
-			moduleInput.push_back(0.0);
+            moduleOutput.push_back(0.0);
 		}
 		if (settings->controlType == settings->ANN_DEFAULT) {
 			createdModules[i]->updateModule(input);
-			moduleInput.push_back(0.0);
+            moduleOutput.push_back(0.0);
 		}
 		if (settings->controlType == settings->ANN_DISTRIBUTED_UP
 			|| settings->controlType == settings->ANN_DISTRIBUTED_DOWN
 			|| settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
-			moduleInput = createdModules[i]->updateModule(input);
+            moduleOutput = createdModules[i]->updateModule(input);
 		}
 		if (settings->controlType == settings->ANN_DISTRIBUTED_UP) {
 			if (createdModules[i]->parentModulePointer) { // if a parent pointer is stored
 				int parent = createdModules[i]->parent;
-				createdModules[i]->parentModulePointer->addInput(moduleInput);
+				createdModules[i]->parentModulePointer->addInput(moduleOutput);
 				//	createdModules[i]->addInput(createdModules[parent]->moduleOutput);
 			}
 		}
@@ -491,7 +483,7 @@ void ER_CPPN_Interpreter::update() {
 		else if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
 			if (createdModules[i]->parentModulePointer) { // if a parent pointer is stored
 				//int parent = createdModules[i]->parent;
-				createdModules[i]->parentModulePointer->addInput(moduleInput);
+				createdModules[i]->parentModulePointer->addInput(moduleOutput);
 				createdModules[i]->addInput(createdModules[i]->parentModulePointer->moduleOutput);
 			}
 		}
@@ -504,20 +496,12 @@ void ER_CPPN_Interpreter::update() {
 void ER_CPPN_Interpreter::updateColors() {
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
-		float alpha = createdModules[0]->energy;
-		if (alpha > 1.0) {
-			alpha = 1.0;
-		}
-		else if (alpha < 0.4) {
-			alpha = 0.4;
-		}
-		//	cout << "alpha = " << alpha << endl;
-		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, alpha);
+		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 
 void ER_CPPN_Interpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };

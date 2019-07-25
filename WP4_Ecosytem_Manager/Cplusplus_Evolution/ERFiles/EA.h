@@ -9,22 +9,18 @@ class EA
 public:
 	EA();
 	virtual ~EA();
+
 	void split_line(string & line, string delim, list<string>& values);
 
 	///set the environment type, evolution type...
 	shared_ptr<Settings> settings; 
 	///random number generator for EA
 	shared_ptr<RandNum> randomNum;
+
 	/// container of current population genomes
 	vector<shared_ptr<Genome>> populationGenomes;
 	/// container of next generation genomes
-	vector<shared_ptr<Genome>> nextGenGenomes;  
-	/// used in NEAT
-	shared_ptr<NEAT::Population> population;
-	string neatSaveFile = "/testNEAT";
-
-
-	virtual void update() = 0;  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible. 
+	vector<shared_ptr<Genome>> nextGenGenomes;  //after mutation
 
 	/// storage vectors
 	/// This genome will be evaluated so needs to be assigned
@@ -40,20 +36,29 @@ public:
 	/**
 		@brief This method sets the fitness value of an individual
 	*/
-	virtual void setFitness(int individual, float fitness) = 0;
+	void setFitness(int individual, float fitness);
+
 	/**
 		@brief This method initilizes a population of genomes
 	*/
-	virtual void init() = 0;			// initializes EA
-	virtual void selection() = 0;		// selection operator
-	virtual void replacement() = 0;		// replacement operator
-	virtual void mutation() = 0;		// mutation operator
-	virtual void end() = 0;				// last call to the EA, when simulation stops
+	virtual void init() = 0;
+	/**
+		@brief Selection operator
+	*/
+	virtual void selection() = 0;
+	/**
+		@brief Replacement operator
+	*/
+	virtual void replacement() = 0;
+	/**
+		@brief Mutation operator
+	*/
+	virtual void mutation() = 0;
 	/**
 		@brief Creates the individual in VREP
 		@param indNum the ID of the individual
 	*/
-	virtual void createIndividual(int indNum) = 0;
+	void createIndividual(int indNum);
 	/**
 		@brief Load an individual
 		@param individualNum the ID of the individual
@@ -63,10 +68,9 @@ public:
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
-		@param vector<float> popfit is a vector containing the fitness valus of the population
-		@param vector<float> popIndividuals is a vector containing the ID's of the individuals
+		@param vector<float> popfit a vector of fitness value
 	*/
-	void savePopFitness(int generation, vector<float> popfit, vector<int> popInividuals);
+	void savePopFitness(int generation, vector<float> popfit);
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
@@ -76,10 +80,9 @@ public:
 		@brief Load the best individual based on the evolutionary progression documen
 		@param sceneNum: ID of environment scene
 	*/
-	virtual void loadBestIndividualGenome(int sceneNum) = 0; 
+	void loadBestIndividualGenome(int sceneNum);
 	/**
 		@brief Load all the population genomes?
 	*/
 	void loadPopulationGenomes();
-	virtual shared_ptr<Morphology> getMorph() = 0;
 };

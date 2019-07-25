@@ -20,7 +20,7 @@ public:
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
-	vector<shared_ptr<ER_Module> > createdModules; // Holds information of the modules created (phenotype)
+	vector<shared_ptr<ER_Module> > createdModules;
 
 	struct BASEMODULEPARAMETERS {
 		// State specific parameters
@@ -45,7 +45,6 @@ public:
 		int parentSite;
 		int orientation;
 	};
-
 	
 	void savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
 	void savePhenotype(int ind, float fitness) {};
@@ -53,21 +52,14 @@ public:
 	vector<shared_ptr<BASEMODULEPARAMETERS>> loadBasePhenotype(int indNum);
 	void loadPhenotype(int ind) {}; 
 
-
 	void init();
 	void mutate();
 	void create();
-	float callFitness();
-	void update();
-
-//	void checkForceSensors();
-//	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
+    void update();
 
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
-//	vector<float> checkCollisionReturnPos(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
-//	bool checkCollisionReturn(int objectHandle, vector<float> rayOrigin, vector<float> rayVector);
-	//	ER_LSystem getMultiPurposeLSystemPointer();
+
 	void init_noMorph();
 	int getMaxChilds(int moduleType);
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
@@ -85,6 +77,7 @@ public:
 
 	void updateCreatedModules();
 
+	/// Function that loops through all vertices of shapes and moves robot upward based on the lowest point of the robot.
 	void shiftRobotPosition();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };

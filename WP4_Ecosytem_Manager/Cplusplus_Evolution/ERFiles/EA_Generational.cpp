@@ -12,12 +12,6 @@ EA_Generational::~EA_Generational()
 }
 
 
-void EA_Generational::setFitness(int individual, float fitness)
-{
-	nextGenGenomes[individual]->fitness = fitness;
-	//	nextGenFitness[individual] = fitness;
-}
-
 
 void EA_Generational::init()
 {
@@ -49,8 +43,6 @@ void EA_Generational::initializePopulation()
 		{
 			populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
 			populationGenomes[i]->fitness = 0;
-			// for easy access of fitness values (used by client-server)
-			//popFitness.push_back(0);
 		}
 	}
 	else {

@@ -37,16 +37,6 @@ public:
 
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 protected:
-	enum OBJECTTYPE {
-		CUBE, 
-		BEND, 
-		PANEL
-	};
-	enum CONNECTTYPE {
-		FORCE,
-		PRISMATIC
-	};
-
 	struct LPARAMETERS {
 		// State specific parameters
 		shared_ptr<LPARAMETERS> clone() const {
@@ -54,29 +44,26 @@ protected:
 			lp->control = this->control->clone();
 			return lp;
 		};
-		int currentState;		// The current state of the object
-		int newState;			// The state of the object can change in this particular state. 
+        /// The current state of the object; L-System state (Symbol)
+		int currentState;
+		/// Defines module type
+        int type = -1; // cube, servo, leaf, etc.
+        /// How many children need to be created
+        int amountChilds;
+        /// Defines which attachment site should attach a module
+        vector <int>childSites;
+        /// Defines what the which module is connected to the specific site.
+        vector<int> childSiteStates;
+        /// in which orientation the children should be placed
+		vector<int> childConfigurations;
 
-		int amountChilds;		// How much childs need to be created 
-		int connectType;
-
-		vector<int> childStates; // -1 = no child able
-		int childObjectType; // cube, light-Sensor, sphere
-		int childConnectType; // joint, force sensor
-		// int maxChilds; //
-
-		vector<int> attachmentSites;
-		vector<int> attachmentObjects; // corresponds to the object number used to identify a specific object within a state. 0 is the default parent. 
-		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
-		vector<int> childConfigurations; 
-		float rgb[3];
-		// parameter identifiers
-		int handle;	
+		/// Can store object handle
+		int handle;
+        /// Default rgb value
 		float color[3] = { 0,0,0 };
-		vector <int>childSites;
+
 		shared_ptr<Control> control;
-		float moduleColor[3];
-		int type = -1; // cube, servo, leaf, etc.
+
 	};
 
 	struct LGENOME {
@@ -87,31 +74,10 @@ protected:
 			}
 			return lg;
 		};
+
 		int amountStates = 5;
-		int maxAmountStates = 10;
-		int startingState = 0;
-		vector<shared_ptr<LPARAMETERS>> lParameters; // one struct of parameters for each state 
-		//HORMONEGENOME hormoneGenome;
-		int maxObjects = 50;
-		int mask1 = 65281;
-		int mask2 = 65282;
-		int amountIncrement = 5; // 7 was normal
-		vector<int> lightSensorHandles;
-		int maxIt = 200;
-		int currentIt = 0;
-		float maxVolume = 1;
-		float mutationRate = 0.05;
-		int dynamic = 16;
-		bool useSymmetryMutation = true;
-		bool crossover = true;
-		float crossoverRate = 0.1; // at every state, a crossover can occur
-								   //void deleteLParameters() { // for when it turns out that lParameters needs to store pointers
-								   //	for (int i = 0; i < lParameters.size(); i++) {
-								   //		delete lParameters[i];
-								   //	
-								   //} 
-		//LGENOME*::clone() const
-		//	LGENOME* clone() const;
+        vector<shared_ptr<LPARAMETERS>> lParameters; // one struct of parameters for each state
+
 	};
 
 public:

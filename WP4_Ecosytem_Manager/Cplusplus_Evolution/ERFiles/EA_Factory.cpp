@@ -34,15 +34,6 @@ shared_ptr<EA> EA_Factory::createEA(shared_ptr<RandNum> rn, shared_ptr<Settings>
 		m_ea->settings = st;
 		return m_ea;
 	}
-	case 3: {
-		if (st->verbose) {
-			cout << "NEAT EA" << endl;
-		}
-		unique_ptr<EA> m_ea(new EA_NEAT);
-		m_ea->randomNum = rn;
-		m_ea->settings = st;
-		return m_ea;
-	}
 	default:
 		if (st->verbose) {
 			cout << "Steady state EA" << endl;

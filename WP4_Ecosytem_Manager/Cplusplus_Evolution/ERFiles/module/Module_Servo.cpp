@@ -518,30 +518,7 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 		simGetJointPosition(controlHandles[0], pos);
 		previousPosition = pos[0];
 	}
-	else {
-		simGetJointPosition(controlHandles[0], pos);
-		float currentPos = pos[0];
-		float distanceDifference = (sqrt((currentPos*currentPos) - (previousPosition*previousPosition)));
-	//	cout << "distanceDifference " << distanceDifference << endl;
-		float energyLost = 0;
-		if (distanceDifference > 0.01) {
-			energyLost = (settings->energyDissipationRate * distanceDifference);
-		}
 
-//		cout << "pos: " << currentPos << ", " << previousPosition << endl;
-		if (energyLost < 0) {
-			energyLost = 0;
-		}
-		if (energyLost > 1000) {
-			energyLost = 1000;
-		}
-//		cout << "energy dissipation rate = " << settings->energyDissipationRate << endl;
-//		cout << "energy lost = " << energyLost << endl;
-		energy = energy - energyLost;
-//		cout << "energy = " << energy << endl;
-		simGetJointPosition(controlHandles[0], pos);
-		previousPosition = pos[0];
-	}
 	if (parentModulePointer != NULL) {
 		if (parentModulePointer->broken == true) {
 			this->broken = true;

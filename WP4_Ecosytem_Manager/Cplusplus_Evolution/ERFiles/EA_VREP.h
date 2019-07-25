@@ -17,6 +17,6 @@ public:
 	void initNewGenome(shared_ptr<Settings> st, bool client);
 	void loadIndividual(int individualNum, int sceneNum);
 	void initializePopulation(shared_ptr<Settings> st, bool client);
-	void loadBestIndividualGenome(int sceneNum) {};
+	void loadBestIndividualGenome(int sceneNum);
 };
 
