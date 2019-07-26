@@ -50,7 +50,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 	for (int i = 0; i < length_i; i++) {
 		if (createdModules[i]->handled != true) {
 			createdModules[i]->handled = true;
-			if (createdModules.size() >= settings->maxNumberModules) {
+			if (createdModules.size() >= settings->maxAmountModules) {
 				break;
 			}
 			// cout << "handling module " << i << endl; 
@@ -68,11 +68,11 @@ void ER_LSystemInterpreter::incrementLSystem() {
 			//	cout << "created module free sites: " << createdModules[i]->freeSites.size() << endl;
 			int newChildAmount = 0;
 			for (int j = 0; j < tempFreeSites.size(); j++) { // should never be more then free sites of module
-				if (createdModules.size() >= settings->maxNumberModules) {
+				if (createdModules.size() >= settings->maxAmountModules) {
 					break;
 				}
 				for (int k = 0; k < lGenome->lParameters[t_state]->childSites.size(); k++) {
-					if (createdModules.size() >= settings->maxNumberModules) {
+					if (createdModules.size() >= settings->maxAmountModules) {
 						break;
 					}
 					if (lGenome->lParameters[t_state]->childSites.size() != lGenome->lParameters[t_state]->childSiteStates.size()) {
@@ -630,6 +630,9 @@ int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialP
 				m_ID++;
 			}
 		}
+		// create UI for morphologies
+		vrepUI = shared_ptr<VREPUI>(new VREPUI);
+		vrepUI->createMorphUI(createdModules);
 	}
 
 
@@ -665,7 +668,7 @@ void ER_LSystemInterpreter::init() { // should use create instead
 		ER_LSystem::init();
 	}
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	for (int i = 0; i < settings->numberOfModules; i++) {
+	for (int i = 0; i < settings->amountModules; i++) {
 		modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 		modules[i]->state = i;
 		modules[i]->type = settings->moduleTypes[i];
@@ -696,7 +699,17 @@ shared_ptr<Morphology> ER_LSystemInterpreter::clone() const {
 
 void ER_LSystemInterpreter::updateColors() {
 	for (int i = 0; i < createdModules.size(); i++) {
-		createdModules[i]->colorModule(lGenome->lParameters[createdModules[i]->state]->color,0.5);
+		float alpha = createdModules[0]->energy;
+		if (alpha > 1.0) {
+			alpha = 1.0;
+		}
+		else if (alpha < 0.4) {
+			alpha = 0.4;
+		}
+		//cout << "alpha = " << alpha << endl;
+		//cout << "color: " << lGenome->lParameters[createdModules[i]->state]->color[0] << "," << lGenome->lParameters[createdModules[i]->state]->color[1]
+		//	<< "," << lGenome->lParameters[createdModules[i]->state]->color[2] << endl;
+		createdModules[i]->colorModule(lGenome->lParameters[createdModules[i]->state]->color,alpha);
 	}
 }
 
@@ -779,37 +792,37 @@ void ER_LSystemInterpreter::setColors() {
 		switch (i) {
 		case 0:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = red[j];
+				lGenome->lParameters[i]->rgb[j] = red[j];
 			}
 			break;
 		case 1:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = blue[j];
+				lGenome->lParameters[i]->rgb[j] = blue[j];
 			}
 			break;
 		case 2:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = yellow[j];
+				lGenome->lParameters[i]->rgb[j] = yellow[j];
 			}
 			break;
 		case 3:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = green[j];
+				lGenome->lParameters[i]->rgb[j] = green[j];
 			}
 			break;
 		case 4:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = orange[j];
+				lGenome->lParameters[i]->rgb[j] = orange[j];
 			}
 			break;
 		case 5:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = orangePlus[j];
+				lGenome->lParameters[i]->rgb[j] = orangePlus[j];
 			}
 			break;
 		default:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = black[j];
+				lGenome->lParameters[i]->rgb[j] = black[j];
 			}
 			break;
 		}
@@ -820,7 +833,7 @@ void ER_LSystemInterpreter::create() {
 	setColors();
 	init();
 	//unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	//for (int i = 0; i < settings->numberOfModules; i++) {
+	//for (int i = 0; i < settings->amountModules; i++) {
 	//	modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 	//	modules[i]->state = i;
 	//	if (i > 3) {
@@ -996,7 +1009,8 @@ void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
 				int chosenSite = lGenome->lParameters[i]->childSites[chosenOne];
 				int chosenCon = lGenome->lParameters[i]->childConfigurations[chosenOne];
 				int chosenState = lGenome->lParameters[i]->childSiteStates[chosenOne];
-                int newPos = randomNum->randInt(getMaxChilds(lGenome->lParameters[i]->type), 0);
+				int newPos = randomNum->randInt(getMaxChilds(lGenome->lParameters[i]->type), 0);
+
 				if (newPos >= amountChilds) {
 					lGenome->lParameters[i]->childSites.push_back(mirrorSite[0]);
 					lGenome->lParameters[i]->childConfigurations.push_back(mirrorSite[1]);

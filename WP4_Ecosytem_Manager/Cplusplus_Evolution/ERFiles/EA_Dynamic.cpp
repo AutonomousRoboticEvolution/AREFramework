@@ -77,7 +77,7 @@ void EA_Dynamic::loadPopulationGenomes(int scenenum)
 	std::cout << "Loading population" << std::endl;
 	for (int i = 0; i < popIndNumbers.size(); i++) {
 		std::cout << "loading individual " << popIndNumbers[i] << std::endl;
-		populationGenomes[i]->loadGenome(popIndNumbers[i], scenenum);
+		populationGenomes[i]->loadMorphologyGenome(popIndNumbers[i], scenenum);
 		populationGenomes[i]->fitness = settings->indFits[i]; // indFits has to be saved now. 
 	}
 }

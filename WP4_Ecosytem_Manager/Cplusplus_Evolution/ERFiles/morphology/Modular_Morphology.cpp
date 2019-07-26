@@ -10,6 +10,14 @@ vector <Modular_Morphology::ModulePointer> Modular_Morphology::getCreatedModules
 	return nullVec;
 }
 
+void Modular_Morphology::updateRobotEnergy()
+{
+	robotEnergy = 0;
+	for (int i = 0; i < createdModules.size(); i++) {
+		robotEnergy += createdModules[i]->energy;
+	}
+}
+
 void Modular_Morphology::update()
 {
 	if (createdModules.size() < 2) {

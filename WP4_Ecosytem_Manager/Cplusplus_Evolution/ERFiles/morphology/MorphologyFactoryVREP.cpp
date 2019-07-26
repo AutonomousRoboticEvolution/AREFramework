@@ -115,6 +115,13 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
 		m_morph->settings = st;
 		return m_morph;
 	}
+	case 12: {
+		//		shared_ptr<Morphology> m_morph(new MultiPurposeLSystemV2);
+		shared_ptr<Morphology> m_morph(new NEAT_CPPN_Encoding);
+		m_morph->randomNum = rn;
+		m_morph->settings = st;
+		return m_morph;
+	}
 	case 20: {
 		shared_ptr<Morphology> m_morph(new Tissue_DirectBarsVREP);
 		m_morph->randomNum = rn;

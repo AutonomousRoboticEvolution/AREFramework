@@ -19,21 +19,24 @@ void ER_VREP::initializeServer() {
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
-	// initialize the environment
 	environment->init();
+	unique_ptr<EA_Factory> eaf(new EA_Factory);
+	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+	ea->randomNum = randNum;
+	ea->init();
+	eaf.reset();
 }
 
 
 void ER_VREP::initializeSimulation() {
-    // Initialize a genome factory to create genomes when the simulation is running
+	// simulationType = RECALLBEST;
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
-	// Environment factory is used to create the environment
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
 	unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings);// unique_ptr<EA>(new EA_VREP);
+	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
 	environment->init();
@@ -48,23 +51,24 @@ void ER_VREP::initialize() {
 	 */
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
-		if (settings->verbose) {
-		    std::cout << "Regular Evolution" << std::endl;
-		}
-		settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
+		std::cout << "Regular Evolution" << std::endl;
+		settings->client = true;
 		if (settings->verbose) {
 			std::cout << "initializing evolution" << std::endl;
 		}
-		// initialize simulation
 		initializeSimulation();
 	}
-	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && simSet != RECALLBEST) {
-		if (settings->verbose){
-		    std::cout << "Initializing Server" << std::endl;
-		}
-		settings->client = false; // V-REP plugin will receive genomes from ea client
+	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && settings->simulationType != settings->RECALLBEST) {
+		std::cout << "Initializing Server" << std::endl;
+		settings->client = false;
 		initializeServer();
 	}
+	else {
+		// used to initialize robot connected to V-REP
+		// initializeSimulation();
+		// initializeRobot();
+	}
+	//simulationType = RECALLBEST;
 }
 
 void ER_VREP::startOfSimulation(){
@@ -73,62 +77,103 @@ void ER_VREP::startOfSimulation(){
 	* it initializes the properties of the individual of the optimization
 	* strategy chosen.
 	*/
+	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+		return;
+	}
 	if (settings->verbose) {
 		std::cout << "Starting" << std::endl;
 	}
 
 	// set the random seed
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
-
+	
+	// old code snippet to be removed after evaluation:
+	// environment->initialPos.clear();
+	// environment->init();
+	
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		// If the simulation is a server. It just holds information for one genome for now. 
-		currentGenome->create(); // creates the phenotype of the robot
-		currentMorphology = currentGenome->morph;
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->createIndividual(individualToBeLoaded); // this actually sets the NEAT genome
+			// ea->createIndividual(-1);
+			currentMorphology = ea->getMorph();
+			currentMorphology->create();
+		}
+		else {
+			// If the simulation is a server. It just holds information for one genome for now. 
+			// currentGenome should be created, double check
+			currentGenome->create();
+			// OLD CODE:
+			// ea->newGenome->create(); 
+			// new genome should be initialized through api command. 
+			currentMorphology = currentGenome->morph;
+		}
 	}
 	else {
-		if (simSet != RECALLBEST) { 
+		if (settings->simulationType != settings->RECALLBEST) {
 			if (settings->verbose) {
 				cout << "Creating Individual " << settings->indCounter << endl;
 			}
-			if (settings->indCounter < ea->nextGenGenomes.size()) {		
+			if (settings->indCounter < ea->nextGenGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->nextGenGenomes[currentInd]->init();
-//				ea->popIndNumbers.push_back(settings->indCounter);
+				//				ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
-				//currentGenome->init(); // should not initialize base class
-				currentGenome->create();
-				currentMorphology = currentGenome->morph->clone();
+				if (settings->evolutionType == settings->EA_NEAT) {
+					ea->createIndividual(-1);
+					currentMorphology = ea->getMorph();
+					currentMorphology->create();
+				}
+				else {
+					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
+					//currentGenome->init(); // should not initialize base class
+					currentGenome->create();
+					currentMorphology = currentGenome->morph->clone();
+				}
 				// ea->newGenome = ea->populationGenomes[settings->indCounter];
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
 				// != first generation
 				// ea->selection(); // selection done in end
 				// ea->newGenome->init();
-				currentInd = settings->indCounter % settings->populationSize;
-				currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
-				currentGenome->create();
-				currentMorphology = currentGenome->morph->clone(); // essential function... But for what? I forgot...
+				if (settings->evolutionType == settings->EA_NEAT) {
+					ea->createIndividual(-1);
+					currentMorphology = ea->getMorph();
+				}
+				else {
+					currentInd = settings->indCounter % settings->populationSize;
+					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
+					currentGenome->create();
+					currentMorphology = currentGenome->morph->clone(); // essential function... But for what? I forgot...
+				}
 			}
 		}
 
-		else if (simSet == RECALLBEST) {
+		else if (settings->simulationType == settings->RECALLBEST) {
 
-			loadBestIndividualGenome(settings->sceneNum);
-			currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
-			currentGenome->create();
-			currentMorphology = currentGenome->morph;
+			if (settings->evolutionType == settings->EA_NEAT) {
+				ea->loadBestIndividualGenome(settings->sceneNum); // loads from ea
+				ea->createIndividual(-2);
+				currentMorphology = ea->getMorph();
+
+			}
+			else {
+				loadBestIndividualGenome(settings->sceneNum);
+				currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
+				currentGenome->create();
+				currentMorphology = currentGenome->morph;
+			}
 		}
 
-		else if (simSet == RECALLBESTFROMGENOME) {
-			// to do 
+		else if (settings->simulationType == settings->RECALLBESTFROMGENOME) {
+			// TODO 
 		}
 	}
-	currentMorphology->setPhenValue();
-
+	if (settings->evolutionType != settings->EA_NEAT) {
+		currentMorphology->setPhenValue();
+	}
 }
 
 void ER_VREP::handleSimulation() {
@@ -144,15 +189,31 @@ void ER_VREP::handleSimulation() {
 		return;
 	}
 	simulationTime += simGetSimulationTimeStep();
-	environment->updateEnv(currentMorphology);
+	if (settings->evolutionType == settings->EA_NEAT) {
+		// ea->end(); // needs the position of the robot.
+		environment->updateEnv(currentMorphology);
+	}
+	else {
+		environment->updateEnv(currentMorphology);
+	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		currentGenome->update();
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->update();
+		}
+		else {
+			currentGenome->update();
+		}
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
 	}
 	else {
-		currentGenome->update();
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->update();
+		}
+		else {
+			currentGenome->update();
+		}
 		if (simGetSimulationTime() > environment->maxTime) {
 			simStopSimulation();
 		}
@@ -160,126 +221,144 @@ void ER_VREP::handleSimulation() {
 }
 
 float ER_VREP::fitnessFunction(MorphologyPointer morph) {
-	vector <float> pStart;
-	vector <float> pOne;
-	vector <float> pEnd;
+	vector <float> pStart; // start position of the robot
+	vector <float> pOne; // position after x time
+	vector <float> pEnd; // end position of the robot
 	float fitness = 0;
 
-		//	int mainHandle = morph->getMainHandle();
-		//	float pos[3];
-		//	simGetObjectPosition(mainHandle, -1, pos);
-		//	return pos[0];
-		if (settings->moveDirection == settings->FORWARD_Y) {
-			if (morph->modular == false) {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				pOne.clear();
-				pEnd.clear();
+	//	int mainHandle = morph->getMainHandle();
+	//	float pos[3];
+	//	simGetObjectPosition(mainHandle, -1, pos);
+	//	return pos[0];
+	if (settings->moveDirection == settings->FORWARD_Y) {
+		if (morph->modular == false) {
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = -pos[1];
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = -pos[1];
-				pEnd.push_back(-pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-				}
-				else {
-					fitness = fitness + pOne[1];
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
+				fitness = fitness + pOne[1];
 			}
+			pOne.clear();
+			pEnd.clear();
 		}
 		else {
-			if (morph->modular == false) {
-				//		cout << "getting main handle" << endl;
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-				fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				pOne.clear();
-				pEnd.clear();
-				//	fitness = 0; // no fixed morphology that can absorb light
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = -pos[1];
+			pEnd.push_back(-pos[1]);
+			if (pOne.size() < 1) {
+				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
-				int mainHandle = morph->getMainHandle();
-				float pos[3];
-				simGetObjectPosition(mainHandle, -1, pos);
-
-				pEnd.push_back(pos[0]);
-				pEnd.push_back(pos[1]);
-				if (pOne.size() < 1) {
-					//			cout << "Note, pOne never set" << endl;
-					fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
-				}
-				else {
-					fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
-				}
-				int brokenModules = morph->getAmountBrokenModules();
-
-				fitness = fitness * pow(0.8, brokenModules);
-				pOne.clear();
-				pEnd.clear();
-				// to do: pEnd - pOne
-
-			//	vector<shared_ptr<ER_Module> > createdModules = morph->getCreatedModules();
-			//	vector<float> pos = createdModules[0]->getPosition();
-			//	fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+				fitness = fitness + pOne[1];
 			}
+			int brokenModules = morph->getAmountBrokenModules();
+			fitness = fitness * pow(0.8, brokenModules);
+			pOne.clear();
+			pEnd.clear();
 		}
+	}
+	else {
+		if (morph->modular == false) {
+			//		cout << "getting main handle" << endl;
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
+			fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+			pEnd.push_back(pos[0]);
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//			cout << "Note, pOne never set" << endl;
+				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
+			}
+			else {
+				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
+			}
+			pOne.clear();
+			pEnd.clear();
+			//	fitness = 0; // no fixed morphology that can absorb light
+		}
+		else {
+			int mainHandle = morph->getMainHandle();
+			float pos[3];
+			simGetObjectPosition(mainHandle, -1, pos);
 
-		return fitness;
-	
+			pEnd.push_back(pos[0]);
+			pEnd.push_back(pos[1]);
+			if (pOne.size() < 1) {
+				//			cout << "Note, pOne never set" << endl;
+				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
+			}
+			else {
+				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
+			}
+			int brokenModules = morph->getAmountBrokenModules();
 
+			fitness = fitness * pow(0.8, brokenModules);
+			pOne.clear();
+			pEnd.clear();
+			// to do: pEnd - pOne
+
+		//	vector<shared_ptr<ER_Module> > createdModules = morph->getCreatedModules();
+		//	vector<float> pos = createdModules[0]->getPosition();
+		//	fitness = sqrtf(pos[0] * pos[0]) + sqrtf(pos[1] * pos[1]);
+		}
+	}
+	return fitness;
 }
 
 void ER_VREP::endOfSimulation(){
 	/* At the end of the simulation the fitness value of the simulated individual
 	* is retrieved and stored in the appropriate files. 
 	*/
+	if (settings->verbose) {
+		std::cout << "End of simulation" << endl;
+	}
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
 	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		float fitness = environment->fitnessFunction(currentMorphology);
-		// Environment independent fitness function:
-		// float fitness = fit->fitnessFunction(currentMorphology);
-		float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-		cout << "fitness = " << fitness << endl;
-		simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-		simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-		int signal[1] = { 2 };
-		simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-		if (settings->savePhenotype) {
-			currentGenome->fitness = fitness;
-			currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+		if (settings->evolutionType == settings->EA_NEAT) {
+			currentMorphology = ea->getMorph();
+			float fitness = environment->fitnessFunction(currentMorphology);
+			ea->setFitness(-1, fitness);
+
+			// Environment independent fitness function:
+			// float fitness = fit->fitnessFunction(currentMorphology);
+			float phenValue = 0.0; // not used in CPPN-NEAT
+			cout << "fitness = " << fitness << endl;
+			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+			int signal[1] = { 2 };
+			simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+		}
+		
+		
+		else {
+			float fitness = environment->fitnessFunction(currentMorphology);
+			// Environment independent fitness function:
+			// float fitness = fit->fitnessFunction(currentMorphology);
+			float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+			cout << "fitness = " << fitness << endl;
+			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+			int signal[1] = { 2 };
+			simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+			if (settings->savePhenotype) {
+				currentGenome->fitness = fitness;
+				currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+			}
 		}
 	}
 	else {
 		cout << "settings->indCounter = " << settings->indCounter << endl;
-		if (simSet != RECALLBEST) {
+		if (settings->simulationType != settings->RECALLBEST) {
 			if (settings->indCounter < ea->populationGenomes.size()) {
 				float fitness = environment->fitnessFunction(currentMorphology);
 				ea->populationGenomes[currentInd]->fitness = fitness;
@@ -293,19 +372,27 @@ void ER_VREP::endOfSimulation(){
 				settings->indCounter++;
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				float fitness = environment->fitnessFunction(currentMorphology);
-				currentGenome->fitness = fitness;
-				if (settings->savePhenotype) {
-					currentGenome->fitness = fitness;
-					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
+				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+					currentMorphology = ea->getMorph();
 				}
-				// TODO set fitness
-				ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
-				currentGenome->morph->saveGenome(settings->indCounter, fitness);
-				cout << "FITNESS = " << fitness << endl;
-				settings->indCounter++;
+				float fitness = environment->fitnessFunction(currentMorphology);
+				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+					ea->setFitness(-1,fitness);
+				}
+				else {
+					currentGenome->fitness = fitness;
+					if (settings->savePhenotype) {
+						currentGenome->fitness = fitness;
+						currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
+					}
+					// TODO set fitness
+					ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
+					currentGenome->morph->saveGenome(settings->indCounter, fitness);
+					cout << "FITNESS = " << fitness << endl;
+					settings->indCounter++;
+				}
 			}
-			if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
+			if (settings->evolutionType != settings->EA_NEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
 				ea->selection();
 				ea->savePopFitness(generation);
@@ -314,7 +401,7 @@ void ER_VREP::endOfSimulation(){
 				newGenerations++;
 			}
 		}
-		if (simSet == RECALLBEST) {
+		if (settings->simulationType == settings->RECALLBEST) {
 			float fitness = environment->fitnessFunction(currentMorphology);
 			currentGenome.reset();
 			cout << "-----------------------------------" << endl;
@@ -368,14 +455,21 @@ bool ER_VREP::loadIndividual(int individualNum)
 		std::istringstream individualGenomeStream(individualGenome);
 		load = currentGenome->loadGenome(individualGenomeStream, individualNum);
 	} 
-	else 
+	else
 	{
 		// load from file
 		if (settings->verbose) {
 			std::cout << " file." << std::endl;
 		}
-		
-		load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+		if (settings->evolutionType == settings->EA_NEAT) {
+			ea->loadPopulationGenomes();
+			// ea->createIndividual(individualNum); // this actually sets the NEAT genome
+			individualToBeLoaded = individualNum;
+			load = true;
+		}
+		else {
+			load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+		}
 	}
 
 	if (signal != nullptr) {
@@ -466,6 +560,6 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	currentGenome.reset();
 	currentGenome = genomeFactory->createGenome(1, randNum, settings);
 	currentGenome->init();	//	cout << "loading" << endl;
-	currentGenome->loadGenome(bestInd, settings->sceneNum);
+	currentGenome->loadMorphologyGenome(bestInd, settings->sceneNum);
 }
 

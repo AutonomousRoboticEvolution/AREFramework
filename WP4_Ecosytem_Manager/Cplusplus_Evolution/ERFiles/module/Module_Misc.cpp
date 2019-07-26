@@ -27,6 +27,228 @@ int Module_Misc::mutate(float mutationRate) {
 	return 1;
 }
 
+int Module_Misc::createModuleBackup(vector<float> configuration, int relativePosHandle, int parentHandle) {
+	int fsParams[5];
+	fsParams[0] = 0;
+	fsParams[1] = 1;
+	fsParams[2] = 10; // settings->consecutiveThresholdViolations;
+	fsParams[3] = 0;
+	fsParams[4] = 0;
+	float fsFParams[5];
+	fsFParams[0] = 0.01;
+	fsFParams[1] = 80000; //settings->maxForceSensor;
+	fsFParams[2] = 10000.7; //settings->maxForceSensor; // change torque
+	fsFParams[3] = 0;
+	fsFParams[4] = 0;
+	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
+
+	float relPos[3];
+	simGetObjectPosition(relativePosHandle,-1,relPos);
+	phenV = 0;
+	phenV += relPos[0];
+	phenV += relPos[1];
+	phenV += relPos[2];
+	if (phenV > 1000) {
+		phenV = 1000;
+	}
+	else if (phenV < -1000) {
+		phenV = -1000;
+	}
+	int d1 = simCreateDummy(0.001, NULL);
+	int d2 = simCreateDummy(0.001, NULL);
+	int d3 = simCreateDummy(0.001, NULL);
+	//	int d4 = simCreateDummy(0.001, NULL);
+	float fsR[3];
+	fsR[0] = configuration[3];
+	fsR[1] = configuration[4];
+	fsR[2] = configuration[5];
+	float zeroOrigin[3] = { 0,0,0 };
+
+	float fsPos[3];
+	fsPos[0] = 0;
+	fsPos[1] = 0;
+	fsPos[2] = configuration[2] + 0.00005;
+	
+	float zeroPos[3];
+	zeroPos[0] = 0.0;
+	zeroPos[1] = 0.0;
+	zeroPos[2] = 0.0;
+
+	//simSetObjectOrientation(fs, relativePosHandle, fsR);
+	//	simSetObjectPosition(fs, relativePosHandle, fsPos);
+	// simSetObjectParent(fs, parentHandle, true);
+
+	simSetObjectPosition(fs, relativePosHandle, zeroPos);
+	simSetObjectOrientation(fs, relativePosHandle, fsR);
+	simSetObjectPosition(fs, fs, fsPos);
+	simSetObjectParent(fs, parentHandle, true);
+
+	float objectOrigin[3];
+	float size[3] = { 0.055,0.055,0.003 };
+
+	objectOrigin[0] = configuration[0];
+	objectOrigin[1] = configuration[1];
+	objectOrigin[2] = configuration[2] + (size[2]*0.5) + 0.0001;
+
+	float rotationOrigin[3];
+	rotationOrigin[0] = configuration[3];
+	rotationOrigin[1] = configuration[4];
+	rotationOrigin[2] = configuration[5];
+
+//	float size[3] = { 0.055,0.055,0.003 };
+	float mass = 0.0275;
+	int baseHandle = simCreatePureShape(0, objectPhysics, size, mass, 0);
+	int part2 = simCreatePureShape(0, objectPhysics, size, mass, 0);
+	int part3 = simCreatePureShape(0, objectPhysics, size, mass, 0);
+	int part4 = simCreatePureShape(0, objectPhysics, size, mass, 0);
+
+	float appearanceSize[3] = { 0.032, 0.036, 0.058 };
+	int appearancePeace = simCreatePureShape(0, objectPhysics, appearanceSize, 0.055, 0);
+	//	cout << "baseHandle and appearancePeace: " << baseHandle << ", " << appearancePeace << endl; 
+	float jointSize[3] = { 0.048,0.018, 0 };
+	float appearancePos[3] = { 0.0, 0.00, 0.0305 };
+	int joint = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
+	float part2Pos[3] = { 0,0,0.074001 };
+	float part3Pos[3] = { 0,0.029001,0.045 };
+	float part4Pos[3] = { 0,-0.029001,0.045 };
+
+	simSetShapeMaterial(baseHandle, 2290011); // default material
+	simSetShapeMaterial(part2, 2290011);
+	simSetShapeMaterial(part3, 2290011);
+	simSetShapeMaterial(part4, 2290011);
+	simSetShapeMaterial(appearancePeace, 2290011);
+
+	simSetObjectPosition(baseHandle, relativePosHandle, zeroOrigin);
+	simSetObjectOrientation(baseHandle, relativePosHandle, rotationOrigin);
+	simSetObjectPosition(baseHandle, baseHandle, objectOrigin);
+	simSetObjectPosition(appearancePeace, baseHandle, appearancePos);
+	//	simSetObjectPosition(innerfs, baseHandle, appearancePos);
+	simSetObjectPosition(part2, baseHandle, part2Pos);
+	simSetObjectPosition(part3, baseHandle, part3Pos);
+	simSetObjectPosition(part4, baseHandle, part4Pos);
+	simSetObjectPosition(d1, baseHandle, part2Pos);
+	simSetObjectPosition(d2, baseHandle, part3Pos);
+	simSetObjectPosition(d3, baseHandle, part4Pos);
+
+	float part2Or[3] = { 0,0,0 };
+	float part3Or[3] = { -0.5 * M_PI,0.0,0 };
+	float part4Or[3] = { 0.5 * M_PI,-0.0,0 };
+
+	simSetObjectOrientation(appearancePeace, baseHandle, zeroOrigin);
+	//	simSetObjectOrientation(innerfs, baseHandle, zeroOrigin);
+	simSetObjectOrientation(part2, baseHandle, part2Or);
+	simSetObjectOrientation(part3, baseHandle, part3Or);
+	simSetObjectOrientation(part4, baseHandle, part4Or);
+	simSetObjectOrientation(d1, baseHandle, part2Or);
+	simSetObjectOrientation(d2, baseHandle, part3Or);
+	simSetObjectOrientation(d3, baseHandle, part4Or);
+	float pos[3] = { 0.0,0.0,size[2]*0.5f };
+	simSetObjectPosition(d1, d1, pos);
+	simSetObjectPosition(d2, d2, pos);
+	simSetObjectPosition(d3, d3, pos);
+
+	float jointPos[3] = { 0,0,0.045 };
+	float jointOr[3] = { 0.5*M_PI,0,0 };
+
+	simSetObjectPosition(joint, baseHandle, jointPos);
+	simSetObjectOrientation(joint, baseHandle, jointOr);
+	//	float tpos[3];
+	//	simGetObjectPosition(part2, baseHandle, tpos);
+	//
+	int shapHands[3] = { part4, part3, part2 };
+	int groupedShaps = simGroupShapes(shapHands, 3);
+
+	int baseshapHands[2] = { baseHandle, appearancePeace };
+	int groupedBase = simGroupShapes(baseshapHands, 2);
+
+	vector<shared_ptr<SITE>> site1;
+	for (int i = 0; i < 4; i++) {
+		site1.push_back(shared_ptr<SITE>(new SITE));
+	}
+	vector<shared_ptr<SITE>> site2;
+	for (int i = 0; i < 4; i++) {
+		site2.push_back(shared_ptr<SITE>(new SITE));
+	}
+	vector<shared_ptr<SITE>> site3;
+	for (int i = 0; i < 4; i++) {
+		site3.push_back(shared_ptr<SITE>(new SITE));
+	}
+	for (int i = 0; i < 4; i++) {
+		site1[i]->x = 0.0;
+		site1[i]->y = 0.0;
+		site1[i]->z = 0.0;
+		site1[i]->rX = 0.0 * M_PI;
+		site1[i]->rY = 0.0 * M_PI;
+		site1[i]->rZ = (0.0 + (0.5*i)) * M_PI;
+		site1[i]->parentHandle = groupedShaps;
+		site1[i]->relativePosHandle = d1;
+	}
+	siteConfigurations.push_back(site1);
+	sites.push_back(0);
+	for (int i = 0; i < 4; i++) {
+		site2[i]->x = 0.0;
+		site2[i]->y = 0.0;
+		site2[i]->z = 0.00;
+		site2[i]->rX = 0.0 * M_PI;
+		site2[i]->rY = 0.0 * M_PI;
+		site2[i]->rZ = (0.0 + (0.5*i)) * M_PI;
+		site2[i]->parentHandle = groupedShaps;
+		site2[i]->relativePosHandle = d2;
+	}
+	siteConfigurations.push_back(site2);
+	sites.push_back(1);
+	for (int i = 0; i < 4; i++) {
+		site3[i]->x = 0.0;
+		site3[i]->y = 0.0;
+		site3[i]->z = 0.0;
+		site3[i]->rX = 0.0 * M_PI;
+		site3[i]->rY = 0.0 * M_PI;
+		site3[i]->rZ = (0.0 + (0.5*i)) * M_PI;
+		site3[i]->parentHandle = groupedShaps;
+		site3[i]->relativePosHandle = d3;
+	}
+	siteConfigurations.push_back(site3);
+	sites.push_back(2);
+
+	freeSites = sites;
+	site1.clear();
+	objectHandles.push_back(fs);
+	objectHandles.push_back(groupedBase);
+	objectHandles.push_back(groupedShaps);
+	objectHandles.push_back(d1);
+	objectHandles.push_back(d2);
+	objectHandles.push_back(d3);
+	objectHandles.push_back(joint);
+
+	controlHandles.push_back(joint);
+
+	simSetObjectParent(groupedBase, fs, true);
+	simSetObjectParent(d1, groupedShaps, true);
+	simSetObjectParent(d2, groupedShaps, true);
+	simSetObjectParent(d3, groupedShaps, true);
+	simSetObjectParent(joint, groupedBase, true);
+	simSetObjectParent(groupedShaps, joint, true);
+
+	simSetObjectInt32Parameter(joint, 2000, 1);
+	simSetObjectInt32Parameter(joint, 2001, 1);
+	simSetObjectFloatParameter(joint, 2002, 0.1);
+	simSetObjectFloatParameter(joint, 2003, 0.01);
+	simSetObjectFloatParameter(joint, 2004, 0.0);
+	simSetJointTargetPosition(joint, 0.0);
+	//	cout << "maxForce = " << settings->maxForce << endl;
+	simSetJointForce(controlHandles[0], settings->maxForce);
+	simSetJointTargetVelocity(controlHandles[0], 0.05);
+
+	for (int j = 0; j < objectHandles.size(); j++) {
+		simSetObjectSpecialProperty(objectHandles[j], sim_objectspecialproperty_detectable_all);
+	}
+
+	// ------------------------
+	//	simSetJointTargetPosition(joint, 0);
+	return baseHandle;
+
+}
+
 
 int Module_Misc::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
 	int miscHandle = simLoadModel(("models/" + filename).c_str());
@@ -42,19 +264,15 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	// this possibly causes a leak, advice to use simAddObjectsToSelection with sim_handle_tree
 	// then get simGetObjectSelection to get the object types. 
 	/**/
-	// All object handles of the module
 	vector<int> shapes;
-	// all joint handles of the module
 	vector<int> joints;
-	// all dummy handles of the module
 	vector<int> dummies;
-	// all sensor handles of the module
 	vector<int> sensors;
 	// select all objects in tree
 	simAddObjectToSelection(sim_handle_tree, miscHandle);
 	int selectionSize = simGetObjectSelectionSize();
-	// store all these objects (max 50 shapes)
-	int shapesStorage[50]; // stores up to 50 shapes
+	// store all these objects (max 20 shapes)
+	int shapesStorage[50]; // stores up to 20 shapes
 	simGetObjectSelection(shapesStorage);
 	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
@@ -68,7 +286,6 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 			// attachment location
 			dummies.push_back(shapesStorage[i]);
 		}
-		// TODO: Other sensors might need to be added as well
 		else if (objectType == sim_object_proximitysensor_type) {
 			// sensor
 			sensors.push_back(shapesStorage[i]);
@@ -78,19 +295,21 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	simRemoveObjectFromSelection(sim_handle_all, miscHandle);
 
 	// get the difference between the parent attachment configurations and the main handle of the object?
-    if (settings->verbose) {
+
+
+	if (settings->verbose) {
 		cout << "creating force sensor" << endl;
 	}
 	int fsParams[5];
 	fsParams[0] = 0;
 	fsParams[1] = 1;
-	fsParams[2] = settings->consecutiveThresholdViolations;
+	fsParams[2] = 20; // settings->consecutiveThresholdViolations;
 	fsParams[3] = 0;
 	fsParams[4] = 0;
 	float fsFParams[5];
 	fsFParams[0] = 0.005;
-	fsFParams[1] = settings->maxForce_ForceSensor;
-	fsFParams[2] = settings->maxTorque_ForceSensor; // change torque
+	fsFParams[1] = 800; //settings->maxForceSensor;
+	fsFParams[2] = 1000;// 1.7; //settings->maxForceSensor; // change torque
 	fsFParams[3] = 0;
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
@@ -105,38 +324,24 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	float fsPos[3];
 	fsPos[0] = 0.0;
 	fsPos[1] = 0.0;
-    if (parentHandle != -1) {
-        fsPos[2] = configuration[2] + 0.0001;
-    }
-    else{
-        fsPos[2] = 1.0;
-    }
+	fsPos[2] = configuration[2] + 0.0001;
 	float zeroPos[3]; 
 	zeroPos[0] = 0.0;
 	zeroPos[1] = 0.0;
 	zeroPos[2] = 0.0;
 
-    if (parentHandle == -1) {
-        // TODO: Change function below in comments
-        //simSetObjectPosition(miscHandle, NULL, zeroPos);
-        //simSetObjectOrientation(miscHandle, NULL, fsR);
-    }
-    else{
-        simSetObjectPosition(fs, relativePosHandle, zeroPos);
-        simSetObjectOrientation(fs, relativePosHandle, fsR);
-        simSetObjectPosition(fs, fs, fsPos);
-        simSetObjectParent(fs, parentHandle, true);
-        simSetObjectPosition(miscHandle, fs, zeroPos);
-        simSetObjectOrientation(miscHandle, relativePosHandle, fsR);
-    }
+	simSetObjectPosition(fs, relativePosHandle, zeroPos);
+	simSetObjectOrientation(fs, relativePosHandle, fsR);
+	simSetObjectPosition(fs, fs, fsPos);
+	simSetObjectParent(fs, parentHandle, true);
 
-
+	simSetObjectPosition(miscHandle, fs, zeroPos);
+	simSetObjectOrientation(miscHandle, relativePosHandle, fsR);
+	
 	simRemoveObject(miscHandle);
 	dummies.erase(dummies.begin());
 	miscHandle = shapes[0];
-    if (parentHandle != -1) {
-        simSetObjectParent(miscHandle, fs, true);
-    }
+	simSetObjectParent(miscHandle, fs, true);
 	
 	// get dummy position and orientation
 //	float dummyPos[3];
@@ -202,7 +407,7 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 			site[i]->rX = 0;
 			site[i]->rY = 0;
 			site[i]->rZ = (0.0 + (0.5*i)) * M_PI;
-			site[i]->parentHandle = shapes[shapes.size()-1];
+			site[i]->parentHandle = shapes[1];
 			site[i]->relativePosHandle = dummies[n];
 		}
 		siteConfigurations.push_back(site);
@@ -233,9 +438,6 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	if (settings->verbose) {
 		cout << "Done creating misc module" << endl;
 	}
-    if (parentHandle == -1) {
-        simRemoveObject(fs); //dont't need force sensor when parentHandle = -1
-    }
 	return miscHandle;
 }
 
@@ -277,6 +479,30 @@ vector<float> Module_Misc::updateModule(vector<float> input) {
 	float pos[3];
 	if (controlHandles.size() > 0) {
 		if (previousPosition == -1) {
+			simGetJointPosition(controlHandles[0], pos);
+			previousPosition = pos[0];
+		}
+		else {
+			simGetJointPosition(controlHandles[0], pos);
+			float currentPos = pos[0];
+			float distanceDifference = (sqrt((currentPos*currentPos) - (previousPosition*previousPosition)));
+			//	cout << "distanceDifference " << distanceDifference << endl;
+			float energyLost = 0;
+			if (distanceDifference > 0.01) {
+				energyLost = (settings->energyDissipationRate * distanceDifference);
+			}
+
+			//		cout << "pos: " << currentPos << ", " << previousPosition << endl;
+			if (energyLost < 0) {
+				energyLost = 0;
+			}
+			if (energyLost > 1000) {
+				energyLost = 1000;
+			}
+			//		cout << "energy dissipation rate = " << settings->energyDissipationRate << endl;
+			//		cout << "energy lost = " << energyLost << endl;
+			energy = energy - energyLost;
+			//		cout << "energy = " << energy << endl;
 			simGetJointPosition(controlHandles[0], pos);
 			previousPosition = pos[0];
 		}

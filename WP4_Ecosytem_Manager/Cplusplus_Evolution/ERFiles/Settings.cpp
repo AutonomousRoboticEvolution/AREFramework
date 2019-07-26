@@ -14,13 +14,11 @@ Settings::Settings() {
 	// 15: sensor 
 	// 16: servo
 	// 17: bone
-	// 18: example
-	moduleTypes.push_back(13);
-	moduleTypes.push_back(14);
-	moduleTypes.push_back(14);
-	moduleTypes.push_back(16);
-	moduleTypes.push_back(17);
-	autoDeleteSettings = true;
+	moduleTypes.push_back(1);  
+	moduleTypes.push_back(4);  
+	moduleTypes.push_back(4);  
+	moduleTypes.push_back(4); 
+	moduleTypes.push_back(4);  
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -29,21 +27,23 @@ Settings::Settings() {
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
 	maxModuleTypes[0][1] = 100; // one base module
-	maxNumberModules = 20;
-	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = MODULAR_LSYSTEM;
-	environmentType = DEFAULT_ENV;
+	
+	maxAmountModules = 20;
+	
+	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
+	morphologyType = CPPN_NEAT_MORPH;
 	controlType = ANN_CUSTOM;
-	populationSize = 4;
+	populationSize = 6;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
+	environmentType = DEFAULT_ENV;
 //	controlType = ANN_DEFAULT;
-	verbose = true;
+	verbose = false;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
-	evolutionType = STEADY_STATE;
+	evolutionType = EA_NEAT;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
@@ -58,9 +58,7 @@ Settings::Settings() {
 	killWhenNotConnected = true;
 	colorization = COLOR_NEURALNETWORK;
 	createPatternNeurons = false;
-	maxTorque_ForceSensor = 1000000;
-	maxForce_ForceSensor = 1000000;
-	consecutiveThresholdViolations = 1000;
+
 	//repository="files";
 }
 
@@ -87,21 +85,29 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 	}
 }
 
+void Settings::openPort() {
+	// deprecated
+	//packetHandler1 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION1);
+	//packetHandler2 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION2);
+	//char *dev_name = (char*)DEVICENAME;
+	//portHandler = dynamixel::PortHandler::getPortHandler(dev_name);
+
+	//if (portHandler->openPort())
+	//{
+	//	printf("Succeeded to open the port!\n\n");
+	//	printf(" - Device Name : %s\n", dev_name);
+	//	printf(" - Baudrate    : %d\n\n", portHandler->getBaudRate());
+	//}
+	//else
+	//{
+	//	printf("Failed to open the port! [%s]\n", dev_name);
+	//	printf("Press any key to terminate...\n");
+	//	//		getch();
+	//}
+}
 
 void Settings::readSettings() {
 	bool fileExists = false;
-	if (autoDeleteSettings == true) {
-		// check if settings file exists and delete if present
-		ofstream settingsFile;
-		settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
-		fileExists = settingsFile.good();
-		settingsFile.close();
-		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
-		return;
-	}
-
-
-	fileExists = false;
 	std::cout << "sceneNum = " << sceneNum << std::endl;
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;
@@ -558,20 +564,20 @@ void Settings::readSettings() {
 				energyDissipationRate = atof(tmp.c_str());
 			}
 
-			else if (tmp == "#numberOfModules") {
+			else if (tmp == "#amountModules") {
 				it++;
 				tmp = *it;
-				numberOfModules = atoi(tmp.c_str());
+				amountModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#useVarModules") {
 				it++;
 				tmp = *it;
 				useVarModules = atoi(tmp.c_str());
 			}
-			else if (tmp == "#maxNumberModules") {
+			else if (tmp == "#maxAmountModules") {
 				it++;
 				tmp = *it;
-				maxNumberModules = atoi(tmp.c_str());
+				maxAmountModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#maxForceModules") {
 				cout << "found max force modules" << endl;
@@ -587,7 +593,7 @@ void Settings::readSettings() {
 			}
 			else if (tmp == "#moduleTypes") {
 				moduleTypes.clear();
-				for (int i = 0; i < numberOfModules; i++) {
+				for (int i = 0; i < amountModules; i++) {
 					it++;
 					tmp = *it;
 					moduleTypes.push_back(atoi(tmp.c_str()));
@@ -597,7 +603,7 @@ void Settings::readSettings() {
 				maxModuleTypes.clear();
 				vector<int> tmpTypes;
 
-				for (int i = 0; i < numberOfModules; i++) {
+				for (int i = 0; i < amountModules; i++) {
 					it++;
 					tmp = *it;
 					vector<int> tmpMaxMods;
@@ -642,9 +648,9 @@ void Settings::saveSettings() {
 	settingsFile << ",#bestIndividual," << bestIndividual << endl; // set when saving
 	settingsFile << ",#initialSeed," << seed << "," << endl;
 	settingsFile << ",#verbose," << verbose << "," << endl;
-	settingsFile << ",#numberOfModules," << numberOfModules << "," << endl; // not used
+	settingsFile << ",#amountModules," << amountModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
-	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << endl;
+	settingsFile << ",#maxAmountModules," << maxAmountModules << "," << endl;
 	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
 	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
 
@@ -675,9 +681,4 @@ void Settings::saveSettings() {
 	settingsFile << endl;
 
 	settingsFile.close();
-}
-
-void Settings::setRepository(std::string repository) {
-    this->repository = repository;
-    std::cout << "setting repository to " << repository << std::endl;
 }

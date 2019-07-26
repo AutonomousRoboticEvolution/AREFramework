@@ -468,7 +468,21 @@ void ER_Module::updateMorph(int num) {
 }
 
 vector<float> ER_Module::updateModule(vector<float> input) {
-	colorModule(moduleColor, control->cf);
+//	energy = energy - energyDissipationRate;
+//	diffuseEnergy();
+//	cout << "moduleColor = " << moduleColor[0] << ", " << moduleColor[1] << ", " << moduleColor[2] << endl;
+//	if (settings->colorization == settings->COLOR_NEURALNETWORK) {
+//		float newModColor[3] = { 0.5,0.5,0.5 };
+		colorModule(moduleColor, control->cf);
+//	}
+//	else {
+//		colorModule(moduleColor, control->cf);
+//	}
+//	vector<float> output;
+//	if (control) {
+//		output = control->update(input);
+//	}
+//	cout << "energy = " << energy << endl;
 	if (control) {
 		addInput(input);//update input accoring to new input
 	}
@@ -477,8 +491,11 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 		|| settings->environmentType == settings->SUN_CONSTRAINED_AND_MOVING
 		|| settings->environmentType == settings->SUN_MOVING
 		|| settings->environmentType == settings->SUN_BLOCKED) {
+//		cout << "direct diffusing" << endl;
+		directDiffuseEnergy();
 	}
-    vector<float> output;
+	vector<float> output = input;
+
 	if (broken == false) {
 		output = control->update(input);//update inputLayer, recurrentLayer and outputLayer
 		for (int i = 0; i < output.size(); i++) {
@@ -490,13 +507,12 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 			}
 		}
 	}
-	else {
-	    // if the module is broken it might still require an output.
-        output = input;
-    }
 	return output;
 }
 
+void ER_Module::addEnergy(float addedEnergy) {
+	energy += addedEnergy;
+}
 
 void ER_Module::addInput(vector<float> input) {
 	if (control) {
@@ -504,7 +520,31 @@ void ER_Module::addInput(vector<float> input) {
 	}
 }
 
+void ER_Module::diffuseEnergy() {
+	
+	if (parentModulePointer != NULL) {
+		float diffEn = parentModulePointer->energy - energy;
+		if (diffEn < 0) {
+			parentModulePointer->energy += -(diffEn / 2);
+			energy += (diffEn / 2);
+		}
+		else if (diffEn == 0) {
+		}
+		else {
+			parentModulePointer->energy += -(diffEn / 2);
+			energy += (diffEn / 2);
+		}
+	}
+}
 
+void ER_Module::directDiffuseEnergy() {
+	if (parentModulePointer != NULL) {
+//		cout << "energy = " << energy << endl;
+		parentModulePointer->energy += energy;
+//		cout << "parentEnergy = " << parentModulePointer->energy << endl;
+		energy = 0;
+	}
+}
 
 void ER_Module::setModuleID(int id) {
 	moduleID = id;

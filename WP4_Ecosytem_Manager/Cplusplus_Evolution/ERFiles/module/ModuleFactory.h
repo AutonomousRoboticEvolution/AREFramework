@@ -1,7 +1,17 @@
 #pragma once
 #include "ER_Module.h"
 #include "Module_Cube.h"
+//#include "Module_Bend.h"
+#include "Module_Leaf.h"
 #include "Module_Servo.h"
+//#include "Module_Rodrigo.h"
+//#include "Module_Rectangle.h"
+#include "Module_LeafChloe.h"
+//#include "Module_Brain.h"
+#include "Module_APlantBase.h"
+//#include "Module_Spring.h"
+#include "Module_Solar.h"
+//#include "Module_Head.h"
 #include "Module_Misc.h"
 #include "Module_Bone.h"
 #include <memory>
@@ -20,13 +30,13 @@ private:
 	{
 		DEFAULTMODULE = 0,
 		CUBE = 1,
+		BEND = 2,
+		LEAF = 3,
 		SERVO = 4,
-		WHEEL = 14,
-		BRAIN = 13,
-		ARE_SERVO = 16,
-		SENSOR = 15,
-		BONE = 17,
-		EXAMPLE = 18
+		RECTANGLE = 5,
+		LEAFCHLOE = 6,
+		BRAIN = 7,
+		STICK
 	};
 };
 

@@ -13,21 +13,24 @@ public:
 	ER_DirectEncoding();
 	~ER_DirectEncoding();
 
-	// Essentials
 	void init();
 	void mutate();
-    void update();
-    shared_ptr<Morphology> clone() const;
 
+
+	int initializeGenome(int type);
 	void initializeRobot(int type);
-    int mutateControlERGenome(float mutationRate);
+	int mutateERGenome(float mutationRate);
+	int checkTreeDepth(int attachModule, int increment);
+	int mutateControlERGenome(float mutationRate);
 
-    /// Checks the controller of the module
+	void deleteModuleFromGenome(int num);
+
 	void checkControl(int individual, int sceneNum);
+	shared_ptr<Morphology> clone() const;
+	void update();
 	float fitness;
-	/// Can be used to print some debugging information
 	void printSome();
-    /// Can be used if you want to manually create a direct encoding genome
+
 	void initializeGenomeCustom(int type);
 	void initializeQuadruped(int type);
 	virtual const std::string generateGenome(int individual, float fitness) const override;
@@ -36,8 +39,19 @@ public:
 	bool loadGenome(std::istream& input, int individualNumber);
 	void setGenomeColors();
 	void symmetryMutation(float mutationRate);
+
 	void crossover(shared_ptr<Morphology>, float crossoverRate);
 protected:
+	enum OBJECTTYPE {
+		CUBE, 
+		BEND, 
+		PANEL
+	};
+	enum CONNECTTYPE {
+		FORCE,
+		PRISMATIC
+	};
+
 	struct MODULEPARAMETERS {
 		// State specific parameters
 		shared_ptr<MODULEPARAMETERS> clone() const {
@@ -45,26 +59,20 @@ protected:
 			mp->control = this->control->clone();
 			return mp;
 		};
-		/// This means that a phenotype of this module is created and it's children have been attached
 		bool expressed = true;
 	
 		// not stored in genome
 		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
 		float rgb[3];
 		// parameter identifiers
-        int type = -1; // cube, servo, leaf, etc.
-		int handle;
+		int handle;	
 		float color[3] = { 0.45f,0.45f,0.45f };
-        float moduleColor[3];
-
 		shared_ptr<Control> control;
-
-		/// ID (position in 'moduleParameters' vector) of the particular module this module should connect to
+		float moduleColor[3];
+		int type = -1; // cube, servo, leaf, etc.
+		// for direct encoding
 		int parent;
-		/// Every module has a number of connection sites,
-		/// this defines to which connection site this particular module is attached
-		int parentSite;
-		/// 4 possible orientations
+		int parentSite; 
 		int orientation;
 	};
 
@@ -77,8 +85,23 @@ protected:
 			return ug;
 		};
 		vector<shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state 
-
-		int numberOfModules = 1; // initial number of modules
+		//HORMONEGENOME hormoneGenome;
+		
+		int amountModules = 1; // initial amount of modules
+		int mask1 = 65281;
+		int mask2 = 65282;
+		int maxIt = 200;
+		int dynamic = 16;
+		bool useSymmetryMutation = true;
+		bool crossover = true;
+		float crossoverRate = 0.1; // at every state, a crossover can occur
+								   //void deleteLParameters() { // for when it turns out that lParameters needs to store pointers
+								   //	for (int i = 0; i < lParameters.size(); i++) {
+								   //		delete lParameters[i];
+								   //	
+								   //} 
+		//LGENOME*::clone() const
+		//	LGENOME* clone() const;
 	};
 
 public:
@@ -87,9 +110,4 @@ public:
 
 private:
 	void checkGenome(int individualNumber, int sceneNum);
-    int mutateERGenome(float mutationRate);
-    int initializeGenome(int type);
-    int checkTreeDepth(int attachModule, int increment);
-    void deleteModuleFromGenome(int num);
-
 };

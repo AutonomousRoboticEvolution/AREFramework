@@ -62,6 +62,9 @@ void Development::saveGenome(int indNum, float fitness)
 	genomeFile.close();
 }
 
+float Development::callFitness() {
+	return fitness;
+}
 
 bool Development::loadGenome(int individualNumber, int sceneNum)
 {
@@ -127,17 +130,23 @@ int Development::getMaxChilds(int t) {
 	else if (t == 1) {
 		return 5;
 	}
-	else if (t == 14 || t == 15) {
+	else if (t == 13 || t == 14 || t == 15) {
 		return 0;
 	}
-	else if (t == 16 || t == 18) {
+	else if (t == 16) {
 		return 1;
 	}
 	else if (t == 17) {
 		return 5;
 	}
-	else if (t == 13) {
-		return 4;
+	else if (t == 31) {
+		return 1;
+	}
+	else if (t == 34) {
+		return 1;
+	}
+	else if (t == 35) {
+		return 1;
 	}
 	else {
 		return 0;
@@ -319,7 +328,7 @@ int Development::mutateControlERLGenome(float mutationRate) {
 }
 
 void Development::create() {
-    cout << "CANNOT CREAT DEVELOPMENT GENOME" << endl;
+
 }
 
 void Development::mutate() {

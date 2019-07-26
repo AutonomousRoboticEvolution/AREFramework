@@ -9,29 +9,33 @@ public:
 	~EA_SteadyState();
 
 	void split_line(string & line, string delim, list<string>& values);
-
-	/**
-	 * @brief
-	 */
+	vector<int> evaluationQueue;
+	
+	// base functions of EA
 	void init();
 	void selection();
 	void replacement();
 	void mutation();
+	void update() {}; // not used in this class
+	void createIndividual(int indNum) {}; // not used in this class
+	void initNewGenome(int indnum);
+	void end() {}; // not used in this class
 
-	/**
-		@brief This method initilizes a population of genomes
-	*/
+
+	// unique functions
 	void initializePopulation();
-	void selectIndividuals(); // random tournament, empty function?
-	void replaceIndividuals(); // random empty function?
+	void selectIndividuals(); // random tournament
+	void replaceIndividuals(); // random
 	void replaceNewIndividual(int indNum, int sceneNum, float fitness);
-
-	/**
-		@brief This method creates a new morphology base on a randomly selected parent (copy)
-	*/
+	virtual shared_ptr<Genome> initNewGenome();
+	virtual void saveGenome(shared_ptr<Genome>);
+	void setFitness(int individual, float fitness);
+	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
+	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used here
 	void createNewGenRandomSelect();
-
+	
 	void replaceNewPopRandom(int numAttempts);
 	void replaceNewRank();
 	void loadPopulationGenomes(int scenenum);
 };
+

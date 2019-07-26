@@ -17,34 +17,40 @@ public:
 	shared_ptr<RandNum> randomNum;
 	/// morph is part of genome
 	shared_ptr<Morphology> morph;
-	/// Can be used for a adding a centralized controller
 	shared_ptr<Control> control;
+	bool initialized = false;
 
 	/// fitness value; make vector for multi-objective
 	float fitness;
 	/// mark the end of evaluation for a generation
 	bool isEvaluated = false; 
 
-	/// mark the ID of individual
+	///mark the ID of inidividual
 	int individualNumber;
-	/// Initialize the morph and its control
+	/**
+	@brief Initialize the morph and its control 
+	*/
 	virtual void init() = 0;
-    /// Creates the phenotype
+
 	virtual void create() = 0;
-    /// This function is called every frame (updates the phenotype)
+
 	virtual void update() = 0;
-	/// This method deep copies the genome
+	/**
+		@brief This method clone the genome
+	*/
 	virtual shared_ptr<Genome> clone() const = 0;
 	virtual void mutate() = 0;
+
 	virtual void savePhenotype(int indNum, int sceneNum) = 0;
-    /// loads genome from .csv
+
 	virtual bool loadGenome(int indNum, int sceneNum) = 0;
-    /// loads genome from signal : TODO BUG????
-    virtual bool loadGenome(std::istream &input, int indNum) = 0;
-    virtual void saveGenome(int indNum) = 0;
-    /// Returns a genome string from existing genome
-	virtual const std::string generateGenome() const = 0;
-	/// prints out a few genome debugging statements
+	virtual bool loadGenome(std::istream &input, int indNum) = 0;
+	virtual void saveGenome(int indNum) = 0;
+	virtual const std::string generateGenome() const = 0; 
+	virtual void clearGenome() = 0;
 	virtual void checkGenome() = 0; // for debugging
+	virtual bool loadMorphologyGenome(int indNum, int sceneNum) = 0;
+	virtual bool loadMorphologyGenome(std::istream &input, int indNum) = 0;
+
 };
 

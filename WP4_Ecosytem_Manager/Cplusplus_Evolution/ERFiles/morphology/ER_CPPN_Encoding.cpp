@@ -56,7 +56,7 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 	cppn->mutate(0.5);
 
 	// make a temporary storage for phenotype based on genotypic information
-	//for (int i = 0; i < genome->numberOfModules; i++) {
+	//for (int i = 0; i < genome->amountModules; i++) {
 	//	genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 	//	genome->moduleParameters[i]->type = settings->initialModuleType;
 	//	vector<float>tempVector;
@@ -98,142 +98,6 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 	}
 	cppn->mutate(settings->morphMutRate);
 
-	//cout << "mutating direct" << endl;
-	//// 1) add module, 
-	//// 2) mutate morphology
-	//// 3) mutate control
-	//// 4) prune 
-	//// 5) symmetry
-
-	//for (int am = 0; am < 5; am++) {
-	//	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-	//		if (settings->verbose) {
-	//			cout << "adding module" << endl;
-	//		}
-	//		// add module
-	//		// select where module should be attached to
-	//		if (genome->moduleParameters.size() < 50) { // absolute max amount modules
-	//			int attachModule = randomNum->randInt(genome->moduleParameters.size(), 0);
-	//			int attachType = genome->moduleParameters[attachModule]->type;
-	//			if (genome->moduleParameters[attachModule]->childSiteStates.size() < genome->moduleParameters[attachModule]->maxChilds) {
-	//				int newModuleType = 4;//settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
-	//				//	genome->moduleParameters.size(); // type of module to be attached // change
-	//				bool collideSite = true;
-	//				int newModuleLocation = 0;
-	//				newModuleLocation = randomNum->randInt(genome->moduleParameters[attachModule]->maxChilds, 0);
-
-	//				int moduleAmount = 0;
-	//				int typeLoc = -1; // should always be assigned
-	//				for (int j = 0; j < settings->moduleTypes.size(); j++) {
-	//					if (newModuleType == settings->moduleTypes[j]) {
-	//						typeLoc = j;
-	//						for (int i = 0; i < genome->moduleParameters.size(); i++) {
-	//							if (genome->moduleParameters[i]->type == settings->moduleTypes[j]) {
-	//								moduleAmount++;
-	//								break;
-	//							}
-	//						}
-	//					}
-	//				}
-
-	//				if (moduleAmount > settings->maxModuleTypes[typeLoc][1]) {
-
-	//				}
-	//				else {
-
-	//					genome->moduleParameters[attachModule]->childSiteStates.push_back(newModuleType);
-	//					genome->moduleParameters[attachModule]->childSites.push_back(newModuleLocation);
-	//					genome->moduleParameters[attachModule]->childStates.push_back(newModuleType);
-	//					int newOr = randomNum->randInt(4, 0);
-	//					genome->moduleParameters[attachModule]->childConfigurations.push_back(newOr);
-	//					unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-	//					genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-	//					int theNewModule = genome->moduleParameters.size() - 1;
-	//					int n = randomNum->randInt(settings->moduleTypes.size() - 1, 1);
-	//					genome->moduleParameters[theNewModule]->type = settings->moduleTypes[n];
-	//					vector<float>tempVector;
-	//					genome->moduleParameters[theNewModule]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
-	//					genome->moduleParameters[theNewModule]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
-	//					genome->moduleParameters[theNewModule]->control->mutate(0.5);
-	//					genome->moduleParameters[theNewModule]->control->mutate(0.5);
-	//					cf.reset();
-	//					genome->moduleParameters[theNewModule]->control->mutate(0.8);
-	//					if (genome->moduleParameters[theNewModule]->type == 1) {
-	//						genome->moduleParameters[theNewModule]->maxChilds = 5;
-	//					}
-	//					else if (genome->moduleParameters[theNewModule]->type == 4) {
-	//						genome->moduleParameters[theNewModule]->maxChilds = 3;
-	//					}
-	//					else {
-	//						genome->moduleParameters[theNewModule]->maxChilds = 0;
-	//					}
-	//					genome->moduleParameters[theNewModule]->amountChilds = genome->moduleParameters[theNewModule]->childSites.size();
-	//					genome->moduleParameters[theNewModule]->parent = attachModule;
-	//					genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
-	//					genome->moduleParameters[theNewModule]->orientation = newOr;
-	//					genome->numberOfModules = genome->moduleParameters.size();
-	//				}
-	//			}
-	//		}
-	//	}
-	//}
-
-	//for (int i = 0; i < genome->moduleParameters.size(); i++) {
-	//	if (randomNum->randFloat(0.0, 1.0) < settings->morphMutRate) {
-	//		for (int j = 0; j < genome->moduleParameters[i]->childConfigurations.size(); j++) {
-	//			int newOr = randomNum->randInt(4, 0);
-	//			genome->moduleParameters[i]->childConfigurations[j] = newOr;
-	//		}
-	//	}
-	//}
-	//for (int i = 0; i < genome->moduleParameters.size(); i++) {
-	//	if (genome->moduleParameters[i]->control) { // to check if not nullpointer
-	//		genome->moduleParameters[i]->control->mutate(settings->mutationRate);
-	//	}
-	//}
-	//if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-	//	if (settings->verbose) {
-	//		cout << "pruning" << endl;
-	//	}
-	//	if (genome->moduleParameters.size() > 1) {
-	//		int randomModule = randomNum->randInt(genome->moduleParameters.size() - 1, 1);
-	//		vector<int> deleteModules;
-	//		deleteModules.push_back(randomModule);
-	//		cout << "deleting: " << randomModule << endl;
-	//		for (int j = 0; j < deleteModules.size(); j++) {
-	//			cout << "dm[j]: " << deleteModules[j] << endl;
-	//			for (int i = 0; i < genome->moduleParameters.size(); i++) {
-	//				if (genome->moduleParameters[i]->parent == deleteModules[j])
-	//				{
-	//					deleteModules.push_back(i);
-	//					cout << "deleting: " << i << ", " << genome->moduleParameters[i]->parent << ", dm: " << deleteModules[j] << endl;
-	//					//						genome->moduleParameters.erase(genome->moduleParameters.begin() + i);
-	//				}
-	//			}
-	//		}
-	//		cout << "actual deletion" << endl;
-	//		int dCounter = 0;
-	//		std::sort(deleteModules.begin(), deleteModules.end());
-	//		for (int i = deleteModules.size() - 1; i >= 0; i--) {
-	//			cout << "i: " << i << endl;
-	//			cout << "module params size = " << genome->moduleParameters.size() << endl;
-	//			genome->moduleParameters.erase(genome->moduleParameters.begin() + (deleteModules[i]));
-	//			cout << "removed one from module parameters" << endl;
-	//			genome->numberOfModules -= 1;
-	//			for (int j = 0; j < genome->moduleParameters.size(); j++) {
-	//				cout << "j: " << j << endl;
-	//				if (genome->moduleParameters[j]->parent >= deleteModules[i] - dCounter) {
-	//					genome->moduleParameters[j]->parent -= 1;
-	//				}
-	//			}
-	//			cout << "deleted" << endl;
-	//		}
-	//	}
-	//}
-	//if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-	//	symmetryMutation(settings->morphMutRate);
-	//}
-
 	if (settings->verbose) {
 		cout << "mutated CPPN" << endl;
 	}
@@ -248,7 +112,7 @@ void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) 
 	tempGenome = morpho->genome->clone(); 
 
 	bool cross = false;
-	for (int i = 0; i < genome->numberOfModules; i++) {
+	for (int i = 0; i < genome->amountModules; i++) {
 		if (randomNum->randFloat(0, 1) < cr) {
 			if (cross == false) {
 				cross = true;
@@ -386,8 +250,8 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 		else if (tmp == "#AmountStates:") {
 			it++;
 			tmp = *it;
-			genome->numberOfModules = atoi(tmp.c_str());
-			for (int i = 0; i < genome->numberOfModules; i++) {
+			genome->amountModules = atoi(tmp.c_str());
+			for (int i = 0; i < genome->amountModules; i++) {
 				genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 			}
 		}
@@ -479,7 +343,7 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	//	lGenome->lParameters.resize(lGenome->amountStates);
 	//	cout << "amount of states = " << lGenome->amountStates << endl; 
 	morphFitness = 0;
-	for (int i = 0; i < genome->numberOfModules; i++) {
+	for (int i = 0; i < genome->amountModules; i++) {
 		switch (i) {
 		case 0:
 			for (int j = 0; j < 3; j++) {
