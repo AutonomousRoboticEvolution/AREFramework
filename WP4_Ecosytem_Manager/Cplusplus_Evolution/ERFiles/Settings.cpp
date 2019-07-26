@@ -39,7 +39,7 @@ Settings::Settings() {
 	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -631,6 +631,17 @@ void Settings::readSettings() {
                 }
                 std::cout << "Viability: Organs above printing bed - " << bOrgansAbovePrintingBed << std::endl;
             }
+            else if (tmp == "#nonprintableorientations") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bNonprintableOrientations = false;
+                }
+                else {
+                    bNonprintableOrientations = true;
+                }
+                std::cout << "Viability: Organs above printing bed - " << bNonprintableOrientations << std::endl;
+            }
 			fileExists = true;
 		}
 	}
@@ -669,6 +680,12 @@ void Settings::saveSettings() {
 	settingsFile << ",#numberOfModules," << numberOfModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
 	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << endl;
+
+	// Viability
+    settingsFile << ",#collidingorgans," << bCollidingOrgans << "," << endl;
+    settingsFile << ",#organsbelowprintingbed," << bOrgansAbovePrintingBed << "," << endl;
+    settingsFile << ",#nonprintableorientations," << bNonprintableOrientations << "," << endl;
+
 	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
 	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
 

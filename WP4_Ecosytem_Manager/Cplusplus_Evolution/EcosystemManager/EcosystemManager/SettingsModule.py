@@ -147,47 +147,53 @@ class EnvironmentParameters(Frame):
 
 class ViabilityParameters(Frame):
 	def __init__(self,parent):
-		self.manLabel = Label(parent,text="Manufacturability")
-		self.manLabel.grid(column = 0, row = 0)
-		self.manCheckVar = IntVar()
-		self.manCheck = Checkbutton(parent, variable = self.manCheckVar)
-		self.manCheck.grid(column = 1, row = 0)
-		
-		self.esLabel = Label(parent,text="Essential Organ")
-		self.esLabel.grid(column = 0, row = 1)
-		self.esCheckVar = IntVar()
-		self.esCheck = Checkbutton(parent, variable = self.esCheckVar)
-		self.esCheck.grid(column = 1, row = 1)
-
 		self.gndLabel = Label(parent,text="Organs below printing bed")
-		self.gndLabel.grid(column = 0, row = 2)
+		self.gndLabel.grid(column = 0, row = 1)
 		self.esCheckGndVar = IntVar()
 		self.esCheckGnd = Checkbutton(parent, variable = self.esCheckGndVar)
-		self.esCheckGnd.grid(column = 1, row = 2)
+		self.esCheckGnd.grid(column = 1, row = 1)
 
 		self.collLabel = Label(parent,text="Colliding organs")
-		self.collLabel.grid(column = 0, row = 3)
+		self.collLabel.grid(column = 0, row = 2)
 		self.esCheckCollVar = IntVar()
 		self.esCheckColl = Checkbutton(parent, variable = self.esCheckCollVar)
-		self.esCheckColl.grid(column = 1, row = 3)
+		self.esCheckColl.grid(column = 1, row = 2)
+
+		self.oriLabel = Label(parent,text="Non-printable organ orientations")
+		self.oriLabel.grid(column = 0, row = 3)
+		self.esCheckOriVar = IntVar()
+		self.esCheckOri = Checkbutton(parent, variable = self.esCheckOriVar)
+		self.esCheckOri.grid(column = 1, row = 3)
+
+		self.manLabel = Label(parent,text="Manufacturability")
+		self.manLabel.grid(column = 0, row = 4)
+		self.manCheckVar = IntVar()
+		self.manCheck = Checkbutton(parent, variable = self.manCheckVar)
+		self.manCheck.grid(column = 1, row = 4)
+
+		self.esLabel = Label(parent,text="Essential Organ")
+		self.esLabel.grid(column = 0, row = 5)
+		self.esCheckVar = IntVar()
+		self.esCheck = Checkbutton(parent, variable = self.esCheckVar)
+		self.esCheck.grid(column = 1, row = 5)
 
 		self.printVolLabel = Label(parent,text="Max Print Volume")
-		self.printVolLabel.grid(column = 0, row = 4)
+		self.printVolLabel.grid(column = 0, row = 6)
 		self.printVolVar = IntVar(parent,3)
 		#self.printVolVar.trace("w", self.moduleSizeChanged)
 		self.printVolScale = Scale(parent, from_=0, to=10, orient=HORIZONTAL,resolution=1, variable = self.printVolVar)
-		self.printVolScale.grid(column = 1, row = 4)
+		self.printVolScale.grid(column = 1, row = 6)
 		self.printVolText=Entry(parent, textvariable = self.printVolVar)
-		self.printVolText.grid(column = 2, row = 4)
+		self.printVolText.grid(column = 2, row = 6)
 
 		self.orgInLabel = Label(parent,text="Organ Insertion Sequence")
-		self.orgInLabel.grid(column = 0, row = 5)
+		self.orgInLabel.grid(column = 0, row = 7)
 
 		self.behaviorTestLabel = Label(parent,text="Behavior Test")
-		self.behaviorTestLabel.grid(column = 0, row = 6)
+		self.behaviorTestLabel.grid(column = 0, row = 8)
 		self.beCheckVar = IntVar()
 		self.beCheck = Checkbutton(parent, variable = self.beCheckVar)
-		self.beCheck.grid(column = 1, row = 6)
+		self.beCheck.grid(column = 1, row = 8)
 
 	def getSettings(self):
 		data = []
@@ -198,6 +204,10 @@ class ViabilityParameters(Frame):
 		row = []
 		row.append("#organsbelowprintingbed")
 		row.append(self.esCheckCollVar.get())
+		data.append(row)
+		row = []
+		row.append("#nonprintableorientations")
+		row.append(self.esCheckOriVar.get())
 		data.append(row)
 		return data
 

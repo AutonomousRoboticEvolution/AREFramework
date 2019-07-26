@@ -240,6 +240,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
 				}
                 // TODO: EB: Viability goes here?
+                // TODO: EB: Rearrange this into functions
                 // Check for collisions. If there is a colliding object, remove it from the genome representaion.
 				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans == true) {
                     if (settings->verbose) {
@@ -250,12 +251,26 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                         if (settings->verbose) {
                             cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED." << endl;
                         }
-                        for (int n = 0; n < modules.size(); n++) {
-                            if (modules[n]->parent == i) {
-                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                        // If the orientation of the organ is printable
+                        if((abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.8725665 && // 95o degrees
+                        abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.8725665) || // 50o degrees
+                        createdModules[createdModulesSize - 1]->type != 14 || settings->bNonprintableOrientations == true){
+                            if (settings->verbose) {
+                                cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
                             }
+                            for (int n = 0; n < modules.size(); n++) {
+                                if (modules[n]->parent == i) {
+                                    modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                }
+                            }
+                            genome->moduleParameters[i]->expressed = true;
                         }
-                        genome->moduleParameters[i]->expressed = true;
+                        else{
+                            if (settings->verbose) {
+                                cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
+                            }
+                            createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                        }
                     }
 				    else{
                         if (settings->verbose) {

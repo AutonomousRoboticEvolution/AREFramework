@@ -259,7 +259,10 @@ public:
 	/// Viability variables
 	// Allow organs above printing bed
 	bool bOrgansAbovePrintingBed = false;
+	// Allow colliding organs
     bool bCollidingOrgans = false;
+    // Allow any orientation for organs
+    bool bNonprintableOrientations = false;
 
 	/**
 		@brief Set the repository for saving data
