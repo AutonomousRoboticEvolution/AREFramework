@@ -32,9 +32,12 @@ bool ClientEA::init(int amountPorts, int startPort)
 			continue; // jump back to beginning loop
 		}
 	}
-	ea = shared_ptr<EA>(new EA_SteadyState());
-	ea->setSettings(settings, randNum);
+	unique_ptr<EA_Factory> eaf = unique_ptr<EA_Factory>(new EA_Factory());
+	ea = eaf->createEA(randNum, settings);
+	// ea = shared_ptr<EA>(new EA_SteadyState());
+	// ea->setSettings(settings, randNum);
 	ea->init();
+	eaf.reset();
 	return true;
 }
 
@@ -45,10 +48,16 @@ bool ClientEA::init(int amountPorts, int startPort)
 
 void ClientEA::initGA() {
 	// init GA
-	for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-		ea->nextGenGenomes[i]->init();
-		ea->nextGenGenomes[i]->morph->saveGenome(i, 0.0);
-		ea->nextGenGenomes[i]->individualNumber = i;
+	if (settings->evolutionType == settings->EA_NEAT) {
+		// doesn't need to be initialized?? (constructor initializes neat) 
+		// TODO change the name of the NEAT file. 
+	}
+	else {
+		for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
+			ea->nextGenGenomes[i]->init();
+			ea->nextGenGenomes[i]->morph->saveGenome(i, 0.0);
+			ea->nextGenGenomes[i]->individualNumber = i;
+		}
 	}
 	extApi_sleepMs(500);
 }
@@ -129,9 +138,23 @@ bool ClientEA::evaluatePop() {
 		std::cout << "Pushing individuals" << endl;
 	}
 
-	// start by making adding individuals to the queue
-	for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-		queuedInds.push_back(i);
+	if (settings->evolutionType == settings->EA_NEAT) {
+		// use isEvaluated instead
+		for (int i = 0; i < ea->population->m_Species.size(); i++) {
+			for (int j = 0; j < ea->population->m_Species[i].m_Individuals.size(); j++) {
+				queuedInds.push_back(ea->population->m_Species[i].m_Individuals[j].GetID());
+			}
+		}
+		for (int i = 0; i < queuedInds.size(); i++) {
+			cout << queuedInds[i] << endl;
+		}
+	}
+	else {
+		// following code does not work for NEAT
+		// start by making adding individuals to the queue
+		for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
+			queuedInds.push_back(i);
+		}
 	}
 	int returnValue = -8; // value to see what's going on. 
 
@@ -159,7 +182,6 @@ bool ClientEA::evaluatePop() {
 
 			int state;
 			state = slave->getIntegerSignalBuffer("simulationState");
-
 			//try {
 			// state = slave->getIntegerSignalBuffer("simulationState");
 			//} catch (const VrepRemoteException &e) {
@@ -172,7 +194,7 @@ bool ClientEA::evaluatePop() {
 			//	}
 			//}
 
-			if (state == 9) {
+			if (state == 9) { // Error loading genome
 				extApi_sleepMs(20);
 				std::cout << "It seems that server in port " << slave->port() << " could not load the genome. Sending it again. (" << slave->individualNum() << ")" << std::endl;
 				//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_blocking);
@@ -189,24 +211,36 @@ bool ClientEA::evaluatePop() {
 			if (state == 0 && slave->state() == SlaveConnection::State::FREE && queuedInds.size() > 0) {
 				// state 0 means that the client can send a new individual to the server. 
 				// the individual number of the serverInstance is set to the last queued individual and the vector is popped. 
-				
+
 				int ind = queuedInds.back();
-				queuedInds.pop_back(); 
+				queuedInds.pop_back();
 				slave->setIndividual(ind);
+				cout << "Trying to evaluate " << ind << endl;
+				if (settings->evolutionType == settings->EA_NEAT) {
+					slave->setIndividualNum(ind);
+					slave->setIntegerSignal("individual", ind);
+					slave->setIntegerSignal("simulationState", 1);
+					slave->setState(SlaveConnection::State::EVALUATING);
+					std::cout << "evaluating: " << ind << ", num: " << ind << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
 
-				// now set the number in order to load the file properly.
-				int indNum = ea->nextGenGenomes[ind]->individualNumber;
-				slave->setIndividualNum(indNum);
-
-				// tell simulator to start evaluating genome
-				if (settings->sendGenomeAsSignal) {
-					const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
-					sendGenomeSignal(slave, individualGenome);
 				}
-				slave->setIntegerSignal("individual", indNum);
-				slave->setIntegerSignal("simulationState", 1);
-				slave->setState(SlaveConnection::State::EVALUATING);
-				std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
+				else {
+					// now set the number in order to load the file properly.
+					int indNum = ea->nextGenGenomes[ind]->individualNumber;
+					slave->setIndividualNum(indNum);
+
+					// tell simulator to start evaluating genome
+					if (settings->sendGenomeAsSignal) {
+						const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
+						sendGenomeSignal(slave, individualGenome);
+					}
+					slave->setIntegerSignal("individual", indNum);
+					slave->setIntegerSignal("simulationState", 1);
+					slave->setState(SlaveConnection::State::EVALUATING);
+					std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
+
+				}
+				
 			}
 			else if (state == 2 && slave->state() == SlaveConnection::State::EVALUATING)
 			{
@@ -217,14 +251,24 @@ bool ClientEA::evaluatePop() {
 				std::cout << "The fitness of individual " << slave->individualNum() << " is " << fitness << std::endl;
 
 				// set the individual fitness in the ea :: TODO: set phenotype value as well
-				// Make a buffer vector for nextGenGenome and don't switch between the two like I do now. 
-				ea->nextGenGenomes[slave->individual()]->fitness = fitness;
-				
+				// Make a buffer vector for nextGenGenome and don't switch between the two like I do now.
+				if (settings->evolutionType == settings->EA_NEAT) {
+					for (int i = 0; i < ea->population->m_Species.size(); i++) {
+						for (int j = 0;  j < ea->population->m_Species[i].m_Individuals.size(); j++) {
+							if (ea->population->m_Species[i].m_Individuals[j].GetID() == slave->individualNum()) {
+								ea->population->m_Species[i].m_Individuals[j].SetEvaluated();
+								ea->population->m_Species[i].m_Individuals[j].SetFitness(fitness);
+							}
+						}
+					}
+				}
+				else {
+					ea->nextGenGenomes[slave->individual()]->fitness = fitness;
+					// set the genome evaluation to true
+					ea->nextGenGenomes[slave->individual()]->isEvaluated = true;
+				}
 				// set the simulation state back to 0 so this v-rep instance can receive another genome. 
 				slave->setIntegerSignal("simulationState", 0);
-
-				// set the genome evaluation to true
-				ea->nextGenGenomes[slave->individual()]->isEvaluated = true;
 
 				// Reset the individual numbers 
 				slave->setIndividual(-1);
@@ -234,13 +278,31 @@ bool ClientEA::evaluatePop() {
 		} /* end connections loop */
 
 		// if all individual have been evaluated, break the while loop. 
-		for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
-			if (ea->nextGenGenomes[z]->isEvaluated == false) {
-				doneEvaluating = false;
-				break;
+		if (settings->evolutionType == settings->EA_NEAT) {
+			for (int i = 0; i < ea->population->m_Species.size(); i++) {
+				for (int j = 0; j < ea->population->m_Species[i].m_Individuals.size(); j++) {
+					if (ea->population->m_Species[i].m_Individuals[j].IsEvaluated() == false) {
+						doneEvaluating = false;
+						break; // should break out of both loops
+					}
+					else {
+						doneEvaluating = true;
+					}
+				}
+				if (doneEvaluating == false) {
+					break; // breaks out of the species loop as well
+				}
 			}
-			else {
-				doneEvaluating = true; 
+		}
+		else{
+			for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
+				if (ea->nextGenGenomes[z]->isEvaluated == false) {
+					doneEvaluating = false;
+					break;
+				}
+				else {
+					doneEvaluating = true;
+				}
 			}
 		}
 	}
@@ -248,25 +310,41 @@ bool ClientEA::evaluatePop() {
 		std::cout << "Out of while loop" << std::endl;
 	}
 	ea->replacement();
-	ea->savePopFitness(settings->generation);
 	if (settings->verbose) {
 		std::cout << "Just saved pop fitness " << std::endl;
 	}
 	// save settings after replacement. 
 	settings->indNumbers.clear();
 	settings->indFits.clear();
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		if (settings->verbose) {
-			std::cout << "nr of " << i << " is " << ea->populationGenomes[i]->individualNumber << std::endl;
-			std::cout << "fitness of " << i << " is " << ea->populationGenomes[i]->fitness << std::endl;
+	if (settings->evolutionType == settings->EA_NEAT) {
+		for (int i = 0; i < ea->population->m_Species.size(); i++) {
+			for (int j = 0; j < ea->population->m_Species[i].m_Individuals.size(); j++) {
+				settings->indNumbers.push_back(ea->population->m_Species[i].m_Individuals[j].GetID());
+				settings->indFits.push_back(ea->population->m_Species[i].m_Individuals[j].GetFitness());
+			}
 		}
-		settings->indNumbers.push_back(ea->populationGenomes[i]->individualNumber);
-		settings->indFits.push_back(ea->populationGenomes[i]->fitness);
 	}
-	//settings->indFits = ea->popFitness;
+	else {
+		for (int i = 0; i < ea->populationGenomes.size(); i++) {
+			if (settings->verbose) {
+				std::cout << "nr of " << i << " is " << ea->populationGenomes[i]->individualNumber << std::endl;
+				std::cout << "fitness of " << i << " is " << ea->populationGenomes[i]->fitness << std::endl;
+			}
+			settings->indNumbers.push_back(ea->populationGenomes[i]->individualNumber);
+			settings->indFits.push_back(ea->populationGenomes[i]->fitness);
+		}
+		//settings->indFits = ea->popFitness;
+	}
 	if (settings->verbose) {
 		std::cout << "Just before saving settings " << std::endl;
 	}
+	if (settings->evolutionType == settings->EA_NEAT) {
+		ea->savePopFitness(settings->generation, settings->indFits, settings->indNumbers);
+	}
+	else {
+		ea->savePopFitness(settings->generation);
+	}
 	settings->saveSettings();
+	cout << "saved settings " << endl;
 	return true;
 }
