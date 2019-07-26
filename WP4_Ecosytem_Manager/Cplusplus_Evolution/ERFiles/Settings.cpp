@@ -18,8 +18,8 @@ Settings::Settings() {
 	moduleTypes.push_back(13);
 	moduleTypes.push_back(14);
 	moduleTypes.push_back(14);
-	moduleTypes.push_back(17);
-	moduleTypes.push_back(17);
+	moduleTypes.push_back(14);
+	moduleTypes.push_back(14);
 	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
@@ -66,6 +66,9 @@ Settings::Settings() {
 	maxTorque_ForceSensor = 1000000;
 	maxForce_ForceSensor = 1000000;
 	consecutiveThresholdViolations = 1000;
+    bOrgansAbovePrintingBed = false;
+    bCollidingOrgans = false;
+    bNonprintableOrientations = false;
 	//repository="files";
 }
 

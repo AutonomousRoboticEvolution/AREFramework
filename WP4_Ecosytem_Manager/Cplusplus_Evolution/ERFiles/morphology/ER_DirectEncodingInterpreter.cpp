@@ -252,9 +252,64 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                             cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED." << endl;
                         }
                         // If the orientation of the organ is printable
-                        if((abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.8725665 && // 95o degrees
-                        abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.8725665) || // 50o degrees
-                        createdModules[createdModulesSize - 1]->type != 14 || settings->bNonprintableOrientations == true){
+                        if(createdModules[createdModulesSize - 1]->type == 14){
+                            if(abs(createdModules[createdModulesSize - 1]->absOri[2]) > 1.48353 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 1.65806){
+                                if(abs(createdModules[createdModulesSize - 1]->absOri[1]) < 1.65806 || settings->bNonprintableOrientations == true){
+                                    if(abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.0872665 || settings->bNonprintableOrientations == true){
+                                        if (settings->verbose) {
+                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
+                                        }
+                                        for (int n = 0; n < modules.size(); n++) {
+                                            if (modules[n]->parent == i) {
+                                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                            }
+                                        }
+                                        genome->moduleParameters[i]->expressed = true;
+                                    }
+                                    else{
+                                        if (settings->verbose) {
+                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
+                                        }
+                                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                                    }
+                                }
+                                else{
+                                    if (settings->verbose) {
+                                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
+                                    }
+                                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                                }
+                            }
+                            else{
+                                if(abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.0872665 || settings->bNonprintableOrientations == true){
+                                    if(abs(createdModules[createdModulesSize - 1]->absOri[0]) < 1.65806 || settings->bNonprintableOrientations == true){
+                                        if (settings->verbose) {
+                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
+                                        }
+                                        for (int n = 0; n < modules.size(); n++) {
+                                            if (modules[n]->parent == i) {
+                                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                            }
+                                        }
+                                        genome->moduleParameters[i]->expressed = true;
+                                    }
+                                    else{
+                                        if (settings->verbose) {
+                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
+                                        }
+                                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                                    }
+                                }
+                                else{
+                                    if (settings->verbose) {
+                                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
+                                    }
+                                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+
+                                }
+                            }
+                        }
+                        else{
                             if (settings->verbose) {
                                 cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
                             }
@@ -264,12 +319,6 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                                 }
                             }
                             genome->moduleParameters[i]->expressed = true;
-                        }
-                        else{
-                            if (settings->verbose) {
-                                cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
-                            }
-                            createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
                         }
                     }
 				    else{
