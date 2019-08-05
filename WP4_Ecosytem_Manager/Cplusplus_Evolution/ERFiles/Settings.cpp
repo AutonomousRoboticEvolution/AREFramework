@@ -21,6 +21,7 @@ Settings::Settings() {
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
+
 	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
@@ -37,10 +38,10 @@ Settings::Settings() {
 	//maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = CAT_MORPHOLOGY;
+	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_CUSTOM;
-	populationSize = 20;
+	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;

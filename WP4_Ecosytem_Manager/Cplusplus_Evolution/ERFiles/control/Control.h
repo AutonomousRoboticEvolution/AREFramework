@@ -14,7 +14,7 @@ public:
 	virtual void init(int input, int inter, int output) = 0; 
 	virtual vector<float> update(vector<float> sensorValues) = 0; // takes sensorInput and returns output 
 	virtual void mutate(float mutationRate) = 0; 
-	virtual shared_ptr<Control> clone() const = 0 ;
+	virtual shared_ptr<Control> clone() const = 0;
 	virtual stringstream getControlParams() = 0; 
 	virtual void setControlParams(vector<string>) = 0; 
 	virtual void cloneControlParameters(shared_ptr<Control> parent) = 0;

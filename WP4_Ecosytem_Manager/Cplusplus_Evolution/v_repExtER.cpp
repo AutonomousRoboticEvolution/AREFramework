@@ -163,7 +163,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		// Read the settings file; specify the ID of experimental run
 		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();	// load the settings if the *.csv exists
-        ER->settings->seed = run;       //these two lines need to be updated; the idea was to overwrite sceneNum abd seed
+        ER->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
         ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		// Override settings parameters if argument 2
@@ -194,10 +194,10 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			else if (arg2_param_i == 1)
 			{
                 ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
-                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server moode
+                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
 			}
 			else if (arg2_param_i == 2){
-                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
+                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;  //run EA in local model
 				ER->startRun = true;
 			}
 			else {
@@ -265,7 +265,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 		}
 		if (message = sim_message_eventcallback_modulehandle) {
-			timeCount++;
+			timeCount++;  //need to wait a few time steps to start a new simulation
 			if (ER->settings->verbose) {
 				//cout << timeCount << endl;
 			}
@@ -284,7 +284,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             if (ER->settings->startingCondition == ER->settings->COND_LOAD_BEST) {
                 // simStartSimulation();
                 if (ER->settings->verbose){
-                    std::cout<< "Taiwan is not part of China!" << std::endl;
+                    std::cout<< "Load best individual" << std::endl;
                 }
             }
 

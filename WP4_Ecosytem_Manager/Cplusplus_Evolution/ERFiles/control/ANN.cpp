@@ -612,18 +612,23 @@ void ANN::cloneControlParameters(shared_ptr<Control> parent) {
 
 void ANN::changeConnectionIDToPointer() {
 	//	cout << "changing connection ID to pointer" << endl;
+	// input layer can connect to recurrent and output layer
 	for (int i = 0; i < inputLayer.size(); i++) {
 		if (inputLayer[i]->connections.size() != inputLayer[i]->connectionsID.size()) {
-	//		cout << "ERROR: connections" << i << ".size() = " << inputLayer[i]->connections.size();
-	//		cout << ", while: connectionsID" << i << ".size() = " << inputLayer[i]->connectionsID.size() << endl;
+			if (settings->verbose == true) {
+                cout << "ERROR: connections" << i << ".size() = " << inputLayer[i]->connections.size();
+                cout << ", while: connectionsID" << i << ".size() = " << inputLayer[i]->connectionsID.size() << endl;
+            }
 		}
-		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());
+		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());  //TODO:??
 		for (int j = 0; j < inputLayer[i]->connectionsID.size(); j++) {
 			for (int k = 0; k < recurrentLayer.size(); k++) {
 				if (inputLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = recurrentLayer[k];
 					if (recurrentLayer[k] == NULL) {
-		//				cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
@@ -631,15 +636,20 @@ void ANN::changeConnectionIDToPointer() {
 				if (inputLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = outputLayer[k];
 					if (outputLayer[k] == NULL) {
-	//					cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
 			if (inputLayer[i]->connections[j] == NULL) {
-				cout << "ERROR: still inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                if (settings->verbose == true) {
+                    cout << "ERROR: still inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                }
 			}
 		}
 	}
+	// recurrent layer only connects to recurrent layer
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->connections.resize(recurrentLayer[i]->connectionsID.size());
 		for (int j = 0; j < recurrentLayer[i]->connectionsID.size(); j++) {
@@ -647,7 +657,9 @@ void ANN::changeConnectionIDToPointer() {
 				if (recurrentLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = recurrentLayer[k];
 					if (recurrentLayer[k] == NULL) {
-	//					cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
@@ -655,12 +667,16 @@ void ANN::changeConnectionIDToPointer() {
 				if (recurrentLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = outputLayer[k];
 					if (outputLayer[k] == NULL) {
-	//					cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
 			if (recurrentLayer[i]->connections[j] == NULL) {
-	//			cout << "ERROR: recurrentLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                if (settings->verbose == true) {
+                    cout << "ERROR: recurrentLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                }
 			}
 		}
 	}

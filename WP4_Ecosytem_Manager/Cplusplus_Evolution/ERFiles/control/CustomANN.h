@@ -8,13 +8,24 @@ class CustomANN :
 public:
 	CustomANN();
 	~CustomANN();
+    /**
+    @brief Initialize the NN
+    @param input number of input neurons
+    @param inter number of hidden neurons
+    @param output number of output neurons
+    */
 	void init(int input, int inter, int output);
+    /**
+    @brief Update the NN
+    @param vector<float> sensor input
+    */
 	vector<float> update(vector<float>);
 	void mutate(float mutationRate); 
 	void printNeuronValues(); 
 	shared_ptr<Control> clone() const;
 	int neuronID = 0; 
-	int type = 0; 
+	int type = 0;
+    /// this function deletes the connections to deleted neurons and in turn the pointer to these neurons should go out of scope.
 	void checkConnections(); 
 	stringstream getControlParams();
 	void setControlParams(vector<string>);

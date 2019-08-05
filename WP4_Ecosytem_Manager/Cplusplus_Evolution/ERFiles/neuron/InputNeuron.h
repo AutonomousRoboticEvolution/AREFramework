@@ -10,7 +10,8 @@ class InputNeuron :
 {
 public:
 	InputNeuron(); 
-	~InputNeuron(); 
+	~InputNeuron();
+	/// assign ID to the neuron
 	void init(int neuronID); 
 	void update();
 	void reset();

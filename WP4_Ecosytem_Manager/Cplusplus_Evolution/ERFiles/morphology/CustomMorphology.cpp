@@ -69,11 +69,11 @@ void CustomMorphology::saveGenome(int indNum, float fitness) {
 }
 
 void CustomMorphology::init() {
-	create();
+	create();   //create the morphology
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
-	control->init(4, 4, 4);
+	control->init(1, 1, 2);
 	control->mutate(0.5);
 }
 
