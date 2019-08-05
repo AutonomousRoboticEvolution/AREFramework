@@ -22,7 +22,7 @@ Settings::Settings() {
 	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
 
-	autoDeleteSettings = true;
+	autoDeleteSettings = false;    //true
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;

@@ -69,7 +69,7 @@ void CustomMorphologyVREP::update() {
         simHandleProximitySensor(sensorHandles[0], pt, doh, vecs);
         int det = simReadProximitySensor(sensorHandles[0], pt, doh, vecs);
         if (det == 1) { //if detecting something
-              cout << "read doh? : " << doh[0] << " but " << det << endl;
+              cout << "read doh : " << doh[0] << endl;
               cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
         }
         //input.push_back(pt[3]);
