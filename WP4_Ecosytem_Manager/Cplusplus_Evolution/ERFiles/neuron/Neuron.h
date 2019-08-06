@@ -13,12 +13,19 @@ public:
 	Neuron(){};
 	virtual ~Neuron() {};
 	shared_ptr<RandNum> randomNum;
-	virtual void init(int neuronID) = 0; 
+    /**
+    @brief Assign each neuron an unique ID
+    @param neuronID ID of the neuron
+    */
+	virtual void init(int neuronID) = 0;
+	/// update the neuron based on connection weights and input
 	virtual void update() = 0;
+	/// clone a neuron parameter to another neuron
 	virtual shared_ptr<Neuron> clone() = 0;
+	/// remove the neuron
 	virtual void reset() = 0;
     /**
-    @brief Mutate the neuron
+    @brief Mutate connection weight of neuron
     @param mutationRate mutation rate
     */
 	virtual void mutate(float mutationRate) = 0;
@@ -34,9 +41,11 @@ public:
 	/// output value of this neuron; can be accumulated
 	float output;
 	float threshold;
+	/// the upper bound of a random-generated float
 	float sigma = 0.2;
 	virtual stringstream getNeuronParams() = 0; 
-	virtual void setNeuronParams(vector<string>) = 0; 
+	virtual void setNeuronParams(vector<string>) = 0;
+	/// check if the connection is correct
 	virtual bool checkNeuron(vector<string>) = 0;
 	virtual void setFloatParameters(vector<float> values) = 0;
 	/// unique ID of neuron

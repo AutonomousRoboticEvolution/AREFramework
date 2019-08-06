@@ -11,8 +11,18 @@ class Control
 public:
 	Control(){};
 	virtual ~Control();
-	virtual void init(int input, int inter, int output) = 0; 
-	virtual vector<float> update(vector<float> sensorValues) = 0; // takes sensorInput and returns output 
+    /**
+    @brief Specify the number of neurons in input layer, hidden layer, and output layer
+    @param input number of neuron in input layer
+    @param inter number of neuron in hidden layer
+    @param output number of neuron in output layer
+    */
+	virtual void init(int input, int inter, int output) = 0;
+    /**
+    @brief Take sensorInput and returns output
+    @param sensorValues sensor values
+    */
+	virtual vector<float> update(vector<float> sensorValues) = 0;
 	virtual void mutate(float mutationRate) = 0; 
 	virtual shared_ptr<Control> clone() const = 0;
 	virtual stringstream getControlParams() = 0; 

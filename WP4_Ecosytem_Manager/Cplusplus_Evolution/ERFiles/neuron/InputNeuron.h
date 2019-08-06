@@ -12,9 +12,12 @@ public:
 	InputNeuron(); 
 	~InputNeuron();
 	/// assign ID to the neuron
-	void init(int neuronID); 
+	void init(int neuronID);
+	/// update the weights of this neuron
 	void update();
+	/// remove the neuron
 	void reset();
+	/// mutate the neuron
 	void mutate(float mutationRate); 
 	float transformValue = 0; 
 	shared_ptr<Neuron> clone(); 

@@ -72,8 +72,8 @@ void CustomMorphologyVREP::update() {
               cout << "read doh : " << doh[0] << endl;
               cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
         }
-        //input.push_back(pt[3]);
-        input.push_back(1.0);
+        input.push_back(pt[3]);
+        //input.push_back(1.0);
 //        if (name == "Pioneer_p3dx") {
 //			int lightHandle = simGetObjectHandle("Light");
 //			if (settings->verbose == true) {
@@ -150,7 +150,7 @@ void CustomMorphologyVREP::update() {
 				cout << "output " << i << " = " << output[i] << endl;
 			}
 			if (i < outputHandles.size()) {
-				simSetJointTargetVelocity(outputHandles[i], -1);  //output[i],-1.0
+				simSetJointTargetVelocity(outputHandles[i], output[i]);  //output[i],-1.0
 			}
 		}
 	}

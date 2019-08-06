@@ -133,33 +133,18 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
 		cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
-		// cout << "outputvalues " <<  outputValues[0] << endl;
+		cout << "outputvalues " <<  outputValues[i] << endl;
 	}
 	cf += 0.5;
-	//	printNeuronValues();
+	printNeuronValues();
 		//leaky(0.8);
 	return outputValues;
 }
 
-void CustomANN::mutateConnections(float mutationRate) {
-	ANN::mutateConnections(mutationRate);
-}
-
-void CustomANN::addNeurons(float mutationRate) {
-	ANN::addNeurons(mutationRate);
-}
 
 void CustomANN::setFloatParameters(vector<float> values) {
 	// function can be used to manually set specific parameters
 	recurrentLayer[0]->setFloatParameters(values);
-}
-
-void CustomANN::removeNeurons(float mutationRate) {
-	ANN::removeNeurons(mutationRate);
-}
-
-void CustomANN::changeNeurons(float mutationRate) { // debugging required
-	ANN::changeNeurons(mutationRate);
 }
 
 void CustomANN::mutate(float mutationRate) {
@@ -169,12 +154,6 @@ void CustomANN::mutate(float mutationRate) {
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->mutate(mutationRate);
 	}
-//	mutateConnections(mutationRate);
-//	addNeurons(mutationRate);
-//	removeNeurons(mutationRate);
-//	changeNeurons(mutationRate);	
-//	checkConnections(); 
-//	changeConnectionIDToPointer();
 }
 
 shared_ptr<Control> CustomANN::clone() const {
@@ -197,10 +176,6 @@ shared_ptr<Control> CustomANN::clone() const {
 	return newANN;
 }
 
-void CustomANN::printNeuronValues() {
-	ANN::printNeuronValues();
-}
-
 stringstream CustomANN::getControlParams() {
 	return ANN::getControlParams();
 }
@@ -209,16 +184,8 @@ void CustomANN::setControlParams(vector<string> values) {
 	ANN::setControlParams(values);
 }
 
-void CustomANN::cloneControlParameters(shared_ptr<Control> parent) {
-	ANN::cloneControlParameters(parent);
-}
-
 void CustomANN::changeConnectionIDToPointer() {
 	ANN::changeConnectionIDToPointer();
-}
-
-void CustomANN::changeConnectionPointerToID() {
-	ANN::changeConnectionPointerToID();
 }
 
 bool CustomANN::checkControl(vector<string> values) {

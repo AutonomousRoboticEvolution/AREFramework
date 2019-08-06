@@ -40,7 +40,7 @@ Settings::Settings() {
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
 	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_CUSTOM;
+	controlType = ANN_FIXED_STRUCTURE;
 	populationSize = 10;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
