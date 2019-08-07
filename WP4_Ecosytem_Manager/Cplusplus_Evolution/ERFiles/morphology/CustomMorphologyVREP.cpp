@@ -169,7 +169,7 @@ void CustomMorphologyVREP::create()
 	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/wheeled-robot2.ttm");
     mainHandle = simGetObjectHandle("RobotBase");
 //	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/robots/mobile/e-puck.ttm");
-//    mainHandle = simGetObjectHandle("ePuck");
+//  mainHandle = simGetObjectHandle("ePuck");
     if (control) {
     if (settings->verbose) {
 			cout << "At create Custom morphology, control is present" << endl;
