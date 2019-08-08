@@ -559,9 +559,9 @@ class EAParameters(Frame):
 		self.master = parent
 		self.EATypeLabel = Label(parent,text="Evolution type")
 		self.EATypeLabel.grid(column = 0, row = 0)
-		self.EATypeOptions = {'Steady State','Generational'}
+		self.EATypeOptions = {'(mu + lambda)','(mu, lambda)'}
 		self.EATypeVar = StringVar(parent)
-		self.EATypeVar.set('Steady State')
+		self.EATypeVar.set('(mu + lambda)')
 		self.EATypeMenu = OptionMenu(parent,self.EATypeVar,*self.EATypeOptions)
 		self.EATypeMenu.grid(column = 1, row = 0, columnspan = 1)
 
