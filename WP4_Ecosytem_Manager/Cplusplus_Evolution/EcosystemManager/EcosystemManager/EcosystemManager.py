@@ -106,14 +106,14 @@ class DataFrame(Frame):
 		figure_w, figure_h = int(figure_w), int(figure_h)
 		photo = tk.PhotoImage(master=canvas, width=figure_w, height=figure_h)
 
-    # Position: convert from top-left anchor to center anchor
+		# Position: convert from top-left anchor to center anchor
 		canvas.create_image(loc[0] + figure_w/2, loc[1] + figure_h/2, image=photo)
 
-    # Unfortunately, there's no accessor for the pointer to the native renderer
+		# Unfortunately, there's no accessor for the pointer to the native renderer
 		tkagg.blit(photo, figure_canvas_agg.get_renderer()._renderer, colormode=2)
 
-    # Return a handle which contains a reference to the photo object
-    # which must be kept live or else the picture disappears
+		# Return a handle which contains a reference to the photo object
+		# which must be kept live or else the picture disappears
 		return photo
 
 class SimulationFrame(Frame):
@@ -171,10 +171,11 @@ class SimulationFrame(Frame):
 		self.coreButton.grid(column = 1, row = row)
 		row += 1
 		# For the repository
+		# TODO: add a command that sets the repository
 		self.repLab = Label(parent,text=directory)
 		self.repLab.grid(column=0, row = row)
 		self.repository=Entry(parent,width=60)
-		self.repository.grid(column=0,row=row, columnspan = 2)
+		self.repository.grid(column=1,row=row, columnspan = 2)
 		self.repository.configure(text=directory)	
 		row += 1
 
@@ -655,7 +656,6 @@ class Window(Frame):
 	def dochelper(self):
 		url = "https://www.overleaf.com/8988212588bdkjhpfdtckz"
 		webbrowser.open(url)
-
 
 # Page containing information about the settings
 class SettingsPage(Frame):
