@@ -17,7 +17,7 @@ void InputNeuron::init(int id) {
 void InputNeuron::update() {
 //	cout << "input = " << input << endl, 
 	output = input;// * transformValue; 
-//	cout << "output = " << output << endl; 
+//	cout << "output = " << output << endl;
 	for (int i = 0; i < connections.size(); i++) {
 		connections[i]->input += (output * connectionWeights[i]);
 	}

@@ -123,9 +123,9 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 	for (int i = 0; i < outputLayer.size(); i++) {
 		for (int j = 0; j < outputLayer[i]->connections.size(); j++) {
 			if (outputLayer[i]->connections[j]->neuronID == -1) {
-				outputLayer[i]->connections[j].reset();
+				outputLayer[i]->connections[j].reset();  //remove the connection
 				outputLayer[i]->connections.erase(outputLayer[i]->connections.begin() + j);
-				outputLayer[i]->connectionWeights.erase(outputLayer[i]->connectionWeights.begin() + j);
+				outputLayer[i]->connectionWeights.erase(outputLayer[i]->connectionWeights.begin() + j); //remove he connection weight
 			}
 		}
 	}
@@ -133,12 +133,13 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 //	printNeuronValues();
 }
 
+//TODO: motivation?
 void ANN::addInput(vector<float> input) {
 	int controlSize = inputLayer.size();
 	int inputSize = input.size();
 	if (inputSize > controlSize) {
 		for (int i = 0; i < controlSize; i++) {
-			inputLayer[i]->input = input[i];
+			inputLayer[i]->input += input[i];   //TODO: = or +=?
 		}
 	}
 	else {
@@ -180,20 +181,7 @@ vector<float> ANN::update(vector<float> sensorValues) {
 	}
 	cf += 0.5;
 //	printNeuronValues();
-	//leaky(0.8);
 	return outputValues; 
-}
-
-void ANN::leaky(float lr) {
-	for (int i = 0; i < inputLayer.size(); i++) {
-		inputLayer[i]->input = inputLayer[i]->input * lr;
-	}
-	for (int i = 0; i < recurrentLayer.size(); i++) {
-		recurrentLayer[i]->input = recurrentLayer[i]->input * lr;
-	}
-	for (int i = 0; i < outputLayer.size(); i++) {
-		outputLayer[i]->input = outputLayer[i]->input * lr;
-	}
 }
 
 void ANN::flush()
@@ -489,12 +477,12 @@ void ANN::mutate(float mutationRate) {
 }
 
 shared_ptr<Control> ANN::clone() const {
-	shared_ptr<ANN> newANN = make_unique<ANN>(*this);
+	shared_ptr<ANN> newANN = make_unique<ANN>(*this); //make a copy of the ANN class with different address/pointer
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
 	for (int i = 0; i < this->inputLayer.size(); i++) {
-		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+		newANN->inputLayer.push_back(this->inputLayer[i]->clone()); //make a copy of the neuron with the same parameter; clear the input and output
 	}
 	for (int i = 0; i < this->recurrentLayer.size(); i++) {
 		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());

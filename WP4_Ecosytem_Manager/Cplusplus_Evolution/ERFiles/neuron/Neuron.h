@@ -40,6 +40,7 @@ public:
 	float input = 0;
 	/// output value of this neuron; can be accumulated
 	float output;
+	/// activation value of the neuron
 	float threshold;
 	/// the upper bound of a random-generated float
 	float sigma = 0.2;
@@ -50,8 +51,6 @@ public:
 	virtual void setFloatParameters(vector<float> values) = 0;
 	/// unique ID of neuron
 	int neuronID;
-	int sceneNum;
-	bool conserved = false;
 	/// reset the value of input and output into 0
 	virtual void flush() = 0;
 protected:

@@ -16,36 +16,40 @@ public:
 	void printNeuronValues(); 
 	shared_ptr<Control> clone() const;
 	//void makeDependenciesUnique();
-	int neuronID = 0; 
-	int type = 0; 
+	/// neuron ID
+	int neuronID = 0;
+	/// neuron type
+	int type = 0;
+	/// check the connection between neurons and remove unconnected connection
 	void checkConnections(); 
 	stringstream getControlParams();
 	void setFloatParameters(vector<float> values);
 	void setControlParams(vector<string>);
-	void changeConnectionIDToPointer(); 
+	/// map the connection ID into reference
+	void changeConnectionIDToPointer();
+	/// clone the parent's neuron parameter
 	void cloneControlParameters(shared_ptr<Control> parent);
+	/// maximum number size of neuron for each layer
 	int maxLayerSize;
+	///
 	int maxCon;
+	/// read the topology from CSV file and check if it is correct
 	bool checkControl(vector<string> values);
 	void changeConnectionPointerToID();
+	/// destroy the neuron of the ANN
 	void reset();
+	/// add the inputs into the ANN
 	void addInput(vector<float> input);
-	void leaky(float leakRate);
+	/// clear value of the neuron
 	void flush();
+	/// change connection through adding, removing or switching
 	void mutateConnections(float mutationRate);
+	/// add a neuron in the recurrent layer
 	void addNeurons(float mutationRate);
+	/// delete a neuron from the recurrent layer
 	void removeNeurons(float mutationRate);
 	void changeNeurons(float mutationRate);
-//	float tmpMutRate = 0.05; //delete!!!
 
-	/*struct Connection {
-		float weight;
-		float in; 
-		float out; 
-	};*/
-
-	vector<float> in;
-	vector<float> out;
 	/// a vector of input neurons
 	vector<shared_ptr<Neuron>> inputLayer;
     /// a vector of output neurons
@@ -53,5 +57,7 @@ public:
     /// a vector of hidden neurons
 	vector<shared_ptr<Neuron>> recurrentLayer;
 };
+
+
 
 
