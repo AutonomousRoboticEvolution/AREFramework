@@ -50,6 +50,9 @@ public:
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;
 
+	/// Viability methods
+	bool bCheckCollision();
+
 	void setPhenValue();
 	void savePhenotype(int ind, float fitness);
 	//void loadPhenotype(int ind);

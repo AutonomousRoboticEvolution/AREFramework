@@ -335,6 +335,8 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                     createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
 				}
 			}
+			// End of viability
+			// TODO: FV what is this?
 			else {
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
 					if (settings->verbose) {
@@ -707,4 +709,9 @@ void ER_DirectEncodingInterpreter::symmetryMutation(float mutationRate) {
 		}
 	}*/
 	cout << "Done with symmetry mutation" << endl;
+}
+
+bool ER_DirectEncodingInterpreter::bCheckCollision() {
+    
+    return false;
 }

@@ -45,6 +45,7 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 
 	// These three vectors need to be populated with the appropriate parts when constructing the skeleton
 	vector<int> partHandles = createBone(configuration, relativePosHandle, parentHandle);
+    cout << "DEBUG - partHandles.size(): " << partHandles.size() << endl;
 	if (partHandles.size() < 1) {
 		cout << "ERROR: No parts have been created for the bones." << endl;
 		return -1;
@@ -55,6 +56,7 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	int shapesStorage[100]; // stores up to 20 shapes
 	simGetObjectSelection(shapesStorage);
 	int selectionSize = simGetObjectSelectionSize();
+    cout << "DEBUG - selectionSize: " << selectionSize << endl;
 	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
@@ -80,6 +82,7 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 
 	if (settings->verbose) {
 		cout << "creating force sensor" << endl;
+        cout << "shape and dummy handles size = " << shapes.size() << ", " << dummies.size() << endl;
 	}
 	int fsParams[5];
 	fsParams[0] = 0;

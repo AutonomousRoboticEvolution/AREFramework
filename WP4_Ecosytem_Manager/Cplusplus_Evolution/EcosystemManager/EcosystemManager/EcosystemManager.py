@@ -26,7 +26,7 @@ if (os.name == 'nt'):
 	print("Running windows")
 	directory = "C:/Program Files/V-REP3/V-REP_PRO_EDU"
 else:
-	directory = "/home/ebb505/Documents/V-REP_Software"
+	directory = "/home/ebb505/ARE_Project/vrep"
 	print("Not running windows")
 
 def make_label(parent, img):

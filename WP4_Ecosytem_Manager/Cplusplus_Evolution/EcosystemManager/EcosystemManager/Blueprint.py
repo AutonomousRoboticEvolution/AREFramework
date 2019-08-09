@@ -46,7 +46,8 @@ class Blueprint:
 				self.addModuleBlueprint(id,tp,coor)
 	## Save BP file.
 	def saveBP(self, path, name): # stores mbps
-		with open(path + "/Blueprint" + str(name) + ".csv", 'w') as csvfile:
+		with open("../../../../../robofab/blueprints/BP" + str(name) + ".csv", 'w') as csvfile:
+		#with open(path + "/Blueprint" + str(name) + ".csv", 'w') as csvfile:
 			writer = csv.writer(csvfile, delimiter=',')
 			for m in self.mbps:
 				writer.writerow(m.getSpecifications())
