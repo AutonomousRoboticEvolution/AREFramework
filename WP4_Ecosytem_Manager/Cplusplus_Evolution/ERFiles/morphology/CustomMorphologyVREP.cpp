@@ -166,7 +166,7 @@ int CustomMorphologyVREP::getMainHandle()
 
 void CustomMorphologyVREP::create()
 {
-	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/wheeled-robot2.ttm");
+	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/wheeled-robot4.ttm");
     mainHandle = simGetObjectHandle("RobotBase");
 //	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/robots/mobile/e-puck.ttm");
 //  mainHandle = simGetObjectHandle("ePuck");
