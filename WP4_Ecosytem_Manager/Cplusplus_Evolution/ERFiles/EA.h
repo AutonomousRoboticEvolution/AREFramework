@@ -3,6 +3,9 @@
 #include "GenomeFactory.h"
 #include "Genome.h"
 #include "Settings.h"
+#include "NEAT_LIB\Genome.h"
+#include "NEAT_LIB\Population.h"
+#include "NEAT_LIB\Assert.h"
 
 class EA
 {

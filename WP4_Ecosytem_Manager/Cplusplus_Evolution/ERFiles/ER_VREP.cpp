@@ -117,7 +117,7 @@ void ER_VREP::startOfSimulation(){
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->nextGenGenomes[currentInd]->init();
-				//				ea->popIndNumbers.push_back(settings->indCounter);
+				//	ea->popIndNumbers.push_back(settings->indCounter);
 				if (settings->verbose) {
 					cout << "creating individual" << endl;
 				}

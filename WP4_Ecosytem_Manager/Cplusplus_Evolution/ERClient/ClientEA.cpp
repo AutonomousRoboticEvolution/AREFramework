@@ -231,6 +231,7 @@ bool ClientEA::evaluatePop() {
 
 					// tell simulator to start evaluating genome
 					if (settings->sendGenomeAsSignal) {
+						cout << "sending genome as signal" << endl;
 						const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
 						sendGenomeSignal(slave, individualGenome);
 					}
@@ -238,9 +239,8 @@ bool ClientEA::evaluatePop() {
 					slave->setIntegerSignal("simulationState", 1);
 					slave->setState(SlaveConnection::State::EVALUATING);
 					std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
-
 				}
-				
+			
 			}
 			else if (state == 2 && slave->state() == SlaveConnection::State::EVALUATING)
 			{
@@ -339,7 +339,7 @@ bool ClientEA::evaluatePop() {
 		std::cout << "Just before saving settings " << std::endl;
 	}
 	if (settings->evolutionType == settings->EA_NEAT) {
-		ea->savePopFitness(settings->generation, settings->indFits, settings->indNumbers);
+		//ea->savePopFitness(settings->generation, settings->indFits, settings->indNumbers);
 	}
 	else {
 		ea->savePopFitness(settings->generation);

@@ -458,6 +458,7 @@ void Population::UpdateSpecies()
 // the epoch method - the heart of the GA
 void Population::Epoch()
 {   
+	cout << "Epoching" << endl;
     // So, all genomes are evaluated..
     for(unsigned int i=0; i<m_Species.size(); i++)
     {

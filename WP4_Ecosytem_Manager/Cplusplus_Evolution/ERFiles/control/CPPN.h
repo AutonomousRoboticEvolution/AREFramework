@@ -19,4 +19,3 @@ public:
 	shared_ptr<Control> clone() const;
 	vector<float> update(vector<float> inputs);
 };
-

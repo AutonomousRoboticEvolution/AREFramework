@@ -37,18 +37,17 @@ void EA_SteadyState::init()
 
 void EA_SteadyState::selection()
 {
-	cout << "SETTINGS POINTER::: " << settings->indCounter << endl;
+	cout << "Called selection" << endl;
 	createNewGenRandomSelect();
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
 		evaluationQueue.push_back(i);
 	}
-	cout << "!SETTINGS POINTER::: " << settings->indCounter << endl;
 
 }
 
 void EA_SteadyState::replacement()
 {
-	cout << "SETTINGS POINTER::: " << settings->indCounter << endl;
+	cout << "called replacement" << endl;
 	if (populationGenomes.size() > 0) {
 		// number of attempts means how many times the new individuals should be checked against the existing population
 		//replaceNewPopRandom(2); // int is amount trials comparing offspring to existing population
@@ -59,11 +58,11 @@ void EA_SteadyState::replacement()
 			populationGenomes.push_back(nextGenGenomes[i]->clone());
 		}
 	}
-	cout << "!SETTINGS POINTER::: " << settings->indCounter << endl;
 }
 
 void EA_SteadyState::mutation() {
 	for (int i = 0; i < nextGenGenomes.size(); i++) {
+		cout << "Mutation rate = " << settings->mutationRate << endl;
 		nextGenGenomes[i]->mutate();
 	}
 }
@@ -162,11 +161,11 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	
 	}
 	vector<shared_ptr<Genome>> populationGenomesBuffer;
-	cout << "RSETTINGS BEFORE CLEAR::: " << randomNum->getSeed() << endl;
-	cout << "SETTINGS BEFORE CLEAR::: " << settings->indCounter << endl;
+	// cout << "RSETTINGS BEFORE CLEAR::: " << randomNum->getSeed() << endl;
+	// cout << "SETTINGS BEFORE CLEAR::: " << settings->indCounter << endl;
 	//nextGenGenomes.clear();
-	cout << "SETTINGS AFTER CLEAR::: " << settings->indCounter << endl;
-	cout << "RSETTINGS AFTER CLEAR::: " << randomNum->getSeed() << endl;
+	// cout << "SETTINGS AFTER CLEAR::: " << settings->indCounter << endl;
+	// cout << "RSETTINGS AFTER CLEAR::: " << randomNum->getSeed() << endl;
 	//	nextGenFitness.clear();
 	shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
 	for (int i = 0; i < populationGenomes.size() - additionalInds.size(); i++) {
@@ -192,7 +191,6 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	if (settings->verbose) {
 		std::cout << "Mutating next gen genomes of size: " << nextGenGenomes.size() << std::endl;
 	}
-	mutation();
 	// load queue individuals
 	for (int i = 0; i < additionalInds.size(); i++) {
 		populationGenomesBuffer.push_back(unique_ptr<DefaultGenome>(new DefaultGenome()));
@@ -215,6 +213,8 @@ void EA_SteadyState::createNewGenRandomSelect() {
 	for (int i = 0; i < populationGenomesBuffer.size(); i++) {
 		nextGenGenomes.push_back(populationGenomesBuffer[i]->clone());
 	}
+	mutation();
+	populationGenomesBuffer.clear();
 	mfact.reset();
 
 }

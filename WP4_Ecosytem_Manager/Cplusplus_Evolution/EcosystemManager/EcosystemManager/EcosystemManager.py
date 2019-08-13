@@ -79,19 +79,30 @@ class DataFrame(Frame):
 
 		data = []
 		dataMax = []
+		data25 = []
+		data75 = []
+		dataMin = []
 		with open(directory + "/files/" + "SavedGenerations0.csv") as csv_file:
 			csv_reader = csv.reader(csv_file, delimiter = ',')
 			for row in csv_reader:
+				dataAll = []
+				loadInd = True;
 				for i, gib in enumerate(row):
 					if (gib == "avg: "):
 						data.append(float(row[i+1]))
+						loadInd = False
 					if gib == "fitness: ":
 						dataMax.append(float(row[i+1]))
+					if (i> 0 and loadInd == True):
+						dataAll.append(float(row[i]))
+				dataMin.append(min(dataAll))
+						# load individuals
 
 		fig = plt.figure()
 		ax = fig.add_subplot(1,1,1)
 		ax.plot(data)
 		ax.plot(dataMax)
+		ax.plot(dataMin)
 		plt.show()
 
 	def draw_figure(self,canvas, figure, loc=(0, 0)):
@@ -134,7 +145,7 @@ class SimulationFrame(Frame):
 		self.runPB.grid(column=0,row=row);
 		row += 1
 		# Button to run on cluster TODO: add command function that can be used 
-		self.runPB = Button(parent, text="Run on Cluster", height = buttonSize[1], width = buttonSize[0])
+		self.runPB = Button(parent, text="Run on Cluster", height = buttonSize[1], width = buttonSize[0],bg="orange2")
 		self.runPB.grid(column=0,row=row);
 		row += 1
 		# Specify the path to the savedGenerations .csv file
@@ -172,10 +183,11 @@ class SimulationFrame(Frame):
 		row += 1
 		# For the repository
 		# TODO: add a command that sets the repository
-		self.repLab = Label(parent,text=directory)
+		self.repLab = Label(parent,text='repository')
 		self.repLab.grid(column=0, row = row)
-		self.repository=Entry(parent,width=60)
-		self.repository.grid(column=1,row=row, columnspan = 2)
+		self.repository=Entry(parent,width=30)
+		row+=1
+		self.repository.grid(column=0,row=row, columnspan = 1)
 		self.repository.configure(text=directory)	
 		row += 1
 
@@ -250,7 +262,7 @@ class SimulationFrame(Frame):
 		for ind in individuals:
 			self.popQueue.individuals.append(Individual(ind))
 		for ind in self.popQueue.individuals:
-			self.popQueueList.insert(END, "Genome " + str(ind.num))
+			self.popQueueList.insert(END, "Genome " + str(ind.num)+ " - Fitness " + " ... DM ... Size ... ")
 				
 		print(individuals)
 
@@ -296,12 +308,11 @@ class SimulationFrame(Frame):
 			docwriter = csv.writer(csvfile, delimiter = ',')
 			for row in settingsdata:
 				docwriter.writerow(row)
-
 		# Open V-REP as subprocess
 		if (os.name == 'nt'):
-			subprocess.Popen([r""+ directory + "/vrep.exe", "-g99", "-g0", "-gfiles"])
+			subprocess.Popen([r""+ directory + "/vrep.exe", "-g99", "-g2", "-gfiles"])
 		else:
-			subprocess.Popen([r""+ directory + "/vrep.sh", "-g99", "-g0", "-gfiles"])
+			subprocess.Popen([r""+ directory + "/vrep.sh", "-g99", "-g2", "-gfiles"])
 
 
 	def setRealWorldPointer(self, p):
@@ -360,7 +371,7 @@ class SimulationFrame(Frame):
 		self.repository.configure(text=directory)
 		# TODO: connect headless variable to running the program in headless mode or not.
 		if (os.name == 'nt'):
-			subprocess.Popen([r""+ directory + "/vrep.exe", "-h", "-g0", "-g0", "-gfiles"])
+			subprocess.Popen([r""+ directory + "/vrep.exe", "-g0", "-g2", "-gfiles"])
 		else:
 			subprocess.Popen([r""+ directory + "/vrep.sh", "-g0", "-g2", "-gfiles"])
 		# file = 'C:\\Program Files\\V-REP3\\V-REP_PRO_EDU\\vrep.exe'
@@ -418,37 +429,50 @@ class RealWorldFrame(Frame):
 		self.robots = []
 
 		# Buttons with various functions:
+		row = 0;
+		self.conLabel = Label(parent, text="For connecting to real robot (deprecated)")
+		self.conLabel.grid(column = 0, row = row)
 		# connects to a robot via serial
-		self.runRobotButton = Button(parent, text="Run Robot", command=self.openPort)
-		self.runRobotButton.grid(column=0, row=0);
+		row += 1;
+		self.runRobotButton = Button(parent, text="Open Port", command=self.openPort, height = buttonSize[1], width = buttonSize[0])
+		self.runRobotButton.grid(column=0, row=row)
 		# send genome via serial
-		self.sendGenomeButton = Button(parent,text="Send Genome", command = self.sendGenome);
-		self.sendGenomeButton.grid(column=0, row=1);
+		row += 1;
+		self.sendGenomeButton = Button(parent,text="Send Genome", command = self.sendGenome, height = buttonSize[1], width = buttonSize[0])
+		self.sendGenomeButton.grid(column=0, row=row);
 		# checks whether the robots are done being evaluated (placeholder)
-		self.checkDoneButton = Button(parent,text="Check Robots", command = self.checkRobots);
-		self.checkDoneButton.grid(column=0, row=2);
+		row += 1;
+		self.checkDoneButton = Button(parent,text="Check Robots", command = self.checkRobots, height = buttonSize[1], width = buttonSize[0])
+		self.checkDoneButton.grid(column=0, row=row);
 		# close serial port
-		self.closeConButton = Button(parent,text="Close Connections", command = self.closeConnections);
-		self.closeConButton.grid(column=0, row=3);
+		row += 1;
+		self.closeConButton = Button(parent,text="Close Connections", command = self.closeConnections, height = buttonSize[1], width = buttonSize[0])
+		self.closeConButton.grid(column=0, row=row);
 		# to open physical evolution, now just runs a simulation
-		self.runPhysicalEvolution = Button(parent,text="Run Physical", comman = self.clickRun);
-		self.runPhysicalEvolution.grid(column=0, row=4);
+		row += 1;
+		self.newLabel = Label(parent, text="---------------")
+		self.newLabel.grid(column = 0, row = row)
+		row +=1;
+		self.runPhysicalEvolution = Button(parent,text="Run Physical", comman = self.clickRun, height = buttonSize[1], width = buttonSize[0])
+		self.runPhysicalEvolution.grid(column=0, row=row);
 		# loads a population to be loaded for the physical EA run
+		row += 1;
 		self.loadPopulationButton = Button(parent, text="Load Population", command=self.loadPopulation, height = buttonSize[1], width = buttonSize[0])
-		self.loadPopulationButton.grid(column=0, row=5);
+		self.loadPopulationButton.grid(column=0, row=row);
 		# path to the SavedGenerations98 (physical evolution) 
 		self.pathGen = directory + '/' + fileRepository + '/' + 'SavedGenerations98.csv'
 		# placeholder for a selection probability mechanism # TODO: add proper functionality in plugin
-		self.selLabel = Label(parent, text="Queue Selection Probability")
-		self.selLabel.grid(column = 0, row = 7)
-		self.selButton = Scale(parent, from_=0, to=1, resolution=0.1, orient=HORIZONTAL)
+		row += 1;
+		self.selLabel = Label(parent, text="Queue Selection Probability",bg="orange2")
+		self.selLabel.grid(column = 0, row = row)
+		self.selButton = Scale(parent, from_=0, to=1, resolution=0.1, orient=HORIZONTAL,bg="orange2")
 		self.selButton.set(1)
-		self.selButton.grid(column = 1, row = 7)
-
+		self.selButton.grid(column = 1, row = row)
+		row +=1
 		#self.popQueueList.bind('<<ListboxSelect>>',self.CurSelect)
 		self.selectedInd = self.popQueueList.curselection()
 		self.saveBPButton = Button(parent,text="Save Genome Blueprint", command = self.saveBlueprint);
-		self.saveBPButton.grid(column=0, row=6);
+		self.saveBPButton.grid(column=0, row=row);
 
 	def loadPopulation(self):
 		# empty existing queue
@@ -477,7 +501,7 @@ class RealWorldFrame(Frame):
 		for ind in individuals:
 			self.popQueue.individuals.append(Individual(ind))
 		for ind in self.popQueue.individuals:
-			self.popQueueList.insert(END, "Genome " + str(ind.num))
+			self.popQueueList.insert(END, "Genome " + str(ind.num) + " - Fitness ... DM ... Size ... ")
 				
 		print(individuals)
 
@@ -645,6 +669,7 @@ class Window(Frame):
 		edit = Menu(menu)
 		edit.add_command(label="About")
 		edit.add_command(label="Documentation", command = self.dochelper)
+		edit.add_command(label="Documentation should open webbrowser")
 		menu.add_cascade(label="Help", menu = edit)
 
 		# :::::::::::::::::::::::::::::::::::::::::::::::

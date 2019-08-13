@@ -14,7 +14,7 @@ Settings::Settings() {
 	// 15: sensor 
 	// 16: servo
 	// 17: bone
-	moduleTypes.push_back(1);  
+	moduleTypes.push_back(1);
 	moduleTypes.push_back(4);  
 	moduleTypes.push_back(4);  
 	moduleTypes.push_back(4); 
@@ -31,11 +31,11 @@ Settings::Settings() {
 	maxAmountModules = 20;
 	
 	// Use : MODULAR_LSYSTEM MODULAR_DIRECT MODULAR_CPPN
-	morphologyType = CPPN_NEAT_MORPH;
+	morphologyType = MODULAR_DIRECT;
 	controlType = ANN_CUSTOM;
 	populationSize = 6;
 	energyDissipationRate = 0.0;
-	lIncrements = 4; // not used, should be somewhere else?
+	lIncrements = 4; 
 	environmentType = DEFAULT_ENV;
 //	controlType = ANN_DEFAULT;
 	verbose = false;
@@ -43,7 +43,7 @@ Settings::Settings() {
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
-	evolutionType = EA_NEAT;
+	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;

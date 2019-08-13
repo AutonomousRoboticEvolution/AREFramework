@@ -1,7 +1,7 @@
 #pragma once
 
 #include "EA.h"
-#include "NEAT_LIB\Genome.h"
+//#include "NEAT_LIB\Genome.h"
 #include "morphology\MorphologyFactoryVREP.h"
 
 class EA_NEAT : public EA

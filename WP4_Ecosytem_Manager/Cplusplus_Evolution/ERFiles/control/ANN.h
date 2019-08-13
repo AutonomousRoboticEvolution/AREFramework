@@ -25,7 +25,7 @@ public:
 	void changeConnectionIDToPointer(); 
 	void cloneControlParameters(shared_ptr<Control> parent);
 	int maxLayerSize;
-	int maxCon;
+	int maxCon = 8;
 	bool checkControl(vector<string> values);
 	void changeConnectionPointerToID();
 	void reset();

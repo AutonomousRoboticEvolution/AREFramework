@@ -131,10 +131,11 @@ int main(int argc, char* argv[])
 			break;
 		}
 		client->settings->indCounter += client->settings->populationSize;
-		client->ea->selection();
 		client->settings->generation = i + 1;
+
+		client->ea->selection(); // epochs in NEAT
 		if (client->settings->evolutionType == client->settings->EA_NEAT) {
-			client->ea->population->Save((client->settings->repository + client->ea->neatSaveFile).c_str());
+			client->ea->population->Save((client->settings->repository + client->ea->neatSaveFile + to_string(client->settings->generation)).c_str());
 		}
 	}
 

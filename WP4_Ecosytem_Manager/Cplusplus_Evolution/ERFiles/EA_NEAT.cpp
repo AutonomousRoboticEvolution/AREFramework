@@ -32,7 +32,7 @@ void EA_NEAT::split_line(string& line, string delim, list<string>& values)
 
 void EA_NEAT::init()
 {
-	NEAT::Parameters params;
+	NEAT::Parameters params; 
 	params.PopulationSize = settings->populationSize;
 	params.DynamicCompatibility = true;
 	params.WeightDiffCoeff = 0.0;
@@ -272,7 +272,8 @@ void EA_NEAT::loadPopulationGenomes(int scenenum)
 		population->loadPopulation((settings->repository + neatSaveFile).c_str());
 	}
 	else {
-		population = shared_ptr<NEAT::Population>(new NEAT::Population((settings->repository + neatSaveFile).c_str()));
+		population->loadPopulation((settings->repository + neatSaveFile).c_str());
+		// population = shared_ptr<NEAT::Population>(new NEAT::Population((settings->repository + neatSaveFile).c_str()));
 	}
 }
 
@@ -344,13 +345,12 @@ void EA_NEAT::createIndividual(int ind) {
 			}
 		}
 	}
-	if (shouldEpoch == true) {
-		population->Save((settings->repository + "/testNEAT").c_str());
+	if (shouldEpoch == true && settings->instanceType != settings->INSTANCE_SERVER) {
+		population->Save((settings->repository + "/testNEAT" + to_string(settings->generation)).c_str());
 		selection();
-		//population->Epoch();
-
+		// population->Epoch();
 	}
-
+	bool foundIndividualToEvaluate = false;
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
 			// check if the genomes have been evaluated.
@@ -366,7 +366,8 @@ void EA_NEAT::createIndividual(int ind) {
 				if (settings->verbose) {
 					currentNeatIndividual->PrintAllTraits();
 				}
-				break; // break from for loop to evaluate this genome
+				foundIndividualToEvaluate = true; // not used
+				return; // break from for loop to evaluate this genome
 			}
 		}
 	}
@@ -385,6 +386,7 @@ void EA_NEAT::loadBestIndividualGenome(int sceneNum) {
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
 			population->m_Species[i].m_Individuals[j].SetFitness(settings->indFits[c]);
+			//population->m_Species[i].m_Individuals[j].SetID(settings->indNumbers[c]);
 			c++;
 		}
 	}
@@ -392,7 +394,7 @@ void EA_NEAT::loadBestIndividualGenome(int sceneNum) {
 	cout << "loaded individual number " << currentNeatIndividual->GetID() << " that had a fitness of " << currentNeatIndividual->GetFitness() << endl;
 	for (int i = 0; i < population->m_Species.size(); i++) {
 		for (int j = 0; j < population->m_Species[i].m_Individuals.size(); j++) {
-			cout << "fitness of individual " << i << "," << j << " = " << population->m_Species[i].m_Individuals[j].GetFitness() << endl;
+			cout << "fitness of individual " << population->m_Species[i].m_Individuals[j].GetID() << "," << j << " = " << population->m_Species[i].m_Individuals[j].GetFitness() << endl;
 		}
 	}
 }
