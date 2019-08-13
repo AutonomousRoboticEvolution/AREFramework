@@ -21,12 +21,12 @@ public:
 	typedef shared_ptr<Morphology> MorphologyPointer;
 	/**
 	@brief Calculate the fitness value of the robot
-	@param morph The pointer of the robot morphology
+	@param morph The pointer of the robot (morphology)
 	*/
 	virtual float fitnessFunction(MorphologyPointer morph) = 0;
 	/**
 	@brief update the info of the objects (e.g. robot) in the environments
-	@param morph The pointer of the robot morphology
+	@param morph The pointer of the robot (morphology)
 	*/
 	virtual float updateEnv(MorphologyPointer morph) = 0;
 	/**

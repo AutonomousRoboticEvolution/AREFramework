@@ -9,7 +9,9 @@ public:
 	void init(); 
 
 	vector <float> pStart;
+	/// starting point
 	vector <float> pOne;
+	/// end point
 	vector <float> pEnd;
 
 	float fitnessFunction(MorphologyPointer morph);

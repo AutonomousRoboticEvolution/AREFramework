@@ -11,7 +11,6 @@ public:
 	virtual vector<int> getJointHandles(int parentHandle);
 	void update();
 	virtual int getMainHandle();
-	int createWei();
 	void create();
 
 

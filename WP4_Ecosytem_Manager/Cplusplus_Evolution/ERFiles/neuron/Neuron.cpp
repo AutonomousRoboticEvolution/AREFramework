@@ -25,7 +25,7 @@ void Neuron::mutate(float mr) {
 		// local mutations
 		if (randomNum->randFloat(0.0, 1.0) < mr) {
 			connectionWeights[i]+= randomNum->randFloat(-sigma, sigma);
-			if (connectionWeights[i] > 1.0) {
+			if (connectionWeights[i] > 1.0) {   //normalize the weights
 				connectionWeights[i] = 1.0;
 			}
 			else if (connectionWeights[i] < -1.0) {
@@ -40,7 +40,7 @@ stringstream Neuron::getNeuronParams() {
 	ss << "\t" << ",#NeuronID," << neuronID << "," << endl;
 	ss << "\t" << ",#Connections,";
 	for (int i = 0; i < connections.size(); i++) {
-		ss << connections[i]->neuronID << ",";
+		ss << connections[i]->neuronID << ",";  //the ID of the neuron this neuron connects to
 	}
 	ss << endl;
 	ss << "\t" << ",#ConnectionWeights,";

@@ -2,12 +2,12 @@
 #include "ANN.h"
 #include <vector>
 
-class CustomANN :
+class FixedStructureANN :
 	public ANN
 {
 public:
-	CustomANN();
-	~CustomANN();
+    FixedStructureANN();
+	~FixedStructureANN();
     /**
     @brief Initialize the NN
     @param input number of input neurons

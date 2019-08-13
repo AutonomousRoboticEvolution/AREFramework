@@ -27,6 +27,7 @@ set(SOURCES
     ERFiles/control/ControlFactory.cpp
     ERFiles/control/CPPN.cpp
     ERFiles/control/CustomANN.cpp
+    ERFiles/control/FixedStructreANN.cpp
     ERFiles/control/SimpleControl.cpp
     ERFiles/DefaultGenome.cpp
     ERFiles/DefaultGenomeVREP.cpp

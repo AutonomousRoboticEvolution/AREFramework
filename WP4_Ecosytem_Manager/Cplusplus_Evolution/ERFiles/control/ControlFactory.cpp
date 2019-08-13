@@ -45,6 +45,13 @@ shared_ptr<Control> ControlFactory::createNewControlGenome(int type, shared_ptr<
 	else if (st->controlType == st->ANN_NEAT) {
 		cout << "ERROR: Neat is not yet set up" << endl;
 	}
+    else if (st->controlType == st->ANN_FIXED_STRUCTURE) {
+        // creates fixed structure ANN
+        shared_ptr<Control> fixedStructureANN(new FixedStructureANN);
+        fixedStructureANN->randomNum = rn;
+        fixedStructureANN->settings = st;
+        return fixedStructureANN;
+    }
 }
 
 

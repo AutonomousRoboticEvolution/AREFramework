@@ -1,19 +1,18 @@
-#include "CustomANN.h"
+#include "FixedStructreANN.h"
 #include <iostream>
 
-
-CustomANN::CustomANN()
+FixedStructureANN::FixedStructureANN()
 {
 
 }
 
 
-CustomANN::~CustomANN()
+FixedStructureANN::~FixedStructureANN()
 {
 
 }
 
-void CustomANN::flush() {
+void FixedStructureANN::flush() {
 	for (int i = 0; i < inputLayer.size(); i++) {
 		inputLayer[i]->flush();
 	}
@@ -25,7 +24,7 @@ void CustomANN::flush() {
 	}
 }
 
-void CustomANN::init(int input, int inter, int output) {
+void FixedStructureANN::init(int input, int inter, int output) {
 	unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 	neuronID = 0;
 	for (int i = 0; i < input; i++) {
@@ -46,14 +45,25 @@ void CustomANN::init(int input, int inter, int output) {
 		outputLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
 	}
-	inputLayer[0]->connectionsID.push_back(recurrentLayer[0]->neuronID);  //TODO:??
-	recurrentLayer[0]->connectionsID.push_back(outputLayer[0]->neuronID); //TODO:??
+    //Connection is extended for the entire layer
+    for (int i = 0; i < recurrentLayer.size(); i++) {
+        for (int j = 0; j < inputLayer.size(); j++) {
+            inputLayer[j]->connectionsID.push_back(recurrentLayer[i]->neuronID);
+            inputLayer[j]->connectionWeights.push_back(1.0);
+        }
+    }
+	for (int i = 0; i < outputLayer.size(); i++) {
+        for (int j = 0; j < recurrentLayer.size(); j++) {
+            recurrentLayer[j]->connectionsID.push_back(outputLayer[i]->neuronID);
+            recurrentLayer[j]->connectionWeights.push_back(1.0);
+        }
+    }
 	checkConnections();
 	changeConnectionIDToPointer();
 	neuronFactory.reset();  //destroy the unique point
 }
 
-void CustomANN::reset() {
+void FixedStructureANN::reset() {
 	for (int i = 0; i < inputLayer.size(); i++) {
 		inputLayer[i].reset();
 	}
@@ -65,7 +75,7 @@ void CustomANN::reset() {
 	}
 }
 
-void CustomANN::checkConnections() {
+void FixedStructureANN::checkConnections() {
 //	cout << "in" << inputLayer.size() << endl;
 	for (int i = 0; i < inputLayer.size(); i++) {
 //		cout << "conID:" << inputLayer[i]->connectionsID.size() << endl;
@@ -113,7 +123,7 @@ void CustomANN::checkConnections() {
 //	printNeuronValues();
 }
 
-vector<float> CustomANN::update(vector<float> sensorValues) {
+vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 	vector<float> outputValues; 
 	if (sensorValues.size() != inputLayer.size()) {
 		std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
@@ -121,33 +131,32 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 	}
 	else {
 		for (int i = 0; i < sensorValues.size(); i++) {
-			inputLayer[i]->input = sensorValues[i];
-			inputLayer[i]->update();
+			inputLayer[i]->input = sensorValues[i];  //overwrite the input of the input layer
+			inputLayer[i]->update();  //update the neuron the input layer is connected to
 		}
 	}
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->update();
 	}
-	cf = 0.0;
+	//cf = 0.0;
 	for (int i = 0; i < outputLayer.size(); i++) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
-		cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
+		//cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
 		cout << "outputvalues " <<  outputValues[i] << endl;
 	}
-	cf += 0.5;
-	printNeuronValues();
-		//leaky(0.8);
+	//cf += 0.5;
+	//printNeuronValues();
 	return outputValues;
 }
 
 
-void CustomANN::setFloatParameters(vector<float> values) {
+void FixedStructureANN::setFloatParameters(vector<float> values) {
 	// function can be used to manually set specific parameters
 	recurrentLayer[0]->setFloatParameters(values);
 }
 
-void CustomANN::mutate(float mutationRate) {
+void FixedStructureANN::mutate(float mutationRate) {
 	for (int i = 0; i < inputLayer.size(); i++) {
 		inputLayer[i]->mutate(mutationRate);
 	}
@@ -156,8 +165,8 @@ void CustomANN::mutate(float mutationRate) {
 	}
 }
 
-shared_ptr<Control> CustomANN::clone() const {
-	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);  //make_unique
+shared_ptr<Control> FixedStructureANN::clone() const {
+	shared_ptr<FixedStructureANN> newANN = make_unique<FixedStructureANN>(*this);  //make_unique
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
@@ -176,19 +185,19 @@ shared_ptr<Control> CustomANN::clone() const {
 	return newANN;
 }
 
-stringstream CustomANN::getControlParams() {
+stringstream FixedStructureANN::getControlParams() {
 	return ANN::getControlParams();
 }
 
-void CustomANN::setControlParams(vector<string> values) {
+void FixedStructureANN::setControlParams(vector<string> values) {
 	ANN::setControlParams(values);
 }
 
-void CustomANN::changeConnectionIDToPointer() {
+void FixedStructureANN::changeConnectionIDToPointer() {
 	ANN::changeConnectionIDToPointer();
 }
 
-bool CustomANN::checkControl(vector<string> values) {
+bool FixedStructureANN::checkControl(vector<string> values) {
 	return ANN::checkControl(values);
 }
 

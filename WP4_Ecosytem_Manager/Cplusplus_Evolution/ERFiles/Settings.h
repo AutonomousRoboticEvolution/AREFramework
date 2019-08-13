@@ -147,7 +147,9 @@ public:
         /// Should be used for calling the ANN used in NEAT
 		ANN_NEAT = 6,
 		/// Can be used to specify leaky integrators in the ANN
-		LEAKY_ANN_CONTROL = 7  // TODO: adjustable leakiness parameter
+		LEAKY_ANN_CONTROL = 7,  // TODO: adjustable leakiness parameter
+        /// Fixed structure ANN
+		ANN_FIXED_STRUCTURE = 8
 	};
 
 	enum EvolutionType {

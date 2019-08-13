@@ -15,11 +15,13 @@ public:
 
 	void saveGenome(int indNum, float fitness);
 
+    bool loadGenome(int individualNumber, int sceneNum);
 	void init();
 	shared_ptr<Morphology> clone() const;
 	string name;
 	vector<int> outputHandles;
 	vector<int> outputValues;
+    float fitness;
 
 };
 

@@ -208,7 +208,7 @@ class SimulationFrame(Frame):
 		self.repLab = Label(parent,text=directory)
 		self.repLab.grid(column=0, row = row)
 		self.repository=Entry(parent,width=60)
-		self.repository.grid(column=0,row=row, columnspan = 2)
+		self.repository.grid(column=1,row=row, columnspan = 2)
 		self.repository.configure(text=directory)	
 		row += 1
 		self.con = Label(parent,text="Output")
