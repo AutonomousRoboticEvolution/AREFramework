@@ -18,8 +18,7 @@ public:
 	/// remove the neuron
 	void reset();
 	/// mutate the neuron
-	void mutate(float mutationRate); 
-	float transformValue = 0; 
+	void mutate(float mutationRate);
 	shared_ptr<Neuron> clone(); 
 	stringstream getNeuronParams();
 	void setNeuronParams(vector<string>);

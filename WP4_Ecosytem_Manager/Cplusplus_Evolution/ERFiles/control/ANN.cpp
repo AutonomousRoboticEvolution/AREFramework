@@ -124,7 +124,7 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 		for (int j = 0; j < outputLayer[i]->connections.size(); j++) {
 			if (outputLayer[i]->connections[j]->neuronID == -1) {
 				outputLayer[i]->connections[j].reset();  //remove the connection
-				outputLayer[i]->connections.erase(outputLayer[i]->connections.begin() + j);
+				outputLayer[i]->connections.erase(outputLayer[i]->connections.begin() + j);  //remove the connection
 				outputLayer[i]->connectionWeights.erase(outputLayer[i]->connectionWeights.begin() + j); //remove he connection weight
 			}
 		}
@@ -133,13 +133,13 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 //	printNeuronValues();
 }
 
-//TODO: motivation?
+//may not be needed
 void ANN::addInput(vector<float> input) {
 	int controlSize = inputLayer.size();
 	int inputSize = input.size();
 	if (inputSize > controlSize) {
 		for (int i = 0; i < controlSize; i++) {
-			inputLayer[i]->input += input[i];   //TODO: = or +=?
+			inputLayer[i]->input += input[i];
 		}
 	}
 	else {
@@ -409,44 +409,6 @@ void ANN::removeNeurons(float mutationRate) {
 					}
 				}
 			}
-		}
-	}
-}
-
-void ANN::changeNeurons(float mutationRate) { // debugging required
-	// replace neuron
-	for (int i = 0; i < recurrentLayer.size(); i++) {
-		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-			//cout << "replacing neuron" << endl;
-			int deletedID = recurrentLayer[i]->neuronID;
-			recurrentLayer[i].reset();
-			unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
-			int neuronType = randomNum->randInt(2, 0); // simple or CPG
-			if (neuronType == 1) {
-				neuronType = 5;
-			}
-			recurrentLayer[i] = neuronFactory->createNewNeuronGenome(neuronType, settings);
-			recurrentLayer[i]->init(neuronID);
-			neuronID++;
-			neuronFactory.reset();
-			recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-			for (int j = 0; j < inputLayer.size(); j++) {
-				for (int k = 0; k < inputLayer[j]->connectionsID.size(); k++) {
-					if (inputLayer[j]->connectionsID[k] == deletedID) {
-						inputLayer[j]->connectionsID[k] = recurrentLayer[i]->neuronID;
-			//			inputLayer[j]->connections[k] = recurrentLayer[i];
-					}
-				}
-			}
-			for (int j = 0; j < recurrentLayer.size(); j++) {
-				for (int k = 0; k < recurrentLayer[j]->connectionsID.size(); k++) {
-					if (recurrentLayer[j]->connectionsID[k] == deletedID) {
-						recurrentLayer[j]->connectionsID[k] = recurrentLayer[i]->neuronID;
-						//					recurrentLayer[j]->connections[k] = recurrentLayer[i];
-					}
-				}
-			}
-			//			cout << "replaced neuron" << endl;
 		}
 	}
 }

@@ -31,10 +31,11 @@ public:
 	void cloneControlParameters(shared_ptr<Control> parent);
 	/// maximum number size of neuron for each layer
 	int maxLayerSize;
-	///
+	/// maximum number of connection (not set initially?)
 	int maxCon;
 	/// read the topology from CSV file and check if it is correct
 	bool checkControl(vector<string> values);
+	/// map the neuron reference connection pointer into neuron ID
 	void changeConnectionPointerToID();
 	/// destroy the neuron of the ANN
 	void reset();
@@ -47,8 +48,7 @@ public:
 	/// add a neuron in the recurrent layer
 	void addNeurons(float mutationRate);
 	/// delete a neuron from the recurrent layer
-	void removeNeurons(float mutationRate);
-	void changeNeurons(float mutationRate);
+	void removeNeurons(float mutationRate);   //another operator: replace neuron
 
 	/// a vector of input neurons
 	vector<shared_ptr<Neuron>> inputLayer;
