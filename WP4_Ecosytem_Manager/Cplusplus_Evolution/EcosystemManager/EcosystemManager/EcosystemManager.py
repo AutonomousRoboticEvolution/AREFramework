@@ -428,7 +428,7 @@ class RealWorldFrame(Frame):
 		self.evaluatedQueueList = Listbox(parent, width =60)
 		self.evaluatedQueueList.grid(column=3,row=9, columnspan = 2, rowspan = 3, sticky=E+W)
 		self.robots = []
-		self.runRobotButton = Button(parent, text="Run Robot", command=self.openPort)
+		self.runRobotButton = Button(parent, text="Open connection", command=self.openPort)
 		self.runRobotButton.grid(column=0, row=0);
 		self.sendGenomeButton = Button(parent,text="Send Genome", command = self.sendGenome);
 		self.sendGenomeButton.grid(column=0, row=1);
@@ -491,7 +491,7 @@ class RealWorldFrame(Frame):
 		if (len(self.robots) >1):
 			print("Cannot connect to more than one robot for now")
 			return -1
-		self.robots.append(RobotConnection(ip_address, port))
+		self.robots.append(robot_connection.RobotConnection('192.168.1.5'))
 
 	def sendGenome(self):
 		if (len(self.robots)<1):
@@ -499,7 +499,6 @@ class RealWorldFrame(Frame):
 			return -1
 		for rob in robots:
 			rob.sendMessage("2")
-	
 
 	def checkRobots(self):
 		if (len(self.robots)<1):

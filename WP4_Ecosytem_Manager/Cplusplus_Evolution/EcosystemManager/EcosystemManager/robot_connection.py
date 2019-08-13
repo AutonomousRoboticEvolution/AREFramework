@@ -1,17 +1,30 @@
-import socket
-BUFFER_SIZE = 1024
-ip_address = "10.2.166.80"
-#ip_address = "0.0.0.0"
-port = 3010
+import paramiko
 
 class RobotConnection:
-	def __init__(self, ip_address, port):
-		self.s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.s.connect((ip_address, port))
-		# TODO return failed connection
+	def __init__(self, ip_address):
+		try:
+			# Stablish communication
+			self.ssh_client=paramiko.SSHClient()
+			self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			self.ssh_client.connect(hostname='192.168.1.5', username='pi', password='arerobot')
+			print("Communication STABLISHED with robot")
+			self.isconnected = True
+		except:
+			print("ERROR stablishing communication with robot")
+			self.isconnected = False
+	## Send genome to robot
 	def sendMessage(self, message):
-		self.s.send(bytes(message, 'utf-8'))
+		print("Sending message to robot")
+	## Receive message from robots
 	def receiveMessage(self):
-		return self.s.recv(BUFFER_SIZE).decode()
+		print("Receive message to robot")
+	## Start program in robot
+	def robotStart(self):
+		print("Robot starting")
+	## Close connection ports with robots
 	def closePort(self):
-		self.s.close()
+		if(self.isconnected):
+			self.ssh_client.close()
+			print("Connection port to robot closed")
+		else:
+			print("Robot not connected")
