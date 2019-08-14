@@ -89,7 +89,7 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 			pEnd.push_back(pos[1]);
 			if (pOne.size() < 1) {
 	//			cout << "Note, pOne never set" << endl;
-				cout<<"FitnessFunction pOne size <>> 1"<<endl;
+				// cout<<"FitnessFunction pOne size <>> 1"<<endl;
 				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
 			}
 			else {

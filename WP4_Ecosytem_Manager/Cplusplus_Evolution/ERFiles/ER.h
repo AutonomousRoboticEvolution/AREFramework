@@ -21,13 +21,7 @@
 
 using namespace std;
 
-enum simulationSetup
-{
-	DEFAULT_SETUP,
-	RECALLBEST,
-	RECALLPOP,
-	RECALLBESTFROMGENOME
-};
+
 
 class CER
 {
@@ -39,9 +33,8 @@ public:
        @brief This method splits lines
 	*/
 	void split_line(string& line, string delim, list<string>& values);
-	/// simulation setup detemining which genome to load for start
-	simulationSetup simSet = DEFAULT_SETUP;
-	/// pointer to settting of EA
+
+	///pointer to settting of EA
 	shared_ptr<Settings> settings;  
 	/// pointer to EA
 	unique_ptr<EA> ea;               
@@ -49,7 +42,9 @@ public:
 	shared_ptr<RandNum> randNum;
 
 	void saveSettings();
-	/// Indicates whether to start the simulation in server mode (received genome)
+	void initialize();
+	void initializeSimulation();
+    /// Indicates whether to start the simulation in server mode (received genome)
 	bool startRun = true;
 
 	// parameters

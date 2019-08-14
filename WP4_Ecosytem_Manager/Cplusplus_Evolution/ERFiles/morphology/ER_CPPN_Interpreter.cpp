@@ -3,6 +3,8 @@
 #include <cmath>
 
 
+
+
 ER_CPPN_Interpreter::ER_CPPN_Interpreter()
 {
 	modular = true;
@@ -330,7 +332,7 @@ void ER_CPPN_Interpreter::init() {
 	genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	genome->moduleParameters[0]->control->init(1, 1, 1);
 	if (settings->verbose) {
-		cout << "quereuing cppn" << endl;
+		cout << "querying cppn" << endl;
 	}
 	for (int i = 0; i < maxIterations; i++)
 	{
@@ -377,7 +379,7 @@ void ER_CPPN_Interpreter::init() {
 					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
-						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
+						int typeM = (int)(moduleTypeFloat[0] * (moduleAmount - 1));
 						if (typeM < 0) {
 							typeM = 0;
 						}

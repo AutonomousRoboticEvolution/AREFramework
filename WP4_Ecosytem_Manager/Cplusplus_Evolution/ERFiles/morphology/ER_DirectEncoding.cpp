@@ -664,7 +664,7 @@ void ER_DirectEncoding::deleteModuleFromGenome(int num)
 }
 
 void ER_DirectEncoding::mutate() {
-	//cout << "mutating lmorph" << endl;
+	cout << "mutating direct with mutation rate of " << settings->mutationRate << endl;
 	mutateERGenome(settings->morphMutRate);
 }
 

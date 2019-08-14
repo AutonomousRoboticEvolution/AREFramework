@@ -65,9 +65,7 @@ public:
 	string mainHandleName;
     /// Reference to a morphology object that can be updated in V-REP (phenotype)
 	shared_ptr<Morphology> currentMorphology;
-    /// store the current genome
-    shared_ptr<Genome> currentGenome;
-
+	int individualToBeLoaded = -1;
 	/**
 		@brief Get the morphology reference
 		@param g the reference of the Genome
@@ -75,7 +73,9 @@ public:
 	shared_ptr<Morphology> getMorphology(Genome* g);
 
 	shared_ptr<EA> ea;
-	/// used to create a genome
+	///store the current genome
+	shared_ptr<Genome> currentGenome;
+	///used to create a genome
 	shared_ptr<GenomeFactoryVREP> genomeFactory;
 
 	/**

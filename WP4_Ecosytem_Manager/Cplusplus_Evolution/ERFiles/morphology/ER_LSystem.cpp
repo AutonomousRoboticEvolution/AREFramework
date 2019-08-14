@@ -423,7 +423,7 @@ void ER_LSystem::initializeSolar(int type)
 		else {
 		}
 	}
-	settings->morphMutRate = -0.1;
+	//settings->morphMutRate = -0.1;
 	cf.reset();
 }
 
@@ -833,7 +833,6 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 			std::cerr << "control = null? Check ER_LSystem.cpp" << std::endl;
 		}
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
-
 		// Resize the rules (Potentially very destructive) 
 		int childSize = lGenome->lParameters[i]->childSites.size();
 

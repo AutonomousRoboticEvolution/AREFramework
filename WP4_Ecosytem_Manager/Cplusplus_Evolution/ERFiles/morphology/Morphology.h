@@ -7,6 +7,7 @@
 #include "../control/ControlFactory.h"
 #include "../../RandNum.h"
 #include "../Settings.h"
+#include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 
 using namespace std;
 
@@ -73,6 +74,7 @@ public:
 
 	float phenValue = -1.0;
 	virtual void setPhenValue() = 0;
+	
 
 	vector<vector <int> > maxModuleTypes;
 //	typedef shared_ptr<Control> ControlPointer;
@@ -82,4 +84,5 @@ public:
 	virtual int getMainHandle() = 0;
 	float minimumHeight = 0;
 	int amountIncrement = 1;
+	shared_ptr<NEAT::NeuralNetwork> neat_net;
 };

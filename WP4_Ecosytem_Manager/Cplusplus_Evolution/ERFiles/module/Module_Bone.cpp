@@ -77,8 +77,12 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	// deselect
 	simRemoveObjectFromSelection(sim_handle_all, miscHandle);
 
-	// get the difference between the parent attachment configurations and the main handle of the object?
+	if (shapes.size() < 1) {
+		cout << "ERROR: No shapes have been created for the bones." << endl;
+		return -1;
+	}
 
+	// get the difference between the parent attachment configurations and the main handle of the object?
 
 	if (settings->verbose) {
 		cout << "creating force sensor" << endl;

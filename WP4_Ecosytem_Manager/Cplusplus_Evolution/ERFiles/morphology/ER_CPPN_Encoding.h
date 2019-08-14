@@ -6,7 +6,6 @@
 
 using namespace std;
 
-
 class ER_CPPN_Encoding : public Development
 {
 public:

@@ -20,6 +20,7 @@ public:
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules();
+	/// Holds information of the modules created (phenotype)
 	vector<shared_ptr<ER_Module> > createdModules;
     int getMainHandle();
 	struct BASEMODULEPARAMETERS {
@@ -47,7 +48,8 @@ public:
 		float absPos[3];
         float absOri[3];
 	};
-	
+
+
 	void savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
 	void savePhenotype(int ind, float fitness) {};
 

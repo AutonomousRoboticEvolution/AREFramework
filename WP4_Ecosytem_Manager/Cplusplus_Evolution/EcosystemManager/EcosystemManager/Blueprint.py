@@ -6,8 +6,7 @@ class Type(Enum):
 	WHEEL = 1
 	JOINT = 2
 	#BONE: SKELETON = 3
-	MISC = 4
-
+	MISC = 3
 
 class ModuleBlueprintParameters:
 	def __init__(self, id, moduleType, absPos, absOri):
@@ -51,6 +50,7 @@ class Blueprint:
 			writer = csv.writer(csvfile, delimiter=',')
 			for m in self.mbps:
 				writer.writerow(m.getSpecifications())
+
 	def getcsv(self):
 		dt = []
 		writer = csv.writer(csvfile, delimiter=',')

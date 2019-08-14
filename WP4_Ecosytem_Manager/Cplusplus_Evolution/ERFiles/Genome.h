@@ -19,6 +19,7 @@ public:
 	shared_ptr<Morphology> morph;
 	/// Can be used for a adding a centralized controller
 	shared_ptr<Control> control;
+	bool initialized = false;
 
 	/// fitness value; make vector for multi-objective
 	float fitness;

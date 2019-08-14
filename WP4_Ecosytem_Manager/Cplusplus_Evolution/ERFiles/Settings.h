@@ -128,6 +128,9 @@ public:
 		INTEGRATION = 22,
 		/// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
 		MODULAR_PHENOTYPE = 11,
+		CPPN_NEAT_MORPH = 12
+
+
 	};
 
 	enum ControlType {
@@ -158,6 +161,7 @@ public:
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
         /// deprecated
+		EA_NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
 	};
 
@@ -170,19 +174,20 @@ public:
         /// deprecated
         INSTANCE_DEBUGGING = 2
 	};
-	
+
 	/// Can be used when there are differences between operating systems. Not encountered yet.
 	enum OS {
 		WINDOWS,
 		LINUX
 	};
 
+
     StartingCondition startingCondition = COND_RUN_EVOLUTION_CLIENT;
 	InstanceType instanceType = INSTANCE_REGULAR;		// Whether the code runs in client or server mode
 	EvolutionType evolutionType = STEADY_STATE;			// Type of evolutionary algorithm used
 	FitnessType fitnessType = MOVE;						// Fitness type
 	EnvironmentType environmentType = DEFAULT_ENV;		// Environment type
-	MoveDirection moveDirection = DISTANCE_XY;			// This is used to modify the fitness function by specifying the direction. By default 
+	MoveDirection moveDirection = DISTANCE_XY;			// This is used to modify the fitness function by specifying the direction. By default
 														// it is set to DISTANCE_XY which is the horizontal distance moved
 	MorphologyType morphologyType = CAT_MORPHOLOGY;		// Type of morphology used
 	ControlType controlType = ANN_DEFAULT;				// Specifies the type of controller used
@@ -202,29 +207,39 @@ public:
 	int individualCounter = 0;		// This variable counts the total number of individuals that have been evaluated during one evolutionary runs
 	int crossover = 0;				// Using crossover (int value for potentially using different crossover strategies)
 	float crossoverRate = 0;		// Rate at which crossover happens. Variable can be used like mutation rate
-	
+
 	int ageInds = 0;				// Whether age should be used (deprecated) (TODO: DELETE : DEPRECATED)
 	int maxAge = 0;					// An absolute maximum age could be set. (TODO: DELETE : DEPRECATED)
 	int minAge = 0;					// Minimum age, death cannot occur before this (TODO: DELETE : DEPRECATED)
 	float deathProb = 0;			// Probability of individuals being removed at random from the population (TODO: DELETE : DEPRECATED)
-	
+
 	vector<int> indNumbers;			// Vector storing the IDs of the individuals in the current population. This vector can be used to load all individuals from a specific generation
 	vector<float> indFits;			// Vector storing the fitness values of the individuals in the current population
 	int seed = 0;					// Random seed passed to the random number generator (TODO: random number generator names are slightly different)
 
-	/// modular parameters
-	int useVarModules = 0;			// There was an option to mutate the number of modules in the L-System (TODO: DELETE : DEPRECATED)
-	float maxForce = 1.5;			// Maximum force to be set on all joints
-	float maxForceSensor = 80;		// Maximum force set on all force sensors (N*m)
+
+	/*enum LSystemType{
+	DEFAULT_LSYSTEM = 0,
+	CUBE_LSYSTEM = 1,
+	JOINT_AND_CUBE_LSYSTEM = 2,
+	MODULAR_LSYSTEM = 3,
+	LIGHT_LSYSTEM = 4,
+	};*/
+
+    /// modular parameters
+    int useVarModules = 0;			// There was an option to mutate the number of modules in the L-System (TODO: DELETE : DEPRECATED)
+    float maxForce = 1.5;			// Maximum force to be set on all joints
+    float maxForceSensor = 80;		// Maximum force set on all force sensors (N*m)
     float maxForce_ForceSensor = 0.01;// Maximum force set on all force sensors (by default) TODO: should replace maxForceSensor
     float maxTorque_ForceSensor = 1000;    // Maximum torque set on all force sensors (by default)
 
+//	EvolutionType evolutionType = GENERATIONAL; // not implemented yet
 
     int consecutiveThresholdViolations = 10; // Determining how many consecutive force sensor threshold violations will lead to the module breaking
 	int maxNumberModules = 20;		// Maximum number of modules allowed in phenotype
 	vector<int> moduleTypes;		// Vector storing the module types
-	vector<vector<int> > maxModuleTypes; /* Vector storing how many of each module type can be expressed 
-										 NOTE: this takes into account how many times the module type is expressed in total! So if you choose to append module 
+	vector<vector<int> > maxModuleTypes; /* Vector storing how many of each module type can be expressed
+										 NOTE: this takes into account how many times the module type is expressed in total! So if you choose to append module
 										 type 4 to be appended twice in module Types, both of them will be counted when checking for the maximum module types */
 
 	int numberOfModules = 5;		// The number of module types used by the L-System (note: not maximum number of modules!!!)
@@ -235,15 +250,17 @@ public:
 	int initialModuleType = 1;		// initial module for direct encoding, similar to axiom of L-System. This is the cube module by default
 
 	float energyDissipationRate = 0.00;// Can be used to simulate how much energy is consumed by specific modules (TODO: DELETE : DEPRECATED)
-	int lIncrements = 3;			// Specifies how many times the L-System is iterated over or specifies 
+	int lIncrements = 3;			// Specifies how many times the L-System is iterated over or specifies
 	int bestIndividual = 0;			// Tracks the best individual of every generation
 	int loadInd = 0;				// Specifies if an individual should be loaded (used in client-server mode)
-	bool verbose = false;			// Specifies whether to output print statement. 
-	Colorization colorization = COLOR_NEURALNETWORK; // To specify how to color the robot morphology. This is useful for debugging. 
-	
+	bool verbose = false;			// Specifies whether to output print statement.
+	Colorization colorization = COLOR_NEURALNETWORK; // To specify how to color the robot morphology. This is useful for debugging.
+
 	bool killWhenNotConnected = true;// Whether to send a message to shutdown V-REP servers if the connection with the client is lost
-	bool shouldReopenConnections = false;// Sometimes, connections between client and servers are lost, this specifies whether the connections should be reopened. 
+	bool shouldReopenConnections = false;// Sometimes, connections between client and servers are lost, this specifies whether the connections should be reopened.
 	bool createPatternNeurons = false;// Pattern neurons are basically sinusoidal wave functions now
+
+
 
 	// neural network parameters
 	int initialInputNeurons = 3;	// Initial number of input neurons
@@ -265,6 +282,7 @@ public:
     bool bCollidingOrgans = false;
     // Allow any orientation for organs
     bool bNonprintableOrientations = false;
+	bool loadFromQueue = false;
 
 	/**
 		@brief Set the repository for saving data

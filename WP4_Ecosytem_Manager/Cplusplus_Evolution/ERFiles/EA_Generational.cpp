@@ -12,6 +12,12 @@ EA_Generational::~EA_Generational()
 }
 
 
+void EA_Generational::setFitness(int individual, float fitness)
+{
+	nextGenGenomes[individual]->fitness = fitness;
+	//	nextGenFitness[individual] = fitness;
+}
+
 
 void EA_Generational::init()
 {

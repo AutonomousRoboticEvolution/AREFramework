@@ -31,9 +31,8 @@ public:
 	void cloneControlParameters(shared_ptr<Control> parent);
 	/// maximum number size of neuron for each layer
 	int maxLayerSize;
-	/// maximum number of connection (not set initially?)
-	int maxCon;
-	/// read the topology from CSV file and check if it is correct
+    /// maximum number of connection
+	int maxCon = 8;
 	bool checkControl(vector<string> values);
 	/// map the neuron reference connection pointer into neuron ID
 	void changeConnectionPointerToID();

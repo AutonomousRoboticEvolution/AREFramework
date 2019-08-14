@@ -36,9 +36,9 @@ Settings::Settings() {
 	//maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = MODULAR_DIRECT;
+	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_CUSTOM;
+	controlType = ANN_DEFAULT;
 	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
@@ -94,7 +94,6 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 		values.push_back(line);
 	}
 }
-
 
 void Settings::readSettings() {
 	bool fileExists = false;

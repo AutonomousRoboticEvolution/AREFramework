@@ -51,7 +51,7 @@ class Settings(Frame):
 		self.nb.add(f5, text="Modules")
 		self.nb.add(f6, text="Environment")
 		self.nb.add(f7, text="Controller")
-		self.nb.add(f8, text="Components")
+		self.nb.add(f8, text="Components") # TODO: Components not yet implemented, uses modules tab instead
 		self.nb.add(f9, text="Viability")
 		self.saveSettingsButton = Button(parent, text="Save Settings", command=self.saveCSV)
 		self.saveSettingsButton_R = Button(parent, text="Save Settings Real World", command=self.saveCSV_R)
@@ -333,7 +333,8 @@ class MorphologyParameters(Frame):
 
 		if(self.morphVar.get() == 'ARE'):
 			self.settings.nb.tab(3, state="normal")
-			self.settings.nb.tab(4, state="disabled")
+			self.settings.nb.tab(4, state="normal")
+			#self.settings.nb.tab(4, state="disabled")
 			self.settings.nb.tab(7, state="normal")
 
 
@@ -548,14 +549,19 @@ class GeneralParameters(Frame):
 		self.sendGenomeAsLabel.grid(column = 0, row = 4)
 		self.sendGenomeAsChoices = {'signal','file'}
 		self.sendGenomeAsDrop = StringVar(parent)
-		self.sendGenomeAsDrop.set('signal')
+		self.sendGenomeAsDrop.set('file')
 		self.sendGenomeAsMenu = OptionMenu(parent,self.sendGenomeAsDrop,*self.sendGenomeAsChoices)
 		self.sendGenomeAsMenu.grid(column = 1, row = 4, columnspan = 1)
 		
-		self.reopenConnectionsLabel = Label(parent,text=reopenConnectionsText)
+		self.reopenConnectionsLabel = Label(parent,text=reopenConnectionsText,bg="orange2")
 		self.reopenConnectionsLabel.grid(column = 0, row = 5)
-		self.reopenConnectionsCheck = Checkbutton(parent)
+		self.reopenConnectionsCheck = Checkbutton(parent,bg="orange2")
 		self.reopenConnectionsCheck.grid(column = 1, row = 5)
+
+		self.headlessLabel = Label(parent,text="headless mode",bg="orange2")
+		self.headlessLabel.grid(column = 0, row = 6)
+		self.headlessCheck = Checkbutton(parent,bg="orange2")
+		self.headlessCheck.grid(column = 1, row = 6)
 
 	def getSettings(self):
 		data = []
@@ -594,9 +600,9 @@ class EAParameters(Frame):
 		self.master = parent
 		self.EATypeLabel = Label(parent,text="Evolution type")
 		self.EATypeLabel.grid(column = 0, row = 0)
-		self.EATypeOptions = {'Steady State','Generational'}
+		self.EATypeOptions = {'(mu + lambda)','(mu, lambda)'}
 		self.EATypeVar = StringVar(parent)
-		self.EATypeVar.set('Steady State')
+		self.EATypeVar.set('(mu + lambda)')
 		self.EATypeMenu = OptionMenu(parent,self.EATypeVar,*self.EATypeOptions)
 		self.EATypeMenu.grid(column = 1, row = 0, columnspan = 1)
 
@@ -618,7 +624,7 @@ class EAParameters(Frame):
 		self.morphmrText=Entry(parent, textvariable = self.morphmrVar)
 		self.morphmrText.grid(column = 2, row = 2)
 
-		self.selectionTypeLabel = Label(parent,text="Selection")
+		self.selectionTypeLabel = Label(parent,text="Selection",bg="orange2")
 		self.selectionTypeLabel.grid(column = 0, row = 4)
 		self.selOptions = {'Random','Fitness Proportional', 'Tournament'}
 		self.selVar = StringVar(parent)
@@ -626,7 +632,7 @@ class EAParameters(Frame):
 		self.selMenu = OptionMenu(parent,self.selVar,*self.selOptions)
 		self.selMenu.grid(column = 1, row = 4, columnspan = 1)
 
-		self.replacementTypeLabel = Label(parent,text="Replacement")
+		self.replacementTypeLabel = Label(parent,text="Replacement",bg="orange2")
 		self.replacementTypeLabel.grid(column = 0, row = 5)
 		self.repOptions = {'Random','Fitness Proportional', 'Tournament', 'Replace worst'}
 		self.repVar = StringVar(parent)
@@ -656,13 +662,13 @@ class EAParameters(Frame):
 		self.popText=Entry(parent, textvariable = self.popVar)
 		self.popText.grid(column = 2, row = 8)
 
-		self.crossoverLabel = Label(parent,text="Crossover Chance")
+		self.crossoverLabel = Label(parent,text="Crossover Chance",bg="orange2")
 		self.crossoverLabel.grid(column = 0, row = 9)
 		self.crossVar = DoubleVar(parent,0.0)
 		self.crossVar.trace("w", self.callback)
-		self.crossScale = Scale(parent, from_=0, to=1, orient=HORIZONTAL,resolution=0.02, variable = self.crossVar)
+		self.crossScale = Scale(parent, from_=0, to=1, orient=HORIZONTAL,resolution=0.02, variable = self.crossVar,bg="orange2")
 		self.crossScale.grid(column = 1, row = 9)
-		self.crossText=Entry(parent, textvariable = self.crossVar)
+		self.crossText=Entry(parent, textvariable = self.crossVar,bg="orange2")
 		self.crossText.grid(column = 2, row = 9)
 			
 	def callback(self,*args):

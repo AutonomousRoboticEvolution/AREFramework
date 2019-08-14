@@ -21,7 +21,6 @@ void InputNeuron::update() {
 	for (int i = 0; i < connections.size(); i++) {
 		connections[i]->input += (output * connectionWeights[i]);
 	}
-//	input = 0;
 }
 void InputNeuron::reset() {
 	input = 0.0;
