@@ -6,7 +6,7 @@ class RobotConnection:
 			# Stablish communication
 			self.ssh_client=paramiko.SSHClient()
 			self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-			self.ssh_client.connect(hostname='192.168.1.5', username='pi', password='arerobot')
+			self.ssh_client.connect(hostname=ip_address, username='pi', password='arerobot')
 			print("Communication STABLISHED with robot")
 			self.isconnected = True
 		except:
@@ -19,8 +19,16 @@ class RobotConnection:
 	def receiveMessage(self):
 		print("Receive message to robot")
 	## Start program in robot
-	def robotStart(self):
-		print("Robot starting")
+	def robotStart(self, name):
+		if self.isconnected:
+			print("Transfering controller")
+			ftp_client=self.ssh_client.open_sftp()
+			ftp_client.put('../../../../../vrep/files/morphologies98/phenotype' + str(name) +'.csv','testController.csv')
+			ftp_client.close()
+			print("Robot starting")
+			stdin,stdout,stderr = self.ssh_client.exec_command("./simpleController/main")
+		else:
+			print("ERROR: Robot is not connected")
 	## Close connection ports with robots
 	def closePort(self):
 		if(self.isconnected):

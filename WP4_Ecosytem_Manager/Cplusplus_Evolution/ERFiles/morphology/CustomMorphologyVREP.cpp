@@ -78,7 +78,7 @@ int CustomMorphologyVREP::getMainHandle()
 
 void CustomMorphologyVREP::create()
 {
-    simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/wheeled-robot.ttm");
+    simLoadModel(settings-> "models/wheeled-robot.ttm");
     mainHandle = simGetObjectHandle("RobotBase");
 
     simFloat pos[3] = {-0.05, -0.15056, 0.031662};

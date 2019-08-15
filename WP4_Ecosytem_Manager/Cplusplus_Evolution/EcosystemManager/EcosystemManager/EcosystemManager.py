@@ -536,14 +536,16 @@ class RealWorldFrame(Frame):
 			print("Cannot connect to more than one robot for now")
 			return -1
         #IP address: device specific
-		self.robots.append(robot_connection.RobotConnection('192.168.1.5'))
+		self.robots.append(robot_connection.RobotConnection('192.168.1.101'))
 
 	def sendGenome(self):
 		if (len(self.robots)<1):
 			print("ERROR: not connected to any robots")
 			return -1
-		for rob in robots:
-			rob.sendMessage("2")
+		for rob in self.robots:
+			#rob.sendMessage("2")
+			ind = int(self.selectedInd[0])
+			rob.robotStart(self.popQueue.individuals[ind].num)
 
 	def checkRobots(self):
 		# Check connectivity
@@ -586,7 +588,7 @@ class RealWorldFrame(Frame):
 		# Initialize blueprint with parameters
 		self.popQueue.individuals[ind].blueprint.init(self.popQueue.individuals[ind].componentType,self.popQueue.individuals[ind].componentAbsPos,self.popQueue.individuals[ind].componentAbsOri) # TODO
 		# Save blueprint file
-		self.popQueue.individuals[ind].blueprint.saveBP(os.getcwd(), self.popQueue.individuals[ind].num)
+		self.popQueue.individuals[ind].blueprint.saveBP(self.popQueue.individuals[ind].num)
 		# Generate mesh file
 		subprocess.call([os.getcwd() + '/meshGeneratorScript.sh', str(self.popQueue.individuals[ind].num)])
 
