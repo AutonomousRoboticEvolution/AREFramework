@@ -136,7 +136,7 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 		cout << "outputvalues " <<  outputValues[i] << endl;
 	}
 	cf += 0.5;
-	printNeuronValues();
+	//printNeuronValues();
 		//leaky(0.8);
 	return outputValues;
 }

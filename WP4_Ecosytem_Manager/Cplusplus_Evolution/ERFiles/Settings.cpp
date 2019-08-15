@@ -17,8 +17,8 @@ Settings::Settings() {
 	// 18: example
 	moduleTypes.push_back(13);
 	moduleTypes.push_back(14);
+	moduleTypes.push_back(15);
 	moduleTypes.push_back(14);
-	moduleTypes.push_back(17);
 	moduleTypes.push_back(17);
 	autoDeleteSettings = true;
 
@@ -36,9 +36,9 @@ Settings::Settings() {
 	//maxModuleTypes[0][1] = 100; // one base module
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = CUSTOM_MORPHOLOGY;
+	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_DEFAULT;
+	controlType = ANN_CUSTOM;
 	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?

@@ -252,7 +252,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                             cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED." << endl;
                         }
                         // If the orientation of the organ is printable
-                        if(createdModules[createdModulesSize - 1]->type == 14){
+                        if(createdModules[createdModulesSize - 1]->type == 14 || createdModules[createdModulesSize - 1]->type == 15){
                             if(abs(createdModules[createdModulesSize - 1]->absOri[2]) > 1.48353 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 1.65806){
                                 if(abs(createdModules[createdModulesSize - 1]->absOri[1]) < 1.65806 || settings->bNonprintableOrientations == true){
                                     if(abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.0872665 || settings->bNonprintableOrientations == true){
