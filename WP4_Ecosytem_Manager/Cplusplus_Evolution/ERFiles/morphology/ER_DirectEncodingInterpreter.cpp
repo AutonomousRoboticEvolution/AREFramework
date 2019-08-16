@@ -241,18 +241,23 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                 }
                 // set color
                 // createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
-                if(bCheckCollision(parentHandle, createdModulesSize)) {
-                    if (bCheckGround(createdModulesSize)) {
-                        if(bCheckOrientation(createdModulesSize)){
-                            for (int n = 0; n < modules.size(); n++) {
-                                if (modules[n]->parent == i) {
-                                    modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                if(bCheckOrgansNumber(createdModulesSize)){
+                    if(bCheckCollision(parentHandle, createdModulesSize)) {
+                        if (bCheckGround(createdModulesSize)) {
+                            if(bCheckOrientation(createdModulesSize)){
+                                for (int n = 0; n < modules.size(); n++) {
+                                    if (modules[n]->parent == i) {
+                                        modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                    }
                                 }
-                            }
-                            genome->moduleParameters[i]->expressed = true;
+                                genome->moduleParameters[i]->expressed = true;
                             std::cout << "Orientation [0]: " << createdModules[createdModulesSize - 1]->absOri[0] << std::endl;
                             std::cout << "Orientation [1]: " << createdModules[createdModulesSize - 1]->absOri[1] << std::endl;
                             std::cout << "Orientation [2]: " << createdModules[createdModulesSize - 1]->absOri[2] << std::endl;
+                            }
+                            else{
+                                createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                            }
                         }
                         else{
                             createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
@@ -265,7 +270,6 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
                 else{
                     createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
                 }
-                bCheckOrgansNumber(createdModulesSize);
             }
 			// End of viability
 			// TODO: FV what is this?
@@ -687,68 +691,29 @@ bool ER_DirectEncodingInterpreter::bCheckOrientation(int createdModulesSize){
     // If the orientation of the organ is printable
     if (createdModules[createdModulesSize - 1]->type == 14 ||
         createdModules[createdModulesSize - 1]->type == 15) {
-        if (createdModules[createdModulesSize - 1]->absOri[2] > 1.48353 &&
-            createdModules[createdModulesSize - 1]->absOri[2] < 1.65806) {
-            if (abs(createdModules[createdModulesSize - 1]->absOri[1]) < 1.65806 ||
-                settings->bNonprintableOrientations) {
-                if (abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.0872665 ||
-                    settings->bNonprintableOrientations) {
-                    if (settings->verbose) {
-                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                             << " Good orientation - PASSED." << endl;
-                    }
-                    bViabilityResult = true;
-                } else {
-                    if (settings->verbose) {
-                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                             << " Good orientation - FAILED." << endl;
-                    }
-                    bViabilityResult = false;
-                }
-            } else {
-                if (settings->verbose) {
-                    cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                         << " Good orientation - FAILED." << endl;
-                }
-                bViabilityResult = false;
-            }
-        }
-        else {
-            if(createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665) {
-                if (abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.0872665 ||
-                    settings->bNonprintableOrientations) {
-                    if (abs(createdModules[createdModulesSize - 1]->absOri[0]) < 1.65806 ||
-                        settings->bNonprintableOrientations) {
-                        if (settings->verbose) {
-                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                                 << " Good orientation - PASSED." << endl;
-                        }
-                        bViabilityResult = true;
-                    }
-                    else {
-                        if (settings->verbose) {
-                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                                 << " Good orientation - FAILED." << endl;
-                        }
-                        bViabilityResult = false;
-                    }
-                }
-                else {
-                    if (settings->verbose) {
-                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                             << " Good orientation - FAILED." << endl;
-                    }
-                    bViabilityResult = false;
-                }
-            }
-            else{
-                if (settings->verbose) {
-                    cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                         << " Good orientation - FAILED." << endl;
-                }
-                bViabilityResult = false;
-            }
-        }
+       if(
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[1] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[0] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[1] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[0] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886 && abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
+          settings->bNonprintableOrientations){
+           if (settings->verbose) {
+               cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                    << " Good orientation - PASSED." << endl;
+           }
+           bViabilityResult = true;
+       }
+       else{
+           if (settings->verbose) {
+               cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                    << " Good orientation - FAILED." << endl;
+           }
+           bViabilityResult = false;
+       }
     }
     else { // If organ is not brain or sensor
         if (settings->verbose) {
@@ -762,8 +727,48 @@ bool ER_DirectEncodingInterpreter::bCheckOrientation(int createdModulesSize){
 /// Check of number of organs.
 bool ER_DirectEncodingInterpreter::bCheckOrgansNumber(int createdModulesSize){
     bool bViabilityResult = true;
+    int brainCounter = 0;
+    int motorCounter = 0;
+    int sensorCounter = 0;
+    int boneCounter = 0;
     for (int i = 0; i < createdModulesSize; ++i) {
-        std::cout << createdModules[i]->type << std::endl;
+        if (genome->moduleParameters[i]->expressed){
+            switch (createdModules[i]->type){
+                case 13:
+                    brainCounter++;
+                    break;
+                case 14:
+                    motorCounter++;
+                    break;
+                case 15:
+                    sensorCounter++;
+                    break;
+                case 17:
+                    boneCounter++;
+                    break;
+                default:
+                    std::cout << "ERROR: Organ type does not exist in bCheckOrgansNumber() " << std::endl;
+                    break;
+            }
+
+        }
+    }
+    std::cout << "Total motors: " << motorCounter << std::endl;
+    std::cout << "Total sensors: " << sensorCounter << std::endl;
+    if((createdModules[createdModulesSize - 1]->type == 14 && motorCounter > 2) ||
+        (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter > 2)){
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - PASSED." << endl;
+        }
+        bViabilityResult = true;
     }
     return bViabilityResult;
 }

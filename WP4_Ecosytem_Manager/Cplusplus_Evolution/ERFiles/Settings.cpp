@@ -16,10 +16,10 @@ Settings::Settings() {
 	// 17: bone
 	// 18: example
 	moduleTypes.push_back(13);
+	moduleTypes.push_back(14);
 	moduleTypes.push_back(15);
-	moduleTypes.push_back(15);
-	moduleTypes.push_back(15);
-	moduleTypes.push_back(15);
+	moduleTypes.push_back(17);
+	moduleTypes.push_back(17);
 	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
@@ -38,7 +38,7 @@ Settings::Settings() {
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
 	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_CUSTOM;
+	controlType = ANN_DEFAULT;
 	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?

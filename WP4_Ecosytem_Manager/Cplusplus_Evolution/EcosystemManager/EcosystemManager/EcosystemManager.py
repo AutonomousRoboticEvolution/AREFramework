@@ -463,7 +463,7 @@ class RealWorldFrame(Frame):
 		self.runRobotButton.grid(column=0, row=row)
 		# send genome via serial
 		row += 1;
-		self.sendGenomeButton = Button(parent,text="Send Genome", command = self.sendGenome, height = buttonSize[1], width = buttonSize[0])
+		self.sendGenomeButton = Button(parent,text="Activate Robot", command = self.sendGenome, height = buttonSize[1], width = buttonSize[0])
 		self.sendGenomeButton.grid(column=0, row=row);
 		# checks whether the robots are done being evaluated (placeholder)
 		row += 1;
