@@ -178,163 +178,95 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 			}
 
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-				if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
-					cout << "state " << createdModules[createdParentNumber]->state << ",";
-					cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
-					//	cout << "id " << createdModules[parentNr]-> << endl;
-				}
-				// parentHandle = createdModules[i]->parentModulePointer->;
-				if (settings->verbose) {
-					cout << "should create module : " << i << ",";
-				}
-				shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
-				if (parentModulePointer == NULL) {
-					cout << ", null , ";
-				}
-				if (settings->verbose) {
-					cout << "parent = " << modules[i]->parent << endl;
-					// cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
-					cout << "parentModulePointer = " << parentModulePointer << ", ";
-					cout << "parentSite = " << parentSite << ", ";
-					cout << " .. " << parentModulePointer->moduleID << ",";
-					cout << " pType " << parentModulePointer->type << ",";
-					cout << "orientation " << orien << endl;
-				}
-				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
-				std::cout << "NAME: " << simGetObjectName(parentHandle) << std::endl;
-				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
-				if (settings->verbose) {
-					cout << " 1 ,";
-				}
-				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
-				if (settings->verbose) {
-					cout << " 1.1, ";
-				}	
-				int createdModulesSize = createdModules.size();
-				vector<float> siteConfiguration;
-				if (settings->verbose) {
-					cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
-					cout << createdModules[createdParentNumber]->type << ",";
-					cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-				}
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
-				if (settings->verbose) {
-					cout << " a ,";
-				}
-				createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
-				createdModulesSize = createdModules.size();
-				if (settings->verbose) {
-					cout << " b ,";
-				}
-				// set color
-				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
-
-				vector<int> exception;
-				exception.push_back(parentHandle);
-				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
-				}
-                // TODO: EB: Viability goes here?
-                // TODO: EB: Rearrange this into functions
-                // Check for collisions. If there is a colliding object, remove it from the genome representaion.
-				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans == true) {
-                    if (settings->verbose) {
-                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
-                    }
-                    // If object is above the ground, it can be created
-                    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed == true){
-                        if (settings->verbose) {
-                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED." << endl;
-                        }
-                        // If the orientation of the organ is printable
-                        if(createdModules[createdModulesSize - 1]->type == 14 || createdModules[createdModulesSize - 1]->type == 15){
-                            if(abs(createdModules[createdModulesSize - 1]->absOri[2]) > 1.48353 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 1.65806){
-                                if(abs(createdModules[createdModulesSize - 1]->absOri[1]) < 1.65806 || settings->bNonprintableOrientations == true){
-                                    if(abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.0872665 || settings->bNonprintableOrientations == true){
-                                        if (settings->verbose) {
-                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
-                                        }
-                                        for (int n = 0; n < modules.size(); n++) {
-                                            if (modules[n]->parent == i) {
-                                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-                                            }
-                                        }
-                                        genome->moduleParameters[i]->expressed = true;
-                                    }
-                                    else{
-                                        if (settings->verbose) {
-                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
-                                        }
-                                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-                                    }
-                                }
-                                else{
-                                    if (settings->verbose) {
-                                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
-                                    }
-                                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-                                }
-                            }
-                            else{
-                                if(abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.0872665 || settings->bNonprintableOrientations == true){
-                                    if(abs(createdModules[createdModulesSize - 1]->absOri[0]) < 1.65806 || settings->bNonprintableOrientations == true){
-                                        if (settings->verbose) {
-                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
-                                        }
-                                        for (int n = 0; n < modules.size(); n++) {
-                                            if (modules[n]->parent == i) {
-                                                modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-                                            }
-                                        }
-                                        genome->moduleParameters[i]->expressed = true;
-                                    }
-                                    else{
-                                        if (settings->verbose) {
-                                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
-                                        }
-                                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-                                    }
-                                }
-                                else{
-                                    if (settings->verbose) {
-                                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - FAILED." << endl;
-                                    }
-                                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-
-                                }
-                            }
-                        }
-                        else{
-                            if (settings->verbose) {
-                                cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Good orientation - PASSED." << endl;
-                            }
+                if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
+                    cout << "state " << createdModules[createdParentNumber]->state << ",";
+                    cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
+                    //	cout << "id " << createdModules[parentNr]-> << endl;
+                }
+                // parentHandle = createdModules[i]->parentModulePointer->;
+                if (settings->verbose) {
+                    cout << "should create module : " << i << ",";
+                }
+                shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
+                if (parentModulePointer == NULL) {
+                    cout << ", null , ";
+                }
+                if (settings->verbose) {
+                    cout << "parent = " << modules[i]->parent << endl;
+                    // cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+                    cout << "parentModulePointer = " << parentModulePointer << ", ";
+                    cout << "parentSite = " << parentSite << ", ";
+                    cout << " .. " << parentModulePointer->moduleID << ",";
+                    cout << " pType " << parentModulePointer->type << ",";
+                    cout << "orientation " << orien << endl;
+                }
+                parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
+                std::cout << "NAME: " << simGetObjectName(parentHandle) << std::endl;
+                int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
+                if (settings->verbose) {
+                    cout << " 1 ,";
+                }
+                createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+                if (settings->verbose) {
+                    cout << " 1.1, ";
+                }
+                int createdModulesSize = createdModules.size();
+                vector<float> siteConfiguration;
+                if (settings->verbose) {
+                    cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien
+                         << ",";
+                    cout << createdModules[createdParentNumber]->type << ",";
+                    cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
+                }
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
+                if (settings->verbose) {
+                    cout << " a ,";
+                }
+                createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle,
+                                                                     parentHandle);
+                createdModulesSize = createdModules.size();
+                if (settings->verbose) {
+                    cout << " b ,";
+                }
+                // set color
+                // createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
+                if(bCheckCollision(parentHandle, createdModulesSize)) {
+                    if (bCheckGround(createdModulesSize)) {
+                        if(bCheckOrientation(createdModulesSize)){
                             for (int n = 0; n < modules.size(); n++) {
                                 if (modules[n]->parent == i) {
                                     modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
                                 }
                             }
                             genome->moduleParameters[i]->expressed = true;
+                            std::cout << "Orientation [0]: " << createdModules[createdModulesSize - 1]->absOri[0] << std::endl;
+                            std::cout << "Orientation [1]: " << createdModules[createdModulesSize - 1]->absOri[1] << std::endl;
+                            std::cout << "Orientation [2]: " << createdModules[createdModulesSize - 1]->absOri[2] << std::endl;
+                        }
+                        else{
+                            createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
                         }
                     }
-				    else{
-                        if (settings->verbose) {
-                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
-                        }
+                    else{
                         createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-				    }
-				}
-				else {
-                    if (settings->verbose) {
-                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
                     }
+                }
+                else{
                     createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-				}
-			}
+                }
+                bCheckOrgansNumber(createdModulesSize);
+            }
 			// End of viability
 			// TODO: FV what is this?
 			else {
@@ -710,8 +642,128 @@ void ER_DirectEncodingInterpreter::symmetryMutation(float mutationRate) {
 	}*/
 	cout << "Done with symmetry mutation" << endl;
 }
-
-bool ER_DirectEncodingInterpreter::bCheckCollision() {
-    
-    return false;
+/// Check for collisions. If there is a colliding object, remove it from the genome representation.
+bool ER_DirectEncodingInterpreter::bCheckCollision(int iParentHandle, int createdModulesSize) {
+    bool bViabilityResult = true;
+    vector<int> exception;
+    exception.push_back(iParentHandle);
+    for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+        exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+    }
+    if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// If object is above the ground, it can be created
+bool ER_DirectEncodingInterpreter::bCheckGround(int createdModulesSize) {
+    bool bViabilityResult = true;
+    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// Check for orientation. If the orientation of the organ is printable
+bool ER_DirectEncodingInterpreter::bCheckOrientation(int createdModulesSize){
+    bool bViabilityResult = true;
+    // If the orientation of the organ is printable
+    if (createdModules[createdModulesSize - 1]->type == 14 ||
+        createdModules[createdModulesSize - 1]->type == 15) {
+        if (createdModules[createdModulesSize - 1]->absOri[2] > 1.48353 &&
+            createdModules[createdModulesSize - 1]->absOri[2] < 1.65806) {
+            if (abs(createdModules[createdModulesSize - 1]->absOri[1]) < 1.65806 ||
+                settings->bNonprintableOrientations) {
+                if (abs(createdModules[createdModulesSize - 1]->absOri[0]) < 0.0872665 ||
+                    settings->bNonprintableOrientations) {
+                    if (settings->verbose) {
+                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                             << " Good orientation - PASSED." << endl;
+                    }
+                    bViabilityResult = true;
+                } else {
+                    if (settings->verbose) {
+                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                             << " Good orientation - FAILED." << endl;
+                    }
+                    bViabilityResult = false;
+                }
+            } else {
+                if (settings->verbose) {
+                    cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                         << " Good orientation - FAILED." << endl;
+                }
+                bViabilityResult = false;
+            }
+        }
+        else {
+            if(createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665) {
+                if (abs(createdModules[createdModulesSize - 1]->absOri[1]) < 0.0872665 ||
+                    settings->bNonprintableOrientations) {
+                    if (abs(createdModules[createdModulesSize - 1]->absOri[0]) < 1.65806 ||
+                        settings->bNonprintableOrientations) {
+                        if (settings->verbose) {
+                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                                 << " Good orientation - PASSED." << endl;
+                        }
+                        bViabilityResult = true;
+                    }
+                    else {
+                        if (settings->verbose) {
+                            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                                 << " Good orientation - FAILED." << endl;
+                        }
+                        bViabilityResult = false;
+                    }
+                }
+                else {
+                    if (settings->verbose) {
+                        cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                             << " Good orientation - FAILED." << endl;
+                    }
+                    bViabilityResult = false;
+                }
+            }
+            else{
+                if (settings->verbose) {
+                    cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                         << " Good orientation - FAILED." << endl;
+                }
+                bViabilityResult = false;
+            }
+        }
+    }
+    else { // If organ is not brain or sensor
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Good orientation - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
+}
+/// Check of number of organs.
+bool ER_DirectEncodingInterpreter::bCheckOrgansNumber(int createdModulesSize){
+    bool bViabilityResult = true;
+    for (int i = 0; i < createdModulesSize; ++i) {
+        std::cout << createdModules[i]->type << std::endl;
+    }
+    return bViabilityResult;
 }

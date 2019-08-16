@@ -16,10 +16,10 @@ Settings::Settings() {
 	// 17: bone
 	// 18: example
 	moduleTypes.push_back(13);
-	moduleTypes.push_back(14);
 	moduleTypes.push_back(15);
-	moduleTypes.push_back(14);
-	moduleTypes.push_back(17);
+	moduleTypes.push_back(15);
+	moduleTypes.push_back(15);
+	moduleTypes.push_back(15);
 	autoDeleteSettings = true;
 
 	for (int i = 0; i < moduleTypes.size(); i++) {

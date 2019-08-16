@@ -51,7 +51,14 @@ public:
 	shared_ptr<ModuleFactory> moduleFactory;
 
 	/// Viability methods
-	bool bCheckCollision();
+    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
+	bool bCheckCollision(int iParentHandle, int createdModulesSize);
+    /// Check for ground. If object is above the ground, it can be created
+    bool bCheckGround(int createdModulesSize);
+    /// Check for orientation. If the orientation of the organ is printable
+    bool bCheckOrientation(int createdModulesSize);
+    /// Check of number of organs.
+    bool bCheckOrgansNumber(int createdModulesSize);
 
 	void setPhenValue();
 	void savePhenotype(int ind, float fitness);
