@@ -753,10 +753,8 @@ bool ER_DirectEncodingInterpreter::bCheckOrgansNumber(int createdModulesSize){
 
         }
     }
-    std::cout << "Total motors: " << motorCounter << std::endl;
-    std::cout << "Total sensors: " << sensorCounter << std::endl;
-    if((createdModules[createdModulesSize - 1]->type == 14 && motorCounter > 2) ||
-        (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter > 2)){
+    if((createdModules[createdModulesSize - 1]->type == 14 && motorCounter >= 2) ||
+        (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter >= 2)){
         if (settings->verbose) {
             cout << "Component: " << createdModules[createdModulesSize - 1]->filename
                  << " Organs number check - FAILED." << endl;
