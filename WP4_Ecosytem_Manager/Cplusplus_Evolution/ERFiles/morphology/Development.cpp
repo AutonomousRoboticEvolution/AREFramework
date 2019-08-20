@@ -175,6 +175,12 @@ void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> created
 		phenotypeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
 		phenotypeFile << "#Orientation:," << createdModules[i]->orientation << endl;
 
+		// TODO: EB: This shouldn't be here. This offsets the coordinates so it can be printabled.
+        if(createdModules[i]->absPos[0] > 0) createdModules[i]->absPos[0] += 0.003;
+        else createdModules[i]->absPos[0] -= 0.003;
+        if(createdModules[i]->absPos[1] > 0) createdModules[i]->absPos[1] += 0.003;
+        else createdModules[i]->absPos[1] -= 0.003;
+        createdModules[i]->absPos[2] += 0.002;
 
         phenotypeFile << "#AbsPosition:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
         phenotypeFile << "#AbsOrientation:," << createdModules[i]->absOri[0] << "," << createdModules[i]->absOri[1] << "," << createdModules[i]->absOri[2] << std::endl;

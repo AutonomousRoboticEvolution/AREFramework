@@ -282,6 +282,9 @@ public:
     bool bCollidingOrgans = false;
     // Allow any orientation for organs
     bool bNonprintableOrientations = false;
+    // Any number of organs
+    bool bAnyOrgansNumber =false;
+
 	bool loadFromQueue = false;
 
 	/**

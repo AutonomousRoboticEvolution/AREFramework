@@ -82,6 +82,7 @@ class Settings(Frame):
 		data += self.environment.getSettings()
 		data += self.control.getSettings()
 		data += self.viability.getSettings()
+		data += self.component.getSettings()
 		for dat in data:
 			print(dat)
 		repo = self.directory + '/files/'
@@ -94,9 +95,10 @@ class Settings(Frame):
 		data += self.ea.getSettings()
 		data += self.morphology.getSettings()
 		data += self.encoding.getSettings()
-		data += self.module.getSettings()
+		#data += self.module.getSettings()
 		data += self.environment.getSettings()
 		data += self.control.getSettings()
+		#data += self.component.getSettings()
 		for dat in data:
 			print(dat)
 		repo = self.directory + '/files/'
@@ -165,35 +167,11 @@ class ViabilityParameters(Frame):
 		self.esCheckOri = Checkbutton(parent, variable = self.esCheckOriVar)
 		self.esCheckOri.grid(column = 1, row = 3)
 
-		self.manLabel = Label(parent,text="Manufacturability")
-		self.manLabel.grid(column = 0, row = 4)
-		self.manCheckVar = IntVar()
-		self.manCheck = Checkbutton(parent, variable = self.manCheckVar)
-		self.manCheck.grid(column = 1, row = 4)
-
-		self.esLabel = Label(parent,text="Essential Organ")
-		self.esLabel.grid(column = 0, row = 5)
-		self.esCheckVar = IntVar()
-		self.esCheck = Checkbutton(parent, variable = self.esCheckVar)
-		self.esCheck.grid(column = 1, row = 5)
-
-		self.printVolLabel = Label(parent,text="Max Print Volume")
-		self.printVolLabel.grid(column = 0, row = 6)
-		self.printVolVar = IntVar(parent,3)
-		#self.printVolVar.trace("w", self.moduleSizeChanged)
-		self.printVolScale = Scale(parent, from_=0, to=10, orient=HORIZONTAL,resolution=1, variable = self.printVolVar)
-		self.printVolScale.grid(column = 1, row = 6)
-		self.printVolText=Entry(parent, textvariable = self.printVolVar)
-		self.printVolText.grid(column = 2, row = 6)
-
-		self.orgInLabel = Label(parent,text="Organ Insertion Sequence")
-		self.orgInLabel.grid(column = 0, row = 7)
-
-		self.behaviorTestLabel = Label(parent,text="Behavior Test")
-		self.behaviorTestLabel.grid(column = 0, row = 8)
-		self.beCheckVar = IntVar()
-		self.beCheck = Checkbutton(parent, variable = self.beCheckVar)
-		self.beCheck.grid(column = 1, row = 8)
+		self.numLabel = Label(parent,text="Any number of organs")
+		self.numLabel.grid(column = 0, row = 4)
+		self.esCheckNumVar = IntVar()
+		self.esCheckNum = Checkbutton(parent, variable = self.esCheckNumVar)
+		self.esCheckNum.grid(column = 1, row = 4)
 
 	def getSettings(self):
 		data = []
@@ -207,6 +185,10 @@ class ViabilityParameters(Frame):
 		data.append(row)
 		row = []
 		row.append("#nonprintableorientations")
+		row.append(self.esCheckOriVar.get())
+		data.append(row)
+		row = []
+		row.append("#anynumberoforgans")
 		row.append(self.esCheckOriVar.get())
 		data.append(row)
 		return data
@@ -260,18 +242,6 @@ class ComponentParameters(Frame):
 			self.moduleMaxEntries.append(Entry(parent,textvariable = self.moduleMaxs[i]))
 			self.moduleMaxEntries[i].grid(column = 2, row = currentRow + i)
 		self.moduleSizeChanged()
-		self.directBarsWidthLabel = Label(parent,text="Direct Bars Width")
-		self.directBarsWidthLabel.grid(column = 0, row = 14)
-		self.directBarsHeightLabel = Label(parent,text="Direct Bars Height")
-		self.directBarsHeightLabel.grid(column = 0, row = 15)
-	
-		self.bhScale = Scale(parent, from_=0, to=1.0,resolution=0.01, orient=HORIZONTAL)
-		self.bhScale.set(0.15)
-		self.bhScale.grid(column=1,row=14)
-	
-		self.bwScale = Scale(parent, from_=0, to=1.0,resolution=0.01, orient=HORIZONTAL)
-		self.bwScale.set(0.1)
-		self.bwScale.grid(column=1,row=15)
 	
 	def moduleSizeChanged(self, *args):
 		for i in range(10):
@@ -299,6 +269,18 @@ class ComponentParameters(Frame):
 	def getSettings(self):
 		data = []
 		row = []
+		row.append('#numberOfModules')
+		row.append(str(self.mmVar.get()))
+		data.append(row)
+		row = []
+		row.append('#moduleTypes')
+		for i in range(self.mmVar.get()):
+			row.append(str(self.moduleTypeEntries[i].get()))
+		data.append(row)
+		row = []
+		row.append('#maxAmountModules')
+		for i in range(self.mmVar.get()):
+			row.append(str(self.moduleMaxEntries[i].get()))
 		data.append(row)
 		return data
 	
@@ -363,7 +345,7 @@ class MorphologyParameters(Frame):
 
 		data.append(row)
 		return data
-
+3
 class ControlParameters(Frame):
 	def __init__(self,parent):
 		self.parent = parent

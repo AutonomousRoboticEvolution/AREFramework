@@ -454,19 +454,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 	if (settings->verbose) {
 		cout << "mutating direct" << endl;
 	}
-	// 1) add module, 
-	// 2) mutate morphology
-	// 3) mutate control
-	// 4) prune (removing modules)
-	// 5) symmetry
-
-//	int typeOfMutation = randomNum->randInt(5, 0);
-//	typeOfMutation = 0;
-//	switch (typeOfMutation) {
-//	case 0: {
-	// modularParameters.size() influences the chance of adding modules. 
-	// TODO: Should be put somewhere more logical
-	int maxModuleAddition = 5; // up to five modules can be added each mutation step...
+    /// This number defines the number of components than can be added each mutation step.
+	int maxModuleAddition = 10;
+	/// Adding modules
 	for (int am = 0; am < maxModuleAddition; am++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			if (settings->verbose) {
@@ -554,17 +544,19 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 		}
 	}
 	
-	// mutate orientation stored in childConfigurations
+	/// Mutate orientation
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		if (randomNum->randFloat(0.0, 1.0) <settings->morphMutRate) {
 			genome->moduleParameters[i]->orientation = randomNum->randInt(4, 0);
 		}
 	}
+	/// Mutate control
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 			if (genome->moduleParameters[i]->control) { // to check if not nullpointer
 				genome->moduleParameters[i]->control->mutate(settings->mutationRate);
 			}
 	}
+	/// Delete modules
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate / 2) { // less chance to delete
 		if (settings->verbose) {
 			cout << "pruning" << endl;
@@ -625,6 +617,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 			}
 		}
 	}
+	/// Symmetry mutation
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 		symmetryMutation(settings->morphMutRate);
 	}
