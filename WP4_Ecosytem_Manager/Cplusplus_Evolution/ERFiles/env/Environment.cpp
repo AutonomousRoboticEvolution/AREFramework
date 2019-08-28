@@ -18,7 +18,7 @@ void Environment::init() {
 	envObjectHandles.clear(); // every time the environment is created, it removes all objects and creates them again
 	//simLoadScene("scenes/DefaultERLight.ttt");
 	//simLoadScene("scenes/Cat_Scene2.ttt");
-    simLoadScene("scenes/myScenes/ExperimentArena.ttt");
+    simLoadScene("scenes/myScenes/ExperimentArena2.ttt");
 	initialPos.resize(3);
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;

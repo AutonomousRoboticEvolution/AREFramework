@@ -62,7 +62,7 @@ void CustomMorphologyVREP::update() {
                 //cout << "output " << i << " = " << output[i] << endl;
             }
             if (i < outputHandles.size()) {
-                simSetJointTargetVelocity(outputHandles[i], output[i]);  //output[i],-1.0
+                simSetJointTargetVelocity(outputHandles[i], output[i]*2);  //output[i],-1.0
             }
         }
     }
@@ -78,11 +78,17 @@ int CustomMorphologyVREP::getMainHandle()
 
 void CustomMorphologyVREP::create()
 {
-    simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/wheeled-robot.ttm");
-    mainHandle = simGetObjectHandle("RobotBase");
+    simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/robot5.ttm");
+    mainHandle = simGetObjectHandle("Cuboid");  //Cuboid,RobotBase
 
-    simFloat pos[3] = {-0.05, -0.15056, 0.031662};
+    simFloat pos[3] = {-0.05, -0.15056, 0.031662};// {-0.05, -0.15056, 0.031662};
+    //randomNum->setSeed(randomNum->randInt(0,1000));
+    simFloat randomAngle = randomNum->randFloat(0.0, 1.0) * 3.14;
+    cout << "randomAngle: " << randomAngle << endl;
+
+    simFloat rot[3] = {0,0,randomAngle};
     simSetObjectPosition(mainHandle, -1, pos);
+    simSetObjectOrientation(mainHandle, -1, rot);
 //	simLoadModel("/home/wei/Softwares/V-REP_PRO_EDU_V3_6_1_Ubuntu16_04/models/robots/mobile/e-puck.ttm");
 //  mainHandle = simGetObjectHandle("ePuck");
     //init();

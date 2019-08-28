@@ -143,7 +143,7 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
 		//cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
-		cout << "outputvalues " <<  outputValues[i] << endl;
+		cout << "output values: " <<  outputValues[i] << endl;
 	}
 	//cf += 0.5;
 	//printNeuronValues();
