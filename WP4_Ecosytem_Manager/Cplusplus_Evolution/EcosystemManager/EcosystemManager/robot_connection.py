@@ -1,5 +1,5 @@
 import paramiko
-
+import time
 class RobotConnection:
 	def __init__(self, ip_address):
 		try:
@@ -32,6 +32,10 @@ class RobotConnection:
 	## Close connection ports with robots
 	def closePort(self):
 		if(self.isconnected):
+			stdin,stdout,stderr = self.ssh_client.exec_command("sudo killall -9 main")
+			stdin,stdout,stderr = self.ssh_client.exec_command("./stopController/main")
+			time.sleep(1)
+			stdin,stdout,stderr = self.ssh_client.exec_command("sudo poweroff")
 			self.ssh_client.close()
 			print("Connection port to robot closed")
 		else:

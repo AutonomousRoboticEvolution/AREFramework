@@ -20,7 +20,7 @@ Settings::Settings() {
 	moduleTypes.push_back(14);
 	//moduleTypes.push_back(15);
 	moduleTypes.push_back(17);
-	autoDeleteSettings = false;
+	autoDeleteSettings = true;
     // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -67,8 +67,8 @@ Settings::Settings() {
 	consecutiveThresholdViolations = 1000;
     bOrgansAbovePrintingBed = false;
     bCollidingOrgans = false;
-    bNonprintableOrientations = false;
-    bAnyOrgansNumber =true;
+    bNonprintableOrientations = true;
+    bAnyOrgansNumber = true;
 	//repository="files";
 }
 

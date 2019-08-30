@@ -27,7 +27,7 @@ difference(){
                rotate([mr[i][5]*180/3.1415 + CLIPROTX, 0.0, 0.0])
                rotate([0.0, mr[i][6]*180/3.1415 + CLIPROTY, 0.0])
                rotate([0.0, 0.0, mr[i][7]*180/3.1415+CLIPROTZ])
-               import("maleConnector.stl", center=true);
+               import("MeshFiles/maleConnector.stl", center=true);
             }
             // Piece of bone
             if(mr[i][1]==17){
@@ -43,4 +43,4 @@ difference(){
     }
 }
 // Create brain slot
-rotate([0, 0, 0]) translate([0.0, 0.0, 0.0]) import("brainOrganSlot.stl", center=true);
+rotate([0, 0, 0]) translate([0.0, 0.0, 0.0]) import("MeshFiles/brainOrganSlot.stl", center=true);

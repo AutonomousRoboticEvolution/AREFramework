@@ -455,7 +455,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 		cout << "mutating direct" << endl;
 	}
     /// This number defines the number of components than can be added each mutation step.
-	int maxModuleAddition = 10;
+	int maxModuleAddition = 5;
 	/// Adding modules
 	for (int am = 0; am < maxModuleAddition; am++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {

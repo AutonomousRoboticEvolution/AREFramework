@@ -282,6 +282,12 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	if (createdModules[0]->type != 8) {
 		Development::shiftRobotPosition();
 	}
+    // TODO: EB remove this! This is just to save the model.
+    int mHandle = simGetObjectHandle("Cuboid");
+	if(mHandle == -1) std::cout << "Something went WRONG! - Handle" << std::endl;
+	int tempHan = 0;
+    tempHan = simSaveModel(mHandle,"robot.ttm");
+    if(tempHan == -1) std::cout << "Something went WRONG! - Save" << std::endl;
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
 //	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;

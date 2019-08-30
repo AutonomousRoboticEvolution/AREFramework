@@ -10,10 +10,10 @@ echo "Append information to the openScad file"
 sed -i -e '/COORDINATES/ r BluePrintData.txt' -e '/COORDINATES/d' blueprintDecoderCopy.scad
 # Remove unnecessary files
 echo "Removing unnecessary files"
-#rm -r BluePrintData.txt
+rm -r BluePrintData.txt
 # Generate mesh
 echo "Generating mesh"
-#openscad -o ../../../../../robofab/meshes/mesh$1.stl blueprintDecoderCopy.scad
+openscad -o ../../../../../robofab/meshes/mesh$1.stl blueprintDecoderCopy.scad
 # Remove unnecessary files
 echo "Removing unnecessary files"
-#rm -f blueprintDecoderCopy.scad
+rm -f blueprintDecoderCopy.scad
