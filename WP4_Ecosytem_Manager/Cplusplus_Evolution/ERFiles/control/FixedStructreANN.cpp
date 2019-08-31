@@ -46,16 +46,25 @@ void FixedStructureANN::init(int input, int inter, int output) {
 		neuronID++;
 	}
     //Connection is extended for the entire layer
+    //connection between input and recurrent layer
     for (int i = 0; i < recurrentLayer.size(); i++) {
         for (int j = 0; j < inputLayer.size(); j++) {
             inputLayer[j]->connectionsID.push_back(recurrentLayer[i]->neuronID);
             inputLayer[j]->connectionWeights.push_back(1.0);
         }
     }
+    //connection between recurrent and output layer
 	for (int i = 0; i < outputLayer.size(); i++) {
         for (int j = 0; j < recurrentLayer.size(); j++) {
             recurrentLayer[j]->connectionsID.push_back(outputLayer[i]->neuronID);
             recurrentLayer[j]->connectionWeights.push_back(1.0);
+        }
+    }
+	//direct connection between input and output
+    for (int i = 0; i < outputLayer.size(); i++) {
+        for (int j = 0; j < inputLayer.size(); j++) {
+            inputLayer[j]->connectionsID.push_back(outputLayer[i]->neuronID);
+            inputLayer[j]->connectionWeights.push_back(1.0);
         }
     }
 	checkConnections();
@@ -130,6 +139,11 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 		cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
 	}
 	else {
+	    for (int j = 0; j < inputLayer.size(); j++) {
+            for (int i = 0; i < inputLayer[j]->connections.size(); i++) {
+                inputLayer[j]->connections[i]->input = 0;
+            }
+        }
 		for (int i = 0; i < sensorValues.size(); i++) {
 			inputLayer[i]->input = sensorValues[i];  //overwrite the input of the input layer
 			inputLayer[i]->update();  //update the neuron the input layer is connected to
@@ -140,10 +154,11 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 	}
 	//cf = 0.0;
 	for (int i = 0; i < outputLayer.size(); i++) {
+        outputLayer[i]->connections;
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
 		//cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
-		cout << "output values: " <<  outputValues[i] << endl;
+		//cout << "output values: " <<  outputValues[i] << endl;
 	}
 	//cf += 0.5;
 	//printNeuronValues();

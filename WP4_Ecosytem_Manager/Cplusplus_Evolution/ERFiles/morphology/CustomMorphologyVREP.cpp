@@ -50,8 +50,8 @@ void CustomMorphologyVREP::update() {
             simHandleProximitySensor(sensorHandles[i], pt, doh, vecs);
             int det = simReadProximitySensor(sensorHandles[i], pt, doh, vecs);
             if (det == 1) { //if detecting something
-                cout << "read doh : " << doh[0] << endl;
-                cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
+                //cout << "read doh : " << doh[0] << endl;
+                //cout << "pt = " << pt[0] << ", " << pt[1] << ", " << pt[2] << ", " << pt[3] << endl;
             }
             input.push_back(pt[3]);
             cout << "sensor reading: " << input[i] << endl;
@@ -59,10 +59,10 @@ void CustomMorphologyVREP::update() {
         vector<float> output = control->update(input);  //control output
         for (int i = 0; i < output.size(); i++) {
             if (settings->verbose) {
-                //cout << "output " << i << " = " << output[i] << endl;
+                cout << "output: " << i << " = " << output[i] << endl;
             }
             if (i < outputHandles.size()) {
-                simSetJointTargetVelocity(outputHandles[i], output[i]*2);  //output[i],-1.0
+                simSetJointTargetVelocity(outputHandles[i], output[i]*5);  //output[i],-1.0
             }
         }
     }
