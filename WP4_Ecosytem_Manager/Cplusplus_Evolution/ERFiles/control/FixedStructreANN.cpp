@@ -139,6 +139,7 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 		cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
 	}
 	else {
+
 	    for (int j = 0; j < inputLayer.size(); j++) {
             for (int i = 0; i < inputLayer[j]->connections.size(); i++) {
                 inputLayer[j]->connections[i]->input = 0;
