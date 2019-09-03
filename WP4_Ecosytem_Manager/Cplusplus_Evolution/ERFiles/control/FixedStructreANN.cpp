@@ -2,7 +2,6 @@
 #include <iostream>
 #include <memory>
 
-using namespace std;
 
 FixedStructureANN::FixedStructureANN()
 {
@@ -28,7 +27,7 @@ void FixedStructureANN::flush() {
 }
 
 void FixedStructureANN::init(int input, int inter, int output) {
-	unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
+	std::unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 	neuronID = 0;
 	for (int i = 0; i < input; i++) {
 		inputLayer.push_back(neuronFactory->createNewNeuronGenome(1, settings));
@@ -88,30 +87,30 @@ void FixedStructureANN::reset() {
 }
 
 void FixedStructureANN::checkConnections() {
-//	cout << "in" << inputLayer.size() << endl;
+//	std::cout << "in" << inputLayer.size() << std::endl;
 	for (int i = 0; i < inputLayer.size(); i++) {
-//		cout << "conID:" << inputLayer[i]->connectionsID.size() << endl;
-//		cout << "con:" << inputLayer[i]->connections.size() << endl;
+//		std::cout << "conID:" << inputLayer[i]->connectionsID.size() << std::endl;
+//		std::cout << "con:" << inputLayer[i]->connections.size() << std::endl;
 		for (int j = 0; j < inputLayer[i]->connections.size(); j++) {
 			if (inputLayer[i]->connections[j] == NULL) {
-	//			cout << "ERROR: connection " << j << " of neuron " << i << " is NULL" << endl;
+	//			std::cout << "ERROR: connection " << j << " of neuron " << i << " is NULL" << std::endl;
 				for (int k = 0; k < inputLayer[i]->connections.size(); k++) {
-	//				cout << "Con " << k << " = " << inputLayer[i]->connections[k] << endl;
-	//				cout << "Con ID " << k << " = " << inputLayer[i]->connectionsID[k] << endl;
+	//				std::cout << "Con " << k << " = " << inputLayer[i]->connections[k] << std::endl;
+	//				std::cout << "Con ID " << k << " = " << inputLayer[i]->connectionsID[k] << std::endl;
 				}
 
 			}
-	//		cout << "j:" << j << endl;
-	//		cout << "/" << inputLayer[i]->connectionsID[j] << endl;
-	//		cout << "/" << inputLayer[i]->connections[j] << endl;
+	//		std::cout << "j:" << j << std::endl;
+	//		std::cout << "/" << inputLayer[i]->connectionsID[j] << std::endl;
+	//		std::cout << "/" << inputLayer[i]->connections[j] << std::endl;
 //			/
-            // If shared_ptr::unique returns true, then calling shared_ptr::reset will delete the managed object.
-            // However, if shared_ptr::unique returns false, it means there are more than one shared_ptrs sharing ownership of that object.
+            // If std::shared_ptr::unique returns true, then calling std::shared_ptr::reset will delete the managed object.
+            // However, if std::shared_ptr::unique returns false, it means there are more than one std::shared_ptrs sharing ownership of that object.
             // In this case a call to reset will only result in the reference count being decremented by 1,
-            // actual deletion of the object will take place when the last shared_ptr managing that object either goes out of scope or is itself reset.
+            // actual deletion of the object will take place when the last std::shared_ptr managing that object either goes out of scope or is itself reset.
 			if (inputLayer[i]->connections[j]->neuronID == -1) {
 				inputLayer[i]->connections[j].reset();  //release the shared pointer
-				inputLayer[i]->connections.erase(inputLayer[i]->connections.begin() + j); //remove the object from the vector
+				inputLayer[i]->connections.erase(inputLayer[i]->connections.begin() + j); //remove the object from the std::vector
 			}
 		}
 	}
@@ -131,16 +130,16 @@ void FixedStructureANN::checkConnections() {
 			}
 		}
 	}
-//	cout << "checked connections" << endl;
+//	std::cout << "checked connections" << std::endl;
 //	printNeuronValues();
 }
 
-vector<float> FixedStructureANN::update(const vector<float> &sensorValues)
+std::vector<float> FixedStructureANN::update(const std::vector<float> &sensorValues)
 {
-	vector<float> outputValues; 
+	std::vector<float> outputValues; 
 	if (sensorValues.size() != inputLayer.size()) {
-		std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
-		cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
+		std::cout << "ERROR: sensor amount differs from input neuron amount" << std::endl;
+		std::cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << std::endl;
 	}
 	else {
 
@@ -162,7 +161,7 @@ vector<float> FixedStructureANN::update(const vector<float> &sensorValues)
         outputLayer[i]->update();
         outputValues.push_back(outputLayer[i]->output);
 		//cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
-		//cout << "output values: " <<  outputValues[i] << endl;
+		//std::cout << "output values: " <<  outputValues[i] << std::endl;
 	}
 	//cf += 0.5;
 	//printNeuronValues();
@@ -170,7 +169,7 @@ vector<float> FixedStructureANN::update(const vector<float> &sensorValues)
 }
 
 
-void FixedStructureANN::setFloatParameters(vector<float> values) {
+void FixedStructureANN::setFloatParameters(std::vector<float> values) {
 	// function can be used to manually set specific parameters
 	recurrentLayer[0]->setFloatParameters(values);
 }
@@ -184,8 +183,8 @@ void FixedStructureANN::mutate(float mutationRate) {
 	}
 }
 
-shared_ptr<Control> FixedStructureANN::clone() const {
-	shared_ptr<FixedStructureANN> newANN = std::make_unique<FixedStructureANN>(*this);
+std::shared_ptr<Control> FixedStructureANN::clone() const {
+	std::shared_ptr<FixedStructureANN> newANN = std::make_unique<FixedStructureANN>(*this);
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
@@ -204,7 +203,7 @@ shared_ptr<Control> FixedStructureANN::clone() const {
 	return newANN;
 }
 
-stringstream FixedStructureANN::getControlParams() {
+std::stringstream FixedStructureANN::getControlParams() {
 	return ANN::getControlParams();
 }
 
@@ -216,7 +215,7 @@ void FixedStructureANN::changeConnectionIDToPointer() {
 	ANN::changeConnectionIDToPointer();
 }
 
-bool FixedStructureANN::checkControl(vector<string> values) {
+bool FixedStructureANN::checkControl(std::vector<std::string> values) {
 	return ANN::checkControl(values);
 }
 
