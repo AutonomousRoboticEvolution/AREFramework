@@ -1,6 +1,8 @@
 #include "FixedStructreANN.h"
 #include <iostream>
 
+using namespace std;
+
 FixedStructureANN::FixedStructureANN()
 {
 
@@ -132,7 +134,8 @@ void FixedStructureANN::checkConnections() {
 //	printNeuronValues();
 }
 
-vector<float> FixedStructureANN::update(vector<float> sensorValues) {
+vector<float> FixedStructureANN::update(const vector<float> &sensorValues)
+{
 	vector<float> outputValues; 
 	if (sensorValues.size() != inputLayer.size()) {
 		std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
@@ -140,9 +143,9 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 	}
 	else {
 
-	    for (int j = 0; j < inputLayer.size(); j++) {
-            for (int i = 0; i < inputLayer[j]->connections.size(); i++) {
-                inputLayer[j]->connections[i]->input = 0;
+	    for (auto &input : inputLayer) {
+            for (int i = 0; i < input->connections.size(); i++) {
+                input->connections[i]->input = 0;
             }
         }
 		for (int i = 0; i < sensorValues.size(); i++) {
@@ -155,9 +158,8 @@ vector<float> FixedStructureANN::update(vector<float> sensorValues) {
 	}
 	//cf = 0.0;
 	for (int i = 0; i < outputLayer.size(); i++) {
-        outputLayer[i]->connections;
-		outputLayer[i]->update();
-		outputValues.push_back(outputLayer[i]->output);
+        outputLayer[i]->update();
+        outputValues.push_back(outputLayer[i]->output);
 		//cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
 		//cout << "output values: " <<  outputValues[i] << endl;
 	}
@@ -205,7 +207,7 @@ stringstream FixedStructureANN::getControlParams() {
 	return ANN::getControlParams();
 }
 
-void FixedStructureANN::setControlParams(vector<string> values) {
+void FixedStructureANN::setControlParams(const std::vector<std::string> &values) {
 	ANN::setControlParams(values);
 }
 

@@ -4,16 +4,93 @@
 	Allows control of motor and shows how the bus should be set up.
 	@author Mike Angus
 */
-#include <stdio.h>
+#include <csignal>
+#include <fstream>
+#include <functional>
+
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
+#include "../Cplusplus_Evolution/ERFiles/control/FixedStructreANN.h"
 
 #define SENSOR1 0x72
 #define SENSOR2 0x73
 #define MOTOR1 0x66
 #define MOTOR2 0x68
 
-int main(void) {
+
+void split_line(std::string& line, char delim, std::vector<std::string>& values)
+{
+    size_t pos = 0;
+    while ((pos = line.find(delim, (pos + 0))) != string::npos) {
+        string p = line.substr(0, pos);
+        values.push_back(p);
+        line = line.substr(pos + 1);
+    }
+    while ((pos = line.find(delim, (pos + 1))) != string::npos) {
+        string p = line.substr(0, pos);
+        values.push_back(p);
+        line = line.substr(pos + 1);
+    }
+
+    if (!line.empty()) {
+        values.push_back(line);
+    }
+}
+
+bool running = true;
+
+void sigint_handler(int s)
+{
+    running = false;
+}
+
+
+void setup_sigint_catch()
+{
+    struct sigaction sigIntHandler;
+    memset(&sigIntHandler, 0, sizeof(sigIntHandler));
+
+    sigIntHandler.sa_handler = sigint_handler;
+    sigemptyset(&sigIntHandler.sa_mask);
+    sigIntHandler.sa_flags = 0;
+
+    sigaction(SIGINT, &sigIntHandler, NULL);
+
+}
+
+std::vector<std::string> load_params_list(const std::string &filename)
+{
+    std::vector<std::string> brain_params;
+    //load brain params from file
+    std::ifstream genome_file(filename);
+    if (!genome_file) {
+        std::cerr << "Could not load " << filename << std::endl;
+        std::exit(1);
+    }
+
+    {
+        std::string value;
+        while (std::getline(genome_file, value, ',')) {
+            if (value.find('\n') != string::npos) {
+                split_line(value, '\n', brain_params);
+            } else {
+                brain_params.push_back(value);
+            }
+        }
+    }
+
+    return brain_params;
+}
+
+int main()
+{
+    setup_sigint_catch();
+
+    FixedStructureANN controller;
+    controller.init(2, 0, 2);
+    std::vector<std::string> brain_params = load_params_list("genome.csv");
+    controller.setControlParams(brain_params);
+
 	// Variables
 	int8_t speed1 = 0;
 	int8_t speed2 = 0;
@@ -38,23 +115,25 @@ int main(void) {
 		// Take readings from sensors
 		reading1 = sensor1.readProximity();
 		reading2 = sensor2.readProximity();
-		printf("Sensor 1 reading: %d\n", reading1);
-		printf("Sensor 2 reading: %d\n", reading2);
-		speed1 = 35;  //35
-		speed2 = 35;  //35
-		// Bang-bang controller
-		if(reading1 > 100)
-			speed2 = 0;
-		if(reading2 > 100)
-			speed1 = 0;
-		// Turn on motors
-	  	motor1.setSpeed(speed1);
+
+		std::vector<float> inputs = {
+		        static_cast<float>(reading1),
+                static_cast<float>(reading2)
+		};
+
+		std::vector<float> output = controller.update(inputs);
+
+		speed1 = output[0];
+		speed2 = output[1];
+
+		motor1.setSpeed(speed1);
 		motor2.setSpeed(speed2);
+
 		//Loop timer
-		//usleep(100000); //100ms
-		usleep(1000000);
-	} while (1);
+		usleep(10*1000); //10ms
+	} while (running);
+
 	motor1.brake();
 	motor2.brake();
-	return 1;
+	return 0;
 }

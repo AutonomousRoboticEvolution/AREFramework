@@ -1,11 +1,16 @@
 # Locate libraries and headers
 
+set (CMAKE_CXX_STANDARD 11)
+
 add_executable(robot_controller_are
 		main.cpp
 		I2CDevice.cpp
 		MotorOrgan.cpp
 		SensorOrgan.cpp
 		Sensors.cpp
+
+		# From VREP
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/FixedStructreANN.cpp"
 		)
 
 find_package(Threads REQUIRED)

@@ -511,13 +511,13 @@ void ANN::setControlParams(vector<string> values) {
 	outputLayer.clear();
 
 	for (int it = 0; it < values.size(); it++) {
-		string tmp = values[it];
+		std::string tmp = values[it];
 		if (tmp == "#StartNeuron") {
 			checkingNeuron = true;
 			it++;
 			tmp = values[it];
 		}
-		if (checkingNeuron == true) {
+		if (checkingNeuron) {
 			neuronValues.push_back(tmp);
 		}
 		if (tmp == "#EndNeuron") {
