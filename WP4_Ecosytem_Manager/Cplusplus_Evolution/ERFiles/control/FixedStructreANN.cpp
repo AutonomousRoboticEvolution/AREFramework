@@ -1,5 +1,6 @@
 #include "FixedStructreANN.h"
 #include <iostream>
+#include <memory>
 
 using namespace std;
 
@@ -184,7 +185,7 @@ void FixedStructureANN::mutate(float mutationRate) {
 }
 
 shared_ptr<Control> FixedStructureANN::clone() const {
-	shared_ptr<FixedStructureANN> newANN = make_unique<FixedStructureANN>(*this);  //make_unique
+	shared_ptr<FixedStructureANN> newANN = std::make_unique<FixedStructureANN>(*this);
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
