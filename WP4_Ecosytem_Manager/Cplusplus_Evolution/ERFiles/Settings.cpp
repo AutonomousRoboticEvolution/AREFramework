@@ -20,7 +20,7 @@ Settings::Settings() {
 	moduleTypes.push_back(14);
 	//moduleTypes.push_back(15);
 	moduleTypes.push_back(17);
-	autoDeleteSettings = true;
+	autoDeleteSettings = false;
     // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -35,10 +35,11 @@ Settings::Settings() {
 	}
 
 	maxNumberModules = 20;
-	morphologyType = MODULAR_DIRECT;
+	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
+	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_DEFAULT;
-	populationSize = 100;
+	controlType = ANN_FIXED_STRUCTURE;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -52,7 +53,7 @@ Settings::Settings() {
 //	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
-	maxGeneration = 100;
+	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	xGenerations = 50;

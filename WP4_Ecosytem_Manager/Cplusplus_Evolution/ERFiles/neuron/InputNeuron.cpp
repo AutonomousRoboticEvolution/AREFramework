@@ -14,14 +14,16 @@ InputNeuron::~InputNeuron() {
 void InputNeuron::init(int id) {
 	neuronID = id;
 }
+
 void InputNeuron::update() {
-//	cout << "input = " << input << endl, 
+	//cout << "input before = " << input << endl;
 	output = input;
-//	cout << "output = " << output << endl;
+
 	for (int i = 0; i < connections.size(); i++) {
 		connections[i]->input += (output * connectionWeights[i]);
 	}
 }
+
 void InputNeuron::reset() {
 	input = 0.0;
 	output = 0.0;
@@ -61,3 +63,4 @@ void InputNeuron::flush()
 	input = 0.0;
 	output = 0.0;
 }
+

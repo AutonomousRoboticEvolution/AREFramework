@@ -127,7 +127,7 @@ void CustomMorphology::init() {
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
-	control->init(2, 1, 2);  //2: two inputs; 1: one hidden neuron; 2: two outputs
+	control->init(2, 0, 2);  //2: two inputs; 1: one hidden neuron; 2: two outputs
 	control->mutate(0.5);
 }
 
