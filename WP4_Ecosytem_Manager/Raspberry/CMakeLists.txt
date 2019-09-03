@@ -13,6 +13,16 @@ add_executable(robot_controller_are
 		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/FixedStructreANN.cpp"
 		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/NeuronFactory.cpp"
 		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/ANN.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/ANN.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/Control.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/RandNum.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/Neuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/InputNeuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/OutputNeuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/CPGNeuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/FunctionNeuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/PatternNeuron.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/SimpleNeuron.cpp"
 		)
 
 find_package(Threads REQUIRED)
