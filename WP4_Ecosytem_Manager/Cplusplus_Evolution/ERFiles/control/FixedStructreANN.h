@@ -21,7 +21,7 @@ public:
     */
 	std::vector<float> update(const std::vector<float> &sensorValues);
 	void mutate(float mutationRate);
-	std::shared_ptr<Control> clone() const;
+//	std::shared_ptr<Control> clone() const;
 	int neuronID = 0; 
 	int type = 0;
     /// this function deletes the connections to deleted neurons and in turn the pointer to these neurons should go out of scope.

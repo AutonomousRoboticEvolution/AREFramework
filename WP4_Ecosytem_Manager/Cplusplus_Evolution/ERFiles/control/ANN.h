@@ -14,7 +14,7 @@ public:
 	vector<float> update(vector<float>);
 	void mutate(float mutationRate); 
 	void printNeuronValues(); 
-	shared_ptr<Control> clone() const;
+//	shared_ptr<Control> clone() const;
 	//void makeDependenciesUnique();
 	/// neuron ID
 	int neuronID = 0;
