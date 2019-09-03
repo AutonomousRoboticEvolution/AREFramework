@@ -7,6 +7,7 @@
 #include <csignal>
 #include <fstream>
 #include <functional>
+#include <memory>
 
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
@@ -85,8 +86,11 @@ std::vector<std::string> load_params_list(const std::string &filename)
 int main()
 {
     setup_sigint_catch();
+    Settings settings;
 
     FixedStructureANN controller;
+    controller.settings = std::make_shared<Settings>();
+    controller.randomNum = std::make_shared<RandNum>(0);
     controller.init(2, 0, 2);
     std::vector<std::string> brain_params = load_params_list("genome.csv");
     controller.setControlParams(brain_params);
