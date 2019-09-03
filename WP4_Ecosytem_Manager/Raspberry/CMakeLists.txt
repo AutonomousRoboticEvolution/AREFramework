@@ -11,6 +11,8 @@ add_executable(robot_controller_are
 
 		# From VREP
 		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/FixedStructreANN.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/neuron/NeuronFactory.cpp"
+		"${PROJECT_SOURCE_DIR}/WP4_Ecosytem_Manager/Cplusplus_Evolution/ERFiles/control/ANN.cpp"
 		)
 
 find_package(Threads REQUIRED)
