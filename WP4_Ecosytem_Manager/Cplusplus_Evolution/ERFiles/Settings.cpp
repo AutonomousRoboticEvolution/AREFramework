@@ -39,7 +39,7 @@ Settings::Settings() {
 	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_FIXED_STRUCTURE;
-	populationSize = 50;
+	populationSize = 20;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;

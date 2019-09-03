@@ -44,7 +44,7 @@ public:
 	///initial position of the object
 	vector<float> initialPos; 
 	///maximum simulation time
-	float maxTime = 10.0; 
+	float maxTime = 0.0;
 	int type = 0;
 };
 
