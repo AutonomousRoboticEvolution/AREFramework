@@ -98,8 +98,8 @@ int main()
 	// Variables
 	int8_t speed1 = 0;
 	int8_t speed2 = 0;
-	uint16_t reading1 = 0;
-	uint16_t reading2 = 0;
+	float reading1 = 0;
+	float reading2 = 0;
 	//Create a sensor and motor  organs
 	SensorOrgan sensor1(SENSOR1);
 	SensorOrgan sensor2(SENSOR2);
@@ -117,14 +117,10 @@ int main()
 	// Infinite loop
 	do {
 		// Take readings from sensors
-		reading1 = sensor1.readProximity();
-		reading2 = sensor2.readProximity();
+		reading1 = sensor1.calibratedProximityReading();
+		reading2 = sensor2.calibratedProximityReading();
 
-		std::vector<float> inputs = {
-		        static_cast<float>(reading1),
-                static_cast<float>(reading2)
-		};
-
+		std::vector<float> inputs = { reading1, reading2 };
 		std::vector<float> output = controller.update(inputs);
 
 		speed1 = output[0];

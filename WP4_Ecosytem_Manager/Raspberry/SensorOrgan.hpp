@@ -99,6 +99,12 @@ class SensorOrgan {
 			@return Raw reading from the sensor
 		*/
 		uint16_t readProximity();
+
+		/**
+		 * @brief Read the proximity sensor's current value.
+		 * @return Reading from the sensor converted in meters
+		 */
+        float calibratedProximityReading();
 		/**
 			@brief Initialise the proximity sensor before use.
 		*/

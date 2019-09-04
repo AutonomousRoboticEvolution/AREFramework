@@ -136,4 +136,19 @@ int SensorOrgan :: readDistanceTOF()
 	return data;
 }
 
+//Caliberate the proximity sensor
+float SensorOrgan::calibratedProximityReading()
+{
+    float out[21] = {0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100};
+    float index[21] = {400000, 8000, 4000, 2000, 1200, 900, 600, 500, 400, 300, 250, 210, 190, 170, 150, 130, 110, 100, 90, 80,0};
+    float reading = static_cast<float>(this->readProximity());
+    float calibrateReading = 0; // = this->readProximity();
+    for(int8_t i = 0; i < 21; i++){
+        if (reading > index[i]){
+            calibrateReading = out[i-1] + (reading-index[i-1])*(out[i]-out[i-1])/(index[i]-index[i-1]);
+            break;
+        }
+    }
 
+    return calibrateReading/1000.0f;
+}
