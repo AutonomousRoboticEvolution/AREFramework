@@ -18,8 +18,8 @@
 #define MOTOR1 0x68
 #define MOTOR2 0x66
 
-#define SCALE_MOTOR1 1.0
-#define SCALE_MOTOR2 1.0
+#define SCALE_MOTOR1 6.0
+#define SCALE_MOTOR2 6.0
 
 
 void split_line(std::string& line, char delim, std::vector<std::string>& values)
