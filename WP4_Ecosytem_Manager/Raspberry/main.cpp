@@ -18,8 +18,8 @@
 #define MOTOR1 0x68
 #define MOTOR2 0x66
 
-#define SCALE_MOTOR1 2.5
-#define SCALE_MOTOR2 2.5
+#define SCALE_MOTOR1 1.0
+#define SCALE_MOTOR2 1.0
 
 
 void split_line(std::string& line, char delim, std::vector<std::string>& values)
@@ -126,14 +126,14 @@ int main()
 		std::vector<float> inputs = { reading1, reading2 };
 		std::vector<float> output = controller.update(inputs);
 
-		speed1 = output[0] * 100 * SCALE_MOTOR1;
-		speed2 = output[1] * 100 * SCALE_MOTOR2;
+		speed1 = output[0] * 250.0 * SCALE_MOTOR1;
+		speed2 = output[1] * 250.0 * SCALE_MOTOR2;
 
 		motor1.setSpeed(speed1);
 		motor2.setSpeed(speed2);
 
 		//Loop timer
-		usleep(100*1000); // 100ms
+		usleep(50*1000); // 50ms -> 20Hz
 	} while (running);
 
 	motor1.brake();
