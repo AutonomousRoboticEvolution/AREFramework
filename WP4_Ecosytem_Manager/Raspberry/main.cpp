@@ -126,8 +126,8 @@ int main()
 		std::vector<float> inputs = { reading1, reading2 };
 		std::vector<float> output = controller.update(inputs);
 
-		speed1 = output[0] * 250.0 * SCALE_MOTOR1;
-		speed2 = output[1] * 250.0 * SCALE_MOTOR2;
+		speed1 = output[0] * 63.0 * SCALE_MOTOR1;
+		speed2 = output[1] * 63.0 * SCALE_MOTOR2;
 
 		motor1.setSpeed(speed1);
 		motor2.setSpeed(speed2);
