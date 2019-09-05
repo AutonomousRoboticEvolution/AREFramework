@@ -48,14 +48,14 @@ void sigint_handler(int s)
 
 void setup_sigint_catch()
 {
-    struct sigaction sigIntHandler;
+    struct sigaction sigIntHandler {};
     memset(&sigIntHandler, 0, sizeof(sigIntHandler));
 
     sigIntHandler.sa_handler = sigint_handler;
     sigemptyset(&sigIntHandler.sa_mask);
     sigIntHandler.sa_flags = 0;
 
-    sigaction(SIGINT, &sigIntHandler, NULL);
+    sigaction(SIGINT, &sigIntHandler, nullptr);
 
 }
 
@@ -130,7 +130,7 @@ int main()
 		motor2.setSpeed(speed2);
 
 		//Loop timer
-		usleep(10*1000); //10ms
+		usleep(100*1000); // 100ms
 	} while (running);
 
 	motor1.brake();
