@@ -14,7 +14,7 @@ MoveEnv::~MoveEnv()
 void MoveEnv::init() {
 	Environment::init();
 	timeCheck = 2.5;
-	maxTime = 100.0;
+	maxTime = 60.0;
 }
 
 float MoveEnv::fitnessFunction(MorphologyPointer morph) {

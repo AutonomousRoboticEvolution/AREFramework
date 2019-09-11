@@ -438,7 +438,7 @@ void ANN::mutate(float mutationRate) {
 //	cout << "ANN MUTATED" << endl;
 }
 
-/*
+
 shared_ptr<Control> ANN::clone() const {
 	shared_ptr<ANN> newANN = make_unique<ANN>(*this); //make a copy of the ANN class with different address/pointer
 	newANN->inputLayer.clear();
@@ -458,7 +458,7 @@ shared_ptr<Control> ANN::clone() const {
 	newANN->flush();
 	return newANN;
 }
-*/
+
 
 void ANN::printNeuronValues() {
 	std::cout << "printingNeuronValues: " << endl;

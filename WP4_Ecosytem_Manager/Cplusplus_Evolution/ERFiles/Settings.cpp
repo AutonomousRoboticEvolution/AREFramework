@@ -20,7 +20,7 @@ Settings::Settings() {
 	moduleTypes.push_back(14);
 	//moduleTypes.push_back(15);
 	moduleTypes.push_back(17);
-	autoDeleteSettings = false;
+	autoDeleteSettings = true;
     // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
@@ -36,10 +36,10 @@ Settings::Settings() {
 
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = CUSTOM_MORPHOLOGY;
+	morphologyType = MODULAR_DIRECT;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_FIXED_STRUCTURE;
-	populationSize = 20;
+	controlType = ANN_DEFAULT;
+	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
 //	controlType = ANN_DEFAULT;
@@ -68,8 +68,8 @@ Settings::Settings() {
 	consecutiveThresholdViolations = 1000;
     bOrgansAbovePrintingBed = false;
     bCollidingOrgans = false;
-    bNonprintableOrientations = true;
-    bAnyOrgansNumber = true;
+    bNonprintableOrientations = false;
+    bAnyOrgansNumber = false;
 	//repository="files";
 }
 

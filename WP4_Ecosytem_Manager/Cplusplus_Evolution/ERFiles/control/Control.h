@@ -27,7 +27,7 @@ public:
 
 	virtual void mutate(float mutationRate) = 0;
 	/// deep copy the ANN recursively
-//	virtual shared_ptr<Control> clone() const = 0;
+	virtual shared_ptr<Control> clone() const = 0;
 	virtual stringstream getControlParams() = 0; 
 	virtual void setControlParams(vector<string>) = 0;
     /// clone the parent's neuron parameter

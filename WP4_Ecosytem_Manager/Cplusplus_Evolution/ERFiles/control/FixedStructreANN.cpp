@@ -183,7 +183,7 @@ void FixedStructureANN::mutate(float mutationRate) {
 	}
 }
 
-/*
+
 std::shared_ptr<Control> FixedStructureANN::clone() const {
 	std::shared_ptr<FixedStructureANN> newANN = std::make_unique<FixedStructureANN>(*this);
 	newANN->inputLayer.clear();
@@ -203,7 +203,7 @@ std::shared_ptr<Control> FixedStructureANN::clone() const {
 	newANN->flush(); // flush
 	return newANN;
 }
-*/
+
 
 std::stringstream FixedStructureANN::getControlParams() {
 	return ANN::getControlParams();
