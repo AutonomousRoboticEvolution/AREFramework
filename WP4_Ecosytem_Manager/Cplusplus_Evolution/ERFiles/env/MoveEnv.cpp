@@ -14,7 +14,7 @@ MoveEnv::~MoveEnv()
 void MoveEnv::init() {
 	Environment::init();
 	timeCheck = 2.5;
-	maxTime = 20.0;
+	maxTime = 60.0;
 }
 
 float MoveEnv::fitnessFunction(MorphologyPointer morph) {
@@ -89,9 +89,13 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 			pEnd.push_back(pos[1]);
 			if (pOne.size() < 1) {
 	//			cout << "Note, pOne never set" << endl;
+				// cout<<"FitnessFunction pOne size <>> 1"<<endl;
 				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
 			}
 			else {
+				cout<<"FitnessFunction pOne size > 1"<<endl;
+				cout<<"function's pOne"<<pOne[0]<<" "<<pOne[1]<<endl;
+				cout<<"function's pEnd"<<pEnd[0]<<" "<<pEnd[1]<<endl;
 				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
 			}
 			int brokenModules = morph->getAmountBrokenModules();
@@ -117,6 +121,7 @@ float MoveEnv::updateEnv(MorphologyPointer morph) {
 		simGetObjectPosition(mainHandle, -1, pos);
 		pOne.push_back(pos[0]);
 		pOne.push_back(pos[1]);
+		cout<<"pOne: "<<pos[0]<<" "<<pos[1]<<endl;
 	}
 	return 0;
 }

@@ -84,8 +84,6 @@ void BaseMorphology::init() {
 
 void BaseMorphology::create() {
 	cout << "NOTE: BaseMorphology::create() is deprecated" << endl;
-
-
 }
 
 void BaseMorphology::printSome() {

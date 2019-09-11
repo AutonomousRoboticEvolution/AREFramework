@@ -8,38 +8,32 @@ class CustomANN :
 public:
 	CustomANN();
 	~CustomANN();
+    /**
+    @brief Initialize the NN
+    @param input number of input neurons
+    @param inter number of hidden neurons
+    @param output number of output neurons
+    */
 	void init(int input, int inter, int output);
+    /**
+    @brief Update the NN
+    @param vector<float> sensor input
+    */
 	vector<float> update(vector<float>);
-	void mutate(float mutationRate); 
-	void printNeuronValues(); 
+	void mutate(float mutationRate);
 	shared_ptr<Control> clone() const;
 	int neuronID = 0; 
-	int type = 0; 
+	int type = 0;
+    /// this function deletes the connections to deleted neurons and in turn the pointer to these neurons should go out of scope.
 	void checkConnections(); 
 	stringstream getControlParams();
 	void setControlParams(vector<string>);
-	void changeConnectionIDToPointer(); 
-	void cloneControlParameters(shared_ptr<Control> parent);
-	int maxLayerSize = 2;
-	int maxCon = 2;
+	void changeConnectionIDToPointer();
 	bool checkControl(vector<string> values);
-	void changeConnectionPointerToID();
+	/// destroy the neuron of CustomANN
 	void reset();
-	
-	void mutateConnections(float mutationRate);
-	void addNeurons(float mutationRate);
+	///reset the value of the neuron of CustomANN
+	void flush();
 	void setFloatParameters(vector<float> values);
-	void removeNeurons(float mutationRate);
-	void changeNeurons(float mutationRate);
-//	float tmpMutRate = 0.05; //delete!!!
-
-	/*struct Connection {
-		float weight;
-		float in; 
-		float out; 
-	};*/
-
-//	vector<shared_ptr<Neuron>> allNeurons; 
-	//vector<Connection> connections;
 };
 

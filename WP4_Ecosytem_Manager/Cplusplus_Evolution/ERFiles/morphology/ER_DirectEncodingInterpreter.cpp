@@ -25,11 +25,16 @@ bool ER_DirectEncodingInterpreter::checkJointModule() {
 void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
-	setColors();
+
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeDirectEncoding(position); // / amount increment is not in genome anymore
+
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+	//initializeDirectEncoding(position); // / amount increment is not in genome anymore
 }
 
 void ER_DirectEncodingInterpreter::printSome() {
@@ -38,19 +43,14 @@ void ER_DirectEncodingInterpreter::printSome() {
 }
 
 bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
-	bool collision = true;
-//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
-//	cout << "createdModules.size = " << createdModules.size()  << endl;
-	
+	// TODO EB: Implement a way to ignore visuals.
+    bool collision = true;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {
 				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
 					if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
 						for (int k = 0; k < exceptionHandles.size(); k++) {
-							//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
 							if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
 								return true;
 							}
@@ -59,49 +59,20 @@ bool ER_DirectEncodingInterpreter::checkLCollisions(shared_ptr<ER_Module> module
 				}
 			}
 			// check collision with environment
-//			cout << "objectHandles.size() = " << environment->envObjectHandles.size() << endl;
 			for (int i = 0; i < settings->envObjectHandles.size(); i++) {
 				if (module->objectHandles[n] != settings->envObjectHandles[i]) {
 					for (int k = 0; k < exceptionHandles.size(); k++) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
 						if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
 							if (createdModules[i]->objectHandles[n] != exceptionHandles[k]) {
 								return true;
 							}
 						}
 					}
-					//if (simCheckCollision(module->objectHandles[n], environment->envObjectHandles[i]) == true) {
-					//	cout << "object collided with object from environment" << endl;
-					//	return true;
-					//}
-				}
-			}
-			// check to see if positions are not the same
-			float handleNPos[3];
-			float handleIJPos[3];
-			simGetObjectPosition(module->objectHandles[n], -1, handleNPos);
-			for (int i = 0; i < createdModules.size() - 1; i++) {
-				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					simGetObjectPosition(createdModules[i]->objectHandles[j], -1, handleIJPos);
-					if (handleNPos[0] > handleIJPos[0] - 0.001 && handleNPos[0] < handleIJPos[0] + 0.001
-						&& handleNPos[1] > handleIJPos[1] - 0.001 && handleNPos[1] < handleIJPos[1] + 0.001
-						&& handleNPos[2] > handleIJPos[2] - 0.001 && handleNPos[2] < handleIJPos[2] + 0.001) {
-						//		cout << "modules are at the same position" << endl; 
-						return true;
-					}
-				}
-			}
-
-			// checks if collition with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
-			// don't delete this function!
-			if (createdModules[0]->type == 8) {
-				if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
-					return true;
 				}
 			}
 		}
 	}
-	return false; 
+	return false;
 }
 
 void ER_DirectEncodingInterpreter::checkForceSensors() {
@@ -111,9 +82,9 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 				if (simGetObjectType(createdModules[i]->objectHandles[j]) == sim_object_forcesensor_type) {
 					int force = simReadForceSensor(createdModules[i]->objectHandles[j], NULL, NULL);
 					if (force != 0 && force != -1) {
-						if (force == 3) {
-							cout << "force sensor is broken" << endl;
-							cout << "module " << i << " is broken" << endl;
+						if (force == 3) { // TODO: change with flag
+							std::cout << "force sensor is broken" << std::endl;
+                            std::cout << "module " << i << " is broken" << std::endl;
 							createdModules[i]->broken = true;
 						}
 					}
@@ -155,6 +126,7 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	for (int i = 1; i < genome->moduleParameters.size(); i++) {
 		genome->moduleParameters[i]->expressed = false;
 	}
+    // From here the brain organ is created
 	createdModules.push_back(mf->copyModuleGenome(modules[0]));
 	int parentHandle = -1;
 	vector<float> configuration;
@@ -167,16 +139,8 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	configuration[5] = 0;
 	createdModules[0]->createModule(configuration, -1, parentHandle);
 
-	/* old 
-	for (int i = 1; i < modules.size(); i++) {
-		for (int j = 0; j < modules.size(); j++) {
-			int parentNR = modules[i]->parent;
-			if (j == parentNR) {
-				modules[i]->parentModulePointer = createdModules[j];
-			}
-		}
-	}*/
-
+	// From here the rest of the organs are created from the tree
+	// TODO: EB: what's going here?
 	for (int i = 1; i < modules.size(); i++) {
 		if (modules[i]->parent == 0) {
 			modules[i]->parentModulePointer = createdModules[0];
@@ -187,11 +151,12 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	}
 
 	for (int i = 1; i < modules.size(); i++) {
-		if (i < settings->maxAmountModules) {
+		if (i < settings->maxNumberModules) {
 			int parentNr = genome->moduleParameters[i]->parent;
 			int parentSite = genome->moduleParameters[i]->parentSite;
 			int orien = genome->moduleParameters[i]->orientation;
 			int createdParentNumber = -1;
+			// TODO: EB: What's going here?
 			for (int n = 0; n < createdModules.size(); n++)
 			{
 				if (createdModules[n]->moduleID == parentNr) {
@@ -201,83 +166,99 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 			}
 
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-				if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
-					cout << "state " << createdModules[createdParentNumber]->state << ",";
-					cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
-					//	cout << "id " << createdModules[parentNr]-> << endl;
-				}
-				// parentHandle = createdModules[i]->parentModulePointer->;
-				if (settings->verbose) {
-					cout << "should create module : " << i << ",";
-				}
-				shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
-				if (parentModulePointer == NULL) {
-					cout << ", null , ";
-				}
-				if (settings->verbose) {
-					cout << "parent = " << modules[i]->parent << endl;
-					cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
-					cout << "parentModulePointer = " << parentModulePointer << ", ";
-					cout << "parentSite = " << parentSite << ", ";
-					cout << " .. " << parentModulePointer->moduleID << ",";
-					cout << " pType " << parentModulePointer->type << ",";
-					cout << "orientation " << orien << endl;
-				}
-				parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
-				int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
-				if (settings->verbose) {
-					cout << " 1 ,";
-				}
-				createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
-				if (settings->verbose) {
-					cout << " 1.1, ";
-				}	
-				int createdModulesSize = createdModules.size();
-				vector<float> siteConfiguration;
-				if (settings->verbose) {
-					cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien << ",";
-					cout << createdModules[createdParentNumber]->type << ",";
-					cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
-				}
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
-				siteConfiguration.push_back(createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
-				if (settings->verbose) {
-					cout << " a ,";
-				}
-				createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle, parentHandle);
-				createdModulesSize = createdModules.size();
-				if (settings->verbose) {
-					cout << " b ,";
-				}
-				// set color
-				// createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
-
-				vector<int> exception;
-				exception.push_back(parentHandle);
-				for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-					exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
-				}
-
-				if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-					createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-					//		genome->moduleParameters[i]->expressed = false;
-				}
-				else {
-					for (int n = 0; n < modules.size(); n++) {
-						if (modules[n]->parent == i) {
-							modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-						}
-					}
-					genome->moduleParameters[i]->expressed = true;
-				}
-				if (settings->verbose) {
-					cout << "created Module" << endl;
-				}
-			}
+                if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
+                    cout << "state " << createdModules[createdParentNumber]->state << ",";
+                    cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
+                    //	cout << "id " << createdModules[parentNr]-> << endl;
+                }
+                // parentHandle = createdModules[i]->parentModulePointer->;
+                if (settings->verbose) {
+                    cout << "should create module : " << i << ",";
+                }
+                shared_ptr<ER_Module> parentModulePointer = modules[i]->parentModulePointer;
+                if (parentModulePointer == NULL) {
+                    cout << ", null , ";
+                }
+                if (settings->verbose) {
+                    cout << "parent = " << modules[i]->parent << endl;
+                    // cout << "parentModulePointer? = " << createdModules[modules[i]->parent] << endl;
+                    cout << "parentModulePointer = " << parentModulePointer << ", ";
+                    cout << "parentSite = " << parentSite << ", ";
+                    cout << " .. " << parentModulePointer->moduleID << ",";
+                    cout << " pType " << parentModulePointer->type << ",";
+                    cout << "orientation " << orien << endl;
+                }
+                parentHandle = parentModulePointer->siteConfigurations[parentSite][0]->parentHandle;
+                std::cout << "NAME: " << simGetObjectName(parentHandle) << std::endl;
+                int relativePositionHandle = parentModulePointer->siteConfigurations[parentSite][0]->relativePosHandle;
+                if (settings->verbose) {
+                    cout << " 1 ,";
+                }
+                createdModules.push_back(moduleFactory->copyModuleGenome(modules[i]));
+                if (settings->verbose) {
+                    cout << " 1.1, ";
+                }
+                int createdModulesSize = createdModules.size();
+                vector<float> siteConfiguration;
+                if (settings->verbose) {
+                    cout << "pnr:" << createdParentNumber << ", cMs: " << createdModules.size() << ", or " << orien
+                         << ",";
+                    cout << createdModules[createdParentNumber]->type << ",";
+                    cout << "sc.size: " << createdModules[createdParentNumber]->siteConfigurations.size() << ",";
+                }
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->x);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->y);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->z);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rX);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rY);
+                siteConfiguration.push_back(
+                        createdModules[createdParentNumber]->siteConfigurations[parentSite][orien]->rZ);
+                if (settings->verbose) {
+                    cout << " a ,";
+                }
+                createdModules[createdModulesSize - 1]->createModule(siteConfiguration, relativePositionHandle,
+                                                                     parentHandle);
+                createdModulesSize = createdModules.size();
+                if (settings->verbose) {
+                    cout << " b ,";
+                }
+                // set color
+                // createdModules[createdModulesSize - 1]->colorModule(genome->moduleParameters[i]->color, 1.0);
+                /// Viability part
+                if(bCheckOrgansNumber(createdModulesSize)){
+                    if(bCheckCollision(parentHandle, createdModulesSize)) {
+                        if (bCheckGround(createdModulesSize)) {
+                            if(bCheckOrientation(createdModulesSize)){
+                                for (int n = 0; n < modules.size(); n++) {
+                                    if (modules[n]->parent == i) {
+                                        modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                    }
+                                }
+                                genome->moduleParameters[i]->expressed = true;
+                            }
+                            else{
+                                createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                            }
+                        }
+                        else{
+                            createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                        }
+                    }
+                    else{
+                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                    }
+                }
+                else{
+                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                }
+            }
+			// End of viability
+			// TODO: FV what is this?
 			else {
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
 					if (settings->verbose) {
@@ -289,17 +270,24 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 		}
 		else {
 			if (settings->verbose) {
-				cout << "Already created " << settings->maxAmountModules << endl;
+				cout << "Already created " << settings->maxNumberModules << endl;
 			}			
 			break;
 		}
 		
 	}
-
-//	cout << "shifting robot position" << endl;
-	if (createdModules[0]->type != 8) {
-		shiftRobotPosition();
+	if (settings->verbose) {
+		cout << "shifting robot position" << endl;
 	}
+	if (createdModules[0]->type != 8) {
+		Development::shiftRobotPosition();
+	}
+    // TODO: EB remove this! This is just to save the model.
+    int mHandle = simGetObjectHandle("Cuboid");
+	if(mHandle == -1) std::cout << "Something went WRONG! - Handle" << std::endl;
+	int tempHan = 0;
+    tempHan = simSaveModel(mHandle,"robot.ttm");
+    if(tempHan == -1) std::cout << "Something went WRONG! - Save" << std::endl;
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
 //	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;
@@ -343,6 +331,10 @@ void ER_DirectEncodingInterpreter::savePhenotype(int ind, float fitness)
 		bmp[i]->parent = createdModules[i]->parent;
 		bmp[i]->parentSite = createdModules[i]->parentSite;
 		bmp[i]->orientation = createdModules[i]->orientation;
+        for (int j = 0; j < 3; ++j) {
+            bmp[i]->absPos[j] = createdModules[i]->absPos[j];
+            bmp[i]->absOri[j] = createdModules[i]->absOri[j];
+        }
 	}
 	Development::savePhenotype(bmp, ind, fitness);
 }
@@ -385,14 +377,8 @@ shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const {
 }
 
 void ER_DirectEncodingInterpreter::update() {	
-//	vector<float> input;
-//	for (int i = 0; i < createdModules.size(); i++) {
-//		createdModules[i]->updateModule(input);
-//	}
-//	checkForceSensors(); 
 	vector<float> input;
 	for (int i = 0; i < createdModules.size(); i++) {
-		//float outputModule = 
 		vector<float> moduleInput;
 		if (settings->controlType == settings->ANN_CUSTOM) {
 			createdModules[i]->updateModule(input);
@@ -429,27 +415,18 @@ void ER_DirectEncodingInterpreter::update() {
 		}
 
 	}
-//	updateColors();
 	checkForceSensors();
 }
 
 void ER_DirectEncodingInterpreter::updateColors() {
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
-		float alpha = createdModules[0]->energy;
-		if (alpha > 1.0) {
-			alpha = 1.0;
-		}
-		else if (alpha < 0.4) {
-			alpha = 0.4;
-		}
-		//	cout << "alpha = " << alpha << endl;
-		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, alpha);
+		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 
 void ER_DirectEncodingInterpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -520,14 +497,7 @@ void ER_DirectEncodingInterpreter::create() {
 	checkJointModule(); // quits simulator when no joint found.
 }
 
-int ER_DirectEncodingInterpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
-	}
-}
+
 
 int ER_DirectEncodingInterpreter::getAmountBrokenModules() {
 	int amountBrokenModules = 0;
@@ -567,94 +537,7 @@ float ER_DirectEncodingInterpreter::checkArea(float interSection[3], float pps[4
 	return (1 / areaX * areaBound);
 }
 
-void ER_DirectEncodingInterpreter::shiftRobotPosition() {
-	float minimumObjectPos = 5.0;
-	for (int i = 0; i < createdModules.size(); i++) {
-		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
-			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
-				float objectOrigin[3];
-				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
-				float size[3];
-				float rotationOrigin[3] = { 0,0,0 };
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
-				}
-
-				vector<vector<float>> cubeVertex; // 8 points in 3d space
-				vector<vector<float>> points;
-				points.resize(8);
-
-				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
-
-				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
-				//for (int i = 0; i < 12; i++) {
-				//	cout << objectMatrix[i] << ", ";
-				//} cout << endl;
-
-				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				vector<vector<float>> rotatedPoints;
-				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
-					}
-				}
-			}
-		}
-	}
-	float tmpPos[3];
-	float newRobotPos[3];
-	mainHandle = getMainHandle();
-	simGetObjectPosition(mainHandle, -1, tmpPos);
-	newRobotPos[0] = tmpPos[0];
-	newRobotPos[1] = tmpPos[1];
-	newRobotPos[2] = -minimumObjectPos + 0.001;
-	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
-	float postpos[3];
-	simGetObjectPosition(mainHandle, -1, postpos);
-	cout << "postpos: " << postpos[2] << endl;
-}
-
+// TODO: EB: What is this for?
 bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);
@@ -754,4 +637,128 @@ void ER_DirectEncodingInterpreter::symmetryMutation(float mutationRate) {
 		}
 	}*/
 	cout << "Done with symmetry mutation" << endl;
+}
+/// Check for collisions. If there is a colliding object, remove it from the genome representation.
+bool ER_DirectEncodingInterpreter::bCheckCollision(int iParentHandle, int createdModulesSize) {
+    bool bViabilityResult = true;
+    vector<int> exception;
+    exception.push_back(iParentHandle);
+    for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+        exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+    }
+    if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// If object is above the ground, it can be created
+bool ER_DirectEncodingInterpreter::bCheckGround(int createdModulesSize) {
+    bool bViabilityResult = true;
+    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// Check for orientation. If the orientation of the organ is printable
+bool ER_DirectEncodingInterpreter::bCheckOrientation(int createdModulesSize){
+    bool bViabilityResult = true;
+    // If the orientation of the organ is printable
+    if (createdModules[createdModulesSize - 1]->type == 14 ||
+        createdModules[createdModulesSize - 1]->type == 15) {
+       if(
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[1] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[0] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[1] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[0] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886 && abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+          ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
+          settings->bNonprintableOrientations){
+           if (settings->verbose) {
+               cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                    << " Good orientation - PASSED." << endl;
+           }
+           bViabilityResult = true;
+       }
+       else{
+           if (settings->verbose) {
+               cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                    << " Good orientation - FAILED." << endl;
+           }
+           bViabilityResult = false;
+       }
+    }
+    else { // If organ is not brain or sensor
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Good orientation - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
+}
+/// Check of number of organs.
+bool ER_DirectEncodingInterpreter::bCheckOrgansNumber(int createdModulesSize){
+    bool bViabilityResult = true;
+    int brainCounter = 0;
+    int motorCounter = 0;
+    int sensorCounter = 0;
+    int boneCounter = 0;
+    for (int i = 0; i < createdModulesSize; ++i) {
+        if (genome->moduleParameters[i]->expressed){
+            switch (createdModules[i]->type){
+                case 13:
+                    brainCounter++;
+                    break;
+                case 14:
+                    motorCounter++;
+                    break;
+                case 15:
+                    sensorCounter++;
+                    break;
+                case 17:
+                    boneCounter++;
+                    break;
+                default:
+                    std::cout << "ERROR: Organ type does not exist in bCheckOrgansNumber() " << std::endl;
+                    break;
+            }
+
+        }
+    }
+    if(((createdModules[createdModulesSize - 1]->type == 14 && motorCounter >= 2) ||
+        (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter >= 2)) && !settings->bAnyOrgansNumber){
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
 }

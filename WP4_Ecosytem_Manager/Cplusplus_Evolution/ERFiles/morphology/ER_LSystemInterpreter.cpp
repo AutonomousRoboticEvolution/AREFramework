@@ -25,11 +25,15 @@ bool ER_LSystemInterpreter::checkJointModule() {
 void ER_LSystemInterpreter::createAtPosition(float x, float y, float z) {
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
-	setColors();
+	//setColors();
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeLSystem(settings->lIncrements, position); // / amount increment is not in genome anymore
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+//	initializeLSystem(settings->lIncrements, position); // / amount increment is not in genome anymore
 }
 
 void ER_LSystemInterpreter::printSome() {
@@ -46,7 +50,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 	for (int i = 0; i < length_i; i++) {
 		if (createdModules[i]->handled != true) {
 			createdModules[i]->handled = true;
-			if (createdModules.size() >= settings->maxAmountModules) {
+			if (createdModules.size() >= settings->maxNumberModules) {
 				break;
 			}
 			// cout << "handling module " << i << endl; 
@@ -64,11 +68,11 @@ void ER_LSystemInterpreter::incrementLSystem() {
 			//	cout << "created module free sites: " << createdModules[i]->freeSites.size() << endl;
 			int newChildAmount = 0;
 			for (int j = 0; j < tempFreeSites.size(); j++) { // should never be more then free sites of module
-				if (createdModules.size() >= settings->maxAmountModules) {
+				if (createdModules.size() >= settings->maxNumberModules) {
 					break;
 				}
 				for (int k = 0; k < lGenome->lParameters[t_state]->childSites.size(); k++) {
-					if (createdModules.size() >= settings->maxAmountModules) {
+					if (createdModules.size() >= settings->maxNumberModules) {
 						break;
 					}
 					if (lGenome->lParameters[t_state]->childSites.size() != lGenome->lParameters[t_state]->childSiteStates.size()) {
@@ -125,6 +129,7 @@ void ER_LSystemInterpreter::incrementLSystem() {
 							//					lGenome->lParameters[t_state]->childSites[k] = -1;
 											//	cout << "attachmentSites[k] == tempFreeSites[j]!!" << endl; 
 											//	cout << "config = " << lGenome->lParameters[t_state]->childConfigurations[k] << endl; 
+		
 							int config = lGenome->lParameters[t_state]->childConfigurations[k];
 							vector<float> siteConfiguration;
 							siteConfiguration.push_back(createdModules[i]->siteConfigurations[tempFreeSites[j]][config]->x);
@@ -148,38 +153,29 @@ void ER_LSystemInterpreter::incrementLSystem() {
 							createdModules[createdModulesSize - 1]->parent = i;
 							createdModules[createdModulesSize - 1]->parentSite = childSite;
 							createdModules[createdModulesSize - 1]->orientation = config;
-							vector<int> exception;
-							exception.push_back(parentHandle);
-							for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-								exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+
+                            /// Viability part
+							if(bCheckCollision(parentHandle,createdModulesSize)){
+                                if (bCheckGround(createdModulesSize)) {
+                                    if(bCheckOrientation(createdModulesSize)) {
+                                        std::cout << "DEBUG: Object created!" << std::endl;
+                                    }
+                                    else{
+                                        createdModules[createdModulesSize - 1]->removeModule();
+                                        createdModules.pop_back();
+                                        newChildAmount--;
+                                    }
+                                }
+                                else{
+                                    createdModules[createdModulesSize - 1]->removeModule();
+                                    createdModules.pop_back();
+                                    newChildAmount--;
+                                }
 							}
-							if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-								//			cout << "COLLISION: Removing module" << endl; 
-										//	createdModules[createdModulesSize - 1]->removeModule(); // automatically called when pointer is erased
-								createdModules[createdModulesSize - 1]->removeModule();
-								createdModules.pop_back();
-								//	createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-								newChildAmount--;
-								//			cout << "newChildAmount = " << newChildAmount << endl; 
-							}
-							else if (settings->environmentType == settings->ENV_SWITCHOBJECTIVE && simGetSimulationTime() < 10) {
-								if (createdModules[createdModulesSize - 1]->type == 11) {
-									// cout << "Removing type 11 " << endl;
-									createdModules[createdModulesSize - 1]->removeModule();
-									createdModules.pop_back();
-									//	createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-									newChildAmount--;
-								}
-							}
-							else {
-								// environment collision with all object handles does not work very well. 
-								/*cout << "env" << endl;
-								for (int i = 0; i < createdModules[createdModules.size() - 1]->objectHandles.size(); i++) {
-									environment->envObjectHandles.push_back(createdModules[createdModules.size() - 1]->objectHandles[i]);
-								}*/
-								// set control
-					//			createdModules[createdModulesSize - 1]->createControl();
-					//			cout << "No Collision" << endl; 
+							else{
+                                createdModules[createdModulesSize - 1]->removeModule();
+                                createdModules.pop_back();
+                                newChildAmount--;
 							}
 							//					if (createdModules[createdModules.size() - 1]->objectHandles.size() > 4) {
 							//						cout << "break" << endl;
@@ -200,74 +196,36 @@ void ER_LSystemInterpreter::incrementLSystem() {
 }
 
 bool ER_LSystemInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
-	bool collision = true;
-//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
-//	cout << "createdModules.size = " << createdModules.size()  << endl;
-	
-	for (int n = 0; n < module->objectHandles.size(); n++) {
-		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
-			for (int i = 0; i < createdModules.size() - 1; i++) {
-				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
-					if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << endl;
-						for (int k = 0; k < exceptionHandles.size(); k++) {
-							//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
-							if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
-								return true;
-							}
-						}
-					}
-				}
-			}
-			// check collision with environment
-//			cout << "objectHandles.size() = " << environment->envObjectHandles.size() << endl;
-			for (int i = 0; i < settings->envObjectHandles.size(); i++) {
-				if (module->objectHandles[n] != settings->envObjectHandles[i]) {
-					for (int k = 0; k < exceptionHandles.size(); k++) {
-						//	cout << "mh: " << module->objectHandles[n] << ", cr: " << createdModules[i]->objectHandles[j] << " and eh: " << exceptionHandles[k] << endl;
-						if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
-							if (module->objectHandles[n] != exceptionHandles[k]) {
-						//		cout << "env collision" << endl;
-								return true;
-							}
-						}
-					}
-					// check collision with environment: 
-					//if (simCheckCollision(module->objectHandles[n], environment->objectHandles[i]))
-					//if (simCheckCollision(module->objectHandles[n], environment->envObjectHandles[i]) == true) {
-					//	cout << "object collided with object from environment" << endl;
-					//	return true;
-					//}
-				}
-			}
-			// check to see if positions are not the same
-			float handleNPos[3];
-			float handleIJPos[3];
-			simGetObjectPosition(module->objectHandles[n], -1, handleNPos);
-			for (int i = 0; i < createdModules.size() - 1; i++) {
-				for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-					simGetObjectPosition(createdModules[i]->objectHandles[j], -1, handleIJPos);
-					if (handleNPos[0] > handleIJPos[0] - 0.001 && handleNPos[0] < handleIJPos[0] + 0.001
-						&& handleNPos[1] > handleIJPos[1] - 0.001 && handleNPos[1] < handleIJPos[1] + 0.001
-						&& handleNPos[2] > handleIJPos[2] - 0.001 && handleNPos[2] < handleIJPos[2] + 0.001) {
-						//		cout << "modules are at the same position" << endl; 
-						return true;
-					}
-				}
-			}
-
-			// checks if collision with floor happens. Is replaced with setting the robot position higher depending on the lowest coordinate + 0.0001
-			// don't delete this function!
-			//if (createdModules[0]->type == 8) {
-			// ^ TO young Frank, I did delete the function. You could have told me why I shouldn't delete it.  
-			//	if (checkCollisionBasedOnRotatedPoints(module->objectHandles[n]) == true) {
-			//		return true;
-			//	}
-			//}
-		}
-	}
-	return false; 
+    // TODO EB: Implement a way to ignore visuals.
+    bool collision = true;
+    for (int n = 0; n < module->objectHandles.size(); n++) {
+        if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
+            for (int i = 0; i < createdModules.size() - 1; i++) {
+                for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
+                    if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
+                        for (int k = 0; k < exceptionHandles.size(); k++) {
+                            if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            // check collision with environment
+            for (int i = 0; i < settings->envObjectHandles.size(); i++) {
+                if (module->objectHandles[n] != settings->envObjectHandles[i]) {
+                    for (int k = 0; k < exceptionHandles.size(); k++) {
+                        if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
+                            if (createdModules[i]->objectHandles[n] != exceptionHandles[k]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 void ER_LSystemInterpreter::checkForceSensors() {
@@ -300,6 +258,10 @@ void ER_LSystemInterpreter::savePhenotype(int ind, float fitness)
 		bmp[i]->parent = createdModules[i]->parent;
 		bmp[i]->parentSite = createdModules[i]->parentSite;
 		bmp[i]->orientation = createdModules[i]->orientation;
+        for (int j = 0; j < 3; ++j) {
+            bmp[i]->absPos[j] = createdModules[i]->absPos[j];
+            bmp[i]->absOri[j] = createdModules[i]->absOri[j];
+        }
 	}
 	Development::savePhenotype(bmp, ind, fitness);
 }
@@ -624,7 +586,7 @@ int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialP
 		}
 	}
 	if (createdModules[0]->type != 8 ) {
-		shiftRobotPosition();
+		Development::shiftRobotPosition();
 	}
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
@@ -639,9 +601,6 @@ int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialP
 				m_ID++;
 			}
 		}
-		// create UI for morphologies
-		vrepUI = shared_ptr<VREPUI>(new VREPUI);
-		vrepUI->createMorphUI(createdModules);
 	}
 
 
@@ -677,7 +636,7 @@ void ER_LSystemInterpreter::init() { // should use create instead
 		ER_LSystem::init();
 	}
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	for (int i = 0; i < settings->amountModules; i++) {
+	for (int i = 0; i < settings->numberOfModules; i++) {
 		modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 		modules[i]->state = i;
 		modules[i]->type = settings->moduleTypes[i];
@@ -708,17 +667,7 @@ shared_ptr<Morphology> ER_LSystemInterpreter::clone() const {
 
 void ER_LSystemInterpreter::updateColors() {
 	for (int i = 0; i < createdModules.size(); i++) {
-		float alpha = createdModules[0]->energy;
-		if (alpha > 1.0) {
-			alpha = 1.0;
-		}
-		else if (alpha < 0.4) {
-			alpha = 0.4;
-		}
-		//cout << "alpha = " << alpha << endl;
-		//cout << "color: " << lGenome->lParameters[createdModules[i]->state]->color[0] << "," << lGenome->lParameters[createdModules[i]->state]->color[1]
-		//	<< "," << lGenome->lParameters[createdModules[i]->state]->color[2] << endl;
-		createdModules[i]->colorModule(lGenome->lParameters[createdModules[i]->state]->color,alpha);
+		createdModules[i]->colorModule(lGenome->lParameters[createdModules[i]->state]->color,0.5);
 	}
 }
 
@@ -801,37 +750,37 @@ void ER_LSystemInterpreter::setColors() {
 		switch (i) {
 		case 0:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = red[j];
+				lGenome->lParameters[i]->color[j] = red[j];
 			}
 			break;
 		case 1:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = blue[j];
+				lGenome->lParameters[i]->color[j] = blue[j];
 			}
 			break;
 		case 2:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = yellow[j];
+				lGenome->lParameters[i]->color[j] = yellow[j];
 			}
 			break;
 		case 3:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = green[j];
+				lGenome->lParameters[i]->color[j] = green[j];
 			}
 			break;
 		case 4:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = orange[j];
+				lGenome->lParameters[i]->color[j] = orange[j];
 			}
 			break;
 		case 5:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = orangePlus[j];
+				lGenome->lParameters[i]->color[j] = orangePlus[j];
 			}
 			break;
 		default:
 			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->rgb[j] = black[j];
+				lGenome->lParameters[i]->color[j] = black[j];
 			}
 			break;
 		}
@@ -842,7 +791,7 @@ void ER_LSystemInterpreter::create() {
 	setColors();
 	init();
 	//unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
-	//for (int i = 0; i < settings->amountModules; i++) {
+	//for (int i = 0; i < settings->numberOfModules; i++) {
 	//	modules.push_back(mf->createModuleGenome(settings->moduleTypes[i], randomNum, settings));
 	//	modules[i]->state = i;
 	//	if (i > 3) {
@@ -854,15 +803,6 @@ void ER_LSystemInterpreter::create() {
 	checkJointModule(); // quits simulator when no joint found.
 }
 
-
-int ER_LSystemInterpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module." << endl;
-	}
-}
 
 int ER_LSystemInterpreter::getAmountBrokenModules() {
 	int amountBrokenModules = 0;
@@ -934,103 +874,7 @@ float ER_LSystemInterpreter::checkArea(float interSection[3], float pps[4][3]) {
 	return (1 / areaX * areaBound);
 }
 
-void ER_LSystemInterpreter::shiftRobotPosition() {
-	float minimumObjectPos = 50.0;
-	for (int i = 0; i < createdModules.size(); i++) {
-		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
-			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
-				float objectOrigin[3];
-				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
-				float size[3];
-				float rotationOrigin[3] = { 0,0,0 };
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
-				}
 
-				vector<vector<float>> cubeVertex; // 8 points in 3d space
-				vector<vector<float>> points;
-				points.resize(8);
-
-				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
-
-				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
-				//for (int i = 0; i < 12; i++) {
-				//	cout << objectMatrix[i] << ", ";
-				//} cout << endl;
-
-				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				vector<vector<float>> rotatedPoints;
-				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
-					}
-				}
-			}
-		}
-	}
-	float tmpPos[3];
-	float newRobotPos[3];
-	mainHandle = getMainHandle();
-	simGetObjectPosition(mainHandle, -1, tmpPos);
-	if (settings->environmentType != settings->ROUGH) {
-		newRobotPos[0] = tmpPos[0];
-		newRobotPos[1] = tmpPos[1];
-		newRobotPos[2] = -minimumObjectPos + 0.001;
-	}
-	else {
-	//	cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
-		newRobotPos[0] = tmpPos[0];
-		newRobotPos[1] = tmpPos[1];
-		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.35;
-		cout << "newRobotPos = " << newRobotPos[2] << endl;
-		cout << "obPos = " << minimumObjectPos << endl;
-	}
-	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
-//	float postpos[3];
-//	simGetObjectPosition(mainHandle, -1, postpos);
-//	cout << "postpos: " << postpos[2] << endl;
-}
 
 bool ER_LSystemInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];
@@ -1114,8 +958,7 @@ void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
 				int chosenSite = lGenome->lParameters[i]->childSites[chosenOne];
 				int chosenCon = lGenome->lParameters[i]->childConfigurations[chosenOne];
 				int chosenState = lGenome->lParameters[i]->childSiteStates[chosenOne];
-				int newPos = randomNum->randInt(getMaxChilds(lGenome->lParameters[i]->type), 0);
-
+                int newPos = randomNum->randInt(getMaxChilds(lGenome->lParameters[i]->type), 0);
 				if (newPos >= amountChilds) {
 					lGenome->lParameters[i]->childSites.push_back(mirrorSite[0]);
 					lGenome->lParameters[i]->childConfigurations.push_back(mirrorSite[1]);
@@ -1131,4 +974,82 @@ void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
 		}
 	}
 	cout << "Done with symmetry mutation" << endl;
+}
+/// Check for collisions. If there is a colliding object, remove it from the genome representation.
+bool ER_LSystemInterpreter::bCheckCollision(int iParentHandle, int createdModulesSize) {
+    bool bViabilityResult = true;
+    vector<int> exception;
+    exception.push_back(iParentHandle);
+    for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+        exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+    }
+    if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// If object is above the ground, it can be created
+bool ER_LSystemInterpreter::bCheckGround(int createdModulesSize) {
+    bool bViabilityResult = true;
+    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// Check for orientation. If the orientation of the organ is printable
+bool ER_LSystemInterpreter::bCheckOrientation(int createdModulesSize){
+    bool bViabilityResult = true;
+    // If the orientation of the organ is printable
+    if (createdModules[createdModulesSize - 1]->type == 14 ||
+        createdModules[createdModulesSize - 1]->type == 15) {
+        if(
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[1] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[0] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[1] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[0] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886 && abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
+                settings->bNonprintableOrientations){
+            if (settings->verbose) {
+                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - PASSED." << endl;
+            }
+            bViabilityResult = true;
+        }
+        else{
+            if (settings->verbose) {
+                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - FAILED." << endl;
+            }
+            bViabilityResult = false;
+        }
+    }
+    else { // If organ is not brain or sensor
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Good orientation - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
 }

@@ -251,7 +251,11 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 
 
 int Module_Servo::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
-	int rdr = simLoadModel("models/Servo_Module.ttm");
+	/*
+		create order:
+		parent---ForceSensor---SERVO---three dummies
+	*/
+	int rdr = simLoadModel("models/Servo_Module.ttm");//load SERVO module
 	if (rdr < 0) {
 		std::cerr << "Error loading models/Servo_Module.ttm" << std::endl;
 	}
@@ -265,9 +269,10 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	vector<int> shapes;
 	vector<int> joints;
 	simAddObjectToSelection(sim_handle_tree, rdr);
+	int selectionSize = simGetObjectSelectionSize();
 	int shapesStorage[10]; // stores up to 10 shapes
-	simGetObjectSelection(shapesStorage);
-	for (int i = 0; i < 10; i++) {
+	simGetObjectSelection(shapesStorage);//add servo module to shapesStorage
+	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
 			shapes.push_back(shapesStorage[i]);
@@ -310,6 +315,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	fsFParams[4] = 0;
 	int fs = simCreateForceSensor(3, fsParams, fsFParams, NULL);
 
+	/*
+		a servo can have three children
+	*/
 	int d1 = simCreateDummy(0.001, NULL);
 	int d2 = simCreateDummy(0.001, NULL);
 	int d3 = simCreateDummy(0.001, NULL);
@@ -378,6 +386,9 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	simSetObjectParent(d2, shapes[1], true);
 	simSetObjectParent(d3, shapes[1], true);
 
+	/*
+		define three children's position and orientation related to servo module
+	*/
 	simSetObjectPosition(d1, rdr, d1pos);
 	simSetObjectOrientation(d1, rdr, d1or);
 	simSetObjectPosition(d2, rdr, d2pos);
@@ -507,30 +518,7 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 		simGetJointPosition(controlHandles[0], pos);
 		previousPosition = pos[0];
 	}
-	else {
-		simGetJointPosition(controlHandles[0], pos);
-		float currentPos = pos[0];
-		float distanceDifference = (sqrt((currentPos*currentPos) - (previousPosition*previousPosition)));
-	//	cout << "distanceDifference " << distanceDifference << endl;
-		float energyLost = 0;
-		if (distanceDifference > 0.01) {
-			energyLost = (settings->energyDissipationRate * distanceDifference);
-		}
 
-//		cout << "pos: " << currentPos << ", " << previousPosition << endl;
-		if (energyLost < 0) {
-			energyLost = 0;
-		}
-		if (energyLost > 1000) {
-			energyLost = 1000;
-		}
-//		cout << "energy dissipation rate = " << settings->energyDissipationRate << endl;
-//		cout << "energy lost = " << energyLost << endl;
-		energy = energy - energyLost;
-//		cout << "energy = " << energy << endl;
-		simGetJointPosition(controlHandles[0], pos);
-		previousPosition = pos[0];
-	}
 	if (parentModulePointer != NULL) {
 		if (parentModulePointer->broken == true) {
 			this->broken = true;
@@ -539,7 +527,7 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 //			vector<float> sensorValues;
 	//		sensorValues.push_back(0);
 	//		output = controlModule(sensorValues); // sensor values set to zero, no intrinsic sensors in the servo module
-			controlModule(output[0]);
+			controlModule(output[0]);//update joint's position according to output[0]
 		}
 	}
 	
@@ -601,7 +589,7 @@ void Module_Servo::controlModule(float input) {
 	//	cout << "ERROR:: output size is not 1, but should be" << endl;
 //	}
 //	cout << "output[0] = " << input << endl;
-	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);
+	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);//update servo's position
 //	return output;
 }
 

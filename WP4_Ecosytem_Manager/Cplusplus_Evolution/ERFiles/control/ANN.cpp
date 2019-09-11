@@ -25,16 +25,24 @@ void ANN::init(int input, int inter, int output) {
 		neuronID++;
 	}
 	for (int i = 0; i < inter; i++) {
-		if (randomNum->randFloat(0, 1) < 0.5) { // change this 
-			recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates CPG
-			recurrentLayer[i]->init(neuronID);
-			neuronID++;
+		if (settings->createPatternNeurons) {
+			if (randomNum->randFloat(0, 1) < 0.5) { // change this 
+				recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates CPG
+				recurrentLayer[i]->init(neuronID);
+				neuronID++;
+			}
+			else {
+				recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(0, settings)); // creates simpleNeuron
+				recurrentLayer[i]->init(neuronID);
+				neuronID++;
+			}
 		}
 		else {
 			recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(0, settings)); // creates simpleNeuron
 			recurrentLayer[i]->init(neuronID);
 			neuronID++;
 		}
+
 	}
 	for (int i = 0; i < output; i++) {
 		outputLayer.push_back(neuronFactory->createNewNeuronGenome(2, settings));
@@ -115,9 +123,9 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 	for (int i = 0; i < outputLayer.size(); i++) {
 		for (int j = 0; j < outputLayer[i]->connections.size(); j++) {
 			if (outputLayer[i]->connections[j]->neuronID == -1) {
-				outputLayer[i]->connections[j].reset();
-				outputLayer[i]->connections.erase(outputLayer[i]->connections.begin() + j);
-				outputLayer[i]->connectionWeights.erase(outputLayer[i]->connectionWeights.begin() + j);
+				outputLayer[i]->connections[j].reset();  //remove the connection
+				outputLayer[i]->connections.erase(outputLayer[i]->connections.begin() + j);  //remove the connection
+				outputLayer[i]->connectionWeights.erase(outputLayer[i]->connectionWeights.begin() + j); //remove he connection weight
 			}
 		}
 	}
@@ -125,12 +133,13 @@ void ANN::checkConnections() { // this function deletes the connections to delet
 //	printNeuronValues();
 }
 
+//may not be needed
 void ANN::addInput(vector<float> input) {
 	int controlSize = inputLayer.size();
 	int inputSize = input.size();
 	if (inputSize > controlSize) {
 		for (int i = 0; i < controlSize; i++) {
-			inputLayer[i]->input = input[i];
+			inputLayer[i]->input += input[i];
 		}
 	}
 	else {
@@ -172,19 +181,19 @@ vector<float> ANN::update(vector<float> sensorValues) {
 	}
 	cf += 0.5;
 //	printNeuronValues();
-	//leaky(0.8);
 	return outputValues; 
 }
 
-void ANN::leaky(float lr) {
+void ANN::flush()
+{
 	for (int i = 0; i < inputLayer.size(); i++) {
-		inputLayer[i]->input = inputLayer[i]->input * lr;
+		inputLayer[i]->flush();
 	}
 	for (int i = 0; i < recurrentLayer.size(); i++) {
-		recurrentLayer[i]->input = recurrentLayer[i]->input * lr;
+		recurrentLayer[i]->flush();
 	}
 	for (int i = 0; i < outputLayer.size(); i++) {
-		outputLayer[i]->input = outputLayer[i]->input * lr;
+		outputLayer[i]->flush();
 	}
 }
 
@@ -404,44 +413,6 @@ void ANN::removeNeurons(float mutationRate) {
 	}
 }
 
-void ANN::changeNeurons(float mutationRate) { // debugging required
-	// replace neuron
-	for (int i = 0; i < recurrentLayer.size(); i++) {
-		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-			//cout << "replacing neuron" << endl;
-			int deletedID = recurrentLayer[i]->neuronID;
-			recurrentLayer[i].reset();
-			unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
-			int neuronType = randomNum->randInt(2, 0); // simple or CPG
-			if (neuronType == 1) {
-				neuronType = 5;
-			}
-			recurrentLayer[i] = neuronFactory->createNewNeuronGenome(neuronType, settings);
-			recurrentLayer[i]->init(neuronID);
-			neuronID++;
-			neuronFactory.reset();
-			recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-			for (int j = 0; j < inputLayer.size(); j++) {
-				for (int k = 0; k < inputLayer[j]->connectionsID.size(); k++) {
-					if (inputLayer[j]->connectionsID[k] == deletedID) {
-						inputLayer[j]->connectionsID[k] = recurrentLayer[i]->neuronID;
-			//			inputLayer[j]->connections[k] = recurrentLayer[i];
-					}
-				}
-			}
-			for (int j = 0; j < recurrentLayer.size(); j++) {
-				for (int k = 0; k < recurrentLayer[j]->connectionsID.size(); k++) {
-					if (recurrentLayer[j]->connectionsID[k] == deletedID) {
-						recurrentLayer[j]->connectionsID[k] = recurrentLayer[i]->neuronID;
-						//					recurrentLayer[j]->connections[k] = recurrentLayer[i];
-					}
-				}
-			}
-			//			cout << "replaced neuron" << endl;
-		}
-	}
-}
-
 void ANN::mutate(float mutationRate) {
 //	cout << "Mutating ANN" << endl;
 	for (int i = 0; i < inputLayer.size(); i++) {
@@ -467,13 +438,14 @@ void ANN::mutate(float mutationRate) {
 //	cout << "ANN MUTATED" << endl;
 }
 
+
 shared_ptr<Control> ANN::clone() const {
-	shared_ptr<ANN> newANN = make_unique<ANN>(*this);
+	shared_ptr<ANN> newANN = make_unique<ANN>(*this); //make a copy of the ANN class with different address/pointer
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
 	for (int i = 0; i < this->inputLayer.size(); i++) {
-		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+		newANN->inputLayer.push_back(this->inputLayer[i]->clone()); //make a copy of the neuron with the same parameter; clear the input and output
 	}
 	for (int i = 0; i < this->recurrentLayer.size(); i++) {
 		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());
@@ -481,8 +453,12 @@ shared_ptr<Control> ANN::clone() const {
 	for (int i = 0; i < this->outputLayer.size(); i++) {
 		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
 	}
+	newANN->checkConnections();
+	newANN->changeConnectionIDToPointer();
+	newANN->flush();
 	return newANN;
 }
+
 
 void ANN::printNeuronValues() {
 	std::cout << "printingNeuronValues: " << endl;
@@ -537,13 +513,13 @@ void ANN::setControlParams(vector<string> values) {
 	outputLayer.clear();
 
 	for (int it = 0; it < values.size(); it++) {
-		string tmp = values[it];
+		std::string tmp = values[it];
 		if (tmp == "#StartNeuron") {
 			checkingNeuron = true;
 			it++;
 			tmp = values[it];
 		}
-		if (checkingNeuron == true) {
+		if (checkingNeuron) {
 			neuronValues.push_back(tmp);
 		}
 		if (tmp == "#EndNeuron") {
@@ -588,18 +564,23 @@ void ANN::cloneControlParameters(shared_ptr<Control> parent) {
 
 void ANN::changeConnectionIDToPointer() {
 	//	cout << "changing connection ID to pointer" << endl;
+	// input layer can connect to recurrent and output layer
 	for (int i = 0; i < inputLayer.size(); i++) {
 		if (inputLayer[i]->connections.size() != inputLayer[i]->connectionsID.size()) {
-	//		cout << "ERROR: connections" << i << ".size() = " << inputLayer[i]->connections.size();
-	//		cout << ", while: connectionsID" << i << ".size() = " << inputLayer[i]->connectionsID.size() << endl;
+			if (settings->verbose == true) {
+                cout << "ERROR: connections" << i << ".size() = " << inputLayer[i]->connections.size();
+                cout << ", while: connectionsID" << i << ".size() = " << inputLayer[i]->connectionsID.size() << endl;
+            }
 		}
-		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());
+		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());  //TODO:??
 		for (int j = 0; j < inputLayer[i]->connectionsID.size(); j++) {
 			for (int k = 0; k < recurrentLayer.size(); k++) {
 				if (inputLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = recurrentLayer[k];
 					if (recurrentLayer[k] == NULL) {
-		//				cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
@@ -607,15 +588,20 @@ void ANN::changeConnectionIDToPointer() {
 				if (inputLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = outputLayer[k];
 					if (outputLayer[k] == NULL) {
-	//					cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
 			if (inputLayer[i]->connections[j] == NULL) {
-				cout << "ERROR: still inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                if (settings->verbose == true) {
+                    cout << "ERROR: still inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                }
 			}
 		}
 	}
+	// recurrent layer only connects to recurrent layer
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->connections.resize(recurrentLayer[i]->connectionsID.size());
 		for (int j = 0; j < recurrentLayer[i]->connectionsID.size(); j++) {
@@ -623,7 +609,9 @@ void ANN::changeConnectionIDToPointer() {
 				if (recurrentLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = recurrentLayer[k];
 					if (recurrentLayer[k] == NULL) {
-	//					cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
@@ -631,12 +619,16 @@ void ANN::changeConnectionIDToPointer() {
 				if (recurrentLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = outputLayer[k];
 					if (outputLayer[k] == NULL) {
-	//					cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        if (settings->verbose == true) {
+                            cout << "ERROR: output layer " << k << " = NULL" << endl;
+                        }
 					}
 				}
 			}
 			if (recurrentLayer[i]->connections[j] == NULL) {
-	//			cout << "ERROR: recurrentLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                if (settings->verbose == true) {
+                    cout << "ERROR: recurrentLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
+                }
 			}
 		}
 	}

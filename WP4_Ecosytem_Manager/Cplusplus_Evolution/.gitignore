@@ -3,6 +3,9 @@
 
 #cmake build directory
 /build/
+/Doc/
+/include
+/common
 
 #compiled and intermediatory files
 /obj/

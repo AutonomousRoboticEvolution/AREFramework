@@ -1,3 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
-add_subdirectory(WP4_Ecosytem_Manager/Cplusplus_Evolution)
+if (RASPBERRY)
+    add_subdirectory(WP4_Ecosytem_Manager/Raspberry)
+else()
+    add_subdirectory(WP4_Ecosytem_Manager/Cplusplus_Evolution)
+endif()

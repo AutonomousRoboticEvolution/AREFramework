@@ -31,7 +31,7 @@ void ER_DirectEncoding::crossover(shared_ptr<Morphology> partnerMorph, float cr)
 	tempLGenome = morpho->genome->clone(); 
 
 	bool cross = false;
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		if (randomNum->randFloat(0, 1) < cr) {
 			if (cross == false) {
 				cross = true;
@@ -95,11 +95,9 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 		//if (genome->moduleParameters[i]->expressed == true) {
 			genomeText << "#Module:," << i << std::endl;
 			genomeText << "#ModuleType:," << genome->moduleParameters[i]->type << std::endl;
-			
 			genomeText << "#ModuleParent:," << genome->moduleParameters[i]->parent << std::endl;
 			genomeText << "#ParentSite:," << genome->moduleParameters[i]->parentSite << std::endl;
 			genomeText << "#Orientation:," << genome->moduleParameters[i]->orientation << std::endl;
-			
 			genomeText << "#ControlParams:," << std::endl;
 			genomeText << genome->moduleParameters[i]->control->getControlParams().str();
 			genomeText << "#EndControlParams" << std::endl;
@@ -146,7 +144,7 @@ bool ER_DirectEncoding::loadGenome(std::istream &genomeInput, int individualNumb
 {
 	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
 		loadPhenotype(individualNumber);
-		genome->amountModules = genome->moduleParameters.size();
+		genome->numberOfModules = genome->moduleParameters.size();
 		morphFitness = 0;
 		setGenomeColors();
 		return true; // TODO CHANGE
@@ -203,8 +201,8 @@ bool ER_DirectEncoding::loadGenome(std::istream &genomeInput, int individualNumb
 		else if (tmp == "#AmountStates:") {
 			it++;
 			tmp = *it;
-			genome->amountModules = atoi(tmp.c_str());
-			//for (int i = 0; i < genome->amountModules; i++) {
+			genome->numberOfModules = atoi(tmp.c_str());
+			//for (int i = 0; i < genome->numberOfModules; i++) {
 			//	genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 			//}
 		}
@@ -264,7 +262,7 @@ bool ER_DirectEncoding::loadGenome(std::istream &genomeInput, int individualNumb
 
 	//	lGenome->lParameters.resize(lGenome->amountStates);
 	//	cout << "amount of states = " << lGenome->amountStates << endl; 
-	genome->amountModules = genome->moduleParameters.size();
+	genome->numberOfModules = genome->moduleParameters.size();
 	morphFitness = 0;
 	setGenomeColors();
 
@@ -359,15 +357,15 @@ int ER_DirectEncoding::initializeGenome(int type) {
 	}
 	morphFitness = 0;
 	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
-		genome->moduleParameters[i]->type = settings->initialModuleType;
+		genome->moduleParameters[i]->type = settings->moduleTypes[0];// settings->initialModuleType;
 		vector<float>tempVector;
 		// currently everything has a neural network...
 		genome->moduleParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 		if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
 			genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr 
-//			cout << "OUTPUTSIZE = " << genome->moduleParameters[i]->control-> outputLayer.size() << endl;
+            // cout << "OUTPUTSIZE = " << genome->moduleParameters[i]->control-> outputLayer.size() << endl;
 		}
 		else if (settings->controlType == settings->ANN_DISTRIBUTED_UP) {
 			genome->moduleParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons); // 2 additional inputs and outputs used fotr 
@@ -440,6 +438,7 @@ void ER_DirectEncoding::symmetryMutation(float mutationRate) {
 	if (settings->verbose) {
 		cout << "This version does not support symmetry mutation, check code" << endl;
 	}
+	// TODO: Wei should implement a symmetry mutation operator for the direct encoding.
 }
 
 bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAMETERS>> mps, int parentSite, int parent) {
@@ -455,18 +454,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 	if (settings->verbose) {
 		cout << "mutating direct" << endl;
 	}
-	// 1) add module, 
-	// 2) mutate morphology
-	// 3) mutate control
-	// 4) prune 
-	// 5) symmetry
-
-//	int typeOfMutation = randomNum->randInt(5, 0);
-//	typeOfMutation = 0;
-//	switch (typeOfMutation) {
-//	case 0: {
-	// modularParameters.size() influences the chance of adding modules. 
-	int maxModuleAddition = 5; // up to five modules can be added each mutation step...
+    /// This number defines the number of components than can be added each mutation step.
+	int maxModuleAddition = 5;
+	/// Adding modules
 	for (int am = 0; am < maxModuleAddition; am++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			if (settings->verbose) {
@@ -474,6 +464,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 			}		
 			// add module
 			// select where module should be attached to
+			// TODO: put the 50 variable somewhere more logical.
 			if (genome->moduleParameters.size() < 50) { // absolute max amount modules
 				int attachModule = randomNum->randInt(genome->moduleParameters.size(), 0);
 				int treeDepth = checkTreeDepth(attachModule, 0);
@@ -488,7 +479,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 					int maxCh = getMaxChilds(genome->moduleParameters[attachModule]->type); // placeholder for max childs of parent module
 					if (genome->moduleParameters[attachModule]->childSiteStates.size() < maxCh) {
 						int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
-
 						//bool collideSite = true;
 						int newModuleLocation = 0;
 						newModuleLocation = randomNum->randInt(getMaxChilds(genome->moduleParameters[attachModule]->type), 0);
@@ -498,7 +488,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 							}
 						}
 						else {
-
 							// Check module to be created
 							int moduleAmount = 0;
 							int typeLoc = -1; // should always be assigned
@@ -513,7 +502,6 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 									}
 								}
 							}
-
 
 							if (moduleAmount > settings->maxModuleTypes[typeLoc][1]) {
 
@@ -547,7 +535,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 								genome->moduleParameters[theNewModule]->parent = attachModule;
 								genome->moduleParameters[theNewModule]->parentSite = newModuleLocation;
 								genome->moduleParameters[theNewModule]->orientation = newOr;
-								genome->amountModules = genome->moduleParameters.size();
+								genome->numberOfModules = genome->moduleParameters.size();
 							}
 						}
 					}
@@ -556,17 +544,19 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 		}
 	}
 	
-	// mutate orientation stored in childConfigurations
+	/// Mutate orientation
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		if (randomNum->randFloat(0.0, 1.0) <settings->morphMutRate) {
 			genome->moduleParameters[i]->orientation = randomNum->randInt(4, 0);
 		}
 	}
+	/// Mutate control
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 			if (genome->moduleParameters[i]->control) { // to check if not nullpointer
 				genome->moduleParameters[i]->control->mutate(settings->mutationRate);
 			}
 	}
+	/// Delete modules
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate / 2) { // less chance to delete
 		if (settings->verbose) {
 			cout << "pruning" << endl;
@@ -603,15 +593,15 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 			for (int i = deleteModules.size() -1; i >= 0; i--) {
 				if (settings->verbose) {
 					cout << "i: " << i << endl;
-					//				cout << "deleting " << deleteModules[i] - dCounter << endl;
+					//	cout << "deleting " << deleteModules[i] - dCounter << endl;
 					cout << "module params size = " << genome->moduleParameters.size() << endl;
-					//				cout << "dcounter = " << dCounter; cout << ", deleteModules[i] = " << deleteModules[i];
+					//	cout << "dcounter = " << dCounter; cout << ", deleteModules[i] = " << deleteModules[i];
 				}
 				genome->moduleParameters.erase(genome->moduleParameters.begin() + (deleteModules[i]));
 				if (settings->verbose) {
 					cout << "removed one from module parameters" << endl;
 				}
-				genome->amountModules -= 1;
+				genome->numberOfModules -= 1;
 				for (int j = 0; j < genome->moduleParameters.size(); j++) {
 					if (settings->verbose) {
 						cout << "j: " << j << endl;
@@ -625,11 +615,9 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 				}
 				//			dCounter++;
 			}
-			
-//			genome->moduleParameters[randomModule];
-		//	deleteModuleFromGenome(randomModule); // deletes module branch (includes all child modules)
 		}
 	}
+	/// Symmetry mutation
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 		symmetryMutation(settings->morphMutRate);
 	}
@@ -669,7 +657,7 @@ void ER_DirectEncoding::deleteModuleFromGenome(int num)
 }
 
 void ER_DirectEncoding::mutate() {
-	//cout << "mutating lmorph" << endl;
+	cout << "mutating direct with mutation rate of " << settings->mutationRate << endl;
 	mutateERGenome(settings->morphMutRate);
 }
 

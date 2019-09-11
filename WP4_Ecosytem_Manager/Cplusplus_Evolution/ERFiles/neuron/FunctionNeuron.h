@@ -45,7 +45,7 @@ public:
 //	void setFloatParameters(vector<float> values) {};
 
 	int functionRange = 14; // between 0 and 13 are used
-
+	virtual void flush();
 	bool dir = true;
 	stringstream getNeuronParams();
 	//	void setNeuronParams(vector<string>);

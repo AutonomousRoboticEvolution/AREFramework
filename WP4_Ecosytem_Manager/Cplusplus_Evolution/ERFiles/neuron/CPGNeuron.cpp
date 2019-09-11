@@ -77,6 +77,13 @@ void CPGNeuron::mutate(float mutationRate) {
 	Neuron::mutate(mutationRate);
 }
 
+void CPGNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+	innerValue = 0.0;
+}
+
 stringstream CPGNeuron::getNeuronParams() {
 	stringstream ss; 
 	ss << "3," << endl; 

@@ -11,11 +11,12 @@ public:
 	virtual vector<int> getJointHandles(int parentHandle);
 	void update();
 	virtual int getMainHandle();
-	int createWei();
 	void create();
 
-	void init();
 
+	shared_ptr<Morphology> clone() const;
+
+	vector<int> sensorHandles;
 	vector<int> outputHandles;
 	vector<int> outputValues;
 

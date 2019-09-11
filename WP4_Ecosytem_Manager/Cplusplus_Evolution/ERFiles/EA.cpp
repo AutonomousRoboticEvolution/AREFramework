@@ -36,11 +36,7 @@ void EA::setSettings(shared_ptr<Settings> st, shared_ptr<RandNum> rn)
 	randomNum = rn;
 }
 
-void EA::setFitness(int individual, float fitness)
-{
-	nextGenGenomes[individual]->fitness = fitness;
-//	nextGenFitness[individual] = fitness;
-}
+
 
 void EA::init()
 {
@@ -57,35 +53,35 @@ void EA::loadIndividual(int individualNum, int sceneNum) {
 
 }
 
-void EA::savePopFitness(int generation, vector<float> popfit) {
+void EA::savePopFitness(int generation, vector<float> popfit, vector<int> popIndividuals) {
 	cout << "SAVING GENERATION" << endl << endl;
 	ofstream savePopFile;
 	string saveFileName;
 	saveFileName = settings->repository + "/SavedGenerations" + to_string(settings->sceneNum) + ".csv";
 	savePopFile.open(saveFileName.c_str(), ios::out | ios::ate | ios::app);
 	savePopFile << "generation " << generation << ": ,";
-	for (int i = 0; i < populationGenomes.size(); i++) {
+	for (int i = 0; i < popfit.size(); i++) {
 		savePopFile /*<< " ind " << i << ": " */ << popfit[i] << ",";
 	}
 	float avgFitness = 0;
-	for (int i = 0; i < populationGenomes.size(); i++) {
+	for (int i = 0; i < popfit.size(); i++) {
 		avgFitness += popfit[i];
 	}
-	avgFitness = avgFitness / populationGenomes.size();
+	avgFitness = avgFitness / popfit.size();
 	savePopFile << "avg: ," << avgFitness << ",";
 	int bestInd = 0;
 	float bestFitness = 0;
-	for (int i = 0; i < populationGenomes.size(); i++) {
+	for (int i = 0; i < popfit.size(); i++) {
 		if (bestFitness < popfit[i]) {
 			bestFitness = popfit[i];
 			bestInd = i;
 		}
 	}
-	savePopFile << "ind: ," << populationGenomes[bestInd]->individualNumber << ",";
+	savePopFile << "ind: ," << popIndividuals[bestInd] << ",";
 	savePopFile << "fitness: ," << bestFitness << ",";
 	savePopFile << "individuals: ,";
-	for (int i = 0; i < populationGenomes.size(); i++) {
-		savePopFile << populationGenomes[i]->individualNumber << ",";
+	for (int i = 0; i < popIndividuals.size(); i++) {
+		savePopFile << popIndividuals[i] << ",";
 	}
 	savePopFile << endl;
 	savePopFile.close();
@@ -134,7 +130,7 @@ void EA::loadPopulationGenomes()
 	for (int i = 0; i < settings->indNumbers.size(); i++) {
 		cout << "loading individual " << settings->indNumbers[i] << endl;
 		populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
-		populationGenomes[i]->loadMorphologyGenome(settings->indNumbers[i], settings->sceneNum);
+		populationGenomes[i]->loadGenome(settings->indNumbers[i], settings->sceneNum);
 		//cout << "Make sure the following is correct" << endl;
 		populationGenomes[i]->fitness = settings->indFits[i];
 		populationGenomes[i]->individualNumber = settings->indNumbers[i];

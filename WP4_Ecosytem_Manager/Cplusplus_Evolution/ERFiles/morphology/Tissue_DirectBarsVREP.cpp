@@ -2,6 +2,7 @@
 
 Tissue_DirectBarsVREP::Tissue_DirectBarsVREP()
 {
+	viability = shared_ptr<Viability>(new Viability);
 }
 
 
@@ -86,7 +87,7 @@ int Tissue_DirectBarsVREP::createMorphology() {
     int robotHandle = -1;
     // Before robot generation checks
     bool viabilityResult = false;
-    viabilityResult = viability.checkOrgansType(organs);
+    viabilityResult = viability->checkOrgansType(organs);
     if(viabilityResult == true){
         // Importing motor organs
         vector<int> organHandle(organsNumber,-1);
@@ -98,19 +99,19 @@ int Tissue_DirectBarsVREP::createMorphology() {
         skeletonHandle = createSkeleton();
         componentHandles.push_back(skeletonHandle);
         //  Create components and set parents
-        for(int i = 1; i < organsNumber; i++){
-            createOrgan(i, &organHandle[i], &forceSensor[i]);
+        for(int i = 0; i < organsNumber; i++){
+            organs[i].createOrgan(organs[i].organType, organs[i].coordinates, organs[i].orientations, &organHandle[i], &forceSensor[i]);
             componentHandles.push_back(organHandle[i]);
             simSetObjectParent(forceSensor[i], skeletonHandle, 1);
             // During robot generation checks
-            viabilityResult = viability.printVolume(organs[i].coordinates);
+            viabilityResult = viability->printVolume(organs[i].coordinates);
             if(viabilityResult == false) break;
 
-            viabilityResult = viability.collisionDetector(componentHandles, organHandle[i]);
+            viabilityResult = viability->collisionDetector(componentHandles, organHandle[i]);
             if(viabilityResult == false) break;
 
             int gripperHandle;
-            gripperHandle = viability.createTemporalGripper(organs[i]);
+            gripperHandle = viability->createTemporalGripper(organs[i]);
             //viabilityResult = viability.collisionDetector(componentHandles, gripperHandle);
             simRemoveModel(gripperHandle);
             //if(viabilityResult == false) break;
@@ -288,6 +289,7 @@ bool Tissue_DirectBarsVREP::loadGenome(int individualNumber, int sceneNum) {
     return true; // TODO: Change this to only return true when genome is correctly loaded
 }
 // Initialize variables for morphology
+// Reserve some space
 void Tissue_DirectBarsVREP::initMorphology() {
 
     std::cout << "Init Morph!" << std::endl;
@@ -338,37 +340,7 @@ void Tissue_DirectBarsVREP::mutateMorphology(float mutationRate) {
         //organs[i].orientations[2] = 1.5708;
     }
 }
-// Create organ
-void Tissue_DirectBarsVREP::createOrgan(int counter, int* organHandle, int* sensorHandle) {
-    int forSenPamsArg1[] = {0, 0, 0, 0, 0};
-    float forSenPamsArg2[] = {0, 0, 0, 0, 0};
-    float organPosition[3] = {organs[counter].coordinates[0]/100, organs[counter].coordinates[1]/100, organs[counter].coordinates[2]/100 + 0.05}; // 0.0225 Wheels barely touching floor but more room to rotate;
-    float organOrientation[3] = {organs[counter].orientations[0],organs[counter].orientations[1],organs[counter].orientations[2]};
 
-    // Create organ and sensor
-    switch(organs[counter].organType){
-        case 0:
-            *organHandle = simLoadModel("models/brainOrgan.ttm");
-            break;
-        case 1:
-            *organHandle = simLoadModel("models/motorOrgan3_massFixed.ttm");
-            break;
-        case 2:
-            *organHandle = simLoadModel("models/sensorOrgan.ttm");
-            break;
-        default:
-            std::cout << "WARNING: Organ type does not exist" << std::endl;
-            break;
-    }
-    *sensorHandle = simCreateForceSensor(0, forSenPamsArg1, forSenPamsArg2, NULL);
-    // Set positions and orientations
-    simSetObjectPosition(*organHandle, -1, organPosition);
-    simSetObjectPosition(*sensorHandle, -1, organPosition);
-    simSetObjectOrientation(*organHandle, -1, organOrientation);
-    simSetObjectOrientation(*sensorHandle, -1, organOrientation);
-    // Set parenthood
-    simSetObjectParent(*organHandle, *sensorHandle, 1);
-}
 // Create body
 int Tissue_DirectBarsVREP::createSkeleton() {
     std::vector<int> primitiveHandles;
@@ -461,94 +433,3 @@ int Tissue_DirectBarsVREP::createSkeleton() {
     return skeletonHandle;
 }
 
-// This method checks if there is at least one organ of each type
-int Tissue_DirectBarsVREP::viabilityStruct::checkOrgansType(vector<Organs> organs) {
-    bool result = true;
-    int organTypesCounter = 0;
-    for(int i = 0; i < 3; i++){
-        for(int j = 0; j < organs.size(); j++){
-            if(organs[j].organType == i){
-                organTypesCounter++;
-                break;
-            }
-        }
-    }
-    // If there are at least 2 different organs.
-    if(organTypesCounter != 2){
-        result = false;
-        std::cout << "WARNING: There is an organ type missing!" << std::endl;
-    }
-    return result;
-
-}
-// This method checks whether if an organ is inside of outside of the 3D print volume
-int Tissue_DirectBarsVREP::viabilityStruct::printVolume(vector<float> coordinates) {
-    bool result = true;
-    if(coordinates[0] > 140 || coordinates[0] < -140 ||
-        coordinates[1] > 140 || coordinates[1] < -140 ||
-        coordinates[2] > 250 || coordinates[2] < 0){
-        result = false;
-        std::cout << "WARNING: There is an organ outside the print volume!" << std::endl;
-    }
-    return result;
-}
-// Detect whether the organ is colliding with anything
-int Tissue_DirectBarsVREP::viabilityStruct::collisionDetector(vector<int> allComponents, int componentHandle) {
-    int result = true;
-    for(int i = 0; i < allComponents.size(); i++){
-        if(simCheckCollision(allComponents[i], componentHandle)){
-			//std::cout << simGetObjectName(allComponents[1]) << " and ";
-			//std::cout << simGetObjectName(componentHandle) << " are colliding. " << std::endl;
-            std::cout << "WARNING: An organ is colliding!" << std::endl;
-            result = false;
-            break;
-        }
-    }
-    return result;
-}
-// Create temporal gripper
-int Tissue_DirectBarsVREP::viabilityStruct::createTemporalGripper(Organs organ) {
-    int gripperHandle;
-    float gripperPosition[3] = {0.0, 0.0, 0.0};
-    float gripperOrientation[3] = {organ.orientations[0], organ.orientations[1], organ.orientations[2]};
-
-    float offSetX = 0;
-    float offSetY = 0;
-    float offSetZ = -0.08;
-    float tempX = 0;
-    float tempY = 0;
-    float tempZ = 0;
-
-    gripperHandle = simLoadModel("models/gripper.ttm");
-
-    tempX = offSetX;
-    tempY = offSetY * cos(organ.orientations[0]) - offSetZ * sin(organ.orientations[0]);
-    tempZ = offSetY * sin(organ.orientations[0]) + offSetZ * cos(organ.orientations[0]);
-    offSetX = tempX;
-    offSetY = tempY;
-    offSetZ = tempZ;
-    // 2nd rotation
-    // TODO Why minus here!!!
-    tempX = offSetX * cos(organ.orientations[1]) - offSetZ * sin(organ.orientations[1]);
-    tempY = offSetY;
-    tempZ = offSetX * sin(organ.orientations[1]) + offSetZ * cos(organ.orientations[1]);
-    offSetX = tempX;
-    offSetY = tempY;
-    offSetZ = tempZ;
-    // 3nd rotation
-    tempX = offSetX * cos(organ.orientations[2]) - offSetY * sin(organ.orientations[2]);
-    tempY = offSetX * sin(organ.orientations[2]) + offSetY * cos(organ.orientations[2]);
-    tempZ = offSetZ;
-    offSetX = tempX;
-    offSetY = tempY;
-    offSetZ = tempZ;
-    gripperPosition[0] = (organ.coordinates[0]/100) + offSetX;
-    gripperPosition[1] = (organ.coordinates[1]/100) + offSetY;
-    gripperPosition[2] = (organ.coordinates[2]/100) + offSetZ + 0.05;
-
-    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
-    simSetObjectPosition(gripperHandle, -1, gripperPosition);
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1);
-
-    return gripperHandle;
-}

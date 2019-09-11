@@ -19,7 +19,7 @@ shared_ptr<Genome> GenomeFactory::createGenome(int type, shared_ptr<RandNum> rn,
 		if (st->verbose) {
 			cout << "Creating default genome" << endl;
 		}
-		unique_ptr<Genome> m_genome(new DefaultGenome);
+		unique_ptr<Genome> m_genome(new DefaultGenome);  //create a genome??
 		m_genome->randomNum = rn;
 		m_genome->settings = st;
 		//cout << m_genome->settings->COLOR_LSYSTEM << endl;

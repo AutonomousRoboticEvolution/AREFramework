@@ -8,8 +8,6 @@ DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings
 	randomNum = rn;
 	settings = st;
 	genomeFitness = 0;
-	maxAge = settings->maxAge;
-	age = 0;
 }
 
 DefaultGenomeVREP::~DefaultGenomeVREP() {
@@ -61,5 +59,7 @@ void DefaultGenomeVREP::init() {
 
 shared_ptr<Genome> DefaultGenomeVREP::clone() const
 {
-	return make_unique<DefaultGenomeVREP>(*this);
+	shared_ptr<DefaultGenomeVREP> p = make_unique<DefaultGenomeVREP>(*this);
+	p->morph = this->morph->clone();
+	return p;
 }

@@ -47,9 +47,9 @@ int main(int argc, char* argv[])
 		destination = arguments[0];
 		cout << "arguments are: ";
 		for (int i = 0; i < arguments.size(); i++) {
-			cout << arguments[i] << ", ";
+			std:cout << arguments[i] << ", ";
 		}
-		cout << endl;
+		std::cout << std::endl;
 	}
 	else {
 		destination = "files"; // default location
@@ -131,8 +131,12 @@ int main(int argc, char* argv[])
 			break;
 		}
 		client->settings->indCounter += client->settings->populationSize;
-		client->ea->selection();
 		client->settings->generation = i + 1;
+
+		client->ea->selection(); // epochs in NEAT
+		if (client->settings->evolutionType == client->settings->EA_NEAT) {
+			client->ea->population->Save((client->settings->repository + client->ea->neatSaveFile + to_string(client->settings->generation)).c_str());
+		}
 	}
 
 	extApi_sleepMs(5000);

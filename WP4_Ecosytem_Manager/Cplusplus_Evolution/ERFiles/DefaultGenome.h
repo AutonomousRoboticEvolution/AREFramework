@@ -21,32 +21,28 @@ public:
 
 	void createInitialMorphology(int individualNumber);
 
-	int age = 0;
-	int maxAge = 0;
-	int minAge = 0;
 	float mutationRate = 0.05f;
-	float parentPhenValue;
 
 	void savePhenotype(int indNum, int sceneNum);
 	virtual void init() override;
 	virtual void create() override;
-	virtual void update() override; 
+	virtual void update() override;
 	virtual void mutate() override;
 	virtual bool loadGenome(int indNum, int sceneNum) override;
 	virtual bool loadGenome(std::istream &input, int indNum) override;
 	virtual void saveGenome(int indNum) override;
 	virtual const std::string generateGenome() const override;
-	virtual void clearGenome() override;
+	void clearGenome();
 	virtual void checkGenome() override;
-	virtual bool loadMorphologyGenome(int indNum, int sceneNum) override;
-	virtual bool loadMorphologyGenome(std::istream &input, int indNum) override;
+	bool loadMorphologyGenome(int indNum, int sceneNum);
+	bool loadMorphologyGenome(std::istream &input, int indNum);
 	shared_ptr<Genome> cloneGenome();
 
 	void init_noMorph();
 	void createAtPosition(float x, float y, float z);
 
 	//void mutate();
-	float genomeFitness;  
+	float genomeFitness;
 
 	void loadBaseMorphology(int indNum, int sceneNum); // old
 
@@ -55,5 +51,3 @@ protected:
 	// virtual functions to extend with simulator specific classes
 	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory();
 };
-
-

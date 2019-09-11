@@ -1,5 +1,6 @@
 #pragma once
-#include "FixedBaseMorphology.h"
+//#include "FixedBaseMorphology.h"
+#include "Component.h"
 
 struct Vector3 {
 	float x;
@@ -21,7 +22,7 @@ struct Sensor {
 };
 
 
-class Tissue_DirectBars : public FixedBaseMorphology
+class Tissue_DirectBars : public Component	
 {
 public:
 	Tissue_DirectBars();

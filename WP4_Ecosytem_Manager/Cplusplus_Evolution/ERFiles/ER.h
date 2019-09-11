@@ -21,13 +21,7 @@
 
 using namespace std;
 
-enum simulationSetup
-{
-	DEFAULT_SETUP,
-	RECALLBEST,
-	RECALLPOP,
-	RECALLBESTFROMGENOME
-};
+
 
 class CER
 {
@@ -35,23 +29,32 @@ public:
 	CER();
 	virtual ~CER();
 
+	/**
+       @brief This method splits lines
+	*/
 	void split_line(string& line, string delim, list<string>& values);
 
-	simulationSetup simSet = DEFAULT_SETUP;
-	shared_ptr<Settings> settings;
-	unique_ptr<EA> ea; // can be changed to another ea. Factory pattern?
+	///pointer to settting of EA
+	shared_ptr<Settings> settings;  
+	/// pointer to EA
+	unique_ptr<EA> ea;               
+	/// pointer to random number generator of EA
+	shared_ptr<RandNum> randNum;
 
 	void saveSettings();
 	void initialize();
-	void initializeSimulation(); 
+	void initializeSimulation();
+    /// Indicates whether to start the simulation in server mode (received genome)
+	bool startRun = true;
 
 	// parameters
+	/// Tracks the individual number (corresponding to genomes in the population)
 	int currentInd = 0;
+	/// generation counter
 	int generation = 0;
-	int newGenerations = 0; 
-	bool _initialize = true;
-
+	/// When recalling an evolutionary run, not only the generation is counted, but also the newGenerations. This allows the user to run evolution with generational intervals. 
+	int newGenerations = 0; // deprecate?
+	/// not used here
 	void loadIndividual(int individualNum, int sceneNum);
 
-	shared_ptr<RandNum> randNum;
 };

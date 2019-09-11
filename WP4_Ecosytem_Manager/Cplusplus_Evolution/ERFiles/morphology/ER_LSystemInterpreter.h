@@ -43,7 +43,6 @@ public:
 	void updateColors();
 
 	void printSome();
-	int getMainHandle();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();
@@ -57,7 +56,7 @@ public:
 	vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
-	void shiftRobotPosition();
+	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;
@@ -66,5 +65,13 @@ public:
 
 //	VREPUI *vrepUI;
 	shared_ptr<VREPUI> vrepUI;
+
+    /// Viability methods
+    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
+    bool bCheckCollision(int iParentHandle, int createdModulesSize);
+    /// Check for ground. If object is above the ground, it can be created
+    bool bCheckGround(int createdModulesSize);
+    /// Check for orientation. If the orientation of the organ is printable
+    bool bCheckOrientation(int createdModulesSize);
 
 };

@@ -22,51 +22,45 @@ endif()
 
 
 set(SOURCES
-    ERFiles/CollisionDetector.cpp
     ERFiles/control/ANN.cpp
     ERFiles/control/Control.cpp
     ERFiles/control/ControlFactory.cpp
     ERFiles/control/CPPN.cpp
     ERFiles/control/CustomANN.cpp
+    ERFiles/control/FixedStructreANN.cpp
     ERFiles/control/SimpleControl.cpp
     ERFiles/DefaultGenome.cpp
     ERFiles/DefaultGenomeVREP.cpp
     ERFiles/EA_Factory.cpp
     ERFiles/EA_Generational.cpp
+    ERFiles/EA_Dynamic.cpp
     ERFiles/EA_SteadyState.cpp
     ERFiles/EA_VREP.cpp
     ERFiles/EA.cpp
-    ERFiles/env/BasicSunEnv.cpp
-    ERFiles/env/BlockingSunEnv.cpp
-    ERFiles/env/ConstrainedSunEnv.cpp
+    ERFiles/EA_NEAT.cpp
     ERFiles/env/Environment.cpp
     ERFiles/env/EnvironmentFactory.cpp
-    ERFiles/env/MoveAndSun.cpp
     ERFiles/env/MoveEnv.cpp
-    ERFiles/env/MovingSunEnv.cpp
+    ERFiles/env/EnvPhototaxis.cpp
     ERFiles/env/RoughMoveEnv.cpp
-    ERFiles/env/WaterEnv.cpp
     ERFiles/ER_VREP.cpp
     ERFiles/ER.cpp
     ERFiles/Genome.cpp
     ERFiles/GenomeFactory.cpp
     ERFiles/GenomeFactoryVREP.cpp
     ERFiles/module/ER_Module.cpp
-    ERFiles/module/Module_APlantBase.cpp
     ERFiles/module/Module_Cube.cpp
-    ERFiles/module/Module_Leaf.cpp
-    ERFiles/module/Module_LeafChloe.cpp
+    ERFiles/module/Module_Bone.cpp
     ERFiles/module/Module_Servo.cpp
-    ERFiles/module/Module_Solar.cpp
+    ERFiles/module/Module_Misc.cpp
     ERFiles/module/ModuleFactory.cpp
+    ERFiles/module/Module_Misc.cpp
     ERFiles/morphology/BaseMorphology.cpp
     ERFiles/morphology/CAT.cpp
     ERFiles/morphology/CATVREP.cpp
     ERFiles/morphology/CustomMorphology.cpp
     ERFiles/morphology/CustomMorphologyVREP.cpp
     ERFiles/morphology/Development.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClass.cpp
-    ERFiles/morphology/EdgarsAmazingMorphologyClassVREP.cpp
     ERFiles/morphology/ER_CPPN_Encoding.cpp
     ERFiles/morphology/ER_CPPN_Interpreter.cpp
     ERFiles/morphology/ER_CPPN.cpp
@@ -74,6 +68,7 @@ set(SOURCES
     ERFiles/morphology/ER_DirectEncodingInterpreter.cpp
     ERFiles/morphology/ER_LSystem.cpp
     ERFiles/morphology/ER_LSystemInterpreter.cpp
+    ERFiles/morphology/NEAT_CPPN_Encoding.cpp
     ERFiles/morphology/FixedBaseMorphology.cpp
     ERFiles/morphology/Morphology.cpp
     ERFiles/morphology/MorphologyFactory.cpp
@@ -82,6 +77,8 @@ set(SOURCES
     ERFiles/morphology/Tissue_DirectBarsVREP.cpp
     ERFiles/morphology/Tissue_GMX.cpp
     ERFiles/morphology/Tissue_GMX_VREP.cpp
+	ERFiles/morphology/Viability.cpp
+	ERFiles/morphology/Organ.cpp
     ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
     ERFiles/neuron/InputNeuron.cpp
@@ -92,6 +89,22 @@ set(SOURCES
     ERFiles/neuron/SimpleNeuron.cpp
     ERFiles/Settings.cpp
     ERFiles/VREPUI/VREPUI.cpp
+    NEAT_LIB/NEAT_LIB/Genome.cpp
+    NEAT_LIB/NEAT_LIB/Innovation.cpp
+    NEAT_LIB/NEAT_LIB/NeuralNetwork.cpp
+    NEAT_LIB/NEAT_LIB/Parameters.cpp
+    NEAT_LIB/NEAT_LIB/PhenotypeBehavior.cpp
+    NEAT_LIB/NEAT_LIB/Population.cpp
+    NEAT_LIB/NEAT_LIB/Parameters.cpp
+    NEAT_LIB/NEAT_LIB/MainN.cpp
+    NEAT_LIB/NEAT_LIB/PythonBindings.cpp
+    NEAT_LIB/NEAT_LIB/Species.cpp
+    NEAT_LIB/NEAT_LIB/Random.cpp
+    NEAT_LIB/NEAT_LIB/Substrate.cpp
+    NEAT_LIB/NEAT_LIB/Traits.cpp
+    NEAT_LIB/NEAT_LIB/Utils.cpp
+    NEAT_LIB/NEAT_LIB/Assert.h
+    NEAT_LIB/NEAT_LIB/Genes.h
     RandNum.cpp
     "${VREP_FOLDER}/programming/common/v_repLib.cpp"
     #	ERFiles/control/Hormones.cpp
@@ -100,7 +113,7 @@ set(SOURCES
     #	ERFiles/module/Module_Brain.cpp
     #	ERFiles/module/Module_Rectangle.cpp
     #	ERFiles/module/Module_Spring.cpp
-)
+    NEAT_LIB/NEAT_LIB/stdafx.cpp NEAT_LIB/NEAT_LIB/stdafx.h)
 
 add_library(ER_library STATIC ${SOURCES})
 

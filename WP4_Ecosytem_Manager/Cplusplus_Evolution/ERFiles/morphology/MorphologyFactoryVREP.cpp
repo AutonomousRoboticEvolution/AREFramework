@@ -115,6 +115,13 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
 		m_morph->settings = st;
 		return m_morph;
 	}
+	case 12: {
+		//		shared_ptr<Morphology> m_morph(new MultiPurposeLSystemV2);
+		shared_ptr<Morphology> m_morph(new NEAT_CPPN_Encoding);
+		m_morph->randomNum = rn;
+		m_morph->settings = st;
+		return m_morph;
+	}
 	case 20: {
 		shared_ptr<Morphology> m_morph(new Tissue_DirectBarsVREP);
 		m_morph->randomNum = rn;
@@ -166,7 +173,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 
 		shared_ptr<CATVREP> castObject;
 		castObject = make_shared<CATVREP>();
-		castObject->control = placeHolder->control;
+		castObject->control = placeHolder->control->clone();
 		castObject->randomNum = placeHolder->randomNum;
 		castObject->settings = placeHolder->settings;
 		return castObject;
@@ -231,14 +238,11 @@ shared_ptr<Morphology> MorphologyFactoryVREP::convertMorph(shared_ptr<Morphology
 
 		shared_ptr<CustomMorphologyVREP> castObject;
 		castObject = make_shared<CustomMorphologyVREP>();
+        castObject->control = placeHolder->control->clone();
 		//castObject->genome = placeHolder->genome;
 		castObject->randomNum = placeHolder->randomNum;
 		castObject->settings = placeHolder->settings;
 		return castObject;
-
-		shared_ptr<Morphology> morph(new CustomMorphologyVREP);
-		cout << "ERROR: NO TRANSFORM OF 'CustomMorphology' to 'CustomMorphologyVREP' made yet" << endl;
-		return morph;
 	}
 			//case 5: {
 			//	shared_ptr<Manual_ModularRobot> mr = shared_ptr<Manual_ModularRobot>(new Manual_ModularRobot);

@@ -47,7 +47,7 @@ shared_ptr<Neuron> SimpleNeuron::clone() {
 void SimpleNeuron::mutate(float mutationRate) {
 	if (mutationRate > randomNum->randFloat(0, 1)) {
 		threshold = randomNum->randFloat(-1.0, 1.0);
-		outputWeight = randomNum->randFloat(-1.0, 1.0);
+		outputWeight = randomNum->randFloat(-1.0, 1.0); // TODO: This might not be used!
 	}
 	Neuron::mutate(mutationRate);
 //	input = randFloat(-1.0, 1.0);
@@ -76,4 +76,11 @@ void SimpleNeuron::setNeuronParams(vector<string> values) {
 
 bool SimpleNeuron::checkNeuron(vector<string> values) {
 	return Neuron::checkNeuron(values);
+}
+
+void SimpleNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+
 }

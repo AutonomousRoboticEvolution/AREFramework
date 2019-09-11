@@ -10,5 +10,7 @@ public:
 	float fitnessFunction(MorphologyPointer morph);
 	float updateEnv(MorphologyPointer morph);
 
+	float minimumHeigth = 0.0;
+
 };
 

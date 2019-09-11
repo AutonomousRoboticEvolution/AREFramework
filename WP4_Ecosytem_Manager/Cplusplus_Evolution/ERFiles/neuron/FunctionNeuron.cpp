@@ -118,7 +118,8 @@ FunctionNeuron::~FunctionNeuron() {
 
 void FunctionNeuron::init(int id) {
 	neuronID = id;
-	function_type = randomNum->randInt(14, 0);
+	//function_type = randomNum->randInt(14, 0);
+    function_type = AF_SIGMOID_UNSIGNED;
 	m_a = randomNum->randFloat(-1.0, 1.0);
 	m_b = randomNum->randFloat(-1.0, 1.0);
 }
@@ -148,9 +149,9 @@ shared_ptr<Neuron> FunctionNeuron::clone() {
 
 void FunctionNeuron::mutate(float mutationRate) {
 	threshold = randomNum->randFloat(-1.0, 1.0);
-	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
-		function_type = randomNum->randInt(functionRange, 0);
-	}
+	//if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
+	//	function_type = randomNum->randInt(functionRange, 0);
+	//}
 	if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 		if (randomNum->randFloat(0.0, 1.0) > 0.5) {
 			m_a += randomNum->randFloat(-1.0 * sigma, 1.0 * sigma);
@@ -185,6 +186,12 @@ void FunctionNeuron::mutate(float mutationRate) {
 void FunctionNeuron::setFloatParameters(vector<float> values) {
 	// function can be used to manually set specific parameters
 	
+}
+
+void FunctionNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
 }
 
 stringstream FunctionNeuron::getNeuronParams() {

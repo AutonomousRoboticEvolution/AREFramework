@@ -50,6 +50,7 @@ int CAT::getMainHandle() {
 	return catHandle;
 }
 
+//save the genome into a file
 void CAT::saveGenome(int indNum, float fitness) {
 	cout << "saving Cat Genome " << endl << "-------------------------------- " << endl;
 	ofstream genomeFile;
@@ -74,6 +75,7 @@ void CAT::saveGenome(int indNum, float fitness) {
 	genomeFile.close();
 }
 
+//load the control parameters
 bool CAT::loadGenome(int individualNumber, int sceneNum) {
 	cout << "loading cat genome " << individualNumber << endl;
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
@@ -89,6 +91,7 @@ bool CAT::loadGenome(int individualNumber, int sceneNum) {
 	}
 	string value;
 	list<string> values;
+	//read the control parameters from file
 	while (genomeFile.good()) {
 		getline(genomeFile, value, ',');
 	//	cout << value << ",";

@@ -7,6 +7,7 @@
 #include "../control/ControlFactory.h"
 #include "../../RandNum.h"
 #include "../Settings.h"
+#include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 
 using namespace std;
 
@@ -19,16 +20,26 @@ public:
 	shared_ptr<RandNum> randomNum;
 	virtual shared_ptr<Morphology> clone() const = 0;
 	vector<shared_ptr<ER_Module> > createdModules;
-
+	/**
+		@brief This method initialize the morph
+	*/
 	virtual void init() = 0;
 	virtual void init_noMorph() = 0;
 	virtual void clearMorph() = 0;
 	virtual void savePhenotype(int ind, float fitness) = 0;
-
+	/**
+		@brief This method mutate the morph
+	*/
 	virtual void mutate() = 0;
+	/**
+		@brief This method creates the morph
+	*/
 	virtual void create() = 0;
 	virtual void createAtPosition(float x, float y, float z) = 0;
 
+	/**
+		@brief This method update the control of the morph?
+	*/
 	virtual void update() = 0; 
 
 
@@ -63,12 +74,15 @@ public:
 
 	float phenValue = -1.0;
 	virtual void setPhenValue() = 0;
+	
 
 	vector<vector <int> > maxModuleTypes;
 //	typedef shared_ptr<Control> ControlPointer;
+	///control of part of morphology 
 	shared_ptr<Control> control;
 public:
 	virtual int getMainHandle() = 0;
 	float minimumHeight = 0;
 	int amountIncrement = 1;
+	shared_ptr<NEAT::NeuralNetwork> neat_net;
 };

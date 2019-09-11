@@ -59,3 +59,4 @@ stringstream SimpleControl::getControlParams() {
 void SimpleControl::setControlParams(vector<string> values) {
 
 }
+

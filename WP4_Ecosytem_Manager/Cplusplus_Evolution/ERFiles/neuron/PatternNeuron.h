@@ -25,8 +25,9 @@ public:
 	shared_ptr<Neuron> clone(); 
 	void setNeuronParams(vector<string> values);
 	bool checkNeuron(vector<string>);
+	virtual void flush();
 private:
-	float time = 0; // initial
+	float time = 0.0; // initial
 	float timeStep = 0.05f;
 	float maxFreq = 2.5f;// 1.0f;// 2.5f;
 };

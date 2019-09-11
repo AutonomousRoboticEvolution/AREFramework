@@ -11,6 +11,7 @@ CPPN::~CPPN()
 }
 
 void CPPN::init(int input, int inter, int output) {
+	
 	unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 	// create CPPN neurons
 	neuronID = 0;
@@ -30,13 +31,6 @@ void CPPN::init(int input, int inter, int output) {
 		neuronID++;
 	}
 	
-	//inputLayer[0]->connectionsID.push_back(recurrentLayer[0]->neuronID);
-	//inputLayer[1]->connectionsID.push_back(recurrentLayer[1]->neuronID);
-	//recurrentLayer[0]->connectionsID.push_back(outputLayer[0]->neuronID);
-	//recurrentLayer[1]->connectionsID.push_back(outputLayer[1]->neuronID);
-	//recurrentLayer[0]->connectionsID.push_back(outputLayer[1]->neuronID);
-	//recurrentLayer[1]->connectionsID.push_back(outputLayer[2]->neuronID);
-
 	// randomized TODO
 	int amountConnections = settings->initialAmountConnectionsNeurons; // the amount of connections the initial neurons have
 	for (int i = 0; i < inputLayer.size(); i++) {
@@ -59,30 +53,6 @@ void CPPN::init(int input, int inter, int output) {
 		}
 	}
 	
-	// nonrandom: uncomment
-	//for (int i = 0; i < inputLayer.size(); i++) {
-	//	if (i < recurrentLayer.size()) {
-	//		inputLayer[i]->connectionsID.push_back(recurrentLayer[i]->neuronID);
-	//		inputLayer[i]->connectionWeights.push_back(1.0);
-	//	}
-	//	else {
-	//		// 
-	//		// recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-	//		// recurrentLayer[i]->connectionWeights.push_back(1.0);
-	//	}
-	//}
-	//for (int i = 0; i < recurrentLayer.size(); i++) {
-	//	if (i < outputLayer.size()) {
-	//		recurrentLayer[i]->connectionsID.push_back(outputLayer[i]->neuronID);
-	//		recurrentLayer[i]->connectionWeights.push_back(1.0);
-	//	}
-	//	else {
-	//		// 
-	//		// recurrentLayer[i]->connectionsID.push_back(outputLayer[0]->neuronID);
-	//		// recurrentLayer[i]->connectionWeights.push_back(1.0);
-	//	}
-	//}
-
 	//	cout << "OUTPUTSIZE = " << outputLayer.size() << endl;
 	changeConnectionIDToPointer();
 	checkConnections();
@@ -152,6 +122,18 @@ void CPPN::addNeurons(float mutationRate) {
 	}
 }
 
+void CPPN::flush() {
+	for (int i = 0; i < inputLayer.size(); i++) {
+		inputLayer[i]->flush();
+	}
+	for (int i = 0; i < recurrentLayer.size(); i++) {
+		recurrentLayer[i]->flush();
+	}
+	for (int i = 0; i < outputLayer.size(); i++) {
+		outputLayer[i]->flush();
+	}
+}
+
 shared_ptr<Control> CPPN::clone() const {
 	shared_ptr<CPPN> newANN = make_unique<CPPN>(*this);
 	newANN->inputLayer.clear();
@@ -167,6 +149,8 @@ shared_ptr<Control> CPPN::clone() const {
 		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
 	}
 	//newANN->makeDependenciesUnique();
+	newANN->checkConnections();
+	newANN->changeConnectionIDToPointer();
 	return newANN;
 }
 

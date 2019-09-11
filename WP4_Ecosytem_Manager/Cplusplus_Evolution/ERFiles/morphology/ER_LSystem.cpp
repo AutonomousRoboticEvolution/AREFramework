@@ -423,7 +423,7 @@ void ER_LSystem::initializeSolar(int type)
 		else {
 		}
 	}
-	settings->morphMutRate = -0.1;
+	//settings->morphMutRate = -0.1;
 	cf.reset();
 }
 
@@ -444,9 +444,19 @@ const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
 
 	genomeText << "Module Parameters Start Here: ," << endl << endl;
 	for (int i = 0; i < amountStates; i++) {
+		if (settings->verbose) {
+			cout << "Receiving genome parameters of module " << i << endl;
+		}
 		genomeText << "#Module:," << i << endl;
 		genomeText << "#ModuleType:," << lGenome->lParameters[i]->type << endl;
 		genomeText << "#ModuleState:," << lGenome->lParameters[i]->currentState << endl; 
+		if (settings->verbose) {
+			cout << "Module "<< i << " has " << lGenome->lParameters[i]->amountChilds << " child modules attached to it" << endl;		
+			cout << " - childSites.size() is " << lGenome->lParameters[i]->childSites.size() << endl;
+			cout << " - childConfigurations.size() is " << lGenome->lParameters[i]->childConfigurations.size() << endl;
+			cout << " - childSiteStates.size() is " << lGenome->lParameters[i]->childSiteStates.size() << endl;
+		}
+
 		genomeText << "#AmountChilds:," << lGenome->lParameters[i]->amountChilds << endl;
 		genomeText << "#ChildSites:,";
 		for (int j = 0; j < lGenome->lParameters[i]->childSites.size(); j++) {
@@ -461,10 +471,16 @@ const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
 			genomeText << lGenome->lParameters[i]->childSiteStates[j] << ",";
 		} genomeText << endl;
 //		genomeText << "," << lGenome->lParameters[i]->moduleType << ",";
+		if (settings->verbose) {
+			cout << "Getting control parameters of module " << i << endl;
+		}
 		genomeText << "#ControlParams:," << endl;
 		genomeText << lGenome->lParameters[i]->control->getControlParams().str(); 
 
 		genomeText << "#EndOfModule," << endl << endl;
+		if (settings->verbose) {
+			cout << "All parameters of module " << i << " were correctly received << endl" << endl;
+		}
 	}
 
 	return genomeText.str();
@@ -655,9 +671,6 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 			}
 			break;
 		}
-		lGenome->lParameters[i]->moduleColor[0] = lGenome->lParameters[i]->color[0];
-		lGenome->lParameters[i]->moduleColor[1] = lGenome->lParameters[i]->color[1];
-		lGenome->lParameters[i]->moduleColor[2] = lGenome->lParameters[i]->color[2];
 	}
 	return true;
 //	cout << "loaded L-System genome" << endl;
@@ -687,10 +700,8 @@ void ER_LSystem::init() {
 
 
 int ER_LSystem::initializeLGenome(int type) {
-	//first read settings
-	lGenome->amountIncrement = settings->lIncrements;
-	lGenome->amountStates = settings->amountModules;
-	lGenome->maxAmountStates = settings->maxAmountModules; // states *
+	/// first read settings
+	lGenome->amountStates = settings->numberOfModules;
 
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
@@ -702,16 +713,15 @@ int ER_LSystem::initializeLGenome(int type) {
 	float pink[3] = { 1.0, 0.5, 0.5 };
 	float white[3] = { 1.0, 1.0, 1.0 };
 	
-//	cout << "initializing L-System Genome" << endl; 
-	//	lGenome->lParameters.resize(lGenome->amountStates);
-	//	cout << "amount of states = " << lGenome->amountStates << endl; 
 	morphFitness = 0;
 	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
 	for (int i = 0; i < lGenome->amountStates; i++) {
 		lGenome->lParameters.push_back(shared_ptr<LPARAMETERS>(new LPARAMETERS));
 		lGenome->lParameters[i]->type = settings->moduleTypes[i];
 		vector<float>tempVector;
-	//	cout << "Initializing state modules" << endl; 
+		if (settings->verbose) {
+            std::cout << "Initializing state modules" << std::endl;
+        }
 		// currently everything has a neural network...
 		lGenome->lParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 		if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
@@ -762,14 +772,13 @@ int ER_LSystem::initializeLGenome(int type) {
 			}
 			break;
 		}
-
 		lGenome->lParameters[i]->currentState = i;
-
 	}
+	// Randomly mutate for initial population
 	mutateERLGenome(0.5);
 	mutateControlERLGenome(0.5);
-	cf.reset();
 
+	cf.reset();
 	return 1;
 }
 
@@ -824,13 +833,17 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 			std::cerr << "control = null? Check ER_LSystem.cpp" << std::endl;
 		}
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
-
 		// Resize the rules (Potentially very destructive) 
 		int childSize = lGenome->lParameters[i]->childSites.size();
+
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // randomly change amount childs, very destructive mutation
-			int maxCh = getMaxChilds(lGenome->lParameters[i]->type);
+			int maxCh = 0;
+			maxCh = getMaxChilds(lGenome->lParameters[i]->type);
+			if (settings->verbose) {
+				cout << "maxCh of module " << i << " is " << maxCh << endl;
+			}
 			if (maxCh != 0) {
-				int newChildSize = randomNum->randInt(maxCh, 0);
+				int newChildSize = randomNum->randInt(maxCh + 1, 0);
 				if (settings->verbose) {
 					std::cout << "newChildSize = " << newChildSize << std::endl;
 					std::cout << "site vector size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
@@ -844,16 +857,6 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 					lGenome->lParameters[i]->childSites.push_back(getNewSite(maxCh, -1, sitebuffer));
 					lGenome->lParameters[i]->childSiteStates.push_back(randomNum->randInt(lGenome->amountStates, 0));
 					lGenome->lParameters[i]->childConfigurations.push_back(randomNum->randInt(4,0));
-					// old code, not working
-					//lGenome->lParameters[i]->childSites.resize(newChildSize);
-					//lGenome->lParameters[i]->childSiteStates.resize(newChildSize);
-					//lGenome->lParameters[i]->childConfigurations.resize(newChildSize);
-					//for (int j = childSize; j < newChildSize; j++) {
-						//		cout << "j = " << j << endl; 
-					//	lGenome->lParameters[i]->childSites[j] = getNewSite(maxCh, -1, lGenome->lParameters[i]->childSites); // -1 because there is no site yet.
-					//	lGenome->lParameters[i]->childSiteStates[j] = randomNum->randInt(lGenome->amountStates, 0); // random state
-					//	lGenome->lParameters[i]->childConfigurations[j] = randomNum->randInt(4, 0); // 4 sites
-					//}
 				}
 				if (settings->verbose) {
 					std::cout << "size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
@@ -895,7 +898,6 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 							if (settings->verbose) {
 								std::cout << "swapping" << std::endl;
 							}
-							// Guys, I know, there is a way more efficient way to do this. Trust me, I know, it will be done soon. s
 							int siteSwapCandidateBuffer = lGenome->lParameters[i]->childSites[swapCandidate];
 							int stateSwapCandidateBuffer = lGenome->lParameters[i]->childSiteStates[swapCandidate];
 							int configurationSwapCandidateBuffer = lGenome->lParameters[i]->childConfigurations[swapCandidate];
@@ -934,16 +936,14 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 }
 
 int ER_LSystem::mutateControlERLGenome(float mutationRate) {
-	cout << "mutating l-genome" << endl;
+	cout << "mutating l-genome control" << endl;
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
-		//		cout << "i = " << i << endl; 
 		lGenome->lParameters[i]->control->mutate(mutationRate);
 	}
 	return 1;
 }
 
 void ER_LSystem::mutate() {
-	//cout << "mutating lmorph" << endl;
 	mutateERLGenome(settings->morphMutRate);
 }
 

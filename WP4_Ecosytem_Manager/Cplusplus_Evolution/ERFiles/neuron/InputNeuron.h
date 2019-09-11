@@ -10,18 +10,21 @@ class InputNeuron :
 {
 public:
 	InputNeuron(); 
-	~InputNeuron(); 
-	void init(int neuronID); 
+	~InputNeuron();
+	/// assign ID to the neuron
+	void init(int neuronID);
+	/// update the weights of this neuron
 	void update();
+	/// remove the neuron
 	void reset();
-	void mutate(float mutationRate); 
-	float transformValue = 0; 
+	/// mutate the neuron
+	void mutate(float mutationRate);
 	shared_ptr<Neuron> clone(); 
 	stringstream getNeuronParams();
 	void setNeuronParams(vector<string>);
 	bool checkNeuron(vector<string>);
 	void setFloatParameters(vector<float> values) {};
-
+	virtual void flush();
 };
 
 

@@ -23,5 +23,6 @@ public:
 	void makeDependenciesUnique();
 	void addInput(vector<float> input) {};
 	void setFloatParameters(vector<float> values) {};
+	void flush() {};
 };
 

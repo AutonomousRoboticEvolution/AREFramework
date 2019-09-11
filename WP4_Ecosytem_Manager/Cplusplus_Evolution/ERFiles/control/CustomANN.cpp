@@ -13,17 +13,29 @@ CustomANN::~CustomANN()
 
 }
 
+void CustomANN::flush() {
+	for (int i = 0; i < inputLayer.size(); i++) {
+		inputLayer[i]->flush();
+	}
+	for (int i = 0; i < recurrentLayer.size(); i++) {
+		recurrentLayer[i]->flush();
+	}
+	for (int i = 0; i < outputLayer.size(); i++) {
+		outputLayer[i]->flush();
+	}
+}
+
 void CustomANN::init(int input, int inter, int output) {
 	unique_ptr<NeuronFactory> neuronFactory(new NeuronFactory);
 	neuronID = 0;
 	for (int i = 0; i < input; i++) {
 		inputLayer.push_back(neuronFactory->createNewNeuronGenome(1, settings));
-		inputLayer[i]->init(neuronID);
-		inputLayer[i]->connectionWeights.push_back(1.0);
-		neuronID++;
+		inputLayer[i]->init(neuronID);  //assign the ID for the neuron
+		inputLayer[i]->connectionWeights.push_back(1.0);  //initialize the weights into 1.0
+		neuronID++;  //make sure the ID is unique for each neuron
 	}
 	for (int i = 0; i < inter; i++) {
-		recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(5, settings)); // creates pattern neuron 
+		recurrentLayer.push_back(neuronFactory->createNewNeuronGenome(0, settings));
 		recurrentLayer[i]->init(neuronID);
 		recurrentLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
@@ -34,11 +46,11 @@ void CustomANN::init(int input, int inter, int output) {
 		outputLayer[i]->connectionWeights.push_back(1.0);
 		neuronID++;
 	}
-	inputLayer[0]->connectionsID.push_back(recurrentLayer[0]->neuronID);
-	recurrentLayer[0]->connectionsID.push_back(outputLayer[0]->neuronID);
+	inputLayer[0]->connectionsID.push_back(recurrentLayer[0]->neuronID);  //TODO:??
+	recurrentLayer[0]->connectionsID.push_back(outputLayer[0]->neuronID); //TODO:??
 	checkConnections();
 	changeConnectionIDToPointer();
-	neuronFactory.reset();
+	neuronFactory.reset();  //destroy the unique point
 }
 
 void CustomANN::reset() {
@@ -53,7 +65,7 @@ void CustomANN::reset() {
 	}
 }
 
-void CustomANN::checkConnections() { // this function deletes the connections to deleted neurons and in turn the pointer to these neurons should go out of scope. 
+void CustomANN::checkConnections() {
 //	cout << "in" << inputLayer.size() << endl;
 	for (int i = 0; i < inputLayer.size(); i++) {
 //		cout << "conID:" << inputLayer[i]->connectionsID.size() << endl;
@@ -70,10 +82,14 @@ void CustomANN::checkConnections() { // this function deletes the connections to
 	//		cout << "j:" << j << endl;
 	//		cout << "/" << inputLayer[i]->connectionsID[j] << endl;
 	//		cout << "/" << inputLayer[i]->connections[j] << endl;
-			
+//			/
+            // If shared_ptr::unique returns true, then calling shared_ptr::reset will delete the managed object.
+            // However, if shared_ptr::unique returns false, it means there are more than one shared_ptrs sharing ownership of that object.
+            // In this case a call to reset will only result in the reference count being decremented by 1,
+            // actual deletion of the object will take place when the last shared_ptr managing that object either goes out of scope or is itself reset.
 			if (inputLayer[i]->connections[j]->neuronID == -1) {
-				inputLayer[i]->connections[j].reset();
-				inputLayer[i]->connections.erase(inputLayer[i]->connections.begin() + j);
+				inputLayer[i]->connections[j].reset();  //release the shared pointer
+				inputLayer[i]->connections.erase(inputLayer[i]->connections.begin() + j); //remove the object from the vector
 			}
 		}
 	}
@@ -100,8 +116,8 @@ void CustomANN::checkConnections() { // this function deletes the connections to
 vector<float> CustomANN::update(vector<float> sensorValues) {
 	vector<float> outputValues; 
 	if (sensorValues.size() != inputLayer.size()) {
-		//std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
-		//cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
+		std::cout << "ERROR: sensor amount differs from input neuron amount" << endl;
+		cout << "sensorSize = " << sensorValues.size() << ", amount inputNeurons = " << inputLayer.size() << endl;
 	}
 	else {
 		for (int i = 0; i < sensorValues.size(); i++) {
@@ -117,33 +133,18 @@ vector<float> CustomANN::update(vector<float> sensorValues) {
 		outputLayer[i]->update();
 		outputValues.push_back(outputLayer[i]->output);
 		cf += ((0.5 * outputLayer[i]->output / outputLayer.size()));
-		// cout << "outputvalues " <<  outputValues[0] << endl;
+		cout << "outputvalues " <<  outputValues[i] << endl;
 	}
 	cf += 0.5;
-	//	printNeuronValues();
+	//printNeuronValues();
 		//leaky(0.8);
 	return outputValues;
 }
 
-void CustomANN::mutateConnections(float mutationRate) {
-	ANN::mutateConnections(mutationRate);
-}
-
-void CustomANN::addNeurons(float mutationRate) {
-	ANN::addNeurons(mutationRate);
-}
 
 void CustomANN::setFloatParameters(vector<float> values) {
 	// function can be used to manually set specific parameters
 	recurrentLayer[0]->setFloatParameters(values);
-}
-
-void CustomANN::removeNeurons(float mutationRate) {
-	ANN::removeNeurons(mutationRate);
-}
-
-void CustomANN::changeNeurons(float mutationRate) { // debugging required
-	ANN::changeNeurons(mutationRate);
 }
 
 void CustomANN::mutate(float mutationRate) {
@@ -153,16 +154,10 @@ void CustomANN::mutate(float mutationRate) {
 	for (int i = 0; i < recurrentLayer.size(); i++) {
 		recurrentLayer[i]->mutate(mutationRate);
 	}
-//	mutateConnections(mutationRate);
-//	addNeurons(mutationRate);
-//	removeNeurons(mutationRate);
-//	changeNeurons(mutationRate);	
-//	checkConnections(); 
-//	changeConnectionIDToPointer();
 }
 
 shared_ptr<Control> CustomANN::clone() const {
-	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);
+	shared_ptr<CustomANN> newANN = make_unique<CustomANN>(*this);  //make_unique
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
@@ -175,11 +170,10 @@ shared_ptr<Control> CustomANN::clone() const {
 	for (int i = 0; i < this->outputLayer.size(); i++) {
 		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
 	}
+	newANN->checkConnections();
+	newANN->changeConnectionIDToPointer();
+	newANN->flush(); // flush
 	return newANN;
-}
-
-void CustomANN::printNeuronValues() {
-	ANN::printNeuronValues();
 }
 
 stringstream CustomANN::getControlParams() {
@@ -190,16 +184,8 @@ void CustomANN::setControlParams(vector<string> values) {
 	ANN::setControlParams(values);
 }
 
-void CustomANN::cloneControlParameters(shared_ptr<Control> parent) {
-	ANN::cloneControlParameters(parent);
-}
-
 void CustomANN::changeConnectionIDToPointer() {
 	ANN::changeConnectionIDToPointer();
-}
-
-void CustomANN::changeConnectionPointerToID() {
-	ANN::changeConnectionPointerToID();
 }
 
 bool CustomANN::checkControl(vector<string> values) {

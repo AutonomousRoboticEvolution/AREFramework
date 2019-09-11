@@ -3,6 +3,8 @@
 #include <cmath>
 
 
+
+
 ER_CPPN_Interpreter::ER_CPPN_Interpreter()
 {
 	modular = true;
@@ -20,7 +22,11 @@ void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
 	position[0] = x;
 	position[1] = y;
 	position[2] = z;
-	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
+	positionFirstObject[0] = x;
+	positionFirstObject[1] = y;
+	positionFirstObject[2] = z;
+	create();
+//	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
 }
 
 bool ER_CPPN_Interpreter::checkJointModule() {
@@ -40,8 +46,6 @@ void ER_CPPN_Interpreter::printSome() {
 
 bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
 	bool collision = true;
-//	cout << "objectHandles.size = " << module->objectHandles.size() << endl;
-//	cout << "createdModules.size = " << createdModules.size()  << endl;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
 			for (int i = 0; i < createdModules.size() - 1; i++) {
@@ -183,9 +187,12 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 				createdParentNumber = n;
 			}
 		}
-		if (createdModules.size() < settings->maxAmountModules) {
+		if (settings->verbose) {
+			cout << "i: " << i << endl;
+		}
+		if (createdModules.size() < settings->maxNumberModules) {
 			if (modules[i]->parentModulePointer != NULL && createdParentNumber > -1 && createdModules[createdParentNumber] != NULL) {
-				if (genome->moduleParameters[parentNr]->expressed == true) {
+				if (genome->moduleParameters[parentNr]->expressed == true) { // Return if the module is not expressed. 
 					if (createdModules[createdParentNumber]->siteConfigurations.size() == 0) {
 					//	cout << "state " << createdModules[createdParentNumber]->state << ",";
 					//	cout << "id " << createdModules[createdParentNumber]->moduleID << ",";
@@ -267,7 +274,7 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 		cout << "shifting robot position" << endl;
 	}
 	if (createdModules[0]->type != 8) {
-		shiftRobotPosition();
+		Development::shiftRobotPosition();
 	}
 //	float pos[3];
 //	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
@@ -325,7 +332,7 @@ void ER_CPPN_Interpreter::init() {
 	genome->moduleParameters[0]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
 	genome->moduleParameters[0]->control->init(1, 1, 1);
 	if (settings->verbose) {
-		cout << "quereuing cppn" << endl;
+		cout << "querying cppn" << endl;
 	}
 	for (int i = 0; i < maxIterations; i++)
 	{
@@ -367,42 +374,33 @@ void ER_CPPN_Interpreter::init() {
 					inputs.push_back(genome->moduleParameters[n]->orientation / 4);
 					inputs.push_back(genome->moduleParameters[n]->parentSite / genome->moduleParameters[n]->maxChilds);
 					inputs.push_back(i / maxIterations);
-					//cout << "updating cppn" << endl;
+					// cout << "updating cppn" << endl;
 					vector<float> moduleTypeFloat = cppn->update(inputs);
-					//cout << "cppn updated" << endl;
+					// cout << "cppn updated" << endl;
 					if (moduleTypeFloat[5] > 0.5) {
 						// only create module if output is above certain threshold
-						int typeM = (int)moduleTypeFloat[0] * (moduleAmount - 1);
+						int typeM = (int)(moduleTypeFloat[0] * (moduleAmount - 1));
 						if (typeM < 0) {
 							typeM = 0;
 						}
-						//cout << "typeM:  " << typeM << endl;
+						// cout << "typeM:  " << typeM << endl;
 						int mt = settings->moduleTypes[typeM];
 						genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 						genome->moduleParameters[genome->moduleParameters.size() - 1]->type = mt;
-						//genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
+						// genome->moduleParameters[n]->childSiteStates[m] = settings->moduleTypes[(int)((moduleAmount + 1) * moduleTypeFloat[0]) - (1.0 / (moduleAmount + 1))];
 						int mn = genome->moduleParameters.size() - 1;
-						//cout << "GHerp: " << mn << endl;
-						if (settings->moduleTypes[typeM] == 4 || settings->moduleTypes[typeM] == 9) {
-							genome->moduleParameters[mn]->maxChilds = 3;
+						if (settings->moduleTypes[typeM] != 17) {
+							genome->moduleParameters[mn]->maxChilds = getMaxChilds(settings->moduleTypes[typeM]);
 						}
-						else if (settings->moduleTypes[typeM] == 6 || settings->moduleTypes[typeM] == 3) {
-							genome->moduleParameters[mn]->maxChilds = 0;
-						}
-						else if (settings->moduleTypes[typeM] == 1) {
-							genome->moduleParameters[mn]->maxChilds = 5;
-						}
-						else {
-							genome->moduleParameters[mn]->maxChilds = 3;
-						}
-						//						genome->moduleParameters[mn]->currentState = n;
+
+						// genome->moduleParameters[mn]->currentState = n;
 						genome->moduleParameters[mn]->parent = n;
 						genome->moduleParameters[mn]->parentSite = m;
 						int ori = (int)(floor(moduleTypeFloat[1] * 3.99));
 						if (ori < 0) { 
 							ori = 0; 
 						}
-						//cout << "ORI:" << ori << endl;
+						// cout << "ORI:" << ori << endl;
 						genome->moduleParameters[mn]->orientation = ori;
 						genome->moduleParameters[mn]->control = cf->createNewControlGenome(1, randomNum, settings);
 						genome->moduleParameters[mn]->control->init(1, 1, 1);
@@ -452,33 +450,27 @@ shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
 	return ur;
 }
 
-void ER_CPPN_Interpreter::update() {	
-//	vector<float> input;
-//	for (int i = 0; i < createdModules.size(); i++) {
-//		createdModules[i]->updateModule(input);
-//	}
-//	checkForceSensors(); 
-	vector<float> input;
+void ER_CPPN_Interpreter::update() {
+	vector<float> input; /// You can add any input values to this vector if needed
 	for (int i = 0; i < createdModules.size(); i++) {
-		//float outputModule = 
-		vector<float> moduleInput;
+		vector<float> moduleOutput;
 		if (settings->controlType == settings->ANN_CUSTOM) {
 			createdModules[i]->updateModule(input);
-			moduleInput.push_back(0.0);
+            moduleOutput.push_back(0.0);
 		}
 		if (settings->controlType == settings->ANN_DEFAULT) {
 			createdModules[i]->updateModule(input);
-			moduleInput.push_back(0.0);
+            moduleOutput.push_back(0.0);
 		}
 		if (settings->controlType == settings->ANN_DISTRIBUTED_UP
 			|| settings->controlType == settings->ANN_DISTRIBUTED_DOWN
 			|| settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
-			moduleInput = createdModules[i]->updateModule(input);
+            moduleOutput = createdModules[i]->updateModule(input);
 		}
 		if (settings->controlType == settings->ANN_DISTRIBUTED_UP) {
 			if (createdModules[i]->parentModulePointer) { // if a parent pointer is stored
 				int parent = createdModules[i]->parent;
-				createdModules[i]->parentModulePointer->addInput(moduleInput);
+				createdModules[i]->parentModulePointer->addInput(moduleOutput);
 				//	createdModules[i]->addInput(createdModules[parent]->moduleOutput);
 			}
 		}
@@ -491,7 +483,7 @@ void ER_CPPN_Interpreter::update() {
 		else if (settings->controlType == settings->ANN_DISTRIBUTED_BOTH) {
 			if (createdModules[i]->parentModulePointer) { // if a parent pointer is stored
 				//int parent = createdModules[i]->parent;
-				createdModules[i]->parentModulePointer->addInput(moduleInput);
+				createdModules[i]->parentModulePointer->addInput(moduleOutput);
 				createdModules[i]->addInput(createdModules[i]->parentModulePointer->moduleOutput);
 			}
 		}
@@ -504,20 +496,12 @@ void ER_CPPN_Interpreter::update() {
 void ER_CPPN_Interpreter::updateColors() {
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
-		float alpha = createdModules[0]->energy;
-		if (alpha > 1.0) {
-			alpha = 1.0;
-		}
-		else if (alpha < 0.4) {
-			alpha = 0.4;
-		}
-		//	cout << "alpha = " << alpha << endl;
-		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, alpha);
+		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 
 void ER_CPPN_Interpreter::setColors() {
-	for (int i = 0; i < genome->amountModules; i++) {
+	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
 		float yellow[3] = { 1.0, 1.0, 0.0 };
@@ -589,14 +573,6 @@ void ER_CPPN_Interpreter::create() {
 	checkJointModule(); // quits simulator when no joint found. 
 }
 
-int ER_CPPN_Interpreter::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
-	}
-	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
-	}
-}
 
 void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
 {
@@ -651,95 +627,6 @@ float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
 	return (1 / areaX * areaBound);
 }
 
-void ER_CPPN_Interpreter::shiftRobotPosition() {
-	float minimumObjectPos = 5.0;
-	for (int i = 0; i < createdModules.size(); i++) {
-		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
-			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
-				float objectOrigin[3];
-				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
-				float size[3];
-				float rotationOrigin[3] = { 0,0,0 };
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
-				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
-				}
-
-				vector<vector<float>> cubeVertex; // 8 points in 3d space
-				vector<vector<float>> points;
-				points.resize(8);
-
-				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
-
-				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
-				//for (int i = 0; i < 12; i++) {
-				//	cout << objectMatrix[i] << ", ";
-				//} cout << endl;
-
-				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
-
-				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
-				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
-				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
-				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
-				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
-
-				vector<vector<float>> rotatedPoints;
-				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
-					}
-				}
-			}
-		}
-	}
-	float tmpPos[3];
-	float newRobotPos[3];
-	mainHandle = getMainHandle();
-	simGetObjectPosition(mainHandle, -1, tmpPos);
-	newRobotPos[0] = tmpPos[0];
-	newRobotPos[1] = tmpPos[1];
-	newRobotPos[2] = -minimumObjectPos + 0.001;
-	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
-	float postpos[3];
-	simGetObjectPosition(mainHandle, -1, postpos);
-	if (settings->verbose) {
-		cout << "postpos: " << postpos[2] << endl;
-	}
-}
 
 bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	float objectOrigin[3];

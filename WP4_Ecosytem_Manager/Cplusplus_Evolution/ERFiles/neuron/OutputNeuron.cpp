@@ -61,3 +61,9 @@ void OutputNeuron::setNeuronParams(vector<string> values) {
 bool OutputNeuron::checkNeuron(vector<string> values) {
 	return Neuron::checkNeuron(values);
 }
+
+void OutputNeuron::flush()
+{
+	input = 0.0;
+	output = 0.0;
+}

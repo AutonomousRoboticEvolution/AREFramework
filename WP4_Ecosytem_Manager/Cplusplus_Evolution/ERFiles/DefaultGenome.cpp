@@ -9,8 +9,6 @@ DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 	randomNum = rn;
 	settings = st;
 	genomeFitness = 0;
-	maxAge = settings->maxAge;
-	age = 0;
 }
 
 DefaultGenome::~DefaultGenome() {
@@ -24,7 +22,9 @@ DefaultGenome::~DefaultGenome() {
 
 shared_ptr<Genome> DefaultGenome::clone() const
 {
-	return make_unique<DefaultGenome>(*this);
+	shared_ptr<DefaultGenome> genome = make_unique<DefaultGenome>(*this);
+	genome->morph = this->morph->clone();
+	return genome;
 }
 
 void DefaultGenome::createInitialMorphology(int individualNumber) {
@@ -112,13 +112,13 @@ bool DefaultGenome::loadMorphologyGenome(std::istream &input, int indNum) {
 }
 
 void DefaultGenome::loadBaseMorphology(int indNum, int sceneNum) {
-	// This is an old piece of code that I didn't want to delete yet. 
+	// This is an old piece of code that I didn't want to delete yet.
 	cout << "about to load base morphology" << endl;
 	morph->loadBaseMorphology(indNum, sceneNum);
 }
 
 void DefaultGenome::init_noMorph() {
-	// For debugging. Shouldn't be used otherwise. 
+	// For debugging. Shouldn't be used otherwise.
 	int m_type = settings->morphologyType;
 	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
@@ -153,9 +153,9 @@ void DefaultGenome::init() {
 void DefaultGenome::mutate() {
 	if (morph == NULL) {
 		cout << "ERROR: morph == NULL" << endl;
-	}	
+	}
 	// TODO: The morphology mutation rate should be gathered from the settings file in the mutate function?
-	morph->mutate(); 
+	morph->mutate();
 }
 
 void DefaultGenome::create() {
@@ -167,5 +167,5 @@ void DefaultGenome::createAtPosition(float x, float y, float z){
 }
 
 void DefaultGenome::clearGenome() {
-	morph->clearMorph(); 
+	morph->clearMorph();
 }

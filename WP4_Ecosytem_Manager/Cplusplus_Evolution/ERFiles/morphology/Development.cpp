@@ -62,9 +62,6 @@ void Development::saveGenome(int indNum, float fitness)
 	genomeFile.close();
 }
 
-float Development::callFitness() {
-	return fitness;
-}
 
 bool Development::loadGenome(int individualNumber, int sceneNum)
 {
@@ -130,10 +127,21 @@ int Development::getMaxChilds(int t) {
 	else if (t == 1) {
 		return 5;
 	}
-	else {
-		return 3;
+	else if (t == 14 || t == 15) {
+		return 0;
 	}
-	
+	else if (t == 16 || t == 18) {
+		return 1;
+	}
+	else if (t == 17) {
+		return 5;
+	}
+	else if (t == 13) {
+		return 20;
+	}
+	else {
+		return 0;
+	}
 }
 
 //vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
@@ -148,32 +156,42 @@ void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> created
 	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountExpressedModules = createdModules.size();
 	
-	ofstream genomeFile;
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
+	ofstream phenotypeFile;
+	ostringstream phenotypeFileName;
+	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
 
-	genomeFile.open(genomeFileName.str());
-	genomeFile << "#Individual:" << indNum << endl;
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
+	phenotypeFile.open(phenotypeFileName.str());
+	phenotypeFile << "#Individual:" << indNum << endl;
+	phenotypeFile << "#Fitness:," << fitness << endl;
+	phenotypeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
 	//	cout << "#AmountStates:," << amountStates << "," << endl << endl;
 
-	genomeFile << "Module Parameters Start Here: ," << endl << endl;
+	phenotypeFile << "Module Parameters Start Here: ," << endl << endl;
 	for (int i = 0; i < createdModules.size(); i++) {
-		genomeFile << "#Module:," << i << endl;
-		genomeFile << "#ModuleType:," << createdModules[i]->type << endl;
+		phenotypeFile << "#Module:," << i << endl;
+		phenotypeFile << "#ModuleType:," << createdModules[i]->type << endl;
 		
-		genomeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
-		genomeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
-		genomeFile << "#Orientation:," << createdModules[i]->orientation << endl;
+		phenotypeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
+		phenotypeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
+		phenotypeFile << "#Orientation:," << createdModules[i]->orientation << endl;
 
-		genomeFile << "#ControlParams:," << endl;
-		genomeFile << createdModules[i]->control->getControlParams().str();
-		genomeFile << "#EndControlParams" << endl;
-		genomeFile << "#EndOfModule," << endl << endl;
+		// TODO: EB: This shouldn't be here. This offsets the coordinates so it can be printabled.
+        if(createdModules[i]->absPos[0] > 0) createdModules[i]->absPos[0] += 0.003;
+        else createdModules[i]->absPos[0] -= 0.003;
+        if(createdModules[i]->absPos[1] > 0) createdModules[i]->absPos[1] += 0.003;
+        else createdModules[i]->absPos[1] -= 0.003;
+        createdModules[i]->absPos[2] += 0.002;
+
+        phenotypeFile << "#AbsPosition:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
+        phenotypeFile << "#AbsOrientation:," << createdModules[i]->absOri[0] << "," << createdModules[i]->absOri[1] << "," << createdModules[i]->absOri[2] << std::endl;
+
+		phenotypeFile << "#ControlParams:," << endl;
+		phenotypeFile << createdModules[i]->control->getControlParams().str();
+		phenotypeFile << "#EndControlParams" << endl;
+		phenotypeFile << "#EndOfModule," << endl << endl;
 	}
-	genomeFile << "End Module Parameters" << endl;
-	genomeFile.close();
+	phenotypeFile << "End Module Parameters" << endl;
+	phenotypeFile.close();
 }
 
 std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
@@ -181,15 +199,15 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 	cout << "loading direct phenotype genome " << endl << "-------------------------------- " << endl;
 
 	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
-	ostringstream genomeFileName;
-	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
-	//	genomeFileName << "files/morphologies0/genome9137.csv";
-	cout << genomeFileName.str() << endl;
-	ifstream genomeFile(genomeFileName.str());
+	ostringstream phenotypeFileName;
+	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
+	//	phenotypeFileName << "files/morphologies0/genome9137.csv";
+	cout << phenotypeFileName.str() << endl;
+	ifstream phenotypeFile(phenotypeFileName.str());
 	string value;
 	list<string> values;
-	while (genomeFile.good()) {
-		getline(genomeFile, value, ',');
+	while (phenotypeFile.good()) {
+		getline(phenotypeFile, value, ',');
 		//		cout << value << ",";
 		if (value.find('\n') != string::npos) {
 			split_line(value, "\n", values);
@@ -311,20 +329,137 @@ int Development::mutateControlERLGenome(float mutationRate) {
 }
 
 void Development::create() {
-
+    cout << "CANNOT CREAT DEVELOPMENT GENOME" << endl;
 }
 
 void Development::mutate() {
 	mutateERLGenome(settings->morphMutRate);
 }
 
-int Development::getMainHandle() {
-	if (createdModules.size() > 0) {
-		return createdModules[0]->objectHandles[1];
+void Development::updateCreatedModules() {
+	// TODO temporary location of function below
+	for (int i = 0; i < createdModules.size(); i++) {
+		if (createdModules[i]->parentModulePointer) {
+			createdModules[i]->parentModulePointer->updateMorph(createdModules[i]->parentSite);
+		}
+	}
+}
+
+void Development::shiftRobotPosition() {
+	updateCreatedModules();
+
+	float minimumObjectPos = 50.0;
+	float minimumYObjectPosition = 50.0;
+	float minimumXObjectPosition = 50.0;
+	for (int i = 0; i < createdModules.size(); i++) {
+		for (int n = 0; n < createdModules[i]->objectHandles.size(); n++) {
+			if (simGetObjectType(createdModules[i]->objectHandles[n]) == sim_object_shape_type) {
+				float objectOrigin[3];
+				simGetObjectPosition(createdModules[i]->objectHandles[n], -1, objectOrigin);
+				float size[3];
+				float rotationOrigin[3] = { 0,0,0 };
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
+				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
+				for (int i = 0; i < 3; i++) {
+					size[i] = size[i] * 2;
+				}
+
+				vector<vector<float>> cubeVertex; // 8 points in 3d space
+				vector<vector<float>> points;
+				points.resize(8);
+
+				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
+
+				simGetObjectMatrix(createdModules[i]->objectHandles[n], -1, objectMatrix);
+
+				points[0].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[0].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[0].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[1].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[1].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[1].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[2].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[2].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[2].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[3].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[3].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[3].push_back(rotationOrigin[2] + (0.5 * size[2]));
+
+				points[4].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[4].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[4].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[5].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[5].push_back(rotationOrigin[1] + (0.5 * size[1]));
+				points[5].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[6].push_back(rotationOrigin[0] - (0.5 * size[0]));
+				points[6].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[6].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				points[7].push_back(rotationOrigin[0] + (0.5 * size[0]));
+				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
+				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
+
+				vector<vector<float>> rotatedPoints;
+				rotatedPoints.resize(8);
+				for (int i = 0; i < 8; i++) {
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
+					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
+					rotatedPoints[i][0] += objectOrigin[0];
+					rotatedPoints[i][1] += objectOrigin[1];
+					rotatedPoints[i][2] += objectOrigin[2];
+					if (rotatedPoints[i][2] < minimumObjectPos) {
+						minimumObjectPos = rotatedPoints[i][2];
+					}
+					if (rotatedPoints[i][1] < minimumYObjectPosition) {
+						minimumYObjectPosition = rotatedPoints[i][1];
+					}
+					if (rotatedPoints[i][0] < minimumXObjectPosition) {
+						minimumXObjectPosition = rotatedPoints[i][0];
+					}
+				}
+			}
+		}
+	}
+	float tmpPos[3];
+	float newRobotPos[3];
+	mainHandle = getMainHandle();
+	simGetObjectPosition(mainHandle, -1, tmpPos);
+	if (settings->environmentType == settings->ROUGH) {
+		if (settings->verbose) {
+            cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+        }
+	    newRobotPos[0] = tmpPos[0];
+		newRobotPos[1] = tmpPos[1];
+		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.35;
+		cout << "newRobotPos = " << newRobotPos[2] << endl;
+		cout << "obPos = " << minimumObjectPos << endl;
 	}
 	else {
-		cout << "ERROR: No module could be created, check initial position of the first module. " << endl;
+		newRobotPos[0] = tmpPos[0];
+		newRobotPos[1] = tmpPos[1];
+		newRobotPos[2] = -minimumObjectPos + 0.001;
 	}
+
+	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
+	//	float postpos[3];
+	//	simGetObjectPosition(mainHandle, -1, postpos);
+	//	cout << "postpos: " << postpos[2] << endl;
+}
+
+int Development::getMainHandle() {
+    if (createdModules.size() > 0) {
+        return createdModules[0]->moduleHandle;
+    }
+    else {
+        std::cerr << "ERROR: No module could be created, check initial position of the first module. " << endl;
+    }
 }
 
 vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles) {

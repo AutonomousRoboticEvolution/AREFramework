@@ -7,29 +7,43 @@
  */
 Settings::Settings() {
 	// set default module parameters
-	moduleTypes.push_back(1);
-	moduleTypes.push_back(4);
-	moduleTypes.push_back(4);
-	moduleTypes.push_back(4);
-	moduleTypes.push_back(4);
-
+	// 1: Cube
+	// 4: Servo Module
+	// 13: Brain (not very useful now)
+	// 14: wheel
+	// 15: sensor 
+	// 16: servo
+	// 17: bone
+	// 18: example
+	// This defines what components to use.
+	moduleTypes.push_back(13);
+	moduleTypes.push_back(14);
+	//moduleTypes.push_back(15);
+	moduleTypes.push_back(17);
+	autoDeleteSettings = true;
+    // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		vector <int> tmpMaxModuleTypes;
 		tmpMaxModuleTypes.push_back(moduleTypes[i]);
-		tmpMaxModuleTypes.push_back(50);
+		if (i == 0) {
+            tmpMaxModuleTypes.push_back(0);
+        }
+		else {
+            tmpMaxModuleTypes.push_back(50); // By default maximum number of components is 50
+        }
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
 	}
-	maxModuleTypes[0][1] = 100; // one base module
-	maxAmountModules = 20;
-	morphologyType = MODULAR_LSYSTEM;// CUSTOM_MORPHOLOGY; // MODULAR_DIRECT;
-	// morphologyType = TISSUE_DIRECT;
-	controlType = ANN_CUSTOM;
-	populationSize = 20;
+
+	maxNumberModules = 20;
+	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
+	morphologyType = MODULAR_DIRECT;
+	environmentType = DEFAULT_ENV;
+	controlType = ANN_DEFAULT;
+	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?
-//	environmentType = ENV_SWITCHOBJECTIVE;
 //	controlType = ANN_DEFAULT;
-	verbose = false;
+	verbose = true;
 	//verbose = true;
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
@@ -37,17 +51,25 @@ Settings::Settings() {
 	evolutionType = STEADY_STATE;
 	seed = 0;
 //	instanceType = INSTANCE_REGULAR;
-	morphMutRate = 0.004;
-	mutationRate = 0.004;
+	morphMutRate = 0.1;
+	mutationRate = 0.1;
 	maxGeneration = 600;
 	initialAmountConnectionsNeurons = 1;
 	maxAddedNeurons = 2;
 	xGenerations = 50;
-	savePhenotype = false;
+	savePhenotype = true;
 	sendGenomeAsSignal = true;
 	shouldReopenConnections = true;
 	killWhenNotConnected = true;
-	colorization = COLOR_LSYSTEM;
+	colorization = COLOR_NEURALNETWORK;
+	createPatternNeurons = false;
+	maxTorque_ForceSensor = 1000000;
+	maxForce_ForceSensor = 1000000;
+	consecutiveThresholdViolations = 1000;
+    bOrgansAbovePrintingBed = false;
+    bCollidingOrgans = false;
+    bNonprintableOrientations = false;
+    bAnyOrgansNumber = false;
 	//repository="files";
 }
 
@@ -74,29 +96,17 @@ void Settings::split_line(string& line, string delim, list<string>& values)
 	}
 }
 
-void Settings::openPort() {
-	// deprecated
-	//packetHandler1 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION1);
-	//packetHandler2 = dynamixel::PacketHandler::getPacketHandler(PROTOCOL_VERSION2);
-	//char *dev_name = (char*)DEVICENAME;
-	//portHandler = dynamixel::PortHandler::getPortHandler(dev_name);
-
-	//if (portHandler->openPort())
-	//{
-	//	printf("Succeeded to open the port!\n\n");
-	//	printf(" - Device Name : %s\n", dev_name);
-	//	printf(" - Baudrate    : %d\n\n", portHandler->getBaudRate());
-	//}
-	//else
-	//{
-	//	printf("Failed to open the port! [%s]\n", dev_name);
-	//	printf("Press any key to terminate...\n");
-	//	//		getch();
-	//}
-}
-
 void Settings::readSettings() {
 	bool fileExists = false;
+	if (autoDeleteSettings == true) {
+		// check if settings file exists and delete if present
+		ofstream settingsFile;
+		settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
+		fileExists = settingsFile.good();
+		settingsFile.close();
+		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
+		return;
+	}
 	std::cout << "sceneNum = " << sceneNum << std::endl;
 	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
 	string morphType;
@@ -345,8 +355,8 @@ void Settings::readSettings() {
 					morphologyType = TISSUE_GMX;
 					break;
 				}
-					cout << "=====================================" << endl;
-				}
+                cout << "=====================================" << endl;
+            }
 
 			//if (tmp == "#morphologyType") { // later
 			//	it++;
@@ -553,20 +563,20 @@ void Settings::readSettings() {
 				energyDissipationRate = atof(tmp.c_str());
 			}
 
-			else if (tmp == "#amountModules") {
+			else if (tmp == "#numberOfModules") {
 				it++;
 				tmp = *it;
-				amountModules = atoi(tmp.c_str());
+				numberOfModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#useVarModules") {
 				it++;
 				tmp = *it;
 				useVarModules = atoi(tmp.c_str());
 			}
-			else if (tmp == "#maxAmountModules") {
+			else if (tmp == "#maxNumberModules") {
 				it++;
 				tmp = *it;
-				maxAmountModules = atoi(tmp.c_str());
+				maxNumberModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#maxForceModules") {
 				cout << "found max force modules" << endl;
@@ -582,7 +592,7 @@ void Settings::readSettings() {
 			}
 			else if (tmp == "#moduleTypes") {
 				moduleTypes.clear();
-				for (int i = 0; i < amountModules; i++) {
+				for (int i = 0; i < numberOfModules; i++) {
 					it++;
 					tmp = *it;
 					moduleTypes.push_back(atoi(tmp.c_str()));
@@ -592,7 +602,7 @@ void Settings::readSettings() {
 				maxModuleTypes.clear();
 				vector<int> tmpTypes;
 
-				for (int i = 0; i < amountModules; i++) {
+				for (int i = 0; i < numberOfModules; i++) {
 					it++;
 					tmp = *it;
 					vector<int> tmpMaxMods;
@@ -602,6 +612,50 @@ void Settings::readSettings() {
 					tmpMaxMods.clear();
 				}
 			}
+            else if (tmp == "#collidingorgans") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bCollidingOrgans = false;
+                }
+                else {
+                    bCollidingOrgans = true;
+                }
+                std::cout << "Viability: Colliding organs - " << bCollidingOrgans << std::endl;
+            }
+            else if (tmp == "#organsbelowprintingbed") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bOrgansAbovePrintingBed = false;
+                }
+                else {
+                    bOrgansAbovePrintingBed = true;
+                }
+                std::cout << "Viability: Organs above printing bed - " << bOrgansAbovePrintingBed << std::endl;
+            }
+            else if (tmp == "#nonprintableorientations") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bNonprintableOrientations = false;
+                }
+                else {
+                    bNonprintableOrientations = true;
+                }
+                std::cout << "Viability: Organs above printing bed - " << bNonprintableOrientations << std::endl;
+            }
+            else if (tmp == "#anynumberoforgans") {
+                it++;
+                tmp = *it;
+                if (atoi(tmp.c_str()) == 0) {
+                    bAnyOrgansNumber = false;
+                }
+                else {
+                    bAnyOrgansNumber = true;
+                }
+                std::cout << "Viability: Organs above printing bed - " << bNonprintableOrientations << std::endl;
+            }
 			fileExists = true;
 		}
 	}
@@ -637,9 +691,15 @@ void Settings::saveSettings() {
 	settingsFile << ",#bestIndividual," << bestIndividual << endl; // set when saving
 	settingsFile << ",#initialSeed," << seed << "," << endl;
 	settingsFile << ",#verbose," << verbose << "," << endl;
-	settingsFile << ",#amountModules," << amountModules << "," << endl; // not used
 	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
-	settingsFile << ",#maxAmountModules," << maxAmountModules << "," << endl;
+	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << endl;
+
+	// Viability
+    settingsFile << ",#collidingorgans," << bCollidingOrgans << "," << endl;
+    settingsFile << ",#organsbelowprintingbed," << bOrgansAbovePrintingBed << "," << endl;
+    settingsFile << ",#nonprintableorientations," << bNonprintableOrientations << "," << endl;
+    settingsFile << ",#anynumberoforgans," << bAnyOrgansNumber << "," << endl;
+
 	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
 	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
 
@@ -647,13 +707,14 @@ void Settings::saveSettings() {
 	settingsFile << ",#maxForceSensorModules," << maxForceSensor << "," << endl;
 	settingsFile << ",#repository," << repository << "," << endl;
 
+    settingsFile << ",#numberOfModules," << numberOfModules << "," << endl; // not used
 	settingsFile << ",#moduleTypes,";
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		settingsFile << moduleTypes[i] << ",";
 	} settingsFile << endl;
 
 	settingsFile << ",#maxAmountModulesTypes,";
-	for (int i = 0; i < moduleTypes.size(); i++) {
+	for (int i = 0; i < maxModuleTypes.size(); i++) {
 		settingsFile << maxModuleTypes[i][1] << ",";
 	}	settingsFile << endl;
 
@@ -670,4 +731,9 @@ void Settings::saveSettings() {
 	settingsFile << endl;
 
 	settingsFile.close();
+}
+
+void Settings::setRepository(std::string repository) {
+    this->repository = repository;
+    std::cout << "setting repository to " << repository << std::endl;
 }

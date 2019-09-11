@@ -14,7 +14,6 @@ public:
 	ER_DirectEncodingInterpreter();
 	~ER_DirectEncodingInterpreter();
 	bool checkJointModule();
-	vector<shared_ptr<ER_Module> > createdModules;
 
 	void init();
 	void create();
@@ -33,7 +32,6 @@ public:
 	shared_ptr<Morphology> clone() const;
 
 	void printSome();
-	int getMainHandle();
 
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 	void initCustomMorphology();
@@ -47,10 +45,20 @@ public:
 	vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
-	void shiftRobotPosition();
+	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;
+
+	/// Viability methods
+    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
+	bool bCheckCollision(int iParentHandle, int createdModulesSize);
+    /// Check for ground. If object is above the ground, it can be created
+    bool bCheckGround(int createdModulesSize);
+    /// Check for orientation. If the orientation of the organ is printable
+    bool bCheckOrientation(int createdModulesSize);
+    /// Check of number of organs.
+    bool bCheckOrgansNumber(int createdModulesSize);
 
 	void setPhenValue();
 	void savePhenotype(int ind, float fitness);
