@@ -13,7 +13,6 @@ def makeFile(location="BRL"):
 	# location specific variables:
 	if location == "BRL":
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.02 / 1000 , -0.67789 , 0.748-0.0005 , math.radians(180),0,0 ]).tolist() #6.315
-		# ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.5 / 1000 , -0.679 , 0.7485 , math.radians(180),0,0 ]).tolist() # 0.749
 		PRINTER_1_ORIGIN = makeTransform( [ 0.3345 , 0.106, 0.0819 , 0 , 0 , math.radians( -90 ) ] ) .tolist()
 		CABLE_BANK_1_ORIGIN = (makeTransform([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90) ]) * makeTransform([-0.002,-0.001,-0.005]) ).tolist()
 		ORGAN_BANK_1_ORIGIN = makeTransform([-0.400 , -0.1598 , -7.4/1000 , 0 , 0 ,math.radians(90) ]).tolist()

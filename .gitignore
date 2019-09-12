@@ -5,3 +5,7 @@
 .DS_Store
 html/
 latex/
+
+*/__pycache__/
+*/.idea/*
+RoboFab/Documentation/*

@@ -32,7 +32,7 @@ class UR5Robot:
         self.disableServoOnFinish = configurationData ["UR5"] ["disableServoOnFinish"]
 
         # connect to the remote controlled gripper via arduino:
-        self.gripper = gripperHandler (configurationData["gripper"])
+        self.gripper = GripperHandler ( configurationData[ "gripper" ] )
 
         # Set up ethernet connection to the UR5 control box:
         laptopAddress = configurationData ["network"] ["COMPUTER_ADDRESS"]
@@ -630,7 +630,7 @@ class UR5Robot:
         self.setMoveSpeed ( self.speedValueNormal )
 
 
-class gripperHandler:
+class GripperHandler:
 
     def __init__ ( self, configurationData ):
 

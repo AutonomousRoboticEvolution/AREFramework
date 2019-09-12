@@ -1,15 +1,19 @@
+## code for establishing an ssh connection to a specific robot, sending the controller to it and starting the controller
+
 import paramiko
 import time
+from helperFunctions import debugPrint
 
+## create an object for the ssh communication with a particular robot.
+# Input ip_address should be a string of the individual robot's IP address, e.g. "192.168.20.101"
 class RobotConnection:
     def __init__(self, ip_address):
         # try:
         # Establish communication
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        # self.ssh_client.connect(hostname=ip_address, username='pi', password='raspberry')
         self.ssh_client.connect(hostname=ip_address, username='pi', password='raspberry')
-        print("Communication ESTABLISHED with robot")
+        debugPrint("Communication ESTABLISHED with robot",messageVerbosity=1)
         self.isConnected = True
         # except:
         #     print("ERROR establishing communication with robot")
@@ -26,12 +30,12 @@ class RobotConnection:
     ## Start program in robot
     def robotStart(self, name):
         if self.isConnected:
-            print("Transferring controller")
+            debugPrint("Transferring controller",messageVerbosity=2)
             ftp_client = self.ssh_client.open_sftp()
             ftp_client.put('./controllers/' + str(name) + '.csv',
                            'genome.csv')
             ftp_client.close()
-            print("Robot starting")
+            debugPrint("Robot starting",messageVerbosity=2)
             stdin, stdout, stderr = self.ssh_client.exec_command("./robot_controller_are")
         else:
             print("ERROR: Robot 1 is not connected")

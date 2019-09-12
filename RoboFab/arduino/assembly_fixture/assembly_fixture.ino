@@ -87,6 +87,9 @@ void loop() {
           findOrigin();
           Serial.write("OK\n");
           break;
+        default:
+          Serial.write("error\n");
+          break;
       }
     }
   }
@@ -266,7 +269,7 @@ void findOrigin(){
   }
   
 	//Position is now known, we are at the endstop, so set the home position
-  if(DEBUG) Serial.println("Found home");
+if(DEBUG) Serial.println("Found home");
   memRot = HOME_POSITION_DEG; //Ensure starting position is an offset from this location
 }
 
