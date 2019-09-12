@@ -58,5 +58,5 @@ cp "../WP4_Ecosytem_Manager/Cplusplus_Evolution/VREP_Files/Servo_Module.ttm" "${
 cp "WP4_Ecosytem_Manager/Cplusplus_Evolution/libv_repExtER.so" "${VREP_FOLDER}/"
 
 echo "STARTING MPI PROGRAM"
-echo mpirun -c ${MPI_NODES} WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
-exec mpirun -c ${MPI_NODES} WP4_Ecosytem_Manager/Cplusplus_Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
+echo mpirun -c ${MPI_NODES} vrepPluggin/Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
+exec mpirun -c ${MPI_NODES} vrepPluggin/Evolution/MPI/mpi_er ${VREP_EXE} ${SEED} ${REPOSITORY}
