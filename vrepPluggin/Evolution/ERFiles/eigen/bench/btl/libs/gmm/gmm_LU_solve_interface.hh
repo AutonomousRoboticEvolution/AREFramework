@@ -180,7 +180,7 @@ public :
       theSum -= matrix_vector_product_sliced(LU, X, i, i+1, N) ;
       //      theSum -= sum( LU( i, Range( i+1, toEnd ) )*X( Range( i+1, toEnd ) ) ) ;
       //      theSum -= sum( LU( i, Range( i+1, toEnd ) )*B( Range( i+1, toEnd ) ) ) ;
-      // Store a component of the solution vector :
+      // Store a module of the solution vector :
       X( i ) = theSum/LU( i, i ) ;
       //      B( i ) = theSum/LU( i, i ) ;
     }

@@ -8,7 +8,7 @@
 
 //***************************PROXIMITY SENSOR********************************//
 
-//Constructor for proximity sensor component of VCNL4040
+//Constructor for proximity sensor module of VCNL4040
 ProximitySensor::ProximitySensor(uint8_t address) : I2CDevice(address) {
 	//Just uses the I2CDevice constructor
 }
@@ -40,7 +40,7 @@ uint16_t ProximitySensor::read() {
 
 //*******************AMBIENT LIGHT SENSOR*********************************//
 
-//Constructor for ambient light sensor component of VCNL4040
+//Constructor for ambient light sensor module of VCNL4040
 AmbientLightSensor::AmbientLightSensor(uint8_t address) : I2CDevice(address) {
 	//Just uses the I2CDevice constructor
 }

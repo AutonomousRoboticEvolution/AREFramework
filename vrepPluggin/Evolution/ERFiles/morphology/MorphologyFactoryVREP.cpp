@@ -49,7 +49,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
             morph->settings = st;
             return morph;
         }
-        case 5: {
+        case 5: { 
             shared_ptr<Morphology> morph(new CustomMorphologyVREP);
             morph->randomNum = rn;
             morph->settings = st;
@@ -89,7 +89,7 @@ shared_ptr<Morphology> MorphologyFactoryVREP::createMorphologyGenome(int type, s
             shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
             return fixedBaseMorph;
         }
-	}
+	}	
 }
 
 shared_ptr<Morphology> MorphologyFactoryVREP::copyMorphologyGenome(shared_ptr<Morphology> parent)

@@ -73,7 +73,7 @@ set(SOURCES
     ERFiles/morphology/Morphology.cpp
     ERFiles/morphology/MorphologyFactory.cpp
     ERFiles/morphology/MorphologyFactoryVREP.cpp
-        ERFiles/neuron/CPGNeuron.cpp
+    ERFiles/neuron/CPGNeuron.cpp
     ERFiles/neuron/FunctionNeuron.cpp
     ERFiles/neuron/InputNeuron.cpp
     ERFiles/neuron/Neuron.cpp

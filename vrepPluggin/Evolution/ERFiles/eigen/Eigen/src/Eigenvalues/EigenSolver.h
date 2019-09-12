@@ -515,7 +515,7 @@ void EigenSolver<MatrixType>::doComputeEigenvectors()
       Scalar lastra(0), lastsa(0), lastw(0);
       Index l = n-1;
 
-      // Last vector component imaginary so matrix is triangular
+      // Last vector module imaginary so matrix is triangular
       if (abs(m_matT.coeff(n,n-1)) > abs(m_matT.coeff(n-1,n)))
       {
         m_matT.coeffRef(n-1,n-1) = q / m_matT.coeff(n,n-1);

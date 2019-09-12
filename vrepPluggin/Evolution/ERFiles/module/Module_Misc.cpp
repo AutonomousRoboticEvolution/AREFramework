@@ -29,7 +29,7 @@ int Module_Misc::mutate(float mutationRate) {
 
 
 int Module_Misc::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
-    // Load virtual component model
+    // Load virtual module model
 	int miscHandle = simLoadModel(("models/" + filename).c_str());
 	if (miscHandle < 0) {
 		std::cerr << "Error models/"+filename << std::endl;
@@ -114,7 +114,7 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	zeroPos[0] = 0.0;
 	zeroPos[1] = 0.0;
 	zeroPos[2] = 0.0;
-    // If the component is not brain assigne orientation and position to force sensor
+    // If the module is not brain assigne orientation and position to force sensor
     if (parentHandle == -1) {
         // TODO: Change function below in comments
         //simSetObjectPosition(miscHandle, NULL, zeroPos);
@@ -134,11 +134,11 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 
 	simRemoveObject(miscHandle); // TODO: EB: why are we doing this?
 	dummies.erase(dummies.begin());
-	// Get main handle of the component
+	// Get main handle of the module
 	miscHandle = shapes[0];
-	// Assign position and orientation of the component
+	// Assign position and orientation of the module
 
-    // If not brain assign force sensor as parent of the component
+    // If not brain assign force sensor as parent of the module
     if (parentHandle != -1) {
         simSetObjectParent(miscHandle, fs, true);
     }
