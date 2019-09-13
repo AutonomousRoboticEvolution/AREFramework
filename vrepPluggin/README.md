@@ -13,7 +13,7 @@ cmake ..
 make
 make install
 ```
-If you would like to use CLion IDE with this project please follow the instructions in the report. [Report](https://www.overleaf.com/8988212588bdkjhpfdtckz)
+If you would like to use CLion IDE with this project please follow the instructions in the [report](https://www.overleaf.com/8988212588bdkjhpfdtckz).
 
 ## Overall structure
 

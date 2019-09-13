@@ -18,8 +18,9 @@ Settings::Settings() {
 	// This defines what components to use.
 	moduleTypes.push_back(13);
 	moduleTypes.push_back(14);
-	//moduleTypes.push_back(15);
-	moduleTypes.push_back(17);
+	moduleTypes.push_back(15);
+	moduleTypes.push_back(16);
+    moduleTypes.push_back(17);
 	autoDeleteSettings = true;
     // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
