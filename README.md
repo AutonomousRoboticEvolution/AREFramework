@@ -1,6 +1,6 @@
 # Evolutionary Robotics Framework
 
-This directory contains all the necessary files to run evolution with C++ and V-REP as simulator.
+This project contains all the files necessary to run experiments for the Autonomous Robotics Evolution project.
 
 ## Installing
 
