@@ -44,9 +44,9 @@ fi
 mkdir -p build
 cd build
 
-# if on FEDORA cmake fails, run the command 
+# if on FEDORA cmakeModules fails, run the command
 #$ module load mpi/openmpi-x86_64
-cmake ..
+cmakeModules ..
 make
 
 # mkdir -p "${REPOSITORY}/morphologies${SEED}"

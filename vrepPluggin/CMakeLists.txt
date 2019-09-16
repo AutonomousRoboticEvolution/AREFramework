@@ -1,7 +1,0 @@
-cmake_minimum_required(VERSION 3.0)
-project(ER)
-if (RASPBERRY)
-    add_subdirectory(Raspberry)
-else()
-    add_subdirectory(Evolution)
-endif()

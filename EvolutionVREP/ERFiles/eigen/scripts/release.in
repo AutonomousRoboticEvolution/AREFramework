@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cmakeModules -DCMAKE_BUILD_TYPE=Release .

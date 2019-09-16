@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.0)
+project(ER)
+if (RASPBERRY)
+    add_subdirectory(RobotController)
+else()
+    add_subdirectory(EvolutionVREP)
+endif()
