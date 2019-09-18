@@ -21,7 +21,7 @@ public:
 
 	float mutationRate = 0.05f;
 
-	void savePhenotype(int indNum, int sceneNum);
+	void savePhenotype(int indNum, int sceneNum) override;
 	virtual void init() override;
 	virtual void create() override;
 	virtual void update() override;

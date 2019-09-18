@@ -108,14 +108,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		/// 1: The first argument sets seed and location
 		int run = 0; // evolutionary run
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
-		if (arg1_param != NULL) {
+		if (arg1_param != nullptr) {
 			run = atoi(arg1_param);
 			std::cout << "run is set to " << arg1_param << std::endl;
 			simReleaseBuffer(arg1_param);
 		}
 		/// 3: The third argument sets the repository
 		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
-		if (arg3_param != NULL) {
+		if (arg3_param != nullptr) {
 			ER->settings->setRepository(arg3_param);
 			simReleaseBuffer(arg3_param);
 		}
@@ -126,45 +126,49 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();	// load the settings if the *.csv exists
         ER->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-        ER->randNum = std::shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
+        ER->randNum = std::make_shared<RandNum>(run);  //used for generating random number using the seed
 
 		/// 2: The second argument sets the condition for simulation
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
-		if (arg2_param != NULL || arg2_param == 0) {
-			const int arg2_param_i = atoi(arg2_param);
-			switch(arg2_param_i){
-                /// Run EA in server-client mode
-			    case 1:
-                    ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
-                    ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
-                    break;
+        int arg2_param_i = -1;
+
+		if (arg2_param != nullptr) {
+            arg2_param_i = atoi(arg2_param);
+            simReleaseBuffer(arg2_param);
+        }
+
+        switch (arg2_param_i) {
+            /// Run EA in server-client mode
+            case 1:
+                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
+                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
+                break;
                 /// Run EA in local mode
-			    case 2:
-                    ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
-                    ER->startRun = true;
-			        break;
-			    case 7:
-                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-                    ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
-                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-                    break;
-			    case 8:
-                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-			        break;
+            case 2:
+                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
+                ER->startRun = true;
+                break;
+            case 7:
+                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+                ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                break;
+            case 8:
+                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                break;
                 /// Load best individual
-                case 9:
-                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
-                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-			        break;
+            case 9:
+                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
+                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                break;
                 /// Wrong argument or no second argument, don't run evolution
-			    default:
-                    std::cout << "No second argument so not running evolution" << std::endl;
-                    ER->startRun = false;
-			        break;
-			}
-			simReleaseBuffer(arg2_param);
-		}
+            default:
+                std::cout << "No second argument so not running evolution" << std::endl;
+                ER->startRun = false;
+                break;
+        }
+
 
 		// Actual initialization of ER
 		ER->initialize(); 
@@ -197,9 +201,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	int errorModeSaved;
 	simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
 	simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
-	void* retVal = NULL;
+	void* retVal = nullptr;
 
-	if (ER->startRun == true) {
+	if (ER->startRun) {
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			// tStart = clock();
 			// Initializes population
@@ -229,7 +233,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			}
 		}
 
-		if (initCall == true && timeCount > 10) {
+		if (initCall && timeCount > 10) {
             timeCount = 0;
             initCall = false;
             counter = 0;
@@ -263,7 +267,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             std::cout << "should quit the simulator" << std::endl;
 			simQuitSimulator(true);
 		}
-		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
+		else if (loadingPossible && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
 			// time out when not receiving commands for 5 minutes.
 			if (!timerOn) {
 				sysTime = clock();
@@ -289,7 +293,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 
 				simGetIntegerSignal((simChar*) "individual", individual);
-				if (ER->loadIndividual(individual[0]) == false) {
+				if (not ER->loadIndividual(individual[0])) {
 					if (ER->settings->verbose) {
 						std::cout << "Server here, I could not load the specified individual: " << individual[0] << std::endl;
 						std::cout << "My signal was " << signal[0] << std::endl;

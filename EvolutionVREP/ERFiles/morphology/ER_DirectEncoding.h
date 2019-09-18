@@ -12,10 +12,10 @@ public:
 	~ER_DirectEncoding();
 
 	// Essentials
-	void init();
-	void mutate();
-    void update();
-    std::shared_ptr<Morphology> clone() const;
+	void init() override;
+	void mutate() override;
+    void update() override;
+    std::shared_ptr<Morphology> clone() const override;
 
 	void initializeRobot(int type);
     int mutateControlERGenome(float mutationRate);
@@ -24,17 +24,17 @@ public:
 	void checkControl(int individual, int sceneNum);
 	float fitness;
 	/// Can be used to print some debugging information
-	void printSome();
+	void printSome() override;
     /// Can be used if you want to manually create a direct encoding genome
 	void initializeGenomeCustom(int type);
 	void initializeQuadruped(int type);
 	virtual const std::string generateGenome(int individual, float fitness) const override;
-	float getFitness();
+	float getFitness() override;
 	void loadPhenotype(int ind);
-	bool loadGenome(std::istream& input, int individualNumber);
+	bool loadGenome(std::istream& input, int individualNumber) override;
 	void setGenomeColors();
 	void symmetryMutation(float mutationRate);
-	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 protected:
 	struct MODULEPARAMETERS {
 		// State specific parameters
@@ -89,5 +89,4 @@ private:
     int initializeGenome(int type);
     int checkTreeDepth(int attachModule, int increment);
     void deleteModuleFromGenome(int num);
-
 };

@@ -116,6 +116,9 @@ target_include_directories(ER_library PUBLIC
     "${VREP_FOLDER}/programming/include"
 )
 
+# tool to help remove the warnings when using GCC
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
 set_target_properties(ER_library PROPERTIES 
     CXX_STANDARD 14
     # COMPILE_FLAGS "-w"

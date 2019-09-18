@@ -10,28 +10,28 @@ public:
 	ER_LSystem();
 	~ER_LSystem();
 
-	void init();
-	void mutate();
+	void init() override;
+	void mutate() override;
 
 	int initializeLGenome(int type);
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
 
 	void checkControl(int individual, int sceneNum);
-    std::shared_ptr<Morphology> clone() const;
-	void update();
+    std::shared_ptr<Morphology> clone() const override;
+	void update() override;
 	float fitness;
-	void printSome();
+	void printSome() override;
 
 	void initializeGenomeCustom(int type);
 
     virtual const std::string generateGenome(int individual, float fitness) const override;
-	float getFitness();
-	bool loadGenome(std::istream &input, int individualNumber);
+	float getFitness() override;
+	bool loadGenome(std::istream &input, int individualNumber) override;
 	void symmetryMutation(float mutationRate);
 	int getNewSite(int maxCh, int currentSite, std::vector<int> sites);
 
-	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 protected:
 	struct LPARAMETERS {
 		// State specific parameters

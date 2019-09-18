@@ -11,8 +11,8 @@ public:
 	ER_CPPN_Encoding();
 	~ER_CPPN_Encoding();
 
-	void init();
-	void mutate();
+	void init() override;
+	void mutate() override;
 
 	int initializeGenome(int type);
 	int mutateCPPN(float mutationRate);
@@ -23,18 +23,18 @@ public:
 	void deleteModuleFromGenome(int num);
 
 	void checkControl(int individual, int sceneNum);
-    std::shared_ptr<Morphology> clone() const;
-	void update();
+    std::shared_ptr<Morphology> clone() const override;
+	void update() override;
 	float fitness;
-	void printSome();
+	void printSome() override;
 
 	void initializeGenomeCustom(int type);
 	void initializeQuadruped(int type);
 	virtual const std::string generateGenome(int individual, float fitness) const override;
-	float getFitness();
-	bool loadGenome(std::istream &input, int individualNumber);
+	float getFitness() override;
+	bool loadGenome(std::istream &input, int individualNumber) override;
 	void symmetryMutation(float mutationRate); 
-	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 
 
 protected:

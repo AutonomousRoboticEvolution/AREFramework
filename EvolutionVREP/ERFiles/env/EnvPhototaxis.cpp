@@ -35,7 +35,6 @@ float EnvPhototaxis::fitnessFunction(MorphologyPointer morph)
 float EnvPhototaxis::start(MorphologyPointer morph)
 {
 	lightHandle = simGetObjectHandle("Light");
-	lightDistance;
 	float angle = alphaRange * morph->randomNum->randFloat(-1.0, 1.0);
 	float x = cos(angle)* lightDistance;
 	float y = sin(angle)* lightDistance;

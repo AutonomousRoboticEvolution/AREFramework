@@ -55,7 +55,7 @@ public:
 	float checkArea(float interSection[3], float pps[4][3]);
 	bool checkCollisionBasedOnRotatedPoints(int objectHandle);
 	void symmetryMutation(float mutationRate);
-	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 
 
 protected:

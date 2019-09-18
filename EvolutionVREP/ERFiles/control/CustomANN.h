@@ -31,7 +31,7 @@ public:
     std::stringstream getControlParams();
 	void setControlParams(std::vector<std::string>);
 	void changeConnectionIDToPointer();
-	bool checkControl(std::vector<std::string> values);
+	bool checkControl(const std::vector<std::string> &values);
 	/// destroy the neuron of CustomANN
 	void reset();
 	///reset the value of the neuron of CustomANN

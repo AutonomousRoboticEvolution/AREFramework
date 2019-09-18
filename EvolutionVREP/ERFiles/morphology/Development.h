@@ -13,10 +13,10 @@ public:
 	~Development();
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
-	int getAmountBrokenModules();
+	int getAmountBrokenModules() override;
 	/// Holds information of the modules created (phenotype)
     std::vector<std::shared_ptr<ER_Module> > createdModules;
-    int getMainHandle();
+    int getMainHandle() override;
 	struct BASEMODULEPARAMETERS {
 		// State specific parameters
         std::shared_ptr<BASEMODULEPARAMETERS> clone() const {
@@ -45,32 +45,32 @@ public:
 
 
 	void savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
-	void savePhenotype(int ind, float fitness) {};
+	void savePhenotype(int ind, float fitness) override {};
 
     std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> loadBasePhenotype(int indNum);
 	void loadPhenotype(int ind) {};
 
-	void init();
-	void mutate();
-	void create();
-    void update();
+	void init() override;
+	void mutate() override;
+	void create() override;
+    void update() override;
 
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
 
-	void init_noMorph();
+	void init_noMorph() override;
 	int getMaxChilds(int moduleType);
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
 	// object creators
-	void createAtPosition(float x, float y, float z);
+	void createAtPosition(float x, float y, float z) override;
 
 //    std::vector<float> eulerToDirectionalVector(std::vector<float> eulerAngles);
 
 	void checkControl(int individual, int sceneNum);
-    std::shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const override;
 	float fitness;
 	// delete functions below???
-	void printSome();
+	void printSome() override;
 
 	void updateCreatedModules();
 
@@ -86,7 +86,7 @@ public:
 	virtual bool loadGenome(std::istream &input, int individualNumber) override;
 
 	//void recallAndCreate();
-	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 
 	struct OriginVector {
         std::vector<float> originVector;

@@ -440,8 +440,9 @@ void ANN::mutate(float mutationRate) {
 }
 
 
-shared_ptr<Control> ANN::clone() const {
-	shared_ptr<ANN> newANN = make_unique<ANN>(*this); //make a copy of the ANN class with different address/pointer
+shared_ptr<Control> ANN::clone() const
+{
+	shared_ptr<ANN> newANN = make_shared<ANN>(*this); //make a copy of the ANN class with different address/pointer
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
@@ -479,21 +480,21 @@ stringstream ANN::getControlParams() {
 	stringstream ss;
 	ss << ",#controlType,0," << endl;
 	ss << "\t" << ",#AmountInputNeurons," << inputLayer.size() << ","<< endl;
-	for (int i = 0; i < inputLayer.size(); i++) {
+	for (auto & neuron : inputLayer) {
 		ss << "\t\t" << ",#StartNeuron,";
-		ss << inputLayer[i]->getNeuronParams().str(); 
+		ss << neuron->getNeuronParams().str();
 		ss << "\t\t" << ",#EndNeuron," << endl;
 	}
 	ss << "\t" << ",#AmountInterNeurons," << recurrentLayer.size() << "," << endl;
-	for (int i = 0; i < recurrentLayer.size(); i++) {
+	for (auto & neuron : recurrentLayer) {
 		ss << "\t\t" << ",#StartNeuron,";
-		ss << recurrentLayer[i]->getNeuronParams().str();
+		ss << neuron->getNeuronParams().str();
 		ss << "\t\t" << ",#EndNeuron," << endl;
 	}
 	ss << "\t" << ",#AmountOutputNeurons," << outputLayer.size() << "," << endl;
-	for (int i = 0; i < outputLayer.size(); i++) {
+	for (auto & neuron : outputLayer) {
 		ss << "\t\t" << ",#StartNeuron,";
-		ss << outputLayer[i]->getNeuronParams().str();
+		ss << neuron->getNeuronParams().str();
 		ss << "\t\t" << ",#EndNeuron," << endl;
 	}
 	ss << endl;
@@ -513,7 +514,7 @@ void ANN::setControlParams(vector<string> values) {
 	recurrentLayer.clear();
 	outputLayer.clear();
 
-	for (int it = 0; it < values.size(); it++) {
+	for (unsigned long it = 0; it < values.size(); it++) {
 		std::string tmp = values[it];
 		if (tmp == "#StartNeuron") {
 			checkingNeuron = true;
@@ -578,8 +579,8 @@ void ANN::changeConnectionIDToPointer() {
 			for (int k = 0; k < recurrentLayer.size(); k++) {
 				if (inputLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = recurrentLayer[k];
-					if (recurrentLayer[k] == NULL) {
-                        if (settings->verbose == true) {
+					if (recurrentLayer[k] == nullptr) {
+                        if (settings->verbose) {
                             cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
                         }
 					}
@@ -588,15 +589,15 @@ void ANN::changeConnectionIDToPointer() {
 			for (int k = 0; k < outputLayer.size(); k++) {
 				if (inputLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					inputLayer[i]->connections[j] = outputLayer[k];
-					if (outputLayer[k] == NULL) {
-                        if (settings->verbose == true) {
+					if (outputLayer[k] == nullptr) {
+                        if (settings->verbose) {
                             cout << "ERROR: output layer " << k << " = NULL" << endl;
                         }
 					}
 				}
 			}
-			if (inputLayer[i]->connections[j] == NULL) {
-                if (settings->verbose == true) {
+			if (inputLayer[i]->connections[j] == nullptr) {
+                if (settings->verbose) {
                     cout << "ERROR: still inputLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
                 }
 			}
@@ -609,8 +610,8 @@ void ANN::changeConnectionIDToPointer() {
 			for (int k = 0; k < recurrentLayer.size(); k++) {
 				if (recurrentLayer[i]->connectionsID[j] == recurrentLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = recurrentLayer[k];
-					if (recurrentLayer[k] == NULL) {
-                        if (settings->verbose == true) {
+					if (recurrentLayer[k] == nullptr) {
+                        if (settings->verbose) {
                             cout << "ERROR: recurrent layer " << k << " = NULL" << endl;
                         }
 					}
@@ -619,15 +620,15 @@ void ANN::changeConnectionIDToPointer() {
 			for (int k = 0; k < outputLayer.size(); k++) {
 				if (recurrentLayer[i]->connectionsID[j] == outputLayer[k]->neuronID) {
 					recurrentLayer[i]->connections[j] = outputLayer[k];
-					if (outputLayer[k] == NULL) {
-                        if (settings->verbose == true) {
+					if (outputLayer[k] == nullptr) {
+                        if (settings->verbose) {
                             cout << "ERROR: output layer " << k << " = NULL" << endl;
                         }
 					}
 				}
 			}
-			if (recurrentLayer[i]->connections[j] == NULL) {
-                if (settings->verbose == true) {
+			if (recurrentLayer[i]->connections[j] == nullptr) {
+                if (settings->verbose) {
                     cout << "ERROR: recurrentLayer[" << i << "]->connections[" << j << "]" << " = NULL" << endl;
                 }
 			}
@@ -636,7 +637,8 @@ void ANN::changeConnectionIDToPointer() {
 	//	cout << "changed connection id to pointer" << endl;
 }
 
-void ANN::changeConnectionPointerToID() {
+void ANN::changeConnectionPointerToID()
+{
 	//	cout << "changing connection ID to pointer" << endl;
 	for (int i = 0; i < inputLayer.size(); i++) {
 		inputLayer[i]->connections.resize(inputLayer[i]->connectionsID.size());
@@ -673,7 +675,8 @@ void ANN::changeConnectionPointerToID() {
 	//	cout << "changed connection id to pointer" << endl;
 }
 
-bool ANN::checkControl(vector<string> values) {
+bool ANN::checkControl(const std::vector<std::string> &values)
+{
 	bool checkingNeuron = false;
 	vector<string> neuronValues;
 
@@ -687,7 +690,7 @@ bool ANN::checkControl(vector<string> values) {
 			it++;
 			tmp = values[it];
 		}
-		if (checkingNeuron == true) {
+		if (checkingNeuron) {
 			neuronValues.push_back(tmp);
 		}
 		if (tmp == "#EndNeuron") {

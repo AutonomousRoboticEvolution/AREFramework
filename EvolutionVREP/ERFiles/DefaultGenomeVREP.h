@@ -20,11 +20,11 @@ public:
 	virtual bool loadGenome(std::istream &input, int indNum) override;
 
 	// deepcopy
-    std::shared_ptr<Genome> clone() const;
+    std::shared_ptr<Genome> clone() const override;
 	
 	typedef std::shared_ptr<Morphology> MorphologyPointer;
 	typedef std::shared_ptr<Control> ControlPointer;
-	void init();
+	void init() override;
 
 protected:
 	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory() override;

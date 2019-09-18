@@ -336,6 +336,7 @@ bool ER_Module::checkControlParams(vector<string> values)
 		bool checkControlOutput = control->checkControl(values);
 		return checkControlOutput;
 	}
+	return true;
 }
 
 void ER_Module::setFileName(string f)

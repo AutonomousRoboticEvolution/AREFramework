@@ -34,7 +34,7 @@ public:
     /// clone the parent's neuron parameter
 	virtual void cloneControlParameters(std::shared_ptr<Control> parent) = 0;
     /// read the topology from CSV file and check if it is correct
-	virtual bool checkControl(std::vector<std::string> values) = 0;
+	virtual bool checkControl(const std::vector<std::string> &values) = 0;
 	virtual void reset() = 0;
 	virtual void flush() = 0;
 	//virtual void makeDependenciesUnique() = 0;
@@ -43,11 +43,6 @@ public:
     std::shared_ptr<RandNum> randomNum;
     std::shared_ptr<Settings> settings;
 	virtual void setFloatParameters(std::vector<float> values) = 0;
-//	virtual void deleteControl() = 0;
 //	vector<ANN> aNN;
 //	vector<FixedPosition> fixedControl;
 };
-
-
-
-

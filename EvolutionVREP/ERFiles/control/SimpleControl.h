@@ -12,12 +12,11 @@ public:
 	virtual void init(int input, int inter, int output);
 	virtual std::vector<float> update(std::vector<float>);
     std::shared_ptr<Control> clone() const;
-	void deleteControl();
 	void mutate(float mutationRate);
     std::stringstream getControlParams();
 	void setControlParams(std::vector<std::string>);
 	void cloneControlParameters(std::shared_ptr<Control> parent) {};
-	bool checkControl(std::vector<std::string> values);
+	bool checkControl(const std::vector<std::string> &values) override;
     std::vector<int> c_jointHandles;
 	void reset() {};
 	void makeDependenciesUnique();

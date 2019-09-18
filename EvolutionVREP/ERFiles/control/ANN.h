@@ -35,7 +35,7 @@ public:
 	int maxLayerSize;
     /// maximum number of connection
 	int maxCon = 8;
-	bool checkControl(std::vector<std::string> values);
+	bool checkControl(const std::vector<std::string> &values);
 	/// map the neuron reference connection pointer into neuron ID
 	void changeConnectionPointerToID();
 	/// destroy the neuron of the ANN
