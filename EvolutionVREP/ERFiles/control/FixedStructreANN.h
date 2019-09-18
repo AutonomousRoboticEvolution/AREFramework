@@ -1,6 +1,7 @@
 #pragma once
-#include "ANN.h"
+
 #include <vector>
+#include "ANN.h"
 
 class FixedStructureANN :
 	public ANN
@@ -25,8 +26,8 @@ public:
 	int neuronID = 0; 
 	int type = 0;
     /// this function deletes the connections to deleted neurons and in turn the pointer to these neurons should go out of scope.
-	void checkConnections(); 
-	stringstream getControlParams();
+	void checkConnections();
+    std::stringstream getControlParams();
 	void setControlParams(const std::vector<std::string> &);
 	void changeConnectionIDToPointer();
 	bool checkControl(std::vector<std::string> values);

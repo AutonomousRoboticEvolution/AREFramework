@@ -23,15 +23,16 @@
 // "
 
 #include "ER.h"
-//#include <afxwin.h> ;
-//***************************************************************************************//
 
-CER::CER(){
+using namespace std;
+
+CER::CER()
+{
 	// to initialize ER
 }
-CER::~CER(){
 
-}
+CER::~CER()
+{}
 
 void CER::split_line(string& line, string delim, list<string>& values)
 {
@@ -47,8 +48,8 @@ void CER::split_line(string& line, string delim, list<string>& values)
 	}
 }
 
-void CER::initializeSimulation() {
-
+void CER::initializeSimulation()
+{
 	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 	//	simSet = RECALLBEST;
 	// }
@@ -61,8 +62,10 @@ void CER::loadIndividual(int individualNum, int sceneNum)
 	cout << "	Make sure you're using ER_VREP to load robots. " << endl;
 
 }
+
 // TODO: Should this be deleted?
-void CER::initialize() {
+void CER::initialize()
+{
 	settings = shared_ptr<Settings>(new Settings);
 	shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
 	randNum = newRandNum;
@@ -78,7 +81,8 @@ void CER::initialize() {
 	initializeSimulation();  //empty function?
 }
 
-void CER::saveSettings() {
+void CER::saveSettings()
+{
 	if (settings->verbose) {
 		cout << "Saving settings" << endl;
 	}

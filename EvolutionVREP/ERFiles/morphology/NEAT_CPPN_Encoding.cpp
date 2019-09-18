@@ -3,13 +3,13 @@
 #include <sstream>
 #include <cmath>
 
+using namespace std;
 
 NEAT_CPPN_Encoding::NEAT_CPPN_Encoding()
 {
 	// cout << "CREATED CPPN ENCODING" << endl;
 	modular = true;
 }
-
 
 NEAT_CPPN_Encoding::~NEAT_CPPN_Encoding()
 {
@@ -25,7 +25,8 @@ NEAT_CPPN_Encoding::~NEAT_CPPN_Encoding()
 	//}
 }
 
-void NEAT_CPPN_Encoding::init() {
+void NEAT_CPPN_Encoding::init()
+{
 	// This function should only be called once when using NEAT
 	robot_genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	maxModuleTypes = settings->maxModuleTypes;
@@ -151,22 +152,24 @@ void NEAT_CPPN_Encoding::init() {
 	cf.reset();
 }
 
-int NEAT_CPPN_Encoding::initializeGenome(int type) {
+int NEAT_CPPN_Encoding::initializeGenome(int type)
+{
 	// The NEAT CPPN has nothing to initialize since it receives the genome from NEAT. 
 	// However, keeping the function here in case something needs initialization. 	
 	morphFitness = 0;
 	return 1;
 }
 
-void NEAT_CPPN_Encoding::mutate() {
+void NEAT_CPPN_Encoding::mutate()
+{
 	// Not done here // though could be done here if the EA from NEAT is not used. // TODO
 }
 
-int NEAT_CPPN_Encoding::mutateCPPN(float mutationRate) {
+int NEAT_CPPN_Encoding::mutateCPPN(float mutationRate)
+{
 	// not used
 	return 1;
 }
-
 
 void NEAT_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
 	// not used		

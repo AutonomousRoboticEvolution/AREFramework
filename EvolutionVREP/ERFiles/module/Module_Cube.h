@@ -1,5 +1,7 @@
 #pragma once
+
 #include "ER_Module.h"
+
 
 class Module_Cube :
 	public ER_Module
@@ -20,21 +22,21 @@ public:
 	 * (not same as mainHandle of module; mainHandle is the root of the module)
 	 * @return
 	 */
-	int createModule(vector<float> configuration, int relativePosHandle, int parentHandle);
+	int createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle);
 	/// Function to check which connection sites are free
-	vector<int> getFreeSites(vector<int>);
-	vector<int> getObjectHandles();
+	std::vector<int> getFreeSites(std::vector<int>);
+    std::vector<int> getObjectHandles();
 	/// deep copy
-	shared_ptr<ER_Module> clone();
+    std::shared_ptr<ER_Module> clone();
 	void setModuleColor();
 	void removeModule();
 	/// propagation of the update function. Module is updated every frame
-	vector<float> updateModule(vector<float> input);
-	stringstream getModuleParams();
-	void setModuleParams(vector<string>);
+    std::vector<float> updateModule(std::vector<float> input);
+    std::stringstream getModuleParams();
+	void setModuleParams(std::vector<std::string>);
 	void createControl() {};//define the function
-	vector<float> getPosition();
-	virtual stringstream getControlParams();
+    std::vector<float> getPosition();
+	virtual std::stringstream getControlParams();
 	
 private:
 	int objectPhysics = 8;

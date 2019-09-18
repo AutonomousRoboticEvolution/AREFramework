@@ -1,6 +1,7 @@
 #include "EA_SteadyState.h"
 #include <algorithm>
 
+using namespace std;
 
 EA_SteadyState::EA_SteadyState()
 {

@@ -1,6 +1,7 @@
 #include "OutputNeuron.h"
 #include <iostream>
 
+using namespace std;
 
 OutputNeuron::OutputNeuron() {
 	threshold = 0.0;

@@ -2,13 +2,14 @@
 
 #include "EA.h"
 
+
 class EA_Dynamic : public EA
 {
 public:
 	EA_Dynamic();
 	~EA_Dynamic();
 
-	void split_line(string & line, string delim, list<string>& values);
+	void split_line(std::string & line, std::string delim, std::list<std::string>& values);
 
 	
 	// base functions of EA
@@ -26,7 +27,7 @@ public:
 	void createNewGenRandomSelect();
 	
 	void replaceNewPopRandom(int numAttempts);
-	bool compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Genome> b);
+	bool compareByFitness(const std::shared_ptr<Genome>& a, const std::shared_ptr<Genome>& b);
 	void replaceNewRank();
 	void loadPopulationGenomes(int scenenum);
 };

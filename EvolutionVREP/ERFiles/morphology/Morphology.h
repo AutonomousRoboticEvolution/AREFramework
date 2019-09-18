@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <memory>
 //#include "../env/Environment.h" // impossible, environment already includes morphology
@@ -9,17 +10,16 @@
 #include "../Settings.h"
 #include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 
-using namespace std;
 
 class Morphology // Abstract Class
 {
 public:
 	Morphology(){};
 	virtual ~Morphology();
-	shared_ptr<Settings> settings;
-	shared_ptr<RandNum> randomNum;
-	virtual shared_ptr<Morphology> clone() const = 0;
-	vector<shared_ptr<ER_Module> > createdModules;
+    std::shared_ptr<Settings> settings;
+    std::shared_ptr<RandNum> randomNum;
+	virtual std::shared_ptr<Morphology> clone() const = 0;
+    std::vector<std::shared_ptr<ER_Module> > createdModules;
 	/**
 		@brief This method initialize the morph
 	*/
@@ -56,33 +56,33 @@ public:
 //	virtual void createMorphology() = 0; // create actual morphology in init
 	virtual void printSome() = 0; 
 
-	virtual vector<int> getObjectHandles(int) =0;
-	virtual vector<int> getJointHandles(int) =0;
-	virtual vector<int> getAllHandles(int) = 0;
+	virtual std::vector<int> getObjectHandles(int) =0;
+	virtual std::vector<int> getJointHandles(int) =0;
+	virtual std::vector<int> getAllHandles(int) = 0;
 
 	virtual bool loadGenome(int individualNumber, int sceneNum) = 0;
 	virtual bool loadGenome(std::istream &input, int individualNumber) = 0;
-	virtual void crossover(shared_ptr<Morphology>, float crossoverRate) = 0;
+	virtual void crossover(std::shared_ptr<Morphology>, float crossoverRate) = 0;
 //	virtual void checkControl(int individual, int sceneNum) =0;
 	bool modular = false;
 //	typedef shared_ptr<ER_Module> ModulePointer;
 
 	// modular functions
 	// This function is needed to implement fluid dynamics on modules...
-	virtual vector <shared_ptr<ER_Module>> getCreatedModules() = 0;
+	virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules() = 0;
 	virtual int getAmountBrokenModules() = 0;
 
 	float phenValue = -1.0;
 	virtual void setPhenValue() = 0;
-	
 
-	vector<vector <int> > maxModuleTypes;
+
+    std::vector<std::vector <int> > maxModuleTypes;
 //	typedef shared_ptr<Control> ControlPointer;
 	///control of part of morphology 
-	shared_ptr<Control> control;
+    std::shared_ptr<Control> control;
 public:
 	virtual int getMainHandle() = 0;
 	float minimumHeight = 0;
 	int amountIncrement = 1;
-	shared_ptr<NEAT::NeuralNetwork> neat_net;
+    std::shared_ptr<NEAT::NeuralNetwork> neat_net;
 };

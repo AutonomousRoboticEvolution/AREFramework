@@ -1,5 +1,7 @@
 #pragma once
+
 #include "FixedBaseMorphology.h"
+
 
 class CAT : public FixedBaseMorphology
 {
@@ -26,18 +28,18 @@ public:
 	void saveGenome(int indNum, float fitness);
 	bool loadGenome(int individualNumber, int sceneNum);
 	int catHandle;
-	shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const;
 	/**
 		@brief This method mutates the controller
 	*/
 	void mutate();
 	int floorHandle;
-	vector <int> feet;
-	vector <int> jointHandles;
+    std::vector <int> feet;
+    std::vector <int> jointHandles;
 
 	struct VestibularAttributes {
-		shared_ptr<VestibularAttributes> clone() const {
-			return make_unique<VestibularAttributes>(*this);
+        std::shared_ptr<VestibularAttributes> clone() const {
+			return std::make_unique<VestibularAttributes>(*this);
 		};
 		float headPosition[3];
 		float headOrientation[3];
@@ -52,6 +54,6 @@ public:
 
 		float normalizedHeadOrientation[6];
 	};
-	shared_ptr<VestibularAttributes> va;
+    std::shared_ptr<VestibularAttributes> va;
 };
 

@@ -49,6 +49,8 @@
 namespace NEAT
 {
 
+    using namespace std;
+
     // forward
     ActivationFunction GetRandomActivation( const Parameters &a_Parameters, RNG &a_RNG);
 

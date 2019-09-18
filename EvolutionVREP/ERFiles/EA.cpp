@@ -1,6 +1,8 @@
 #include "EA.h"
 
+#include <memory>
 
+using namespace std;
 
 EA::EA()
 {
@@ -126,7 +128,7 @@ void EA::savePopFitness(int generation) {
 
 void EA::loadPopulationGenomes()
 {
-	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+	unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
 	for (int i = 0; i < settings->indNumbers.size(); i++) {
 		cout << "loading individual " << settings->indNumbers[i] << endl;
 		populationGenomes.push_back(gf->createGenome(1, randomNum, settings));

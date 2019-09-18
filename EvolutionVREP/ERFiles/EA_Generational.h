@@ -2,6 +2,7 @@
 
 #include "EA.h"
 
+
 class EA_Generational : public EA
 {
 public:
@@ -25,7 +26,7 @@ public:
 	void createIndividual(int indNum);
 	
 	void end() {}; // not used in this class
-	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
+	virtual std::shared_ptr<Morphology> getMorph() { return std::shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
 	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used
 	void createNewGenRandomSelect();
 	void replaceNewPopRandom();

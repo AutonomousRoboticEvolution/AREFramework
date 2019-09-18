@@ -1,5 +1,7 @@
 #pragma once
+
 #include "ER_Module.h"
+
 
 class Module_Bone :
 	public ER_Module
@@ -12,32 +14,32 @@ public:
 	int init();
 	int mutate(float mutationRate);
 
-	vector<int> createBone(vector<float> configuration, int relativePosHandle, int parentHandle);
+    std::vector<int> createBone(std::vector<float> configuration, int relativePosHandle, int parentHandle);
 	// Create cube
-	vector<int> createCube(vector<float> configuration, int relativePosHandle, int parentHandle);
+    std::vector<int> createCube(std::vector<float> configuration, int relativePosHandle, int parentHandle);
 
-	int createModule(vector<float> configuration, int relativePosHandle, int parentHandle);
-	vector<int> getFreeSites(vector<int>);
-	vector<int> getObjectHandles();
+	int createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle);
+    std::vector<int> getFreeSites(std::vector<int>);
+    std::vector<int> getObjectHandles();
 	// For deep copy
-	shared_ptr<ER_Module> clone();
+    std::shared_ptr<ER_Module> clone();
 
 	void setModuleColor();
-	void removeModule(); 
+	void removeModule();
 
-	vector<float> updateModule(vector<float> input);
+    std::vector<float> updateModule(std::vector<float> input);
 	void controlModule(float input);
 
-	stringstream getModuleParams();
+    std::stringstream getModuleParams();
 	bool upDown = true; 
-	void setModuleParams(vector<string>);
+	void setModuleParams(std::vector<std::string>);
 	void createControl();
-	vector<float> getPosition();
-	virtual stringstream getControlParams();
+    std::vector<float> getPosition();
+	virtual std::stringstream getControlParams();
 	float previousPosition = -1;
 
     //void updateMorph(int num) override;
-    void updateMorph(int num) override { cout << "TODO : " << num << endl;/* TODO */ };
+    void updateMorph(int num) override { std::cout << "TODO : " << num << std::endl;/* TODO */ };
 
 private:
 	int objectPhysics = 8;

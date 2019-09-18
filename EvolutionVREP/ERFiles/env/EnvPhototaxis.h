@@ -1,5 +1,8 @@
 #pragma once
+
+#include <vector>
 #include "MoveEnv.h"
+
 
 class EnvPhototaxis :
 	public MoveEnv
@@ -20,6 +23,6 @@ public:
 	float lightDistance = 2.0;
 	float lightHeight = 0.5;
 	int interval = 4;
-	vector<float> fitStorage;
+    std::vector<float> fitStorage;
 };
 

@@ -1,15 +1,12 @@
 #include "GenomeFactoryVREP.h"
 
+using namespace std;
 
 GenomeFactoryVREP::GenomeFactoryVREP()
-{
-}
-
+{}
 
 GenomeFactoryVREP::~GenomeFactoryVREP()
-{
-}
-
+{}
 
 shared_ptr<Genome> GenomeFactoryVREP::createGenome(int type, shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 {

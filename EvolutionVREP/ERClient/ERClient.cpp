@@ -22,6 +22,8 @@
 #include "ClientEA.h"
 #include <ctime>
 
+using namespace std;
+
 clock_t tStart;
 clock_t sysTime;
 

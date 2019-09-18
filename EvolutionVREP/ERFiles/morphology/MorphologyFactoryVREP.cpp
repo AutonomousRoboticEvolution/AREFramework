@@ -1,4 +1,3 @@
-#pragma once
 #include "MorphologyFactoryVREP.h"
 #include <iostream>
 

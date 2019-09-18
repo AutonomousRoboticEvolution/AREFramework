@@ -1,7 +1,7 @@
-#pragma once
 #include "DefaultGenomeVREP.h"
 #include <iostream>
 
+using namespace std;
 
 DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 {
@@ -10,7 +10,8 @@ DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings
 	genomeFitness = 0;
 }
 
-DefaultGenomeVREP::~DefaultGenomeVREP() {
+DefaultGenomeVREP::~DefaultGenomeVREP()
+{
 }
 
 std::shared_ptr<MorphologyFactory> DefaultGenomeVREP::newMorphologyFactory()
@@ -33,7 +34,8 @@ bool DefaultGenomeVREP::loadGenome(std::istream &input, int indNum)
 	return load;
 }
 
-void DefaultGenomeVREP::init() {
+void DefaultGenomeVREP::init()
+{
 	// This function calls a VREP based morphology factory which contains VREP specific functions. 
 	int m_type = settings->morphologyType;
 	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);

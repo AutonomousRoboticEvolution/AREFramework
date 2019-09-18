@@ -2,6 +2,8 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
+
 ER_DirectEncoding::ER_DirectEncoding()
 {
 	modular = true;
@@ -22,8 +24,8 @@ ER_DirectEncoding::~ER_DirectEncoding()
 	//}
 }
 
-
-void ER_DirectEncoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+void ER_DirectEncoding::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+{
 //	cout << "crossing over" << endl;
 	shared_ptr<ER_DirectEncoding>morpho(static_pointer_cast<ER_DirectEncoding>(partnerMorph));   //*partnerMorph(ER_DirectEncoding()));
 	shared_ptr<GENOTYPE> tempLGenome;
@@ -48,7 +50,8 @@ void ER_DirectEncoding::crossover(shared_ptr<Morphology> partnerMorph, float cr)
 	}
 }
 
-void ER_DirectEncoding::printSome() {
+void ER_DirectEncoding::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_DirectEncoding" << endl;
 }
@@ -119,7 +122,8 @@ const std::string ER_DirectEncoding::generateGenome(int indNum, float fitness) c
 
 }
 
-float ER_DirectEncoding::getFitness() {
+float ER_DirectEncoding::getFitness()
+{
 	return fitness;
 }
 
@@ -272,7 +276,8 @@ bool ER_DirectEncoding::loadGenome(std::istream &genomeInput, int individualNumb
 	return true;
 }
 
-void ER_DirectEncoding::setGenomeColors() {
+void ER_DirectEncoding::setGenomeColors()
+{
 	// setting color
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
@@ -328,7 +333,8 @@ void ER_DirectEncoding::setGenomeColors() {
 	}
 }
 
-void ER_DirectEncoding::init() {
+void ER_DirectEncoding::init()
+{
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	maxModuleTypes = settings->maxModuleTypes;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->morphologyType != settings->QUADRUPED_DIRECT) {
@@ -340,7 +346,8 @@ void ER_DirectEncoding::init() {
 }
 
 
-int ER_DirectEncoding::initializeGenome(int type) {
+int ER_DirectEncoding::initializeGenome(int type)
+{
 	//first read settings
 	float red[3] = { 1.0, 0, 0 };
 	float blue[3] = { 0.0, 0.0, 1.0 };
@@ -423,25 +430,29 @@ int ER_DirectEncoding::initializeGenome(int type) {
 	return 1;
 }
 
-shared_ptr<Morphology> ER_DirectEncoding::clone() const {
+shared_ptr<Morphology> ER_DirectEncoding::clone() const
+{
 	BaseMorphology::clone();
 	shared_ptr<ER_DirectEncoding> ur = make_unique<ER_DirectEncoding>(*this);
 	ur->genome = this->genome->clone();
 	return ur;
 }
 
-void ER_DirectEncoding::update() {
+void ER_DirectEncoding::update()
+{
 	cout << "cannot update Genome:: no phenotype" << endl;
 }
 
-void ER_DirectEncoding::symmetryMutation(float mutationRate) {
+void ER_DirectEncoding::symmetryMutation(float mutationRate)
+{
 	if (settings->verbose) {
 		cout << "This version does not support symmetry mutation, check code" << endl;
 	}
 	// TODO: Wei should implement a symmetry mutation operator for the direct encoding.
 }
 
-bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAMETERS>> mps, int parentSite, int parent) {
+bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAMETERS>> mps, int parentSite, int parent)
+{
 	for (int i = 0; i < mps.size(); i++) {
 		if (mps[i]->parent == parent && mps[i]->parentSite == parentSite) {
 			return true;
@@ -450,7 +461,8 @@ bool ER_DirectEncoding::checkIfLocationIsOccupied(vector<shared_ptr<MODULEPARAME
 	return false;
 }
 
-int ER_DirectEncoding::mutateERGenome(float mutationRate) {
+int ER_DirectEncoding::mutateERGenome(float mutationRate)
+{
 	if (settings->verbose) {
 		cout << "mutating direct" << endl;
 	}
@@ -628,7 +640,8 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate) {
 	return 1;
 }
 
-int ER_DirectEncoding::checkTreeDepth(int attachModule, int increment) {
+int ER_DirectEncoding::checkTreeDepth(int attachModule, int increment)
+{
 	if (genome->moduleParameters[attachModule]->parent > -1) {
 		increment++;
 		return checkTreeDepth(genome->moduleParameters[attachModule]->parent, increment);
@@ -638,7 +651,8 @@ int ER_DirectEncoding::checkTreeDepth(int attachModule, int increment) {
 	}
 }
 
-int ER_DirectEncoding::mutateControlERGenome(float mutationRate) {
+int ER_DirectEncoding::mutateControlERGenome(float mutationRate)
+{
 	cout << "mutating l-genome" << endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		//		cout << "i = " << i << endl; 
@@ -656,12 +670,14 @@ void ER_DirectEncoding::deleteModuleFromGenome(int num)
 	}
 }
 
-void ER_DirectEncoding::mutate() {
+void ER_DirectEncoding::mutate()
+{
 	cout << "mutating direct with mutation rate of " << settings->mutationRate << endl;
 	mutateERGenome(settings->morphMutRate);
 }
 
-void ER_DirectEncoding::checkGenome(int individualNumber, int sceneNum) {
+void ER_DirectEncoding::checkGenome(int individualNumber, int sceneNum)
+{
 	cout << "checkingGenome" << endl;
 	ostringstream genomeFileName;
 	genomeFileName << "interfaceFiles\\morphologies" << sceneNum << "\\genome" << individualNumber << ".csv";
@@ -716,6 +732,7 @@ void ER_DirectEncoding::checkGenome(int individualNumber, int sceneNum) {
 	cout << "checked L-System genome" << endl;
 }
 
-void ER_DirectEncoding::checkControl(int individual, int sceneNum) {
+void ER_DirectEncoding::checkControl(int individual, int sceneNum)
+{
 	checkGenome(individual, sceneNum);
 }

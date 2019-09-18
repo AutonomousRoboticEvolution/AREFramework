@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cmath>
 
+using namespace std;
+
 ER_DirectEncodingInterpreter::ER_DirectEncodingInterpreter()
 {
 	modular = true;
@@ -12,7 +14,8 @@ ER_DirectEncodingInterpreter::~ER_DirectEncodingInterpreter()
 	createdModules.clear();
 }
 
-bool ER_DirectEncodingInterpreter::checkJointModule() {
+bool ER_DirectEncodingInterpreter::checkJointModule()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->type == 4) {
 			return true;
@@ -22,7 +25,8 @@ bool ER_DirectEncodingInterpreter::checkJointModule() {
 	return false;
 }
 
-void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z) {
+void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z)
+{
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
 
@@ -37,12 +41,14 @@ void ER_DirectEncodingInterpreter::createAtPosition(float x, float y, float z) {
 	//initializeDirectEncoding(position); // / amount increment is not in genome anymore
 }
 
-void ER_DirectEncodingInterpreter::printSome() {
+void ER_DirectEncodingInterpreter::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_DirectEncodingInterpreter" << endl;
 }
 
-void ER_DirectEncodingInterpreter::checkForceSensors() {
+void ER_DirectEncodingInterpreter::checkForceSensors()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken != true) {
 			for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
@@ -60,8 +66,6 @@ void ER_DirectEncodingInterpreter::checkForceSensors() {
 		}
 	}
 }
-
-
 
 bool ER_DirectEncodingInterpreter::loadGenome(std::istream &input, int individualNumber)
 {
@@ -85,7 +89,8 @@ bool ER_DirectEncodingInterpreter::loadGenome(std::istream &input, int individua
 	return loaded;
 }
 
-int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition[3]) {
+int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition[3])
+{
 //	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
 	cout << "initializing direct encoding interpreter" << endl;
 	shared_ptr<ModuleFactory> mf = shared_ptr<ModuleFactory>(new ModuleFactory);
@@ -263,16 +268,18 @@ int ER_DirectEncodingInterpreter::initializeDirectEncoding(float initialPosition
 	return 1;
 }
 
-float ER_DirectEncodingInterpreter::getFitness() {
+float ER_DirectEncodingInterpreter::getFitness()
+{
 //	environment->fitnessFunction(*this) = 0;
 	return fitness;
 }
 
-void ER_DirectEncodingInterpreter::init_noMorph() {
-
+void ER_DirectEncodingInterpreter::init_noMorph()
+{
 }
 
-void ER_DirectEncodingInterpreter::setPhenValue() {
+void ER_DirectEncodingInterpreter::setPhenValue()
+{
 	float val = 0.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		float pos[3];
@@ -306,10 +313,8 @@ void ER_DirectEncodingInterpreter::savePhenotype(int ind, float fitness)
 	Development::savePhenotype(bmp, ind, fitness);
 }
 
-
-
-
-void ER_DirectEncodingInterpreter::init() { // should use create instead
+void ER_DirectEncodingInterpreter::init() // should use create instead
+{
 	ER_DirectEncoding::init();
 	
 	unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
@@ -327,13 +332,15 @@ void ER_DirectEncodingInterpreter::init() { // should use create instead
 	setPhenValue();
 }
 
-void ER_DirectEncodingInterpreter::initCustomMorphology() {
+void ER_DirectEncodingInterpreter::initCustomMorphology()
+{
 	initializeGenomeCustom(0);
 	float position[3] = { 0, 0, 0.1 };
 	initializeDirectEncoding(position); // amount increment is not in genome anymore
 }
 
-shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const {
+shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const
+{
 	BaseMorphology::clone();
 	shared_ptr<ER_DirectEncodingInterpreter> ur = make_unique<ER_DirectEncodingInterpreter>(*this);
 	for (int i = 0; i < ur->genome->moduleParameters.size(); i++) {
@@ -343,7 +350,8 @@ shared_ptr<Morphology> ER_DirectEncodingInterpreter::clone() const {
 	return ur;
 }
 
-void ER_DirectEncodingInterpreter::update() {	
+void ER_DirectEncodingInterpreter::update()
+{
 	vector<float> input;
 	for (int i = 0; i < createdModules.size(); i++) {
 		vector<float> moduleInput;
@@ -385,14 +393,16 @@ void ER_DirectEncodingInterpreter::update() {
 	checkForceSensors();
 }
 
-void ER_DirectEncodingInterpreter::updateColors() {
+void ER_DirectEncodingInterpreter::updateColors()
+{
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
 		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 
-void ER_DirectEncodingInterpreter::setColors() {
+void ER_DirectEncodingInterpreter::setColors()
+{
 	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
@@ -443,7 +453,8 @@ void ER_DirectEncodingInterpreter::setColors() {
 	}
 }
 
-void ER_DirectEncodingInterpreter::create() {
+void ER_DirectEncodingInterpreter::create()
+{
 //	cout << "creating" << endl;
 	setColors();
 //	cout << "color set" << endl;
@@ -464,9 +475,8 @@ void ER_DirectEncodingInterpreter::create() {
 	checkJointModule(); // quits simulator when no joint found.
 }
 
-
-
-int ER_DirectEncodingInterpreter::getAmountBrokenModules() {
+int ER_DirectEncodingInterpreter::getAmountBrokenModules()
+{
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken == true) {
@@ -476,7 +486,8 @@ int ER_DirectEncodingInterpreter::getAmountBrokenModules() {
 	return amountBrokenModules;
 }
 
-float ER_DirectEncodingInterpreter::checkArea(float interSection[3], float pps[4][3]) {
+float ER_DirectEncodingInterpreter::checkArea(float interSection[3], float pps[4][3])
+{
 
 	float alphaD = sqrt(powf((pps[0][0] - pps[1][0]), 2) + powf((pps[0][1] - pps[1][1]), 2) + powf((pps[0][2] - pps[1][2]), 2));
 	float betaD = sqrt(powf((pps[0][0] - pps[2][0]), 2) + powf((pps[0][1] - pps[2][1]), 2) + powf((pps[0][2] - pps[2][2]), 2));
@@ -505,7 +516,8 @@ float ER_DirectEncodingInterpreter::checkArea(float interSection[3], float pps[4
 }
 
 // TODO: EB: What is this for?
-bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
+bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle)
+{
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);
 	float size[3];
@@ -576,7 +588,8 @@ bool ER_DirectEncodingInterpreter::checkCollisionBasedOnRotatedPoints(int object
 	return false; 
 }
 
-void ER_DirectEncodingInterpreter::symmetryMutation(float mutationRate) {
+void ER_DirectEncodingInterpreter::symmetryMutation(float mutationRate)
+{
 	/*for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			int amountChilds = genome->moduleParameters[i]->childSites.size();

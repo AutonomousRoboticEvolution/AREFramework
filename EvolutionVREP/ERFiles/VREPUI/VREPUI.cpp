@@ -1,5 +1,7 @@
 #include "VREPUI.h"
 
+using namespace std;
+
 VREPUI::VREPUI()
 {
 }

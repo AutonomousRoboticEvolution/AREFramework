@@ -7,39 +7,40 @@
 #include "../NEAT_LIB/NEAT_LIB/Population.h"
 #include "../NEAT_LIB/NEAT_LIB/Assert.h"
 
+
 class EA
 {
 public:
 	EA();
 	virtual ~EA();
-	void split_line(string & line, string delim, list<string>& values);
+	void split_line(std::string & line, std::string delim, std::list<std::string>& values);
 
 	///set the environment type, evolution type...
-	shared_ptr<Settings> settings; 
+	std::shared_ptr<Settings> settings; 
 	///random number generator for EA
-	shared_ptr<RandNum> randomNum;
+	std::shared_ptr<RandNum> randomNum;
 	/// container of current population genomes
-	vector<shared_ptr<Genome>> populationGenomes;
+	std::vector<std::shared_ptr<Genome>> populationGenomes;
 	/// container of next generation genomes
-	vector<shared_ptr<Genome>> nextGenGenomes;  
+	std::vector<std::shared_ptr<Genome>> nextGenGenomes;  
 	/// used in NEAT
-	shared_ptr<NEAT::Population> population;
-	string neatSaveFile = "/testNEAT";
+	std::shared_ptr<NEAT::Population> population;
+	std::string neatSaveFile = "/testNEAT";
 
 
 	virtual void update() = 0;  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible. 
 
 	/// storage vectors
 	/// This genome will be evaluated so needs to be assigned
-	// shared_ptr<Genome> newGenome; // for creating one genome at a time
-	// vector<int> popIndNumbers;
-	// vector<float> popFitness; // used by client-server
-	// vector<float> nextGenFitness; // used by client-server
-	vector<int> popNextIndNumbers;
+	// std::shared_ptr<Genome> newGenome; // for creating one genome at a time
+	// std::vector<int> popIndNumbers;
+	// std::vector<float> popFitness; // used by client-server
+	// std::vector<float> nextGenFitness; // used by client-server
+	std::vector<int> popNextIndNumbers;
 	/**
 		@brief This method initilizes setting for EA and random number generator seed
 	*/
-	void setSettings(shared_ptr<Settings> st, shared_ptr<RandNum> rn);
+	void setSettings(std::shared_ptr<Settings> st, std::shared_ptr<RandNum> rn);
 	/**
 		@brief This method sets the fitness value of an individual
 	*/
@@ -66,10 +67,10 @@ public:
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
-		@param vector<float> popfit is a vector containing the fitness valus of the population
-		@param vector<float> popIndividuals is a vector containing the ID's of the individuals
+		@param std::vector<float> popfit is a std::vector containing the fitness valus of the population
+		@param std::vector<float> popIndividuals is a std::vector containing the ID's of the individuals
 	*/
-	void savePopFitness(int generation, vector<float> popfit, vector<int> popInividuals);
+	void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
 	/**
 		@brief Save the population fitness values
 		@param generation: current generation
@@ -84,5 +85,5 @@ public:
 		@brief Load all the population genomes?
 	*/
 	void loadPopulationGenomes();
-	virtual shared_ptr<Morphology> getMorph() = 0;
+	virtual std::shared_ptr<Morphology> getMorph() = 0;
 };

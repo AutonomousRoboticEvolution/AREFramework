@@ -1,6 +1,10 @@
 #pragma once
 
+#include <memory>
+#include <string>
+#include <vector>
 #include "EA.h"
+
 
 class EA_SteadyState : public EA
 {
@@ -8,12 +12,9 @@ public:
 	EA_SteadyState();
 	~EA_SteadyState();
 
-	void split_line(string & line, string delim, list<string>& values);
+	void split_line(std::string & line, std::string delim, std::list<std::string>& values);
 
-	/**
-	 * @brief
-	 */
-	vector<int> evaluationQueue;
+	std::vector<int> evaluationQueue;
 
 	// base functions of EA
 	void init();
@@ -30,10 +31,10 @@ public:
 		@brief This method initilizes a population of genomes
 	*/
 	void initializePopulation();
-	virtual shared_ptr<Genome> initNewGenome();
-	virtual void saveGenome(shared_ptr<Genome>);
+	virtual std::shared_ptr<Genome> initNewGenome();
+	virtual void saveGenome(std::shared_ptr<Genome>);
 	void setFitness(int individual, float fitness);
-	virtual shared_ptr<Morphology> getMorph() { return shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
+	virtual std::shared_ptr<Morphology> getMorph() { return std::shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
 	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used here
     /**
         @brief This method creates a new morphology base on a randomly selected parent (copy)

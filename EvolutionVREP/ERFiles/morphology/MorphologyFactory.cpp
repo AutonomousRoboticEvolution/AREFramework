@@ -1,6 +1,15 @@
-#pragma once
 #include "MorphologyFactory.h"
 #include <iostream>
+
+#include "BaseMorphology.h"
+#include "FixedBaseMorphology.h"
+#include "ER_LSystem.h"
+#include "ER_CPPN.h"
+#include "ER_LSystemInterpreter.h"
+#include "CAT.h"
+#include "ER_DirectEncoding.h"
+#include "CustomMorphology.h"
+#include "ER_CPPN_Encoding.h"
 
 using namespace std;
 

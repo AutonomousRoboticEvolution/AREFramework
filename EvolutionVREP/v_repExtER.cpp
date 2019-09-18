@@ -24,7 +24,9 @@
 	#endif
 #endif /* _WIN32 */
 #if defined (__linux) || defined (__APPLE__)
-	#include <unistd.h>
+    extern "C" {
+    #include <unistd.h>
+    }
 	#define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
@@ -34,13 +36,14 @@
 LIBRARY vrepLib;
 
 ///save time log
-void saveLog(int num) {
-	ofstream logFile;
-	logFile.open("timeLog" + std::to_string(num) +".csv", ios::app);
+void saveLog(int num)
+{
+	std::ofstream logFile;
+	logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
 	clock_t now = clock();
 //	double deltaSysTime = difftime((double) time(0), sysTime) ;
 	int deltaSysTime = now - sysTime;
-	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << endl;
+	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
 	sysTime = clock();
 	counter = 0;
 	logFile.close();
@@ -98,8 +101,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     startEvolution = true;
 	if (startEvolution) {
 		// Construct classes
-		ER = unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
-		ER->settings = shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
+		ER = std::unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
+		ER->settings = std::shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
 
 		/// Set all three arguments
 		/// 1: The first argument sets seed and location
@@ -117,13 +120,13 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			simReleaseBuffer(arg3_param);
 		}
 		else {
-			std::cout << "Argument 3 was NULL" << endl;
+			std::cout << "Argument 3 was NULL" << std::endl;
 		}
 		// Read the settings file; specify the ID of experimental run
 		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
 		ER->settings->readSettings();	// load the settings if the *.csv exists
         ER->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-        ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
+        ER->randNum = std::shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
 		/// 2: The second argument sets the condition for simulation
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
@@ -156,7 +159,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			        break;
                 /// Wrong argument or no second argument, don't run evolution
 			    default:
-                    cout << "No second argument so not running evolution" << endl;
+                    std::cout << "No second argument so not running evolution" << std::endl;
                     ER->startRun = false;
 			        break;
 			}
@@ -167,7 +170,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ER->initialize(); 
 		//	ER->environment->sceneLoader();
 		if (ER->settings->verbose) {
-			cout << "ER initialized" << endl;
+            std::cout << "ER initialized" << std::endl;
 		}
 	}
 	int signal[1] = { 0 };
@@ -202,7 +205,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			// Initializes population
 			ER->startOfSimulation();  //start from here after simStartSimulation is called
 			if (ER->settings->verbose) {
-				cout << "SIMULATION ABOUT TO START" << endl;
+                std::cout << "SIMULATION ABOUT TO START" << std::endl;
 			}
 		}
 		else if (message == sim_message_eventcallback_modulehandle) {
@@ -215,9 +218,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 			ER->endOfSimulation();
 			loadingPossible = true;  // start another simulation
 			if (ER->settings->verbose) {
-				cout << "SIMULATION ENDED" << endl;
+                std::cout << "SIMULATION ENDED" << std::endl;
 			}
 		}
+		//TODO you probably meant ==?
 		if (message = sim_message_eventcallback_modulehandle) {
 			timeCount++;  //need to wait a few time steps to start a new simulation
 			if (ER->settings->verbose) {
@@ -256,7 +260,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 		int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
 		simGetIntegerSignal((simChar*) "simulationState", signal);
 		if (signal[0] == 99) {
-			cout << "should quit the simulator" << endl;
+            std::cout << "should quit the simulator" << std::endl;
 			simQuitSimulator(true);
 		}
 		else if (loadingPossible == true && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {

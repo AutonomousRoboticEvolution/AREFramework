@@ -1,22 +1,23 @@
 #pragma once
+
 #include <vector>
 #include <memory>
+#include <sstream>
+#include <iostream>
 #include "v_repLib.h"
 #include "../control/Control.h"
 #include "../control/ControlFactory.h"
-#include <sstream>
-#include <iostream>
 #include "../../RandNum.h"
 
-using namespace std;
+
 class ER_Module // Abstract Class
 {
 public:
 	ER_Module();
 	~ER_Module();
 
-	shared_ptr<RandNum> randomNum;
-	shared_ptr<Settings> settings;
+	std::shared_ptr<RandNum> randomNum;
+    std::shared_ptr<Settings> settings;
 	int parent; // number of the parent as stored in createdModules
 	int parentSite;
 	int orientation;	// orientation relative ro parent connection site 
@@ -34,28 +35,28 @@ public:
  * (not same as mainHandle of module; mainHandle is the root of the module)
  * @return
  */
-	virtual int createModule(vector<float> configuration, int relativePosHandle, int parentHandle) = 0;
+	virtual int createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle) = 0;
 	virtual void createControl() = 0;
-	shared_ptr<Control> control;
+    std::shared_ptr<Control> control;
 
-	virtual stringstream getModuleParams() = 0; // appends module parameters to genome
-	virtual stringstream getControlParams() = 0; // appends module control parameters to genome
-	virtual void setModuleParams(vector<string>) = 0;
-	virtual void setControlParams(vector<string>);
+	virtual std::stringstream getModuleParams() = 0; // appends module parameters to genome
+	virtual std::stringstream getControlParams() = 0; // appends module control parameters to genome
+	virtual void setModuleParams(std::vector<std::string>) = 0;
+	virtual void setControlParams(std::vector<std::string>);
 
 	virtual void removeModule() = 0;
-	virtual vector<float> getPosition() =0;
+	virtual std::vector<float> getPosition() =0;
 
-	vector<int> getMirrorSite(int site, int configuration, int mirrorAxis);
+    std::vector<int> getMirrorSite(int site, int configuration, int mirrorAxis);
 	void updateParentModuleMorphology(int num);
 
-	virtual shared_ptr<ER_Module> clone() = 0;
-	bool checkControlParams(vector<string>);
+	virtual std::shared_ptr<ER_Module> clone() = 0;
+	bool checkControlParams(std::vector<std::string>);
 	/// specifies if the modules has been instantiated (and not deleted)
 	bool handled = false;
 	/// Can be used to specify .ttm filename
-	string filename = "default";
-	void setFileName(string filename);
+    std::string filename = "default";
+	void setFileName(std::string filename);
 
 	// sets the module in and outputs by looping through parts
 	void colorModule(float color[3], float alpha);
@@ -64,9 +65,9 @@ public:
 
 	// L-System info
 	/// Defines which attachment sites have child modules connected to them.
-	vector<int> sites;
+    std::vector<int> sites;
 	/// Defines which attachment sites are free
-	vector<int> freeSites; 
+    std::vector<int> freeSites;
 	/// state used by L-System
 	int state;
 	/// module type
@@ -83,46 +84,46 @@ public:
 		int relativePosHandle;
 	};
 	/// vector specifying all the child sites of the module
-	vector<vector<shared_ptr<SITE>> > siteConfigurations;
-	virtual vector<int> getFreeSites(vector<int>) = 0;
+    std::vector<std::vector<std::shared_ptr<SITE>> > siteConfigurations;
+	virtual std::vector<int> getFreeSites(std::vector<int>) = 0;
     /// can be used to add an input vector to the module (sensor)
-	vector<float> moduleInput;
+    std::vector<float> moduleInput;
 	/// Used to define the output of the module (e.g. to handle servo control)
-	vector<float> moduleOutput;
+    std::vector<float> moduleOutput;
 
 	/// Updates the morphology (This can be called right after creating the module
 	/// allowing the user to adjust the morphology)
 	virtual void updateMorph(int num);
 
 	/// Used to update the module, can receive additional input values from environment or adjacent modules
-	virtual vector<float> updateModule(vector<float> input) = 0; // should return output
+	virtual std::vector<float> updateModule(std::vector<float> input) = 0; // should return output
 	int moduleID = 0;
 	void setModuleID(int id);
 
     int moduleHandle;
-	shared_ptr<ER_Module> parentModulePointer;
-	vector<shared_ptr<ER_Module>> childModulePointers;
+    std::shared_ptr<ER_Module> parentModulePointer;
+    std::vector<std::shared_ptr<ER_Module>> childModulePointers;
 
 	float phenV = 0; // deprecated
 	int maxChilds;  // TODO: maxChilds is currently defined as a fixed value for each module
 	                // This could be change to become a variable.
 	// object info
 	/// All the handles of the module
-	vector<int> objectHandles;
+    std::vector<int> objectHandles;
 	/// The handles of the objects that can have other modules attached ro them (cannot be a dummy)
-	vector<int> attachHandles;
+    std::vector<int> attachHandles;
 	/// The relative position handles of where other modules can be attached (relativePosHandle)
-	vector<int> attachRefHandles;
+    std::vector<int> attachRefHandles;
 	/// Handles of objects that can be controlled using a controller output (e.g. joints).
-	vector<int> controlHandles;
+    std::vector<int> controlHandles;
 	/// Handles of objects that can pass an input to the controller (e.g. sensors)
-	vector<int> inputHandles;
+    std::vector<int> inputHandles;
     /// Appends an input vector to the existing input of the module
-	void addInput(vector<float>);
+	void addInput(std::vector<float>);
 
 //	vector<vector<float>> dragFacet; // four points for each face with drag. 
 
-	virtual vector<int> getObjectHandles() = 0; 
+	virtual std::vector<int> getObjectHandles() = 0;
 
 	// color
 	bool broken = false;

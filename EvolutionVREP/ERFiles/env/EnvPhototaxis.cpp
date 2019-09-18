@@ -1,18 +1,17 @@
 #include "EnvPhototaxis.h"
 
 
-
 EnvPhototaxis::EnvPhototaxis()
 {
-	cout << "CREATED MOVE AND SUN" << endl;
+	std::cout << "CREATED MOVE AND SUN" << std::endl;
 }
-
 
 EnvPhototaxis::~EnvPhototaxis()
 {
 }
 
-void EnvPhototaxis::init() {
+void EnvPhototaxis::init()
+{
 	envObjectHandles.clear(); // every time the environment is created, it removes all objects and creates them again
 	Environment::init();
 	maxTime = 30;
@@ -20,8 +19,8 @@ void EnvPhototaxis::init() {
 	lightHandle = simGetObjectHandle("Light");
 }
 
-
-float EnvPhototaxis::fitnessFunction(MorphologyPointer morph) {
+float EnvPhototaxis::fitnessFunction(MorphologyPointer morph)
+{
 	float fitness = 0;
 	int mh = morph->getMainHandle();
 	float posM[3];
@@ -33,7 +32,8 @@ float EnvPhototaxis::fitnessFunction(MorphologyPointer morph) {
 	return fitness;
 }
 
-float EnvPhototaxis::start(MorphologyPointer morph) {
+float EnvPhototaxis::start(MorphologyPointer morph)
+{
 	lightHandle = simGetObjectHandle("Light");
 	lightDistance;
 	float angle = alphaRange * morph->randomNum->randFloat(-1.0, 1.0);
@@ -47,9 +47,8 @@ float EnvPhototaxis::start(MorphologyPointer morph) {
 	return 0.0f;
 }
 
-
-
-float EnvPhototaxis::updateEnv(MorphologyPointer morph) {
+float EnvPhototaxis::updateEnv(MorphologyPointer morph)
+{
 	float fitness = 0.0;
 
 	return fitness;

@@ -1,26 +1,32 @@
 #include "PatternNeuron.h"
+
 #include <iostream>
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
 
+using namespace std;
 
-PatternNeuron::PatternNeuron() {
+PatternNeuron::PatternNeuron()
+{
 	input = 0.0;
 	output = 0.0;
 }
 
-PatternNeuron::~PatternNeuron() {
+PatternNeuron::~PatternNeuron()
+{
 	//	cout << "DELETED CONTROL" << endl; 
 }
 
-void PatternNeuron::setFloatParameters(vector<float> values) {
+void PatternNeuron::setFloatParameters(vector<float> values)
+{
 	// function can be used to manually set specific parameters
 	frequency = values[0];
 	amplitude = values[1]; 
 	phase = values[2];
 }
 
-void PatternNeuron::init(int id) {
+void PatternNeuron::init(int id)
+{
 	neuronID = id;
 	amplitude = randomNum->randFloat(-1.0, 1.0);
 	frequency = randomNum->randFloat(-1.0, 1.0);
@@ -29,7 +35,9 @@ void PatternNeuron::init(int id) {
 	amplitude = roundf(amplitude * 10000) / 10000;
 	phase = roundf(phase * 10000) / 10000;
 }
-void PatternNeuron::update() {
+
+void PatternNeuron::update()
+{
 //	if (usePhaseControl && !useAngularFreqControl && !useAmplitudeControl) {
 //		targetPosition = (float)(maxAmplitude[module] * Math.sin(maxAngFreq[module] * time + phaseControl[module] / 180 * Math.M_PI));
 //	}

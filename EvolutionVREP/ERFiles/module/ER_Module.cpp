@@ -1,6 +1,6 @@
 #include "ER_Module.h"
 
-
+using namespace std;
 
 ER_Module::ER_Module()
 {
@@ -8,7 +8,6 @@ ER_Module::ER_Module()
 	moduleColor[1] = 0.5;
 	moduleColor[2] = 0.5;
 }
-
 
 static double _cm[256][3] = {
   { 0.001462, 0.000466, 0.013866 },
@@ -269,7 +268,6 @@ static double _cm[256][3] = {
   { 0.987053, 0.991438, 0.749504 }
 };
 
-
 ER_Module::~ER_Module()
 {
 	siteConfigurations.clear();
@@ -279,7 +277,8 @@ ER_Module::~ER_Module()
 	attachRefHandles.clear();
 }
 
-void ER_Module::colorModule(float color[3], float alpha) {
+void ER_Module::colorModule(float color[3], float alpha)
+{
 	float newColor[3] = { color[0] * alpha, color[1] * alpha, color[2] * alpha };
 	//	cout << "Color = " << color[0] << ", " << color[1] << ", " << color[2] << endl;
 	if (settings->colorization == settings->COLOR_NEURALNETWORK) {
@@ -312,7 +311,8 @@ void ER_Module::colorModule(float color[3], float alpha) {
 	}
 }
 
-void ER_Module::setControlParams(vector<string> values) {
+void ER_Module::setControlParams(vector<string> values)
+{
 	for (int it = 0; it < values.size(); it++) {
 		string tmp = values[it];
 		if (tmp == "#ControlType") {
@@ -330,7 +330,8 @@ void ER_Module::setControlParams(vector<string> values) {
 	}
 }
 
-bool ER_Module::checkControlParams(vector<string> values) {
+bool ER_Module::checkControlParams(vector<string> values)
+{
 	if (control) {
 		bool checkControlOutput = control->checkControl(values);
 		return checkControlOutput;
@@ -344,7 +345,8 @@ void ER_Module::setFileName(string f)
 
 
 
-vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis) {
+vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis)
+{
 	vector<int> mirrored; 
 	if (mirrorAxis == 0) { // standard mirror
 		switch (site) {
@@ -460,14 +462,16 @@ vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis
 	return mirrored;
 }
 
-void ER_Module::updateParentModuleMorphology(int num) {
+void ER_Module::updateParentModuleMorphology(int num)
+{
 	parentModulePointer->updateMorph(num);
 }
 
 void ER_Module::updateMorph(int num) {
 }
 
-vector<float> ER_Module::updateModule(vector<float> input) {
+vector<float> ER_Module::updateModule(vector<float> input)
+{
 	colorModule(moduleColor, control->cf);
 	if (control) {
 		addInput(input);//update input accoring to new input
@@ -479,7 +483,7 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 		|| settings->environmentType == settings->SUN_BLOCKED) {
 	}
     vector<float> output;
-	if (broken == false) {
+	if (not broken) {
 		output = control->update(input);//update inputLayer, recurrentLayer and outputLayer
 		for (int i = 0; i < output.size(); i++) {
 			if (output[i] > 1.0) {
@@ -498,7 +502,8 @@ vector<float> ER_Module::updateModule(vector<float> input) {
 }
 
 
-void ER_Module::addInput(vector<float> input) {
+void ER_Module::addInput(vector<float> input)
+{
 	if (control) {
 		control->addInput(input);
 	}
@@ -506,6 +511,7 @@ void ER_Module::addInput(vector<float> input) {
 
 
 
-void ER_Module::setModuleID(int id) {
+void ER_Module::setModuleID(int id)
+{
 	moduleID = id;
 }

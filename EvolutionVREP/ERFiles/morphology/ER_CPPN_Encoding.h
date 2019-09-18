@@ -1,10 +1,9 @@
 #pragma once
 
-#include <vector>;
-#include "Development.h"
 #include <algorithm>
+#include <vector>
+#include "Development.h"
 
-using namespace std;
 
 class ER_CPPN_Encoding : public Development
 {
@@ -20,11 +19,11 @@ public:
 	int mutateControlERGenome(float mutationRate);
 	bool queried = false;
 	int maxIterations = 4;
-	shared_ptr<Control> cppn;
+    std::shared_ptr<Control> cppn;
 	void deleteModuleFromGenome(int num);
 
 	void checkControl(int individual, int sceneNum);
-	shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const;
 	void update();
 	float fitness;
 	void printSome();
@@ -35,7 +34,7 @@ public:
 	float getFitness();
 	bool loadGenome(std::istream &input, int individualNumber);
 	void symmetryMutation(float mutationRate); 
-	void crossover(shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate);
 
 
 protected:
@@ -51,20 +50,20 @@ protected:
 
 	struct MODULEPARAMETERS {
 		// State specific parameters
-		shared_ptr<MODULEPARAMETERS> clone() const {
-			return make_unique<MODULEPARAMETERS>(*this);
+        std::shared_ptr<MODULEPARAMETERS> clone() const {
+			return std::make_unique<MODULEPARAMETERS>(*this);
 		};
 		bool expressed = true;
 		int maxChilds;
 		bool queried = false;
 
 		// not stored in genome
-		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
+        std::vector<int> childSiteStates; // which attachment site has which child object. -1 = no child
 		float rgb[3];
 		// parameter identifiers
 		int handle;
 		float color[3] = { 0.45f,0.45f,0.45f };
-		shared_ptr<Control> control;
+        std::shared_ptr<Control> control;
 		float moduleColor[3];
 		int type = -1; // cube, servo, leaf, etc.
 
@@ -75,10 +74,10 @@ protected:
 	};
 
 	struct GENOTYPE {
-		shared_ptr<GENOTYPE> clone() const {
-			return make_unique<GENOTYPE>(*this);
+        std::shared_ptr<GENOTYPE> clone() const {
+			return std::make_unique<GENOTYPE>(*this);
 		};
-		vector<shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state 
+        std::vector<std::shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state
 		//HORMONEGENOME hormoneGenome;
 		
 		int numberOfModules = 1; // initial amount of modules
@@ -99,7 +98,7 @@ protected:
 	};
 
 public:
-	shared_ptr<GENOTYPE> genome;
+    std::shared_ptr<GENOTYPE> genome;
 	
 
 private:

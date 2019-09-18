@@ -1,21 +1,18 @@
 #pragma once
-#include <vector>
-//#include "Morphology.h"
-//#include "LMorphology.h"
-//#include "Control.h"
-#include "morphology/MorphologyFactoryVREP.h"
-#include "control/ControlFactory.h"
+
 #include <memory>
-#include "../RandNum.h"
+#include <vector>
 #include "Settings.h"
 #include "DefaultGenome.h"
+#include "control/ControlFactory.h"
+#include "morphology/MorphologyFactoryVREP.h"
+#include "../RandNum.h"
 
-using namespace std;
 
 class DefaultGenomeVREP : public DefaultGenome
 {
 public:
-	DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings> st);
+	DefaultGenomeVREP(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
 	DefaultGenomeVREP() {};
 
 	~DefaultGenomeVREP();
@@ -23,10 +20,10 @@ public:
 	virtual bool loadGenome(std::istream &input, int indNum) override;
 
 	// deepcopy
-	shared_ptr<Genome> clone() const;
+    std::shared_ptr<Genome> clone() const;
 	
-	typedef shared_ptr<Morphology> MorphologyPointer;
-	typedef shared_ptr<Control> ControlPointer;
+	typedef std::shared_ptr<Morphology> MorphologyPointer;
+	typedef std::shared_ptr<Control> ControlPointer;
 	void init();
 
 protected:

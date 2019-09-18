@@ -1,18 +1,23 @@
 #include "EnvironmentFactory.h"
+
 #include <iostream>
 #include <memory>
+#include "MoveEnv.h"
+#include "RoughMoveEnv.h"
+#include "EnvPhototaxis.h"
+
 using namespace std;
 
 EnvironmentFactory::EnvironmentFactory()
 {
 }
 
-
 EnvironmentFactory::~EnvironmentFactory()
 {
 }
 
-shared_ptr<Environment> EnvironmentFactory::createNewEnvironment(shared_ptr<Settings> st) {
+shared_ptr<Environment> EnvironmentFactory::createNewEnvironment(const shared_ptr<Settings>& st)
+{
 
 	if (st->environmentType == st->DEFAULT_ENV) {
 		shared_ptr<Environment> moveEnv(new MoveEnv);
@@ -29,5 +34,6 @@ shared_ptr<Environment> EnvironmentFactory::createNewEnvironment(shared_ptr<Sett
 		env->settings = st;
 		return env;
 	}
-}
 
+	return nullptr;
+}

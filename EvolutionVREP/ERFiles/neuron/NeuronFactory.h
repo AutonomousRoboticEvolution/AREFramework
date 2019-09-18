@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Neuron.h"
 #include "SimpleNeuron.h"
 #include "InputNeuron.h"
@@ -13,8 +14,8 @@ class NeuronFactory
 public:
 	NeuronFactory();
 	~NeuronFactory();
-	shared_ptr<Neuron> createNewNeuronGenome(int neuronType, shared_ptr<Settings> st);
-	shared_ptr<Neuron> copyNeuronGenome(shared_ptr<Neuron> parentNeuron);
+    std::shared_ptr<Neuron> createNewNeuronGenome(int neuronType, std::shared_ptr<Settings> st);
+    std::shared_ptr<Neuron> copyNeuronGenome(std::shared_ptr<Neuron> parentNeuron);
 
 };
 

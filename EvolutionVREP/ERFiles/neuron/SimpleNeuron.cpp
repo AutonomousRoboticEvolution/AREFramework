@@ -1,7 +1,7 @@
 #include "SimpleNeuron.h"
 #include <iostream>
 
-
+using namespace std;
 
 SimpleNeuron::SimpleNeuron() {
 	threshold = 0.0;

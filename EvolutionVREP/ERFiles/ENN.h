@@ -37,10 +37,9 @@
 #include "Population.h"
 
 #define _CRTDBG_MAP_ALLOC
-#include <stdlib.h>
-#include <crtdbg.h>
+#include <cstdlib>
+#include <ccrtdbg>
 
-using namespace std;
 
 enum simulationSetup
 {

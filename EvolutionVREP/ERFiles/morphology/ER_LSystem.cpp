@@ -2,20 +2,20 @@
 #include <iostream>
 #include <sstream>
 
+using namespace std;
 
 ER_LSystem::ER_LSystem()
 {
 	modular = true;
 }
 
-
 ER_LSystem::~ER_LSystem()
 {
 	
 }
 
-
-void ER_LSystem::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+void ER_LSystem::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+{
 //	cout << "crossing over" << endl;
 	shared_ptr<ER_LSystem>morpho(static_pointer_cast<ER_LSystem>(partnerMorph));   //*partnerMorph(ER_LSystem()));
 	shared_ptr<LGENOME> tempLGenome;
@@ -40,11 +40,11 @@ void ER_LSystem::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
 	}
 }
 
-void ER_LSystem::printSome() {
+void ER_LSystem::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_LSystem" << endl;
 }
-
 
 void ER_LSystem::initializeGenomeCustom(int type)
 {
@@ -230,7 +230,8 @@ const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
 	return genomeText.str();
 }
 
-float ER_LSystem::getFitness() {
+float ER_LSystem::getFitness()
+{
 	return fitness;
 }
 
@@ -416,13 +417,15 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 	return true;
 }
 
-void ER_LSystem::init() {
+void ER_LSystem::init()
+{
 	lGenome = shared_ptr<LGENOME>(new LGENOME);
 	maxModuleTypes = settings->maxModuleTypes;
 	initializeLGenome(0);
 }
 
-int ER_LSystem::initializeLGenome(int type) {
+int ER_LSystem::initializeLGenome(int type)
+{
 	/// first read settings
 	lGenome->amountStates = settings->numberOfModules;
 
@@ -504,7 +507,8 @@ int ER_LSystem::initializeLGenome(int type) {
 	return 1;
 }
 
-shared_ptr<Morphology> ER_LSystem::clone() const {
+shared_ptr<Morphology> ER_LSystem::clone() const
+{
 	BaseMorphology::clone();
 	shared_ptr<ER_LSystem> ur = make_unique<ER_LSystem>(*this);
 	ur->lGenome = this->lGenome->clone();
@@ -514,15 +518,18 @@ shared_ptr<Morphology> ER_LSystem::clone() const {
 	return ur;
 }
 
-void ER_LSystem::update() {	
+void ER_LSystem::update()
+{
 	cout << "cannot update Genome:: no phenotype" << endl;
 }
 
-void ER_LSystem::symmetryMutation(float mutationRate) {
+void ER_LSystem::symmetryMutation(float mutationRate)
+{
 	cout << "This version does not support symmetry mutation, check code" << endl;
 }
 
-int ER_LSystem::getNewSite(int maxCh, int currentSite, vector<int> sites) {
+int ER_LSystem::getNewSite(int maxCh, int currentSite, vector<int> sites)
+{
 	if (maxCh == sites.size()) {
 		// all other sites are occupied, so the site cannot be changed. 
 		return currentSite;
@@ -545,7 +552,8 @@ int ER_LSystem::getNewSite(int maxCh, int currentSite, vector<int> sites) {
 	return newSite;
 }
 
-int ER_LSystem::mutateERLGenome(float mutationRate) {
+int ER_LSystem::mutateERLGenome(float mutationRate)
+{
 	if (settings->verbose) {
 		std::cout << "Mutating L-Genome" << std::endl;
 	}
@@ -661,7 +669,8 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 	return 1;
 }
 
-int ER_LSystem::mutateControlERLGenome(float mutationRate) {
+int ER_LSystem::mutateControlERLGenome(float mutationRate)
+{
 	cout << "mutating l-genome control" << endl;
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		lGenome->lParameters[i]->control->mutate(mutationRate);
@@ -669,11 +678,13 @@ int ER_LSystem::mutateControlERLGenome(float mutationRate) {
 	return 1;
 }
 
-void ER_LSystem::mutate() {
+void ER_LSystem::mutate()
+{
 	mutateERLGenome(settings->morphMutRate);
 }
 
-void ER_LSystem::checkGenome(int individualNumber, int sceneNum) {
+void ER_LSystem::checkGenome(int individualNumber, int sceneNum)
+{
 	cout << "checkingGenome" << endl;
 	ostringstream genomeFileName;
 	genomeFileName << "interfaceFiles\\morphologies" << sceneNum << "\\genome" << individualNumber << ".csv";
@@ -728,6 +739,7 @@ void ER_LSystem::checkGenome(int individualNumber, int sceneNum) {
 	cout << "checked L-System genome" << endl;
 }
 
-void ER_LSystem::checkControl(int individual, int sceneNum) {
+void ER_LSystem::checkControl(int individual, int sceneNum)
+{
 	checkGenome(individual, sceneNum);
 }

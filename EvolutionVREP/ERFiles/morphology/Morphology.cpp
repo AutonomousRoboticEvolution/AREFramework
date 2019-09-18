@@ -1,12 +1,11 @@
 #include "Morphology.h"
 #include <iostream>
 
-Morphology::~Morphology(){
-};
+Morphology::~Morphology()
+{}
 
-vector<shared_ptr<ER_Module>> Morphology::getCreatedModules() {
-	vector<shared_ptr<ER_Module>> nullVec;
+std::vector<std::shared_ptr<ER_Module>> Morphology::getCreatedModules()
+{
+	std::vector<std::shared_ptr<ER_Module>> nullVec;
 	return nullVec;
 }
-
-

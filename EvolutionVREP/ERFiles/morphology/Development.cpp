@@ -2,6 +2,8 @@
 #include <iostream>
 #include <algorithm>
 
+using namespace std;
+
 Development::Development()
 {
 	modular = true;
@@ -13,7 +15,8 @@ Development::~Development()
 	createdModules.clear();
 }
 
-int Development::getAmountBrokenModules() {
+int Development::getAmountBrokenModules()
+{
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken == true) {
@@ -27,7 +30,8 @@ int Development::getAmountBrokenModules() {
 //	return createdModules;
 //}
 
-void Development::createAtPosition(float x, float y, float z) {
+void Development::createAtPosition(float x, float y, float z)
+{
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl;
 	float position[3];
 
@@ -36,11 +40,13 @@ void Development::createAtPosition(float x, float y, float z) {
 	position[2] = z;
 }
 
-void Development::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+void Development::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+{
 
 }
 
-void Development::printSome() {
+void Development::printSome()
+{
 	cout << "printing some from Development" << endl;
 }
 
@@ -106,8 +112,8 @@ bool Development::loadGenome(std::istream &input, int individualNumber)
 }
 
 
-void Development::init_noMorph() {
-
+void Development::init_noMorph()
+{
 }
 
 /*!
@@ -116,8 +122,8 @@ void Development::init_noMorph() {
  * \param t
  * \return 
  */
-
-int Development::getMaxChilds(int t) {
+int Development::getMaxChilds(int t)
+{
 	if (t == 4 || t == 9) {
 		return 3; 
 	}
@@ -145,7 +151,6 @@ int Development::getMaxChilds(int t) {
 }
 
 //vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
-	
 //}
 
 void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
@@ -302,41 +307,49 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 }
 
 
-void Development::init() {
-
+void Development::init()
+{
 }
 
-void Development::initCustomMorphology() {
+void Development::initCustomMorphology()
+{
 	float position[3] = { 0, 0, 0.1 };
 }
 
 
-shared_ptr<Morphology> Development::clone() const {
+shared_ptr<Morphology> Development::clone() const
+{
 	BaseMorphology::clone();
 	return make_unique<Development>(*this);
 }
 
-void Development::update() {
+void Development::update()
+{
 
 }
 
-int Development::mutateERLGenome(float mutationRate) {
+int Development::mutateERLGenome(float mutationRate)
+{
 	return 1;
 }
 
-int Development::mutateControlERLGenome(float mutationRate) {
+int Development::mutateControlERLGenome(float mutationRate)
+{
 	return 1;
 }
 
-void Development::create() {
+void Development::create()
+{
     cout << "CANNOT CREAT DEVELOPMENT GENOME" << endl;
 }
 
-void Development::mutate() {
+void Development::mutate()
+{
 	mutateERLGenome(settings->morphMutRate);
 }
 
-void Development::updateCreatedModules() {
+void Development::updateCreatedModules()
+{
 	// TODO temporary location of function below
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->parentModulePointer) {
@@ -345,7 +358,8 @@ void Development::updateCreatedModules() {
 	}
 }
 
-void Development::shiftRobotPosition() {
+void Development::shiftRobotPosition()
+{
 	updateCreatedModules();
 
 	float minimumObjectPos = 50.0;
@@ -453,7 +467,8 @@ void Development::shiftRobotPosition() {
 	//	cout << "postpos: " << postpos[2] << endl;
 }
 
-int Development::getMainHandle() {
+int Development::getMainHandle()
+{
     if (createdModules.size() > 0) {
         return createdModules[0]->moduleHandle;
     }
@@ -462,33 +477,35 @@ int Development::getMainHandle() {
     }
 }
 
-vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles) {
-	Matrix3f m;
-	m = AngleAxisf(eulerAngles[0], Vector3f::UnitX())
-		* AngleAxisf(eulerAngles[1], Vector3f::UnitY())
-		* AngleAxisf(eulerAngles[2], Vector3f::UnitZ());
-	//	cout << m << endl << "is unitary " << m.isUnitary() << endl; 
-	AngleAxisf AA = AngleAxisf(1 * M_PI, Vector3f::UnitZ());
-	vector<float> directionalVector;
-	directionalVector.push_back(m(6));
-	directionalVector.push_back(m(7));
-	directionalVector.push_back(m(8));
+//vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles)
+//{
+//	Eigen::Matrix3f m;
+//	m = AngleAxisf(eulerAngles[0], Vector3f::UnitX())
+//		* AngleAxisf(eulerAngles[1], Vector3f::UnitY())
+//		* AngleAxisf(eulerAngles[2], Vector3f::UnitZ());
+//	//	cout << m << endl << "is unitary " << m.isUnitary() << endl;
+//	AngleAxisf AA = AngleAxisf(1 * M_PI, Vector3f::UnitZ());
+//	vector<float> directionalVector;
+//	directionalVector.push_back(m(6));
+//	directionalVector.push_back(m(7));
+//	directionalVector.push_back(m(8));
+//
+//	return directionalVector;
+//}
 
+void Development::checkGenome(int individualNumber, int sceneNum)
+{
 
-
-	return directionalVector;
 }
 
-
-void Development::checkGenome(int individualNumber, int sceneNum) {
-
-}
-
-void Development::checkControl(int individual, int sceneNum) {
+void Development::checkControl(int individual, int sceneNum)
+{
 	checkGenome(individual, sceneNum);
 }
+
 /// Check whether two components are colliding
-bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
+bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles)
+{
     // TODO EB: Implement a way to ignore visuals.
     bool collision = true;
     for (int n = 0; n < module->objectHandles.size(); n++) {
@@ -520,8 +537,10 @@ bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exc
     }
     return false;
 }
+
 /// Check for collisions. If there is a colliding object, remove it from the genome representation.
-bool Development::bCheckCollision(int iParentHandle, int createdModulesSize) {
+bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
+{
     bool bViabilityResult = true;
     vector<int> exception;
     exception.push_back(iParentHandle);
@@ -542,8 +561,10 @@ bool Development::bCheckCollision(int iParentHandle, int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check for ground. If object is above the ground, it can be created
-bool Development::bCheckGround(int createdModulesSize) {
+bool Development::bCheckGround(int createdModulesSize)
+{
     bool bViabilityResult = true;
     if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
         if (settings->verbose) {
@@ -559,8 +580,10 @@ bool Development::bCheckGround(int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check for orientation. If the orientation of the organ is printable
-bool Development::bCheckOrientation(int createdModulesSize) {
+bool Development::bCheckOrientation(int createdModulesSize)
+{
     bool bViabilityResult = true;
     // If the orientation of the organ is printable
     if (createdModules[createdModulesSize - 1]->type == 14 ||
@@ -598,8 +621,10 @@ bool Development::bCheckOrientation(int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check of number of organs.
-bool Development::bCheckOrgansNumber(int createdModulesSize) {
+bool Development::bCheckOrgansNumber(int createdModulesSize)
+{
     bool bViabilityResult = true;
     int brainCounter = 0;
     int motorCounter = 0;

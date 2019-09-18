@@ -1,9 +1,10 @@
 #include "EA_VREP.h"
 
+using namespace std;
+
 EA_VREP::EA_VREP()
 {
 }
-
 
 EA_VREP::~EA_VREP()
 {

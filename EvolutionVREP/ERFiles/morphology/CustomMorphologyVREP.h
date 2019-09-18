@@ -1,24 +1,25 @@
 #pragma once
+
 #include "CustomMorphology.h"
 #include "v_repLib.h"
+
 
 class CustomMorphologyVREP : public CustomMorphology
 {
 public:
 	CustomMorphologyVREP();
 	~CustomMorphologyVREP();
-	virtual vector<int> getObjectHandles(int parentHandle);
-	virtual vector<int> getJointHandles(int parentHandle);
+	virtual std::vector<int> getObjectHandles(int parentHandle);
+	virtual std::vector<int> getJointHandles(int parentHandle);
 	void update();
 	virtual int getMainHandle();
 	void create();
 
 
-	shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const;
 
-	vector<int> sensorHandles;
-	vector<int> outputHandles;
-	vector<int> outputValues;
-
+    std::vector<int> sensorHandles;
+    std::vector<int> outputHandles;
+    std::vector<int> outputValues;
 };
 

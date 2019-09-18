@@ -2,13 +2,10 @@
 
 #include <vector>
 #include <iostream>
-#include "../module/ModuleFactory.h"
 #include "ER_LSystem.h"
 #include "Modular_Morphology.h"
+#include "../module/ModuleFactory.h"
 #include "../VREPUI/VREPUI.h"
-
-using namespace Eigen;
-using namespace std;
 
 
 class ER_LSystemInterpreter : public ER_LSystem
@@ -37,7 +34,7 @@ public:
 	void init_noMorph();
 	// object creators
 	void createAtPosition(float x, float y, float z);
-	shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const;
 
 	void updateColors();
 
@@ -51,17 +48,17 @@ public:
 	void setColors();
 
 	float checkArea(float interSection[3], float pps[4][3]);
-	void cubeDrawing(vector<vector<float>> rotatedPoints, float color[3]);
-	vector<int> debugDrawings;
+	void cubeDrawing(std::vector<std::vector<float>> rotatedPoints, float color[3]);
+    std::vector<int> debugDrawings;
 	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
 	int getAmountBrokenModules();
 	//void shiftRobotPosition();
 	void symmetryMutation(float mutationRate);
-	vector<shared_ptr<ER_Module>> modules;
-	shared_ptr<ModuleFactory> moduleFactory;
+    std::vector<std::shared_ptr<ER_Module>> modules;
+    std::shared_ptr<ModuleFactory> moduleFactory;
 
 	void setPhenValue();
 
 //	VREPUI *vrepUI;
-	shared_ptr<VREPUI> vrepUI;
+    std::shared_ptr<VREPUI> vrepUI;
 };

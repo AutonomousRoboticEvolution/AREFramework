@@ -1,6 +1,7 @@
 #include "CustomANN.h"
 #include <iostream>
 
+using namespace std;
 
 CustomANN::CustomANN()
 {

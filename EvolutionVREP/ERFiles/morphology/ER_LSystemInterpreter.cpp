@@ -1,6 +1,7 @@
 #include "ER_LSystemInterpreter.h"
 #include <iostream>
 
+using namespace std;
 
 ER_LSystemInterpreter::ER_LSystemInterpreter()
 {
@@ -12,7 +13,8 @@ ER_LSystemInterpreter::~ER_LSystemInterpreter()
 	createdModules.clear();
 }
 
-bool ER_LSystemInterpreter::checkJointModule() {
+bool ER_LSystemInterpreter::checkJointModule()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->type == 4) {
 			return true;
@@ -22,7 +24,8 @@ bool ER_LSystemInterpreter::checkJointModule() {
 	return false;
 }
 
-void ER_LSystemInterpreter::createAtPosition(float x, float y, float z) {
+void ER_LSystemInterpreter::createAtPosition(float x, float y, float z)
+{
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
 	//setColors();
@@ -36,12 +39,14 @@ void ER_LSystemInterpreter::createAtPosition(float x, float y, float z) {
 //	initializeLSystem(settings->lIncrements, position); // / amount increment is not in genome anymore
 }
 
-void ER_LSystemInterpreter::printSome() {
+void ER_LSystemInterpreter::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_LSystemInterpreter" << endl;
 }
 
-void ER_LSystemInterpreter::incrementLSystem() {
+void ER_LSystemInterpreter::incrementLSystem()
+{
 	if (settings->verbose) {
 		std::cout << "Incrementing L-System" << std::endl;
 	}
@@ -204,7 +209,8 @@ void ER_LSystemInterpreter::incrementLSystem() {
 //	cout << endl;
 }
 
-void ER_LSystemInterpreter::checkForceSensors() {
+void ER_LSystemInterpreter::checkForceSensors()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken != true) {
 			for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
@@ -242,7 +248,8 @@ void ER_LSystemInterpreter::savePhenotype(int ind, float fitness)
 	Development::savePhenotype(bmp, ind, fitness);
 }
 
-void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
+void ER_LSystemInterpreter::initializeGenomeCustom(int type)
+{
 	//srand(rand()%100000);
 
 	shared_ptr<ModuleFactory> mf = shared_ptr<ModuleFactory>(new ModuleFactory);
@@ -387,7 +394,8 @@ void ER_LSystemInterpreter::initializeGenomeCustom(int type) {
 	mf.reset();
 }
 
-void ER_LSystemInterpreter::initializeLRobot(int type) {
+void ER_LSystemInterpreter::initializeLRobot(int type)
+{
 	//srand(rand()%100000);
 
 	float red[3] = { 1.0, 0, 0 };
@@ -516,7 +524,6 @@ void ER_LSystemInterpreter::initializeLRobot(int type) {
 	//	mutateControlERLGenome(0.3);
 }
 
-
 bool ER_LSystemInterpreter::loadGenome(std::istream &input, int individualNumber)
 {
 	bool load = ER_LSystem::loadGenome(input, individualNumber);
@@ -532,7 +539,8 @@ bool ER_LSystemInterpreter::loadGenome(std::istream &input, int individualNumber
 	return load;
 }
 
-int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialPosition[3]) {
+int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialPosition[3])
+{
 //	simSetInt32Parameter(sim_intparam_dynamic_step_divider, 25);
 //	getEnvironmentObjects();
 	createdModules.clear();
@@ -577,16 +585,18 @@ int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialP
 	return 1;
 }
 
-float ER_LSystemInterpreter::getFitness() {
+float ER_LSystemInterpreter::getFitness()
+{
 //	environment->fitnessFunction(*this) = 0;
 	return fitness;
 }
 
-void ER_LSystemInterpreter::init_noMorph() {
-
+void ER_LSystemInterpreter::init_noMorph()
+{
 }
 
-void ER_LSystemInterpreter::setPhenValue() {
+void ER_LSystemInterpreter::setPhenValue()
+{
 	float val = 0.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		float pos[3];
@@ -601,7 +611,8 @@ void ER_LSystemInterpreter::setPhenValue() {
 	phenValue = val; 
 }
 
-void ER_LSystemInterpreter::init() { // should use create instead
+void ER_LSystemInterpreter::init() // should use create instead
+{
 	if (ER_LSystem::lGenome == NULL) {
 		ER_LSystem::init();
 	}
@@ -618,7 +629,8 @@ void ER_LSystemInterpreter::init() { // should use create instead
 	setPhenValue();
 }
 
-shared_ptr<Morphology> ER_LSystemInterpreter::clone() const {
+shared_ptr<Morphology> ER_LSystemInterpreter::clone() const
+{
 	BaseMorphology::clone();
 	shared_ptr<ER_LSystemInterpreter> ur = make_unique<ER_LSystemInterpreter>(*this);
 	for (int i = 0; i < ur->lGenome->lParameters.size(); i++) {
@@ -629,13 +641,15 @@ shared_ptr<Morphology> ER_LSystemInterpreter::clone() const {
 	return ur;
 }
 
-void ER_LSystemInterpreter::updateColors() {
+void ER_LSystemInterpreter::updateColors()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		createdModules[i]->colorModule(lGenome->lParameters[createdModules[i]->state]->color,0.5);
 	}
 }
 
-void ER_LSystemInterpreter::update() {	
+void ER_LSystemInterpreter::update()
+{
 	vector<float> input;
 	/// Update neural network
 	for (int i = 0; i < createdModules.size(); i++) {
@@ -690,7 +704,8 @@ void ER_LSystemInterpreter::getEnvironmentObjects()
 	}
 }
 
-void ER_LSystemInterpreter::setColors() {
+void ER_LSystemInterpreter::setColors()
+{
 	for (int i = 0; i < lGenome->amountStates; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
@@ -740,7 +755,8 @@ void ER_LSystemInterpreter::setColors() {
 	}
 }
 
-void ER_LSystemInterpreter::create() {
+void ER_LSystemInterpreter::create()
+{
 	setColors();
 	init();
 	//unique_ptr<ModuleFactory> mf = unique_ptr<ModuleFactory>(new ModuleFactory);
@@ -756,8 +772,8 @@ void ER_LSystemInterpreter::create() {
 	checkJointModule(); // quits simulator when no joint found.
 }
 
-
-int ER_LSystemInterpreter::getAmountBrokenModules() {
+int ER_LSystemInterpreter::getAmountBrokenModules()
+{
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken == true) {
@@ -767,7 +783,8 @@ int ER_LSystemInterpreter::getAmountBrokenModules() {
 	return amountBrokenModules;
 }
 
-void ER_LSystemInterpreter::cubeDrawing(vector<vector<float>> rotatedPoints, float color[3]) {
+void ER_LSystemInterpreter::cubeDrawing(vector<vector<float>> rotatedPoints, float color[3])
+{
 	int cubeSegment = simAddDrawingObject(sim_drawing_lines + sim_drawing_cyclic, 4, 0.0, -1, 12, color, NULL, NULL, color);
 	debugDrawings.push_back(cubeSegment);
 
@@ -799,7 +816,8 @@ void ER_LSystemInterpreter::cubeDrawing(vector<vector<float>> rotatedPoints, flo
 
 }
 
-float ER_LSystemInterpreter::checkArea(float interSection[3], float pps[4][3]) {
+float ER_LSystemInterpreter::checkArea(float interSection[3], float pps[4][3])
+{
 
 	float alphaD = sqrt(powf((pps[0][0] - pps[1][0]), 2) + powf((pps[0][1] - pps[1][1]), 2) + powf((pps[0][2] - pps[1][2]), 2));
 	float betaD = sqrt(powf((pps[0][0] - pps[2][0]), 2) + powf((pps[0][1] - pps[2][1]), 2) + powf((pps[0][2] - pps[2][2]), 2));
@@ -827,9 +845,8 @@ float ER_LSystemInterpreter::checkArea(float interSection[3], float pps[4][3]) {
 	return (1 / areaX * areaBound);
 }
 
-
-
-bool ER_LSystemInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
+bool ER_LSystemInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle)
+{
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);
 	float size[3];
@@ -900,7 +917,8 @@ bool ER_LSystemInterpreter::checkCollisionBasedOnRotatedPoints(int objectHandle)
 	return false; 
 }
 
-void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
+void ER_LSystemInterpreter::symmetryMutation(float mutationRate)
+{
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			int amountChilds = lGenome->lParameters[i]->childSites.size();

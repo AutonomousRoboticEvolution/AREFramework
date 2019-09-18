@@ -23,7 +23,7 @@ void Environment::init() {
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
-	cout << "environment Initialized" << endl;
+	std::cout << "environment Initialized" << std::endl;
 	float ts[1];
 	int a = simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
 	int b = simGetFloatingParameter(sim_floatparam_simulation_time_step, ts);
@@ -34,12 +34,12 @@ void Environment::init() {
 }
 
 void Environment::print() {
-	cout << "Environment is here" << endl; 
+    std::cout << "Environment is here" << std::endl;
 }
 
 float Environment::fitnessFunction(MorphologyPointer morph) {
 	float fitness = 0.0;
-	cout << "empty morphology" << endl;
+    std::cout << "empty morphology" << std::endl;
 	return fitness;
 }
 

@@ -1,6 +1,7 @@
 #include "ANN.h"
 #include <iostream>
 
+using namespace std;
 
 ANN::ANN()
 {

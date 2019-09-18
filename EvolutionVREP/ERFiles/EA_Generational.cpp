@@ -1,23 +1,22 @@
 #include "EA_Generational.h"
 
+#include <memory>
 
+using namespace std;
 
 EA_Generational::EA_Generational()
 {
 }
 
-
 EA_Generational::~EA_Generational()
 {
 }
-
 
 void EA_Generational::setFitness(int individual, float fitness)
 {
 	nextGenGenomes[individual]->fitness = fitness;
 	//	nextGenFitness[individual] = fitness;
 }
-
 
 void EA_Generational::init()
 {
@@ -35,14 +34,14 @@ void EA_Generational::replacement()
 
 void EA_Generational::mutation()
 {
-	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		nextGenGenomes[i]->mutate();
+	for (auto & nextGenGenome : nextGenGenomes) {
+		nextGenGenome->mutate();
 	}
 }
 
 void EA_Generational::initializePopulation()
 {
-	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+	unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
 
 	if (settings->client) {
 		for (int i = 0; i < settings->populationSize; i++)
@@ -68,8 +67,6 @@ void EA_Generational::selectIndividuals()
 {
 }
 
-
-
 void EA_Generational::replaceIndividuals()
 {
 }
@@ -79,9 +76,8 @@ void EA_Generational::createIndividual(int indNum)
 	populationGenomes[indNum]->create();
 }
 
-
-
-void EA_Generational::createNewGenRandomSelect() {
+void EA_Generational::createNewGenRandomSelect()
+{
 	nextGenGenomes.clear();
 	//nextGenFitness.clear();
 
@@ -89,7 +85,7 @@ void EA_Generational::createNewGenRandomSelect() {
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		int parent = i;
 		//nextGenFitness.push_back(-100.0);
-		nextGenGenomes.push_back(unique_ptr<DefaultGenome>(new DefaultGenome(randomNum, settings)));
+		nextGenGenomes.push_back(std::make_unique<DefaultGenome>(randomNum, settings));
 		nextGenGenomes[i]->individualNumber = i + settings->indCounter;
 		nextGenGenomes[i]->morph = mfact->copyMorphologyGenome(populationGenomes[parent]->morph->clone());
 		// artefact, use for morphological protection
@@ -108,9 +104,9 @@ void EA_Generational::createNewGenRandomSelect() {
 		//	}
 	}
 	mutation();
-	for (int i = 0; i < nextGenGenomes.size(); i++) {
-		nextGenGenomes[i]->fitness = 0; // setting their fitness to zero since they haven't been evaluated yet. 
-		nextGenGenomes[i]->saveGenome(nextGenGenomes[i]->individualNumber);
+	for (auto & nextGenGenome : nextGenGenomes) {
+		nextGenGenome->fitness = 0; // setting their fitness to zero since they haven't been evaluated yet.
+		nextGenGenome->saveGenome(nextGenGenome->individualNumber);
 	}
 	mfact.reset();
 }

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cmath>
 
+using namespace std;
 
 inline double af_sigmoid_unsigned(double aX, double aSlope, double aShift)
 {

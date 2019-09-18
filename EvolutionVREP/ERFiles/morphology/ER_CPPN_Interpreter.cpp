@@ -2,8 +2,7 @@
 #include <iostream>
 #include <cmath>
 
-
-
+using namespace std;
 
 ER_CPPN_Interpreter::ER_CPPN_Interpreter()
 {
@@ -15,7 +14,8 @@ ER_CPPN_Interpreter::~ER_CPPN_Interpreter()
 	createdModules.clear();
 }
 
-void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
+void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z)
+{
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl; 
 	float position[3];
 	setColors();
@@ -29,7 +29,8 @@ void ER_CPPN_Interpreter::createAtPosition(float x, float y, float z) {
 //	initializeCPPNEncoding(position); // / amount increment is not in genome anymore
 }
 
-bool ER_CPPN_Interpreter::checkJointModule() {
+bool ER_CPPN_Interpreter::checkJointModule()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->type == 4) {
 			return true;
@@ -39,12 +40,14 @@ bool ER_CPPN_Interpreter::checkJointModule() {
 	return false;
 }
 
-void ER_CPPN_Interpreter::printSome() {
+void ER_CPPN_Interpreter::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_CPPN_Interpreter" << endl;
 }
 
-bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
+bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles)
+{
 	bool collision = true;
 	for (int n = 0; n < module->objectHandles.size(); n++) {
 		if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
@@ -108,7 +111,8 @@ bool ER_CPPN_Interpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<
 	return false; 
 }
 
-void ER_CPPN_Interpreter::checkForceSensors() {
+void ER_CPPN_Interpreter::checkForceSensors()
+{
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken != true) {
 			for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
@@ -126,8 +130,6 @@ void ER_CPPN_Interpreter::checkForceSensors() {
 		}
 	}
 }
-
-
 
 bool ER_CPPN_Interpreter::loadGenome(std::istream &input, int individualNumber)
 {
@@ -303,17 +305,18 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 	return 1;
 }
 
-float ER_CPPN_Interpreter::getFitness() {
+float ER_CPPN_Interpreter::getFitness()
+{
 //	environment->fitnessFunction(*this) = 0;
 	return fitness;
 }
 
-void ER_CPPN_Interpreter::init_noMorph() {
-
+void ER_CPPN_Interpreter::init_noMorph()
+{
 }
 
-
-void ER_CPPN_Interpreter::setPhenValue() {
+void ER_CPPN_Interpreter::setPhenValue()
+{
 	float val = 0.0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		float pos[3];
@@ -328,7 +331,8 @@ void ER_CPPN_Interpreter::setPhenValue() {
 	phenValue = val; 
 }
 
-void ER_CPPN_Interpreter::init() { 
+void ER_CPPN_Interpreter::init()
+{
 	if (ER_CPPN_Encoding::genome == NULL) {
 		// only initialize when this hasn't been done already
 		ER_CPPN_Encoding::init();
@@ -453,13 +457,15 @@ void ER_CPPN_Interpreter::init() {
 	//setPhenValue(); // temp test function
 }
 
-void ER_CPPN_Interpreter::initCustomMorphology() {
+void ER_CPPN_Interpreter::initCustomMorphology()
+{
 	initializeGenomeCustom(0);
 	float position[3] = { 0, 0, 0.1 };
 	initializeCPPNEncoding(position); // amount increment is not in genome anymore
 }
 
-shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
+shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const
+{
 	BaseMorphology::clone();
 	// shouldn't clone this?
 	shared_ptr<ER_CPPN_Interpreter> ur = make_unique<ER_CPPN_Interpreter>(*this);
@@ -470,7 +476,8 @@ shared_ptr<Morphology> ER_CPPN_Interpreter::clone() const {
 	return ur;
 }
 
-void ER_CPPN_Interpreter::update() {
+void ER_CPPN_Interpreter::update()
+{
 	vector<float> input; /// You can add any input values to this vector if needed
 	for (int i = 0; i < createdModules.size(); i++) {
 		vector<float> moduleOutput;
@@ -513,14 +520,16 @@ void ER_CPPN_Interpreter::update() {
 	checkForceSensors();
 }
 
-void ER_CPPN_Interpreter::updateColors() {
+void ER_CPPN_Interpreter::updateColors()
+{
 	// not working for direct encoding yet
 	for (int i = 0; i < createdModules.size(); i++) {
 		createdModules[i]->colorModule(genome->moduleParameters[createdModules[i]->state]->color, 0.5);
 	}
 }
 
-void ER_CPPN_Interpreter::setColors() {
+void ER_CPPN_Interpreter::setColors()
+{
 	for (int i = 0; i < genome->numberOfModules; i++) {
 		float red[3] = { 1.0, 0, 0 };
 		float blue[3] = { 0.0, 0.0, 1.0 };
@@ -571,7 +580,8 @@ void ER_CPPN_Interpreter::setColors() {
 	}
 }
 
-void ER_CPPN_Interpreter::create() {
+void ER_CPPN_Interpreter::create()
+{
 	init();
 //	cout << "creating" << endl;
 	setColors();
@@ -592,7 +602,6 @@ void ER_CPPN_Interpreter::create() {
 	initializeCPPNEncoding(positionFirstObject); // amount increment is not in genome anymore
 	checkJointModule(); // quits simulator when no joint found. 
 }
-
 
 void ER_CPPN_Interpreter::savePhenotype(int ind, float fitness)
 {
@@ -619,8 +628,8 @@ int ER_CPPN_Interpreter::getAmountBrokenModules() {
 	return amountBrokenModules;
 }
 
-float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
-
+float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3])
+{
 	float alphaD = sqrt(powf((pps[0][0] - pps[1][0]), 2) + powf((pps[0][1] - pps[1][1]), 2) + powf((pps[0][2] - pps[1][2]), 2));
 	float betaD = sqrt(powf((pps[0][0] - pps[2][0]), 2) + powf((pps[0][1] - pps[2][1]), 2) + powf((pps[0][2] - pps[2][2]), 2));
 	//	cout << "alpha and beta should be the same:" << endl;
@@ -647,8 +656,8 @@ float ER_CPPN_Interpreter::checkArea(float interSection[3], float pps[4][3]) {
 	return (1 / areaX * areaBound);
 }
 
-
-bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
+bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle)
+{
 	float objectOrigin[3];
 	simGetObjectPosition(objectHandle, -1, objectOrigin);
 	float size[3];
@@ -719,7 +728,8 @@ bool ER_CPPN_Interpreter::checkCollisionBasedOnRotatedPoints(int objectHandle) {
 	return false; 
 }
 
-void ER_CPPN_Interpreter::symmetryMutation(float mutationRate) {
+void ER_CPPN_Interpreter::symmetryMutation(float mutationRate)
+{
 	/*for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			int amountChilds = genome->moduleParameters[i]->childSites.size();

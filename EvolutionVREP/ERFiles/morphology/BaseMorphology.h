@@ -1,10 +1,10 @@
 #pragma once
+
 #include <vector>
-#include "Morphology.h"
 #include <list>
 #include <memory>
+#include "Morphology.h"
 
-using namespace std;
 
 struct ObjectParameters {
 	float size[3];
@@ -15,6 +15,7 @@ struct ObjectParameters {
 	int type; 
 	int state; // only used for LSystems? 
 };
+
 
 struct JointParameters {
 	float size[3];
@@ -28,6 +29,7 @@ struct JointParameters {
 	int state;
 };
 
+
 class BaseMorphology : public Morphology
 {
 
@@ -35,14 +37,14 @@ public:
 	BaseMorphology();
 	virtual ~BaseMorphology();
 	
-	void split_line(string& line, string delim, list<string>& values);
-	virtual shared_ptr<Morphology> clone() const override;
+	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
+	virtual std::shared_ptr<Morphology> clone() const override;
 	
 	virtual void printSome() override;
 	virtual void update() override;
 
 	// operators of the evolutionary algorithm
-	virtual void crossover(shared_ptr<Morphology>, float cr) override {};
+	virtual void crossover(std::shared_ptr<Morphology>, float cr) override {};
 	void grow() {};
 	virtual void mutate() override;
 	virtual bool loadGenome(int individualNumber, int sceneNum) override;
@@ -63,9 +65,9 @@ public:
 //	void deleteRays();
 //	vector<int> rayHandles;
 
-	virtual vector<int> getObjectHandles(int) override;
-	virtual vector<int> getJointHandles(int) override;
-	virtual vector<int> getAllHandles(int) override;
+	virtual std::vector<int> getObjectHandles(int) override;
+	virtual std::vector<int> getJointHandles(int) override;
+	virtual std::vector<int> getAllHandles(int) override;
 
 	virtual void init() override;
 	virtual void init_noMorph() override {};
@@ -77,7 +79,7 @@ public:
 	
 	// Modular Functions
 	virtual int getAmountBrokenModules() override;
-	virtual vector <shared_ptr<ER_Module>> getCreatedModules() override;
+	virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules() override;
 
 	virtual void setPhenValue() override;
 

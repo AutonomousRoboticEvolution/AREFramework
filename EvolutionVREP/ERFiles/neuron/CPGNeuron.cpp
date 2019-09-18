@@ -1,24 +1,30 @@
 #include "CPGNeuron.h"
 #include <iostream>
 
+using namespace std;
 
-CPGNeuron::CPGNeuron() {
-	cycleSpeed = 0.01;
-	cycleRange = 0.5;
-	threshold = 0.0;
-	input = 0.0;
-	output = 0.0;
-	innerValue = 0.0;
+CPGNeuron::CPGNeuron()
+    : cycleSpeed(0.01)
+    , cycleRange(0.5)
+    , innerValue(0.0)
+{
+    threshold = 0.0;
+    input = 0.0;
+    output = 0.0;
 }
 
-CPGNeuron::~CPGNeuron() {
+CPGNeuron::~CPGNeuron()
+{
 	//	cout << "DELETED CONTROL" << endl; 
 }
 
-void CPGNeuron::init(int id) {
+void CPGNeuron::init(int id)
+{
 	neuronID = id;
 }
-void CPGNeuron::update() {
+
+void CPGNeuron::update()
+{
 //	cout << "Speed and Range : " << cycleSpeed << ", " << cycleRange << endl;
 	// CPG doesn't actually take an input value, it uses a stable limit cycle instead
 	// note that the input value is used as an x value for the stable limit cycle
@@ -51,20 +57,23 @@ void CPGNeuron::update() {
 	//	cout << "innerValue " << neuronID << " = " << innerValue << endl; 
 }
 
-void CPGNeuron::reset() {
+void CPGNeuron::reset()
+{
 	input = 0.0;
 	output = 0.0;
 	innerValue = 0.0;
 }
 
-shared_ptr<Neuron> CPGNeuron::clone() {
+shared_ptr<Neuron> CPGNeuron::clone()
+{
 	shared_ptr<CPGNeuron> thisNeuron = make_unique<CPGNeuron>(*this);
 	thisNeuron->input = 0;
 	thisNeuron->output = 0;
 	return thisNeuron;
 }
 
-void CPGNeuron::mutate(float mutationRate) {
+void CPGNeuron::mutate(float mutationRate)
+{
 	if (mutationRate < randomNum->randFloat(0, 1)) {
 		threshold = randomNum->randFloat(-1.0, 1.0);
 	}
@@ -84,7 +93,8 @@ void CPGNeuron::flush()
 	innerValue = 0.0;
 }
 
-stringstream CPGNeuron::getNeuronParams() {
+stringstream CPGNeuron::getNeuronParams()
+{
 	stringstream ss; 
 	ss << "3," << endl; 
 	ss << Neuron::getNeuronParams().str(); 
@@ -111,7 +121,8 @@ stringstream CPGNeuron::getNeuronParams() {
 //	}
 //}
 
-void CPGNeuron::setNeuronParams(vector<string> values) {
+void CPGNeuron::setNeuronParams(vector<string> values)
+{
 	Neuron::setNeuronParams(values);
 	for (int it = 0; it < values.size(); it++) {
 		string tmp = values[it];
@@ -128,7 +139,8 @@ void CPGNeuron::setNeuronParams(vector<string> values) {
 	}
 }
 
-bool CPGNeuron::checkNeuron(vector<string> values) {
+bool CPGNeuron::checkNeuron(vector<string> values)
+{
 	for (int it = 0; it < values.size(); it++) {
 		string tmp = values[it];
 		if (tmp == "#CycleSpeed") {

@@ -1,9 +1,10 @@
 #pragma once
-#include "ANN.h"
 
+#include "ANN.h"
 #include "../../NEAT_LIB/NEAT_LIB/Assert.h"
 #include "../../NEAT_LIB/NEAT_LIB/Population.h"
 #include "../../NEAT_LIB/NEAT_LIB/Genome.h"
+
 
 class CPPN :
 	public ANN
@@ -16,6 +17,6 @@ public:
 	void addNeurons(float mutationRate);
 	void flush();
 
-	shared_ptr<Control> clone() const;
-	vector<float> update(vector<float> inputs);
+    std::shared_ptr<Control> clone() const;
+    std::vector<float> update(std::vector<float> inputs);
 };
