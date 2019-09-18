@@ -1,22 +1,8 @@
-// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
-// marc@coppeliarobotics.com
-// www.coppeliarobotics.com
-// 
-// -------------------------------------------------------------------
-// THIS FILE IS DISTRIBUTED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
-// WARRANTY. THE USER WILL USE IT AT HIS/HER OWN RISK. THE ORIGINAL
-// AUTHORS AND COPPELIA ROBOTICS GMBH WILL NOT BE LIABLE FOR DATA LOSS,
-// DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR
-// MISUSING THIS SOFTWARE.
-// 
-// You are free to use/modify/distribute this file for whatever purpose!
-// -------------------------------------------------------------------
-//
-// This file was automatically created for V-REP release V3.2.1 on May 3rd 2015
-
 /**
-	@file v_repExtER.h
-	@brief Class declaration of the plugin
+	@file v_repExtER.cpp
+    @authors Edgar Buchanan, Wei Li, Matteo de Carlo and Frank Veenstra
+	@brief This files from the three arguments decides whether to start simulation in local or server mode,
+    specifies seed and repository.
 */
 
 #pragma once
@@ -25,25 +11,22 @@
 #include <memory>
 #include "ERFiles/ER_VREP.h"
 
-using namespace std;
 
-/// Indicate whether the plugin is ready to accept/load genome sent from client
-bool loadingPossible = true;
-/// an uniqure pointer to ER_VREP class
+/// an unique pointer to ER_VREP class
 unique_ptr<ER_VREP> ER;
 // Used to indicate the initial call
 // It shouldn't matter, maybe it didn;t update
 bool initCall = true; // hello
-// Arbitrary counter
-int counter = 0; 
-bool initialized = false;
+// TODO: EB  do we need these variables? I guess they are used for client-server mode.
+int counter = 0;
 int timeCount = 0;
 bool timerOn = false;
 double timeElapsed;
+bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
+clock_t sysTime; // Measure simulation time.
+
 /// This variable marks the start of evolution.
-bool startEvolution = true;
-/// Measure simulation time.
-clock_t sysTime;
+bool startEvolution;
 
 #ifdef _WIN32
 	#define VREP_DLLEXPORT extern "C" __declspec(dllexport)
@@ -53,16 +36,10 @@ clock_t sysTime;
 #endif /* __linux || __APPLE__ */
 
 // The 3 required entry points of the plugin:
-/**
-	@brief Initialize v-rep plugin and starts evolution.
-	@return unsigned char; v-rep version if operation successful, false if not
-*/
+
+/// Initialize v-rep plugin and starts evolution.
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt);
-/**
-	@brief Release the v-rep lib
-*/
+/// Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd();
-/**
-	@brief Handle different message of simulation
-*/
+/// Handle different message of simulation
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData);

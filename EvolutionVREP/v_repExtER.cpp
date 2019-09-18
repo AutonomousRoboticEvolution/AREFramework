@@ -1,22 +1,8 @@
-// Copyright 2006-2015 Coppelia Robotics GmbH. All rights reserved. 
-// marc@coppeliarobotics.com
-// www.coppeliarobotics.com
-// 
-// -------------------------------------------------------------------
-// THIS FILE IS DISTRIBUTED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
-// WARRANTY. THE USER WILL USE IT AT HIS/HER OWN RISK. THE ORIGINAL
-// AUTHORS AND COPPELIA ROBOTICS GMBH WILL NOT BE LIABLE FOR DATA LOSS,
-// DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING OR
-// MISUSING THIS SOFTWARE.
-// 
-// You are free to use/modify/distribute this file for whatever purpose!
-// -------------------------------------------------------------------
-//
-// This file was automatically created for V-REP release V3.2.1 on May 3rd 2015
-
 /**
 	@file v_repExtER.cpp
-	@brief Implementation of the plugin.
+    @authors Edgar Buchanan, Wei Li, Matteo de Carlo and Frank Veenstra
+	@brief This files from the three arguments decides whether to start simulation in local or server mode,
+    specifies seed and repository.
 */
 
 #include "v_repExtER.h"
@@ -25,7 +11,6 @@
 #include <fstream>
 #include "v_repLib.h"
 
-using namespace std;
 //CCatContainer* catContainer = NULL;
 //CCreatureCreator* creatureCreator = NULL;
 //CUserInterface* userInterfaceCreator = NULL;
@@ -110,39 +95,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		return(0); // Means error, V-REP will unload this plugin
 	}
 
-	// make sure necessary folders are in place // doesn't work on linux
-	//string OutputFolder = "interfaceFiles";
-	//if (CreateDirectory(OutputFolder.c_str(), NULL))
-	//{
-	//	// CopyFile(...)
-	//	cout << "interfaceFiles made" << endl;
-	//}
-	//else
-	//{
-	//	cout << "interfaceFiles already exists" << endl;
-	//	// Failed to create directory.
-	//}
-
-	//OutputFolder = "interfaceFiles/morphologies0";
-	//if (CreateDirectory(OutputFolder.c_str(), NULL))
-	//{
-	//	// CopyFile(...)
-	//	cout << "interfaceFiles made" << endl;
-	//}
-	//else
-	//{
-	//	cout << "interfaceFiles already exists" << endl;
-	//	// Failed to create directory.
-	//}
-
-	if (startEvolution == true) {
-
+    startEvolution = true;
+	if (startEvolution) {
 		// Construct classes
 		ER = unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
 		ER->settings = shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
 
-		// Set all arguments
-		// 1: Set seed and location
+		/// Set all three arguments
+		/// 1: The first argument sets seed and location
 		int run = 0; // evolutionary run
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != NULL) {
@@ -150,8 +110,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 			std::cout << "run is set to " << arg1_param << std::endl;
 			simReleaseBuffer(arg1_param);
 		}
-
-		// 3: Sets the output file-path for the settings file.
+		/// 3: The third argument sets the repository
 		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
 		if (arg3_param != NULL) {
 			ER->settings->setRepository(arg3_param);
@@ -166,44 +125,43 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         ER->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
         ER->randNum = shared_ptr<RandNum>(new RandNum(run));  //used for generating random number using the seed
 
-		// Override settings parameters if argument 2
-		// 2:
+		/// 2: The second argument sets the condition for simulation
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
 		if (arg2_param != NULL || arg2_param == 0) {
 			const int arg2_param_i = atoi(arg2_param);
-			// If the second argument passed (arg2_param) is equal to 9, then load best individual and run simulations in local machine
-			if (arg2_param_i == 9)
-			{
-				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
-				ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-				//ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
-			}
-			else if (arg2_param_i == 8) {
-				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-			}
-			else if (arg2_param_i == 7) {
-				ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-				ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
-                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
-            }
-			// If the second argument passed (arg2_param) is equal to 1, then run the simulations in server-client mode
-			else if (arg2_param_i == 1)
-			{
-                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
-                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
-			}
-			else if (arg2_param_i == 2){
-                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;  //run EA in local model
-				ER->startRun = true;
-			}
-			else {
-				cout << "No second argument so not running evolution" << endl;
-				ER->startRun = false;
+			switch(arg2_param_i){
+                /// Run EA in server-client mode
+			    case 1:
+                    ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
+                    ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
+                    break;
+                /// Run EA in local mode
+			    case 2:
+                    ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
+                    ER->startRun = true;
+			        break;
+			    case 7:
+                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+                    ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
+                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                    break;
+			    case 8:
+                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
+                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+			        break;
+                /// Load best individual
+                case 9:
+                    ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
+                    ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+			        break;
+                /// Wrong argument or no second argument, don't run evolution
+			    default:
+                    cout << "No second argument so not running evolution" << endl;
+                    ER->startRun = false;
+			        break;
 			}
 			simReleaseBuffer(arg2_param);
 		}
-
 
 		// Actual initialization of ER
 		ER->initialize(); 
@@ -229,7 +187,6 @@ VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
 	unloadVrepLibrary(vrepLib); // release the library
 }
-
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
