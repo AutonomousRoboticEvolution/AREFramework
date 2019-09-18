@@ -129,9 +129,11 @@ public:
 	bool sleepMode = false; // should limit energy update
 	bool battery = false; // define module as a battery module. Currently, the first module can only be the parent.
 
-	// Stores the absolute position and orientation of the module iself.
+	/// Stores the absolute position and orientation of the module iself.
 	float absPos[3];
 	float absOri[3];
+
+	bool expressed;
 
 	virtual void setModuleColor() = 0; 
 	

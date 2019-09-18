@@ -22,7 +22,6 @@ public:
 	void checkForceSensors();
 	void initializeGenomeCustom(int type) {};
 	void initializeLRobot(int type);
-	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
 
 	int initializeDirectEncoding(float initialPosition[3]);
 	float getFitness();
@@ -49,16 +48,6 @@ public:
 	void symmetryMutation(float mutationRate);
 	vector<shared_ptr<ER_Module>> modules;
 	shared_ptr<ModuleFactory> moduleFactory;
-
-	/// Viability methods
-    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
-	bool bCheckCollision(int iParentHandle, int createdModulesSize);
-    /// Check for ground. If object is above the ground, it can be created
-    bool bCheckGround(int createdModulesSize);
-    /// Check for orientation. If the orientation of the organ is printable
-    bool bCheckOrientation(int createdModulesSize);
-    /// Check of number of organs.
-    bool bCheckOrgansNumber(int createdModulesSize);
 
 	void setPhenValue();
 	void savePhenotype(int ind, float fitness);

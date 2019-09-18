@@ -247,19 +247,39 @@ int ER_CPPN_Interpreter::initializeCPPNEncoding(float initialPosition[3]) {
 						exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
 					}
 
-					if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == true) {
-						createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
-						//		genome->moduleParameters[i]->expressed = false;
-					}
-					else {
-						for (int n = 0; n < modules.size(); n++) {
-							if (modules[n]->parent == i) {
-								modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
-							}
-						}
-						genome->moduleParameters[i]->expressed = true;
-					}
-					//cout << "created Module" << endl;
+					/// Viability part
+                    if(bCheckOrgansNumber(createdModulesSize)) {
+                        if (bCheckCollision(parentHandle, createdModulesSize)) {
+                            if (bCheckGround(createdModulesSize)) {
+                                if (bCheckOrientation(createdModulesSize)) {
+                                    for (int n = 0; n < modules.size(); n++) {
+                                        if (modules[n]->parent == i) {
+                                            modules[n]->parentModulePointer = createdModules[createdModulesSize - 1];
+                                        }
+                                    }
+                                    //genome->moduleParameters[i]->expressed = true;
+                                    createdModules[createdModulesSize - 1]->expressed = true;
+                                }
+                                else{
+                                    createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                                    createdModules[createdModulesSize - 1]->expressed = false;
+                                    //		genome->moduleParameters[i]->expressed = false;
+                                }
+                            }
+                            else{
+                                createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                                createdModules[createdModulesSize - 1]->expressed = false;
+                            }
+                        }
+                        else{
+                            createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                            createdModules[createdModulesSize - 1]->expressed = false;
+                        }
+                    }
+                    else{
+                        createdModules.erase(createdModules.begin() + (createdModulesSize - 1));
+                        createdModules[createdModulesSize - 1]->expressed = false;
+                    }
 				}
 			}
 		}

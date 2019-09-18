@@ -155,28 +155,37 @@ void ER_LSystemInterpreter::incrementLSystem() {
 							createdModules[createdModulesSize - 1]->orientation = config;
 
                             /// Viability part
-							if(bCheckCollision(parentHandle,createdModulesSize)){
-                                if (bCheckGround(createdModulesSize)) {
-                                    if(bCheckOrientation(createdModulesSize)) {
-                                        std::cout << "DEBUG: Object created!" << std::endl;
-                                    }
-                                    else{
+                            if(bCheckOrgansNumber(createdModulesSize)) {
+                                if (bCheckCollision(parentHandle, createdModulesSize)) {
+                                    if (bCheckGround(createdModulesSize)) {
+                                        if (bCheckOrientation(createdModulesSize)) {
+                                            std::cout << "DEBUG: Object created!" << std::endl;
+                                            createdModules[createdModulesSize - 1]->expressed = true;
+                                        } else {
+                                            createdModules[createdModulesSize - 1]->removeModule();
+                                            createdModules.pop_back();
+                                            newChildAmount--;
+                                            createdModules[createdModulesSize - 1]->expressed = false;
+                                        }
+                                    } else {
                                         createdModules[createdModulesSize - 1]->removeModule();
                                         createdModules.pop_back();
                                         newChildAmount--;
+                                        createdModules[createdModulesSize - 1]->expressed = false;
                                     }
-                                }
-                                else{
+                                } else {
                                     createdModules[createdModulesSize - 1]->removeModule();
                                     createdModules.pop_back();
                                     newChildAmount--;
+                                    createdModules[createdModulesSize - 1]->expressed = false;
                                 }
-							}
-							else{
+                            }
+                            else{
                                 createdModules[createdModulesSize - 1]->removeModule();
                                 createdModules.pop_back();
                                 newChildAmount--;
-							}
+                                createdModules[createdModulesSize - 1]->expressed = false;
+                            }
 							//					if (createdModules[createdModules.size() - 1]->objectHandles.size() > 4) {
 							//						cout << "break" << endl;
 							//					}
@@ -193,39 +202,6 @@ void ER_LSystemInterpreter::incrementLSystem() {
 		}
 	}
 //	cout << endl;
-}
-
-bool ER_LSystemInterpreter::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
-    // TODO EB: Implement a way to ignore visuals.
-    bool collision = true;
-    for (int n = 0; n < module->objectHandles.size(); n++) {
-        if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
-            for (int i = 0; i < createdModules.size() - 1; i++) {
-                for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
-                    if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
-                        for (int k = 0; k < exceptionHandles.size(); k++) {
-                            if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-            // check collision with environment
-            for (int i = 0; i < settings->envObjectHandles.size(); i++) {
-                if (module->objectHandles[n] != settings->envObjectHandles[i]) {
-                    for (int k = 0; k < exceptionHandles.size(); k++) {
-                        if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
-                            if (createdModules[i]->objectHandles[n] != exceptionHandles[k]) {
-                                return true;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return false;
 }
 
 void ER_LSystemInterpreter::checkForceSensors() {
@@ -585,12 +561,6 @@ int ER_LSystemInterpreter::initializeLSystem(int amountIncrement, float initialP
 			incrementLSystem();
 		}
 	}
-	if (createdModules[0]->type != 8 ) {
-		Development::shiftRobotPosition();
-	}
-//	float pos[3];
-//	simGetObjectPosition(createdModules[0]->objectHandles[0], -1, pos);
-//	cout << pos[0] << "," << pos[1] << "," << pos[2] << endl;
 	
 	if (settings->evolutionType == settings->EMBODIED_EVOLUTION) {
 		// set module IDs so they can be controlled
@@ -648,12 +618,6 @@ void ER_LSystemInterpreter::init() { // should use create instead
 	setPhenValue();
 }
 
-void ER_LSystemInterpreter::initCustomMorphology() {
-	initializeGenomeCustom(0);
-	float position[3] = { 0, 0, 0.1 };
-	initializeLSystem(settings->lIncrements, position); // amount increment is not in genome anymore
-}
-
 shared_ptr<Morphology> ER_LSystemInterpreter::clone() const {
 	BaseMorphology::clone();
 	shared_ptr<ER_LSystemInterpreter> ur = make_unique<ER_LSystemInterpreter>(*this);
@@ -673,14 +637,7 @@ void ER_LSystemInterpreter::updateColors() {
 
 void ER_LSystemInterpreter::update() {	
 	vector<float> input;
-	if (settings->environmentType == settings->ENV_SWITCHOBJECTIVE) {
-		if (simGetSimulationTime() >= 15) {
-			if (incrementer == false) {
-				incrementLSystem();
-				incrementer = true; 
-			}
-		}
-	}
+	/// Update neural network
 	for (int i = 0; i < createdModules.size(); i++) {
 		//float outputModule = 
 		vector<float> moduleInput;
@@ -715,10 +672,6 @@ void ER_LSystemInterpreter::update() {
 		}
 
 	}
-	if (createdModules.size() < 2) {
-		simStopSimulation();
-	}
-	//updateColors();
 	checkForceSensors(); 
 }
 
@@ -974,82 +927,4 @@ void ER_LSystemInterpreter::symmetryMutation(float mutationRate) {
 		}
 	}
 	cout << "Done with symmetry mutation" << endl;
-}
-/// Check for collisions. If there is a colliding object, remove it from the genome representation.
-bool ER_LSystemInterpreter::bCheckCollision(int iParentHandle, int createdModulesSize) {
-    bool bViabilityResult = true;
-    vector<int> exception;
-    exception.push_back(iParentHandle);
-    for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
-        exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
-    }
-    if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
-        if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
-        }
-        bViabilityResult = true;
-    }
-    else{
-        if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
-        }
-        bViabilityResult = false;
-    }
-    return bViabilityResult;
-}
-/// If object is above the ground, it can be created
-bool ER_LSystemInterpreter::bCheckGround(int createdModulesSize) {
-    bool bViabilityResult = true;
-    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
-        if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
-        }
-        bViabilityResult = true;
-    }
-    else{
-        if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
-        }
-        bViabilityResult = false;
-    }
-    return bViabilityResult;
-}
-/// Check for orientation. If the orientation of the organ is printable
-bool ER_LSystemInterpreter::bCheckOrientation(int createdModulesSize){
-    bool bViabilityResult = true;
-    // If the orientation of the organ is printable
-    if (createdModules[createdModulesSize - 1]->type == 14 ||
-        createdModules[createdModulesSize - 1]->type == 15) {
-        if(
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[1] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[0] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[1] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[0] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886 && abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
-                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
-                settings->bNonprintableOrientations){
-            if (settings->verbose) {
-                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                     << " Good orientation - PASSED." << endl;
-            }
-            bViabilityResult = true;
-        }
-        else{
-            if (settings->verbose) {
-                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                     << " Good orientation - FAILED." << endl;
-            }
-            bViabilityResult = false;
-        }
-    }
-    else { // If organ is not brain or sensor
-        if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                 << " Good orientation - PASSED." << endl;
-        }
-        bViabilityResult = true;
-    }
-    return bViabilityResult;
 }

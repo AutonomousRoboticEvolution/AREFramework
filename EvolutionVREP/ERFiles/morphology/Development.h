@@ -11,8 +11,7 @@
 using namespace std;
 using namespace Eigen;
 
-class Development :
-	public BaseMorphology
+class Development :	public BaseMorphology
 {
 public:
 	Development();
@@ -112,6 +111,17 @@ public:
 //	void cubeDrawing(vector<vector<float>> rotatedPoints, float color[3]);
 //	vector<int> debugDrawings;
 //	bool checkCollisionBasedOnRotatedPoints(int objechHandle);
+    /// Check whether two components are colliding
+    bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
+    /// Viability methods
+    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
+    bool bCheckCollision(int iParentHandle, int createdModulesSize);
+    /// Check for ground. If object is above the ground, it can be created
+    bool bCheckGround(int createdModulesSize);
+    /// Check for orientation. If the orientation of the organ is printable
+    bool bCheckOrientation(int createdModulesSize);
+    /// Check of number of organs.
+    bool bCheckOrgansNumber(int createdModulesSize);
 
 protected:
 

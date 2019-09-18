@@ -37,7 +37,7 @@ Settings::Settings() {
 
 	maxNumberModules = 20;
 	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
-	morphologyType = MODULAR_DIRECT;
+	morphologyType = MODULAR_LSYSTEM;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_DEFAULT;
 	populationSize = 100;

@@ -27,9 +27,8 @@ public:
 	void printSome();
 
 	void initializeGenomeCustom(int type);
-	void initializeQuadruped(int type);
-	void initializeSolar(int type);
-	virtual const std::string generateGenome(int individual, float fitness) const override;
+
+    virtual const std::string generateGenome(int individual, float fitness) const override;
 	float getFitness();
 	bool loadGenome(std::istream &input, int individualNumber);
 	void symmetryMutation(float mutationRate);

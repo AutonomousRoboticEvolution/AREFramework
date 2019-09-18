@@ -31,7 +31,6 @@ public:
 	void savePhenotype(int ind, float fitness);
 	void initializeGenomeCustom(int type);
 	void initializeLRobot(int type);
-	bool checkLCollisions(shared_ptr <ER_Module> module, vector<int> exceptionHandles);
 
 	int initializeLSystem(int increments, float initialPosition[3]);
 	float getFitness();
@@ -65,13 +64,4 @@ public:
 
 //	VREPUI *vrepUI;
 	shared_ptr<VREPUI> vrepUI;
-
-    /// Viability methods
-    /// Check for collisions. If there is a colliding object, remove it from the genome representation.
-    bool bCheckCollision(int iParentHandle, int createdModulesSize);
-    /// Check for ground. If object is above the ground, it can be created
-    bool bCheckGround(int createdModulesSize);
-    /// Check for orientation. If the orientation of the organ is printable
-    bool bCheckOrientation(int createdModulesSize);
-
 };

@@ -487,3 +487,164 @@ void Development::checkGenome(int individualNumber, int sceneNum) {
 void Development::checkControl(int individual, int sceneNum) {
 	checkGenome(individual, sceneNum);
 }
+/// Check whether two components are colliding
+bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
+    // TODO EB: Implement a way to ignore visuals.
+    bool collision = true;
+    for (int n = 0; n < module->objectHandles.size(); n++) {
+        if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
+            for (int i = 0; i < createdModules.size() - 1; i++) {
+                for (int j = 0; j < createdModules[i]->objectHandles.size(); j++) {
+                    if (simCheckCollision(module->objectHandles[n], createdModules[i]->objectHandles[j]) == true) {
+                        for (int k = 0; k < exceptionHandles.size(); k++) {
+                            if (createdModules[i]->objectHandles[j] != exceptionHandles[k]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            // check collision with environment
+            for (int i = 0; i < settings->envObjectHandles.size(); i++) {
+                if (module->objectHandles[n] != settings->envObjectHandles[i]) {
+                    for (int k = 0; k < exceptionHandles.size(); k++) {
+                        if (simCheckCollision(module->objectHandles[n], settings->envObjectHandles[i]) == true) {
+                            if (createdModules[i]->objectHandles[n] != exceptionHandles[k]) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    return false;
+}
+/// Check for collisions. If there is a colliding object, remove it from the genome representation.
+bool Development::bCheckCollision(int iParentHandle, int createdModulesSize) {
+    bool bViabilityResult = true;
+    vector<int> exception;
+    exception.push_back(iParentHandle);
+    for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
+        exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
+    }
+    if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// Check for ground. If object is above the ground, it can be created
+bool Development::bCheckGround(int createdModulesSize) {
+    bool bViabilityResult = true;
+    if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
+        }
+        bViabilityResult = true;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    return bViabilityResult;
+}
+/// Check for orientation. If the orientation of the organ is printable
+bool Development::bCheckOrientation(int createdModulesSize) {
+    bool bViabilityResult = true;
+    // If the orientation of the organ is printable
+    if (createdModules[createdModulesSize - 1]->type == 14 ||
+        createdModules[createdModulesSize - 1]->type == 15) {
+        if(
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[1] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[0] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[1] < -1.48353) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[0] > 1.48353) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886 && abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[2] > -0.0872665)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] < 1.65806 && createdModules[createdModulesSize - 1]->absOri[2] > 1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (createdModules[createdModulesSize - 1]->absOri[2] > -1.65806 && createdModules[createdModulesSize - 1]->absOri[2] < -1.48353)) ||
+                ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
+                settings->bNonprintableOrientations){
+            if (settings->verbose) {
+                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - PASSED." << endl;
+            }
+            bViabilityResult = true;
+        }
+        else{
+            if (settings->verbose) {
+                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - FAILED." << endl;
+            }
+            bViabilityResult = false;
+        }
+    }
+    else { // If organ is not brain or sensor
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Good orientation - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
+}
+/// Check of number of organs.
+bool Development::bCheckOrgansNumber(int createdModulesSize) {
+    bool bViabilityResult = true;
+    int brainCounter = 0;
+    int motorCounter = 0;
+    int sensorCounter = 0;
+    int jointCounter = 0;
+    int boneCounter = 0;
+    for (int i = 0; i < createdModulesSize; ++i) {
+        if (createdModules[createdModulesSize - 1]->expressed){
+            switch (createdModules[i]->type){
+                case 13:
+                    brainCounter++;
+                    break;
+                case 14:
+                    motorCounter++;
+                    break;
+                case 15:
+                    sensorCounter++;
+                    break;
+                case 16:
+                    jointCounter++;
+                    break;
+                case 17:
+                    boneCounter++;
+                    break;
+                default:
+                    std::cout << "ERROR: Organ type does not exist in bCheckOrgansNumber() " << std::endl;
+                    break;
+            }
+
+        }
+    }
+    if(((createdModules[createdModulesSize - 1]->type == 14 && motorCounter >= 2) ||
+        (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter >= 2)) && !settings->bAnyOrgansNumber){
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - FAILED." << endl;
+        }
+        bViabilityResult = false;
+    }
+    else{
+        if (settings->verbose) {
+            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - PASSED." << endl;
+        }
+        bViabilityResult = true;
+    }
+    return bViabilityResult;
+}

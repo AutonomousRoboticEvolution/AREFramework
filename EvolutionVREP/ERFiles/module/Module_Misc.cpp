@@ -31,6 +31,8 @@ int Module_Misc::mutate(float mutationRate) {
 int Module_Misc::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
     // Load virtual module model
 	int miscHandle = simLoadModel(("models/" + filename).c_str());
+    // This grants enough time for VREP to load the core organ.
+	usleep(1000000); // TODO: EB - is this necessary?
 	if (miscHandle < 0) {
 		std::cerr << "Error models/"+filename << std::endl;
 	}

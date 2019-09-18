@@ -172,262 +172,6 @@ void ER_LSystem::initializeGenomeCustom(int type)
 	cf.reset();
 }
 
-void ER_LSystem::initializeQuadruped(int type)
-{
-	float red[3] = { 1.0, 0, 0 };
-	float blue[3] = { 0.0, 0.0, 1.0 };
-	float yellow[3] = { 1.0, 1.0, 0.0 };
-	float green[3] = { 0.0, 0.3, 0.0 };
-	float orange[3] = { 1.0, 0.5, 0.0 };
-	float orangePlus[3] = { 1.0, 0.6, 0.2 };
-	float black[3] = { 0.0, 0.0, 0 };
-	float pink[3] = { 1.0, 0.5, 0.5 };
-	float white[3] = { 1.0, 1.0, 1.0 };
-
-	cout << "initializing Quadruped L-System Genome" << endl;
-
-	morphFitness = 0;
-	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-
-	for (int i = 0; i < lGenome->amountStates; i++) {
-		lGenome->lParameters.push_back(shared_ptr<LPARAMETERS>(new LPARAMETERS));
-		lGenome->lParameters[i]->currentState = i;
-		if (i == 0) {
-			lGenome->lParameters[i]->type = 1;
-		}
-		else if (i == 4) {
-			lGenome->lParameters[i]->type = 12;
-		}
-		else {
-			lGenome->lParameters[i]->type = 4;
-		}
-		lGenome->lParameters[i]->amountChilds = 0;
-		vector<float>tempVector;
-
-		lGenome->lParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
-		lGenome->lParameters[i]->control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
-		//	cout << "Initializing state modules" << endl; 
-		switch (i) {
-		case 0:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = red[j];
-			}
-			break;
-		case 1:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = blue[j];
-			}
-			break;
-		case 2:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = yellow[j];
-			}
-			break;
-		case 3:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = pink[j];
-			}
-			break;
-		case 4:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = green[j];
-			}
-		case 5:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = orange[j];
-			}
-		default:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = white[j];
-			}
-			break;
-		}
-
-		if (i == 0) {
-			// head
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(4);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			
-			// servos
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(4);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(1);
-			lGenome->lParameters[i]->childSiteStates.push_back(2);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(2);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(3);
-			lGenome->lParameters[i]->childSiteStates.push_back(2);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			
-			//		lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//		lGenome->lParameters[i]->childSites.push_back(2);
-			//		lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//		lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//		lGenome->lParameters[i]->childConfigurations.push_back(2);
-			//		lGenome->lParameters[i]->childSites.push_back(3);
-			//		lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//		lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//			lGenome->lParameters[i]->childSites.push_back(2);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			/*	lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(2);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(3);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(4);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();*/
-		}
-		else if (i == 1) {
-			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(3);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->module = lGenome->moduleFactory->createModuleGenome(4, randomNum, settings);
-			//			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//			lGenome->lParameters[i]->childSites.push_back(1);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-			//			lGenome->lParameters[i]->module = lGenome->moduleFactory->createModuleGenome(4, randomNum, settings);
-			//			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			//			lGenome->lParameters[i]->childSites.push_back(2);
-			//			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			//			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}
-		else if (i == 2) {
-			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(3);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}
-		else if (i == 3) {
-		}
-		else if (i == 4) {
-		}
-		else {
-		}
-	}
-	cf.reset();
-}
-
-void ER_LSystem::initializeSolar(int type)
-{
-
-	float red[3] = { 1.0, 0, 0 };
-	float blue[3] = { 0.0, 0.0, 1.0 };
-	float yellow[3] = { 1.0, 1.0, 0.0 };
-	float green[3] = { 0.0, 0.3, 0.0 };
-	float orange[3] = { 1.0, 0.5, 0.0 };
-	float orangePlus[3] = { 1.0, 0.6, 0.2 };
-	float black[3] = { 0.0, 0.0, 0 };
-	float pink[3] = { 1.0, 0.5, 0.5 };
-	float white[3] = { 1.0, 1.0, 1.0 };
-
-	cout << "initializing Quadruped L-System Genome" << endl;
-
-	morphFitness = 0;
-	unique_ptr<ControlFactory> cf = unique_ptr<ControlFactory>(new ControlFactory);
-
-	for (int i = 0; i < lGenome->amountStates; i++) {
-		lGenome->lParameters.push_back(shared_ptr<LPARAMETERS>(new LPARAMETERS));
-		lGenome->lParameters[i]->currentState = i;
-		if (i == 0) {
-			lGenome->lParameters[i]->type = 8;
-		}
-		else if (i == 4) {
-			lGenome->lParameters[i]->type = 11;
-		}
-		else {
-			lGenome->lParameters[i]->type = 4;
-		}
-		lGenome->lParameters[i]->amountChilds = 0;
-		vector<float>tempVector;
-
-		lGenome->lParameters[i]->control = cf->createNewControlGenome(settings->controlType, randomNum, settings);
-		lGenome->lParameters[i]->control->init(6, 1, 2);
-		//	cout << "Initializing state modules" << endl; 
-		switch (i) {
-		case 0:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = red[j];
-			}
-			break;
-		case 1:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = blue[j];
-			}
-			break;
-		case 2:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = yellow[j];
-			}
-			break;
-		case 3:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = pink[j];
-			}
-			break;
-		case 4:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = green[j];
-			}
-		case 5:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = orange[j];
-			}
-		default:
-			for (int j = 0; j < 3; j++) {
-				lGenome->lParameters[i]->color[j] = white[j];
-			}
-			break;
-		}
-
-		if (i == 0) {
-			// head
-			lGenome->lParameters[i]->childConfigurations.push_back(0);
-			lGenome->lParameters[i]->childSites.push_back(1);
-			lGenome->lParameters[i]->childSiteStates.push_back(1);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}
-		else if (i == 1) {
-			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(2);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}
-		else if (i == 2) {
-			lGenome->lParameters[i]->childConfigurations.push_back(1);
-			lGenome->lParameters[i]->childSites.push_back(0);
-			lGenome->lParameters[i]->childSiteStates.push_back(4);
-			lGenome->lParameters[i]->amountChilds = lGenome->lParameters[i]->childSites.size();
-		}
-		else if (i == 3) {
-		}
-		else if (i == 4) {
-		}
-		else {
-		}
-	}
-	//settings->morphMutRate = -0.1;
-	cf.reset();
-}
-
-
 const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
 {
 //	cout << "saving lGenome " << indNum << " in folder " << sceneNum << ", that had a fitness of " << fitness << endl << "-------------------------------- "<< endl;
@@ -629,9 +373,6 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 	float white[3] = { 0.95,0.95,0.95 };
 	float grey[3] = { 0.45,0.45,0.45 };
 
-
-	//	lGenome->lParameters.resize(lGenome->amountStates);
-	//	cout << "amount of states = " << lGenome->amountStates << endl; 
 	morphFitness = 0;
 	for (int i = 0; i < lGenome->amountStates; i++) {
 		switch (i) {
@@ -673,31 +414,13 @@ bool ER_LSystem::loadGenome(std::istream &genomeInput, int individualNumber)
 		}
 	}
 	return true;
-//	cout << "loaded L-System genome" << endl;
 }
-
-
 
 void ER_LSystem::init() {
 	lGenome = shared_ptr<LGENOME>(new LGENOME);
 	maxModuleTypes = settings->maxModuleTypes;
-	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->morphologyType != settings->QUADRUPED_GENERATIVE 
-		&& settings->morphologyType != settings->CUSTOM_SOLAR_GENERATIVE) {
-//		initializeGenomeCustom(0);
-		initializeLGenome(0);
-	}
-	if (settings->morphologyType == settings->QUADRUPED_GENERATIVE) {
-		initializeQuadruped(0);
-	}
-	else if (settings->morphologyType == settings->CUSTOM_SOLAR_GENERATIVE) {
-		initializeSolar(0);
-	}
-	else {
-//		initializeLRobot(0);
-	}
+	initializeLGenome(0);
 }
-
-
 
 int ER_LSystem::initializeLGenome(int type) {
 	/// first read settings
@@ -777,7 +500,6 @@ int ER_LSystem::initializeLGenome(int type) {
 	// Randomly mutate for initial population
 	mutateERLGenome(0.5);
 	mutateControlERLGenome(0.5);
-
 	cf.reset();
 	return 1;
 }
@@ -827,6 +549,7 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 	if (settings->verbose) {
 		std::cout << "Mutating L-Genome" << std::endl;
 	}
+	/// For each symbol
 	for (int i = 0; i < lGenome->lParameters.size(); i++) {
 		// mutate the controller. 
 		if (!lGenome->lParameters[i]->control) {
@@ -835,68 +558,71 @@ int ER_LSystem::mutateERLGenome(float mutationRate) {
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
 		// Resize the rules (Potentially very destructive) 
 		int childSize = lGenome->lParameters[i]->childSites.size();
-
-		if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // randomly change amount childs, very destructive mutation
+        /// Randomly changes number of children, very destructive mutation
+		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			int maxCh = 0;
 			maxCh = getMaxChilds(lGenome->lParameters[i]->type);
 			if (settings->verbose) {
 				cout << "maxCh of module " << i << " is " << maxCh << endl;
 			}
-			if (maxCh != 0) {
-				int newChildSize = randomNum->randInt(maxCh + 1, 0);
-				if (settings->verbose) {
-					std::cout << "newChildSize = " << newChildSize << std::endl;
-					std::cout << "site vector size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
-				}
-				while (lGenome->lParameters[i]->childSites.size() < newChildSize) {
-					if (settings->verbose) {
-						std::cout << "while" << std::endl;
-					}
-					// TODO make another object containing child site, state and orientation. Struct?
-					vector<int> sitebuffer = lGenome->lParameters[i]->childSites;
-					lGenome->lParameters[i]->childSites.push_back(getNewSite(maxCh, -1, sitebuffer));
-					lGenome->lParameters[i]->childSiteStates.push_back(randomNum->randInt(lGenome->amountStates, 0));
-					lGenome->lParameters[i]->childConfigurations.push_back(randomNum->randInt(4,0));
-				}
-				if (settings->verbose) {
-					std::cout << "size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
-				}
-				else if (lGenome->lParameters[i]->childSites.size() > newChildSize) {
-					if (settings->verbose) {
-						std::cout << "erasing" << std::endl;
-					}
-					while (lGenome->lParameters[i]->childSites.size() > newChildSize) { // now removes random site
-						int rSite = randomNum->randInt(lGenome->lParameters[i]->childSites.size(), 0);
-						lGenome->lParameters[i]->childSites.erase(lGenome->lParameters[i]->childSites.begin() + rSite);
-						lGenome->lParameters[i]->childSiteStates.erase(lGenome->lParameters[i]->childSiteStates.begin() + rSite);
-						lGenome->lParameters[i]->childConfigurations.erase(lGenome->lParameters[i]->childConfigurations.begin() + rSite);
-					}
-				}
-			}
+            if (maxCh != 0) {
+                int newChildSize = randomNum->randInt(maxCh + 1, 0);
+                if (settings->verbose) {
+                    std::cout << "newChildSize = " << newChildSize << std::endl;
+                    std::cout << "site vector size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
+                }
+                /// Add children
+                while (lGenome->lParameters[i]->childSites.size() < newChildSize) {
+                    if (settings->verbose) {
+                        std::cout << "Adding children..." << std::endl;
+                    }
+                    // TODO make another object containing child site, state and orientation. Struct?
+                    vector<int> sitebuffer = lGenome->lParameters[i]->childSites;
+                    lGenome->lParameters[i]->childSites.push_back(getNewSite(maxCh, -1, sitebuffer));
+                    lGenome->lParameters[i]->childSiteStates.push_back(randomNum->randInt(lGenome->amountStates, 0));
+                    lGenome->lParameters[i]->childConfigurations.push_back(randomNum->randInt(4, 0));
+                }
+                /// Remove children
+                if (lGenome->lParameters[i]->childSites.size() > newChildSize) {
+                    if (settings->verbose) {
+                        std::cout << "Removing children" << std::endl;
+                    }
+                    while (lGenome->lParameters[i]->childSites.size() > newChildSize) { // now removes random site
+                        int rSite = randomNum->randInt(lGenome->lParameters[i]->childSites.size(), 0);
+                        lGenome->lParameters[i]->childSites.erase(lGenome->lParameters[i]->childSites.begin() + rSite);
+                        lGenome->lParameters[i]->childSiteStates.erase(
+                                lGenome->lParameters[i]->childSiteStates.begin() + rSite);
+                        lGenome->lParameters[i]->childConfigurations.erase(
+                                lGenome->lParameters[i]->childConfigurations.begin() + rSite);
+                    }
+                }
+            }
 			if (settings->verbose) {
 				std::cout << "size = " << lGenome->lParameters[i]->childSites.size() << std::endl;
 			}
-			// mutate the sites
+			/// Mutate sites (position, orientation and type)
 			for (int j = 0; j < lGenome->lParameters[i]->childSites.size(); j++) {
 				if (settings->verbose) {
 					std::cout << "j = " << j << std::endl;
 				}
-				if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // change child configuration and state at random
+				/// Change configuration and states
+				if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 					if (maxCh != 0) {
 						if (settings->verbose) {
-							std::cout << "randomizing" << std::endl;
+							std::cout << "Changing sites..." << std::endl;
 						}
 						lGenome->lParameters[i]->childSites[j] = getNewSite(maxCh, lGenome->lParameters[i]->childSites[j], lGenome->lParameters[i]->childSites);
 						lGenome->lParameters[i]->childSiteStates[j] = randomNum->randInt(lGenome->amountStates,0);
 						lGenome->lParameters[i]->childConfigurations[j] = randomNum->randInt(4, 0);
 					}
 				}
-				if (randomNum->randFloat(0.0, 1.0) < mutationRate) { // swap sites
+				/// Swap sites
+				if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 					if (maxCh >= 2) {
 						int swapCandidate = randomNum->randInt(lGenome->lParameters[i]->childSites.size(), 0);
 						if (j != swapCandidate) { 
 							if (settings->verbose) {
-								std::cout << "swapping" << std::endl;
+								std::cout << "Swapping sites..." << std::endl;
 							}
 							int siteSwapCandidateBuffer = lGenome->lParameters[i]->childSites[swapCandidate];
 							int stateSwapCandidateBuffer = lGenome->lParameters[i]->childSiteStates[swapCandidate];
