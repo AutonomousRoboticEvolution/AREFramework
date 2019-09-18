@@ -340,9 +340,9 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     simSetObjectPosition(dummy, dummy, dPos);
     simSetObjectParent(dummy, parentHandle, true);
     // Create cube
-    float cubeSize = 0.018;
-    float size[3] = { cubeSize, cubeSize, cubeSize };
-    int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
+    const float cubeSize = 0.018;
+    const float size[3] = { cubeSize, cubeSize, cubeSize };
+    int cube = simCreatePureShape(0, objectPhysics, size, 0.3, nullptr);
     float objectOrigin[3];
     objectOrigin[0] = configuration[0];
     objectOrigin[1] = configuration[1];
@@ -365,9 +365,9 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     // Create children dummies
     vector<int> dummies;
     for (int i = 0; i < 5; i++) {
-        dummies.push_back(simCreateDummy(0.01,0));
+        dummies.push_back(simCreateDummy(0.01, nullptr));
     }
-    float d1[3] = { 0.0,0.0, cubeSize * 0.5 };
+    float d1[3] = { 0.0,0.0, cubeSize * 0.5f };
     float d1R[3] = { 0.0,0.0, 0.0 };
     float d2[3] = { 0.0,0.0, 0.0 };
     float d2R[3] = { 0.5 * M_PI,0.0, 0.0 };
@@ -397,9 +397,9 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     simSetObjectOrientation(dummies[4], cube, d5R);
     simSetObjectPosition(dummies[4], dummies[4], d1);
 
-    for (int i = 0; i < dummies.size(); i++) {
-        simSetObjectParent(dummies[i], cube, true);
-        partHandles.push_back(dummies[i]);
+    for (int dummie : dummies) {
+        simSetObjectParent(dummie, cube, true);
+        partHandles.push_back(dummie);
     }
     // Return all handles
     return partHandles;
