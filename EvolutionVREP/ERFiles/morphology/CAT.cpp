@@ -7,8 +7,7 @@ using namespace std;
 
 CAT::CAT()
 {
-	float position[3] = { 0.0, 0.0, 1.0 };
-	va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
+    va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }
 
 
@@ -108,7 +107,7 @@ bool CAT::loadGenome(int individualNumber, int sceneNum) {
 	list<string>::const_iterator it = values.begin();
 	for (it = values.begin(); it != values.end(); it++) {
 		string tmp = *it;
-		if (checkingControl == true) {
+		if (checkingControl) {
 			controlValues.push_back(tmp);
 		}
 		if (tmp == "#Fitness:") {

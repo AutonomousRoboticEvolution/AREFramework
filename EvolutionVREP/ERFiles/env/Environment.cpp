@@ -15,31 +15,24 @@ void Environment::sceneLoader() {
 }
 
 void Environment::init() {
-	envObjectHandles.clear(); // every time the environment is created, it removes all objects and creates them again
-	//simLoadScene("scenes/DefaultERLight.ttt");
-	//simLoadScene("scenes/Cat_Scene2.ttt");
-    //simLoadScene("scenes/myScenes/ExperimentArena7.ttt");
+    // Every time the environment is created, it removes all objects and creates them again
+	envObjectHandles.clear();
 	initialPos.resize(3);
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
-	cout << "environment Initialized" << endl;
-	float ts[1];
-	int a = simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
-	int b = simGetFloatingParameter(sim_floatparam_simulation_time_step, ts);
-//	int f = 0;
-//	simSetSimulationTimeStep(50);
-//	int a[1];
-//	simGetInt32Parameter(sim_intparam_dynamic_step_divider, a);
+	std::cout << "Environment initialized" << std::endl;
+	// Sets time step
+	simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
 }
 
 void Environment::print() {
-	cout << "Environment is here" << endl; 
+    std::cout << "Environment is here" << std::endl;
 }
 
 float Environment::fitnessFunction(MorphologyPointer morph) {
 	float fitness = 0.0;
-	cout << "empty morphology" << endl;
+    std::cout << "empty morphology" << std::endl;
 	return fitness;
 }
 

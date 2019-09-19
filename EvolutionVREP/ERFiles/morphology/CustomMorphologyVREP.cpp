@@ -1,9 +1,10 @@
 #include "CustomMorphologyVREP.h"
 
+using namespace std;
+
 CustomMorphologyVREP::CustomMorphologyVREP()
 {
 }
-
 
 CustomMorphologyVREP::~CustomMorphologyVREP()
 {
@@ -38,7 +39,8 @@ vector<int> CustomMorphologyVREP::getJointHandles(int parentHandle)
     return jointHandles;
 }
 
-void CustomMorphologyVREP::update() {
+void CustomMorphologyVREP::update()
+{
     if (control) {
         vector<float> input; // get sensor parameters, not set in this case
         for (int i = 0; i < sensorHandles.size(); i++) {
@@ -107,8 +109,8 @@ void CustomMorphologyVREP::create()
 
 }
 
-
-shared_ptr<Morphology> CustomMorphologyVREP::clone() const {
+shared_ptr<Morphology> CustomMorphologyVREP::clone() const
+{
     // shared_ptr<Morphology>()
     shared_ptr<CustomMorphologyVREP> cat = make_unique<CustomMorphologyVREP>(*this);
     cat->control = control->clone();

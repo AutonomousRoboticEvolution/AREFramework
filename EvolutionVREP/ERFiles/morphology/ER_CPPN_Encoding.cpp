@@ -1,15 +1,14 @@
 #include "ER_CPPN_Encoding.h"
 #include <iostream>
-#include <sstream>
 #include <cmath>
 
+using namespace std;
 
 ER_CPPN_Encoding::ER_CPPN_Encoding()
 {
 	// cout << "CREATED CPPN ENCODING" << endl;
 	modular = true;
 }
-
 
 ER_CPPN_Encoding::~ER_CPPN_Encoding()
 {
@@ -25,7 +24,8 @@ ER_CPPN_Encoding::~ER_CPPN_Encoding()
 	//}
 }
 
-void ER_CPPN_Encoding::init() {
+void ER_CPPN_Encoding::init()
+{
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	maxModuleTypes = settings->maxModuleTypes;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->morphologyType != settings->QUADRUPED_DIRECT) {
@@ -38,7 +38,8 @@ void ER_CPPN_Encoding::init() {
 	
 }
 
-int ER_CPPN_Encoding::initializeGenome(int type) {
+int ER_CPPN_Encoding::initializeGenome(int type)
+{
 	//first read settings
 
 	if (settings->verbose) {
@@ -86,13 +87,13 @@ int ER_CPPN_Encoding::initializeGenome(int type) {
 	return 1;
 }
 
-
-void ER_CPPN_Encoding::mutate() {
+void ER_CPPN_Encoding::mutate()
+{
 	mutateCPPN(settings->morphMutRate);
 }
 
-
-int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
+int ER_CPPN_Encoding::mutateCPPN(float mutationRate)
+{
 	if (settings->verbose) {
 		cout << "mutating CPPN" << endl;
 	}
@@ -104,8 +105,8 @@ int ER_CPPN_Encoding::mutateCPPN(float mutationRate) {
 	return 1;
 }
 
-
-void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+{
 		
 	shared_ptr<ER_CPPN_Encoding>morpho(static_pointer_cast<ER_CPPN_Encoding>(partnerMorph));   //*partnerMorph(ER_CPPN_Encoding()));
 	shared_ptr<GENOTYPE> tempGenome;
@@ -127,11 +128,11 @@ void ER_CPPN_Encoding::crossover(shared_ptr<Morphology> partnerMorph, float cr) 
 	}
 }
 
-void ER_CPPN_Encoding::printSome() {
+void ER_CPPN_Encoding::printSome()
+{
 	BaseMorphology::printSome();
 	cout << "printing some from ER_CPPN_Encoding : Use this function for debugging" << endl;
 }
-
 
 /*!
  * Temporary function for future use
@@ -162,7 +163,8 @@ void ER_CPPN_Encoding::initializeQuadruped(int type)
  * \param indNum
  * \param fitness
  */
-const std::string ER_CPPN_Encoding::generateGenome(int indNum, float fitness) const {
+const std::string ER_CPPN_Encoding::generateGenome(int indNum, float fitness) const
+{
 	if (settings->verbose) {
 		cout << "generating CPPN genome " << endl << "-------------------------------- " << endl;
 	}
@@ -185,7 +187,8 @@ const std::string ER_CPPN_Encoding::generateGenome(int indNum, float fitness) co
 	return genomeText.str();
 }
 
-float ER_CPPN_Encoding::getFitness() {
+float ER_CPPN_Encoding::getFitness()
+{
 	return fitness;
 }
 
@@ -392,9 +395,8 @@ bool ER_CPPN_Encoding::loadGenome(std::istream &genomeInput, int individualNumbe
 	return true;
 }
 
-
-
-shared_ptr<Morphology> ER_CPPN_Encoding::clone() const {
+shared_ptr<Morphology> ER_CPPN_Encoding::clone() const
+{
 	BaseMorphology::clone();
 	shared_ptr<ER_CPPN_Encoding> ur = make_unique<ER_CPPN_Encoding>(*this);
 	ur->genome = this->genome->clone();
@@ -409,16 +411,18 @@ shared_ptr<Morphology> ER_CPPN_Encoding::clone() const {
 	return ur;
 }
 
-void ER_CPPN_Encoding::update() {
+void ER_CPPN_Encoding::update()
+{
 	cout << "cannot update Genome:: no phenotype" << endl;
 }
 
-void ER_CPPN_Encoding::symmetryMutation(float mutationRate) {
+void ER_CPPN_Encoding::symmetryMutation(float mutationRate)
+{
 	cout << "This version does not support symmetry mutation, check code" << endl;
 }
 
-
-int ER_CPPN_Encoding::mutateControlERGenome(float mutationRate) {
+int ER_CPPN_Encoding::mutateControlERGenome(float mutationRate)
+{
 	cout << "mutating l-genome" << endl;
 	for (int i = 0; i < genome->moduleParameters.size(); i++) {
 		//		cout << "i = " << i << endl; 
@@ -435,9 +439,8 @@ void ER_CPPN_Encoding::deleteModuleFromGenome(int num)
 	}
 }
 
-
-
-void ER_CPPN_Encoding::checkGenome(int individualNumber, int sceneNum) {
+void ER_CPPN_Encoding::checkGenome(int individualNumber, int sceneNum)
+{
 	cout << "checkingGenome" << endl;
 	ostringstream genomeFileName;
 	genomeFileName << "interfaceFiles\\morphologies" << sceneNum << "\\genome" << individualNumber << ".csv";
@@ -492,6 +495,7 @@ void ER_CPPN_Encoding::checkGenome(int individualNumber, int sceneNum) {
 	cout << "checked L-System genome" << endl;
 }
 
-void ER_CPPN_Encoding::checkControl(int individual, int sceneNum) {
+void ER_CPPN_Encoding::checkControl(int individual, int sceneNum)
+{
 	checkGenome(individual, sceneNum);
 }

@@ -52,6 +52,8 @@ shared_ptr<Control> ControlFactory::createNewControlGenome(int type, shared_ptr<
         fixedStructureANN->settings = st;
         return fixedStructureANN;
     }
+
+    return nullptr;
 }
 
 

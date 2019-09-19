@@ -1,20 +1,22 @@
 #pragma once
+
+#include <memory>
 #include "ER_Module.h"
 #include "Module_Cube.h"
 #include "Module_Servo.h"
 #include "Module_Misc.h"
 #include "Module_Bone.h"
-#include <memory>
-//#include "../../dynamixel/c++/src/dynamixel_sdk.h"
+
 
 class ModuleFactory
 {
 public:
 	ModuleFactory();
 	~ModuleFactory();
-	shared_ptr<ER_Module> createModuleGenome(int moduleType, shared_ptr<RandNum> rn, shared_ptr<Settings> st);
-	shared_ptr<ER_Module> copyModuleGenome(shared_ptr<ER_Module> parentModule);
-	shared_ptr<RandNum> randomNum;
+    std::shared_ptr<ER_Module> createModuleGenome(int moduleType, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
+    std::shared_ptr<ER_Module> copyModuleGenome(std::shared_ptr<ER_Module> parentModule);
+    std::shared_ptr<RandNum> randomNum;
+
 private:
 	enum ModuleType
 	{

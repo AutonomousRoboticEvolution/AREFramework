@@ -1,5 +1,4 @@
 #include "NeuronFactory.h"
-#include <iostream>
 #include <memory>
 using namespace std;
 

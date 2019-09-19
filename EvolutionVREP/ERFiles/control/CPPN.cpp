@@ -1,10 +1,11 @@
 #include "CPPN.h"
 
+using namespace std;
+
 CPPN::CPPN()
 {
 	// init(2, 2, 3); // creates a feedforward network of five neurons
 }
-
 
 CPPN::~CPPN()
 {

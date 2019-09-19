@@ -1,5 +1,6 @@
-#pragma once
 #include "Settings.h"
+
+using namespace std;
 
 /*!
  * The settings that are set in the constructor are mainly for debugging purposes. 

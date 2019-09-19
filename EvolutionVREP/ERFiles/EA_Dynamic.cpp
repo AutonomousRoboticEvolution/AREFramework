@@ -1,6 +1,7 @@
 #include "EA_Dynamic.h"
 #include <algorithm>
 
+using namespace std;
 
 EA_Dynamic::EA_Dynamic()
 {
@@ -149,7 +150,7 @@ void EA_Dynamic::replaceNewPopRandom(int numAttempts)
 	cout << "REPLACED POP" << endl;
 }
 
-bool EA_Dynamic::compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Genome> b)
+bool EA_Dynamic::compareByFitness(const shared_ptr<Genome>& a, const shared_ptr<Genome>& b)
 {
 	return a->fitness > b->fitness;
 }

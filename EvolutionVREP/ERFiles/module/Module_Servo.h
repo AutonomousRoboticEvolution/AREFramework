@@ -1,5 +1,7 @@
 #pragma once
+
 #include "ER_Module.h"
+
 
 class Module_Servo :
 	public ER_Module
@@ -9,22 +11,22 @@ public:
 	~Module_Servo();
 	int init();
 	int mutate(float mutationRate);
-	int createModule(vector<float> configuration, int relativePosHandle, int parentHandle);
-	int createModuleBackup(vector<float> configuration, int relativePosHandle, int parentHandle);
-	vector<int> getFreeSites(vector<int>);
-	vector<int> getObjectHandles();
-	shared_ptr<ER_Module> clone();
+	int createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle);
+	int createModuleBackup(std::vector<float> configuration, int relativePosHandle, int parentHandle);
+    std::vector<int> getFreeSites(std::vector<int>);
+    std::vector<int> getObjectHandles();
+    std::shared_ptr<ER_Module> clone();
 	float bendAngle = 0.25;
 	void setModuleColor();
-	void removeModule(); 
-	vector<float> updateModule(vector<float> input);
-	stringstream getModuleParams();
+	void removeModule();
+    std::vector<float> updateModule(std::vector<float> input);
+    std::stringstream getModuleParams();
 	void controlModule(float input);
 	bool upDown = true; 
-	void setModuleParams(vector<string>);
+	void setModuleParams(std::vector<std::string>);
 	void createControl();
-	vector<float> getPosition();
-	virtual stringstream getControlParams();
+    std::vector<float> getPosition();
+	virtual std::stringstream getControlParams();
 	float previousPosition = -1;
 
 private:

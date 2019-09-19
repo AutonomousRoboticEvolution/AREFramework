@@ -1,4 +1,3 @@
-#pragma once
 #include "DefaultGenome.h"
 #include <iostream>
 

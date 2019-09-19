@@ -1,5 +1,7 @@
 #include "VREPUI.h"
 
+using namespace std;
+
 VREPUI::VREPUI()
 {
 }
@@ -44,7 +46,6 @@ int VREPUI::createNNUI(vector<shared_ptr<ER_Module>> createdModules)
 int VREPUI::createMorphUI(vector<shared_ptr<ER_Module>> createdModules)
 {
 	int uiSizeY = createdModules.size();
-	float black[3] = { -250,-250,-250 };
 	float white[3] = { 250,250,250 };
 
 	int buttonHandles[3] = { 1, 2, 3 };

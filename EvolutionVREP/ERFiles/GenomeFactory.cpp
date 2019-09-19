@@ -1,11 +1,10 @@
 #include "GenomeFactory.h"
 
-
+using namespace std;
 
 GenomeFactory::GenomeFactory()
 {
 }
-
 
 GenomeFactory::~GenomeFactory()
 {

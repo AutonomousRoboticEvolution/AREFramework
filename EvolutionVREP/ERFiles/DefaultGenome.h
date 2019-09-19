@@ -1,29 +1,27 @@
 #pragma once
+
+#include <memory>
 #include <vector>
-//#include "Morphology.h"
-//#include "LMorphology.h"
-//#include "Control.h"
 #include "morphology/MorphologyFactory.h"
 #include "control/ControlFactory.h"
-#include <memory>
-#include "../RandNum.h"
 #include "Settings.h"
 #include "Genome.h"
+#include "../RandNum.h"
 
 class DefaultGenome : public Genome
 {
 public:
-	DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st);
+	DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
 	DefaultGenome() {};
-	
+
 	~DefaultGenome();
-	virtual shared_ptr<Genome> clone() const override;
+	virtual std::shared_ptr<Genome> clone() const override;
 
 	void createInitialMorphology(int individualNumber);
 
 	float mutationRate = 0.05f;
 
-	void savePhenotype(int indNum, int sceneNum);
+	void savePhenotype(int indNum, int sceneNum) override;
 	virtual void init() override;
 	virtual void create() override;
 	virtual void update() override;
@@ -36,7 +34,7 @@ public:
 	virtual void checkGenome() override;
 	bool loadMorphologyGenome(int indNum, int sceneNum);
 	bool loadMorphologyGenome(std::istream &input, int indNum);
-	shared_ptr<Genome> cloneGenome();
+    std::shared_ptr<Genome> cloneGenome();
 
 	void init_noMorph();
 	void createAtPosition(float x, float y, float z);

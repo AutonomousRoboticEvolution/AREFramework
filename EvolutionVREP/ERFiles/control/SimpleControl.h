@@ -10,19 +10,18 @@ public:
 	SimpleControl();
 	~SimpleControl();
 	virtual void init(int input, int inter, int output);
-	virtual vector<float> update(vector<float>);
-	shared_ptr<Control> clone() const;
-	void deleteControl();
+	virtual std::vector<float> update(std::vector<float>);
+    std::shared_ptr<Control> clone() const;
 	void mutate(float mutationRate);
-	stringstream getControlParams(); 
-	void setControlParams(vector<string>);
-	void cloneControlParameters(shared_ptr<Control> parent) {};
-	bool checkControl(vector<string> values);
-	vector<int> c_jointHandles;
+    std::stringstream getControlParams();
+	void setControlParams(std::vector<std::string>);
+	void cloneControlParameters(std::shared_ptr<Control> parent) {};
+	bool checkControl(const std::vector<std::string> &values) override;
+    std::vector<int> c_jointHandles;
 	void reset() {};
 	void makeDependenciesUnique();
-	void addInput(vector<float> input) {};
-	void setFloatParameters(vector<float> values) {};
+	void addInput(std::vector<float> input) {};
+	void setFloatParameters(std::vector<float> values) {};
 	void flush() {};
 };
 

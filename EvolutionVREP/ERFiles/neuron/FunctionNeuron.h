@@ -1,9 +1,9 @@
 #pragma once
+
 #include <vector>
 #include <memory>
 #include "Neuron.h"
 
-using namespace std;
 
 class FunctionNeuron :
 	public Neuron
@@ -35,7 +35,7 @@ public:
 	void update();
 	void reset();
 	void mutate(float mutationRate);
-	void setFloatParameters(vector<float> values);
+	void setFloatParameters(std::vector<float> values);
 	float m_a = 1;
 	float m_b = 0;
 	float m_activation = 0;
@@ -47,11 +47,11 @@ public:
 	int functionRange = 14; // between 0 and 13 are used
 	virtual void flush();
 	bool dir = true;
-	stringstream getNeuronParams();
+    std::stringstream getNeuronParams();
 	//	void setNeuronParams(vector<string>);
-	shared_ptr<Neuron> clone();
-	void setNeuronParams(vector<string> values);
-	bool checkNeuron(vector<string>);
+    std::shared_ptr<Neuron> clone();
+	void setNeuronParams(std::vector<std::string> values);
+	bool checkNeuron(std::vector<std::string>);
 private:
 	
 };

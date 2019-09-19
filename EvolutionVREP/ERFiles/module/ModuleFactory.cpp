@@ -1,7 +1,5 @@
-#pragma once
 #include "ModuleFactory.h"
 #include <iostream>
-
 
 using namespace std; 
 

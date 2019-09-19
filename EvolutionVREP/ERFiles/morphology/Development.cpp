@@ -2,6 +2,8 @@
 #include <iostream>
 #include <algorithm>
 
+using namespace std;
+
 Development::Development()
 {
 	modular = true;
@@ -13,7 +15,8 @@ Development::~Development()
 	createdModules.clear();
 }
 
-int Development::getAmountBrokenModules() {
+int Development::getAmountBrokenModules()
+{
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->broken == true) {
@@ -27,7 +30,8 @@ int Development::getAmountBrokenModules() {
 //	return createdModules;
 //}
 
-void Development::createAtPosition(float x, float y, float z) {
+void Development::createAtPosition(float x, float y, float z)
+{
 	cout << "x, y, z: " << x << ", " << y << ", " << z << endl;
 	float position[3];
 
@@ -36,11 +40,13 @@ void Development::createAtPosition(float x, float y, float z) {
 	position[2] = z;
 }
 
-void Development::crossover(shared_ptr<Morphology> partnerMorph, float cr) {
+void Development::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+{
 
 }
 
-void Development::printSome() {
+void Development::printSome()
+{
 	cout << "printing some from Development" << endl;
 }
 
@@ -106,8 +112,8 @@ bool Development::loadGenome(std::istream &input, int individualNumber)
 }
 
 
-void Development::init_noMorph() {
-
+void Development::init_noMorph()
+{
 }
 
 /*!
@@ -116,8 +122,8 @@ void Development::init_noMorph() {
  * \param t
  * \return 
  */
-
-int Development::getMaxChilds(int t) {
+int Development::getMaxChilds(int t)
+{
 	if (t == 4 || t == 9) {
 		return 3; 
 	}
@@ -145,7 +151,6 @@ int Development::getMaxChilds(int t) {
 }
 
 //vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
-	
 //}
 
 void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
@@ -302,41 +307,48 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 }
 
 
-void Development::init() {
-
+void Development::init()
+{
 }
 
-void Development::initCustomMorphology() {
-	float position[3] = { 0, 0, 0.1 };
+void Development::initCustomMorphology()
+{
 }
 
 
-shared_ptr<Morphology> Development::clone() const {
+shared_ptr<Morphology> Development::clone() const
+{
 	BaseMorphology::clone();
 	return make_unique<Development>(*this);
 }
 
-void Development::update() {
+void Development::update()
+{
 
 }
 
-int Development::mutateERLGenome(float mutationRate) {
+int Development::mutateERLGenome(float mutationRate)
+{
 	return 1;
 }
 
-int Development::mutateControlERLGenome(float mutationRate) {
+int Development::mutateControlERLGenome(float mutationRate)
+{
 	return 1;
 }
 
-void Development::create() {
+void Development::create()
+{
     cout << "CANNOT CREAT DEVELOPMENT GENOME" << endl;
 }
 
-void Development::mutate() {
+void Development::mutate()
+{
 	mutateERLGenome(settings->morphMutRate);
 }
 
-void Development::updateCreatedModules() {
+void Development::updateCreatedModules()
+{
 	// TODO temporary location of function below
 	for (int i = 0; i < createdModules.size(); i++) {
 		if (createdModules[i]->parentModulePointer) {
@@ -345,7 +357,8 @@ void Development::updateCreatedModules() {
 	}
 }
 
-void Development::shiftRobotPosition() {
+void Development::shiftRobotPosition()
+{
 	updateCreatedModules();
 
 	float minimumObjectPos = 50.0;
@@ -361,8 +374,8 @@ void Development::shiftRobotPosition() {
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
+				for (int j = 0; j < 3; j++) {
+					size[j] = size[j] * 2;
 				}
 
 				vector<vector<float>> cubeVertex; // 8 points in 3d space
@@ -407,21 +420,21 @@ void Development::shiftRobotPosition() {
 
 				vector<vector<float>> rotatedPoints;
 				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
+				for (int j = 0; j < 8; j++) {
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[0]) + (points[j][1] * objectMatrix[1]) + (points[j][2] * objectMatrix[2]));
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[4]) + (points[j][1] * objectMatrix[5]) + (points[j][2] * objectMatrix[6]));
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[8]) + (points[j][1] * objectMatrix[9]) + (points[j][2] * objectMatrix[10]));
+					rotatedPoints[j][0] += objectOrigin[0];
+					rotatedPoints[j][1] += objectOrigin[1];
+					rotatedPoints[j][2] += objectOrigin[2];
+					if (rotatedPoints[j][2] < minimumObjectPos) {
+						minimumObjectPos = rotatedPoints[j][2];
 					}
-					if (rotatedPoints[i][1] < minimumYObjectPosition) {
-						minimumYObjectPosition = rotatedPoints[i][1];
+					if (rotatedPoints[j][1] < minimumYObjectPosition) {
+						minimumYObjectPosition = rotatedPoints[j][1];
 					}
-					if (rotatedPoints[i][0] < minimumXObjectPosition) {
-						minimumXObjectPosition = rotatedPoints[i][0];
+					if (rotatedPoints[j][0] < minimumXObjectPosition) {
+						minimumXObjectPosition = rotatedPoints[j][0];
 					}
 				}
 			}
@@ -453,7 +466,8 @@ void Development::shiftRobotPosition() {
 	//	cout << "postpos: " << postpos[2] << endl;
 }
 
-int Development::getMainHandle() {
+int Development::getMainHandle()
+{
     if (createdModules.size() > 0) {
         return createdModules[0]->moduleHandle;
     }
@@ -462,35 +476,36 @@ int Development::getMainHandle() {
     }
 }
 
-vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles) {
-	Matrix3f m;
-	m = AngleAxisf(eulerAngles[0], Vector3f::UnitX())
-		* AngleAxisf(eulerAngles[1], Vector3f::UnitY())
-		* AngleAxisf(eulerAngles[2], Vector3f::UnitZ());
-	//	cout << m << endl << "is unitary " << m.isUnitary() << endl; 
-	AngleAxisf AA = AngleAxisf(1 * M_PI, Vector3f::UnitZ());
-	vector<float> directionalVector;
-	directionalVector.push_back(m(6));
-	directionalVector.push_back(m(7));
-	directionalVector.push_back(m(8));
+//vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles)
+//{
+//	Eigen::Matrix3f m;
+//	m = AngleAxisf(eulerAngles[0], Vector3f::UnitX())
+//		* AngleAxisf(eulerAngles[1], Vector3f::UnitY())
+//		* AngleAxisf(eulerAngles[2], Vector3f::UnitZ());
+//	//	cout << m << endl << "is unitary " << m.isUnitary() << endl;
+//	AngleAxisf AA = AngleAxisf(1 * M_PI, Vector3f::UnitZ());
+//	vector<float> directionalVector;
+//	directionalVector.push_back(m(6));
+//	directionalVector.push_back(m(7));
+//	directionalVector.push_back(m(8));
+//
+//	return directionalVector;
+//}
 
+void Development::checkGenome(int individualNumber, int sceneNum)
+{
 
-
-	return directionalVector;
 }
 
-
-void Development::checkGenome(int individualNumber, int sceneNum) {
-
-}
-
-void Development::checkControl(int individual, int sceneNum) {
+void Development::checkControl(int individual, int sceneNum)
+{
 	checkGenome(individual, sceneNum);
 }
+
 /// Check whether two components are colliding
-bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles) {
+bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles)
+{
     // TODO EB: Implement a way to ignore visuals.
-    bool collision = true;
     for (int n = 0; n < module->objectHandles.size(); n++) {
         if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
             for (int i = 0; i < createdModules.size() - 1; i++) {
@@ -520,9 +535,11 @@ bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exc
     }
     return false;
 }
+
 /// Check for collisions. If there is a colliding object, remove it from the genome representation.
-bool Development::bCheckCollision(int iParentHandle, int createdModulesSize) {
-    bool bViabilityResult = true;
+bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
+{
+    bool bViabilityResult;
     vector<int> exception;
     exception.push_back(iParentHandle);
     for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
@@ -542,9 +559,11 @@ bool Development::bCheckCollision(int iParentHandle, int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check for ground. If object is above the ground, it can be created
-bool Development::bCheckGround(int createdModulesSize) {
-    bool bViabilityResult = true;
+bool Development::bCheckGround(int createdModulesSize)
+{
+    bool bViabilityResult;
     if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
         if (settings->verbose) {
             cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
@@ -559,9 +578,11 @@ bool Development::bCheckGround(int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check for orientation. If the orientation of the organ is printable
-bool Development::bCheckOrientation(int createdModulesSize) {
-    bool bViabilityResult = true;
+bool Development::bCheckOrientation(int createdModulesSize)
+{
+    bool bViabilityResult;
     // If the orientation of the organ is printable
     if (createdModules[createdModulesSize - 1]->type == 14 ||
         createdModules[createdModulesSize - 1]->type == 15) {
@@ -598,8 +619,10 @@ bool Development::bCheckOrientation(int createdModulesSize) {
     }
     return bViabilityResult;
 }
+
 /// Check of number of organs.
-bool Development::bCheckOrgansNumber(int createdModulesSize) {
+bool Development::bCheckOrgansNumber(int createdModulesSize)
+{
     bool bViabilityResult = true;
     int brainCounter = 0;
     int motorCounter = 0;

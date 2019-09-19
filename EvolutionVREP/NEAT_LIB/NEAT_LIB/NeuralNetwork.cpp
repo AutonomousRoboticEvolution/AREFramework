@@ -29,8 +29,8 @@
 
 
 
-#include <math.h>
-#include <float.h>
+#include <cmath>
+#include <cfloat>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -45,6 +45,8 @@
 
 namespace NEAT
 {
+
+using namespace std;
 
 /////////////////////////////////////
 // The set of activation functions //
@@ -854,7 +856,7 @@ bool NeuralNetwork::Load(std::ifstream& a_DataFile)
 
     if (!a_DataFile)
     {
-        ostringstream tStream;
+        std::ostringstream tStream;
         tStream << "NN file error!" << std::endl;
         //    throw NS::Exception(tStream.str());
     }

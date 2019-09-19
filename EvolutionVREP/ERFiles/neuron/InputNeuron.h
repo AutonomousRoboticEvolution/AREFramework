@@ -1,9 +1,9 @@
 #pragma once
+
 #include <vector>
 #include <memory>
 #include "Neuron.h"
 
-using namespace std;
 
 class InputNeuron : 
 	public Neuron
@@ -19,11 +19,11 @@ public:
 	void reset();
 	/// mutate the neuron
 	void mutate(float mutationRate);
-	shared_ptr<Neuron> clone(); 
-	stringstream getNeuronParams();
-	void setNeuronParams(vector<string>);
-	bool checkNeuron(vector<string>);
-	void setFloatParameters(vector<float> values) {};
+	std::shared_ptr<Neuron> clone();
+	std::stringstream getNeuronParams();
+	void setNeuronParams(std::vector<std::string>);
+	bool checkNeuron(std::vector<std::string>);
+	void setFloatParameters(std::vector<float> values) {};
 	virtual void flush();
 };
 

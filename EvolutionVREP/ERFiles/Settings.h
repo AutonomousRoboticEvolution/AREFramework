@@ -13,7 +13,6 @@
 #define DEVICENAME                      "\\\\.\\COM26"      //"/dev/ttyUSB0"      // Check which port is being used on your controller
 */
 
-using namespace std;
 
 class Settings
 {
@@ -213,8 +212,8 @@ public:
 	int minAge = 0;					// Minimum age, death cannot occur before this (TODO: DELETE : DEPRECATED)
 	float deathProb = 0;			// Probability of individuals being removed at random from the population (TODO: DELETE : DEPRECATED)
 
-	vector<int> indNumbers;			// Vector storing the IDs of the individuals in the current population. This vector can be used to load all individuals from a specific generation
-	vector<float> indFits;			// Vector storing the fitness values of the individuals in the current population
+	std::vector<int> indNumbers;			// Vector storing the IDs of the individuals in the current population. This vector can be used to load all individuals from a specific generation
+    std::vector<float> indFits;			// Vector storing the fitness values of the individuals in the current population
 	int seed = 0;					// Random seed passed to the random number generator (TODO: random number generator names are slightly different)
 
 
@@ -237,15 +236,15 @@ public:
 
     int consecutiveThresholdViolations = 10; // Determining how many consecutive force sensor threshold violations will lead to the module breaking
 	int maxNumberModules = 20;		// Maximum number of modules allowed in phenotype
-	vector<int> moduleTypes;		// Vector storing the module types
-	vector<vector<int> > maxModuleTypes; /* Vector storing how many of each module type can be expressed
+    std::vector<int> moduleTypes;		// Vector storing the module types
+    std::vector<std::vector<int> > maxModuleTypes; /* Vector storing how many of each module type can be expressed
 										 NOTE: this takes into account how many times the module type is expressed in total! So if you choose to append module
 										 type 4 to be appended twice in module Types, both of them will be counted when checking for the maximum module types */
 
 	int numberOfModules = 5;		// The number of module types used by the L-System (note: not maximum number of modules!!!)
 
 
-	string repository = "files";	/* The repository seen from the working directory to look for the settings.csv and the genomes.
+    std::string repository = "files";	/* The repository seen from the working directory to look for the settings.csv and the genomes.
 									NOTE: the morphologies subfolders are not automatically created! */
 	int initialModuleType = 1;		// initial module for direct encoding, similar to axiom of L-System. This is the cube module by default
 
@@ -269,7 +268,7 @@ public:
 	int initialAmountConnectionsNeurons = 3; // Initial number of connections for each neuron
 	int	maxAddedNeurons = 4;		// The maximum number of neurons that can be added in one call of the mutation operator
 	bool savePhenotype = true;		// Whether to save the phenotype or not
-	vector<int> envObjectHandles;	// Object handles of the environment objects (TODO: DELETE : DEPRECATED)
+    std::vector<int> envObjectHandles;	// Object handles of the environment objects (TODO: DELETE : DEPRECATED)
 
 	void readSettings();			// Reading a .csv settings file
 	void saveSettings();			// Saving a .csv settings file
@@ -293,5 +292,5 @@ public:
     void setRepository(std::string repository);
 
 private:
-	void split_line(string& line, string delim, list<string>& values);
+	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
 };

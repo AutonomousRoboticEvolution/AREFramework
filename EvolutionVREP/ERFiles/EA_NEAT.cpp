@@ -1,15 +1,13 @@
 #include "EA_NEAT.h"
 #include <algorithm>
 
+using namespace std;
 
 EA_NEAT::EA_NEAT()
-{
-}
-
+{}
 
 EA_NEAT::~EA_NEAT()
-{
-}
+{}
 
 void EA_NEAT::split_line(string& line, string delim, list<string>& values)
 {

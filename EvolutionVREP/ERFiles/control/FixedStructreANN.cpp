@@ -169,7 +169,8 @@ std::vector<float> FixedStructureANN::update(const std::vector<float> &sensorVal
 }
 
 
-void FixedStructureANN::setFloatParameters(std::vector<float> values) {
+void FixedStructureANN::setFloatParameters(std::vector<float> values)
+{
 	// function can be used to manually set specific parameters
 	recurrentLayer[0]->setFloatParameters(values);
 }
@@ -184,19 +185,20 @@ void FixedStructureANN::mutate(float mutationRate) {
 }
 
 
-std::shared_ptr<Control> FixedStructureANN::clone() const {
-	std::shared_ptr<FixedStructureANN> newANN = std::make_unique<FixedStructureANN>(*this);
+std::shared_ptr<Control> FixedStructureANN::clone() const
+{
+	std::shared_ptr<FixedStructureANN> newANN = std::make_shared<FixedStructureANN>(*this);
 	newANN->inputLayer.clear();
 	newANN->recurrentLayer.clear();
 	newANN->outputLayer.clear();
-	for (int i = 0; i < this->inputLayer.size(); i++) {
-		newANN->inputLayer.push_back(this->inputLayer[i]->clone());
+	for (const auto & neuron : this->inputLayer) {
+		newANN->inputLayer.push_back(neuron->clone());
 	}
-	for (int i = 0; i < this->recurrentLayer.size(); i++) {
-		newANN->recurrentLayer.push_back(this->recurrentLayer[i]->clone());
+	for (const auto & neuron : this->recurrentLayer) {
+		newANN->recurrentLayer.push_back(neuron->clone());
 	}
-	for (int i = 0; i < this->outputLayer.size(); i++) {
-		newANN->outputLayer.push_back(this->outputLayer[i]->clone());
+	for (const auto & neuron : this->outputLayer) {
+		newANN->outputLayer.push_back(neuron->clone());
 	}
 	newANN->checkConnections();
 	newANN->changeConnectionIDToPointer();
@@ -205,19 +207,23 @@ std::shared_ptr<Control> FixedStructureANN::clone() const {
 }
 
 
-std::stringstream FixedStructureANN::getControlParams() {
+std::stringstream FixedStructureANN::getControlParams()
+{
 	return ANN::getControlParams();
 }
 
-void FixedStructureANN::setControlParams(const std::vector<std::string> &values) {
+void FixedStructureANN::setControlParams(const std::vector<std::string> &values)
+{
 	ANN::setControlParams(values);
 }
 
-void FixedStructureANN::changeConnectionIDToPointer() {
+void FixedStructureANN::changeConnectionIDToPointer()
+{
 	ANN::changeConnectionIDToPointer();
 }
 
-bool FixedStructureANN::checkControl(std::vector<std::string> values) {
+bool FixedStructureANN::checkControl(const std::vector<std::string> &values)
+{
 	return ANN::checkControl(values);
 }
 

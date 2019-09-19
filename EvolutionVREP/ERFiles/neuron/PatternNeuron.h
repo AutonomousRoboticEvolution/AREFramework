@@ -1,9 +1,9 @@
 #pragma once
+
 #include <vector>
 #include <memory>
 #include "Neuron.h"
 
-using namespace std;
 
 class PatternNeuron : 
 	public Neuron
@@ -11,7 +11,7 @@ class PatternNeuron :
 public:
 	PatternNeuron(); 
 	~PatternNeuron();
-	void setFloatParameters(vector<float> values);
+	void setFloatParameters(std::vector<float> values);
 
 	void init(int neuronID); 
 	void update();
@@ -20,11 +20,11 @@ public:
 	float frequency = 0.5;
 	float amplitude = 0.0;
 	float phase = 0.0;
-	stringstream getNeuronParams(); 
+    std::stringstream getNeuronParams();
 //	void setNeuronParams(vector<string>);
-	shared_ptr<Neuron> clone(); 
-	void setNeuronParams(vector<string> values);
-	bool checkNeuron(vector<string>);
+    std::shared_ptr<Neuron> clone();
+	void setNeuronParams(std::vector<std::string> values);
+	bool checkNeuron(std::vector<std::string>);
 	virtual void flush();
 private:
 	float time = 0.0; // initial

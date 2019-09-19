@@ -32,7 +32,7 @@ bool ClientEA::init(int amountPorts, int startPort)
 			continue; // jump back to beginning loop
 		}
 	}
-	unique_ptr<EA_Factory> eaf = unique_ptr<EA_Factory>(new EA_Factory());
+	std::unique_ptr<EA_Factory> eaf = std::make_unique<EA_Factory>();
 	ea = eaf->createEA(randNum, settings);
 	// ea = shared_ptr<EA>(new EA_SteadyState());
 	// ea->setSettings(settings, randNum);
@@ -46,7 +46,8 @@ bool ClientEA::init(int amountPorts, int startPort)
  * 
  */
 
-void ClientEA::initGA() {
+void ClientEA::initGA()
+{
 	// init GA
 	if (settings->evolutionType == settings->EA_NEAT) {
 		// doesn't need to be initialized?? (constructor initializes neat) 
@@ -71,7 +72,8 @@ void ClientEA::quitSimulators()
 	}
 }
 
-int ClientEA::finishConnections() {
+int ClientEA::finishConnections()
+{
 	for (auto &slave: serverInstances) {
 		slave->disconnect();
 	}
@@ -79,7 +81,8 @@ int ClientEA::finishConnections() {
 	return 0;
 }
 
-int ClientEA::openConnections() {
+int ClientEA::openConnections()
+{
 	for (auto &slave: serverInstances) {
 		std::cout << "Reconnecting to vrep on port " << slave->port() << std::endl;
 		slave->connect(5000);
@@ -89,13 +92,15 @@ int ClientEA::openConnections() {
 	return 0;
 }
 
-int ClientEA::reopenConnections() {
+int ClientEA::reopenConnections()
+{
 	finishConnections();	
 	openConnections();
 	return 0;
 }
 
-bool ClientEA::confirmConnections() {
+bool ClientEA::confirmConnections()
+{
 	int tries = 0;
 	for (auto &slave: serverInstances) {
 		if (!slave->status()) {
@@ -107,7 +112,7 @@ bool ClientEA::confirmConnections() {
 			continue;
 		}
 		if (tries > loadingTrials) {
-		std:cerr << "One V-REP instance is faulty since I tried to connect to it for more than 1000 times." << std::endl;
+		std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than 1000 times." << std::endl;
 			return false;
 		}
 	}
@@ -116,7 +121,8 @@ bool ClientEA::confirmConnections() {
 	return true;
 }
 
-bool ClientEA::evaluatePop() {
+bool ClientEA::evaluatePop()
+{
 	int tries = 0;
 	int pauseTime = 100; // milliseconds
 	// communicate with all ports
@@ -135,7 +141,7 @@ bool ClientEA::evaluatePop() {
 	}
 
 	if (settings->verbose) {
-		std::cout << "Pushing individuals" << endl;
+		std::cout << "Pushing individuals" << std::endl;
 	}
 
 	if (settings->evolutionType == settings->EA_NEAT) {
@@ -146,7 +152,7 @@ bool ClientEA::evaluatePop() {
 			}
 		}
 		for (int i = 0; i < queuedInds.size(); i++) {
-			cout << queuedInds[i] << endl;
+            std::cout << queuedInds[i] << std::endl;
 		}
 	}
 	else {
@@ -159,7 +165,7 @@ bool ClientEA::evaluatePop() {
 	int returnValue = -8; // value to see what's going on. 
 
 	if (settings->verbose) {
-		std::cout << "Entering while with server size " << serverInstances.size() << endl;
+		std::cout << "Entering while with server size " << serverInstances.size() << std::endl;
 	}
 
 	while (serverInstances.size() > 0) {
@@ -167,7 +173,7 @@ bool ClientEA::evaluatePop() {
 			break;
 		}
 		if (tries > loadingTrials) {
-			std::cout << "I have told the slaves (server instances) too many times to load the genomes. If they don't want to do it, I'll kill them and myself." << endl;
+			std::cout << "I have told the slaves (server instances) too many times to load the genomes. If they don't want to do it, I'll kill them and myself." << std::endl;
 			quitSimulators();
 			return false;
 		}
@@ -215,7 +221,7 @@ bool ClientEA::evaluatePop() {
 				int ind = queuedInds.back();
 				queuedInds.pop_back();
 				slave->setIndividual(ind);
-				cout << "Trying to evaluate " << ind << endl;
+                std::cout << "Trying to evaluate " << ind << std::endl;
 				if (settings->evolutionType == settings->EA_NEAT) {
 					slave->setIndividualNum(ind);
 					slave->setIntegerSignal("individual", ind);
@@ -231,7 +237,7 @@ bool ClientEA::evaluatePop() {
 
 					// tell simulator to start evaluating genome
 					if (settings->sendGenomeAsSignal) {
-						cout << "sending genome as signal" << endl;
+                        std::cout << "sending genome as signal" << std::endl;
 						const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
 						sendGenomeSignal(slave, individualGenome);
 					}
@@ -345,6 +351,6 @@ bool ClientEA::evaluatePop() {
 		ea->savePopFitness(settings->generation);
 	}
 	settings->saveSettings();
-	cout << "saved settings " << endl;
+    std::cout << "saved settings " << std::endl;
 	return true;
 }

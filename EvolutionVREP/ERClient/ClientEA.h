@@ -1,14 +1,12 @@
 #pragma once
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
-#include <vector>
 #include <memory>
-
+#include <vector>
 #include "v_repLib.h"
 #include "v_repConst.h"
-//#include "../ERFiles/Population.h"
 #include "../ERFiles/SettingsERClient.h"
 #include "../RandNum.h"
 #include "../ERFiles/EA.h"
@@ -25,11 +23,6 @@ extern "C" {
 	#include "remoteApi/extApi.h"
 }
 
-#define IPNUM = "127.0.0.1"
-
-using namespace std;
-
-
 
 class ClientEA
 {
@@ -42,13 +35,13 @@ public:
 	// vector<int> portState;
 	// vector<int> portIndividualNum; // actual number for loading genome
 
-	shared_ptr<Settings> settings;
-	shared_ptr<RandNum> randNum;
-//	vector<shared_ptr<IND>> queuedInds;
+	std::shared_ptr<Settings> settings;
+	std::shared_ptr<RandNum> randNum;
+//	vector<std::shared_ptr<IND>> queuedInds;
 	// the queued individuals point to the genome array. Not actual number
-	vector<int> queuedInds;
-	//shared_ptr<Population> pop;
-	shared_ptr<EA> ea;
+	std::vector<int> queuedInds;
+	//std::shared_ptr<Population> pop;
+	std::shared_ptr<EA> ea;
 
 	// functions
 	bool init(int amountPorts, int startPort=104000);

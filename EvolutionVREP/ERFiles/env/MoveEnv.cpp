@@ -1,23 +1,22 @@
 #include "MoveEnv.h"
 
-
-
 MoveEnv::MoveEnv()
 {
 }
-
 
 MoveEnv::~MoveEnv()
 {
 }
 
-void MoveEnv::init() {
+void MoveEnv::init()
+{
 	Environment::init();
 	timeCheck = 2.5;
 	maxTime = 60.0;
 }
 
-float MoveEnv::fitnessFunction(MorphologyPointer morph) {
+float MoveEnv::fitnessFunction(MorphologyPointer morph)
+{
 	float fitness = 0;
 	
 //	int mainHandle = morph->getMainHandle();
@@ -47,7 +46,7 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 			fitness = -pos[1];
 			pEnd.push_back(-pos[1]);
 			if (pOne.size() < 1) {
-				cout << "Note, pOne never set" << endl;
+                std::cout << "Note, pOne never set" << std::endl;
 			}
 			else {
 				fitness = fitness + pOne[1];
@@ -62,7 +61,7 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 	}
 	else {
 		if (morph->modular == false) {
-	//		cout << "getting main handle" << endl;
+	//		std::cout << "getting main handle" << std::endl;
 			int mainHandle = morph->getMainHandle();
 			float pos[3];
 			simGetObjectPosition(mainHandle, -1, pos);
@@ -70,7 +69,7 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 			pEnd.push_back(pos[0]);
 			pEnd.push_back(pos[1]);
 			if (pOne.size() < 1) {
-	//			cout << "Note, pOne never set" << endl;
+	//			std::cout << "Note, pOne never set" << std::endl;
 				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
 			}
 			else {
@@ -93,9 +92,9 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 				fitness = sqrtf((pEnd[0] * pEnd[0]) + (pEnd[1] * pEnd[1]));
 			}
 			else {
-				cout<<"FitnessFunction pOne size > 1"<<endl;
-				cout<<"function's pOne"<<pOne[0]<<" "<<pOne[1]<<endl;
-				cout<<"function's pEnd"<<pEnd[0]<<" "<<pEnd[1]<<endl;
+                std::cout<<"FitnessFunction pOne size > 1"<<std::endl;
+                std::cout<<"function's pOne"<<pOne[0]<<" "<<pOne[1]<<std::endl;
+                std::cout<<"function's pEnd"<<pEnd[0]<<" "<<pEnd[1]<<std::endl;
 				fitness = sqrtf(((pEnd[0] - pOne[0]) * (pEnd[0] - pOne[0])) + ((pEnd[1] - pOne[1]) * (pEnd[1] - pOne[1])));
 			}
 			int brokenModules = morph->getAmountBrokenModules();
@@ -114,14 +113,15 @@ float MoveEnv::fitnessFunction(MorphologyPointer morph) {
 	return fitness;
 }
 
-float MoveEnv::updateEnv(MorphologyPointer morph) {
+float MoveEnv::updateEnv(MorphologyPointer morph)
+{
 	if (pOne.size() < 1 && simGetSimulationTime() >= timeCheck) {
 		int mainHandle = morph->getMainHandle();
 		float pos[3];
 		simGetObjectPosition(mainHandle, -1, pos);
 		pOne.push_back(pos[0]);
 		pOne.push_back(pos[1]);
-		cout<<"pOne: "<<pos[0]<<" "<<pos[1]<<endl;
+        std::cout<<"pOne: "<<pos[0]<<" "<<pos[1]<<std::endl;
 	}
 	return 0;
 }

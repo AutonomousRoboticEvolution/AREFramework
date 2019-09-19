@@ -1,26 +1,21 @@
 #pragma once
 
-#include "../RandNum.h"
-#include <vector>
-#include <stdlib.h>
-
-#include <iostream>
-#include <thread>
-#include <fstream> // for storing arrays and using ofstream
-#include <cstdlib> // for converting values
-#include <cstring>
-#include <sstream>
-#include <list>		// for reading files and handling the acquired information
-#include <iterator> // for reading files and handling the acquired information
-#include <string>
-#include <vector>
 #include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <iostream>
+#include <iterator> // for reading files and handling the acquired information
+#include <fstream> // for storing arrays and using ofstream
+#include <list>		// for reading files and handling the acquired information
 #include <memory>
+#include <sstream>
+#include <string>
+#include <thread>
+#include <vector>
+
 #include "EA_VREP.h"
 #include "EA_SteadyState.h"
-
-using namespace std;
-
+#include "../RandNum.h"
 
 
 class CER
@@ -32,14 +27,14 @@ public:
 	/**
        @brief This method splits lines
 	*/
-	void split_line(string& line, string delim, list<string>& values);
+	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
 
 	///pointer to settting of EA
-	shared_ptr<Settings> settings;  
+	std::shared_ptr<Settings> settings;
 	/// pointer to EA
-	unique_ptr<EA> ea;               
+	std::unique_ptr<EA> ea;
 	/// pointer to random number generator of EA
-	shared_ptr<RandNum> randNum;
+	std::shared_ptr<RandNum> randNum;
 
 	void saveSettings();
 	void initialize();

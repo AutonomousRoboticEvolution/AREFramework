@@ -1,15 +1,14 @@
 #pragma once
-#include "Environment.h"
-#include "MoveEnv.h"
-#include "RoughMoveEnv.h"
-#include "EnvPhototaxis.h"
+
 #include <memory>
+#include "Environment.h"
+
 
 class EnvironmentFactory
 {
 public:
 	EnvironmentFactory();
 	~EnvironmentFactory();
-	shared_ptr<Environment> createNewEnvironment(shared_ptr<Settings> st);
+    std::shared_ptr<Environment> createNewEnvironment(const std::shared_ptr<Settings>& st);
 };
 

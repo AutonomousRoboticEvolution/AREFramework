@@ -1,20 +1,20 @@
-
 #pragma once
 
+#include <memory>
+#include <string>
 #include "ER.h"
 #include "env/Environment.h"
 #include "env/EnvironmentFactory.h"
 #include "v_repLib.h"
 #include "EA_Factory.h"
 
-using namespace std;
 
 class ER_VREP : public CER
 {
 public:
 	ER_VREP();
 	virtual ~ER_VREP();
-	typedef shared_ptr<Morphology> MorphologyPointer;
+	typedef std::shared_ptr<Morphology> MorphologyPointer;
 
 	/// This method reads the instanceType member from settings class. According to its value ER initializes as a server or as server-client.
 	void initialize();  // This function overrides the CER function
@@ -58,25 +58,25 @@ public:
 	///mark the simulation time step
 	float simulationTime = 0;
 	/// Pointer to the Environment class
-	shared_ptr<Environment> environment;
+	std::shared_ptr<Environment> environment;
 
 	// To keep track of the position of the robot
     /// deprecated
-	string mainHandleName;
+    std::string mainHandleName;
     /// Reference to a morphology object that can be updated in V-REP (phenotype)
-	shared_ptr<Morphology> currentMorphology;
+    std::shared_ptr<Morphology> currentMorphology;
 	int individualToBeLoaded = -1;
 	/**
 		@brief Get the morphology reference
 		@param g the reference of the Genome
 	*/
-	shared_ptr<Morphology> getMorphology(Genome* g);
+    std::shared_ptr<Morphology> getMorphology(Genome* g);
 
-	shared_ptr<EA> ea;
+    std::shared_ptr<EA> ea;
 	///store the current genome
-	shared_ptr<Genome> currentGenome;
+    std::shared_ptr<Genome> currentGenome;
 	///used to create a genome
-	shared_ptr<GenomeFactoryVREP> genomeFactory;
+    std::shared_ptr<GenomeFactoryVREP> genomeFactory;
 
 	/**
 		@brief Logs information about the fitness of each individual, best individual and list of individuals.

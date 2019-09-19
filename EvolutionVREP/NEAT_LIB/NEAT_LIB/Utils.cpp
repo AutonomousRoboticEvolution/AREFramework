@@ -29,6 +29,8 @@
 
 #include "Utils.h"
 
+using namespace std;
+
 void Scale(vector<double>& a_Values, const double a_tr_min, const double a_tr_max)
 {
     double t_max = std::numeric_limits<double>::min(), t_min = std::numeric_limits<double>::max();

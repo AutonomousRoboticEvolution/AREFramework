@@ -1,13 +1,12 @@
 #pragma once
 
-#include <vector>;
-#include "Development.h"
 #include <algorithm>
+#include <vector>
+#include "Development.h"
 #include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 #include "../module/ER_Module.h"
 #include "../module/ModuleFactory.h"
 
-using namespace std;
 
 class NEAT_CPPN_Encoding : public Development
 {
@@ -23,17 +22,17 @@ public:
 	int mutateControlERGenome(float mutationRate);
 	bool queried = false;
 	int maxIterations = 4;
-	shared_ptr<Control> cppn;
+    std::shared_ptr<Control> cppn;
 	void deleteModuleFromGenome(int num);
 
-	vector<shared_ptr<ER_Module>> modules; // placeholder for modules. Not sure anymore why this is different from createdModules
+    std::vector<std::shared_ptr<ER_Module>> modules; // placeholder for modules. Not sure anymore why this is different from createdModules
 
 	void checkControl(int individual, int sceneNum);
 	void createAtPosition(float x, float y, float z);
-	bool checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles);
+	bool checkLCollisions(std::shared_ptr<ER_Module> module, std::vector<int> exceptionHandles);
 	void checkForceSensors();
 	int initializeCPPNEncoding(float initialPosition[3]);
-	shared_ptr<Morphology> clone() const;
+    std::shared_ptr<Morphology> clone() const;
 	void update();
 	//void updateColors();
 	void setColors();
@@ -56,7 +55,7 @@ public:
 	float checkArea(float interSection[3], float pps[4][3]);
 	bool checkCollisionBasedOnRotatedPoints(int objectHandle);
 	void symmetryMutation(float mutationRate);
-	void crossover(shared_ptr<Morphology>, float crossoverRate);
+	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;
 
 
 protected:
@@ -72,20 +71,20 @@ protected:
 
 	struct MODULEPARAMETERS {
 		// State specific parameters
-		shared_ptr<MODULEPARAMETERS> clone() const {
-			return make_unique<MODULEPARAMETERS>(*this);
+        std::shared_ptr<MODULEPARAMETERS> clone() const {
+			return std::make_unique<MODULEPARAMETERS>(*this);
 		};
 		bool expressed = true;
 		int maxChilds;
 		bool queried = false;
 
 		// not stored in genome
-		vector<int> childSiteStates; // which attachment site has which child object. -1 = no child 
+        std::vector<int> childSiteStates; // which attachment site has which child object. -1 = no child
 		float rgb[3];
 		// parameter identifiers
 		int handle;
 		float color[3] = { 0.45f,0.45f,0.45f };
-		shared_ptr<Control> control;
+        std::shared_ptr<Control> control;
 		float moduleColor[3];
 		int type = -1; // cube, servo, leaf, etc.
 
@@ -96,10 +95,10 @@ protected:
 	};
 
 	struct GENOTYPE {
-		shared_ptr<GENOTYPE> clone() const {
-			return make_unique<GENOTYPE>(*this);
+        std::shared_ptr<GENOTYPE> clone() const {
+			return std::make_unique<GENOTYPE>(*this);
 		};
-		vector<shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state 
+        std::vector<std::shared_ptr<MODULEPARAMETERS>> moduleParameters; // one struct of parameters for each state
 		//HORMONEGENOME hormoneGenome;
 		
 		int amountModules = 1; // initial amount of modules
@@ -120,7 +119,7 @@ protected:
 	};
 
 public:
-	shared_ptr<GENOTYPE> robot_genome; // genome of the robot
+    std::shared_ptr<GENOTYPE> robot_genome; // genome of the robot
 	NEAT::NeuralNetwork *neat_NN; // pointer to the network received by NEAT. This is a phenotype
 
 private:

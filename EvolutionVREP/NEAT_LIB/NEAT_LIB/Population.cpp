@@ -27,8 +27,6 @@
 // Description: Implementation of the Population class.
 ///////////////////////////////////////////////////////////////////////////////
 
-
-
 #include <algorithm>
 #include <fstream>
 
@@ -44,6 +42,8 @@
 
 namespace NEAT
 {
+
+using namespace std;
 
 // The constructor
 Population::Population(const Genome& a_Seed, const Parameters& a_Parameters,
@@ -452,8 +452,6 @@ void Population::UpdateSpecies()
         m_Species[t_oldbestidx].ResetAgeGens();
     }
 }
-
-
 
 // the epoch method - the heart of the GA
 void Population::Epoch()

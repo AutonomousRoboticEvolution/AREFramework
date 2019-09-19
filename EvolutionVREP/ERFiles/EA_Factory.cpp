@@ -1,15 +1,12 @@
 #include "EA_Factory.h"
 
+using namespace std;
 
 EA_Factory::EA_Factory()
-{
-}
-
+{}
 
 EA_Factory::~EA_Factory()
-{
-}
-
+{}
 
 shared_ptr<EA> EA_Factory::createEA(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
 {

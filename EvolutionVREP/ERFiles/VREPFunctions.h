@@ -1,21 +1,10 @@
 #pragma once
+
 #include <vector>
 #include <string>
 #include "v_repLib.h"
 #include "cassert"
 
-using namespace std;
-/*
-typedef int vrep_handle;
-typedef string vrep_name;
-typedef bool vrep_addHandleToName;
-typedef bool vrep_renderable;
-typedef float vrep_size[3];
-typedef float vrep_position[3];
-typedef float vrep_orientation[3];
-typedef float vrep_mass;
-typedef int vrep_bitvalue;
-*/
 
 class ObjectCreator
 {
@@ -35,7 +24,6 @@ private:
 	int objectHandle;
 	int jointHandle;
 	float objectSize[3];
-//	vector<float>
 private:
 };
 

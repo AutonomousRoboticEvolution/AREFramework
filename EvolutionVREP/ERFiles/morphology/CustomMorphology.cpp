@@ -1,11 +1,10 @@
 #include "CustomMorphology.h"
 
-
+using namespace std;
 
 CustomMorphology::CustomMorphology()
 {
 }
-
 
 CustomMorphology::~CustomMorphology()
 {
@@ -21,8 +20,8 @@ vector<int> CustomMorphology::getJointHandles(int parentHandle)
 	return vector<int>();
 }
 
-void CustomMorphology::update() {
-
+void CustomMorphology::update()
+{
 }
 
 int CustomMorphology::getMainHandle()
@@ -32,17 +31,18 @@ int CustomMorphology::getMainHandle()
 
 void CustomMorphology::create()
 {
-
 }
 
-void CustomMorphology::mutate() {
+void CustomMorphology::mutate()
+{
 	if (control) {
 		control->mutate(settings->mutationRate);
 	}
 }
 
 //load the control parameters
-bool CustomMorphology::loadGenome(int individualNumber, int sceneNum) {
+bool CustomMorphology::loadGenome(int individualNumber, int sceneNum)
+{
     cout << "loading custom genome " << individualNumber << endl;
     unique_ptr<ControlFactory> controlFactory(new ControlFactory);
     control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
@@ -95,7 +95,8 @@ bool CustomMorphology::loadGenome(int individualNumber, int sceneNum) {
     return true;
 }
 
-void CustomMorphology::saveGenome(int indNum, float fitness) {
+void CustomMorphology::saveGenome(int indNum, float fitness)
+{
 	cout << "saving Custom Morphology Genome " << endl << "-------------------------------- " << endl;
 
 	ofstream genomeFile;
@@ -122,7 +123,8 @@ void CustomMorphology::saveGenome(int indNum, float fitness) {
 	genomeFile.close();
 }
 
-void CustomMorphology::init() {
+void CustomMorphology::init()
+{
 	create();   //create the morphology
 	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
@@ -131,7 +133,8 @@ void CustomMorphology::init() {
 	control->mutate(0.5);
 }
 
-shared_ptr<Morphology> CustomMorphology::clone() const {
+shared_ptr<Morphology> CustomMorphology::clone() const
+{
 	// shared_ptr<Morphology>()
 	shared_ptr<CustomMorphology> cat = make_unique<CustomMorphology>(*this);
 	cat->randomNum = randomNum;
@@ -140,5 +143,3 @@ shared_ptr<Morphology> CustomMorphology::clone() const {
 	cat->control = control->clone();
 	return cat;
 }
-
-

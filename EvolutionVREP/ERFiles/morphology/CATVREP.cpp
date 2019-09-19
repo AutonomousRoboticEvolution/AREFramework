@@ -7,8 +7,7 @@ using namespace std;
 
 CATVREP::CATVREP()
 {
-	float position[3] = { 0.0, 0.0, 1.0 };
-	va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
+    va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }
 
 
@@ -118,8 +117,7 @@ vector<int> CATVREP::getObjectHandles(int parentHandle) {
 	vector<int> objectHandles;
 	//s_objectAmount = selectionSize;
 	simGetObjectSelection(tempObjectHandles);
-	int objectCounter = 0;
-	for (size_t i = 0; i < selectionSize; i++)
+    for (size_t i = 0; i < selectionSize; i++)
 	{
 		if (simGetObjectType(tempObjectHandles[i]) == 0) {
 			objectHandles.push_back(tempObjectHandles[i]);
@@ -135,8 +133,7 @@ vector<int> CATVREP::getJointHandles(int parentHandle) {
 	vector<int> jointHandles;
 	//s_objectAmount = selectionSize;
 	simGetObjectSelection(tempObjectHandles);
-	int objectCounter = 0;
-	for (size_t i = 0; i < selectionSize; i++)
+    for (size_t i = 0; i < selectionSize; i++)
 	{
 		if (simGetObjectType(tempObjectHandles[i]) == sim_object_joint_type) {
 			jointHandles.push_back(tempObjectHandles[i]);

@@ -1,6 +1,5 @@
 #include "VREPFunctions.h"
 #include "v_repLib.h"
-#include <iostream>
 #include <cassert>
 
 using namespace std;
@@ -101,7 +100,7 @@ int ObjectCreator::v_createVisionSensor(int bitvalue, float size[3], float posit
 
 bool RetrieveVREPInfo::v_checkObjectCollision(int, vector<int>, vector<int>) {
 	return true;
-};
+}
 
 int RetrieveVREPInfo::v_getChildren(int parentHandle) {
 	int objIndex = 0;

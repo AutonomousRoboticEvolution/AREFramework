@@ -1,20 +1,19 @@
 #include "ER_VREP.h"
 
-//#include <afxwin.h> ;
-//***************************************************************************************//
-ER_VREP::ER_VREP(){
+using namespace std;
 
-}
-ER_VREP::~ER_VREP(){
+ER_VREP::ER_VREP()
+{}
 
-}
-
+ER_VREP::~ER_VREP()
+{}
 
 /*!
  * Initializes ER as a server to accept genomes from client. 
  * 
  */
-void ER_VREP::initializeServer() {
+void ER_VREP::initializeServer()
+{
 	// create the environment
 	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
@@ -28,8 +27,8 @@ void ER_VREP::initializeServer() {
 	eaf.reset();
 }
 
-
-void ER_VREP::initializeSimulation() {
+void ER_VREP::initializeSimulation()
+{
     // Initialize a genome factory to create genomes when the simulation is running
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
@@ -45,7 +44,8 @@ void ER_VREP::initializeSimulation() {
 	eaf.reset();
 }
 
-void ER_VREP::initialize() {
+void ER_VREP::initialize()
+{
 	/* initialize the settings class; it will read a settings file or it 
 	 * will use default parameters if it cannot read a settings file. 
 	 * A random number class will also be created and all other files
@@ -72,7 +72,8 @@ void ER_VREP::initialize() {
 	}
 }
 
-void ER_VREP::startOfSimulation(){
+void ER_VREP::startOfSimulation()
+{
 	
 	/* When V-REP starts, this function is called. Depending on the settings,
 	* it initializes the properties of the individual of the optimization
@@ -166,7 +167,8 @@ void ER_VREP::startOfSimulation(){
 	}
 }
 
-void ER_VREP::handleSimulation() {
+void ER_VREP::handleSimulation()
+{
 	
 	/* This function is called every simulation step. Note that the behavior of
 	* the robot drastically changes when slowing down the simulation since this
@@ -210,7 +212,8 @@ void ER_VREP::handleSimulation() {
 	}
 }
 
-float ER_VREP::fitnessFunction(MorphologyPointer morph) {
+float ER_VREP::fitnessFunction(MorphologyPointer morph)
+{
 	vector <float> pStart; // start position of the robot
 	vector <float> pOne; // position after x time
 	vector <float> pEnd; // end position of the robot
@@ -303,7 +306,8 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph) {
 	return fitness;
 }
 
-void ER_VREP::endOfSimulation(){
+void ER_VREP::endOfSimulation()
+{
 	/* At the end of the simulation the fitness value of the simulated individual
 	* is retrieved and stored in the appropriate files. 
 	*/
@@ -472,7 +476,8 @@ bool ER_VREP::loadIndividual(int individualNum)
 }
 
 
-void ER_VREP::saveSettings(){
+void ER_VREP::saveSettings()
+{
 	cout << "saving" << endl;
 	settings->generation = generation;
 	settings->individualCounter = settings->indCounter;
@@ -552,4 +557,3 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	currentGenome->init();	//	cout << "loading" << endl;
 	currentGenome->loadGenome(bestInd, settings->sceneNum);
 }
-
