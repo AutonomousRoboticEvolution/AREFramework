@@ -37,53 +37,27 @@ public:
 	// std::vector<float> popFitness; // used by client-server
 	// std::vector<float> nextGenFitness; // used by client-server
 	std::vector<int> popNextIndNumbers;
-	/**
-		@brief This method initilizes setting for EA and random number generator seed
-	*/
+	/// This method initilizes setting for EA and random number generator seed
 	void setSettings(std::shared_ptr<Settings> st, std::shared_ptr<RandNum> rn);
-	/**
-		@brief This method sets the fitness value of an individual
-	*/
+	/// This method sets the fitness value of an individual
 	virtual void setFitness(int individual, float fitness) = 0;
-	/**
-		@brief This method initilizes a population of genomes
-	*/
+	/// This method initilizes a population of genomes
 	virtual void init() = 0;			// initializes EA
 	virtual void selection() = 0;		// selection operator
 	virtual void replacement() = 0;		// replacement operator
 	virtual void mutation() = 0;		// mutation operator
 	virtual void end() = 0;				// last call to the EA, when simulation stops
-	/**
-		@brief Creates the individual in VREP
-		@param indNum the ID of the individual
-	*/
+	/// Creates the individual in VREP
 	virtual void createIndividual(int indNum) = 0;
-	/**
-		@brief Load an individual
-		@param individualNum the ID of the individual
-		@param sceneNum ID of environment scene?
-	*/
+	/// Load an individual
 	void loadIndividual(int individualNum, int sceneNum);
-	/**
-		@brief Save the population fitness values
-		@param generation: current generation
-		@param std::vector<float> popfit is a std::vector containing the fitness valus of the population
-		@param std::vector<float> popIndividuals is a std::vector containing the ID's of the individuals
-	*/
+	/// Save the population fitness values
 	void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
-	/**
-		@brief Save the population fitness values
-		@param generation: current generation
-	*/
+	/// Save the population fitness values
 	void savePopFitness(int generation);
-	/**
-		@brief Load the best individual based on the evolutionary progression documen
-		@param sceneNum: ID of environment scene
-	*/
-	virtual void loadBestIndividualGenome(int sceneNum) = 0; 
-	/**
-		@brief Load all the population genomes?
-	*/
+	/// Load the best individual based on the evolutionary progression documen
+	virtual void loadBestIndividualGenome(int sceneNum) = 0;
+	/// Load all the population genomes?
 	void loadPopulationGenomes();
 	virtual std::shared_ptr<Morphology> getMorph() = 0;
 };

@@ -8,7 +8,7 @@
     - The second argument defines how the experiment is run.
     * 1 -> Run standard EA in client-server mode
     * 2 -> Run standard EA in local mode
-    * 3 -> Run NEAT
+    * 3 -> Run MultiNEAT
     * 7 ->
     * 8 ->
     * 9 -> Load the best individual from the last generation.

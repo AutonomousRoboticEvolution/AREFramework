@@ -107,7 +107,7 @@ set(SOURCES
     #	ERFiles/module/Module_Brain.cpp
     #	ERFiles/module/Module_Rectangle.cpp
     #	ERFiles/module/Module_Spring.cpp
-    NEAT_LIB/NEAT_LIB/stdafx.cpp NEAT_LIB/NEAT_LIB/stdafx.h)
+    NEAT_LIB/NEAT_LIB/stdafx.cpp NEAT_LIB/NEAT_LIB/stdafx.h ERFiles/EA_MultiNEAT.cpp ERFiles/EA_MultiNEAT.h)
 
 add_library(ER_library STATIC ${SOURCES})
 

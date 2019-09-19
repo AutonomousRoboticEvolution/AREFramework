@@ -1,10 +1,11 @@
 /**
-	@file v_repExtER.cpp
+	@file EA_Factory.cpp
     @authors Edgar Buchanan, Wei Li, Matteo de Carlo and Frank Veenstra
 	@brief This file creates the appropriate EA (Steady state, generational, NEAT) according according to settings
     (evolution type).
 */
 #include "EA_Factory.h"
+#include "EA_MultiNEAT.h"
 
 EA_Factory::EA_Factory()
 {}
@@ -40,6 +41,15 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
                 std::cout << "NEAT EA" << std::endl;
             }
             std::unique_ptr<EA> m_ea(new EA_NEAT);
+            m_ea->randomNum = rn;
+            m_ea->settings = st;
+            return m_ea;
+        }
+        case 5: {
+            if (st->verbose) {
+                std::cout << "MultiNEAT" << std::endl;
+            }
+            std::unique_ptr<EA> m_ea(new EA_MultiNEAT);
             m_ea->randomNum = rn;
             m_ea->settings = st;
             return m_ea;

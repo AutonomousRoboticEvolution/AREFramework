@@ -162,6 +162,7 @@ public:
         /// deprecated
 		EA_NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
+		EA_MULTINEAT = 5,
 	};
 
 	/// Instance type defines in what mode the "Evolutionary Robotics" plugin runs // TODO: define name
