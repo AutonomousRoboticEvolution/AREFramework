@@ -40,6 +40,7 @@ shared_ptr<EA> EA_Factory::createEA(shared_ptr<RandNum> rn, shared_ptr<Settings>
 		m_ea->settings = st;
 		return m_ea;
 	}
+	case 4:
 	default:
 		if (st->verbose) {
 			cout << "Steady state EA" << endl;

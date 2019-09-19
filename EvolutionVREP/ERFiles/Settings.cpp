@@ -2,14 +2,9 @@
 
 using namespace std;
 
-/*!
- * The settings that are set in the constructor are mainly for debugging purposes. 
- * 
- */
+/// The settings that are set in the constructor are mainly for debugging purposes.
 Settings::Settings() {
-	// set default module parameters
-	// 1: Cube
-	// 4: Servo Module
+	// et default module parameters
 	// 13: Brain (not very useful now)
 	// 14: wheel
 	// 15: sensor 
@@ -37,7 +32,6 @@ Settings::Settings() {
 	}
 
 	maxNumberModules = 20;
-	//morphologyType = MODULAR_LSYSTEM; // MODULAR_DIRECT;
 	morphologyType = MODULAR_LSYSTEM;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_DEFAULT;
@@ -52,7 +46,6 @@ Settings::Settings() {
 	initialOutputNeurons = 1;
 	evolutionType = STEADY_STATE;
 	seed = 0;
-//	instanceType = INSTANCE_REGULAR;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
 	maxGeneration = 600;

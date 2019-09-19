@@ -27,9 +27,9 @@ void ER_VREP::initializeServer()
 	eaf.reset();
 }
 
+/// Initialize a genome factory to create genomes when the simulation is running
 void ER_VREP::initializeSimulation()
 {
-    // Initialize a genome factory to create genomes when the simulation is running
 	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
@@ -44,13 +44,11 @@ void ER_VREP::initializeSimulation()
 	eaf.reset();
 }
 
+/// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
+/// settings file. A random number class will also be created and all other files refer to this class
 void ER_VREP::initialize()
 {
-	/* initialize the settings class; it will read a settings file or it 
-	 * will use default parameters if it cannot read a settings file. 
-	 * A random number class will also be created and all other files
-	 * refer to this class. 
-	 */
+
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
 		if (settings->verbose) {

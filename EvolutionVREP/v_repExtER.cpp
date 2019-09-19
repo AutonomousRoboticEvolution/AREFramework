@@ -3,6 +3,16 @@
     @authors Edgar Buchanan, Wei Li, Matteo de Carlo and Frank Veenstra
 	@brief This files from the three arguments decides whether to start simulation in local or server mode,
     specifies seed and repository.
+    @details The plug-in to run needs three arguments: -gX, -gX and gX
+    - The first argument defines the seed of the experiment.
+    - The second argument defines how the experiment is run.
+    * 1 -> Run standard EA in client-server mode
+    * 2 -> Run standard EA in local mode
+    * 3 -> Run NEAT
+    * 7 ->
+    * 8 ->
+    * 9 -> Load the best individual from the last generation.
+    - The third argumt defines where the repository is
 */
 
 #include "v_repExtER.h"
@@ -101,8 +111,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     startEvolution = true;
 	if (startEvolution) {
 		// Construct classes
-		ER = std::unique_ptr<ER_VREP>(new ER_VREP);   //the class used to handle the EA
-		ER->settings = std::shared_ptr<Settings>(new Settings);  //initialize settings in the constructor
+		ERVREP = std::unique_ptr<ER_VREP>(new ER_VREP);   // The class used to handle the EA
+		ERVREP->settings = std::shared_ptr<Settings>(new Settings);  // Initialize settings in the constructor
 
 		/// Set all three arguments
 		/// 1: The first argument sets seed and location
@@ -116,17 +126,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		/// 3: The third argument sets the repository
 		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
 		if (arg3_param != nullptr) {
-			ER->settings->setRepository(arg3_param);
+			ERVREP->settings->setRepository(arg3_param);
 			simReleaseBuffer(arg3_param);
 		}
 		else {
 			std::cout << "Argument 3 was NULL" << std::endl;
 		}
 		// Read the settings file; specify the ID of experimental run
-		ER->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-		ER->settings->readSettings();	// load the settings if the *.csv exists
-        ER->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-        ER->randNum = std::make_shared<RandNum>(run);  //used for generating random number using the seed
+		ERVREP->settings->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
+		ERVREP->settings->readSettings();	// load the settings if the *.csv exists
+        ERVREP->settings->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
+        ERVREP->randNum = std::make_shared<RandNum>(run);  //used for generating random number using the seed
 
 		/// 2: The second argument sets the condition for simulation
 		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
@@ -138,42 +148,38 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         }
 
         switch (arg2_param_i) {
-            /// Run EA in server-client mode
-            case 1:
-                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_SERVER;
-                ER->settings->instanceType = ER->settings->INSTANCE_SERVER;  //run EA in a client-server mode (can be parallel)
+            case 1: /// Run EA in server-client mode
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_SERVER;
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_SERVER;
                 break;
-                /// Run EA in local mode
-            case 2:
-                ER->settings->startingCondition = ER->settings->COND_RUN_EVOLUTION_CLIENT;
-                ER->startRun = true;
+            case 2: /// Run EA in local mode
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_CLIENT;
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
+                ERVREP->startRun = true;
                 break;
             case 7:
-                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-                ER->settings->morphologyType = ER->settings->MODULAR_PHENOTYPE;
-                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
+                ERVREP->settings->morphologyType = ERVREP->settings->MODULAR_PHENOTYPE;
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
             case 8:
-                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;
-                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
-                /// Load best individual
-            case 9:
-                ER->settings->instanceType = ER->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
-                ER->settings->startingCondition = ER->settings->COND_LOAD_BEST;
+            case 9: /// Load best individual
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
-                /// Wrong argument or no second argument, don't run evolution
-            default:
+
+            default: /// Wrong argument or no second argument, don't run evolution
                 std::cout << "No second argument so not running evolution" << std::endl;
-                ER->startRun = false;
+                ERVREP->startRun = false;
                 break;
         }
-
-
 		// Actual initialization of ER
-		ER->initialize(); 
+		ERVREP->initialize(); 
 		//	ER->environment->sceneLoader();
-		if (ER->settings->verbose) {
+		if (ERVREP->settings->verbose) {
             std::cout << "ER initialized" << std::endl;
 		}
 	}
@@ -203,32 +209,32 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 	simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
 	void* retVal = nullptr;
 
-	if (ER->startRun) {
+	if (ERVREP->startRun) {
 		if (message == sim_message_eventcallback_simulationabouttostart) {
 			// tStart = clock();
 			// Initializes population
-			ER->startOfSimulation();  //start from here after simStartSimulation is called
-			if (ER->settings->verbose) {
+			ERVREP->startOfSimulation();  //start from here after simStartSimulation is called
+			if (ERVREP->settings->verbose) {
                 std::cout << "SIMULATION ABOUT TO START" << std::endl;
 			}
 		}
 		else if (message == sim_message_eventcallback_modulehandle) {
 
-			ER->handleSimulation(); // handling the simulation.
+			ERVREP->handleSimulation(); // handling the simulation.
 			timeCount = 0;
 		}
 		else if (message == sim_message_eventcallback_simulationended) {
 			initCall = true; // this tells the main loop to restart the simulation
-			ER->endOfSimulation();
+			ERVREP->endOfSimulation();
 			loadingPossible = true;  // start another simulation
-			if (ER->settings->verbose) {
+			if (ERVREP->settings->verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
 			}
 		}
 		//TODO you probably meant ==?
 		if (message = sim_message_eventcallback_modulehandle) {
 			timeCount++;  //need to wait a few time steps to start a new simulation
-			if (ER->settings->verbose) {
+			if (ERVREP->settings->verbose) {
 				//cout << timeCount << endl;
 			}
 		}
@@ -237,15 +243,15 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             timeCount = 0;
             initCall = false;
             counter = 0;
-            if (ER->settings->evolutionType != ER->settings->EMBODIED_EVOLUTION
-                && ER->settings->startingCondition != ER->settings->COND_LOAD_BEST
-                && ER->settings->instanceType != ER->settings->INSTANCE_SERVER
-                && ER->settings->startingCondition != ER->settings->COND_LOAD_SPECIFIC_INDIVIDUAL) {
+            if (ERVREP->settings->evolutionType != ERVREP->settings->EMBODIED_EVOLUTION
+                && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_BEST
+                && ERVREP->settings->instanceType != ERVREP->settings->INSTANCE_SERVER
+                && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_SPECIFIC_INDIVIDUAL) {
                 simStartSimulation();
             }
-            if (ER->settings->startingCondition == ER->settings->COND_LOAD_BEST) {
+            if (ERVREP->settings->startingCondition == ERVREP->settings->COND_LOAD_BEST) {
                 // simStartSimulation();
-                if (ER->settings->verbose){
+                if (ERVREP->settings->verbose){
                     std::cout<< "Load best individual" << std::endl;
                 }
             }
@@ -267,7 +273,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             std::cout << "should quit the simulator" << std::endl;
 			simQuitSimulator(true);
 		}
-		else if (loadingPossible && ER->settings->instanceType == ER->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
+		else if (loadingPossible && ERVREP->settings->instanceType == ERVREP->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
 			// time out when not receiving commands for 5 minutes.
 			if (!timerOn) {
 				sysTime = clock();
@@ -293,8 +299,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 
 				simGetIntegerSignal((simChar*) "individual", individual);
-				if (not ER->loadIndividual(individual[0])) {
-					if (ER->settings->verbose) {
+				if (not ERVREP->loadIndividual(individual[0])) {
+					if (ERVREP->settings->verbose) {
 						std::cout << "Server here, I could not load the specified individual: " << individual[0] << std::endl;
 						std::cout << "My signal was " << signal[0] << std::endl;
 					}

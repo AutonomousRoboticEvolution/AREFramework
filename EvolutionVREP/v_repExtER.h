@@ -13,7 +13,7 @@
 
 
 /// an unique pointer to ER_VREP class
-std::unique_ptr<ER_VREP> ER;
+std::unique_ptr<ER_VREP> ERVREP;
 // Used to indicate the initial call
 // It shouldn't matter, maybe it didn;t update
 bool initCall = true; // hello

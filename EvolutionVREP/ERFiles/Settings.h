@@ -182,7 +182,7 @@ public:
 
 
     StartingCondition startingCondition = COND_RUN_EVOLUTION_CLIENT;
-	InstanceType instanceType = INSTANCE_REGULAR;		// Whether the code runs in client or server mode
+	InstanceType instanceType;		// Whether the code runs in client or server mode
 	EvolutionType evolutionType = STEADY_STATE;			// Type of evolutionary algorithm used
 	FitnessType fitnessType = MOVE;						// Fitness type
 	EnvironmentType environmentType = DEFAULT_ENV;		// Environment type
