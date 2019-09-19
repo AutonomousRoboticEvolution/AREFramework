@@ -157,6 +157,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
                 ERVREP->startRun = true;
                 break;
+		    case 3: /// Run neat
+                ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_CLIENT;
+                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
+		        ERVREP->startRun = true;
+		        break;
             case 7:
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
                 ERVREP->settings->morphologyType = ERVREP->settings->MODULAR_PHENOTYPE;
