@@ -1,6 +1,5 @@
 #include "ER_DirectEncoding.h"
 #include <iostream>
-#include <sstream>
 
 using namespace std;
 
@@ -487,8 +486,7 @@ int ER_DirectEncoding::mutateERGenome(float mutationRate)
 					}
 				}
 				else {
-					int attachType = genome->moduleParameters[attachModule]->type;
-					int maxCh = getMaxChilds(genome->moduleParameters[attachModule]->type); // placeholder for max childs of parent module
+                    int maxCh = getMaxChilds(genome->moduleParameters[attachModule]->type); // placeholder for max childs of parent module
 					if (genome->moduleParameters[attachModule]->childSiteStates.size() < maxCh) {
 						int newModuleType = settings->moduleTypes[randomNum->randInt(settings->moduleTypes.size(), 0)];
 						//bool collideSite = true;

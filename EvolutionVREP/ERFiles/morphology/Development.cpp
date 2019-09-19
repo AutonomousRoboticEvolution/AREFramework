@@ -313,7 +313,6 @@ void Development::init()
 
 void Development::initCustomMorphology()
 {
-	float position[3] = { 0, 0, 0.1 };
 }
 
 
@@ -375,8 +374,8 @@ void Development::shiftRobotPosition()
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 18, &size[0]);
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 19, &size[1]);
 				simGetObjectFloatParameter(createdModules[i]->objectHandles[n], 20, &size[2]);
-				for (int i = 0; i < 3; i++) {
-					size[i] = size[i] * 2;
+				for (int j = 0; j < 3; j++) {
+					size[j] = size[j] * 2;
 				}
 
 				vector<vector<float>> cubeVertex; // 8 points in 3d space
@@ -421,21 +420,21 @@ void Development::shiftRobotPosition()
 
 				vector<vector<float>> rotatedPoints;
 				rotatedPoints.resize(8);
-				for (int i = 0; i < 8; i++) {
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[0]) + (points[i][1] * objectMatrix[1]) + (points[i][2] * objectMatrix[2]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[4]) + (points[i][1] * objectMatrix[5]) + (points[i][2] * objectMatrix[6]));
-					rotatedPoints[i].push_back((points[i][0] * objectMatrix[8]) + (points[i][1] * objectMatrix[9]) + (points[i][2] * objectMatrix[10]));
-					rotatedPoints[i][0] += objectOrigin[0];
-					rotatedPoints[i][1] += objectOrigin[1];
-					rotatedPoints[i][2] += objectOrigin[2];
-					if (rotatedPoints[i][2] < minimumObjectPos) {
-						minimumObjectPos = rotatedPoints[i][2];
+				for (int j = 0; j < 8; j++) {
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[0]) + (points[j][1] * objectMatrix[1]) + (points[j][2] * objectMatrix[2]));
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[4]) + (points[j][1] * objectMatrix[5]) + (points[j][2] * objectMatrix[6]));
+					rotatedPoints[j].push_back((points[j][0] * objectMatrix[8]) + (points[j][1] * objectMatrix[9]) + (points[j][2] * objectMatrix[10]));
+					rotatedPoints[j][0] += objectOrigin[0];
+					rotatedPoints[j][1] += objectOrigin[1];
+					rotatedPoints[j][2] += objectOrigin[2];
+					if (rotatedPoints[j][2] < minimumObjectPos) {
+						minimumObjectPos = rotatedPoints[j][2];
 					}
-					if (rotatedPoints[i][1] < minimumYObjectPosition) {
-						minimumYObjectPosition = rotatedPoints[i][1];
+					if (rotatedPoints[j][1] < minimumYObjectPosition) {
+						minimumYObjectPosition = rotatedPoints[j][1];
 					}
-					if (rotatedPoints[i][0] < minimumXObjectPosition) {
-						minimumXObjectPosition = rotatedPoints[i][0];
+					if (rotatedPoints[j][0] < minimumXObjectPosition) {
+						minimumXObjectPosition = rotatedPoints[j][0];
 					}
 				}
 			}
@@ -507,7 +506,6 @@ void Development::checkControl(int individual, int sceneNum)
 bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles)
 {
     // TODO EB: Implement a way to ignore visuals.
-    bool collision = true;
     for (int n = 0; n < module->objectHandles.size(); n++) {
         if (simGetObjectType(module->objectHandles[n]) == sim_object_shape_type) {
             for (int i = 0; i < createdModules.size() - 1; i++) {
@@ -541,7 +539,7 @@ bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exc
 /// Check for collisions. If there is a colliding object, remove it from the genome representation.
 bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
 {
-    bool bViabilityResult = true;
+    bool bViabilityResult;
     vector<int> exception;
     exception.push_back(iParentHandle);
     for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
@@ -565,7 +563,7 @@ bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
 /// Check for ground. If object is above the ground, it can be created
 bool Development::bCheckGround(int createdModulesSize)
 {
-    bool bViabilityResult = true;
+    bool bViabilityResult;
     if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
         if (settings->verbose) {
             cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
@@ -584,7 +582,7 @@ bool Development::bCheckGround(int createdModulesSize)
 /// Check for orientation. If the orientation of the organ is printable
 bool Development::bCheckOrientation(int createdModulesSize)
 {
-    bool bViabilityResult = true;
+    bool bViabilityResult;
     // If the orientation of the organ is printable
     if (createdModules[createdModulesSize - 1]->type == 14 ||
         createdModules[createdModulesSize - 1]->type == 15) {

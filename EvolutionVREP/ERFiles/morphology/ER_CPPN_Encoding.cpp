@@ -1,6 +1,5 @@
 #include "ER_CPPN_Encoding.h"
 #include <iostream>
-#include <sstream>
 #include <cmath>
 
 using namespace std;

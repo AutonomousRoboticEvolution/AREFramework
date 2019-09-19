@@ -3,7 +3,7 @@
 
 Modular_Morphology::~Modular_Morphology(){
 //	cout << endl << "DELETED MORPHOLOGY" << endl << endl; 
-};
+}
 
 vector <Modular_Morphology::ModulePointer> Modular_Morphology::getCreatedModules() {
 	vector<ModulePointer> nullVec;

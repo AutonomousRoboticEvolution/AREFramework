@@ -259,7 +259,6 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	if (rdr < 0) {
 		std::cerr << "Error loading models/Servo_Module.ttm" << std::endl;
 	}
-	int shapeAmount[1];
 //	energyDissipationRate = 0.1;
 //	cout << "creating rodrigo model" << endl;
 
@@ -326,7 +325,6 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	fsR[0] = configuration[3];
 	fsR[1] = configuration[4];
 	fsR[2] = configuration[5];
-	float zeroOrigin[3] = { 0,0,0 };
 
 	float fsPos[3];
 	fsPos[0] = 0.0;
@@ -448,7 +446,6 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	sites.push_back(2);
 	
 	freeSites = sites;
-	int objectAmount[1];
 //	int *allHandles = simGetObjectsInTree(rdr, sim_handle_all, 1, objectAmount);
 //	for (int i = 0; i < objectAmount[0]; i++) {
 //		objectHandles.push_back(allHandles[i]);
@@ -520,10 +517,10 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 	}
 
 	if (parentModulePointer != NULL) {
-		if (parentModulePointer->broken == true) {
+		if (parentModulePointer->broken) {
 			this->broken = true;
 		}
-		else if (broken == false) {
+		else if (!broken) {
 //			vector<float> sensorValues;
 	//		sensorValues.push_back(0);
 	//		output = controlModule(sensorValues); // sensor values set to zero, no intrinsic sensors in the servo module
@@ -601,7 +598,7 @@ vector<float> Module_Servo::getPosition() {
 	positionVector.push_back(pos[1]);
 	positionVector.push_back(pos[2]);
 	return positionVector;
-};
+}
 
 stringstream Module_Servo::getControlParams() {
 	stringstream ss;

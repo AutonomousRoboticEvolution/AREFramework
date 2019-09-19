@@ -28,7 +28,7 @@ void CPGNeuron::update()
 //	cout << "Speed and Range : " << cycleSpeed << ", " << cycleRange << endl;
 	// CPG doesn't actually take an input value, it uses a stable limit cycle instead
 	// note that the input value is used as an x value for the stable limit cycle
-	if (dir == true) {
+	if (dir) {
 		if ((innerValue + cycleSpeed) > cycleRange) {
 			innerValue -= cycleSpeed;
 			dir = false; // input decreases from here on
@@ -37,7 +37,7 @@ void CPGNeuron::update()
 			innerValue += cycleSpeed;
 		}
 	}
-	else if (dir == false) {
+	else if (!dir) {
 		if ((innerValue - cycleSpeed) < -cycleRange) {
 			innerValue += cycleSpeed;
 			dir = true; // input increases

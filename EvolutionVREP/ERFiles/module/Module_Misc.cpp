@@ -101,7 +101,6 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	fsR[0] = configuration[3];
 	fsR[1] = configuration[4];
 	fsR[2] = configuration[5];
-	float zeroOrigin[3] = { 0,0,0 };
 	// force sensor position (+0.0001 away from z direction of previous)
 	float fsPos[3];
 	fsPos[0] = 0.0;
@@ -224,7 +223,6 @@ int Module_Misc::createModule(vector<float> configuration, int relativePosHandle
 	}
 	
 	freeSites = sites;
-	int objectAmount[1]; // not used??
 	for (int i = 0; i < shapes.size(); i++) {
 		objectHandles.push_back(shapes[i]);
 	}
@@ -297,10 +295,10 @@ vector<float> Module_Misc::updateModule(vector<float> input) {
 		}
 
 		if (parentModulePointer != NULL) {
-			if (parentModulePointer->broken == true) {
+			if (parentModulePointer->broken) {
 				this->broken = true;
 			}
-			else if (broken == false) {
+			else if (!broken) {
 				//			vector<float> sensorValues;
 					//		sensorValues.push_back(0);
 					//		output = controlModule(sensorValues); // sensor values set to zero, no intrinsic sensors in the servo module
@@ -379,7 +377,7 @@ vector<float> Module_Misc::getPosition() {
 	positionVector.push_back(pos[1]);
 	positionVector.push_back(pos[2]);
 	return positionVector;
-};
+}
 
 stringstream Module_Misc::getControlParams() {
 	stringstream ss;

@@ -14,7 +14,6 @@ public:
 	int init();
 	int mutate(float mutationRate);
 	int createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle);
-	int createModuleBackup(std::vector<float> configuration, int relativePosHandle, int parentHandle);
     std::vector<int> getFreeSites(std::vector<int>);
     std::vector<int> getObjectHandles();
 	// For deep copy

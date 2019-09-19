@@ -1,12 +1,9 @@
-#pragma once
+
 #include "Neuron.h"
 #include <iostream>
 
-using namespace std;
-
-
 void Neuron::printNeuron() {
-	cout << "NEURON ID = " << neuronID << ", " << input << ", " << output << ", Threshold: " << threshold << endl;
+	std::cout << "NEURON ID = " << neuronID << ", " << input << ", " << output << ", Threshold: " << threshold << std::endl;
 //	threshold = 0.0;
 }
 
@@ -35,28 +32,28 @@ void Neuron::mutate(float mr) {
 	}
 }
 
-stringstream Neuron::getNeuronParams() {
-	stringstream ss;
-	ss << "\t" << ",#NeuronID," << neuronID << "," << endl;
+std::stringstream Neuron::getNeuronParams() {
+    std::stringstream ss;
+	ss << "\t" << ",#NeuronID," << neuronID << "," << std::endl;
 	ss << "\t" << ",#Connections,";
 	for (int i = 0; i < connections.size(); i++) {
 		ss << connections[i]->neuronID << ",";  //the ID of the neuron this neuron connects to
 	}
-	ss << endl;
+	ss << std::endl;
 	ss << "\t" << ",#ConnectionWeights,";
 	for (int i = 0; i < connections.size(); i++) {
 		ss << connectionWeights[i] << ",";
 	}
-	ss << endl;
+	ss << std::endl;
 	return ss;
 }
 
-void Neuron::setNeuronParams(vector<string> values) {
+void Neuron::setNeuronParams(std::vector<std::string> values) {
 	connections.clear();
 	bool addingConnections = false;
 	bool addingConnectionWeights = false;
 	for (int it = 0; it < values.size(); it++) {
-		string tmp = values[it];
+        std::string tmp = values[it];
 		if (tmp == "#NeuronType") {
 			it++;
 			tmp = values[it];
@@ -95,10 +92,9 @@ void Neuron::setNeuronParams(vector<string> values) {
 	}
 }
 
-bool Neuron::checkNeuron(vector<string> values) {
-	int conCounter = 0;
+bool Neuron::checkNeuron(std::vector<std::string> values) {
 	for (int it = 0; it < values.size(); it++) {
-		string tmp = values[it];
+        std::string tmp = values[it];
 		if (tmp == "#NeuronType") {
 			it++;
 			tmp = values[it];
@@ -107,21 +103,21 @@ bool Neuron::checkNeuron(vector<string> values) {
 			it++;
 			tmp = values[it];
 			if (neuronID != atoi(tmp.c_str())) {
-				cout << "ERROR: neuronID is different" << endl;
-				cout << "neuronID = " << neuronID << ", saved neuronID = " << atoi(tmp.c_str()) << endl;
+                std::cout << "ERROR: neuronID is different" << std::endl;
+                std::cout << "neuronID = " << neuronID << ", saved neuronID = " << atoi(tmp.c_str()) << std::endl;
 				return false;
-			};
+			}
 		}
 		else if (tmp == "#Connections") {
 			for (int i = 0; i < connectionsID.size(); i++) {
 				it++;
 				tmp = values[it];
 				if (connectionsID[i] != atoi(tmp.c_str())) {
-					cout << "ERROR << connections are different" << endl;
+                    std::cout << "ERROR << connections are different" << std::endl;
 					return false;
 				}
 				if (connections[i] == NULL) {
-					cout << "ERROR << connection is NULL" << endl;
+                    std::cout << "ERROR << connection is NULL" << std::endl;
 					return false;
 				}
 
@@ -131,8 +127,8 @@ bool Neuron::checkNeuron(vector<string> values) {
 			it++;
 			tmp = values[it];
 			if ((threshold + 0.001) < atof(tmp.c_str()) || (threshold - 0.001) > atof(tmp.c_str())) {
-				cout << "ERROR << threshold is different" << endl;
-				cout << "threshold = " << threshold << ", while file says " << atof(tmp.c_str()) << endl;
+                std::cout << "ERROR << threshold is different" << std::endl;
+                std::cout << "threshold = " << threshold << ", while file says " << atof(tmp.c_str()) << std::endl;
 				return false;
 			}
 		}

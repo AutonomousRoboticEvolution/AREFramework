@@ -569,7 +569,7 @@ void ANN::changeConnectionIDToPointer() {
 	// input layer can connect to recurrent and output layer
 	for (int i = 0; i < inputLayer.size(); i++) {
 		if (inputLayer[i]->connections.size() != inputLayer[i]->connectionsID.size()) {
-			if (settings->verbose == true) {
+			if (settings->verbose) {
                 cout << "ERROR: connections" << i << ".size() = " << inputLayer[i]->connections.size();
                 cout << ", while: connectionsID" << i << ".size() = " << inputLayer[i]->connectionsID.size() << endl;
             }
@@ -698,7 +698,7 @@ bool ANN::checkControl(const std::vector<std::string> &values)
 			if (neuronType == 0 || neuronType == 3 || neuronType == 5) {
 				if (recurrentLayer[interCheck]->checkNeuron(neuronValues) == false) {
 					return false;
-				};
+				}
 				interCheck++;
 			}
 			else if (neuronType == 1) {

@@ -1,6 +1,5 @@
 #include "ER_LSystem.h"
 #include <iostream>
-#include <sstream>
 
 using namespace std;
 
@@ -175,8 +174,7 @@ void ER_LSystem::initializeGenomeCustom(int type)
 const std::string ER_LSystem::generateGenome(int indNum, float fitness) const
 {
 //	cout << "saving lGenome " << indNum << " in folder " << sceneNum << ", that had a fitness of " << fitness << endl << "-------------------------------- "<< endl;
-//	int evolutionType = 0; // regular evolution, will be changed in the future. 
-	int amountCreatedModules = createdModules.size(); 
+//	int evolutionType = 0; // regular evolution, will be changed in the future.
 	int amountStates = lGenome->lParameters.size(); 
 
 	ostringstream genomeText;
@@ -565,7 +563,6 @@ int ER_LSystem::mutateERLGenome(float mutationRate)
 		}
 		lGenome->lParameters[i]->control->mutate(settings->mutationRate);
 		// Resize the rules (Potentially very destructive) 
-		int childSize = lGenome->lParameters[i]->childSites.size();
         /// Randomly changes number of children, very destructive mutation
 		if (randomNum->randFloat(0.0, 1.0) < mutationRate) {
 			int maxCh = 0;

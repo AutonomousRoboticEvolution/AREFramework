@@ -265,7 +265,7 @@ vector<float> Module_Cube::getPosition() {
 	positionVector.push_back(pos[1]);
 	positionVector.push_back(pos[2]);
 	return positionVector;
-};
+}
 
 stringstream Module_Cube::getControlParams() {
 	stringstream ss;

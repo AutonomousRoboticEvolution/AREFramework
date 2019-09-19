@@ -287,10 +287,7 @@ void EA_SteadyState::replaceNewRank()
 		populationGenomes.push_back(populationGenomesBuffer[i]->clone());
 	}
 	//populationGenomes = populationGenomesBuffer;
-	// ^ This swap should kill all objects no referenced to anymore. Without smart pointers this looks dangerous as hell. 
-
-	int deletedInds = 0;
-
+	// ^ This swap should kill all objects no referenced to anymore. Without smart pointers this looks dangerous as hell.
 	//populationGenomesBuffer.clear();
 	cout << "populationGenomes.size() = " << populationGenomes.size() << endl;
 	cout << "nextGenGenomes.size() = " << nextGenGenomes.size() << endl;

@@ -1,6 +1,5 @@
 #include "NEAT_CPPN_Encoding.h"
 #include <iostream>
-#include <sstream>
 #include <cmath>
 
 using namespace std;
@@ -100,7 +99,7 @@ void NEAT_CPPN_Encoding::init()
 					if (settings->verbose) {
 						cout << "output: " << endl;
 						//for each (double var in moduleTypeFloat)
-						for (int i = 0; i < moduleTypeFloat.size(); i++)
+						for (int j = 0; j < moduleTypeFloat.size(); j++)
 						{
 							cout << moduleTypeFloat[i] << ",";
 						}

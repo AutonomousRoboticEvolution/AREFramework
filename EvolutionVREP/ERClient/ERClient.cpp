@@ -42,14 +42,13 @@ int main(int argc, char* argv[])
 {
 	unique_ptr<ClientEA> client = unique_ptr<ClientEA>(new ClientEA);
 	std::vector<std::string> arguments(argv + 1, argv + argc);
-	int amountGen = 0;
-	client->settings = shared_ptr<Settings>(new Settings);
+    client->settings = shared_ptr<Settings>(new Settings);
 	string destination;
 	if (arguments.size() > 0) {
 		destination = arguments[0];
 		cout << "arguments are: ";
 		for (int i = 0; i < arguments.size(); i++) {
-			std:cout << arguments[i] << ", ";
+			std::cout << arguments[i] << ", ";
 		}
 		std::cout << std::endl;
 	}
