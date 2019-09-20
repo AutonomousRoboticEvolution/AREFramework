@@ -7,9 +7,6 @@
 #pragma once
 #include <memory>
 #include "EA.h"
-#include "EA_SteadyState.h"
-#include "EA_Generational.h"
-#include "EA_NEAT.h"
 
 class EA_Factory 
 {

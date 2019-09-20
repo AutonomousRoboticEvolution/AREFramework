@@ -3,9 +3,7 @@
 #include "GenomeFactory.h"
 #include "Genome.h"
 #include "Settings.h"
-#include "../NEAT_LIB/NEAT_LIB/Genome.h"
-#include "../NEAT_LIB/NEAT_LIB/Population.h"
-#include "../NEAT_LIB/NEAT_LIB/Assert.h"
+#include <multineat/Population.h>
 
 
 class EA

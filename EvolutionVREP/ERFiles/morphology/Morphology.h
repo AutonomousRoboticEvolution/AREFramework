@@ -2,13 +2,13 @@
 
 #include <vector>
 #include <memory>
+#include <multineat/NeuralNetwork.h>
 //#include "../env/Environment.h" // impossible, environment already includes morphology
 #include "../module/ER_Module.h"
 #include "../control/Control.h"
 #include "../control/ControlFactory.h"
 #include "../../RandNum.h"
 #include "../Settings.h"
-#include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 
 
 class Morphology // Abstract Class

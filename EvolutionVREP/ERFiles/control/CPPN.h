@@ -1,9 +1,6 @@
 #pragma once
 
 #include "ANN.h"
-#include "../../NEAT_LIB/NEAT_LIB/Assert.h"
-#include "../../NEAT_LIB/NEAT_LIB/Population.h"
-#include "../../NEAT_LIB/NEAT_LIB/Genome.h"
 
 
 class CPPN :
