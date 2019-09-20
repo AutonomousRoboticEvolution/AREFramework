@@ -16,9 +16,12 @@ EA_MultiNEAT::~EA_MultiNEAT() {
 
 /// Initialiase EA.
 void EA_MultiNEAT::init() {
+    if(settings->verbose){
+        std::cout << "Initialising Multi-NEAT" << std::endl;
+    }
     NEAT::Parameters params = NEAT::Parameters();
     /// Set parameters for NEAT
-    params.PopulationSize = 100;
+    params.PopulationSize = settings->populationSize;
     params.DynamicCompatibility = true;
     params.NormalizeGenomeSize = true;
     params.WeightDiffCoeff = 0.1;
@@ -27,7 +30,7 @@ void EA_MultiNEAT::init() {
     params.SpeciesMaxStagnation = 15;
     params.OldAgeTreshold = 35;
     params.MinSpecies = 2;
-    params.MaxSpecies = 10;
+    params.MaxSpecies = 4;
     params.RouletteWheelSelection = false;
     params.RecurrentProb = 0.0;
     params.OverallMutationRate = 1.0;
@@ -68,7 +71,36 @@ void EA_MultiNEAT::init() {
     /// Defines the initial conditions of the genome
     // (?, number of inputs, number if hidden neurons/layers?, number of outputs, ?, output activation function,
     // (hidden activation function, ?, parameters, number of layers)
-    NEAT::Genome genome(0,3,3,1, false,NEAT::UNSIGNED_SIGMOID, NEAT::UNSIGNED_SIGMOID, 0,params,0);
+    NEAT::Genome genome(0,2,3,1, false,NEAT::UNSIGNED_SIGMOID, NEAT::UNSIGNED_SIGMOID, 0,params,0);
+    population = std::shared_ptr<NEAT::Population>(new NEAT::Population(genome, params, true, 1.0, randomNum->getSeed()));
+    population->Epoch();
+    //
+    /// Create population of genomes
+    unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+    for (int i = 0; i < settings->populationSize; i++)
+    {
+        nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));
+        nextGenGenomes[i]->fitness = 0;
+        nextGenGenomes[i]->individualNumber = i;
+    }
+    /// From here and on the code should be else where.
+//    for(int i = 1; i <= 20; i++){
+//        double bestf = -std::numeric_limits<double>::infinity();
+//        for(unsigned int j = 0; j < population->m_Species.size(); j++){
+//            for(unsigned int k = 0; k < population->m_Species[j].m_Individuals.size(); k++){
+//                population->m_Species[j].m_Individuals[k].SetFitness(randomNum->randFloat(0,1));
+//                population->m_Species[j].m_Individuals[k].SetEvaluated();
+//                std::vector<double> inputs {0.0,1.0};
+//                NEAT::NeuralNetwork neuralNetwork;
+//                genome.BuildPhenotype(neuralNetwork);
+//                neuralNetwork.Input(inputs);
+//                neuralNetwork.Activate();
+//                double result = neuralNetwork.Output()[0];
+//                std::cout << result << std::endl;
+//            }
+//        }
+//        population->Epoch();
+//    }
 }
 
 void EA_MultiNEAT::replacement() {

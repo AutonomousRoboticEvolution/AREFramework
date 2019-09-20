@@ -10,9 +10,9 @@ class EnvPhototaxis :
 public:
 	EnvPhototaxis();
 	~EnvPhototaxis();
-	void init(); 
-	float fitnessFunction(MorphologyPointer morph);
-	float updateEnv(MorphologyPointer morph);
+	void init() override;
+	float fitnessFunction(MorphologyPointer morph) override;
+	float updateEnv(MorphologyPointer morph) override;
 	float start(MorphologyPointer morph);
 
 	float startEnergy = 0;

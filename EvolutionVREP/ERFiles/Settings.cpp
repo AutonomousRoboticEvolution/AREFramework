@@ -44,7 +44,7 @@ Settings::Settings() {
 	initialInputNeurons = 1;
 	initialInterNeurons = 1;
 	initialOutputNeurons = 1;
-	evolutionType = EA_MULTINEAT;
+	evolutionType = STEADY_STATE;
 	seed = 0;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
@@ -730,5 +730,7 @@ void Settings::saveSettings() {
 
 void Settings::setRepository(std::string repository) {
     this->repository = repository;
-    std::cout << "setting repository to " << repository << std::endl;
+    if(verbose){
+        std::cout << "Setting repository to ->" << repository << std::endl;
+    }
 }
