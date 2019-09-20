@@ -5,6 +5,7 @@
 */
 
 #include "EA_MultiNEAT.h"
+#include <memory>
 
 EA_MultiNEAT::EA_MultiNEAT() {
 
@@ -72,11 +73,11 @@ void EA_MultiNEAT::init() {
     // (?, number of inputs, number if hidden neurons/layers?, number of outputs, ?, output activation function,
     // (hidden activation function, ?, parameters, number of layers)
     NEAT::Genome genome(0,2,3,1, false,NEAT::UNSIGNED_SIGMOID, NEAT::UNSIGNED_SIGMOID, 0,params,0);
-    population = std::shared_ptr<NEAT::Population>(new NEAT::Population(genome, params, true, 1.0, randomNum->getSeed()));
+    population = std::make_shared<NEAT::Population>(genome, params, true, 1.0, randomNum->getSeed());
     population->Epoch();
     //
     /// Create population of genomes
-    std::unique_ptr<GenomeFactory> gf = std::unique_ptr<GenomeFactory>(new GenomeFactory);
+    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
     for (int i = 0; i < settings->populationSize; i++)
     {
         nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));

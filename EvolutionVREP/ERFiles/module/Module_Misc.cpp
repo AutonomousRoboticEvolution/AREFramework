@@ -1,7 +1,8 @@
 #include "Module_Misc.h"
 #include <iostream>
 #define _USE_MATH_DEFINES
-#include <math.h>
+#include <cmath>
+#include <unistd.h>
 
 using namespace std;
 

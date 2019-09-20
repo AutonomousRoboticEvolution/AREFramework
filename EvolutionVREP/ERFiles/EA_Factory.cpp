@@ -6,12 +6,15 @@
 */
 #include "EA_Factory.h"
 #include "EA_MultiNEAT.h"
+#include "EA_SteadyState.h"
+#include "EA_Generational.h"
 
 EA_Factory::EA_Factory()
 {}
 
 EA_Factory::~EA_Factory()
 {}
+
 /// Create the appropriate EA according to evolutionType.
 std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
@@ -32,15 +35,6 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
                 std::cout << "Creating EA: Generational" << std::endl;
             }
             std::unique_ptr<EA> m_ea(new EA_Generational);
-            m_ea->randomNum = rn;
-            m_ea->settings = st;
-            return m_ea;
-        }
-        case 3: {
-            if (st->verbose) {
-                std::cout << "Creating EA: NEAT" << std::endl;
-            }
-            std::unique_ptr<EA> m_ea(new EA_NEAT);
             m_ea->randomNum = rn;
             m_ea->settings = st;
             return m_ea;

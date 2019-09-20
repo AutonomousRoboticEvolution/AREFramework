@@ -3,9 +3,8 @@
 #include "GenomeFactory.h"
 #include "Genome.h"
 #include "Settings.h"
-//#include "../NEAT_LIB/NEAT_LIB/Genome.h"
-//#include "../NEAT_LIB/NEAT_LIB/Population.h"
-//#include "../NEAT_LIB/NEAT_LIB/Assert.h"
+#include <multineat/Population.h>
+
 
 class EA
 {
@@ -23,7 +22,7 @@ public:
 	/// container of next generation genomes
 	std::vector<std::shared_ptr<Genome>> nextGenGenomes;  
 	/// used in NEAT
-    std::shared_ptr<NEAT::Population> population;
+	std::shared_ptr<NEAT::Population> population;
 	std::string neatSaveFile = "/testNEAT";
 
 
