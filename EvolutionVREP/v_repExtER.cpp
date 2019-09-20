@@ -8,7 +8,6 @@
     - The second argument defines how the experiment is run.
     * 1 -> Run standard EA in client-server mode
     * 2 -> Run standard EA in local mode
-    * 3 -> Run MultiNEAT
     * 7 ->
     * 8 ->
     * 9 -> Load the best individual from the last generation.
@@ -114,13 +113,19 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ERVREP = std::unique_ptr<ER_VREP>(new ER_VREP);   // The class used to handle the EA
 		ERVREP->settings = std::shared_ptr<Settings>(new Settings);  // Initialize settings in the constructor
 
+        if(ERVREP->settings->verbose){
+            std::cout << " " << std::endl; // Make output more readable
+        }
+
 		/// Set all three arguments
 		/// 1: The first argument sets seed and location
 		int run = 0; // evolutionary run
 		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
 		if (arg1_param != nullptr) {
 			run = atoi(arg1_param);
-			std::cout << "run is set to " << arg1_param << std::endl;
+			if(ERVREP->settings->verbose){
+                std::cout << "Run is set to " << arg1_param << std::endl;
+			}
 			simReleaseBuffer(arg1_param);
 		}
 		/// 3: The third argument sets the repository
@@ -149,44 +154,55 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
         switch (arg2_param_i) {
             case 1: /// Run EA in server-client mode
+                if(ERVREP->settings->verbose){
+                    std::cout << "Mode: Server-client EA" << std::endl;
+                }
                 ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_SERVER;
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_SERVER;
                 break;
             case 2: /// Run EA in local mode
+                if(ERVREP->settings->verbose){
+                    std::cout << "Mode: Local EA" << std::endl;
+                }
                 ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_CLIENT;
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
                 ERVREP->startRun = true;
                 break;
-		    case 3: /// Run neat
-                ERVREP->settings->startingCondition = ERVREP->settings->COND_RUN_EVOLUTION_CLIENT;
-                ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
-		        ERVREP->startRun = true;
-		        break;
             case 7:
+                if(ERVREP->settings->verbose){
+                    std::cout << "?" << std::endl;
+                }
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
                 ERVREP->settings->morphologyType = ERVREP->settings->MODULAR_PHENOTYPE;
                 ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
             case 8:
+                if(ERVREP->settings->verbose){
+                    std::cout << "Mode: ?" << std::endl;
+                }
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;
                 ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
             case 9: /// Load best individual
+                if(ERVREP->settings->verbose){
+                    std::cout << "Mode: Load best individual ever" << std::endl;
+                }
                 ERVREP->settings->instanceType = ERVREP->settings->INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
                 ERVREP->settings->startingCondition = ERVREP->settings->COND_LOAD_BEST;
                 break;
 
             default: /// Wrong argument or no second argument, don't run evolution
-                std::cout << "No second argument so not running evolution" << std::endl;
+                if(ERVREP->settings->verbose){
+                    std::cout << "Mode: No second argument, so not running evolution" << std::endl;
+                }
                 ERVREP->startRun = false;
                 break;
         }
 		// Actual initialization of ER
-		ERVREP->initialize(); 
-		//	ER->environment->sceneLoader();
-		if (ERVREP->settings->verbose) {
-            std::cout << "ER initialized" << std::endl;
-		}
+		ERVREP->initialize();
+        if(ERVREP->settings->verbose){
+            std::cout << " " << std::endl; // Make output more readable
+        }
 	}
 	int signal[1] = { 0 };
 	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)

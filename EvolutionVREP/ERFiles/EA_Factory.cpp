@@ -23,7 +23,7 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
         case 1:
         {
             if (st->verbose) {
-                std::cout << "Steady state EA" << std::endl;
+                std::cout << "Creating EA: Steady State" << std::endl;
             }
             std::unique_ptr<EA> m_ea(new EA_SteadyState);
             m_ea->randomNum = rn;
@@ -32,7 +32,7 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
         }
         case 2: {
             if (st->verbose) {
-                std::cout << "Generational EA" << std::endl;
+                std::cout << "Creating EA: Generational" << std::endl;
             }
             std::unique_ptr<EA> m_ea(new EA_Generational);
             m_ea->randomNum = rn;
@@ -41,7 +41,7 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
         }
         case 5: {
             if (st->verbose) {
-                std::cout << "MultiNEAT" << std::endl;
+                std::cout << "Creating EA: MULTINeat" << std::endl;
             }
             std::unique_ptr<EA> m_ea(new EA_MultiNEAT);
             m_ea->randomNum = rn;

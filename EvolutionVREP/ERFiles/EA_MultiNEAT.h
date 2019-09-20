@@ -5,7 +5,6 @@
 */
 #pragma once
 #include "EA.h"
-#include <multineat/MultiNEAT.h>
 
 class EA_MultiNEAT : public EA{
 public:

@@ -1,6 +1,10 @@
-#include "ER_VREP.h"
+/**
+	@file ER_VREP.h
+    @authors Frank Veenstra, Edgar Buchanan, Matteo de Carlo and Wei Li
+	@brief .
+*/
 
-using namespace std;
+#include "ER_VREP.h"
 
 ER_VREP::ER_VREP()
 {}
@@ -15,12 +19,12 @@ ER_VREP::~ER_VREP()
 void ER_VREP::initializeServer()
 {
 	// create the environment
-	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
 	// initialize the environment
 	environment->init();
-	unique_ptr<EA_Factory> eaf(new EA_Factory);
+    std::unique_ptr<EA_Factory> eaf(new EA_Factory);
 	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
@@ -30,13 +34,13 @@ void ER_VREP::initializeServer()
 /// Initialize a genome factory to create genomes when the simulation is running
 void ER_VREP::initializeSimulation()
 {
-	genomeFactory = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
+	genomeFactory = std::unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
-	unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 	environment = environmentFactory->createNewEnvironment(settings);
 	environmentFactory.reset();
-	unique_ptr<EA_Factory> eaf(new EA_Factory);
+    std::unique_ptr<EA_Factory> eaf(new EA_Factory);
 	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
@@ -49,42 +53,32 @@ void ER_VREP::initializeSimulation()
 void ER_VREP::initialize()
 {
 
+    if (settings->verbose) {
+        std::cout << "ER initialize" << std::endl;
+    }
 	settings->indCounter = 0;
 	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
-		if (settings->verbose) {
-		    std::cout << "Regular Evolution" << std::endl;
-		}
 		settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
-		if (settings->verbose) {
-			std::cout << "initializing evolution" << std::endl;
-		}
-		// initialize simulation
-		initializeSimulation();
+		initializeSimulation(); // Initialize simulation
 	}
 	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && settings->startingCondition != settings->COND_LOAD_BEST) {
-		if (settings->verbose){
-		    std::cout << "Initializing Server" << std::endl;
-		}
 		settings->client = false; // V-REP plugin will receive genomes from ea client
 		initializeServer();
 	}
 }
-
+/// When V-REP starts, this function is called. Depending on the settings, it initializes the properties of the
+/// individual of the optimization strategy chosen.
 void ER_VREP::startOfSimulation()
 {
-	
-	/* When V-REP starts, this function is called. Depending on the settings,
-	* it initializes the properties of the individual of the optimization
-	* strategy chosen.
-	*/
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
 	}
 	if (settings->verbose) {
-		std::cout << "Starting" << std::endl;
+        std::cout << " " << std::endl; // Makes it more readable
+		std::cout << "Start of Simulation" << std::endl;
 	}
 
-	// set the random seed
+	// Set random seed
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
 
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
@@ -104,18 +98,16 @@ void ER_VREP::startOfSimulation()
 	else {
 		if (settings->startingCondition != settings->COND_LOAD_BEST) {
 			if (settings->verbose) {
-				cout << "Creating Individual " << settings->indCounter << endl;
+                std::cout << "Creating Individual " << settings->indCounter << std::endl;
 			}
+			// TODO: EB - what's happening here?
 			if (settings->indCounter < ea->nextGenGenomes.size()) {
 				// First generation:
 				currentInd = settings->indCounter;
 				ea->nextGenGenomes[currentInd]->init(); //create the genome for morphology and control
 
-				if (settings->verbose) {
-					cout << "creating individual" << endl;
-				}
 				if (settings->evolutionType == settings->EA_NEAT) {
-					ea->createIndividual(-1);
+					ea->createIndividual(-1); // This loads the best individual
 					currentMorphology = ea->getMorph();
 					currentMorphology->create();
 				}
@@ -126,6 +118,7 @@ void ER_VREP::startOfSimulation()
 				}
 
 			}
+			// TODO: EB - what's happening here?
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
 				if (settings->evolutionType == settings->EA_NEAT) {
 					ea->createIndividual(-1);
@@ -212,9 +205,9 @@ void ER_VREP::handleSimulation()
 
 float ER_VREP::fitnessFunction(MorphologyPointer morph)
 {
-	vector <float> pStart; // start position of the robot
-	vector <float> pOne; // position after x time
-	vector <float> pEnd; // end position of the robot
+    std::vector <float> pStart; // start position of the robot
+    std::vector <float> pOne; // position after x time
+    std::vector <float> pEnd; // end position of the robot
 	float fitness = 0;
 
 	//	int mainHandle = morph->getMainHandle();
@@ -310,7 +303,7 @@ void ER_VREP::endOfSimulation()
 	* is retrieved and stored in the appropriate files. 
 	*/
 	if (settings->verbose) {
-		std::cout << "End of simulation" << endl;
+		std::cout << "End of simulation" << std::endl;
 	}
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
@@ -324,7 +317,7 @@ void ER_VREP::endOfSimulation()
 			// Environment independent fitness function:
 			// float fitness = fit->fitnessFunction(currentMorphology);
 			float phenValue = 0.0; // not used in CPPN-NEAT
-			cout << "fitness = " << fitness << endl;
+			std::cout << "fitness = " << fitness << std::endl;
 			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
 			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
 			int signal[1] = { 2 };
@@ -337,7 +330,7 @@ void ER_VREP::endOfSimulation()
 			// Environment independent fitness function:
 			// float fitness = fit->fitnessFunction(currentMorphology);
 			float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-			cout << "fitness = " << fitness << endl;
+			std::cout << "fitness = " << fitness << std::endl;
 			simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
 			simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
 			int signal[1] = { 2 };
@@ -349,12 +342,12 @@ void ER_VREP::endOfSimulation()
 		}
 	}
 	else {
-		cout << "settings->indCounter = " << settings->indCounter << endl;
+		std::cout << "settings->indCounter = " << settings->indCounter << std::endl;
 		if (settings->startingCondition != settings->COND_LOAD_BEST) {
 			if (settings->indCounter < ea->populationGenomes.size()) {
 				float fitness = environment->fitnessFunction(currentMorphology);
 				ea->populationGenomes[currentInd]->fitness = fitness;
-				cout << "fitness = " << ea->populationGenomes[currentInd]->fitness << endl;
+                std::cout << "fitness = " << ea->populationGenomes[currentInd]->fitness << std::endl;
 				if (settings->savePhenotype) {
 					currentGenome->fitness = fitness;
 					currentGenome->savePhenotype(settings->indCounter, settings->sceneNum);
@@ -380,7 +373,7 @@ void ER_VREP::endOfSimulation()
 					// TODO set fitness
 					ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
 					currentGenome->morph->saveGenome(settings->indCounter, fitness);
-					cout << "FITNESS = " << fitness << endl;
+                    std::cout << "FITNESS = " << fitness << std::endl;
 					settings->indCounter++;
 				}
 			}
@@ -396,9 +389,9 @@ void ER_VREP::endOfSimulation()
 		if (settings->startingCondition == settings->COND_LOAD_BEST) {
 			float fitness = environment->fitnessFunction(currentMorphology);
 			currentGenome.reset();
-			cout << "-----------------------------------" << endl;
-			cout << "fitness = " << fitness << endl;
-			cout << "-----------------------------------" << endl;
+			std::cout << "-----------------------------------" << std::endl;
+			std::cout << "fitness = " << fitness << std::endl;
+            std::cout << "-----------------------------------" << std::endl;
 		}
 		
 		// following uncommented code was necessary when V-REP itself contained a memory leak.
@@ -412,14 +405,14 @@ void ER_VREP::endOfSimulation()
 
 }
 
-shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
+std::shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 {
-	return shared_ptr<Morphology>();
+	return std::shared_ptr<Morphology>();
 }
 
 bool ER_VREP::loadIndividual(int individualNum)
 {
-	std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << endl;
+	std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
 	currentGenome = genomeFactory->createGenome(0, randNum, settings);
 	// try to load from signal
 	simInt signalLength = -1;
@@ -469,17 +462,17 @@ bool ER_VREP::loadIndividual(int individualNum)
 	}
 	
 	currentGenome->individualNumber = individualNum;
-	cout << "loaded" << endl;
+    std::cout << "loaded" << std::endl;
 	return load;
 }
 
 
 void ER_VREP::saveSettings()
 {
-	cout << "saving" << endl;
+    std::cout << "saving" << std::endl;
 	settings->generation = generation;
 	settings->individualCounter = settings->indCounter;
-	vector<int> indNums;
+    std::vector<int> indNums;
 	for (int i = 0; i < ea->populationGenomes.size(); i++) {
 		indNums.push_back(ea->populationGenomes[i]->individualNumber); // must be set when saving
 	}
@@ -493,28 +486,28 @@ void ER_VREP::saveSettings()
 			bestFitness = ea->populationGenomes[i]->fitness;
 			bestInd = i;
 			bestIndividual = ea->populationGenomes[bestInd]->individualNumber;
-			cout << "Best individual has number " << ea->populationGenomes[bestInd]->individualNumber << endl;
+            std::cout << "Best individual has number " << ea->populationGenomes[bestInd]->individualNumber << std::endl;
 		}
 	}
 	settings->bestIndividual = bestIndividual;
 	settings->saveSettings();
-	cout << "Settings saved" << endl;
+    std::cout << "Settings saved" << std::endl;
 }
 
 void ER_VREP::loadBestIndividualGenome(int sceneNum)
 {
-	vector<int> individuals;
-	vector<float> fitnessValues;
+    std::vector<int> individuals;
+    std::vector<float> fitnessValues;
 
-	ifstream file(settings->repository + "/SavedGenerations" + to_string(settings->sceneNum) + ".csv");
+    std::ifstream file(settings->repository + "/SavedGenerations" + std::to_string(settings->sceneNum) + ".csv");
 	if (file.good()) {
-		cout << "saved generations file found" << endl;
-		string value;
-		list<string> values;
+        std::cout << "saved generations file found" << std::endl;
+        std::string value;
+        std::list<std::string> values;
 		// read the settings file and store the comma seperated values
 		while (file.good()) {
 			getline(file, value, ','); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-			if (value.find('\n') != string::npos) {
+			if (value.find('\n') != std::string::npos) {
 				split_line(value, "\n", values);
 			}
 			else {
@@ -523,9 +516,9 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 		}
 		file.close();
 
-		list<string>::const_iterator it = values.begin();
+        std::list<std::string>::const_iterator it = values.begin();
 		for (it = values.begin(); it != values.end(); it++) {
-			string tmp = *it;
+            std::string tmp = *it;
 			if (tmp == "ind: ") {
 				it++;
 				tmp = *it;
@@ -540,14 +533,14 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	}
 	int bestInd = 0;
 	float bestFit = 0.0;
-	cout << "individuals size = " << individuals.size() << endl;
+    std::cout << "individuals size = " << individuals.size() << std::endl;
 	for (int i = 0; i < individuals.size(); i++) {
 		if (fitnessValues[i] >= bestFit) {
 			bestFit = fitnessValues[i];
 			bestInd = individuals[i];
 		}
 	}
-	cout << "loading individual " << bestInd << ", sceneNum " << settings->sceneNum << endl;
+    std::cout << "loading individual " << bestInd << ", sceneNum " << settings->sceneNum << std::endl;
 	randNum->setSeed(settings->seed + bestInd * bestInd);
 
 	currentGenome.reset();

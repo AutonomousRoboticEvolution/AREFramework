@@ -6,9 +6,9 @@ class RoughMoveEnv :
 public:
 	RoughMoveEnv();
 	~RoughMoveEnv();
-	void init(); 
-	float fitnessFunction(MorphologyPointer morph);
-	float updateEnv(MorphologyPointer morph);
+	void init() override;
+	float fitnessFunction(MorphologyPointer morph) override;
+	float updateEnv(MorphologyPointer morph) override;
 
 	float minimumHeigth = 0.0;
 

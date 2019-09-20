@@ -72,6 +72,9 @@ void EA_SteadyState::initNewGenome(int indnum)
 
 void EA_SteadyState::initializePopulation()
 {
+    if(settings->verbose){
+        std::cout << "Creating initial population" << std::endl;
+    }
 	unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
 	for (int i = 0; i < settings->populationSize; i++)
 	{
