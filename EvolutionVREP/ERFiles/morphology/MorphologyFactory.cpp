@@ -35,41 +35,56 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
             m_morph->settings = st;
             return m_morph;
         }
-        case 1: {
+        case 1:
+        {
             shared_ptr<Morphology> m_morph(new ER_LSystem);
             m_morph->randomNum = rn;
             m_morph->settings = st;
             return m_morph;
         }
-        case 2: {
+        case 2:
+        {
             shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
             return fixedBaseMorph;
         }
-        case 3: {
+        case 3:
+        {
             shared_ptr<Morphology> m_morph(new ER_CPPN_Encoding);
             m_morph->randomNum = rn;
             m_morph->settings = st;
             return m_morph;
         }
-        case 4: {
+        case 4:
+        {
             shared_ptr<Morphology> morph(new ER_DirectEncoding);
             morph->randomNum = rn;
             morph->settings = st;
             return morph;
         }
-        case 5: {
+        case 5:
+        {
             shared_ptr<CustomMorphology> morph(new CustomMorphology);
             morph->randomNum = rn;
             morph->settings = st;
             return morph;
         }
-        case 11: {
+        case 6:
+        {
+            // TODO EB -  This needs yet to be written before being used!
+            //shared_ptr<VoxelMorphology> morph(new VoxelMorphology);
+            //morph->randomNum = rn;
+            //morph->settings = st;
+            //return morph;
+        }
+        case 11:
+        {
             shared_ptr<Morphology> morph(new ER_DirectEncoding);
             morph->randomNum = rn;
             morph->settings = st;
             return morph;
         }
-        default: {
+        default:
+        {
             shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
             return fixedBaseMorph;
         }

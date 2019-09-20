@@ -94,7 +94,7 @@ set(SOURCES
     #	ERFiles/module/Module_Brain.cpp
     #	ERFiles/module/Module_Rectangle.cpp
     #	ERFiles/module/Module_Spring.cpp
-)
+        ERFiles/morphology/ER_VoxelInterpreter.cpp ERFiles/morphology/ER_VoxelInterpreter.h)
 
 add_library(ER_library STATIC ${SOURCES})
 

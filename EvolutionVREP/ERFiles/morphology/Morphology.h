@@ -20,26 +20,21 @@ public:
     std::shared_ptr<RandNum> randomNum;
 	virtual std::shared_ptr<Morphology> clone() const = 0;
     std::vector<std::shared_ptr<ER_Module> > createdModules;
-	/**
-		@brief This method initialize the morph
-	*/
+
+    /// This method initialize the morph
 	virtual void init() = 0;
 	virtual void init_noMorph() = 0;
 	virtual void clearMorph() = 0;
 	virtual void savePhenotype(int ind, float fitness) = 0;
-	/**
-		@brief This method mutate the morph
-	*/
+
+	/// This method mutate the morphology
 	virtual void mutate() = 0;
-	/**
-		@brief This method creates the morph
-	*/
+
+	/// This method creates the morphology
 	virtual void create() = 0;
 	virtual void createAtPosition(float x, float y, float z) = 0;
 
-	/**
-		@brief This method update the control of the morph?
-	*/
+	/// This method updates the control of the morphology
 	virtual void update() = 0; 
 
 

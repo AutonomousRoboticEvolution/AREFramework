@@ -114,15 +114,14 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-		INTEGRATION = 22,
-		/// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
-		MODULAR_PHENOTYPE = 11,
-		CPPN_NEAT_MORPH = 12
-
-
+		VOXEL_MORPHOLOGY = 6,
+		MODULAR_PHENOTYPE = 11, /// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
+		CPPN_NEAT_MORPH = 12,
+        INTEGRATION = 22
 	};
 
-	enum ControlType {
+	enum ControlType
+    {
 	    /// Neural network that changes the topology of the network as well
 		ANN_DEFAULT = 0,
 		/// Neural network that doesn't change it's topology
