@@ -114,16 +114,6 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-        /// Deprecated
-        CUSTOM_MODULAR_MORPHOLOGY = 6, // not working
-        /// Deprecated
-        QUADRUPED_GENERATIVE = 7, // head missing
-        /// Deprecated
-		QUADRUPED_DIRECT = 8, // not working.
-        /// Deprecated
-		CUSTOM_SOLAR_GENERATIVE = 9,
-		TISSUE_DIRECT = 20,
-		TISSUE_GMX = 21,
 		INTEGRATION = 22,
 		/// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
 		MODULAR_PHENOTYPE = 11,

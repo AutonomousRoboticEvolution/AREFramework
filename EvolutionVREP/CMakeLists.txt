@@ -111,7 +111,6 @@ set(SOURCES
 
 add_library(ER_library STATIC ${SOURCES})
 
-
 target_include_directories(ER_library PUBLIC
     "${VREP_FOLDER}/programming/include"
 )

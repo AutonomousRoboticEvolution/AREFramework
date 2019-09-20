@@ -76,7 +76,7 @@ void EA_MultiNEAT::init() {
     population->Epoch();
     //
     /// Create population of genomes
-    unique_ptr<GenomeFactory> gf = unique_ptr<GenomeFactory>(new GenomeFactory);
+    std::unique_ptr<GenomeFactory> gf = std::unique_ptr<GenomeFactory>(new GenomeFactory);
     for (int i = 0; i < settings->populationSize; i++)
     {
         nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));

@@ -325,30 +325,6 @@ void Settings::readSettings() {
 					cout << "----------MODULAR DIRECT-----------" << endl;
 					morphologyType = MODULAR_DIRECT;
 					break;
-				case CUSTOM_MODULAR_MORPHOLOGY:
-					cout << "-----CUSTOM MODULAR MORPHOLOGY-----" << endl;
-					morphologyType = CUSTOM_MODULAR_MORPHOLOGY;
-					break;
-				case QUADRUPED_GENERATIVE:
-					cout << "--QUADRUPED GENERATIVE MORPHOLOGY--" << endl;
-					morphologyType = QUADRUPED_GENERATIVE;
-					break;
-				case QUADRUPED_DIRECT:
-					cout << "----QUADRUPED DIRECT MORPHOLOGY----" << endl;
-					morphologyType = QUADRUPED_DIRECT;
-					break;
-				case CUSTOM_SOLAR_GENERATIVE:
-					cout << "----SOLAR GENERATIVE MORPHOLOGY----" << endl;
-					morphologyType = CUSTOM_SOLAR_GENERATIVE;
-					break;
-				case TISSUE_DIRECT:
-					cout << "----TISSUE_DIRECT----" << endl;
-					morphologyType = TISSUE_DIRECT;
-					break;
-				case TISSUE_GMX:
-					cout << "----TISSUE_GMX----" << endl;
-					morphologyType = TISSUE_GMX;
-					break;
 				}
                 cout << "=====================================" << endl;
             }
