@@ -13,7 +13,7 @@ ER_VoxelInterpreter::ER_VoxelInterpreter()
 
 ER_VoxelInterpreter::~ER_VoxelInterpreter()
 {
-
+    simRemoveObject(mainHandle);
 }
 
 void ER_VoxelInterpreter::init()
@@ -23,23 +23,19 @@ void ER_VoxelInterpreter::init()
     PolyVox::RawVolume<int8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-10, -10, -10), PolyVox::Vector3DInt32(10, 10, 10)));
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
     double output; // Variable used to store the output of the NN.
-    // Create NN
-    NEAT::NeuralNetwork neuralNetwork;
-    // Generate NN from template
-    // genome.BuildPhenotype(neuralNetwork);
     // Generate voxel matrix
-    for(int z = -1; z <= 1; z += 0.1){
-        for(int y = -1; y < 1; y += 0.1){
-            for(int x = -1; x <= 1; x += 0.1){
+    for(float z = -1; z <= 1; z += 0.1){
+        for(float y = -1; y < 1; y += 0.1){
+            for(float x = -1; x <= 1; x += 0.1){
                 input[0] = x;
                 input[1] = y;
                 input[2] = z;
                 // Set inputs to NN
-                neuralNetwork.Input(input);
+                cppn.Input(input);
                 // Activate NN
-                neuralNetwork.Activate();
+                cppn.Activate();
                 // Take output from NN and store it.
-                output = neuralNetwork.Output()[0];
+                output = cppn.Output()[0];
                 // If output greater than threshold write voxel.
                 uint8_t uVoxelValue = 0;
                 if(output > 0.5){
@@ -71,9 +67,8 @@ void ER_VoxelInterpreter::init()
     }
 
     // Import mesh to V-REP
-    int handle;
-    handle = simCreateMeshShape(0, 20.0f*3.1415f/180.0f, vertices.data(), n_vertices, indices.data(), n_indices, nullptr);
-    if(handle == -1){
+    mainHandle = simCreateMeshShape(0, 20.0f*3.1415f/180.0f, vertices.data(), n_vertices, indices.data(), n_indices, nullptr);
+    if(mainHandle == -1){
         std::cout << "Importing mesh NOT succesful!" << std::endl;
     }
 }
@@ -91,4 +86,9 @@ std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
 void ER_VoxelInterpreter::create()
 {
 
+}
+
+void ER_VoxelInterpreter::setCPPN(NEAT::NeuralNetwork neuralNetwork)
+{
+    cppn = neuralNetwork;
 }

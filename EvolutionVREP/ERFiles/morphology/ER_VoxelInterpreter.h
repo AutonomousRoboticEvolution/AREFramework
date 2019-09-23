@@ -11,6 +11,7 @@
 
 class ER_VoxelInterpreter : public Development
 {
+public:
     ER_VoxelInterpreter();
     ~ER_VoxelInterpreter();
 
@@ -20,5 +21,12 @@ class ER_VoxelInterpreter : public Development
     void update() override;
     void create() override;
 
+    void setCPPN(NEAT::NeuralNetwork neuralNetwork);
+
+    int mainHandle; // Main handle
+
     std::shared_ptr<Morphology> clone();
+
+private:
+    NEAT::NeuralNetwork cppn;
 };
