@@ -12,7 +12,7 @@
 class ER_VoxelInterpreter : public Development
 {
     ER_VoxelInterpreter();
-    ~ER_DirectInterpreter();
+    ~ER_VoxelInterpreter();
 
     // Essentials
     void init() override;

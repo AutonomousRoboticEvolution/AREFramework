@@ -11,7 +11,7 @@ ER_VoxelInterpreter::ER_VoxelInterpreter()
 
 }
 
-ER_VoxelInterpreter::~ER_DirectInterpreter()
+ER_VoxelInterpreter::~ER_VoxelInterpreter()
 {
 
 }
