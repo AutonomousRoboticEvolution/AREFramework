@@ -53,9 +53,26 @@ void ER_VoxelInterpreter::init()
     auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
     // I'm not sure if we need this step.
     auto decodedMesh = PolyVox::decodeMesh(mesh);
+
+    unsigned int n_vertices = decodedMesh.getNoOfVertices();
+    unsigned int n_indices = decodedMesh.getNoOfIndices();
+    std::vector<simFloat> vertices;
+    std::vector<simInt> indices;
+    vertices.reserve(n_vertices);
+    indices.reserve(n_indices);
+    for (unsigned int i=0; i < n_vertices; i++) {
+        const auto &pos = decodedMesh.getVertex(i).position;
+        vertices.emplace_back(pos.getX());
+        vertices.emplace_back(pos.getY());
+        vertices.emplace_back(pos.getZ());
+    }
+    for (unsigned int i=0; i < n_indices; i++) {
+        vertices.emplace_back(decodedMesh.getIndex(i));
+    }
+
     // Import mesh to V-REP
     int handle;
-    handle = simCreateMeshShape(0, 20.0f*3.1415f/180.0f, decodedMesh.getVertex(), decodedMesh.getNoOfVertices(), decodedMesh.getIndex(), decodedMesh.getNoOfIndices(), NULL);
+    handle = simCreateMeshShape(0, 20.0f*3.1415f/180.0f, vertices.data(), n_vertices, indices.data(), n_indices, nullptr);
     if(handle == -1){
         std::cout << "Importing mesh NOT succesful!" << std::endl;
     }
