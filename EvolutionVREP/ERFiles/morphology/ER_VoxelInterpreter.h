@@ -11,11 +11,12 @@
 
 class ER_VoxelInterpreter : public Development
 {
+public:
     ER_VoxelInterpreter();
     ~ER_VoxelInterpreter();
 
     // Essentials
-    void init() override;
+    void init(NEAT::NeuralNetwork &neuralNetwork);
     void mutate() override;
     void update() override;
     void create() override;

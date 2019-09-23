@@ -36,7 +36,7 @@ public:
 	void initializeRobot(); // For connecting to actual robot.
 
 	/// Calculate the fitness value of the robot
-	float fitnessFunction(MorphologyPointer morph);
+	float fitnessFunction(const MorphologyPointer& morph);
 
 	/// Mark the simulation time step
 	float simulationTime = 0;

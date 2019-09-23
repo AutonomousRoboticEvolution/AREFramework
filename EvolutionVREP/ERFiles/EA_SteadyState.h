@@ -10,32 +10,28 @@ class EA_SteadyState : public EA
 {
 public:
 	EA_SteadyState();
-	~EA_SteadyState();
+	~EA_SteadyState() override;
 
-	void split_line(std::string & line, std::string delim, std::list<std::string>& values);
-
-	std::vector<int> evaluationQueue;
+	void split_line(std::string & line, std::string delim, std::list<std::string>& values) override;
 
 	// base functions of EA
-	void init();
-	void selection();
-	void replacement();
-	void mutation();
-	void update() {}; // not used in this class
-	void createIndividual(int indNum) {}; // not used in this class
-	void initNewGenome(int indnum);
+	void init() override;
+	void selection() override;
+	void replacement() override;
+	void mutation() override;
+	void update() override {}; // not used in this class
+	void createIndividual(int indNum) override {}; // not used in this class
 	/// used for NEAT
-	void end() {}; // not used in this class
+	void end() override {}; // not used in this class
 
 	/**
 		@brief This method initilizes a population of genomes
 	*/
 	void initializePopulation();
-	virtual std::shared_ptr<Genome> initNewGenome();
-	virtual void saveGenome(std::shared_ptr<Genome>);
-	void setFitness(int individual, float fitness);
-	virtual std::shared_ptr<Morphology> getMorph() { return std::shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
-	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used here
+	virtual void saveGenome(const std::shared_ptr<Genome> &genome);
+	void setFitness(int individual, float fitness) override;
+	std::shared_ptr<Morphology> getMorph() override { return std::shared_ptr<Morphology>(); };  // not used in this class // NEAT hack
+	void loadBestIndividualGenome(int sceneNum) override {}; // not used here
     /**
         @brief This method creates a new morphology base on a randomly selected parent (copy)
     */

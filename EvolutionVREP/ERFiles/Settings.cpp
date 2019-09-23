@@ -3,7 +3,8 @@
 using namespace std;
 
 /// The settings that are set in the constructor are mainly for debugging purposes.
-Settings::Settings() {
+Settings::Settings()
+{
 	// et default module parameters
 	// 13: Brain (not very useful now)
 	// 14: wheel

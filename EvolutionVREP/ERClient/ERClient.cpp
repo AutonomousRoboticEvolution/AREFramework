@@ -20,6 +20,7 @@
 
 // ER files
 #include "ClientEA.h"
+#include "../ERFiles/EA_MultiNEAT.h"
 #include <ctime>
 
 using namespace std;
@@ -135,8 +136,11 @@ int main(int argc, char* argv[])
 		client->settings->generation = i + 1;
 
 		client->ea->selection(); // epochs in NEAT
-		if (client->settings->evolutionType == client->settings->EA_NEAT) {
-			client->ea->population->Save((client->settings->repository + client->ea->neatSaveFile + to_string(client->settings->generation)).c_str());
+		if (client->settings->evolutionType == client->settings->EA_MULTINEAT) {
+		    auto *ea = dynamic_cast<EA_MultiNEAT *>(client->ea.get());
+		    std::ostringstream filename;
+		    filename << client->settings->repository << client->ea->neatSaveFile << client->settings->generation;
+			ea->savePopulation(filename.str());
 		}
 	}
 

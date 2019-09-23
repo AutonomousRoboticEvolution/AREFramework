@@ -11,7 +11,8 @@ class EA
 public:
 	EA();
 	virtual ~EA();
-	void split_line(std::string & line, std::string delim, std::list<std::string>& values);
+
+    virtual void split_line(std::string & line, std::string delim, std::list<std::string>& values);
 
 	///set the environment type, evolution type...
 	std::shared_ptr<Settings> settings; 
@@ -22,7 +23,6 @@ public:
 	/// container of next generation genomes
 	std::vector<std::shared_ptr<Genome>> nextGenGenomes;  
 	/// used in NEAT
-	std::shared_ptr<NEAT::Population> population;
 	std::string neatSaveFile = "/testNEAT";
 
 

@@ -83,9 +83,8 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 			//		std::exit(1);
 		}
 		bool load = this->loadGenome(genomeFile, individualNumber);
-		return load;
 		genomeFile.close();
-
+        return load;
 	}
 	else {
 		genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
@@ -97,9 +96,8 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 			//		std::exit(1);
 		}
 		bool load = this->loadGenome(genomeFile, individualNumber);
-		return load;
 		genomeFile.close();
-
+        return load;
 	}
 	
 
@@ -468,11 +466,12 @@ void Development::shiftRobotPosition()
 
 int Development::getMainHandle()
 {
-    if (createdModules.size() > 0) {
+    if (createdModules.empty()) {
+        std::string error_message = "ERROR: No module could be created, check initial position of the first module. ";
+        std::cerr << error_message << endl;
+        throw std::runtime_error(error_message);
+    } else {
         return createdModules[0]->moduleHandle;
-    }
-    else {
-        std::cerr << "ERROR: No module could be created, check initial position of the first module. " << endl;
     }
 }
 

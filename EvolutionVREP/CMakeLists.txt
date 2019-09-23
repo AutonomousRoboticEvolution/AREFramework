@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 if (NOT VREP_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
 else()
@@ -94,7 +96,7 @@ set(SOURCES
     #	ERFiles/module/Module_Brain.cpp
     #	ERFiles/module/Module_Rectangle.cpp
     #	ERFiles/module/Module_Spring.cpp
-        ERFiles/morphology/ER_VoxelInterpreter.cpp ERFiles/morphology/ER_VoxelInterpreter.h)
+        ERFiles/morphology/ER_VoxelInterpreter.cpp ERFiles/morphology/ER_VoxelInterpreter.h ERFiles/EA_MultiNEATGenome.cpp ERFiles/EA_MultiNEATGenome.h)
 
 add_library(ER_library STATIC ${SOURCES})
 

@@ -138,9 +138,8 @@ void DefaultGenome::savePhenotype(int indNum, int sceneNum)
 void DefaultGenome::init() {
 	// To initialize a genome
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
+	MorphologyFactory morphologyFactory;
+	morph = morphologyFactory.createMorphologyGenome(m_type, randomNum, settings);
 	morph->init();
 //	if (m_type == -1) { // not used
 //		unique_ptr<ControlFactory> controlFactory(new ControlFactory);

@@ -149,7 +149,7 @@ public:
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
         /// deprecated
-		EA_NEAT = 3,
+//		EA_NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
 		EA_MULTINEAT = 5,
 	};

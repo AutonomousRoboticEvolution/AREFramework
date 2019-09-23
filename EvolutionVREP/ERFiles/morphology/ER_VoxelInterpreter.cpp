@@ -16,7 +16,7 @@ ER_VoxelInterpreter::~ER_VoxelInterpreter()
 
 }
 
-void ER_VoxelInterpreter::init()
+void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
 {
     // TODO: EB - Finish implementing when MultiNEAT ready.
     // Create voxel-matrix
@@ -24,7 +24,6 @@ void ER_VoxelInterpreter::init()
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
     double output; // Variable used to store the output of the NN.
     // Create NN
-    NEAT::NeuralNetwork neuralNetwork;
     // Generate NN from template
     // genome.BuildPhenotype(neuralNetwork);
     // Generate voxel matrix
@@ -85,10 +84,15 @@ void ER_VoxelInterpreter::mutate()
 
 std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
 {
-    return std::shared_ptr<Morphology>();
+    return std::shared_ptr<Morphology>(this);
 }
 
 void ER_VoxelInterpreter::create()
 {
 
+}
+
+void ER_VoxelInterpreter::update()
+{
+    Development::update();
 }

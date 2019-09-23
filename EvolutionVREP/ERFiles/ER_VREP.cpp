@@ -6,6 +6,8 @@
 
 #include "ER_VREP.h"
 
+#include <memory>
+
 ER_VREP::ER_VREP()
 {}
 
@@ -34,7 +36,7 @@ void ER_VREP::initializeServer()
 /// Initialize a genome factory to create genomes when the simulation is running
 void ER_VREP::initializeSimulation()
 {
-	genomeFactory = std::unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
+	genomeFactory = std::make_unique<GenomeFactoryVREP>();
 	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
     std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
@@ -74,7 +76,7 @@ void ER_VREP::startOfSimulation()
 		return;
 	}
 	if (settings->verbose) {
-        std::cout << " " << std::endl; // Makes it more readable
+        std::cout << std::endl; // Makes it more readable
 		std::cout << "Start of Simulation" << std::endl;
 	}
 
@@ -82,7 +84,7 @@ void ER_VREP::startOfSimulation()
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
 
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		if (settings->evolutionType == settings->EA_NEAT) {
+		if (settings->evolutionType == settings->EA_MULTINEAT) {
 			ea->createIndividual(individualToBeLoaded); // this actually sets the NEAT genome
 			// ea->createIndividual(-1);
 			currentMorphology = ea->getMorph();
@@ -106,7 +108,7 @@ void ER_VREP::startOfSimulation()
 				currentInd = settings->indCounter;
 				ea->nextGenGenomes[currentInd]->init(); //create the genome for morphology and control
 
-				if (settings->evolutionType == settings->EA_NEAT) {
+				if (settings->evolutionType == settings->EA_MULTINEAT) {
 					ea->createIndividual(-1); // This loads the best individual
 					currentMorphology = ea->getMorph();
 					currentMorphology->create();
@@ -120,7 +122,7 @@ void ER_VREP::startOfSimulation()
 			}
 			// TODO: EB - what's happening here?
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				if (settings->evolutionType == settings->EA_NEAT) {
+				if (settings->evolutionType == settings->EA_MULTINEAT) {
 					ea->createIndividual(-1);
 					currentMorphology = ea->getMorph();
 				}
@@ -135,7 +137,7 @@ void ER_VREP::startOfSimulation()
 
 		else if (settings->startingCondition == settings->COND_LOAD_BEST) {
 
-			if (settings->evolutionType == settings->EA_NEAT) {
+			if (settings->evolutionType == settings->EA_MULTINEAT) {
 				ea->loadBestIndividualGenome(settings->sceneNum); // loads from ea
 				ea->createIndividual(-2);
 				currentMorphology = ea->getMorph();
@@ -153,7 +155,7 @@ void ER_VREP::startOfSimulation()
 			// TODO
 		}
 	}
-	if (settings->evolutionType != settings->EA_NEAT) {
+	if (settings->evolutionType != settings->EA_MULTINEAT) {
 		currentMorphology->setPhenValue();
 	}
 }
@@ -172,38 +174,18 @@ void ER_VREP::handleSimulation()
 		return;
 	}
 	simulationTime += simGetSimulationTimeStep();
-	if (settings->evolutionType == settings->EA_NEAT) {
-		// ea->end(); // needs the position of the robot.
-		environment->updateEnv(currentMorphology);
-	}
-	else {
-		environment->updateEnv(currentMorphology);
-	}
-	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		if (settings->evolutionType == settings->EA_NEAT) {
-			ea->update();
-		}
-		else {
-			currentGenome->update();
-		}
-		if (simGetSimulationTime() > environment->maxTime) {
-			simStopSimulation();
-		}
-	}
-	else {
-		if (settings->evolutionType == settings->EA_NEAT) {
-			ea->update();
-		}
-		else {
-			currentGenome->update();
-		}
-		if (simGetSimulationTime() > environment->maxTime) {
-			simStopSimulation();
-		}
-	}
+    environment->updateEnv(currentMorphology);
+    if (settings->evolutionType == settings->EA_MULTINEAT) {
+        ea->update();
+    } else {
+        currentGenome->update();
+    }
+    if (simGetSimulationTime() > environment->maxTime) {
+        simStopSimulation();
+    }
 }
 
-float ER_VREP::fitnessFunction(MorphologyPointer morph)
+float ER_VREP::fitnessFunction(const MorphologyPointer& morph)
 {
     std::vector <float> pStart; // start position of the robot
     std::vector <float> pOne; // position after x time
@@ -215,13 +197,13 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph)
 	//	simGetObjectPosition(mainHandle, -1, pos);
 	//	return pos[0];
 	if (settings->moveDirection == settings->FORWARD_Y) {
-		if (morph->modular == false) {
+		if (not morph->modular) {
 			int mainHandle = morph->getMainHandle();
 			float pos[3];
 			simGetObjectPosition(mainHandle, -1, pos);
 			fitness = -pos[1];
 			pEnd.push_back(pos[1]);
-			if (pOne.size() < 1) {
+			if (pOne.empty()) {
 				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
@@ -236,20 +218,20 @@ float ER_VREP::fitnessFunction(MorphologyPointer morph)
 			simGetObjectPosition(mainHandle, -1, pos);
 			fitness = -pos[1];
 			pEnd.push_back(-pos[1]);
-			if (pOne.size() < 1) {
+			if (pOne.empty()) {
 				//	cout << "Note, pOne never set" << endl;
 			}
 			else {
 				fitness = fitness + pOne[1];
 			}
 			int brokenModules = morph->getAmountBrokenModules();
-			fitness = fitness * pow(0.8, brokenModules);
+			fitness = fitness * pow(0.8f, brokenModules);
 			pOne.clear();
 			pEnd.clear();
 		}
 	}
 	else {
-		if (morph->modular == false) {
+		if (not morph->modular) {
 			//		cout << "getting main handle" << endl;
 			int mainHandle = morph->getMainHandle();
 			float pos[3];
@@ -309,7 +291,7 @@ void ER_VREP::endOfSimulation()
 		return;
 	}
 	if (settings->instanceType == settings->INSTANCE_SERVER) {
-		if (settings->evolutionType == settings->EA_NEAT) {
+		if (settings->evolutionType == settings->EA_MULTINEAT) {
 			currentMorphology = ea->getMorph();
 			float fitness = environment->fitnessFunction(currentMorphology);
 			ea->setFitness(-1, fitness);
@@ -357,11 +339,11 @@ void ER_VREP::endOfSimulation()
 				settings->indCounter++;
 			}
 			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+				if (settings->evolutionType == settings->EA_MULTINEAT) { // Exception // TODO proper integration
 					currentMorphology = ea->getMorph();
 				}
 				float fitness = environment->fitnessFunction(currentMorphology);
-				if (settings->evolutionType == settings->EA_NEAT) { // Exception // TODO proper integration
+				if (settings->evolutionType == settings->EA_MULTINEAT) { // Exception // TODO proper integration
 					ea->setFitness(-1,fitness);
 				}
 				else {
@@ -377,7 +359,7 @@ void ER_VREP::endOfSimulation()
 					settings->indCounter++;
 				}
 			}
-			if (settings->evolutionType != settings->EA_NEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
+			if (settings->evolutionType != settings->EA_MULTINEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
 				ea->selection();
 				ea->savePopFitness(generation);
@@ -446,7 +428,7 @@ bool ER_VREP::loadIndividual(int individualNum)
 		if (settings->verbose) {
 			std::cout << " file." << std::endl;
 		}
-		if (settings->evolutionType == settings->EA_NEAT) {
+		if (settings->evolutionType == settings->EA_MULTINEAT) {
 			ea->loadPopulationGenomes();
 			// ea->createIndividual(individualNum); // this actually sets the NEAT genome
 			individualToBeLoaded = individualNum;

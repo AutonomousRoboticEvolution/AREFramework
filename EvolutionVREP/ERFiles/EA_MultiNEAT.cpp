@@ -5,85 +5,95 @@
 */
 
 #include "EA_MultiNEAT.h"
+#include "EA_MultiNEATGenome.h"
 #include <memory>
 
-EA_MultiNEAT::EA_MultiNEAT() {
-
+EA_MultiNEAT::EA_MultiNEAT()
+{
+    if (not settings or settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-EA_MultiNEAT::~EA_MultiNEAT() {
-
+EA_MultiNEAT::~EA_MultiNEAT()
+{
+    if (not settings or settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
 /// Initialiase EA.
-void EA_MultiNEAT::init() {
-    if(settings->verbose){
-        std::cout << "Initialising Multi-NEAT" << std::endl;
-    }
+void EA_MultiNEAT::init()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+
+    if (settings->verbose) std::cout << "Initialising Multi-NEAT" << std::endl;
+
     NEAT::Parameters params = NEAT::Parameters();
     /// Set parameters for NEAT
     params.PopulationSize = settings->populationSize;
     params.DynamicCompatibility = true;
-    params.NormalizeGenomeSize = true;
-    params.WeightDiffCoeff = 0.1;
     params.CompatTreshold = 2.0;
     params.YoungAgeTreshold = 15;
-    params.SpeciesMaxStagnation = 15;
+    params.SpeciesMaxStagnation = 100;
     params.OldAgeTreshold = 35;
-    params.MinSpecies = 2;
-    params.MaxSpecies = 4;
+    params.MinSpecies = 5;
+    params.MaxSpecies = 10;
     params.RouletteWheelSelection = false;
+
+    params.MutateRemLinkProb = 0.02;
     params.RecurrentProb = 0.0;
-    params.OverallMutationRate = 1.0;
+    params.OverallMutationRate = 0.15;
+    params.MutateAddLinkProb = 0.08;
+    params.MutateAddNeuronProb = 0.01;
+    params.MutateWeightsProb = 0.90;
+    params.MaxWeight = 8.0;
+    params.WeightMutationMaxPower = 0.2;
+    params.WeightReplacementMaxPower = 1.0;
 
-    params.ArchiveEnforcement = false;
+    params.MutateActivationAProb = 0.0;
+    params.ActivationAMutationMaxPower = 0.5;
+    params.MinActivationA = 0.05;
+    params.MaxActivationA = 6.0;
 
-    params.MutateWeightsProb = 0.05;
-
-    params.WeightMutationMaxPower = 0.5;
-    params.WeightReplacementMaxPower = 8.0;
-    params.MutateWeightsSevereProb = 0.0;
-    params.WeightMutationRate = 0.25;
-    params.WeightReplacementRate = 0.9;
-
-    params.MaxWeight = 8;
-
-    params.MutateAddNeuronProb = 0.001;
-    params.MutateAddLinkProb = 0.3;
-    params.MutateRemLinkProb = 0.0;
-
-    params.MinActivationA  = 4.9;
-    params.MaxActivationA  = 4.9;
+    params.MutateNeuronActivationTypeProb = 0.03;
 
     params.ActivationFunction_SignedSigmoid_Prob = 0.0;
-    params.ActivationFunction_UnsignedSigmoid_Prob = 1.0;
-    params.ActivationFunction_Tanh_Prob = 0.0;
-    params.ActivationFunction_SignedStep_Prob = 0.0;
-
-    params.CrossoverRate = 0.0 ;
-    params.MultipointCrossoverRate = 0.0;
-    params.SurvivalRate = 0.2;
-
-    params.AllowClones = true;
-    params.AllowLoops = true;
+    params.ActivationFunction_UnsignedSigmoid_Prob = 0.0;
+    params.ActivationFunction_Tanh_Prob = 1.0;
+    params.ActivationFunction_TanhCubic_Prob = 0.0;
+    params.ActivationFunction_SignedStep_Prob = 1.0;
+    params.ActivationFunction_UnsignedStep_Prob = 0.0;
+    params.ActivationFunction_SignedGauss_Prob = 1.0;
+    params.ActivationFunction_UnsignedGauss_Prob = 0.0;
+    params.ActivationFunction_Abs_Prob = 0.0;
+    params.ActivationFunction_SignedSine_Prob = 1.0;
+    params.ActivationFunction_UnsignedSine_Prob = 0.0;
+    params.ActivationFunction_Linear_Prob = 1.0;
 
     params.MutateNeuronTraitsProb = 0.0;
     params.MutateLinkTraitsProb = 0.0;
+
+    params.AllowLoops = false;
+
+
+    this->initializePopulation(params);
+}
+
+void EA_MultiNEAT::initializePopulation(const NEAT::Parameters &params)
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
     /// Defines the initial conditions of the genome
     // (?, number of inputs, number if hidden neurons/layers?, number of outputs, ?, output activation function,
     // (hidden activation function, ?, parameters, number of layers)
-    NEAT::Genome genome(0,2,3,1, false,NEAT::UNSIGNED_SIGMOID, NEAT::UNSIGNED_SIGMOID, 0,params,0);
-    population = std::make_shared<NEAT::Population>(genome, params, true, 1.0, randomNum->getSeed());
-    population->Epoch();
-    //
+    NEAT::Genome neat_genome(0, 3, 3, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
+    population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
+
     /// Create population of genomes
-    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
     for (int i = 0; i < settings->populationSize; i++)
     {
-        nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));
+        std::shared_ptr<Genome> genome = std::make_shared<EA_MultiNEATGenome>(population->AccessGenomeByIndex(i));
+        nextGenGenomes.emplace_back(std::move(genome));
         nextGenGenomes[i]->fitness = 0;
         nextGenGenomes[i]->individualNumber = i;
     }
+
     /// From here and on the code should be else where.
 //    for(int i = 1; i <= 20; i++){
 //        double bestf = -std::numeric_limits<double>::infinity();
@@ -104,38 +114,72 @@ void EA_MultiNEAT::init() {
 //    }
 }
 
-void EA_MultiNEAT::replacement() {
-
+void EA_MultiNEAT::epoch()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    for (int i = 0; i < settings->populationSize; i++)
+    {
+        population->AccessGenomeByIndex(i).SetFitness(nextGenGenomes[i]->fitness);
+    }
+    this->population->Epoch();
+    this->nextGenGenomes.clear();
+    for (int i = 0; i < settings->populationSize; i++)
+    {
+        std::shared_ptr<Genome> genome = std::make_shared<EA_MultiNEATGenome>(population->AccessGenomeByIndex(i));
+        nextGenGenomes.emplace_back(std::move(genome));
+        nextGenGenomes[i]->fitness = 0;
+        nextGenGenomes[i]->individualNumber = (population->GetGeneration() * settings->populationSize) + i;
+    }
 }
 
-void EA_MultiNEAT::selection() {
-
+void EA_MultiNEAT::replacement()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-void EA_MultiNEAT::mutation() {
-
+void EA_MultiNEAT::selection()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    this->population->Epoch();
 }
 
-void EA_MultiNEAT::update() {
-
+void EA_MultiNEAT::mutation()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-void EA_MultiNEAT::end() {
-
+void EA_MultiNEAT::update()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-void EA_MultiNEAT::createIndividual(int ind) {
-
+void EA_MultiNEAT::end()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-void EA_MultiNEAT::loadBestIndividualGenome(int sceneNum) {
-
+void EA_MultiNEAT::createIndividual(int ind)
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-void EA_MultiNEAT::setFitness(int ind, float fit) {
-
+void EA_MultiNEAT::loadBestIndividualGenome(int sceneNum)
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
-std::shared_ptr<Morphology> EA_MultiNEAT::getMorph() {
-    return std::shared_ptr<Morphology>();
+void EA_MultiNEAT::setFitness(int ind, float fit)
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+}
+
+std::shared_ptr<Morphology> EA_MultiNEAT::getMorph()
+{
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    return std::shared_ptr<Morphology>(this->nextGenGenomes[0]->morph);
+}
+
+void EA_MultiNEAT::savePopulation(const std::string &filename)
+{
+    this->population->Save(filename.c_str());
 }
