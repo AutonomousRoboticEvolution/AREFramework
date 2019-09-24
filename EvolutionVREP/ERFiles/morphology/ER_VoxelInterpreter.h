@@ -22,6 +22,7 @@ public:
     void create() override;
 
     void setCPPN(NEAT::NeuralNetwork neuralNetwork);
+    void generateVoxels(PolyVox::RawVolume<uint8_t>& volData);
 
     int mainHandle; // Main handle
 
