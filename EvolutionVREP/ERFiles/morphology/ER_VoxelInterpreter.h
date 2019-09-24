@@ -21,8 +21,14 @@ public:
     void update() override;
     void create() override;
 
+    /// Generate CPPN
     void setCPPN(NEAT::NeuralNetwork neuralNetwork);
-    void generateVoxels(PolyVox::RawVolume<uint8_t>& volData);
+    /// Generate matrix with voxels
+    void generateVoxels(PolyVox::RawVolume<int8_t>& volData);
+    /// Export mesh from list of vertices and indices
+    void exportMesh(std::vector<simFloat> vertices, std::vector<simInt> indices);
+    /// Get indices and vertices from mesh file
+    void getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<signed char>>& decodedMesh, std::vector<simFloat>& vertices, std::vector<simInt>& indices);
 
     int mainHandle; // Main handle
 
