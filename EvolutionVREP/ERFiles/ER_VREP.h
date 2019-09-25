@@ -23,11 +23,11 @@ public:
 
 	/// This method reads the instanceType member from settings class. According to its value ER initializes as a
 	/// server or as server-client.
-	void initialize();  // This function overrides the CER function
+	void initialize() override;  // This function overrides the CER function
 
 	/// This method Instatiates genome factory, enviroment and EA. Also settings for the enviroment and EA are loaded.
 	/// Finally, this method initializes EA and environment.
-	void initializeSimulation(); // Loading Environment
+	void initializeSimulation() override; // Loading Environment
 
 	/// Initializes ER as a server to accept genomes from client.
 	void initializeServer();
@@ -56,7 +56,7 @@ public:
     std::shared_ptr<GenomeFactoryVREP> genomeFactory;
 
 	/// Logs information about the fitness of each individual, best individual and list of individuals.
-	void saveSettings();
+	void saveSettings() override;
 
 	/// These functions used to be in newGenome
 	/// Loads specific individual.

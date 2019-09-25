@@ -18,6 +18,7 @@
 //#include "luaFunctionData.h"
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include "v_repLib.h"
 
 //CCatContainer* catContainer = NULL;
@@ -110,8 +111,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     startEvolution = true;
 	if (startEvolution) {
 		// Construct classes
-		ERVREP = std::unique_ptr<ER_VREP>(new ER_VREP);   // The class used to handle the EA
-		ERVREP->settings = std::shared_ptr<Settings>(new Settings);  // Initialize settings in the constructor
+		ERVREP = std::make_unique<ER_VREP>();   // The class used to handle the EA
+		ERVREP->settings = std::make_shared<Settings>();  // Initialize settings in the constructor
 
         if(ERVREP->settings->verbose){
             std::cout << " " << std::endl; // Make output more readable
@@ -224,122 +225,140 @@ VREP_DLLEXPORT void v_repEnd()
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
-	static bool refreshDlgFlag = true;
-	int errorModeSaved;
-	simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
-	simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
-	void* retVal = nullptr;
+    if (not ERVREP->startRun) {
+        return nullptr;
+    }
 
-	if (ERVREP->startRun) {
-		if (message == sim_message_eventcallback_simulationabouttostart) {
-			// tStart = clock();
-			// Initializes population
-			ERVREP->startOfSimulation();  //start from here after simStartSimulation is called
-			if (ERVREP->settings->verbose) {
-                std::cout << "SIMULATION ABOUT TO START" << std::endl;
-			}
-		}
-		else if (message == sim_message_eventcallback_modulehandle) {
+    int errorModeSaved;
+    simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
+    simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
+    void *retVal = nullptr;
 
-			ERVREP->handleSimulation(); // handling the simulation.
-			timeCount = 0;
-		}
-		else if (message == sim_message_eventcallback_simulationended) {
-			initCall = true; // this tells the main loop to restart the simulation
-			ERVREP->endOfSimulation();
-			loadingPossible = true;  // start another simulation
-			if (ERVREP->settings->verbose) {
-                std::cout << "SIMULATION ENDED" << std::endl;
-			}
-		}
-		//TODO you probably meant ==?
-		if (message = sim_message_eventcallback_modulehandle) {
-			timeCount++;  //need to wait a few time steps to start a new simulation
-			if (ERVREP->settings->verbose) {
-				//cout << timeCount << endl;
-			}
-		}
-
-		if (initCall && timeCount > 10) {
-            timeCount = 0;
-            initCall = false;
-            counter = 0;
-            if (ERVREP->settings->evolutionType != ERVREP->settings->EMBODIED_EVOLUTION
-                && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_BEST
-                && ERVREP->settings->instanceType != ERVREP->settings->INSTANCE_SERVER
-                && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_SPECIFIC_INDIVIDUAL) {
-                simStartSimulation();
-            }
-            if (ERVREP->settings->startingCondition == ERVREP->settings->COND_LOAD_BEST) {
-                // simStartSimulation();
-                if (ERVREP->settings->verbose){
-                    std::cout<< "Load best individual" << std::endl;
-                }
-            }
-
-            // TODO:
-            //if (simulationSettings == 8) { // load specific genotype
-            //
-            //}
-            //if (simulationSettings == 7) { // load specific phenotype
-            //
-            //}
-
+    // ABOUT TO START
+    if (message == sim_message_eventcallback_simulationabouttostart)
+    {
+        assert(simulationState == STARTING);
+        simulationState = BUSY;
+        // Initializes population
+        ERVREP->startOfSimulation();  //start from here after simStartSimulation is called
+        if (ERVREP->settings->verbose) {
+            std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
-		// client and v-rep plugin communicates using signal and remote api
-		int signal[1] = { 0 };
-		int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
-		simGetIntegerSignal((simChar*) "simulationState", signal);
-		if (signal[0] == 99) {
-            std::cout << "should quit the simulator" << std::endl;
-			simQuitSimulator(true);
-		}
-		else if (loadingPossible && ERVREP->settings->instanceType == ERVREP->settings->INSTANCE_SERVER && simGetSimulationState() == sim_simulation_stopped) {
-			// time out when not receiving commands for 5 minutes.
-			if (!timerOn) {
-				sysTime = clock();
-				timeElapsed = 0;
-				timerOn = true;
-			}
-			else {
-				// printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-				timeElapsed = (double)(clock() - sysTime) / CLOCKS_PER_SEC;
-				if (timeElapsed > 300) {
-					std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
-					simQuitSimulator(true);
-				}
-			}
+    }
+    // MODULE_HANDLE (DEPRECATED)
+    else if (message == sim_message_eventcallback_modulehandle)
+    {
+        assert(simulationState == BUSY);
+        ERVREP->handleSimulation(); // handling the simulation.
+    }
+    // SIMULATION ENDED
+    else if (message == sim_message_eventcallback_simulationended)
+    {
+        assert(simulationState == BUSY);
+        simulationState = CLEANUP;
+        ERVREP->endOfSimulation();
+        loadingPossible = true;  // start another simulation
+        if (ERVREP->settings->verbose) {
+            std::cout << "SIMULATION ENDED" << std::endl;
+        }
+    }
 
-			// wait until command is received
-			if (signal[0] == 1) {
-				timerOn = false;
-				simSetIntegerSignal((simChar*) "simulationState", 8);
-				int sceneNumber[1] = { 0 };
-				int individual[1] = { 0 };
-				//		cout << "Repository should be files and is " << ER->settings->repository << endl;
-				//simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
+    if (simulationState == CLEANUP) {
+        timeCount++;  //need to wait a few time steps to start a new simulation
+    }
 
-				simGetIntegerSignal((simChar*) "individual", individual);
-				if (not ERVREP->loadIndividual(individual[0])) {
-					if (ERVREP->settings->verbose) {
-						std::cout << "Server here, I could not load the specified individual: " << individual[0] << std::endl;
-						std::cout << "My signal was " << signal[0] << std::endl;
-					}
-					simSetIntegerSignal((simChar*) "simulationState", 9); // 9 is now the error state
-				}
-				else {
-					// old function:
-					//ER->ea->loadIndividual(individual[0], sceneNumber[0]);
-					//saveLog(1);
-					//cout << "Not loaded: see this comment in code to adjust" << endl;
-					simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
-					loadingPossible = false;
-				}
-			}
-		}
+    if (simulationState == CLEANUP && timeCount > 10) {
+        simulationState = FREE;
+        timeCount = 0;
+    }
 
-	}
+    // START NEW SIMULATION
+    if (simulationState == FREE)
+    {
+        simulationState = STARTING;
+        counter = 0;
+        if (ERVREP->settings->evolutionType != ERVREP->settings->EMBODIED_EVOLUTION
+         && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_BEST
+         && ERVREP->settings->instanceType != ERVREP->settings->INSTANCE_SERVER
+         && ERVREP->settings->startingCondition != ERVREP->settings->COND_LOAD_SPECIFIC_INDIVIDUAL)
+        {
+            simStartSimulation();
+        }
+        if (ERVREP->settings->startingCondition == ERVREP->settings->COND_LOAD_BEST)
+        {
+            // simStartSimulation();
+            if (ERVREP->settings->verbose){
+                std::cout<< "Load best individual" << std::endl;
+            }
+        }
+
+        // TODO:
+        //if (simulationSettings == 8) { // load specific genotype
+        //
+        //}
+        //if (simulationSettings == 7) { // load specific phenotype
+        //
+        //}
+
+    }
+
+    // client and v-rep plugin communicates using signal and remote api
+    int signal[1] = { 0 };
+    int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
+    simGetIntegerSignal((simChar*) "simulationState", signal);
+    if (signal[0] == 99)
+    {
+        std::cout << "should quit the simulator" << std::endl;
+        simQuitSimulator(true);
+    }
+    else if (simulationState == FREE
+          && ERVREP->settings->instanceType == ERVREP->settings->INSTANCE_SERVER
+          && simGetSimulationState() == sim_simulation_stopped)
+    {
+        // time out when not receiving commands for 5 minutes.
+        if (!timerOn) {
+            sysTime = clock();
+            timeElapsed = 0;
+            timerOn = true;
+        } else {
+            // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
+            if (timeElapsed > 300)
+            {
+                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+                simQuitSimulator(true);
+            }
+        }
+
+        // wait until command is received
+        if (signal[0] == 1)
+        {
+            timerOn = false;
+            simSetIntegerSignal((simChar *) "simulationState", 8);
+            int sceneNumber[1] = {0};
+            int individual[1] = {0};
+            //		cout << "Repository should be files and is " << ER->settings->repository << endl;
+            //simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
+
+            simGetIntegerSignal((simChar *) "individual", individual);
+            if (not ERVREP->loadIndividual(individual[0])) {
+                if (ERVREP->settings->verbose) {
+                    std::cout << "Server here, I could not load the specified individual: " << individual[0]
+                              << std::endl;
+                    std::cout << "My signal was " << signal[0] << std::endl;
+                }
+                simSetIntegerSignal((simChar *) "simulationState", 9); // 9 is now the error state
+            } else {
+                // old function:
+                //ER->ea->loadIndividual(individual[0], sceneNumber[0]);
+                //saveLog(1);
+                //cout << "Not loaded: see this comment in code to adjust" << endl;
+                simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
+                loadingPossible = false;
+            }
+        }
+    }
 
 	//	simSetIntegerParameter(sim_intparam_error_report_mode, errorModeSaved); // restore previous settings
-	return(retVal);
+	return retVal;
 }

@@ -117,10 +117,6 @@ void EA_MultiNEAT::initializePopulation(const NEAT::Parameters &params)
 void EA_MultiNEAT::epoch()
 {
     if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
-    for (int i = 0; i < settings->populationSize; i++)
-    {
-        population->AccessGenomeByIndex(i).SetFitness(nextGenGenomes[i]->fitness);
-    }
     this->population->Epoch();
     this->nextGenGenomes.clear();
     for (int i = 0; i < settings->populationSize; i++)
@@ -128,7 +124,7 @@ void EA_MultiNEAT::epoch()
         std::shared_ptr<Genome> genome = std::make_shared<EA_MultiNEATGenome>(population->AccessGenomeByIndex(i));
         nextGenGenomes.emplace_back(std::move(genome));
         nextGenGenomes[i]->fitness = 0;
-        nextGenGenomes[i]->individualNumber = (population->GetGeneration() * settings->populationSize) + i;
+        nextGenGenomes[i]->individualNumber = static_cast<int>(population->GetGeneration() * settings->populationSize) + i;
     }
 }
 
@@ -140,7 +136,7 @@ void EA_MultiNEAT::replacement()
 void EA_MultiNEAT::selection()
 {
     if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
-    this->population->Epoch();
+    this->epoch();
 }
 
 void EA_MultiNEAT::mutation()
@@ -150,7 +146,7 @@ void EA_MultiNEAT::mutation()
 
 void EA_MultiNEAT::update()
 {
-    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+//    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
 void EA_MultiNEAT::end()
@@ -160,7 +156,9 @@ void EA_MultiNEAT::end()
 
 void EA_MultiNEAT::createIndividual(int ind)
 {
-    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << '(' << ind << ')' << std::endl;
+    this->nextGenGenomes[ind]->init();
+    this->morph = this->nextGenGenomes[ind]->morph;
 }
 
 void EA_MultiNEAT::loadBestIndividualGenome(int sceneNum)
@@ -170,13 +168,15 @@ void EA_MultiNEAT::loadBestIndividualGenome(int sceneNum)
 
 void EA_MultiNEAT::setFitness(int ind, float fit)
 {
-    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << '(' << ind << ',' << fit << ')' << std::endl;
+    this->population->AccessGenomeByIndex(ind).SetFitness(fit);
 }
 
 std::shared_ptr<Morphology> EA_MultiNEAT::getMorph()
 {
     if (settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
-    return std::shared_ptr<Morphology>(this->nextGenGenomes[0]->morph);
+    assert(this->morph);
+    return this->morph;
 }
 
 void EA_MultiNEAT::savePopulation(const std::string &filename)

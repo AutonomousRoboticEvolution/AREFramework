@@ -39,15 +39,13 @@ void ER_VREP::initializeSimulation()
 	genomeFactory = std::make_unique<GenomeFactoryVREP>();
 	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
-    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
-	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
-    std::unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+    EnvironmentFactory environmentFactory;
+	environment = environmentFactory.createNewEnvironment(settings);
+    EA_Factory eaf;
+	ea = eaf.createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
 	environment->init();
-	eaf.reset();
 }
 
 /// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
@@ -59,11 +57,16 @@ void ER_VREP::initialize()
         std::cout << "ER initialize" << std::endl;
     }
 	settings->indCounter = 0;
-	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_REGULAR) {
+	if (settings->evolutionType != settings->EMBODIED_EVOLUTION
+	 && settings->instanceType == settings->INSTANCE_REGULAR)
+	{
 		settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
 		initializeSimulation(); // Initialize simulation
 	}
-	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->instanceType == settings->INSTANCE_SERVER && settings->startingCondition != settings->COND_LOAD_BEST) {
+	else if (settings->evolutionType != settings->EMBODIED_EVOLUTION
+	      && settings->instanceType == settings->INSTANCE_SERVER
+	      && settings->startingCondition != settings->COND_LOAD_BEST)
+	{
 		settings->client = false; // V-REP plugin will receive genomes from ea client
 		initializeServer();
 	}
@@ -83,7 +86,8 @@ void ER_VREP::startOfSimulation()
 	// Set random seed
 	randNum->setSeed(settings->seed + settings->indCounter * settings->indCounter);
 
-	if (settings->instanceType == settings->INSTANCE_SERVER) {
+	if (settings->instanceType == settings->INSTANCE_SERVER)
+	{
 		if (settings->evolutionType == settings->EA_MULTINEAT) {
 			ea->createIndividual(individualToBeLoaded); // this actually sets the NEAT genome
 			// ea->createIndividual(-1);
@@ -97,45 +101,30 @@ void ER_VREP::startOfSimulation()
 			currentMorphology = currentGenome->morph;
 		}
 	}
-	else {
-		if (settings->startingCondition != settings->COND_LOAD_BEST) {
+	else //no server
+    {
+		if (settings->startingCondition != settings->COND_LOAD_BEST)
+		{
 			if (settings->verbose) {
                 std::cout << "Creating Individual " << settings->indCounter << std::endl;
 			}
-			// TODO: EB - what's happening here?
-			if (settings->indCounter < ea->nextGenGenomes.size()) {
-				// First generation:
-				currentInd = settings->indCounter;
-				ea->nextGenGenomes[currentInd]->init(); //create the genome for morphology and control
 
-				if (settings->evolutionType == settings->EA_MULTINEAT) {
-					ea->createIndividual(-1); // This loads the best individual
-					currentMorphology = ea->getMorph();
-					currentMorphology->create();
-				}
-				else {
-					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[settings->indCounter]);
-					currentGenome->create();//create the morphology in vrep
-					currentMorphology = currentGenome->morph->clone();
-				}
+            currentInd = settings->indCounter % settings->populationSize;
 
-			}
-			// TODO: EB - what's happening here?
-			else if (settings->indCounter >= ea->populationGenomes.size()) {
-				if (settings->evolutionType == settings->EA_MULTINEAT) {
-					ea->createIndividual(-1);
-					currentMorphology = ea->getMorph();
-				}
-				else {
-					currentInd = settings->indCounter % settings->populationSize;
-					currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
-					currentGenome->create();
-					currentMorphology = currentGenome->morph->clone(); // two different classes sharing the same parameter; essential function... But for what? I forgot...
-				}
-			}
+            if (settings->evolutionType == settings->EA_MULTINEAT)
+            {
+                ea->createIndividual(currentInd);
+                currentMorphology = ea->getMorph();
+            }
+            else
+            {
+                currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
+                currentGenome->create();
+                currentMorphology = currentGenome->morph->clone(); // two different classes sharing the same parameter; essential function... But for what? I forgot...
+            }
 		}
-
-		else if (settings->startingCondition == settings->COND_LOAD_BEST) {
+		else if (settings->startingCondition == settings->COND_LOAD_BEST)
+		{
 
 			if (settings->evolutionType == settings->EA_MULTINEAT) {
 				ea->loadBestIndividualGenome(settings->sceneNum); // loads from ea
@@ -150,8 +139,8 @@ void ER_VREP::startOfSimulation()
 				currentMorphology = currentGenome->morph;
 			}
 		}
-
-		else if (settings->startingCondition == settings->COND_LOAD_SPECIFIC_INDIVIDUAL) {
+		else if (settings->startingCondition == settings->COND_LOAD_SPECIFIC_INDIVIDUAL)
+		{
 			// TODO
 		}
 	}
@@ -290,11 +279,12 @@ void ER_VREP::endOfSimulation()
 	if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
 		return;
 	}
-	if (settings->instanceType == settings->INSTANCE_SERVER) {
+	if (settings->instanceType == settings->INSTANCE_SERVER)
+	{
 		if (settings->evolutionType == settings->EA_MULTINEAT) {
 			currentMorphology = ea->getMorph();
 			float fitness = environment->fitnessFunction(currentMorphology);
-			ea->setFitness(-1, fitness);
+			ea->setFitness(currentInd, fitness);
 
 			// Environment independent fitness function:
 			// float fitness = fit->fitnessFunction(currentMorphology);
@@ -305,9 +295,8 @@ void ER_VREP::endOfSimulation()
 			int signal[1] = { 2 };
 			simSetIntegerSignal((simChar*) "simulationState", signal[0]);
 		}
-
-
-		else {
+		else
+        {
 			float fitness = environment->fitnessFunction(currentMorphology);
 			// Environment independent fitness function:
 			// float fitness = fit->fitnessFunction(currentMorphology);
@@ -323,10 +312,14 @@ void ER_VREP::endOfSimulation()
 			}
 		}
 	}
-	else {
+	else //no server
+    {
 		std::cout << "settings->indCounter = " << settings->indCounter << std::endl;
-		if (settings->startingCondition != settings->COND_LOAD_BEST) {
-			if (settings->indCounter < ea->populationGenomes.size()) {
+		if (settings->startingCondition != settings->COND_LOAD_BEST)
+		{
+		    // next individual
+			if (settings->indCounter < ea->populationGenomes.size())
+			{
 				float fitness = environment->fitnessFunction(currentMorphology);
 				ea->populationGenomes[currentInd]->fitness = fitness;
                 std::cout << "fitness = " << ea->populationGenomes[currentInd]->fitness << std::endl;
@@ -338,13 +331,14 @@ void ER_VREP::endOfSimulation()
 				ea->populationGenomes[currentInd]->individualNumber = settings->indCounter;
 				settings->indCounter++;
 			}
-			else if (settings->indCounter >= ea->populationGenomes.size()) {
+			else if (settings->indCounter >= ea->populationGenomes.size())
+			{
 				if (settings->evolutionType == settings->EA_MULTINEAT) { // Exception // TODO proper integration
 					currentMorphology = ea->getMorph();
 				}
 				float fitness = environment->fitnessFunction(currentMorphology);
 				if (settings->evolutionType == settings->EA_MULTINEAT) { // Exception // TODO proper integration
-					ea->setFitness(-1,fitness);
+					ea->setFitness(currentInd, fitness);
 				}
 				else {
 					currentGenome->fitness = fitness;
@@ -356,8 +350,8 @@ void ER_VREP::endOfSimulation()
 					ea->setFitness(settings->indCounter % ea->nextGenGenomes.size(), fitness);
 					currentGenome->morph->saveGenome(settings->indCounter, fitness);
                     std::cout << "FITNESS = " << fitness << std::endl;
-					settings->indCounter++;
 				}
+                settings->indCounter++;
 			}
 			if (settings->evolutionType != settings->EA_MULTINEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
 				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
@@ -455,8 +449,8 @@ void ER_VREP::saveSettings()
 	settings->generation = generation;
 	settings->individualCounter = settings->indCounter;
     std::vector<int> indNums;
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		indNums.push_back(ea->populationGenomes[i]->individualNumber); // must be set when saving
+	for (auto &populationGenome : ea->populationGenomes) {
+		indNums.push_back(populationGenome->individualNumber); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 

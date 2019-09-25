@@ -45,4 +45,5 @@ private:
 
 private:
     std::unique_ptr<NEAT::Population> population;
+    std::shared_ptr<Morphology> morph;
 };

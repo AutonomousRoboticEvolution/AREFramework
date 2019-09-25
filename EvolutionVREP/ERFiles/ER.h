@@ -36,9 +36,11 @@ public:
 	/// pointer to random number generator of EA
 	std::shared_ptr<RandNum> randNum;
 
-	void saveSettings();
-	void initialize();
-	void initializeSimulation();
+    virtual void saveSettings();
+
+    virtual void initialize();
+
+    virtual void initializeSimulation();
     /// Indicates whether to start the simulation in server mode (received genome)
 	bool startRun = true;
 

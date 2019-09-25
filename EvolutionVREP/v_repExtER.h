@@ -14,9 +14,6 @@
 
 /// an unique pointer to ER_VREP class
 std::unique_ptr<ER_VREP> ERVREP;
-// Used to indicate the initial call
-// It shouldn't matter, maybe it didn;t update
-bool initCall = true; // hello
 // TODO: EB  do we need these variables? I guess they are used for client-server mode.
 int counter = 0;
 int timeCount = 0;
@@ -24,6 +21,15 @@ bool timerOn = false;
 double timeElapsed;
 bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
 clock_t sysTime; // Measure simulation time.
+
+enum SimulationState {
+    FREE,
+    STARTING,
+    BUSY,
+    CLEANUP,
+};
+
+SimulationState simulationState = FREE;
 
 /// This variable marks the start of evolution.
 bool startEvolution;

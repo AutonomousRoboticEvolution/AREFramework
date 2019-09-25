@@ -22,4 +22,9 @@ public:
     void create() override;
 
     std::shared_ptr<Morphology> clone();
+
+    int getMainHandle() override;
+
+private:
+    simInt handle;
 };

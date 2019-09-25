@@ -5,4 +5,4 @@
 .DS_Store
 html/
 latex/
-/cmake-build-debug/
+/cmake-build-*/
