@@ -15,13 +15,15 @@ class EA_MultiNEATGenome : public Genome
 public:
     explicit EA_MultiNEATGenome(NEAT::Genome &genome)
             : neat_genome(genome)
-    {}
+    {
+        //std::cout << "Created " << __func__ << " with id:" << genome.GetID() << std::endl;
+    }
 
     virtual ~EA_MultiNEATGenome() = default;
 
     void init() override
     {
-        auto morph = std::make_shared<ER_VoxelInterpreter>();
+        auto morph = std::make_shared<ER_VoxelInterpreter>(neat_genome.GetID());
         NEAT::NeuralNetwork network;
         neat_genome.BuildPhenotype(network);
         morph->init(network);

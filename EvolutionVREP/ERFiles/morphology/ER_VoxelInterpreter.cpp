@@ -6,9 +6,10 @@
 
 #include "ER_VoxelInterpreter.h"
 
-ER_VoxelInterpreter::ER_VoxelInterpreter()
+ER_VoxelInterpreter::ER_VoxelInterpreter(unsigned int id)
+    : id(id)
 {
-
+    mainHandle = 0;
 }
 
 ER_VoxelInterpreter::~ER_VoxelInterpreter()
@@ -16,13 +17,12 @@ ER_VoxelInterpreter::~ER_VoxelInterpreter()
     simRemoveObject(mainHandle);
 }
 
-void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
+void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompose)
 {
     // Create voxel-matrix
     PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
     // Generate voxels
-    this->setCPPN(neuralNetwork);
-    generateVoxels(volData);
+    generateVoxels(volData, neuralNetwork);
     // Marching cubes - we might not need this step at the beginning.
     auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
     // I'm not sure if we need this step.
@@ -36,14 +36,30 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
     // Generate mesh file (stl). We don't have to generate the mesh file here but we can use the function elsewhere.
     exportMesh(vertices,indices);
     // Import mesh to V-REP
-    if (vertices.size() > 0) {
+    if (!vertices.empty()) {
         mainHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, vertices.data(), vertices.size(), indices.data(),
                                         indices.size(), nullptr);
         if (mainHandle == -1) {
             std::cout << "Importing mesh NOT succesful!" << std::endl;
         }
+        std::ostringstream name;
+        name << "VoxelBone" << this->id;
+
+        simSetObjectName(mainHandle, name.str().c_str());
+
+#ifdef VISUALIZE_RAW_CPPN_SHAPE
+        simAddObjectToSelection(sim_handle_single, mainHandle);
+        simCopyPasteSelectedObjects();
+        simInt reference_object = simGetObjectLastSelection();
+        name << "_copy";
+        simSetObjectName(reference_object, name.str().c_str());
+        simFloat reference_object_pos[3];
+        simGetObjectPosition(mainHandle, -1, reference_object_pos);
+        reference_object_pos[0] -= 1.0;
+        simSetObjectPosition(reference_object, -1, reference_object_pos);
+#endif
         // Scale down object
-//    simScaleObject(mainHandle, 0.1, 0.1, 0.1, 0);
+        //simScaleObject(mainHandle, 0.1, 0.1, 0.1, 0);
         // Object is collidable
         simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable);
         // Object is dynamic
@@ -51,9 +67,17 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
         // Object is respondable
         simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
         // Convex decomposition with V-HACD
-        int convDecomIntPams[] = {1, 500, 100, 0, 0, 10000, 20, 4, 4, 20};
-        float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0, 0.0025, 0.05, 0.05, 0.00125, 0.0001};
-        int handle = simConvexDecompose(mainHandle, 129, convDecomIntPams, convDecomFloatPams); // Convex decomposition
+        if (decompose) {
+            int convDecomIntPams[] = {1, 500, 100, 0, 0, 10000, 20, 4, 4, 20};
+            float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0, 0.0025, 0.05, 0.05, 0.00125, 0.0001};
+            mainHandle = simConvexDecompose(mainHandle, 129, convDecomIntPams,
+                                            convDecomFloatPams); // Convex decomposition
+        } else {
+            std::cout << "not decomposing" << std::endl;
+        }
+        // Recompute mass and ineratia to fix object vibration
+        // density of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
+        simComputeMassAndInertia(mainHandle, 1.3f);
     } else {
         //TODO no mesh data, CPPN generated no volume.
     }
@@ -79,17 +103,9 @@ std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
     return std::shared_ptr<Morphology>(this);
 }
 
-/// Generate CPPN
-void ER_VoxelInterpreter::setCPPN(NEAT::NeuralNetwork neuralNetwork)
-{
-    cppn = neuralNetwork;
-}
 /// Generate matrix with voxels
-void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData)
+void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, NEAT::NeuralNetwork &cppn)
 {
-    //TODO size of this region should be the size of the printing bed, with resolution as a multiple of 0.9mm per block
-//    PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
-
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
     double output; // Variable used to store the output of the NN.
     // Create NN
@@ -138,12 +154,28 @@ void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8
         return;
     }
 
+
+    const PolyVox::Vector3DFloat *prev = nullptr;
+    bool pointObject = true;
     for (unsigned int i=0; i < n_vertices; i++) {
-        const auto &pos = decodedMesh.getVertex(i).position;
+        const PolyVox::Vector3DFloat &pos = decodedMesh.getVertex(i).position;
+        if (pointObject) {
+            if (prev != nullptr and (*prev) != pos) pointObject = false;
+            prev = &pos;
+        }
         vertices.emplace_back(pos.getX() / SHAPE_SCALE_VALUE);
         vertices.emplace_back(pos.getY() / SHAPE_SCALE_VALUE);
         vertices.emplace_back(pos.getZ() / SHAPE_SCALE_VALUE);
     }
+
+    // If all vectors are the same, we have an object the size of point. This is considered a failed viability.
+    // and it makes the vertex decomposition to crash badly.
+    if (pointObject) {
+        vertices.clear();
+        indices.clear();
+        return;
+    }
+
     for (unsigned int i=0; i < n_indices; i++) {
         indices.emplace_back(decodedMesh.getIndex(i));
     }
@@ -165,6 +197,5 @@ void ER_VoxelInterpreter::exportMesh(std::vector<simFloat> vertices, std::vector
 
 int ER_VoxelInterpreter::getMainHandle()
 {
-    assert(mainHandle >= 0);
     return mainHandle;
 }
