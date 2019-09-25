@@ -13,17 +13,82 @@ ER_VoxelInterpreter::ER_VoxelInterpreter()
 
 ER_VoxelInterpreter::~ER_VoxelInterpreter()
 {
-
+    simRemoveObject(mainHandle);
 }
 
 void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
 {
     // Create voxel-matrix
-    //TODO size of this region should be the size of the printing bed, with resolution as a multiple of 0.9mm per block
-    const int MATRIX_HALF_SIZE = 25;
-    const int MATRIX_SIZE = MATRIX_HALF_SIZE * 2;
-    const simFloat SHAPE_SCALE_VALUE = static_cast<simFloat>(MATRIX_SIZE);
     PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    // Generate voxels
+    this->setCPPN(neuralNetwork);
+    generateVoxels(volData);
+    // Marching cubes - we might not need this step at the beginning.
+    auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
+    // I'm not sure if we need this step.
+    auto decodedMesh = PolyVox::decodeMesh(mesh);
+    // Get vertices and indices.
+    std::vector<simFloat> vertices;
+    std::vector<simInt> indices;
+    vertices.reserve(decodedMesh.getNoOfVertices());
+    indices.reserve(decodedMesh.getNoOfIndices());
+    getIndicesVertices(decodedMesh,vertices,indices);
+    // Generate mesh file (stl). We don't have to generate the mesh file here but we can use the function elsewhere.
+    exportMesh(vertices,indices);
+    // Import mesh to V-REP
+    if (vertices.size() > 0) {
+        mainHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, vertices.data(), vertices.size(), indices.data(),
+                                        indices.size(), nullptr);
+        if (mainHandle == -1) {
+            std::cout << "Importing mesh NOT succesful!" << std::endl;
+        }
+        // Scale down object
+//    simScaleObject(mainHandle, 0.1, 0.1, 0.1, 0);
+        // Object is collidable
+        simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable);
+        // Object is dynamic
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0);
+        // Object is respondable
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
+        // Convex decomposition with V-HACD
+        int convDecomIntPams[] = {1, 500, 100, 0, 0, 10000, 20, 4, 4, 20};
+        float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0, 0.0025, 0.05, 0.05, 0.00125, 0.0001};
+        int handle = simConvexDecompose(mainHandle, 129, convDecomIntPams, convDecomFloatPams); // Convex decomposition
+    } else {
+        //TODO no mesh data, CPPN generated no volume.
+    }
+}
+
+void ER_VoxelInterpreter::mutate()
+{
+
+}
+
+void ER_VoxelInterpreter::update()
+{
+    Development::update();
+}
+
+void ER_VoxelInterpreter::create()
+{
+
+}
+
+std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
+{
+    return std::shared_ptr<Morphology>(this);
+}
+
+/// Generate CPPN
+void ER_VoxelInterpreter::setCPPN(NEAT::NeuralNetwork neuralNetwork)
+{
+    cppn = neuralNetwork;
+}
+/// Generate matrix with voxels
+void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData)
+{
+    //TODO size of this region should be the size of the printing bed, with resolution as a multiple of 0.9mm per block
+//    PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
 
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
     double output; // Variable used to store the output of the NN.
@@ -32,21 +97,19 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
     // genome.BuildPhenotype(neuralNetwork);
     // Generate voxel matrix
     auto region = volData.getEnclosingRegion();
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1){
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1){
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1){
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 input[0] = x/(volData.getDepth()/2.0);
                 input[1] = y/(volData.getHeight()/2.0);
                 input[2] = z/(volData.getWidth()/2.0);
                 // Set inputs to NN
-                neuralNetwork.Input(input);
+                cppn.Input(input);
                 // Activate NN
-                neuralNetwork.Activate();
+                cppn.Activate();
                 // Take output from NN and store it.
-                output = neuralNetwork.Output()[0];
-//                output = sqrt(x*x + y*y + z*z);
+                output = cppn.Output()[0];
                 // If output greater than threshold write voxel.
-
 #ifdef HARD_BOUNDARIES
                 uint8_t uVoxelValue = 0;
                 if(output > 0.5){
@@ -60,17 +123,21 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
             }
         }
     }
-    // Marching cubes - we might not need this step at the beginning.
-    const auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
-    // I'm not sure if we need this step.
-    const auto decodedMesh = PolyVox::decodeMesh(mesh);
-
+}
+/// Get indices and vertices from mesh file
+void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh,
+                                             std::vector<simFloat>& vertices, std::vector<simInt>& indices)
+{
     const unsigned int n_vertices = decodedMesh.getNoOfVertices();
     const unsigned int n_indices = decodedMesh.getNoOfIndices();
-    std::vector<simFloat> vertices;
-    std::vector<simInt> indices;
-    vertices.reserve(n_vertices);
-    indices.reserve(n_indices);
+
+    if (n_vertices <= 0) {
+        //TODO fail viability test
+        std::clog << "Generated voxel mesh has no volume" << std::endl;
+        std::clog << "TODO: fail viability test" << std::endl;
+        return;
+    }
+
     for (unsigned int i=0; i < n_vertices; i++) {
         const auto &pos = decodedMesh.getVertex(i).position;
         vertices.emplace_back(pos.getX() / SHAPE_SCALE_VALUE);
@@ -80,44 +147,24 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork)
     for (unsigned int i=0; i < n_indices; i++) {
         indices.emplace_back(decodedMesh.getIndex(i));
     }
-
-    // Import mesh to V-REP
-    if (n_vertices > 0) {
-        handle = simCreateMeshShape(0, 20.0f * 3.1415f / 180.0f,
-                vertices.data(), n_vertices * 3,
-                indices.data(), n_indices,
-                nullptr);
-    } else {
-        //TODO fail viability test
-        std::clog << "Generated voxel mesh has no volume" << std::endl;
-        std::clog << "TODO: fail viability test" << std::endl;
-    }
-    if (handle == -1) {
-        std::cout << "Importing mesh NOT succesful!" << std::endl;
-    }
 }
 
-void ER_VoxelInterpreter::mutate()
+/// Export mesh from list of vertices and indices
+void ER_VoxelInterpreter::exportMesh(std::vector<simFloat> vertices, std::vector<simInt> indices)
 {
-
+    const auto** verticesMesh=new const simFloat*[2];
+    auto* verticesSizesMesh=new simInt[2];
+    const auto** indicesMesh=new const simInt*[2];
+    auto* indicesSizesMesh=new simInt[2];
+    verticesMesh[0] = vertices.data();
+    verticesSizesMesh[0] = vertices.size();
+    indicesMesh[0] = indices.data();
+    indicesSizesMesh[0] = indices.size();
+    simExportMesh(3,"example.stl",0,1,1,verticesMesh,verticesSizesMesh,indicesMesh,indicesSizesMesh,NULL,NULL);
 }
 
 int ER_VoxelInterpreter::getMainHandle()
 {
-    return handle;
-}
-
-std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
-{
-    return std::shared_ptr<Morphology>(this);
-}
-
-void ER_VoxelInterpreter::create()
-{
-
-}
-
-void ER_VoxelInterpreter::update()
-{
-    Development::update();
+    assert(mainHandle >= 0);
+    return mainHandle;
 }

@@ -10,6 +10,7 @@
 #include "ER_DirectEncoding.h"
 #include "CustomMorphology.h"
 #include "ER_CPPN_Encoding.h"
+#include "ER_VoxelInterpreter.h"
 
 using namespace std;
 
@@ -71,7 +72,7 @@ shared_ptr<Morphology> MorphologyFactory::createMorphologyGenome(int type, share
         case 6:
         {
             // TODO EB -  This needs yet to be written before being used!
-            //shared_ptr<VoxelMorphology> morph(new VoxelMorphology);
+            //shared_ptr<Morphology> morph(new VoxelMorphology);
             //morph->randomNum = rn;
             //morph->settings = st;
             //return morph;

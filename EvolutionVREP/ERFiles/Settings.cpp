@@ -1,7 +1,5 @@
 #include "Settings.h"
 
-using namespace std;
-
 /// The settings that are set in the constructor are mainly for debugging purposes.
 Settings::Settings()
 {
@@ -21,7 +19,7 @@ Settings::Settings()
 	autoDeleteSettings = true;
     // Assign maximum number of components for each type
 	for (int i = 0; i < moduleTypes.size(); i++) {
-		vector <int> tmpMaxModuleTypes;
+		std::vector <int> tmpMaxModuleTypes;
 		tmpMaxModuleTypes.push_back(moduleTypes[i]);
 		if (i == 0) {
             tmpMaxModuleTypes.push_back(0);
@@ -33,7 +31,7 @@ Settings::Settings()
 	}
 
 	maxNumberModules = 20;
-	morphologyType = MODULAR_LSYSTEM;
+	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
 	controlType = ANN_DEFAULT;
 	populationSize = 100;
@@ -73,16 +71,16 @@ Settings::~Settings() {
 
 }
 
-void Settings::split_line(string& line, string delim, list<string>& values)
+void Settings::split_line(std::string& line, std::string delim, std::list<std::string>& values)
 {
 	size_t pos = 0;
-	while ((pos = line.find(delim, (pos + 0))) != string::npos) {
-		string p = line.substr(0, pos);
+	while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
+        std::string p = line.substr(0, pos);
 		values.push_back(p);
 		line = line.substr(pos + 1);
 	}
-	while ((pos = line.find(delim, (pos + 1))) != string::npos) {
-		string p = line.substr(0, pos);
+	while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
+        std::string p = line.substr(0, pos);
 		values.push_back(p);
 		line = line.substr(pos + 1);
 	}
@@ -96,29 +94,29 @@ void Settings::readSettings() {
 	bool fileExists = false;
 	if (autoDeleteSettings == true) {
 		// check if settings file exists and delete if present
-		ofstream settingsFile;
-		settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
+        std::ofstream settingsFile;
+		settingsFile.open(repository + "/settings" + std::to_string(sceneNum) + ".csv");
 		fileExists = settingsFile.good();
 		settingsFile.close();
-		std::remove((repository + "/settings" + to_string(sceneNum) + ".csv").c_str());
+		std::remove((repository + "/settings" + std::to_string(sceneNum) + ".csv").c_str());
 		return;
 	}
 	std::cout << "sceneNum = " << sceneNum << std::endl;
-	ifstream file(repository + "/settings" + to_string(sceneNum) + ".csv");
-	string morphType;
+    std::ifstream file(repository + "/settings" + std::to_string(sceneNum) + ".csv");
+    std::string morphType;
 	int popCounter = 0;
 
-	std::cout << "Looking up settings in: " << repository << "/settings" << to_string(sceneNum) << ".csv" << std::endl;
+	std::cout << "Looking up settings in: " << repository << "/settings" << std::to_string(sceneNum) << ".csv" << std::endl;
 	if (file.good()) {
 		std::cout << "settings found" << std::endl;
 		int popCounter = 0;
-		string value;
-		list<string> values;
+        std::string value;
+		std::list<std::string> values;
 
 		// read the settings file and store the comma seperated values
 		while (file.good()) {
 			getline(file, value, ','); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-			if (value.find('\n') != string::npos) {
+			if (value.find('\n') != std::string::npos) {
 				split_line(value, "\n", values);
 			}
 			else {
@@ -127,18 +125,18 @@ void Settings::readSettings() {
 		}
 		file.close();
 
-		list<string>::const_iterator it = values.begin();
+		std::list<std::string>::const_iterator it = values.begin();
 		for (it = values.begin(); it != values.end(); it++) {
-			string tmp = *it;
+			std::string tmp = *it;
 	//		cout << tmp << endl;
 			if (tmp == "#serverMode") {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
 				if (tmpInt == 1) {
-					cout << "============INSTANCE MODE============" << endl;
-					cout << "-------------SERVER MODE-------------" << endl;
-					cout << "=====================================" << endl;
+                    std::cout << "============INSTANCE MODE============" << std::endl;
+                    std::cout << "-------------SERVER MODE-------------" << std::endl;
+                    std::cout << "=====================================" << std::endl;
 					instanceType = INSTANCE_SERVER;
 				}
 				else {
@@ -171,34 +169,33 @@ void Settings::readSettings() {
 				switch (tmpInt) {
 				case MOVE:
 					fitnessType = MOVE;
-					cout << "============FITNESS TYPE=============" << endl;
-					cout << "----------MOVE FITNESS TYPE----------" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "============FITNESS TYPE=============" << std::endl;
+					std::cout << "----------MOVE FITNESS TYPE----------" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SOLAR:
 					fitnessType = SOLAR;
-					cout << "============FITNESS TYPE=============" << endl;
-					cout << "---------SOLAR FITNESS TYPE----------" << endl;
-					cout << "=====================================" << endl;
-
+					std::cout << "============FITNESS TYPE=============" << std::endl;
+					std::cout << "---------SOLAR FITNESS TYPE----------" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SWIM:
-					cout << "============FITNESS TYPE=============" << endl;
-					cout << "-------SWIMMING FITNESS TYPE---------" << endl;
-					cout << "=====================================" << endl;
+                    std::cout << "============FITNESS TYPE=============" << std::endl;
+                    std::cout << "-------SWIMMING FITNESS TYPE---------" << std::endl;
+                    std::cout << "=====================================" << std::endl;
 					fitnessType = SWIM;
 					break;
 				case FITNESS_JUMP:
 					fitnessType = FITNESS_JUMP;
-					cout << "============FITNESS TYPE=============" << endl;
-					cout << "----------JUMP FITNESS TYPE----------" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "============FITNESS TYPE=============" << std::endl;
+					std::cout << "----------JUMP FITNESS TYPE----------" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case MOVE_AND_SOLAR:
 					fitnessType = MOVE_AND_SOLAR;
-					cout << "============FITNESS TYPE=============" << endl;
-					cout << "-----MOVE AND SOLAR FITNESS TYPE-----" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "============FITNESS TYPE=============" << std::endl;
+					std::cout << "-----MOVE AND SOLAR FITNESS TYPE-----" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				}
 
@@ -210,124 +207,124 @@ void Settings::readSettings() {
 				switch (tmpInt) {
 				case DEFAULT_ENV:
 					environmentType = DEFAULT_ENV;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "--INITIALIZING DEFAULT ENVIRONMENT---" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "--INITIALIZING DEFAULT ENVIRONMENT---" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SUN_BASIC:
 					environmentType = SUN_BASIC;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "--INITIALIZING SUN BASIC ENVIRONMENT-" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "--INITIALIZING SUN BASIC ENVIRONMENT-" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SUN_CONSTRAINED:
 					environmentType = SUN_CONSTRAINED;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "INITIALIZING SUN CONSTRAINED ENVIRONMENT" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "INITIALIZING SUN CONSTRAINED ENVIRONMENT" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SUN_BLOCKED:
 					environmentType = SUN_BLOCKED;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "------BLOCKED SUN ENVIRONMENT--------" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "------BLOCKED SUN ENVIRONMENT--------" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case SUN_CONSTRAINED_AND_MOVING:
 					environmentType = SUN_CONSTRAINED_AND_MOVING;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "INITIALIZING SUN CONSTRAINED AND MOVING ENVIRONMENT" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "INITIALIZING SUN CONSTRAINED AND MOVING ENVIRONMENT" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				case WATER_ENV:
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "----INITIALIZING WATER ENVIRONMENT---" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "----INITIALIZING WATER ENVIRONMENT---" << std::endl;
+					std::cout << "=====================================" << std::endl;
 
 					environmentType = WATER_ENV;
 					break;
 				case ROUGH:
 					environmentType = ROUGH;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "----INITIALIZING ROUGH ENVIRONMENT---" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "----INITIALIZING ROUGH ENVIRONMENT---" << std::endl;
+					std::cout << "=====================================" << std::endl;
 
 					break;
 				case SUN_MOVING:
 					environmentType = SUN_MOVING;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "-INITIALIZING SUN MOVING ENVIRONMENT-" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "-INITIALIZING SUN MOVING ENVIRONMENT-" << std::endl;
+					std::cout << "=====================================" << std::endl;
 
 					break;
 				case CONSTRAINED_MOVING_SUN:
 					environmentType = CONSTRAINED_MOVING_SUN;
-					cout << "===========ENVIRONMENT TYPE==========" << endl;
-					cout << "--------CONSTRAINED MOVING SUN-------" << endl;
-					cout << "=====================================" << endl;
+					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
+					std::cout << "--------CONSTRAINED MOVING SUN-------" << std::endl;
+					std::cout << "=====================================" << std::endl;
 					break;
 				}
 			}
 			else if (tmp == "#controlType") {
-				cout << "========INITIALIZING CONTROL=========" << endl;
+				std::cout << "========INITIALIZING CONTROL=========" << std::endl;
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
 				switch (tmpInt) {
 				case ANN_DEFAULT:
-					cout << "----------INITIALIZING ANN-----------" << endl;
+					std::cout << "----------INITIALIZING ANN-----------" << std::endl;
 					controlType = ANN_DEFAULT;
 					break;
 				case ANN_CUSTOM:
-					cout << "-------INITIALIZING CUSTOM ANN-------" << endl;
+					std::cout << "-------INITIALIZING CUSTOM ANN-------" << std::endl;
 					controlType = ANN_CUSTOM;
 					break;
 				case ANN_CPPN:
-					cout << "----------INITIALIZING CPPN----------" << endl;
+					std::cout << "----------INITIALIZING CPPN----------" << std::endl;
 					controlType = ANN_CPPN;
 					break;
 				case ANN_DISTRIBUTED_UP:
-					cout << "----INITIALIZING DISTRIBUTED ANN----" << endl;
+					std::cout << "----INITIALIZING DISTRIBUTED ANN----" << std::endl;
 					controlType = ANN_DISTRIBUTED_UP;
 					break;
 				case ANN_DISTRIBUTED_DOWN:
-					cout << "----INITIALIZING DISTRIBUTED ANN----" << endl;
+					std::cout << "----INITIALIZING DISTRIBUTED ANN----" << std::endl;
 					controlType = ANN_DISTRIBUTED_DOWN;
 					break;
 				case ANN_DISTRIBUTED_BOTH:
-					cout << "----INITIALIZING DISTRIBUTED ANN----" << endl;
+					std::cout << "----INITIALIZING DISTRIBUTED ANN----" << std::endl;
 					controlType = ANN_DISTRIBUTED_BOTH;
 					break;
 				}
-				cout << "=====================================" << endl;
+				std::cout << "=====================================" << std::endl;
 			}
 			else if (tmp == "#morphologyType") {
-				cout << "=======INITIALIZING MORPHOLOGY=======" << endl;
+				std::cout << "=======INITIALIZING MORPHOLOGY=======" << std::endl;
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
 				switch (tmpInt) {
 				case CAT_MORPHOLOGY:
-					cout << "----------INITIALIZING CAT----------" << endl;
+					std::cout << "----------INITIALIZING CAT----------" << std::endl;
 					morphologyType = CAT_MORPHOLOGY;
 					break;
 				case MODULAR_LSYSTEM:
-					cout << "----------MODULAR LSYSTEM----------" << endl;
+					std::cout << "----------MODULAR LSYSTEM----------" << std::endl;
 					morphologyType = MODULAR_LSYSTEM;
 					break;
 				case CUSTOM_MORPHOLOGY:
-					cout << "--------CUSTOM MORPHOLOGY----------" << endl;
+					std::cout << "--------CUSTOM MORPHOLOGY----------" << std::endl;
 					morphologyType = CUSTOM_MORPHOLOGY;
 					break;
 				case MODULAR_CPPN:
-					cout << "-----------MODULAR CPPN------------" << endl;
+					std::cout << "-----------MODULAR CPPN------------" << std::endl;
 					morphologyType = MODULAR_CPPN;
 					break;
 				case MODULAR_DIRECT:
-					cout << "----------MODULAR DIRECT-----------" << endl;
+					std::cout << "----------MODULAR DIRECT-----------" << std::endl;
 					morphologyType = MODULAR_DIRECT;
 					break;
 				}
-                cout << "=====================================" << endl;
+                std::cout << "=====================================" << std::endl;
             }
 
 			//if (tmp == "#morphologyType") { // later
@@ -391,7 +388,7 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				generation = atoi(tmp.c_str());
-				cout << "generation found : " << generation << endl;
+				std::cout << "generation found : " << generation << std::endl;
 			}
 	//		else if (tmp == "#repository") { // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	//			it++;
@@ -421,7 +418,7 @@ void Settings::readSettings() {
 				tmp = *it;
 				populationSize = atoi(tmp.c_str());
 				popCounter = populationSize;
-				cout << "populationSize found : " << populationSize << endl;
+				std::cout << "populationSize found : " << populationSize << std::endl;
 			}
 			else if (tmp == "#individuals") {
 				it++;
@@ -519,7 +516,7 @@ void Settings::readSettings() {
 			}
 
 			else if (tmp == "#bestIndividual") {
-				cout << "found best individual" << endl;
+				std::cout << "found best individual" << std::endl;
 				it++;
 				tmp = *it;
 				bestIndividual = atoi(tmp.c_str());
@@ -551,13 +548,13 @@ void Settings::readSettings() {
 				maxNumberModules = atoi(tmp.c_str());
 			}
 			else if (tmp == "#maxForceModules") {
-				cout << "found max force modules" << endl;
+				std::cout << "found max force modules" << std::endl;
 				it++;
 				tmp = *it;
 				maxForce = atof(tmp.c_str());
 			}
 			else if (tmp == "#maxForceSensorModules") {
-				cout << "found max force sensor" << endl;
+				std::cout << "found max force sensor" << std::endl;
 				it++;
 				tmp = *it;
 				maxForceSensor = atof(tmp.c_str());
@@ -572,12 +569,12 @@ void Settings::readSettings() {
 			}
 			else if (tmp == "#maxAmountModulesTypes") {
 				maxModuleTypes.clear();
-				vector<int> tmpTypes;
+				std::vector<int> tmpTypes;
 
 				for (int i = 0; i < numberOfModules; i++) {
 					it++;
 					tmp = *it;
-					vector<int> tmpMaxMods;
+					std::vector<int> tmpMaxMods;
 					tmpMaxMods.push_back(moduleTypes[i]);
 					tmpMaxMods.push_back(atoi(tmp.c_str()));
 					maxModuleTypes.push_back(tmpMaxMods);
@@ -631,76 +628,76 @@ void Settings::readSettings() {
 			fileExists = true;
 		}
 	}
-	cout << "Loaded Settings" << endl;
+	std::cout << "Loaded Settings" << std::endl;
 }
 
 void Settings::saveSettings() {
-	ofstream settingsFile;
-	settingsFile.open(repository + "/settings" + to_string(sceneNum) + ".csv");
-	settingsFile << ",#serverMode," << instanceType << "," << endl;
-	settingsFile << ",#evolutionType," << evolutionType << "," << endl;
-	settingsFile << ",#fitnessType," << fitnessType << "," << endl;
-	settingsFile << ",#environmentType," << environmentType << "," << endl;
-	settingsFile << ",#morphologyType," << morphologyType << "," << endl;
-	settingsFile << ",#selectionType," << selectionType << "," << endl;
-	settingsFile << ",#replacementType," << replacementType << "," << endl;
-	settingsFile << ",#controlType," << controlType << "," << endl;
-	settingsFile << ",#generation," << generation << "," << endl; // set when saving
-	settingsFile << ",#maxGeneration," << maxGeneration << "," << endl;
-	settingsFile << ",#generationInterval," << xGenerations << "," << endl;
-	settingsFile << ",#indCounter," << individualCounter << "," << endl; // set when saving
-	settingsFile << ",#populationSize," << populationSize << "," << endl;
-	settingsFile << ",#mutationRate," << mutationRate << "," << endl;
-	settingsFile << ",#morphMutRate," << morphMutRate << "," << endl;
-	settingsFile << ",#crossover," << crossover << "," << endl;
-	settingsFile << ",#crossoverRate," << crossoverRate << "," << endl;
-	settingsFile << ",#energyDissipationRate," << energyDissipationRate << "," << endl;
-	settingsFile << ",#agingInds," << ageInds << "," << endl;
-	settingsFile << ",#maxAge," << maxAge << "," << endl;
-	settingsFile << ",#minAge," << minAge << "," << endl;
-	settingsFile << ",#deathProbability," << deathProb << "," << endl;
-	settingsFile << ",#lIncrements," << lIncrements << "," << endl;
-	settingsFile << ",#bestIndividual," << bestIndividual << endl; // set when saving
-	settingsFile << ",#initialSeed," << seed << "," << endl;
-	settingsFile << ",#verbose," << verbose << "," << endl;
-	settingsFile << ",#useVarModules," << useVarModules << "," << endl;
-	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << endl;
+	std::ofstream settingsFile;
+	settingsFile.open(repository + "/settings" + std::to_string(sceneNum) + ".csv");
+	settingsFile << ",#serverMode," << instanceType << "," << std::endl;
+	settingsFile << ",#evolutionType," << evolutionType << "," << std::endl;
+	settingsFile << ",#fitnessType," << fitnessType << "," << std::endl;
+	settingsFile << ",#environmentType," << environmentType << "," << std::endl;
+	settingsFile << ",#morphologyType," << morphologyType << "," << std::endl;
+	settingsFile << ",#selectionType," << selectionType << "," << std::endl;
+	settingsFile << ",#replacementType," << replacementType << "," << std::endl;
+	settingsFile << ",#controlType," << controlType << "," << std::endl;
+	settingsFile << ",#generation," << generation << "," << std::endl; // set when saving
+	settingsFile << ",#maxGeneration," << maxGeneration << "," << std::endl;
+	settingsFile << ",#generationInterval," << xGenerations << "," << std::endl;
+	settingsFile << ",#indCounter," << individualCounter << "," << std::endl; // set when saving
+	settingsFile << ",#populationSize," << populationSize << "," << std::endl;
+	settingsFile << ",#mutationRate," << mutationRate << "," << std::endl;
+	settingsFile << ",#morphMutRate," << morphMutRate << "," << std::endl;
+	settingsFile << ",#crossover," << crossover << "," << std::endl;
+	settingsFile << ",#crossoverRate," << crossoverRate << "," << std::endl;
+	settingsFile << ",#energyDissipationRate," << energyDissipationRate << "," << std::endl;
+	settingsFile << ",#agingInds," << ageInds << "," << std::endl;
+	settingsFile << ",#maxAge," << maxAge << "," << std::endl;
+	settingsFile << ",#minAge," << minAge << "," << std::endl;
+	settingsFile << ",#deathProbability," << deathProb << "," << std::endl;
+	settingsFile << ",#lIncrements," << lIncrements << "," << std::endl;
+	settingsFile << ",#bestIndividual," << bestIndividual << std::endl; // set when saving
+	settingsFile << ",#initialSeed," << seed << "," << std::endl;
+	settingsFile << ",#verbose," << verbose << "," << std::endl;
+	settingsFile << ",#useVarModules," << useVarModules << "," << std::endl;
+	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << std::endl;
 
 	// Viability
-    settingsFile << ",#collidingorgans," << bCollidingOrgans << "," << endl;
-    settingsFile << ",#organsbelowprintingbed," << bOrgansAbovePrintingBed << "," << endl;
-    settingsFile << ",#nonprintableorientations," << bNonprintableOrientations << "," << endl;
-    settingsFile << ",#anynumberoforgans," << bAnyOrgansNumber << "," << endl;
+    settingsFile << ",#collidingorgans," << bCollidingOrgans << "," << std::endl;
+    settingsFile << ",#organsbelowprintingbed," << bOrgansAbovePrintingBed << "," << std::endl;
+    settingsFile << ",#nonprintableorientations," << bNonprintableOrientations << "," << std::endl;
+    settingsFile << ",#anynumberoforgans," << bAnyOrgansNumber << "," << std::endl;
 
-	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << endl;
-	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << endl;
+	settingsFile << ",#sendGenomeAsSignal," << sendGenomeAsSignal << "," << std::endl;
+	settingsFile << ",#shouldReopenConnections," << shouldReopenConnections << "," << std::endl;
 
-	settingsFile << ",#maxForceModules," << maxForce << "," << endl;
-	settingsFile << ",#maxForceSensorModules," << maxForceSensor << "," << endl;
-	settingsFile << ",#repository," << repository << "," << endl;
+	settingsFile << ",#maxForceModules," << maxForce << "," << std::endl;
+	settingsFile << ",#maxForceSensorModules," << maxForceSensor << "," << std::endl;
+	settingsFile << ",#repository," << repository << "," << std::endl;
 
-    settingsFile << ",#numberOfModules," << numberOfModules << "," << endl; // not used
+    settingsFile << ",#numberOfModules," << numberOfModules << "," << std::endl; // not used
 	settingsFile << ",#moduleTypes,";
 	for (int i = 0; i < moduleTypes.size(); i++) {
 		settingsFile << moduleTypes[i] << ",";
-	} settingsFile << endl;
+	} settingsFile << std::endl;
 
 	settingsFile << ",#maxAmountModulesTypes,";
 	for (int i = 0; i < maxModuleTypes.size(); i++) {
 		settingsFile << maxModuleTypes[i][1] << ",";
-	}	settingsFile << endl;
+	}	settingsFile << std::endl;
 
 	settingsFile << ",#individuals,";
 	for (int i = 0; i < populationSize; i++) {
 		settingsFile << indNumbers[i] << ","; // must be set when saving
-	} settingsFile << endl;
+	} settingsFile << std::endl;
 	if (indFits.size() > 0) {
 		settingsFile << ",#indFits,";
 		for (int i = 0; i < populationSize; i++) {
 			settingsFile << indFits[i] << ","; // must be set when saving
 		} 
 	}
-	settingsFile << endl;
+	settingsFile << std::endl;
 
 	settingsFile.close();
 }
