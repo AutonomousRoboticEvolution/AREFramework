@@ -40,6 +40,8 @@ public:
 
     void savePopulation(const std::string& );
 
+    void savePopFitness(int generation) override;
+
 private:
     void initializePopulation(const NEAT::Parameters &params);
 

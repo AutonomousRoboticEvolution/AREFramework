@@ -184,15 +184,35 @@ void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8
 /// Export mesh from list of vertices and indices
 void ER_VoxelInterpreter::exportMesh(std::vector<simFloat> vertices, std::vector<simInt> indices)
 {
-    const auto** verticesMesh=new const simFloat*[2];
-    auto* verticesSizesMesh=new simInt[2];
-    const auto** indicesMesh=new const simInt*[2];
-    auto* indicesSizesMesh=new simInt[2];
+    const auto **verticesMesh = new const simFloat *[2];
+    auto *verticesSizesMesh = new simInt[2];
+    const auto **indicesMesh = new const simInt *[2];
+    auto *indicesSizesMesh = new simInt[2];
     verticesMesh[0] = vertices.data();
     verticesSizesMesh[0] = vertices.size();
     indicesMesh[0] = indices.data();
     indicesSizesMesh[0] = indices.size();
-    simExportMesh(3,"example.stl",0,1,1,verticesMesh,verticesSizesMesh,indicesMesh,indicesSizesMesh,NULL,NULL);
+
+    std::ostringstream filename;
+    filename << "morphology_" << this->id << ".stl";
+
+    //fileformat: the fileformat to export to:
+    //  0: OBJ format
+    //  3: TEXT STL format
+    //  4: BINARY STL format
+    //  5: COLLADA format
+    //  6: TEXT PLY format
+    //  7: BINARY PLY format
+    simExportMesh(3, filename.str().c_str(),
+            0, 1.0f, 1,
+            verticesMesh, verticesSizesMesh,
+            indicesMesh, indicesSizesMesh,
+            nullptr, nullptr);
+
+    delete[] verticesMesh;
+    delete[] verticesSizesMesh;
+    delete[] indicesMesh;
+    delete[] indicesSizesMesh;
 }
 
 int ER_VoxelInterpreter::getMainHandle()

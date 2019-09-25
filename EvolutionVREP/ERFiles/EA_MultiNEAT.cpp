@@ -7,6 +7,7 @@
 #include "EA_MultiNEAT.h"
 #include "EA_MultiNEATGenome.h"
 #include <memory>
+#include <cmath>
 
 EA_MultiNEAT::EA_MultiNEAT()
 {
@@ -182,4 +183,40 @@ std::shared_ptr<Morphology> EA_MultiNEAT::getMorph()
 void EA_MultiNEAT::savePopulation(const std::string &filename)
 {
     this->population->Save(filename.c_str());
+}
+
+void EA_MultiNEAT::savePopFitness(int generation)
+{
+    std::cout << "SAVING GENERATION" << std::endl << std::endl;
+    std::ofstream savePopFile;
+    std::string saveFileName;
+    saveFileName = settings->repository + "/SavedGenerations" + std::to_string(settings->sceneNum) + ".csv";
+    savePopFile.open(saveFileName.c_str(), std::ios::out | std::ios::ate | std::ios::app);
+    savePopFile << "generation " << generation << ": ,";
+    for (auto & populationGenome : nextGenGenomes) {
+        savePopFile /*<< " ind " << i << ": " */ << populationGenome->fitness << ",";
+    }
+    float avgFitness = 0;
+    for (auto & populationGenome : nextGenGenomes) {
+        avgFitness += populationGenome->fitness;
+    }
+    avgFitness = avgFitness / nextGenGenomes.size();
+    savePopFile << "avg: ," << avgFitness << ",";
+    size_t bestInd = -1;
+    float bestFitness = -INFINITY;
+    for (size_t i = 0; i < nextGenGenomes.size(); i++) {
+        if (bestFitness < nextGenGenomes[i]->fitness) {
+            bestFitness = nextGenGenomes[i]->fitness;
+            bestInd = i;
+        }
+    }
+    savePopFile << "ind: ," << nextGenGenomes[bestInd]->individualNumber << ",";
+    savePopFile << "fitness: ," << bestFitness << ",";
+    savePopFile << "individuals: ,";
+    for (auto & populationGenome : nextGenGenomes) {
+        savePopFile << populationGenome->individualNumber << ",";
+    }
+    savePopFile << std::endl;
+    savePopFile.close();
+    std::cout << "GENERATION SAVED" << std::endl;
 }

@@ -18,7 +18,7 @@ Settings::Settings()
     moduleTypes.push_back(17);
 	autoDeleteSettings = true;
     // Assign maximum number of components for each type
-	for (int i = 0; i < moduleTypes.size(); i++) {
+	for (size_t i = 0; i < moduleTypes.size(); i++) {
 		std::vector <int> tmpMaxModuleTypes;
 		tmpMaxModuleTypes.push_back(moduleTypes[i]);
 		if (i == 0) {
@@ -67,11 +67,10 @@ Settings::Settings()
 	//repository="files";
 }
 
-Settings::~Settings() {
+Settings::~Settings()
+{}
 
-}
-
-void Settings::split_line(std::string& line, std::string delim, std::list<std::string>& values)
+void Settings::split_line(std::string& line, const std::string& delim, std::list<std::string>& values)
 {
 	size_t pos = 0;
 	while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
@@ -90,9 +89,10 @@ void Settings::split_line(std::string& line, std::string delim, std::list<std::s
 	}
 }
 
-void Settings::readSettings() {
+void Settings::readSettings()
+{
 	bool fileExists = false;
-	if (autoDeleteSettings == true) {
+	if (autoDeleteSettings) {
 		// check if settings file exists and delete if present
         std::ofstream settingsFile;
 		settingsFile.open(repository + "/settings" + std::to_string(sceneNum) + ".csv");
@@ -166,7 +166,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+				{
+                default:
+                    throw std::runtime_error("unrecognized fitness settings");
 				case MOVE:
 					fitnessType = MOVE;
 					std::cout << "============FITNESS TYPE=============" << std::endl;
@@ -204,7 +207,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+				{
+                default:
+                    throw std::runtime_error("unrecognized environment settings");
 				case DEFAULT_ENV:
 					environmentType = DEFAULT_ENV;
 					std::cout << "===========ENVIRONMENT TYPE==========" << std::endl;
@@ -269,7 +275,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+				{
+                default:
+                    throw std::runtime_error("unrecognized controlType settings");
 				case ANN_DEFAULT:
 					std::cout << "----------INITIALIZING ANN-----------" << std::endl;
 					controlType = ANN_DEFAULT;
@@ -302,7 +311,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+                {
+                default:
+                    throw std::runtime_error("unrecognized Morphology type settings");
 				case CAT_MORPHOLOGY:
 					std::cout << "----------INITIALIZING CAT----------" << std::endl;
 					morphologyType = CAT_MORPHOLOGY;
@@ -359,7 +371,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+                {
+                default:
+                    throw std::runtime_error("unrecognized selection type settings");
 				case RANDOM_SELECTION:
 					selectionType = RANDOM_SELECTION;
 					break;
@@ -372,7 +387,10 @@ void Settings::readSettings() {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
-				switch (tmpInt) {
+				switch (tmpInt)
+                {
+                default:
+                    throw std::runtime_error("unrecognized Replacement type settings");
 				case RANDOM_REPLACEMENT:
 					replacementType = RANDOM_REPLACEMENT;
 					break;
@@ -631,7 +649,8 @@ void Settings::readSettings() {
 	std::cout << "Loaded Settings" << std::endl;
 }
 
-void Settings::saveSettings() {
+void Settings::saveSettings()
+{
 	std::ofstream settingsFile;
 	settingsFile.open(repository + "/settings" + std::to_string(sceneNum) + ".csv");
 	settingsFile << ",#serverMode," << instanceType << "," << std::endl;
@@ -678,20 +697,20 @@ void Settings::saveSettings() {
 
     settingsFile << ",#numberOfModules," << numberOfModules << "," << std::endl; // not used
 	settingsFile << ",#moduleTypes,";
-	for (int i = 0; i < moduleTypes.size(); i++) {
-		settingsFile << moduleTypes[i] << ",";
+	for (int moduleType : moduleTypes) {
+		settingsFile << moduleType << ",";
 	} settingsFile << std::endl;
 
 	settingsFile << ",#maxAmountModulesTypes,";
-	for (int i = 0; i < maxModuleTypes.size(); i++) {
-		settingsFile << maxModuleTypes[i][1] << ",";
+	for (auto & maxModuleType : maxModuleTypes) {
+		settingsFile << maxModuleType[1] << ",";
 	}	settingsFile << std::endl;
 
 	settingsFile << ",#individuals,";
 	for (int i = 0; i < populationSize; i++) {
 		settingsFile << indNumbers[i] << ","; // must be set when saving
 	} settingsFile << std::endl;
-	if (indFits.size() > 0) {
+	if (!indFits.empty()) {
 		settingsFile << ",#indFits,";
 		for (int i = 0; i < populationSize; i++) {
 			settingsFile << indFits[i] << ","; // must be set when saving
@@ -702,7 +721,8 @@ void Settings::saveSettings() {
 	settingsFile.close();
 }
 
-void Settings::setRepository(std::string repository) {
+void Settings::setRepository(const std::string &repository)
+{
     this->repository = repository;
     if(verbose){
         std::cout << "Setting repository to ->" << repository << std::endl;

@@ -340,7 +340,8 @@ void ER_VREP::endOfSimulation()
 				if (settings->evolutionType == settings->EA_MULTINEAT) { // Exception // TODO proper integration
 					ea->setFitness(currentInd, fitness);
 				}
-				else {
+				else
+                {
 					currentGenome->fitness = fitness;
 					if (settings->savePhenotype) {
 						currentGenome->fitness = fitness;
@@ -353,14 +354,17 @@ void ER_VREP::endOfSimulation()
 				}
                 settings->indCounter++;
 			}
-			if (settings->evolutionType != settings->EA_MULTINEAT && settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0) {
-				ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
-				ea->selection();
-				ea->savePopFitness(generation);
-				generation++;
-				saveSettings();
-				newGenerations++;
-			}
+
+			// Is it time to create a new generation?
+			if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0)
+            {
+                ea->replacement();// replaceNewIndividual(settings->indCounter, sceneNum, fitness);
+                ea->selection();
+                ea->savePopFitness(generation);
+                generation++;
+                saveSettings();
+                newGenerations++;
+            }
 		}
 		if (settings->startingCondition == settings->COND_LOAD_BEST) {
 			float fitness = environment->fitnessFunction(currentMorphology);
@@ -449,7 +453,9 @@ void ER_VREP::saveSettings()
 	settings->generation = generation;
 	settings->individualCounter = settings->indCounter;
     std::vector<int> indNums;
-	for (auto &populationGenome : ea->populationGenomes) {
+    const auto &genomes = settings->evolutionType == settings->EA_MULTINEAT ?
+            ea->nextGenGenomes : ea->populationGenomes;
+	for (const std::shared_ptr<Genome> &populationGenome : genomes) {
 		indNums.push_back(populationGenome->individualNumber); // must be set when saving
 	}
 	settings->indNumbers = indNums;

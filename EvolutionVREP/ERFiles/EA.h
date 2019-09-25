@@ -52,7 +52,7 @@ public:
 	/// Save the population fitness values
 	void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
 	/// Save the population fitness values
-	void savePopFitness(int generation);
+	virtual void savePopFitness(int generation);
 	/// Load the best individual based on the evolutionary progression documen
 	virtual void loadBestIndividualGenome(int sceneNum) = 0;
 	/// Load all the population genomes?

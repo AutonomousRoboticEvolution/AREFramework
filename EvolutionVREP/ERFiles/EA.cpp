@@ -91,7 +91,8 @@ void EA::savePopFitness(int generation, vector<float> popfit, vector<int> popInd
 }
 
 
-void EA::savePopFitness(int generation) {
+void EA::savePopFitness(int generation)
+{
 	cout << "SAVING GENERATION" << endl << endl;
 	ofstream savePopFile;
 	string saveFileName;

@@ -279,8 +279,8 @@ public:
 	/**
 		@brief Set the repository for saving data
 	*/
-    void setRepository(std::string repository);
+    void setRepository(const std::string &repository);
 
 private:
-	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
+	static void split_line(std::string& line, const std::string& delim, std::list<std::string>& values);
 };
