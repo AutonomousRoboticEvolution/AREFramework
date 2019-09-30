@@ -33,9 +33,14 @@ public:
     int getMainHandle() override;
 
     //TODO size of this region should be the size of the printing bed, with resolution as a multiple of 0.9mm per block
-    const int MATRIX_HALF_SIZE = 25;
-    const int MATRIX_SIZE = MATRIX_HALF_SIZE * 2;
-    const simFloat SHAPE_SCALE_VALUE = static_cast<simFloat>(MATRIX_SIZE);
+    const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
+    const int VOXEL_MULTIPLIER = 4; // voxel of 3.4cm³
+    const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER); // voxel of 3.4cm³
+    const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER); // 66
+    const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2; // 33
+
+    // results into 23.76x23.76x23.76 cm³ - in reality is 28x28x25 cm³
+    const simFloat SHAPE_SCALE_VALUE = VOXEL_REAL_SIZE;
 
 private:
     unsigned int id;

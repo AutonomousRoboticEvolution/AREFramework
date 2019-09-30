@@ -68,10 +68,17 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
         // Convex decomposition with V-HACD
         if (decompose) {
-            int convDecomIntPams[] = {1, 500, 100, 0, 0, 10000, 20, 4, 4, 20};
-            float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0, 0.0025, 0.05, 0.05, 0.00125, 0.0001};
-            mainHandle = simConvexDecompose(mainHandle, 129, convDecomIntPams,
-                                            convDecomFloatPams); // Convex decomposition
+            int convDecomIntPams[] = {1, 500, 100, 0, 0, //HACD
+                                      10000, 20, 4, 4, 20}; //V-HACD
+            float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0,//HACD
+                                          0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
+            try {
+                mainHandle = simConvexDecompose(mainHandle, 1u | 128u, convDecomIntPams,
+                                                convDecomFloatPams); // Convex decomposition
+            } catch (std::exception &e) {
+                //TODO if decomposition fails, discard the robot.
+                std::clog << "Decomposition failed: why? " << e.what() << std::endl;
+            }
         } else {
             std::cout << "not decomposing" << std::endl;
         }
@@ -116,9 +123,9 @@ void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, N
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                input[0] = x/(volData.getDepth()/2.0);
-                input[1] = y/(volData.getHeight()/2.0);
-                input[2] = z/(volData.getWidth()/2.0);
+                input[0] = static_cast<double>(x); // x/(volData.getDepth()/2.0);
+                input[1] = static_cast<double>(y); //y/(volData.getHeight()/2.0);
+                input[2] = static_cast<double>(z); //z/(volData.getWidth()/2.0);
                 // Set inputs to NN
                 cppn.Input(input);
                 // Activate NN
@@ -163,9 +170,9 @@ void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8
             if (prev != nullptr and (*prev) != pos) pointObject = false;
             prev = &pos;
         }
-        vertices.emplace_back(pos.getX() / SHAPE_SCALE_VALUE);
-        vertices.emplace_back(pos.getY() / SHAPE_SCALE_VALUE);
-        vertices.emplace_back(pos.getZ() / SHAPE_SCALE_VALUE);
+        vertices.emplace_back(pos.getX() * SHAPE_SCALE_VALUE);
+        vertices.emplace_back(pos.getY() * SHAPE_SCALE_VALUE);
+        vertices.emplace_back(pos.getZ() * SHAPE_SCALE_VALUE);
     }
 
     // If all vectors are the same, we have an object the size of point. This is considered a failed viability.
