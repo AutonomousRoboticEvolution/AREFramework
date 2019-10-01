@@ -28,6 +28,10 @@ public:
     /// Get indices and vertices from mesh file
     void getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>>& decodedMesh, std::vector<simFloat>& vertices, std::vector<simInt>& indices);
 
+    /// Voxel-matrix post-processing methods.
+    /// Empty space for head organ.
+    void emptySpaceForHead(PolyVox::RawVolume<uint8_t>& volData);
+
     std::shared_ptr<Morphology> clone();
 
     int getMainHandle() override;

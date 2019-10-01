@@ -23,6 +23,8 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
     PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
     // Generate voxels
     generateVoxels(volData, neuralNetwork);
+    // Post-processing
+    emptySpaceForHead(volData);
     // Marching cubes - we might not need this step at the beginning.
     auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
     // I'm not sure if we need this step.
@@ -47,7 +49,7 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
 
         simSetObjectName(mainHandle, name.str().c_str());
 
-#ifdef VISUALIZE_RAW_CPPN_SHAPE
+//#ifdef VISUALIZE_RAW_CPPN_SHAPE
         simAddObjectToSelection(sim_handle_single, mainHandle);
         simCopyPasteSelectedObjects();
         simInt reference_object = simGetObjectLastSelection();
@@ -55,9 +57,9 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         simSetObjectName(reference_object, name.str().c_str());
         simFloat reference_object_pos[3];
         simGetObjectPosition(mainHandle, -1, reference_object_pos);
-        reference_object_pos[0] -= 1.0;
+        reference_object_pos[0] -= 0.4;
         simSetObjectPosition(reference_object, -1, reference_object_pos);
-#endif
+//#endif
         // Scale down object
         //simScaleObject(mainHandle, 0.1, 0.1, 0.1, 0);
         // Object is collidable
@@ -225,4 +227,25 @@ void ER_VoxelInterpreter::exportMesh(std::vector<simFloat> vertices, std::vector
 int ER_VoxelInterpreter::getMainHandle()
 {
     return mainHandle;
+}
+/// Empty space for head organ.
+void ER_VoxelInterpreter::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &volData)
+{
+    // Size of head slot: 11.4cm x 10.0 cm
+    // This is roughly 33.5 by 29.4 voxels with voxel size of 3.4mm.
+    const int xUpperLimit = 17;
+    const int xLowerLimit = -17;
+    const int yUpperLimit = 15;
+    const int yLowerLimit = -15;
+    auto region = volData.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                if(x <= xUpperLimit && x >= xLowerLimit && y <= yUpperLimit && y >= yLowerLimit){
+                    volData.setVoxel(x, y, z, 0.0);
+                }
+            }
+        }
+    }
+
 }
