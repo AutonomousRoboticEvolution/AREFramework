@@ -46,10 +46,15 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         }
         std::ostringstream name;
         name << "VoxelBone" << this->id;
-
         simSetObjectName(mainHandle, name.str().c_str());
-
-//#ifdef VISUALIZE_RAW_CPPN_SHAPE
+        // Set starting point
+        simFloat objectPosition[3];
+        objectPosition[0] = 0.0;
+        objectPosition[1] = 0.0;
+        objectPosition[2] = 0.15;
+        simSetObjectPosition(mainHandle, -1, objectPosition);
+#define VISUALIZE_RAW_CPPN_SHAPE 0
+#ifdef VISUALIZE_RAW_CPPN_SHAPE
         simAddObjectToSelection(sim_handle_single, mainHandle);
         simCopyPasteSelectedObjects();
         simInt reference_object = simGetObjectLastSelection();
@@ -59,9 +64,7 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         simGetObjectPosition(mainHandle, -1, reference_object_pos);
         reference_object_pos[0] -= 0.4;
         simSetObjectPosition(reference_object, -1, reference_object_pos);
-//#endif
-        // Scale down object
-        //simScaleObject(mainHandle, 0.1, 0.1, 0.1, 0);
+#endif
         // Object is collidable
         simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable);
         // Object is dynamic
@@ -70,8 +73,9 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
         // Convex decomposition with V-HACD
         if (decompose) {
+            // Resolution of 1000000 seems to work better than defaul (10000). However it makes it slower.
             int convDecomIntPams[] = {1, 500, 100, 0, 0, //HACD
-                                      10000, 20, 4, 4, 20}; //V-HACD
+                                      1000000, 20, 4, 4, 64}; //V-HACD
             float convDecomFloatPams[] = {0.001, 30, 0.25, 0.0, 0.0,//HACD
                                           0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
             try {
@@ -87,6 +91,11 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
         // Recompute mass and ineratia to fix object vibration
         // density of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
         simComputeMassAndInertia(mainHandle, 1.3f);
+        int brainHandle = simLoadModel("models/C_BrainC.ttm");
+        simSetObjectParent(brainHandle,mainHandle,1);
+        int collectionHandle = simCreateCollection("collection",0);
+        simAddObjectToCollection(collectionHandle,mainHandle,sim_handle_single,0);
+
     } else {
         //TODO no mesh data, CPPN generated no volume.
     }
@@ -115,8 +124,11 @@ std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
 /// Generate matrix with voxels
 void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, NEAT::NeuralNetwork &cppn)
 {
+    int boneMatrix[MATRIX_SIZE][MATRIX_SIZE][MATRIX_SIZE];
+    int motorMatrix[MATRIX_SIZE][MATRIX_SIZE][MATRIX_SIZE];
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
-    double output; // Variable used to store the output of the NN.
+    double voxelOutput; // Variable used to store the output of the NN.
+    double wheelOutput; // Variable used to store the output of the NN.
     // Create NN
     // Generate NN from template
     // genome.BuildPhenotype(neuralNetwork);
@@ -133,17 +145,23 @@ void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, N
                 // Activate NN
                 cppn.Activate();
                 // Take output from NN and store it.
-                output = cppn.Output()[0];
+                voxelOutput = cppn.Output()[0];
+                wheelOutput = cppn.Output()[1];
                 // If output greater than threshold write voxel.
+                // NOTE: Hard boundaries seem to work better with convex decomposition
+#define HARD_BOUNDARIES 0
 #ifdef HARD_BOUNDARIES
                 uint8_t uVoxelValue = 0;
-                if(output > 0.5){
+                if(voxelOutput > 0.5){
                     uVoxelValue = 255;
                 }
 #else
-                output = std::min(1.0, std::max(0.0, output));
-                uint8_t uVoxelValue = static_cast<uint8_t>(output*255.0);
+                voxelOutput = std::min(1.0, std::max(0.0, output));
+                uint8_t uVoxelValue = static_cast<uint8_t>(voxelOutput*255.0);
 #endif
+                if(wheelOutput > 0.5){
+                    uVoxelValue = 0;
+                }
                 volData.setVoxel(x, y, z, uVoxelValue);
             }
         }
@@ -233,10 +251,10 @@ void ER_VoxelInterpreter::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &volData
 {
     // Size of head slot: 11.4cm x 10.0 cm
     // This is roughly 33.5 by 29.4 voxels with voxel size of 3.4mm.
-    const int xUpperLimit = 17;
-    const int xLowerLimit = -17;
-    const int yUpperLimit = 15;
-    const int yLowerLimit = -15;
+    const int xUpperLimit = 16;  // Was: 15
+    const int xLowerLimit = -16; // Was: 15
+    const int yUpperLimit = 18; // Was: 17
+    const int yLowerLimit = -18; // Was: 17
     auto region = volData.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
