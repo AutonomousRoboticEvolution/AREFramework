@@ -83,7 +83,7 @@ void EA_MultiNEAT::initializePopulation(const NEAT::Parameters &params)
     /// Defines the initial conditions of the genome
     // (?, number of inputs, number if hidden neurons/layers?, number of outputs, ?, output activation function,
     // (hidden activation function, ?, parameters, number of layers)
-    NEAT::Genome neat_genome(0, 3, 3, 4, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
+    NEAT::Genome neat_genome(0, 3, 3, 5, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
     population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
 
     /// Create population of genomes

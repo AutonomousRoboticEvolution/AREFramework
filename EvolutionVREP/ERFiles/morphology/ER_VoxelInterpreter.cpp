@@ -20,13 +20,17 @@ ER_VoxelInterpreter::~ER_VoxelInterpreter()
 void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompose)
 {
     // Create voxel-matrix
-    PolyVox::RawVolume<uint8_t> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
-    // Generate voxels
-    generateVoxels(volData, neuralNetwork);
-    // Post-processing
-    emptySpaceForHead(volData);
+    PolyVox::RawVolume<AREVoxel> volData(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    PolyVox::RawVolume<uint8_t > density(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    // Decode genome
+    genomeDecoder(volData, neuralNetwork);
+    /// Post-processing functions
+    regionCounter(volData, density);
+    generateSkeleton(volData, density); // Generate skeleton without modifications
+    emptySpaceForHead(density); // Make space for head organ.
+
     // Marching cubes - we might not need this step at the beginning.
-    auto mesh = PolyVox::extractMarchingCubesMesh(&volData, volData.getEnclosingRegion());
+    auto mesh = PolyVox::extractMarchingCubesMesh(&density, density.getEnclosingRegion());
     // I'm not sure if we need this step.
     auto decodedMesh = PolyVox::decodeMesh(mesh);
     // Get vertices and indices.
@@ -122,16 +126,10 @@ std::shared_ptr<Morphology> ER_VoxelInterpreter::clone()
 }
 
 /// Generate matrix with voxels
-void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, NEAT::NeuralNetwork &cppn)
+void ER_VoxelInterpreter::genomeDecoder(PolyVox::RawVolume<AREVoxel>& volData, NEAT::NeuralNetwork &network)
 {
-    int boneMatrix[MATRIX_SIZE][MATRIX_SIZE][MATRIX_SIZE];
-    int motorMatrix[MATRIX_SIZE][MATRIX_SIZE][MATRIX_SIZE];
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
-    double voxelOutput; // Variable used to store the output of the NN.
-    double wheelOutput; // Variable used to store the output of the NN.
-    // Create NN
-    // Generate NN from template
-    // genome.BuildPhenotype(neuralNetwork);
+    AREVoxel areVoxel;
     // Generate voxel matrix
     auto region = volData.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
@@ -141,34 +139,31 @@ void ER_VoxelInterpreter::generateVoxels(PolyVox::RawVolume<uint8_t>& volData, N
                 input[1] = static_cast<double>(y); //y/(volData.getHeight()/2.0);
                 input[2] = static_cast<double>(z); //z/(volData.getWidth()/2.0);
                 // Set inputs to NN
-                cppn.Input(input);
+                network.Input(input);
                 // Activate NN
-                cppn.Activate();
+                network.Activate();
                 // Take output from NN and store it.
-                voxelOutput = cppn.Output()[0];
-                wheelOutput = cppn.Output()[1];
+                areVoxel.bone = network.Output()[0];
+                areVoxel.wheel = network.Output()[1];
                 // If output greater than threshold write voxel.
                 // NOTE: Hard boundaries seem to work better with convex decomposition
-#define HARD_BOUNDARIES 0
-#ifdef HARD_BOUNDARIES
-                uint8_t uVoxelValue = 0;
-                if(voxelOutput > 0.5){
-                    uVoxelValue = 255;
-                }
-#else
-                voxelOutput = std::min(1.0, std::max(0.0, output));
-                uint8_t uVoxelValue = static_cast<uint8_t>(voxelOutput*255.0);
-#endif
-                if(wheelOutput > 0.5){
-                    uVoxelValue = 0;
-                }
-                volData.setVoxel(x, y, z, uVoxelValue);
+//#define HARD_BOUNDARIES 0
+//#ifdef HARD_BOUNDARIES
+//                uint8_t uVoxelValue = 0;
+//                if(voxelOutput > 0.5){
+//                    uVoxelValue = 255;
+//                }
+//#else
+//                voxelOutput = std::min(1.0, std::max(0.0, output));
+//                uint8_t uVoxelValue = static_cast<uint8_t>(voxelOutput*255.0);
+//#endif
+                volData.setVoxel(x, y, z, areVoxel);
             }
         }
     }
 }
 /// Get indices and vertices from mesh file
-void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh,
+void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t >> &decodedMesh,
                                              std::vector<simFloat>& vertices, std::vector<simInt>& indices)
 {
     const unsigned int n_vertices = decodedMesh.getNoOfVertices();
@@ -255,15 +250,107 @@ void ER_VoxelInterpreter::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &volData
     const int xLowerLimit = -16; // Was: 15
     const int yUpperLimit = 18; // Was: 17
     const int yLowerLimit = -18; // Was: 17
+    uint8_t uVoxelValue = 0;
     auto region = volData.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 if(x <= xUpperLimit && x >= xLowerLimit && y <= yUpperLimit && y >= yLowerLimit){
-                    volData.setVoxel(x, y, z, 0.0);
+                    volData.setVoxel(x, y, z, uVoxelValue);
                 }
             }
         }
     }
 
+}
+
+void ER_VoxelInterpreter::generateSkeleton(PolyVox::RawVolume<AREVoxel>& volData, PolyVox::RawVolume<uint8_t>& density)
+{
+    AREVoxel areVoxel;
+    uint8_t uVoxelValue;
+    // Generate voxel matrix
+    auto region = volData.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                areVoxel = volData.getVoxel(x, y, z);
+                // If output greater than threshold write voxel.
+                // NOTE: Hard boundaries seem to work better with convex decomposition
+#define HARD_BOUNDARIES 0
+#ifdef HARD_BOUNDARIES
+                if(areVoxel.bone > 0.5){
+                    uVoxelValue = 255;
+                }
+                else{
+                    uVoxelValue = 0;
+                }
+#else
+                uVoxelValue = std::min(1.0, std::max(0.0, areVoxel.bone));
+                uVoxelValue = static_cast<uint8_t>(uVoxelValue*255.0);
+#endif
+                density.setVoxel(x, y, z, uVoxelValue);
+            }
+        }
+    }
+}
+
+void ER_VoxelInterpreter::regionCounter(PolyVox::RawVolume<AREVoxel> &volData, PolyVox::RawVolume<uint8_t> &density)
+{
+    // This matrix stores the visited elements.
+    PolyVox::RawVolume<uint8_t > places(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    AREVoxel areVoxel;
+    int blobCounter = 0;
+    auto region = volData.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                places.setVoxel(x, y, z, 0);
+            }
+        }
+    }
+
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                areVoxel = volData.getVoxel(x, y, z);
+                if(areVoxel.bone > 125 && places.getVoxel(x, y, z) == 0){
+                    blobCounter++;
+                    exploration(volData, places, x, y, z);
+                }
+                else{
+                    exploration(volData, places, x, y, z);
+                }
+
+            }
+        }
+    }
+    std::cout << blobCounter << std::endl;
+}
+
+void ER_VoxelInterpreter::exploration(PolyVox::RawVolume<AREVoxel> &volData, PolyVox::RawVolume<uint8_t> &places, int32_t posX, int32_t posY, int32_t posZ)
+{
+    AREVoxel areVoxel;
+    auto region = volData.getEnclosingRegion();
+    std::cout << places.getVoxel(posX, posY, posZ) << std::endl;
+    if(places.getVoxel(posX, posY, posZ) == 0){ // If this cell has not been visited
+        places.setVoxel(posX, posY, posZ, 255); // Cell visited
+        areVoxel = volData.getVoxel(posX, posY, posZ);
+        if(areVoxel.bone > 125){ // Is this the correct threshold?
+            posX -= 1;
+            if(posX > region.getLowerX()) exploration(volData, places, posX, posY, posZ);
+            posX += 2;
+            if(posX < region.getUpperX()) exploration(volData, places, posX, posY, posZ);
+            posX -= 1;
+            posY -= 1;
+            if(posY > region.getLowerY()) exploration(volData, places, posX, posY, posZ);
+            posY += 2;
+            if(posY < region.getUpperY()) exploration(volData, places, posX, posY, posZ);
+            posY -= 1;
+            posZ -= 1;
+            if(posZ > region.getLowerZ()) exploration(volData, places, posX, posY, posZ);
+            posZ += 2;
+            if(posZ < region.getUpperZ()) exploration(volData, places, posX, posY, posZ);
+            posZ -= 1;
+        }
+    }
 }

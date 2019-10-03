@@ -21,16 +21,23 @@ public:
     void update() override;
     void create() override;
 
-    /// Generate matrix with voxels
-    void generateVoxels(PolyVox::RawVolume<uint8_t>& volData, NEAT::NeuralNetwork &network);
+    // Class for AREVoxel
+    struct AREVoxel{
+        uint8_t bone;
+        uint8_t wheel;
+    };
+    /// Decode genome (CPPN --> Matrix)
+    void genomeDecoder(PolyVox::RawVolume<AREVoxel>& volData, NEAT::NeuralNetwork &network);
     /// Export mesh from list of vertices and indices
     void exportMesh(std::vector<simFloat> vertices, std::vector<simInt> indices);
     /// Get indices and vertices from mesh file
     void getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>>& decodedMesh, std::vector<simFloat>& vertices, std::vector<simInt>& indices);
 
     /// Voxel-matrix post-processing methods.
-    /// Empty space for head organ.
-    void emptySpaceForHead(PolyVox::RawVolume<uint8_t>& volData);
+    void generateSkeleton(PolyVox::RawVolume<AREVoxel>& volData, PolyVox::RawVolume<uint8_t>& density); /// Generate complete skeleton (without alterations)
+    void emptySpaceForHead(PolyVox::RawVolume<uint8_t>& volData); /// Empty space for head organ.
+    void regionCounter(PolyVox::RawVolume<AREVoxel>& volData, PolyVox::RawVolume<uint8_t>& density);
+    void exploration(PolyVox::RawVolume<AREVoxel>& volData, PolyVox::RawVolume<uint8_t>& places, int32_t posX, int32_t posY, int32_t posZ);
 
     std::shared_ptr<Morphology> clone();
 
