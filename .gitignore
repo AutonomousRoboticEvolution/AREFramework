@@ -6,3 +6,8 @@
 html/
 latex/
 /cmake-build-debug/
+
+
+*/__pycache__/
+*/.idea/*
+RoboFab/Documentation/*
