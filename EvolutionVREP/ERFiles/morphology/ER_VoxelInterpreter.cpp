@@ -25,8 +25,8 @@ void ER_VoxelInterpreter::init(NEAT::NeuralNetwork &neuralNetwork, bool decompos
     // Decode genome
     genomeDecoder(volData, neuralNetwork);
     /// Post-processing functions
-    regionCounter(volData, density);
     generateSkeleton(volData, density); // Generate skeleton without modifications
+    regionCounter(volData, density);
     emptySpaceForHead(density); // Make space for head organ.
 
     // Marching cubes - we might not need this step at the beginning.
@@ -143,21 +143,16 @@ void ER_VoxelInterpreter::genomeDecoder(PolyVox::RawVolume<AREVoxel>& volData, N
                 // Activate NN
                 network.Activate();
                 // Take output from NN and store it.
-                areVoxel.bone = network.Output()[0];
-                areVoxel.wheel = network.Output()[1];
-                // If output greater than threshold write voxel.
-                // NOTE: Hard boundaries seem to work better with convex decomposition
-//#define HARD_BOUNDARIES 0
-//#ifdef HARD_BOUNDARIES
-//                uint8_t uVoxelValue = 0;
-//                if(voxelOutput > 0.5){
-//                    uVoxelValue = 255;
-//                }
-//#else
-//                voxelOutput = std::min(1.0, std::max(0.0, output));
-//                uint8_t uVoxelValue = static_cast<uint8_t>(voxelOutput*255.0);
-//#endif
+                areVoxel.bone = 0;
+                areVoxel.wheel = 0;
+                if(network.Output()[0] > 0.5){
+                    areVoxel.bone = 255;
+                }
+                if(network.Output()[1] > 0.5){
+                    areVoxel.wheel = 255;
+                }
                 volData.setVoxel(x, y, z, areVoxel);
+
             }
         }
     }
@@ -308,49 +303,41 @@ void ER_VoxelInterpreter::regionCounter(PolyVox::RawVolume<AREVoxel> &volData, P
             }
         }
     }
-
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 2) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 2) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 2) {
                 areVoxel = volData.getVoxel(x, y, z);
                 if(areVoxel.bone > 125 && places.getVoxel(x, y, z) == 0){
                     blobCounter++;
                     exploration(volData, places, x, y, z);
                 }
-                else{
-                    exploration(volData, places, x, y, z);
+                if(places.getVoxel(x, y, z) == 0){
+                    std::cout << "Message!" << std::endl;
                 }
-
             }
         }
     }
-    std::cout << blobCounter << std::endl;
 }
 
 void ER_VoxelInterpreter::exploration(PolyVox::RawVolume<AREVoxel> &volData, PolyVox::RawVolume<uint8_t> &places, int32_t posX, int32_t posY, int32_t posZ)
 {
     AREVoxel areVoxel;
     auto region = volData.getEnclosingRegion();
-    std::cout << places.getVoxel(posX, posY, posZ) << std::endl;
-    if(places.getVoxel(posX, posY, posZ) == 0){ // If this cell has not been visited
-        places.setVoxel(posX, posY, posZ, 255); // Cell visited
-        areVoxel = volData.getVoxel(posX, posY, posZ);
-        if(areVoxel.bone > 125){ // Is this the correct threshold?
-            posX -= 1;
-            if(posX > region.getLowerX()) exploration(volData, places, posX, posY, posZ);
-            posX += 2;
-            if(posX < region.getUpperX()) exploration(volData, places, posX, posY, posZ);
-            posX -= 1;
-            posY -= 1;
-            if(posY > region.getLowerY()) exploration(volData, places, posX, posY, posZ);
-            posY += 2;
-            if(posY < region.getUpperY()) exploration(volData, places, posX, posY, posZ);
-            posY -= 1;
-            posZ -= 1;
-            if(posZ > region.getLowerZ()) exploration(volData, places, posX, posY, posZ);
-            posZ += 2;
-            if(posZ < region.getUpperZ()) exploration(volData, places, posX, posY, posZ);
-            posZ -= 1;
+    places.setVoxel(posX, posY, posZ, 255); // Cell visited
+    // Explore neighbourhood.
+    for (int dz = -2; dz <= 2; dz+=2) {
+        for (int dy = -2; dy <= 2; dy+=2) {
+            for (int dx = -2; dx <= 2; dx+=2) {
+                if (posX + dx > region.getLowerX() && posX + dx < region.getUpperX() &&
+                    posY + dy > region.getLowerY() && posY + dy < region.getUpperY() &&
+                    posZ + dz > region.getLowerZ() && posZ + dz < region.getUpperZ()) {
+                    areVoxel = volData.getVoxel(posX+dx, posY+dy, posZ+dz);
+                    if (places.getVoxel(posX + dx, posY + dy, posZ + dz) == 0 && areVoxel.bone > 120) {
+                        exploration(volData, places, posX + dx, posY + dy, posZ + dz);
+                    }
+                }
+            }
         }
     }
+
 }
