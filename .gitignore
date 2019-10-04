@@ -1,10 +1,12 @@
 /.vscode/
 /.idea/
 /build/
-/cmake-build-*/
+/vrepPluggin/cmake-build-debug/
 .DS_Store
 html/
 latex/
+/cmake-build-debug/
+
 
 */__pycache__/
 */.idea/*
