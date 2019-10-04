@@ -41,9 +41,9 @@ class AssemblyFixture:
             self.homeStepperMotor ()
 
 
-
+    # send the AF to a demanded angular position. This will also update the returned value of AF.currentPosition
     def setPosition ( self, positionDemandRadians ):
-        debugPrint ( "AF: going to position: " + str ( positionDemandRadians ) )
+        debugPrint ( "AF: going to position: " + str ( positionDemandRadians ) ,messageVerbosity= 1)
         if self.HOME_BETWEEN_EVERY_MOVE:
             self.homeStepperMotor()
         self.messageToSend = str ( math.degrees ( positionDemandRadians ) )
@@ -51,12 +51,12 @@ class AssemblyFixture:
         self.updateSerial ()
 
     def turnElectromagnetsOn ( self ):
-        debugPrint ( "AF: I've been told to turn on the electro magnets." )
+        debugPrint ( "AF: I've been told to turn on the electromagnets." )
         self.messageToSend = "h"  # hold (h) robot
         self.updateSerial ()
 
     def turnElectromagnetsOff ( self ):
-        debugPrint ( "AF: I've been told to turn off the electro magnets." )
+        debugPrint ( "AF: I've been told to turn off the electromagnets." )
         self.messageToSend = "r"  # release (r) robot
         self.updateSerial ()
 
@@ -97,7 +97,7 @@ class AssemblyFixture:
         self.arduino.write ( self.messageToSend.encode () )
         debugPrint ( "Sent" )
 
-## Object that deals with the "bank", i.e. the storage place for organs and cables before they are put into a robot.
+## Object that deals with a "bank", i.e. the storage place for organs and/or cables before they are put into a robot.
 class Bank:
     def __init__ ( self, configData , dictionaryOfAllOrganTypes=None ):
         ## Bank.origin is a pose defining the point relative to which the organ and cable storage positions are defined

@@ -68,20 +68,23 @@ class UR5Robot:
             time.sleep ( 0.1 )
         self.setMoveSpeed ( self.speedValueNormal )
         debugPrint("UR5 set up, going to home")
-        self.moveJointAngles(self.HOME_POSITIONS["home"])
+        self.moveArmToJointAngles( self.HOME_POSITIONS[ "home" ] )
         debugPrint("Home")
 
+    ## function to make the large movements between different areas ("stations"), e.g. printer, assembly fixture, bank etc.
+    # This will do a joni-space move between the pre-defined home positions for each station (defined as joint values in the config file)
+    # The input should be a string, the name of the station to move to, as defined in the config file
     def moveBetweenStations( self , stationToMoveTo="home" ):
         debugPrint("moving from station "+str(self.currentStation)+" to station "+str(stationToMoveTo))
 
         currentStationCrouched =  [self.HOME_POSITIONS[self.currentStation][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[self.currentStation][5]]
         destinationStationCrouched =  [self.HOME_POSITIONS[stationToMoveTo][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[stationToMoveTo][5]]
 
-        self.moveJointAngles(self.HOME_POSITIONS[self.currentStation])
+        self.moveArmToJointAngles( self.HOME_POSITIONS[self.currentStation ] )
         if stationToMoveTo != self.currentStation:
-            self.moveJointAngles(currentStationCrouched)
-            self.moveJointAngles(destinationStationCrouched)
-            self.moveJointAngles(self.HOME_POSITIONS[stationToMoveTo])
+            self.moveArmToJointAngles( currentStationCrouched )
+            self.moveArmToJointAngles( destinationStationCrouched )
+            self.moveArmToJointAngles( self.HOME_POSITIONS[stationToMoveTo ] )
             self.currentStation = stationToMoveTo
 
     ## Low-level function to send a text string to UR5 controller
@@ -109,10 +112,9 @@ class UR5Robot:
 
 
     ## Linear movement
-    #
-    #  Executes the "movel" URScript command.
-    def moveArm ( self, transformToSend ):
-        poseToSend = convertTransformToPose ( transformToSend )  # convert to "pose" format as expected by UR5
+    #  Executes the "movel" URScript command, to create a linear motion from the current position to positionTransform (in UR5 base frame)
+    def moveArm ( self, positionTransform ):
+        poseToSend = convertTransformToPose ( positionTransform )  # convert to "pose" format as expected by UR5
         self.waitForArmToBeReady ()
         self.sendString ( "movel" )  # command for linear move
         time.sleep ( 0.01 )  # prevents the two packages getting merged
@@ -120,7 +122,7 @@ class UR5Robot:
 
     ## Movement where the position is specified in cartesian (transformation matrix), but movement will be linear in the joint space.
     #  Executes the "movej" URScript command.
-    def moveJ ( self, transformToSend ):
+    def moveArmLinearInJointSpace ( self, transformToSend ):
         poseToSend = convertTransformToPose ( transformToSend )  # convert to "pose" format as expected by UR5
         self.waitForArmToBeReady ()
         self.sendString ( "move_j" )  # command for linear move
@@ -128,7 +130,7 @@ class UR5Robot:
         self.sendString ( "(" + str ( poseToSend ) [ 1:-1 ] + ")" )    ## Joint space movement
 
     ## Movement where the position is specified as a set of target joint positions (in radians)
-    def moveJointAngles ( self, listOfJointAngles ):
+    def moveArmToJointAngles ( self, listOfJointAngles ):
         self.waitForArmToBeReady ()
         self.sendString ( "move_j_joints" )  # command for linear move
         time.sleep ( 0.01 )  # prevents the two packages getting merged
@@ -137,6 +139,7 @@ class UR5Robot:
     def setHome( self , home ):
         self.homePosition=home
 
+    # TCP = tool center point = transform so the arm uses it inverse kinematics to move the end of the gripper to the right place
     def setTCP( self, transformToSend ):
         poseToSend = convertTransformToPose ( transformToSend )  # convert to "pose" format as expected by UR5
         self.waitForArmToBeReady ()
@@ -254,8 +257,8 @@ class UR5Robot:
     # core organ should already be inserted when this is called
     def removeRobotFromPrinter( self , robot, assemblyFixture ,gripperTCP ,actualDropoffPosition ):
         coreOrgan = robot.organsList[0]
-        vertical_clearance = 0.120
-        vertical_clearanceForPullingUp = 0.025
+        verticalClearanceBeforePickingUp = 0.120
+        verticalClearanceForPostPickup = 0.025
         bedRemovalPullUpAngle = math.radians( 30 )
         postInsertExtraPushDistance = assemblyFixture.CORE_ORGAN_ATTACHMENT_Z_OFFSET
         heightAboveClipApproach = 20.0/1000
@@ -276,7 +279,7 @@ class UR5Robot:
             self.setGripperPosition (GRIPPER_OPEN_POSITION_FOR_CLIPS)
             for i in range(len(robot.printbedPullPoints)):
                 clipPosition = robot.origin*robot.printbedPullPoints[i]
-                self.moveArm(makeTransform([0,0,vertical_clearance]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
+                self.moveArm(makeTransform([0,0,verticalClearanceBeforePickingUp]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
                 self.moveArm( clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back
                 self.moveArm( clipPosition ) #clip position
                 self.setGripperPosition(1.0)
@@ -284,7 +287,7 @@ class UR5Robot:
                 self.moveArm( clipPosition ) # back to starting (theoretical) clip position
                 self.setGripperPosition(GRIPPER_OPEN_POSITION_FOR_CLIPS)
                 self.moveArm( clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back
-                self.moveArm(makeTransform([0,0,vertical_clearance]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
+                self.moveArm(makeTransform([0,0,verticalClearanceBeforePickingUp]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
 
         ## pick up by the core organ and take to assembly fixture:
         gripPosition = np.linalg.inv(coreOrgan.transformOrganOriginToGripper) * coreOrgan.transformOrganOriginToClipCentre
@@ -296,15 +299,15 @@ class UR5Robot:
         # note these are all transform matrices (not poses) and the desired position of the organ origin at these points
         pickupPoint = actualDropoffPosition
         prePickupPoint = makeTransform (
-            [ 0, 0, vertical_clearance ] ) * pickupPoint  # point above pickup point by vertical_clearance
+            [ 0, 0, verticalClearanceBeforePickingUp ] ) * pickupPoint  # point above pickup point by verticalClearanceBeforePickingUp
         # postPickupPoint = makeTransform(
-        #     [0, -vertical_clearance*math.tan(bedRemovalPullUpAngle), vertical_clearance]) * pickupPoint  # point move to just after grabbing - defined to pull up at an angle
-        postPickupPoint = pickupPoint * makeTransform([vertical_clearanceForPullingUp*math.tan(bedRemovalPullUpAngle) , -vertical_clearanceForPullingUp*math.tan(bedRemovalPullUpAngle) , vertical_clearanceForPullingUp])# point move to just after grabbing - designed to pull up at an angle
+        #     [0, -verticalClearanceBeforePickingUp*math.tan(bedRemovalPullUpAngle), verticalClearanceBeforePickingUp]) * pickupPoint  # point move to just after grabbing - defined to pull up at an angle
+        postPickupPoint = pickupPoint * makeTransform([verticalClearanceForPostPickup*math.tan(bedRemovalPullUpAngle) , -verticalClearanceForPostPickup*math.tan(bedRemovalPullUpAngle) , verticalClearanceForPostPickup])# point move to just after grabbing - designed to pull up at an angle
         dropoffPoint = assemblyFixtureLocation * coreOrgan.positionTransformWithinBankOrRobot * makeTransform (
             [ 0, 0, -postInsertExtraPushDistance ] )
         preDropoffPoint = dropoffPoint * makeTransform (
-            [ 0, 0, vertical_clearance ] )  # point back from (in organ frame) final position
-        postDropoffPoint = makeTransform ([ 0, 0, -vertical_clearance ] )  * dropoffPoint # linear move back toward the "safe" position
+            [ 0, 0, verticalClearanceBeforePickingUp ] )  # point back from (in organ frame) final position
+        postDropoffPoint = makeTransform ([ 0, 0, -verticalClearanceBeforePickingUp ] )  * dropoffPoint # linear move back toward the "safe" position
         preForceModePoint = dropoffPoint * makeTransform (
             [ 0, 0,
               distanceForCompliantMove + postInsertExtraPushDistance ] )  # point back from final position from which to start force mode
@@ -320,7 +323,7 @@ class UR5Robot:
             self.moveWithForceForBedRemoval ( postPickupPoint )
         self.moveArm ( postPickupPoint )
         if pushBackIntoBedAfterPickup:
-            self.moveArm(pickupPoint*makeTransform([0,0,vertical_clearanceForPullingUp]))
+            self.moveArm(pickupPoint*makeTransform([0,0,verticalClearanceForPostPickup]))
             self.moveArm(pushBackIntoBedPosition)
         self.setTCP ( gripperTCP * gripPosition )
         self.moveArm(prePickupPoint)
@@ -334,7 +337,7 @@ class UR5Robot:
         assemblyFixture.turnElectromagnetsOn()
 
         # dropoff:
-        self.moveJ ( preDropoffPoint )  # above (or below, in real world...) dropoff
+        self.moveArmLinearInJointSpace ( preDropoffPoint )  # above (or below, in real world...) dropoff
         self.setMoveSpeed ( self.speedValueSlow )  # slow
 
         # force mode:
@@ -439,7 +442,7 @@ class UR5Robot:
         self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) * organInRobot.transformOrganOriginToClipCentre)  # TCP for pickup is centre of clip
         self.setMoveSpeed ( self.speedValueSlow )  # slow
         debugPrint("move to abovePreDropoffPoint",messageVerbosity=2)
-        self.moveJ ( abovePreDropoffPoint )  # above dropoff
+        self.moveArmLinearInJointSpace ( abovePreDropoffPoint )  # above dropoff
         # self.moveArm ( abovePreDropoffPoint )  # above dropoff
         debugPrint("move to preDropoffPoint",messageVerbosity=2)
         self.moveArm ( preDropoffPoint )

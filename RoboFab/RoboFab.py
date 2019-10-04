@@ -220,15 +220,18 @@ class RoboFab_host:
 
         return 0
 
+    def disconnectAll( self ):
+        self.UR5.stopArm()
+        self.AF.disableStepperMotor()
+
 
 ## Run an example
 if __name__ == "__main__":
+    debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # startup
     RoboFab = RoboFab_host ()
 
-
-    debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # open blueprint file
     # RoboFab.setupRobotObject ( robotID= "14104" )
@@ -241,6 +244,5 @@ if __name__ == "__main__":
     debugPrint("RoboFab completed")
 
     # disconnect gracefully:
-    RoboFab.UR5.gripper.disableServos()
-    RoboFab.UR5.stopArm()
-    RoboFab.AF.disableStepperMotor()
+    RoboFab.UR5.disableServoOnFinish=True # as we have reached the end of the code, should be safe to release the gripper
+    RoboFab.disconnectAll()

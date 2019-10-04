@@ -51,7 +51,7 @@ void loop() {
     char firstChar = inString.charAt(0);
     // If the first character is a digit (or a negative sign), do rotation
     if(isDigit(firstChar) || firstChar == '-'){
-      rotToDeg(inString.toFloat());
+      rotateToDegrees(inString.toFloat());
       Serial.write("OK\n");
     }
     else {
@@ -88,7 +88,7 @@ void loop() {
           Serial.write("OK\n");
           break;
         default:
-          Serial.write("error\n");
+          Serial.write("error - unrecognised input\n");
           break;
       }
     }
@@ -124,7 +124,7 @@ void disableOutputs(){
   digitalWrite(enablePin, HIGH);
 }
 // Rotate to a certain angle
-void rotToDeg(float deg){
+void rotateToDegrees(float deg){
   //Report target location if debugging
   if (DEBUG) Serial.print("Rotating to ");
   if (DEBUG) Serial.print(deg);
@@ -268,8 +268,8 @@ void findOrigin(){
     step(STEP_HOMING_DURATION_US);
   }
   
-	//Position is now known, we are at the endstop, so set the home position
-if(DEBUG) Serial.println("Found home");
+  //Position is now known, we are at the endstop, so set the home position
+  if(DEBUG) Serial.println("Found home");
   memRot = HOME_POSITION_DEG; //Ensure starting position is an offset from this location
 }
 
