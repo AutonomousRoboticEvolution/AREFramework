@@ -147,5 +147,4 @@ elseif(UNIX)
 endif()
 
 add_subdirectory(ERClient)
-add_subdirectory(MPI)
 add_subdirectory(VREP_Files)
