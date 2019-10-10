@@ -90,13 +90,8 @@ set(SOURCES
     ERFiles/VREPUI/VREPUI.cpp
     RandNum.cpp
     "${VREP_FOLDER}/programming/common/v_repLib.cpp"
-    #	ERFiles/control/Hormones.cpp
-    #	ERFiles/control/TransferNetwork.cpp
-    #	ERFiles/module/Module_Bend.cpp
-    #	ERFiles/module/Module_Brain.cpp
-    #	ERFiles/module/Module_Rectangle.cpp
-    #	ERFiles/module/Module_Spring.cpp
-        ERFiles/morphology/ER_VoxelInterpreter.cpp ERFiles/morphology/ER_VoxelInterpreter.h ERFiles/EA_MultiNEATGenome.cpp ERFiles/EA_MultiNEATGenome.h)
+    ERFiles/morphology/ER_VoxelInterpreter.cpp
+        )
 
 add_library(ER_library STATIC ${SOURCES})
 

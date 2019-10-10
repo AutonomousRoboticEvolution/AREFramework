@@ -3,7 +3,6 @@
 #include <algorithm>
 #include <vector>
 #include "Development.h"
-//#include "../../NEAT_LIB/NEAT_LIB/NeuralNetwork.h"
 #include "../module/ER_Module.h"
 #include "../module/ModuleFactory.h"
 

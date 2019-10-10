@@ -94,25 +94,6 @@ void EA_MultiNEAT::initializePopulation(const NEAT::Parameters &params)
         nextGenGenomes[i]->fitness = 0;
         nextGenGenomes[i]->individualNumber = i;
     }
-
-    /// From here and on the code should be else where.
-//    for(int i = 1; i <= 20; i++){
-//        double bestf = -std::numeric_limits<double>::infinity();
-//        for(unsigned int j = 0; j < population->m_Species.size(); j++){
-//            for(unsigned int k = 0; k < population->m_Species[j].m_Individuals.size(); k++){
-//                population->m_Species[j].m_Individuals[k].SetFitness(randomNum->randFloat(0,1));
-//                population->m_Species[j].m_Individuals[k].SetEvaluated();
-//                std::vector<double> inputs {0.0,1.0};
-//                NEAT::NeuralNetwork neuralNetwork;
-//                genome.BuildPhenotype(neuralNetwork);
-//                neuralNetwork.Input(inputs);
-//                neuralNetwork.Activate();
-//                double result = neuralNetwork.Output()[0];
-//                std::cout << result << std::endl;
-//            }
-//        }
-//        population->Epoch();
-//    }
 }
 
 void EA_MultiNEAT::epoch()
