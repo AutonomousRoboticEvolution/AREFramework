@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
 if (NOT VREP_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
 else()
@@ -20,6 +22,8 @@ else()
     endif()
 endif()
 
+find_package(MultiNEAT REQUIRED)
+find_package(PolyVox REQUIRED)
 
 set(SOURCES
     ERFiles/control/ANN.cpp
@@ -37,7 +41,8 @@ set(SOURCES
     ERFiles/EA_SteadyState.cpp
     ERFiles/EA_VREP.cpp
     ERFiles/EA.cpp
-    ERFiles/EA_NEAT.cpp
+    ERFiles/EA_MultiNEAT.cpp
+    ERFiles/EA_MultiNEAT.h
     ERFiles/env/Environment.cpp
     ERFiles/env/EnvironmentFactory.cpp
     ERFiles/env/MoveEnv.cpp
@@ -83,34 +88,12 @@ set(SOURCES
     ERFiles/neuron/SimpleNeuron.cpp
     ERFiles/Settings.cpp
     ERFiles/VREPUI/VREPUI.cpp
-    NEAT_LIB/NEAT_LIB/Genome.cpp
-    NEAT_LIB/NEAT_LIB/Innovation.cpp
-    NEAT_LIB/NEAT_LIB/NeuralNetwork.cpp
-    NEAT_LIB/NEAT_LIB/Parameters.cpp
-    NEAT_LIB/NEAT_LIB/PhenotypeBehavior.cpp
-    NEAT_LIB/NEAT_LIB/Population.cpp
-    NEAT_LIB/NEAT_LIB/Parameters.cpp
-    NEAT_LIB/NEAT_LIB/MainN.cpp
-    NEAT_LIB/NEAT_LIB/PythonBindings.cpp
-    NEAT_LIB/NEAT_LIB/Species.cpp
-    NEAT_LIB/NEAT_LIB/Random.cpp
-    NEAT_LIB/NEAT_LIB/Substrate.cpp
-    NEAT_LIB/NEAT_LIB/Traits.cpp
-    NEAT_LIB/NEAT_LIB/Utils.cpp
-    NEAT_LIB/NEAT_LIB/Assert.h
-    NEAT_LIB/NEAT_LIB/Genes.h
     RandNum.cpp
     "${VREP_FOLDER}/programming/common/v_repLib.cpp"
-    #	ERFiles/control/Hormones.cpp
-    #	ERFiles/control/TransferNetwork.cpp
-    #	ERFiles/module/Module_Bend.cpp
-    #	ERFiles/module/Module_Brain.cpp
-    #	ERFiles/module/Module_Rectangle.cpp
-    #	ERFiles/module/Module_Spring.cpp
-    NEAT_LIB/NEAT_LIB/stdafx.cpp NEAT_LIB/NEAT_LIB/stdafx.h)
+    ERFiles/morphology/ER_VoxelInterpreter.cpp
+        )
 
 add_library(ER_library STATIC ${SOURCES})
-
 
 target_include_directories(ER_library PUBLIC
     "${VREP_FOLDER}/programming/include"
@@ -127,6 +110,15 @@ set_target_properties(ER_library PROPERTIES
 
 add_library(v_repExtER SHARED 
     v_repExtER.cpp
+)
+
+target_link_libraries(ER_library
+    MultiNEAT::MultiNEAT
+)
+
+target_include_directories(ER_library
+    PRIVATE
+    ${PolyVox_INCLUDE_DIRS}
 )
 
 target_link_libraries(v_repExtER ER_library)

@@ -15,13 +15,15 @@ void Environment::sceneLoader() {
 }
 
 void Environment::init() {
+    if(settings->verbose){
+        std::cout << "Initialize Environment" << std::endl;
+    }
     // Every time the environment is created, it removes all objects and creates them again
 	envObjectHandles.clear();
 	initialPos.resize(3);
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
-	std::cout << "Environment initialized" << std::endl;
 	// Sets time step
 	simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
 }

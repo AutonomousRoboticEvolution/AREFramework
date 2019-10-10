@@ -2,6 +2,11 @@
 
 This project contains all the files necessary to run experiments for the Autonomous Robotics Evolution project.
 
+## Required libraries
+
+-MultiNEAT
+-PolyVox
+
 ## Installing
 
 In order to install this plu-in please open terminal in the current project and enter the following commands.

@@ -336,7 +336,7 @@ void ER_DirectEncoding::init()
 {
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	maxModuleTypes = settings->maxModuleTypes;
-	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->morphologyType != settings->QUADRUPED_DIRECT) {
+	if (settings->evolutionType != settings->EMBODIED_EVOLUTION) {
 		initializeGenome(0);
 	}
 	else {

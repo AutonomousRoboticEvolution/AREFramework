@@ -28,12 +28,8 @@ void ER_CPPN_Encoding::init()
 {
 	genome = shared_ptr<GENOTYPE>(new GENOTYPE);
 	maxModuleTypes = settings->maxModuleTypes;
-	if (settings->evolutionType != settings->EMBODIED_EVOLUTION && settings->morphologyType != settings->QUADRUPED_DIRECT) {
+	if (settings->evolutionType != settings->EMBODIED_EVOLUTION) {
 		initializeGenome(0);
-	}
-	else if (settings->morphologyType == settings->QUADRUPED_DIRECT) {
-		// not used in CPPN
-		cout << "CPPN encoding cannot yet create a quadruped" << endl;
 	}
 	
 }

@@ -106,7 +106,6 @@ void CustomMorphologyVREP::create()
     }
     vector<int> jointHandles = getJointHandles(mainHandle);
     outputHandles = jointHandles;
-
 }
 
 shared_ptr<Morphology> CustomMorphologyVREP::clone() const

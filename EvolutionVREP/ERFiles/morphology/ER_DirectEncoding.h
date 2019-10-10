@@ -4,7 +4,6 @@
 #include <vector>
 #include "Development.h"
 
-
 class ER_DirectEncoding : public Development
 {
 public:

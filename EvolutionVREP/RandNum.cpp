@@ -38,7 +38,7 @@ int RandNum::randInt(int range, int offset) {
 void RandNum::setSeed(int seed) {
 	srand(seed);
 	m_seed = seed;
-	std::cout << "seed set to " << seed << std::endl;
+	std::cout << "Seed set to " << seed << std::endl;
 }
 
 int RandNum::getSeed()

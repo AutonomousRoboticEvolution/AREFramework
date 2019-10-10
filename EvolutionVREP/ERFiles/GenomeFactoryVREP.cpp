@@ -1,5 +1,7 @@
 #include "GenomeFactoryVREP.h"
 
+#include <memory>
+
 using namespace std;
 
 GenomeFactoryVREP::GenomeFactoryVREP()
@@ -40,7 +42,7 @@ shared_ptr<Genome> GenomeFactoryVREP::convertToGenomeVREP(shared_ptr<Genome> gn)
 	shared_ptr<Genome> vrepGenome(new DefaultGenomeVREP); 
 	vrepGenome->randomNum = gn->randomNum;
 	vrepGenome->settings = gn->settings;
-	unique_ptr<MorphologyFactoryVREP> mf = unique_ptr<MorphologyFactoryVREP>(new MorphologyFactoryVREP);
+	unique_ptr<MorphologyFactoryVREP> mf = std::make_unique<MorphologyFactoryVREP>();
 	// vrepGenome->morph.reset();
 	// shared_ptr<Morphology> m = mf->convertMorph(gn->morph);
 	vrepGenome->morph = mf->convertMorph(gn->morph);

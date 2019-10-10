@@ -5,9 +5,7 @@
 .DS_Store
 html/
 latex/
-/cmake-build-debug/
-
-
-*/__pycache__/
-*/.idea/*
-RoboFab/Documentation/*
+cmake-build-*/
+ __pycache__/
+ .idea/
+ RoboFab/Documentation/*

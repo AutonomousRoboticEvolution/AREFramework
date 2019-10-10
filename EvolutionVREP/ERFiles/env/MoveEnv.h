@@ -9,7 +9,7 @@ class MoveEnv :
 public:
 	MoveEnv();
 	~MoveEnv();
-	void init();
+	void init() override;
 
     std::vector <float> pStart;
 	/// starting point
@@ -17,8 +17,8 @@ public:
 	/// end point
     std::vector <float> pEnd;
 
-	float fitnessFunction(MorphologyPointer morph);
-	float updateEnv(MorphologyPointer morph);
+	float fitnessFunction(MorphologyPointer morph) override;
+	float updateEnv(MorphologyPointer morph) override;
 
 	///time point to check the status of the robot
 	float timeCheck = 0.0;

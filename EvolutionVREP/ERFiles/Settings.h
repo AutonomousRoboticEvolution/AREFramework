@@ -114,25 +114,14 @@ public:
 		MODULAR_CPPN = 3,
 		MODULAR_DIRECT = 4,
 		CUSTOM_MORPHOLOGY = 5,
-        /// Deprecated
-        CUSTOM_MODULAR_MORPHOLOGY = 6, // not working
-        /// Deprecated
-        QUADRUPED_GENERATIVE = 7, // head missing
-        /// Deprecated
-		QUADRUPED_DIRECT = 8, // not working.
-        /// Deprecated
-		CUSTOM_SOLAR_GENERATIVE = 9,
-		TISSUE_DIRECT = 20,
-		TISSUE_GMX = 21,
-		INTEGRATION = 22,
-		/// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
-		MODULAR_PHENOTYPE = 11,
-		CPPN_NEAT_MORPH = 12
-
-
+		VOXEL_MORPHOLOGY = 6,
+		MODULAR_PHENOTYPE = 11, /// Used to load a modular robot from a phenotype file (phenotype<individualNumber>.csv)
+		CPPN_NEAT_MORPH = 12,
+        INTEGRATION = 22
 	};
 
-	enum ControlType {
+	enum ControlType
+    {
 	    /// Neural network that changes the topology of the network as well
 		ANN_DEFAULT = 0,
 		/// Neural network that doesn't change it's topology
@@ -160,8 +149,9 @@ public:
 		STEADY_STATE = 1,
 		GENERATIONAL = 2,
         /// deprecated
-		EA_NEAT = 3,
+//		EA_NEAT = 3,
 		EMBODIED_EVOLUTION = 4,
+		EA_MULTINEAT = 5,
 	};
 
 	/// Instance type defines in what mode the "Evolutionary Robotics" plugin runs // TODO: define name
@@ -182,7 +172,7 @@ public:
 
 
     StartingCondition startingCondition = COND_RUN_EVOLUTION_CLIENT;
-	InstanceType instanceType = INSTANCE_REGULAR;		// Whether the code runs in client or server mode
+	InstanceType instanceType;		// Whether the code runs in client or server mode
 	EvolutionType evolutionType = STEADY_STATE;			// Type of evolutionary algorithm used
 	FitnessType fitnessType = MOVE;						// Fitness type
 	EnvironmentType environmentType = DEFAULT_ENV;		// Environment type
@@ -289,8 +279,8 @@ public:
 	/**
 		@brief Set the repository for saving data
 	*/
-    void setRepository(std::string repository);
+    void setRepository(const std::string &repository);
 
 private:
-	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
+	static void split_line(std::string& line, const std::string& delim, std::list<std::string>& values);
 };
