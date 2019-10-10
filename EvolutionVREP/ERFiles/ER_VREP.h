@@ -48,7 +48,7 @@ public:
 	int individualToBeLoaded = -1;
 	/// Get the morphology reference
     std::shared_ptr<Morphology> getMorphology(Genome* g);
-
+    /// \todo Already decleared in parent
     std::shared_ptr<EA> ea;
 	///store the current genome
     std::shared_ptr<Genome> currentGenome;

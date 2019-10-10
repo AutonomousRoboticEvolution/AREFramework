@@ -769,7 +769,7 @@ void ER_LSystemInterpreter::create()
 	//}
 	//mf.reset();
 	initializeLSystem(settings->lIncrements, positionFirstObject); // amount increment is not in genome anymore
-	checkJointModule(); // quits simulator when no joint found.
+	//checkJointModule(); // quits simulator when no joint found.
 }
 
 int ER_LSystemInterpreter::getAmountBrokenModules()

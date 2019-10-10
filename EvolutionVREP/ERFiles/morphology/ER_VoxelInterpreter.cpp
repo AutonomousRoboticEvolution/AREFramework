@@ -164,7 +164,6 @@ void ER_VoxelInterpreter::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8
         return;
     }
 
-
     const PolyVox::Vector3DFloat *prev = nullptr;
     bool pointObject = true;
     for (unsigned int i=0; i < n_vertices; i++) {
@@ -285,52 +284,39 @@ void ER_VoxelInterpreter::generateSkeleton(PolyVox::RawVolume<AREVoxel>& areMatr
 void ER_VoxelInterpreter::regionCounter(PolyVox::RawVolume<AREVoxel> &areMatrix)
 {
     // This matrix stores the visited elements.
-    PolyVox::RawVolume<uint8_t > places(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
     AREVoxel areVoxel;
     int blobCounter = 0;
     auto region = areMatrix.getEnclosingRegion();
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                places.setVoxel(x, y, z, 0);
-            }
-        }
-    }
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 2) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 2) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 2) {
                 areVoxel = areMatrix.getVoxel(x, y, z);
-                if(areVoxel.bone > 125 && places.getVoxel(x, y, z) == 0){
+                if(areVoxel.bone > 125 && !visitedVoxels.getVoxel(x, y, z)){
                     blobCounter++;
-                    exploration(areMatrix, places, x, y, z);
-                }
-                if(places.getVoxel(x, y, z) == 0){
-                    std::cout << "Message!" << std::endl;
+                    exploration(areMatrix, visitedVoxels, x, y, z, areVoxel);
                 }
             }
         }
     }
 }
 
-void ER_VoxelInterpreter::exploration(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &places, int32_t posX, int32_t posY, int32_t posZ)
+void ER_VoxelInterpreter::exploration(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<bool> &visitedVoxels, int32_t posX, int32_t posY, int32_t posZ, AREVoxel areVoxel)
 {
-    AREVoxel areVoxel;
-    auto region = areMatrix.getEnclosingRegion();
-    places.setVoxel(posX, posY, posZ, 255); // Cell visited
+    visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     // Explore neighbourhood.
     for (int dz = -2; dz <= 2; dz+=2) {
         for (int dy = -2; dy <= 2; dy+=2) {
             for (int dx = -2; dx <= 2; dx+=2) {
-                if (posX + dx > region.getLowerX() && posX + dx < region.getUpperX() &&
-                    posY + dy > region.getLowerY() && posY + dy < region.getUpperY() &&
-                    posZ + dz > region.getLowerZ() && posZ + dz < region.getUpperZ()) {
+                if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
+                    posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
+                    posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
                     areVoxel = areMatrix.getVoxel(posX + dx, posY + dy, posZ + dz);
-                    if (places.getVoxel(posX + dx, posY + dy, posZ + dz) == 0 && areVoxel.bone > 120) {
-                        exploration(areMatrix, places, posX + dx, posY + dy, posZ + dz);
+                    if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && areVoxel.bone > 120) {
+                        exploration(areMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, areVoxel);
                     }
                 }
             }
         }
     }
-
 }

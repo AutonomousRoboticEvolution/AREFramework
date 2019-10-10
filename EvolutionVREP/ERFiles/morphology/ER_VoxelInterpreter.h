@@ -86,12 +86,12 @@ public:
     /**
      * @brief Explores the neighbourhood until no more voxels are found of a specific type.
      * @param areMatrix
-     * @param places
+     * @param visitedVoxels
      * @param posX
      * @param posY
      * @param posZ
      */
-    void exploration(PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t>& places, int32_t posX, int32_t posY, int32_t posZ);
+    void exploration(PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<bool>& visitedVoxels, int32_t posX, int32_t posY, int32_t posZ, AREVoxel areVoxel);
     /**
      * @brief Return the pointer of the morphology
      * @return Morphology share point
