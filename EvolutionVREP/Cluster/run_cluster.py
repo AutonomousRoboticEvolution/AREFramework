@@ -40,6 +40,56 @@ def run_client():
     ])
 
 
+def wait(servers, client, timeout=None):
+    for i, server in enumerate(servers):
+        ret = server.wait(timeout=timeout)
+        print(f'v-rep rank {i} finished with code {ret}')
+    if client is not None:
+        ret = client.wait(timeout=timeout)
+        print(f'Client finished with code {ret}')
+
+
+def kill(servers, client):
+    if client is None:
+        processes = servers
+    else:
+        processes = servers + [client]
+    for p in processes:
+        p.terminate()
+    try:
+        wait(servers, client, timeout=30)
+    except subprocess.TimeoutExpired:
+        for p in processes:
+            p.poll()
+            if p.returncode is not None:
+                p.kill()
+
+
+def main():
+    servers = []
+    client = None
+    try:
+        servers = run_servers(args.n_vrep)
+        client = run_client()
+
+        import time
+        time.sleep(1)
+
+    except:
+        import traceback
+        traceback.print_exc()
+        import sys
+        print(f'Exception occurred: killing processes', file=sys.stderr)
+        kill(servers, client)
+
+    finally:
+        try:
+            wait(servers, client)
+        except KeyboardInterrupt:
+            kill(servers, client)
+            wait(servers, client)
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('n_vrep', metavar='N', type=int,
@@ -65,14 +115,4 @@ if __name__ == "__main__":
                         help='path to the vrep starting script')
 
     args = parser.parse_args()
-    servers = run_servers(args.n_vrep)
-    client = run_client()
-
-    import time
-    time.sleep(1)
-
-    for i, server in enumerate(servers):
-        ret = server.wait()
-        print(f'v-rep rank {i} finished with code {ret}')
-    ret = client.wait()
-    print(f'Client finished with code {ret}')
+    main()
