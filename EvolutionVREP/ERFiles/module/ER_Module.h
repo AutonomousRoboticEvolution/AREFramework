@@ -7,7 +7,6 @@
 #include <functional>
 #include "v_repLib.h"
 #include "../control/Control.h"
-#include "../control/ControlFactory.h"
 #include "../../RandNum.h"
 
 

@@ -318,11 +318,12 @@ void ER_Module::setControlParams(std::vector<std::string> values)
 			tmp = values[it];
 			int controlType = atoi(tmp.c_str());
 			if (controlType != -1) {
-                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-				control = controlFactory->createNewControlGenome(controlType, randomNum, settings); // 0 is ANN, 1 is Custom_ANN
-				control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
+//                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//				control = controlFactory->createNewControlGenome(controlType, randomNum, settings); // 0 is ANN, 1 is Custom_ANN
+                control = controlFactory(controlType, randomNum, settings);
+                control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
 				control->setControlParams(values);
-				controlFactory.reset();
+//				controlFactory.reset();
 			}
 		}
 	}
