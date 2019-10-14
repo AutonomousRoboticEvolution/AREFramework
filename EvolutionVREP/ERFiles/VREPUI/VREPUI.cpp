@@ -1,6 +1,5 @@
 #include "VREPUI.h"
 
-using namespace std;
 
 VREPUI::VREPUI()
 {
@@ -10,7 +9,7 @@ VREPUI::~VREPUI()
 {
 }
 
-int VREPUI::createNNUI(vector<shared_ptr<ER_Module>> createdModules)
+int VREPUI::createNNUI(std::vector<std::shared_ptr<ER_Module>> createdModules)
 {
 	int buttonHandles[3] = {1, 2, 3};
 	int uiSize[2] = { 7,15 };
@@ -19,7 +18,7 @@ int VREPUI::createNNUI(vector<shared_ptr<ER_Module>> createdModules)
 	//button1
 	int button1pos[2] = { 0,1 };
 	int button1Size[2] = { 10,2 };
-	vector<int> uiSliders;
+    std::vector<int> uiSliders;
 	uiSliders.push_back(simCreateUIButton(uiHandle, button1pos, button1Size, sim_buttonproperty_slider));
 	//button2
 	int button2pos[2] = { 0,3 };
@@ -43,7 +42,7 @@ int VREPUI::createNNUI(vector<shared_ptr<ER_Module>> createdModules)
 	return uiHandle;
 }
 
-int VREPUI::createMorphUI(vector<shared_ptr<ER_Module>> createdModules)
+int VREPUI::createMorphUI(std::vector<std::shared_ptr<ER_Module>> createdModules)
 {
 	int uiSizeY = createdModules.size();
 	float white[3] = { 250,250,250 };
@@ -57,10 +56,10 @@ int VREPUI::createMorphUI(vector<shared_ptr<ER_Module>> createdModules)
 		int buttonPos[2] = { 0, i + 1 };
 		int buttonSize[2] = { 25,1 };
 		int labelHandle = simCreateUIButton(uiHandle, buttonPos, buttonSize, sim_buttonproperty_label);
-		string text = "Module " + to_string(i) + " is connected to module " +
-			to_string(createdModules[i]->parent) + " at site " + to_string(createdModules[i]->parentSite)
-			+ " in orientation " + to_string(createdModules[i]->orientation)
-			+ ", ID: " + to_string(createdModules[i]->moduleID);
+        std::string text = "Module " + std::to_string(i) + " is connected to module " +
+            std::to_string(createdModules[i]->parent) + " at site " + std::to_string(createdModules[i]->parentSite)
+            + " in orientation " + std::to_string(createdModules[i]->orientation)
+            + ", ID: " + std::to_string(createdModules[i]->moduleID);
 
 		simSetUIButtonLabel(uiHandle, labelHandle, text.c_str(), "hello");
 		simSetUIButtonColor(uiHandle, labelHandle, NULL, NULL, white);

@@ -3,11 +3,10 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
 
 CATVREP::CATVREP()
 {
-    va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
+    va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }
 
 
@@ -16,16 +15,16 @@ CATVREP::~CATVREP()
 //	cout << "delete CAT class" << endl; 
 }
 
-shared_ptr<Morphology> CATVREP::clone() const {
+std::shared_ptr<Morphology> CATVREP::clone() const {
 	// shared_ptr<Morphology>()
-	shared_ptr<CATVREP> cat = make_unique<CATVREP>(*this);
+    std::shared_ptr<CATVREP> cat = std::make_unique<CATVREP>(*this);
 //	cat->va = va->clone();
 	cat->control = control->clone();
 	return cat;
 }
 
-vector<float> CATVREP::vestibularUpdate() {
-	vector<float> nnInput;
+std::vector<float> CATVREP::vestibularUpdate() {
+    std::vector<float> nnInput;
 	simGetObjectOrientation(mainHandle, -1, va->headOrientation);
 	simGetObjectPosition(mainHandle, -1, va->headPosition);
 
@@ -65,8 +64,8 @@ vector<float> CATVREP::vestibularUpdate() {
 	return nnInput;
 }
 
-vector<float> CATVREP::tactileUpdate() {
-	vector<float> nnInput;
+std::vector<float> CATVREP::tactileUpdate() {
+    std::vector<float> nnInput;
 	for (int i = 0; i < feet.size(); i++) {
 		bool collisionI = simCheckCollision(floorHandle, feet[i]);
 		nnInput.push_back(collisionI);
@@ -74,8 +73,8 @@ vector<float> CATVREP::tactileUpdate() {
 	return nnInput;
 }
 
-vector<float> CATVREP::proprioUpdate() {
-	vector<float> nnInput;
+std::vector<float> CATVREP::proprioUpdate() {
+    std::vector<float> nnInput;
 	for (int i = 0; i < outputHandles.size(); i++) {
 		float jointPos[3];
 		simGetJointPosition(outputHandles[i], jointPos);
@@ -84,12 +83,12 @@ vector<float> CATVREP::proprioUpdate() {
 	return nnInput;
 }
 
-vector<float> CATVREP::catInputs() {
+std::vector<float> CATVREP::catInputs() {
 	// vestibular system
-	vector <float> nnInput;
-	vector <float> vInput = vestibularUpdate();
-	vector <float> tInput = tactileUpdate();
-	vector <float> pInput = proprioUpdate();
+    std::vector <float> nnInput;
+    std::vector <float> vInput = vestibularUpdate();
+    std::vector <float> tInput = tactileUpdate();
+    std::vector <float> pInput = proprioUpdate();
 	nnInput.insert(nnInput.end(), vInput.begin(), vInput.end());
 	nnInput.insert(nnInput.end(), tInput.begin(), tInput.end());
 	nnInput.insert(nnInput.end(), pInput.begin(), pInput.end());
@@ -101,20 +100,20 @@ vector<float> CATVREP::catInputs() {
 
 void CATVREP::update() {
 	if (control) {
-		vector<float> input; // get sensor parameters
+        std::vector<float> input; // get sensor parameters
 		input = catInputs();
-		vector<float> output = control->update(input);
+        std::vector<float> output = control->update(input);
 		for (int i = 0; i < output.size(); i++) {
 			simSetJointTargetPosition(outputHandles[i], output[i]);
 		}
 	}
 }
 
-vector<int> CATVREP::getObjectHandles(int parentHandle) {
+std::vector<int> CATVREP::getObjectHandles(int parentHandle) {
 	simAddObjectToSelection(sim_handle_tree, parentHandle);
 	int selectionSize = simGetObjectSelectionSize();
 	int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
-	vector<int> objectHandles;
+    std::vector<int> objectHandles;
 	//s_objectAmount = selectionSize;
 	simGetObjectSelection(tempObjectHandles);
     for (size_t i = 0; i < selectionSize; i++)
@@ -126,11 +125,11 @@ vector<int> CATVREP::getObjectHandles(int parentHandle) {
 	simRemoveObjectFromSelection(sim_handle_all, -1);
 	return objectHandles;
 }
-vector<int> CATVREP::getJointHandles(int parentHandle) {
+std::vector<int> CATVREP::getJointHandles(int parentHandle) {
 	simAddObjectToSelection(sim_handle_tree, parentHandle);
 	int selectionSize = simGetObjectSelectionSize();
 	int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
-	vector<int> jointHandles;
+    std::vector<int> jointHandles;
 	//s_objectAmount = selectionSize;
 	simGetObjectSelection(tempObjectHandles);
     for (size_t i = 0; i < selectionSize; i++)
@@ -150,7 +149,7 @@ int CATVREP::getMainHandle() {
 }
 
 void CATVREP::create() {
-	va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
+    va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
 	
 	//#ifdef __linux__ 
 	//linux code goes here
@@ -162,8 +161,8 @@ void CATVREP::create() {
 	catHandle = simGetObjectHandle("Cat_Head");
 	mainHandle = catHandle;
 	floorHandle = simGetObjectHandle("ResizableFloor_5_25");
-	vector<int> handles = getObjectHandles(catHandle);
-	vector<int> jointHandles = getJointHandles(catHandle);
+    std::vector<int> handles = getObjectHandles(catHandle);
+    std::vector<int> jointHandles = getJointHandles(catHandle);
 	feet.clear();
 	feet.push_back(simGetObjectHandle("Cat_FootLF"));
 	feet.push_back(simGetObjectHandle("Cat_FootRF"));

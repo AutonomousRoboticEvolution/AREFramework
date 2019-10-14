@@ -1,9 +1,7 @@
 #include "DefaultGenomeVREP.h"
 #include <iostream>
 
-using namespace std;
-
-DefaultGenomeVREP::DefaultGenomeVREP(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
+DefaultGenomeVREP::DefaultGenomeVREP(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
 	randomNum = rn;
 	settings = st;
@@ -16,7 +14,7 @@ DefaultGenomeVREP::~DefaultGenomeVREP()
 
 std::shared_ptr<MorphologyFactory> DefaultGenomeVREP::newMorphologyFactory()
 {
-	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
+    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
 	return morphologyFactory;
 }
 
@@ -38,13 +36,13 @@ void DefaultGenomeVREP::init()
 {
 	// This function calls a VREP based morphology factory which contains VREP specific functions. 
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
+    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 	morph->init();
 	// The control creation is the same as the one in DefaultGenome::init(). Code can be improved.
 	if (m_type == -1) { // not used
-		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+        std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 		morph->control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 		controlFactory.reset();
 	}
@@ -59,9 +57,9 @@ void DefaultGenomeVREP::init()
 	//moduleID
 }
 
-shared_ptr<Genome> DefaultGenomeVREP::clone() const
+std::shared_ptr<Genome> DefaultGenomeVREP::clone() const
 {
-	shared_ptr<DefaultGenomeVREP> p = make_unique<DefaultGenomeVREP>(*this);
+    std::shared_ptr<DefaultGenomeVREP> p = std::make_unique<DefaultGenomeVREP>(*this);
 	p->morph = this->morph->clone();
-	return p;
+    return std::move(p);
 }
