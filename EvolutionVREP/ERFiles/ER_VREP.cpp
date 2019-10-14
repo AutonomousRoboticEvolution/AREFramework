@@ -21,9 +21,10 @@ ER_VREP::~ER_VREP()
 void ER_VREP::initializeServer()
 {
 	// create the environment
-    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
-	environment = environmentFactory->createNewEnvironment(settings);
-	environmentFactory.reset();
+//    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
+//	environment = environmentFactory->createNewEnvironment(settings);
+//	environmentFactory.reset();
+    environment = environmentFactory(settings);
 	// initialize the environment
 	environment->init();
     std::unique_ptr<EA_Factory> eaf(new EA_Factory);
@@ -39,8 +40,9 @@ void ER_VREP::initializeSimulation()
 	genomeFactory = std::make_unique<GenomeFactoryVREP>();
 	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
-    EnvironmentFactory environmentFactory;
-	environment = environmentFactory.createNewEnvironment(settings);
+//    EnvironmentFactory environmentFactory;
+//	environment = environmentFactory.createNewEnvironment(settings);
+    environment = environmentFactory(settings);
     EA_Factory eaf;
 	ea = eaf.createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;

@@ -10,7 +10,7 @@
 #include <string>
 #include "ER.h"
 #include "env/Environment.h"
-#include "env/EnvironmentFactory.h"
+//#include "env/EnvironmentFactory.h"
 #include "v_repLib.h"
 #include "EA_Factory.h"
 
@@ -54,6 +54,8 @@ public:
     std::shared_ptr<Genome> currentGenome;
 	///used to create a genome
     std::shared_ptr<GenomeFactoryVREP> genomeFactory;
+
+    std::function<std::shared_ptr<Environment>(const std::shared_ptr<Settings>&)> environmentFactory;
 
 	/// Logs information about the fitness of each individual, best individual and list of individuals.
 	void saveSettings() override;
