@@ -4,6 +4,7 @@
 #include <memory>
 #include <sstream>
 #include <iostream>
+#include <functional>
 #include "v_repLib.h"
 #include "../control/Control.h"
 #include "../control/ControlFactory.h"
@@ -137,6 +138,11 @@ public:
 	bool expressed;
 
 	virtual void setModuleColor() = 0; 
+
+    std::function<
+        std::shared_ptr<Control>
+            (int type,std::shared_ptr<RandNum> rn,std::shared_ptr<Settings> st)>
+                controlFactory;
 	
 };
 

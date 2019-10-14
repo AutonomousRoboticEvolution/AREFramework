@@ -3,8 +3,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std; 
-
 Module_Cube::Module_Cube()
 {
 
@@ -13,7 +11,7 @@ Module_Cube::Module_Cube()
 
 Module_Cube::~Module_Cube()
 {
-	//cout << "REMOVING MODULE!" << endl; 
+    //std::cout << "REMOVING MODULE!" << std::endl;
 	removeModule();
 }
 
@@ -26,7 +24,7 @@ int Module_Cube::mutate(float mutationRate) {
 	return -1;
 }
 
-int Module_Cube::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
+int Module_Cube::createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
 	/*
 		create order:
 		parent(if parent != -1)---ForceSensor---CUBE
@@ -72,7 +70,7 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	simSetObjectPosition(fs, fs, fsPos);
 
     if (settings->verbose) {
-        cout << "Creating Cube Module" << endl;
+        std::cout << "Creating Cube Module" << std::endl;
     }
 	float size[3] = { 0.055, 0.055, 0.055 };
 	int cube = simCreatePureShape(0, objectPhysics, size, 0.3, 0);
@@ -89,7 +87,7 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	// Cube will be set exactly to the position of the dummy
 	simSetObjectPosition(cube, relativePosHandle, zeroOrigin);
 	// Change the orientation of the cube so the z directional
-	// vector of the cube and the dummy are the same
+    // std::vector of the cube and the dummy are the same
 	simSetObjectOrientation(cube, relativePosHandle, rotationOrigin);
 	// Just move up the cube based on the objectOrigin which moves the
 	// object 0.055/2 meter up
@@ -97,25 +95,25 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	simSetObjectParent(cube, fs, true);
 
 	//	define CUBE's children's position, orientation and parent
-	vector<shared_ptr<SITE>> site1;
+    std::vector<std::shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
-		site1.push_back(shared_ptr<SITE>(new SITE));
+        site1.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site2;
+    std::vector<std::shared_ptr<SITE>> site2;
 	for (int i = 0; i < 4; i++) {
-		site2.push_back(shared_ptr<SITE>(new SITE));
+        site2.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site3;
+    std::vector<std::shared_ptr<SITE>> site3;
 	for (int i = 0; i < 4; i++) {
-		site3.push_back(shared_ptr<SITE>(new SITE));
+        site3.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site4;
+    std::vector<std::shared_ptr<SITE>> site4;
 	for (int i = 0; i < 4; i++) {
-		site4.push_back(shared_ptr<SITE>(new SITE));
+        site4.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site5;
+    std::vector<std::shared_ptr<SITE>> site5;
 	for (int i = 0; i < 4; i++) {
-		site5.push_back(shared_ptr<SITE>(new SITE));
+        site5.push_back(std::shared_ptr<SITE>(new SITE));
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -184,7 +182,7 @@ int Module_Cube::createModule(vector<float> configuration, int relativePosHandle
 	attachHandles.push_back(cube);
 	if (simCheckCollision(cube, sim_handle_all) == true) {
 	    if (settings->verbose){
-	        cout << "cube collided" << endl;
+            std::cout << "cube collided" << std::endl;
 	    }
 	}
 	if (parentHandle == -1) {
@@ -202,8 +200,8 @@ void Module_Cube::removeModule() {
 	}
 }
 
-vector<int> Module_Cube::getFreeSites(vector<int> targetSites) {
-	vector<int> tempFreeSites; 
+std::vector<int> Module_Cube::getFreeSites(std::vector<int> targetSites) {
+    std::vector<int> tempFreeSites;
 	for (int i = 0; i < targetSites.size(); i++) {
 		for (int j = 0; j < freeSites.size(); j++) {
 			if (targetSites[i] == freeSites[j] && targetSites[i] != -1) {
@@ -218,27 +216,27 @@ void Module_Cube::setModuleColor() {
 
 }
 
-vector<int> Module_Cube::getObjectHandles() {
+std::vector<int> Module_Cube::getObjectHandles() {
 	return objectHandles; 
 }
-shared_ptr<ER_Module> Module_Cube::clone() {
-	return shared_ptr<ER_Module>(new Module_Cube(*this));
+std::shared_ptr<ER_Module> Module_Cube::clone() {
+    return std::shared_ptr<ER_Module>(new Module_Cube(*this));
 }
 
-vector<float> Module_Cube::updateModule(vector<float> input) {
+std::vector<float> Module_Cube::updateModule(std::vector<float> input) {
     // input.append(sensor->getInput());
-    vector<float> output = ER_Module::updateModule(input);
+    std::vector<float> output = ER_Module::updateModule(input);
 	return output;
 }
 
 
-stringstream Module_Cube::getModuleParams() {
+std::stringstream Module_Cube::getModuleParams() {
 	// needs to save variables of the module
-	stringstream ss;
-	ss << "#ModuleType:," << 1 << endl;  // make sure this is the same number as in the module factory
+    std::stringstream ss;
+    ss << "#ModuleType:," << 1 << std::endl;  // make sure this is the same number as in the module factory
 	//ss << "#siteParameters:,";
 	//for (int i = 0; i < siteConfigurations.size(); i++) {
-	//	ss << "/t,#site:," << 1 << "," << endl;
+    //	ss << "/t,#site:," << 1 << "," << std::endl;
 	//	for (int j = 0; j < siteConfigurations[i].size(); j++) {
 	//		ss << siteConfigurations[i][j].x << ",";
 	//		ss << siteConfigurations[i][j].y << ",";
@@ -248,28 +246,28 @@ stringstream Module_Cube::getModuleParams() {
 	//		ss << siteConfigurations[i][j].rZ << ",";
 	//	}
 	//}
-	ss << endl;
+    ss << std::endl;
 	return ss;
 
 }
 
-void Module_Cube::setModuleParams(vector<string> values) {
+void Module_Cube::setModuleParams(std::vector<std::string> values) {
 
 }
 
-vector<float> Module_Cube::getPosition() {
-	vector<float> positionVector;
+std::vector<float> Module_Cube::getPosition() {
+    std::vector<float> positionvector;
 	float pos[3];
 	simGetObjectPosition(objectHandles[1], -1, pos);
-	positionVector.push_back(pos[0]);
-	positionVector.push_back(pos[1]);
-	positionVector.push_back(pos[2]);
-	return positionVector;
+    positionvector.push_back(pos[0]);
+    positionvector.push_back(pos[1]);
+    positionvector.push_back(pos[2]);
+    return positionvector;
 }
 
-stringstream Module_Cube::getControlParams() {
-	stringstream ss;
-	ss << "#ControlType," << -1 << endl;
-	ss << endl;
+std::stringstream Module_Cube::getControlParams() {
+    std::stringstream ss;
+    ss << "#ControlType," << -1 << std::endl;
+    ss << std::endl;
 	return ss;
 }

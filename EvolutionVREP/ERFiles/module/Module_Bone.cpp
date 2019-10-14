@@ -277,12 +277,13 @@ void Module_Bone::setModuleParams(std::vector<std::string> values) {
 void Module_Bone::createControl() {
     //	std::cout << "creating Rodrigo genome" << std::endl;
 	// Do not use!
-    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	//control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings); // 0 is ANN
 	//control = controlFactory->createNewControlGenome(1, randomNum, settings); // 0 is ANN
-	control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings);
-	control->init(1, 1, 1); // bias, 6 input, 2 inter, 2 output
-	controlFactory.reset();
+//	control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings);
+    control = controlFactory(settings->controlType,randomNum,settings);
+    control->init(1, 1, 1); // bias, 6 input, 2 inter, 2 output
+//	controlFactory.reset();
 }
 
 void Module_Bone::controlModule(float input) {
