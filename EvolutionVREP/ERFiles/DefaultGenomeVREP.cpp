@@ -42,9 +42,10 @@ void DefaultGenomeVREP::init()
 	morph->init();
 	// The control creation is the same as the one in DefaultGenome::init(). Code can be improved.
 	if (m_type == -1) { // not used
-        std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-		morph->control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
-		controlFactory.reset();
+//        std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//		morph->control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
+//		controlFactory.reset();
+        morph->control = controlFactory(0, randomNum, settings);
 	}
 	//control = new control();
 	//vector<float> output = control->update();

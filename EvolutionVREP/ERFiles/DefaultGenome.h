@@ -44,6 +44,9 @@ public:
 
 	void loadBaseMorphology(int indNum, int sceneNum); // old
 
+    std::function<std::shared_ptr<Control>
+        (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> controlFactory;
+
 
 protected:
 	// virtual functions to extend with simulator specific classes
