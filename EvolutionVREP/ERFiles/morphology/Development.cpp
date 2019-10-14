@@ -287,13 +287,14 @@ std::vector<std::shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loa
 			//			lGenome->lParameters[moduleNum]->module->setModuleParams(moduleValues);
 			moduleValues.clear();
 			if (checkingControl == true) {
-                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-				bmp[moduleNum]->control = controlFactory->createNewControlGenome(atoi(controlValues[2].c_str()), randomNum, settings); // 0 is ANN
-			//	lGenome->lParameters[moduleNum]->control->init(1, 2, 1);
+//                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//				bmp[moduleNum]->control = controlFactory->createNewControlGenome(atoi(controlValues[2].c_str()), randomNum, settings); // 0 is ANN
+                bmp[moduleNum]->control = controlFactory(atoi(controlValues[2].c_str()), randomNum, settings);
+                //	lGenome->lParameters[moduleNum]->control->init(1, 2, 1);
 				bmp[moduleNum]->control->setControlParams(controlValues);
 				checkingControl = false;
 				controlValues.clear();
-				controlFactory.reset();
+//				controlFactory.reset();
 			}
 			moduleNum++;
 			checkingModule = false;

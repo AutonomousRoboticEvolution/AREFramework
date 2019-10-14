@@ -75,6 +75,11 @@ public:
 //	typedef shared_ptr<Control> ControlPointer;
 	///control of part of morphology 
     std::shared_ptr<Control> control;
+
+    std::function<
+        std::shared_ptr<Control>
+            (int type,std::shared_ptr<RandNum> rn,std::shared_ptr<Settings> st)>
+                controlFactory;
 public:
 	virtual int getMainHandle() = 0;
 	float minimumHeight = 0;

@@ -23,17 +23,20 @@ std::shared_ptr<Morphology> CAT::clone() const {
 }
 
 void CAT::init_noMorph() {
-    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
-	controlFactory.reset();
+//    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
+//	controlFactory.reset();
+    control = controlFactory(0, randomNum, settings);
 //	control->init(1, 1, 1);//morph->morph_jointHandles);
 }
 
 void CAT::init(){
 	create();
-    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
-	controlFactory.reset();
+//    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
+//	controlFactory.reset();
+    control = controlFactory(0, randomNum, settings);
+
 	control->init(50, 28, 28);
 	control->mutate(0.5);
 }
@@ -75,9 +78,10 @@ void CAT::saveGenome(int indNum, float fitness) {
 //load the control parameters
 bool CAT::loadGenome(int individualNumber, int sceneNum) {
     std::cout << "loading cat genome " << individualNumber << std::endl;
-    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
-	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
-	controlFactory.reset();
+//    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+//	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
+//	controlFactory.reset();
+    control = controlFactory(0, randomNum, settings);
     std::ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
     std::ifstream genomeFile(genomeFileName.str());
