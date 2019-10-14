@@ -1,7 +1,5 @@
 #include "ER_Module.h"
 
-using namespace std;
-
 ER_Module::ER_Module()
 {
 	moduleColor[0] = 0.5;
@@ -311,16 +309,16 @@ void ER_Module::colorModule(float color[3], float alpha)
 	}
 }
 
-void ER_Module::setControlParams(vector<string> values)
+void ER_Module::setControlParams(std::vector<std::string> values)
 {
 	for (int it = 0; it < values.size(); it++) {
-		string tmp = values[it];
+        std::string tmp = values[it];
 		if (tmp == "#ControlType") {
 			it++;
 			tmp = values[it];
 			int controlType = atoi(tmp.c_str());
 			if (controlType != -1) {
-				unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 				control = controlFactory->createNewControlGenome(controlType, randomNum, settings); // 0 is ANN, 1 is Custom_ANN
 				control->init(settings->initialInputNeurons, settings->initialInterNeurons, settings->initialOutputNeurons);
 				control->setControlParams(values);
@@ -330,7 +328,7 @@ void ER_Module::setControlParams(vector<string> values)
 	}
 }
 
-bool ER_Module::checkControlParams(vector<string> values)
+bool ER_Module::checkControlParams(std::vector<std::string> values)
 {
 	if (control) {
 		bool checkControlOutput = control->checkControl(values);
@@ -339,16 +337,16 @@ bool ER_Module::checkControlParams(vector<string> values)
 	return true;
 }
 
-void ER_Module::setFileName(string f)
+void ER_Module::setFileName(std::string f)
 {
 	filename = f;
 }
 
 
 
-vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis)
+std::vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis)
 {
-	vector<int> mirrored; 
+    std::vector<int> mirrored;
 	if (mirrorAxis == 0) { // standard mirror
 		switch (site) {
 		case 1:
@@ -458,7 +456,7 @@ vector<int> ER_Module::getMirrorSite(int site, int configuration, int mirrorAxis
 		}
 	}
 	if (mirrored.size() != 2) {
-		cerr << "ERROR: Mirror mutation not be done properly" << endl;
+        std::cerr << "ERROR: Mirror mutation not be done properly" << std::endl;
 	}
 	return mirrored;
 }
@@ -471,7 +469,7 @@ void ER_Module::updateParentModuleMorphology(int num)
 void ER_Module::updateMorph(int num) {
 }
 
-vector<float> ER_Module::updateModule(vector<float> input)
+std::vector<float> ER_Module::updateModule(std::vector<float> input)
 {
 	colorModule(moduleColor, control->cf);
 	if (control) {
@@ -483,7 +481,7 @@ vector<float> ER_Module::updateModule(vector<float> input)
 		|| settings->environmentType == settings->SUN_MOVING
 		|| settings->environmentType == settings->SUN_BLOCKED) {
 	}
-    vector<float> output;
+    std::vector<float> output;
 	if (not broken) {
 		output = control->update(input);//update inputLayer, recurrentLayer and outputLayer
 		for (int i = 0; i < output.size(); i++) {
@@ -503,7 +501,7 @@ vector<float> ER_Module::updateModule(vector<float> input)
 }
 
 
-void ER_Module::addInput(vector<float> input)
+void ER_Module::addInput(std::vector<float> input)
 {
 	if (control) {
 		control->addInput(input);

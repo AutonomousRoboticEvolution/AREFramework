@@ -65,9 +65,9 @@ public:
 //	void deleteRays();
 //	vector<int> rayHandles;
 
-	virtual std::vector<int> getObjectHandles(int) override;
-	virtual std::vector<int> getJointHandles(int) override;
-	virtual std::vector<int> getAllHandles(int) override;
+    virtual std::vector<int> getObjectHandles(int);
+    virtual std::vector<int> getJointHandles(int);
+    virtual std::vector<int> getAllHandles(int);
 
 	virtual void init() override;
 	virtual void init_noMorph() override {};
@@ -79,7 +79,7 @@ public:
 	
 	// Modular Functions
 	virtual int getAmountBrokenModules() override;
-	virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules() override;
+    virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules();
 
 	virtual void setPhenValue() override;
 

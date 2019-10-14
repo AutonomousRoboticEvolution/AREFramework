@@ -1,12 +1,6 @@
 #pragma once
 
-#include "ANN.h"
 #include "Control.h"
-#include "SimpleControl.h"
-#include "ANN.h"
-#include "CPPN.h"
-#include "CustomANN.h"
-#include "FixedStructreANN.h"
 
 
 class ControlFactory

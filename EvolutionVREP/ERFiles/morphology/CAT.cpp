@@ -3,11 +3,9 @@
 #include <iostream>
 #include <fstream>
 
-using namespace std;
-
 CAT::CAT()
 {
-    va = shared_ptr<VestibularAttributes>(new VestibularAttributes);
+    va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }
 
 
@@ -16,16 +14,16 @@ CAT::~CAT()
 //	cout << "delete CAT class" << endl; 
 }
 
-shared_ptr<Morphology> CAT::clone() const {
+std::shared_ptr<Morphology> CAT::clone() const {
 	// shared_ptr<Morphology>()
-	shared_ptr<CAT> cat = make_unique<CAT>(*this);
+    std::shared_ptr<CAT> cat = std::make_unique<CAT>(*this);
 //	cat->va = va->clone();
 	cat->control = control->clone();
 	return cat;
 }
 
 void CAT::init_noMorph() {
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
 //	control->init(1, 1, 1);//morph->morph_jointHandles);
@@ -33,7 +31,7 @@ void CAT::init_noMorph() {
 
 void CAT::init(){
 	create();
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
 	control->init(50, 28, 28);
@@ -41,7 +39,7 @@ void CAT::init(){
 }
 
 void CAT::grow(int i) {
-	cout << "Cat cannot grow; therefore, the call to grow(int) will be dismissed." << endl;
+    std::cout << "Cat cannot grow; therefore, the call to grow(int) will be dismissed." << std::endl;
 }
 
 int CAT::getMainHandle() {
@@ -51,62 +49,62 @@ int CAT::getMainHandle() {
 
 //save the genome into a file
 void CAT::saveGenome(int indNum, float fitness) {
-	cout << "saving Cat Genome " << endl << "-------------------------------- " << endl;
-	ofstream genomeFile;
-	ostringstream genomeFileName;
+    std::cout << "saving Cat Genome " << std::endl << "-------------------------------- " << std::endl;
+    std::ofstream genomeFile;
+    std::ostringstream genomeFileName;
 	genomeFileName << settings->repository << "/morphologies" << settings->sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
 		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
 	}
-	genomeFile << ",#GenomeType,CatGenome," << endl;
-	genomeFile << "#Individual:" << indNum << endl;
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#ControlParams:," << endl;
-	genomeFile << "	#ControlType,0," << endl;
+    genomeFile << ",#GenomeType,CatGenome," << std::endl;
+    genomeFile << "#Individual:" << indNum << std::endl;
+    genomeFile << "#Fitness:," << fitness << std::endl;
+    genomeFile << "#ControlParams:," << std::endl;
+    genomeFile << "	#ControlType,0," << std::endl;
 	if (control) {
-		genomeFile << control->getControlParams().str() << endl;
+        genomeFile << control->getControlParams().str() << std::endl;
 	}
-	genomeFile << "#EndControlParams" << endl;
-	genomeFile << "end of cat" << endl;
-	cout << "saved cat" << endl;
+    genomeFile << "#EndControlParams" << std::endl;
+    genomeFile << "end of cat" << std::endl;
+    std::cout << "saved cat" << std::endl;
 	genomeFile.close();
 }
 
 //load the control parameters
 bool CAT::loadGenome(int individualNumber, int sceneNum) {
-	cout << "loading cat genome " << individualNumber << endl;
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::cout << "loading cat genome " << individualNumber << std::endl;
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	control = controlFactory->createNewControlGenome(0, randomNum, settings); // ann
 	controlFactory.reset();
-	ostringstream genomeFileName;
+    std::ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-	ifstream genomeFile(genomeFileName.str());
+    std::ifstream genomeFile(genomeFileName.str());
 	if (!genomeFile) {
 		std::cerr << "Could not load " << genomeFileName.str() << std::endl;
 		return false;
 		//		std::exit(1);
 	}
-	string value;
-	list<string> values;
+    std::string value;
+    std::list<std::string> values;
 	//read the control parameters from file
 	while (genomeFile.good()) {
-		getline(genomeFile, value, ',');
+        std::getline(genomeFile, value, ',');
 	//	cout << value << ",";
-		if (value.find('\n') != string::npos) {
-			split_line(value, "\n", values);
+        if (value.find('\n') != std::string::npos) {
+            split_line(value, "\n", values);
 		}
 		else {
 			values.push_back(value);
 		}
 	}
-	vector<string> controlValues;
+    std::vector<std::string> controlValues;
 	bool checkingControl = false;
 
-	list<string>::const_iterator it = values.begin();
+    std::list<std::string>::const_iterator it = values.begin();
 	for (it = values.begin(); it != values.end(); it++) {
-		string tmp = *it;
+        std::string tmp = *it;
 		if (checkingControl) {
 			controlValues.push_back(tmp);
 		}

@@ -1,8 +1,10 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 #include "v_repLib.h"
-#include "../morphology/Modular_Morphology.h"
+#include "../module/ER_Module.h"
+
 
 class VREPUI
 {

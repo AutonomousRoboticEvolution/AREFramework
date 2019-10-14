@@ -124,6 +124,6 @@ private:
 	void checkGenome(int individualNumber, int sceneNum);
 };
 
-#include "BaseMorphology.h"
+//#include "BaseMorphology.h"
 
 

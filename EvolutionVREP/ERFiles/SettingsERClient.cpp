@@ -10,7 +10,7 @@ SettingsERClient::SettingsERClient() {
 	moduleTypes.push_back(1);
 
 	for (int i = 0; i < moduleTypes.size(); i++) {
-		vector <int> tmpMaxModuleTypes;
+        std::vector<int> tmpMaxModuleTypes;
 		tmpMaxModuleTypes.push_back(moduleTypes[i]);
 		tmpMaxModuleTypes.push_back(50);
 		maxModuleTypes.push_back(tmpMaxModuleTypes);
