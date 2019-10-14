@@ -4,19 +4,17 @@
 #include <sstream>
 #include <fstream>
 
-using namespace std;
-
 // for reading csv file
-void BaseMorphology::split_line(string& line, string delim, list<string>& values)
+void BaseMorphology::split_line(std::string& line, std::string delim, std::list<std::string>& values)
 {
 	size_t pos = 0;
-	while ((pos = line.find(delim, (pos + 0))) != string::npos) {
-		string p = line.substr(0, pos);
+    while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
+        std::string p = line.substr(0, pos);
 		values.push_back(p);
 		line = line.substr(pos + 1);
 	}
-	while ((pos = line.find(delim, (pos + 1))) != string::npos) {
-		string p = line.substr(0, pos);
+    while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
+        std::string p = line.substr(0, pos);
 		values.push_back(p);
 		line = line.substr(pos + 1);
 	}
@@ -36,23 +34,23 @@ BaseMorphology::~BaseMorphology()
 }
 
 void BaseMorphology::mutate(){
-	cout << "Cannot Mutate Base Morphology: check settings" << endl; 
+    std::cout << "Cannot Mutate Base Morphology: check settings" << std::endl;
 }
 
 bool BaseMorphology::loadGenome(int individualNumber, int sceneNum)
 {
-	std::cout << "cannot load basemorph" << std::endl;
+    std::cout << "cannot load basemorph" << std::endl;
 	return false;
 }
 
 bool BaseMorphology::loadGenome(std::istream &input, int individualNumber)
 {
-	std::cout << "cannot load basemorph" << std::endl;
+    std::cout << "cannot load basemorph" << std::endl;
 	return false;
 }
 
-vector <shared_ptr<ER_Module>> BaseMorphology::getCreatedModules() {
-	vector <shared_ptr<ER_Module>> vec;
+std::vector <std::shared_ptr<ER_Module>> BaseMorphology::getCreatedModules() {
+    std::vector <std::shared_ptr<ER_Module>> vec;
 	return vec;
 }
 
@@ -62,28 +60,28 @@ void BaseMorphology::setPhenValue()
 }
 
 
-vector<int> BaseMorphology::getObjectHandles(int)
+std::vector<int> BaseMorphology::getObjectHandles(int)
 {
-	return vector<int>();
+    return std::vector<int>();
 }
 
-vector<int> BaseMorphology::getJointHandles(int)
+std::vector<int> BaseMorphology::getJointHandles(int)
 {
-	return vector<int>();
+    return std::vector<int>();
 }
 
-vector<int> BaseMorphology::getAllHandles(int)
+std::vector<int> BaseMorphology::getAllHandles(int)
 {
-	return vector<int>();
+    return std::vector<int>();
 }
 
 void BaseMorphology::init() {
 // physically construct the initial parameters
-	cout << "NOTE: BaseMorphology::init() is deprecated" << endl; 
+    std::cout << "NOTE: BaseMorphology::init() is deprecated" << std::endl;
 }
 
 void BaseMorphology::create() {
-	cout << "NOTE: BaseMorphology::create() is deprecated" << endl;
+    std::cout << "NOTE: BaseMorphology::create() is deprecated" << std::endl;
 }
 
 void BaseMorphology::printSome() {
@@ -97,7 +95,7 @@ void BaseMorphology::createAtPosition(float x, float y, float z) {
 
 void BaseMorphology::update() {
 	if (control) {
-		vector<float> input; // get sensor parameters
+        std::vector<float> input; // get sensor parameters
 		input.push_back(1);
 		control->update(input);
 	}
@@ -117,15 +115,15 @@ void BaseMorphology::clearMorph(){
 }
 
 void BaseMorphology::setMainHandlePosition(float position[3]) {
-	cout << "setMainHandlePosition is deprived" << endl;
+    std::cout << "setMainHandlePosition is deprived" << std::endl;
 }
 
-shared_ptr<Morphology> BaseMorphology::clone() const {
-	return shared_ptr<Morphology>(new BaseMorphology(*this));
+std::shared_ptr<Morphology> BaseMorphology::clone() const {
+    return std::shared_ptr<Morphology>(new BaseMorphology(*this));
 }
 
 int BaseMorphology::getAmountBrokenModules() { 
-	cout << "BaseMorphology cannot return broken modules, check code" << endl;
+    std::cout << "BaseMorphology cannot return broken modules, check code" << std::endl;
 	return 0; 
 }
 
@@ -134,16 +132,16 @@ int BaseMorphology::getMainHandle() {
 }
 
 float BaseMorphology::getFitness() {
-	cout << "Basemorphology cannot return a fitness, check code" << endl;
+    std::cout << "Basemorphology cannot return a fitness, check code" << std::endl;
 	return 0.0; 
 }
 
 void BaseMorphology::saveGenome(int indNum, float fitness) {
-	cout << "Basemorphology cannot save genome, check code" << endl;
+    std::cout << "Basemorphology cannot save genome, check code" << std::endl;
 }
 
 const std::string BaseMorphology::generateGenome(int indNum, float fitness) const
 {
-	std::cout << "Basemorphology cannot generate genome, check code" << std::endl;
+    std::cout << "Basemorphology cannot generate genome, check code" << std::endl;
 	return "Herp derp"; 
 }

@@ -2,8 +2,6 @@
 
 #include <memory>
 
-using namespace std;
-
 EA_Generational::EA_Generational()
 {
 }
@@ -41,7 +39,7 @@ void EA_Generational::mutation()
 
 void EA_Generational::initializePopulation()
 {
-	unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
+    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
 
 	if (settings->client) {
 		for (int i = 0; i < settings->populationSize; i++)
@@ -51,7 +49,7 @@ void EA_Generational::initializePopulation()
 		}
 	}
 	else {
-		cout << "Cannot create VREP dependent genome. Use EA_Generational_VREP for online evolution" << endl;
+        std::cout << "Cannot create VREP dependent genome. Use EA_Generational_VREP for online evolution" << std::endl;
 		//for (int i = 0; i < st->populationSize; i++)
 		//{
 		//	populationGenomes.push_back(gf->createGenome(1, randomNum, st));
@@ -81,7 +79,7 @@ void EA_Generational::createNewGenRandomSelect()
 	nextGenGenomes.clear();
 	//nextGenFitness.clear();
 
-	shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
+    std::shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
 	for (int i = 0; i < populationGenomes.size(); i++) {
 		int parent = i;
 		//nextGenFitness.push_back(-100.0);

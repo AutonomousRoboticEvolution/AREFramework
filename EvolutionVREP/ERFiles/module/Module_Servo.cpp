@@ -3,8 +3,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-using namespace std;
-
 Module_Servo::Module_Servo()
 {
 	
@@ -13,7 +11,7 @@ Module_Servo::Module_Servo()
 Module_Servo::~Module_Servo()
 {
 //	siteConfigurations.clear();
-//	cout << "REMOVING RODRIGO's MODULE!" << endl;
+//	std::cout << "REMOVING RODRIGO's MODULE!" << std::endl;
 	removeModule();
 }
 
@@ -22,12 +20,12 @@ int Module_Servo::init() {
 }
 
 int Module_Servo::mutate(float mutationRate) {
-//	cout << "About to mutate" << endl;
+//	std::cout << "About to mutate" << std::endl;
 	control->mutate(mutationRate);
 	return 1;
 }
 
-int Module_Servo::createModuleBackup(vector<float> configuration, int relativePosHandle, int parentHandle) {
+int Module_Servo::createModuleBackup(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
 	int fsParams[5];
 	fsParams[0] = 0;
 	fsParams[1] = 1;
@@ -104,7 +102,7 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 
 	float appearanceSize[3] = { 0.032, 0.036, 0.058 };
 	int appearancePeace = simCreatePureShape(0, objectPhysics, appearanceSize, 0.055, 0);
-	//	cout << "baseHandle and appearancePeace: " << baseHandle << ", " << appearancePeace << endl; 
+    //	std::cout << "baseHandle and appearancePeace: " << baseHandle << ", " << appearancePeace << std::endl;
 	float jointSize[3] = { 0.048,0.018, 0 };
 	float appearancePos[3] = { 0.0, 0.00, 0.0305 };
 	int joint = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, jointSize, NULL, NULL);
@@ -161,17 +159,17 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 	int baseshapHands[2] = { baseHandle, appearancePeace };
 	int groupedBase = simGroupShapes(baseshapHands, 2);
 
-	vector<shared_ptr<SITE>> site1;
+    std::vector<std::shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
-		site1.push_back(shared_ptr<SITE>(new SITE));
+        site1.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site2;
+    std::vector<std::shared_ptr<SITE>> site2;
 	for (int i = 0; i < 4; i++) {
-		site2.push_back(shared_ptr<SITE>(new SITE));
+        site2.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site3;
+    std::vector<std::shared_ptr<SITE>> site3;
 	for (int i = 0; i < 4; i++) {
-		site3.push_back(shared_ptr<SITE>(new SITE));
+        site3.push_back(std::shared_ptr<SITE>(new SITE));
 	}
 	for (int i = 0; i < 4; i++) {
 		site1[i]->x = 0.0;
@@ -235,7 +233,7 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 	simSetObjectFloatParameter(joint, 2003, 0.01);
 	simSetObjectFloatParameter(joint, 2004, 0.0);
 	simSetJointTargetPosition(joint, 0.0);
-	//	cout << "maxForce = " << settings->maxForce << endl;
+    //	std::cout << "maxForce = " << settings->maxForce << std::endl;
 	simSetJointForce(controlHandles[0], settings->maxForce);
 	simSetJointTargetVelocity(controlHandles[0], 0.05);
 
@@ -250,23 +248,23 @@ int Module_Servo::createModuleBackup(vector<float> configuration, int relativePo
 }
 
 
-int Module_Servo::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
+int Module_Servo::createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
 	/*
 		create order:
 		parent---ForceSensor---SERVO---three dummies
 	*/
 	int rdr = simLoadModel("models/Servo_Module.ttm");//load SERVO module
 	if (rdr < 0) {
-		std::cerr << "Error loading models/Servo_Module.ttm" << std::endl;
+        std::cerr << "Error loading models/Servo_Module.ttm" << std::endl;
 	}
 //	energyDissipationRate = 0.1;
-//	cout << "creating rodrigo model" << endl;
+//	std::cout << "creating rodrigo model" << std::endl;
 
 	// this possibly causes a leak, advice to use simAddObjectsToSelection with sim_handle_tree
 	// then get simGetObjectSelection to get the object types. 
 	/**/
-	vector<int> shapes;
-	vector<int> joints;
+    std::vector<int> shapes;
+    std::vector<int> joints;
 	simAddObjectToSelection(sim_handle_tree, rdr);
 	int selectionSize = simGetObjectSelectionSize();
 	int shapesStorage[10]; // stores up to 10 shapes
@@ -395,17 +393,17 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	simSetObjectOrientation(d3, rdr, d3or);
 
 
-	vector<shared_ptr<SITE>> site1;
+    std::vector<std::shared_ptr<SITE>> site1;
 	for (int i = 0; i < 4; i++) {
-		site1.push_back(shared_ptr<SITE>(new SITE));
+        site1.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site2;
+    std::vector<std::shared_ptr<SITE>> site2;
 	for (int i = 0; i < 4; i++) {
-		site2.push_back(shared_ptr<SITE>(new SITE));
+        site2.push_back(std::shared_ptr<SITE>(new SITE));
 	}
-	vector<shared_ptr<SITE>> site3;
+    std::vector<std::shared_ptr<SITE>> site3;
 	for (int i = 0; i < 4; i++) {
-		site3.push_back(shared_ptr<SITE>(new SITE));
+        site3.push_back(std::shared_ptr<SITE>(new SITE));
 	}
 
 	for (int i = 0; i < 4; i++) {
@@ -475,8 +473,8 @@ int Module_Servo::createModule(vector<float> configuration, int relativePosHandl
 	return shapes[0];	
 }
 
-vector<int> Module_Servo::getFreeSites(vector<int> targetSites) {
-	vector<int> tempFreeSites;
+std::vector<int> Module_Servo::getFreeSites(std::vector<int> targetSites) {
+    std::vector<int> tempFreeSites;
 	for (int i = 0; i < targetSites.size(); i++) {
 		for (int j = 0; j < freeSites.size(); j++) {
 			if (targetSites[i] == freeSites[j]) {
@@ -486,7 +484,7 @@ vector<int> Module_Servo::getFreeSites(vector<int> targetSites) {
 	}
 	return tempFreeSites;
 }
-vector<int> Module_Servo::getObjectHandles() {
+std::vector<int> Module_Servo::getObjectHandles() {
 	return objectHandles;
 }
 
@@ -494,8 +492,8 @@ void Module_Servo::setModuleColor() {
 
 }
 
-shared_ptr<ER_Module> Module_Servo::clone() {
-	shared_ptr<Module_Servo> clonedModule = make_unique<Module_Servo>(*this);
+std::shared_ptr<ER_Module> Module_Servo::clone() {
+    std::shared_ptr<Module_Servo> clonedModule = std::make_unique<Module_Servo>(*this);
 //	clonedModule->control = control->clone();
 	return clonedModule;
 }
@@ -506,9 +504,9 @@ void Module_Servo::removeModule() {
 	}
 }
 
-vector<float> Module_Servo::updateModule(vector<float> input) {
+std::vector<float> Module_Servo::updateModule(std::vector<float> input) {
 //	controlModule();
-	vector<float> output = ER_Module::updateModule(input);
+    std::vector<float> output = ER_Module::updateModule(input);
 //	energy = energy - energyDissipationRate;
 	float pos[3];
 	if (previousPosition == -1) {
@@ -521,7 +519,7 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 			this->broken = true;
 		}
 		else if (!broken) {
-//			vector<float> sensorValues;
+//			std::vector<float> sensorValues;
 	//		sensorValues.push_back(0);
 	//		output = controlModule(sensorValues); // sensor values set to zero, no intrinsic sensors in the servo module
 			controlModule(output[0]);//update joint's position according to output[0]
@@ -531,13 +529,13 @@ vector<float> Module_Servo::updateModule(vector<float> input) {
 	return output; // 
 }
 
-stringstream Module_Servo::getModuleParams() {
+std::stringstream Module_Servo::getModuleParams() {
 	// needs to save variables of the module
-	stringstream ss;
-	ss << "#ModuleType:," << 4 << endl;  // make sure this is the same number as in the module factory
+    std::stringstream ss;
+    ss << "#ModuleType:," << 4 << std::endl;  // make sure this is the same number as in the module factory
 	/*ss << "#siteParameters:,";
 	for (int i = 0; i < siteConfigurations.size(); i++) {
-		ss << "/t,#site:," << 1 << "," << endl;
+        ss << "/t,#site:," << 1 << "," << std::endl;
 		for (int j = 0; j < siteConfigurations[i].size(); j++) {
 			ss << siteConfigurations[i][j].x << ",";
 			ss << siteConfigurations[i][j].y << ",";
@@ -547,15 +545,15 @@ stringstream Module_Servo::getModuleParams() {
 			ss << siteConfigurations[i][j].rZ << ",";
 		}
 	}
-	ss << endl;*/
+    ss << std::endl;*/
 	return ss;
 }
 
-void Module_Servo::setModuleParams(vector<string> values) {
+void Module_Servo::setModuleParams(std::vector<std::string> values) {
 	ER_Module::setControlParams(values);
 	/*for (int it = 0; it < values.size(); it++) {
 		string tmp = values[it];
-		vector<string> controlParams;
+        std::vector<string> controlParams;
 		if (tmp == "#ControlParams:") {
 			it++;
 			controlParams.push_back(tmp);
@@ -569,9 +567,9 @@ void Module_Servo::setModuleParams(vector<string> values) {
 
 
 void Module_Servo::createControl() {
-	//	cout << "creating Rodrigo genome" << endl; 
+    //	std::cout << "creating Rodrigo genome" << std::endl;
 	// Do not use!
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	//control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings); // 0 is ANN
 	//control = controlFactory->createNewControlGenome(1, randomNum, settings); // 0 is ANN
 	control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings);
@@ -581,30 +579,30 @@ void Module_Servo::createControl() {
 
 void Module_Servo::controlModule(float input) {
 	//	control->update(sensorValues);
-//	vector<float> output = control->update(sensorValues);
+//	std::vector<float> output = control->update(sensorValues);
 //	if (output.size() != 1) {
-	//	cout << "ERROR:: output size is not 1, but should be" << endl;
+    //	std::cout << "ERROR:: output size is not 1, but should be" << std::endl;
 //	}
-//	cout << "output[0] = " << input << endl;
+//	std::cout << "output[0] = " << input << std::endl;
 	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);//update servo's position
 //	return output;
 }
 
-vector<float> Module_Servo::getPosition() {
-	vector<float> positionVector;
+std::vector<float> Module_Servo::getPosition() {
+    std::vector<float> positionvector;
 	float pos[3];
 	simGetObjectPosition(objectHandles[1], -1, pos);
-	positionVector.push_back(pos[0]);
-	positionVector.push_back(pos[1]);
-	positionVector.push_back(pos[2]);
-	return positionVector;
+    positionvector.push_back(pos[0]);
+    positionvector.push_back(pos[1]);
+    positionvector.push_back(pos[2]);
+    return positionvector;
 }
 
-stringstream Module_Servo::getControlParams() {
-	stringstream ss;
-	ss << "#ControlType," << settings->controlType << endl; // CUSTOM_ANN
+std::stringstream Module_Servo::getControlParams() {
+    std::stringstream ss;
+    ss << "#ControlType," << settings->controlType << std::endl; // CUSTOM_ANN
 	ss << control->getControlParams().str();
-	ss << "#EndControl," << endl;
-	ss << endl;
+    ss << "#EndControl," << std::endl;
+    ss << std::endl;
 	return ss;
 }

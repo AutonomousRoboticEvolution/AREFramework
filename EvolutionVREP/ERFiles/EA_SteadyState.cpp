@@ -2,8 +2,6 @@
 #include <algorithm>
 #include <memory>
 
-using namespace std;
-
 
 EA_SteadyState::EA_SteadyState()
 {}
@@ -11,16 +9,16 @@ EA_SteadyState::EA_SteadyState()
 EA_SteadyState::~EA_SteadyState()
 {}
 
-void EA_SteadyState::split_line(string &line, string delim, list<string> &values)
+void EA_SteadyState::split_line(std::string &line, std::string delim, std::list<std::string> &values)
 {
     size_t pos = 0;
-    while ((pos = line.find(delim, (pos + 0))) != string::npos) {
-        string p = line.substr(0, pos);
+    while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
+        std::string p = line.substr(0, pos);
         values.push_back(p);
         line = line.substr(pos + 1);
     }
-    while ((pos = line.find(delim, (pos + 1))) != string::npos) {
-        string p = line.substr(0, pos);
+    while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
+       std::string p = line.substr(0, pos);
         values.push_back(p);
         line = line.substr(pos + 1);
     }
@@ -76,7 +74,7 @@ void EA_SteadyState::initializePopulation()
 
 void EA_SteadyState::loadPopulationGenomes(int scenenum)
 {
-    const vector<int> &popIndNumbers = settings->indNumbers;
+    const std::vector<int> &popIndNumbers = settings->indNumbers;
     std::cout << "Loading population" << std::endl;
     for (unsigned long i = 0; i < popIndNumbers.size(); i++) {
         std::cout << "loading individual " << popIndNumbers[i] << std::endl;
@@ -103,21 +101,21 @@ void EA_SteadyState::setFitness(int individual, float fitness)
 void EA_SteadyState::createNewGenRandomSelect()
 {
     nextGenGenomes.clear();
-    vector<int> additionalInds;
+    std::vector<int> additionalInds;
     // start
     if (settings->loadFromQueue) {
         // check if file exists
-        ifstream file(settings->repository + "/queue" + to_string(settings->sceneNum) + ".csv");
+        std::ifstream file(settings->repository + "/queue" + std::to_string(settings->sceneNum) + ".csv");
         if (file.good()) {
-            std::cout << "found queue, loading individuals" << endl;
+            std::cout << "found queue, loading individuals" << std::endl;
             // load csv
-            string value;
-            list<string> values;
+            std::string value;
+            std::list<std::string> values;
             // read the settings file and store the comma seperated values
             while (file.good()) {
                 getline(file, value,
                         ','); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
-                if (value.find('\n') != string::npos) {
+                if (value.find('\n') != std::string::npos) {
                     split_line(value, "\n", values);
                 } else {
                     values.push_back(value);
@@ -132,9 +130,9 @@ void EA_SteadyState::createNewGenRandomSelect()
         }
 
     }
-    vector<shared_ptr<Genome>> populationGenomesBuffer;
+    std::vector<std::shared_ptr<Genome>> populationGenomesBuffer;
 
-    shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
+    std::shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
     for (int i = 0; i < populationGenomes.size() - additionalInds.size(); i++) {
         int parent = randomNum->randInt(populationGenomes.size(), 0);
         if (settings->verbose) {
@@ -145,12 +143,12 @@ void EA_SteadyState::createNewGenRandomSelect()
         //nextGenFitness.push_back(-100.0);
         populationGenomesBuffer.push_back(populationGenomes[parent]->clone());
         if (settings->verbose) {
-            std::cout << "About to deep copy genome" << endl;
+            std::cout << "About to deep copy genome" << std::endl;
 
         }
 
         if (settings->verbose) {
-            std::cout << "Done with deep copy genome" << endl;
+            std::cout << "Done with deep copy genome" << std::endl;
         }
         populationGenomesBuffer[i]->individualNumber = i + settings->indCounter;
         populationGenomesBuffer[i]->fitness = 0; // Ensure the fitness is set to zero.
@@ -189,7 +187,7 @@ void EA_SteadyState::createNewGenRandomSelect()
 
 void EA_SteadyState::replaceNewPopRandom(int numAttempts)
 {
-    cout << "REPLACINGPOP::::::::::::::" << endl;
+    std::cout << "REPLACINGPOP::::::::::::::" << std::endl;
     for (int p = 0; p < populationGenomes.size(); p++) {
         for (int n = 0; n < numAttempts; n++) {
             int currentInd = randomNum->randInt(populationGenomes.size(), 0);
@@ -197,41 +195,41 @@ void EA_SteadyState::replaceNewPopRandom(int numAttempts)
             // number of attempts is reached, and the new individual did not
             // replace an individual in the existing population, it's genome is deleted.
             if (nextGenGenomes[p]->fitness >= populationGenomes[currentInd]->fitness) {
-                cout << "replacement: " << nextGenGenomes[p]->individualNumber << " replaces "
-                     << populationGenomes[currentInd]->individualNumber << endl;
-                cout << "replacement: " << nextGenGenomes[p]->fitness << " replaces "
-                     << populationGenomes[currentInd]->fitness << endl;
+                std::cout << "replacement: " << nextGenGenomes[p]->individualNumber << " replaces "
+                     << populationGenomes[currentInd]->individualNumber << std::endl;
+                std::cout << "replacement: " << nextGenGenomes[p]->fitness << " replaces "
+                     << populationGenomes[currentInd]->fitness << std::endl;
                 populationGenomes[currentInd].reset();
                 populationGenomes[currentInd] = nextGenGenomes[p]->clone(); // new DefaultGenome();
                 break;
             } else if (n == (numAttempts - 1)) {
                 // delete genome file
-                stringstream ss;
+                std::stringstream ss;
                 ss << settings->repository + "/morphologies" << settings->sceneNum << "/genome"
                    << nextGenGenomes[p]->individualNumber << ".csv";
-                string genomeFileName = ss.str();
-                stringstream ssp;
+                std::string genomeFileName = ss.str();
+                std::stringstream ssp;
                 ssp << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype"
                     << nextGenGenomes[p]->individualNumber << ".csv";
-                string phenotypeFileName = ssp.str();
+                std::string phenotypeFileName = ssp.str();
                 //	genomeFileName << indNum << ".csv";
-                cout << "Removing " << nextGenGenomes[p]->individualNumber << endl;
+                std::cout << "Removing " << nextGenGenomes[p]->individualNumber << std::endl;
                 remove(genomeFileName.c_str());
                 remove(phenotypeFileName.c_str());
             }
         }
     }
-    cout << "REPLACED POP" << endl;
+    std::cout << "REPLACED POP" << std::endl;
 }
 
-bool compareByFitness(const shared_ptr<Genome> a, const shared_ptr<Genome> b)
+bool compareByFitness(const std::shared_ptr<Genome> a, const std::shared_ptr<Genome> b)
 {
     return a->fitness > b->fitness;
 }
 
 void EA_SteadyState::replaceNewRank()
 {
-    vector<shared_ptr<Genome>> populationGenomesBuffer;
+    std::vector<std::shared_ptr<Genome>> populationGenomesBuffer;
     // create one big population. Just store the pointers in the buffer.
     for (int i = 0; i < populationGenomes.size(); i++) {
         populationGenomesBuffer.push_back(populationGenomes[i]);
@@ -266,7 +264,7 @@ void EA_SteadyState::replaceNewRank()
     //populationGenomes = populationGenomesBuffer;
     // ^ This swap should kill all objects no referenced to anymore. Without smart pointers this looks dangerous as hell.
     //populationGenomesBuffer.clear();
-    cout << "populationGenomes.size() = " << populationGenomes.size() << endl;
-    cout << "nextGenGenomes.size() = " << nextGenGenomes.size() << endl;
-    cout << "REPLACED POP RANKED" << endl;
+    std::cout << "populationGenomes.size() = " << populationGenomes.size() << std::endl;
+    std::cout << "nextGenGenomes.size() = " << nextGenGenomes.size() << std::endl;
+    std::cout << "REPLACED POP RANKED" << std::endl;
 }

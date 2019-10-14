@@ -1,6 +1,5 @@
 #include "FixedBaseMorphology.h"
 #include <iostream>
-using namespace std;
 
 FixedBaseMorphology::FixedBaseMorphology()
 {
@@ -8,45 +7,45 @@ FixedBaseMorphology::FixedBaseMorphology()
 
 FixedBaseMorphology::~FixedBaseMorphology()
 {
-//	cout << "should delete FixedBaseMorphology" << endl; 
+//	std::cout << "should delete FixedBaseMorphology" << std::endl;
 }
 
 void FixedBaseMorphology::init() {
-	cout << "FixedBaseMorphology.init() is called" << endl; 
+    std::cout << "FixedBaseMorphology.init() is called" << std::endl;
 	addDefaultMorphology();
 	BaseMorphology::init();
 }
 
 void FixedBaseMorphology::addDefaultMorphology() {
-	cout << "addDefaultMorphology is called but the function is deprived" << endl; 
+    std::cout << "addDefaultMorphology is called but the function is deprived" << std::endl;
 }
 
 void FixedBaseMorphology::saveGenome(int indNum, float fitness) {
-	cout << "saving Fixed Genome " << endl << "-------------------------------- " << endl;
-	ofstream genomeFile;
-	ostringstream genomeFileName;
+    std::cout << "saving Fixed Genome " << std::endl << "-------------------------------- " << std::endl;
+    std::ofstream genomeFile;
+    std::ostringstream genomeFileName;
 	genomeFileName << settings->repository << "/morphologies" << settings->sceneNum << "/genome" << indNum << ".csv";
 	//	genomeFileName << indNum << ".csv";
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
+        std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
 	}
 	if (settings->morphologyType == settings->CAT_MORPHOLOGY) {
-		genomeFile << ",#GenomeType,CatGenome," << endl;
+        genomeFile << ",#GenomeType,CatGenome," << std::endl;
 	}
 	else {
-		genomeFile << ",#GenomeType,unknown," << endl;
+        genomeFile << ",#GenomeType,unknown," << std::endl;
 	}
-	genomeFile << "#Individual:" << indNum << endl;
-	genomeFile << "#Fitness:," << fitness << endl;
-	genomeFile << "#ControlParams:," << endl;
-	genomeFile << "	#ControlType,0," << endl;
+    genomeFile << "#Individual:" << indNum << std::endl;
+    genomeFile << "#Fitness:," << fitness << std::endl;
+    genomeFile << "#ControlParams:," << std::endl;
+    genomeFile << "	#ControlType,0," << std::endl;
 	if (control) {
-		genomeFile << control->getControlParams().str() << endl;
+        genomeFile << control->getControlParams().str() << std::endl;
 	}
-	genomeFile << "#EndControlParams" << endl;
-	genomeFile << "end of fixed Morphology" << endl;
-	cout << "saved cat" << endl;
+    genomeFile << "#EndControlParams" << std::endl;
+    genomeFile << "end of fixed Morphology" << std::endl;
+    std::cout << "saved cat" << std::endl;
 	genomeFile.close();
 }
 
@@ -92,9 +91,9 @@ void FixedBaseMorphology::saveGenome(int indNum, float fitness) {
 //		* Eigen::MatrixXd::NullaryExpr(3, numberOfSamples, randN)).colwise()
 //		+ means;
 //
-//	//std::cout << "Mean\n" << means << std::endl;
-//	//std::cout << "Covar\n" << covar << std::endl;
-//	//std::cout << "Samples\n" << samples << std::endl;
+//	//std::std::cout << "Mean\n" << means << std::std::endl;
+//	//std::std::cout << "Covar\n" << covar << std::std::endl;
+//	//std::std::cout << "Samples\n" << samples << std::std::endl;
 //
 //	return samples;
 //}

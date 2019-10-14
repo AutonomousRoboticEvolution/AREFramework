@@ -3,7 +3,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <math.h>
-using namespace std;
 
 Module_Bone::Module_Bone()
 {
@@ -20,31 +19,31 @@ int Module_Bone::init() {
 }
 
 int Module_Bone::mutate(float mutationRate) {
-//	cout << "About to mutate" << endl;
+//	std::cout << "About to mutate" << std::endl;
 	control->mutate(mutationRate);
 	return 1;
 }
 
-vector<int> Module_Bone::createBone(vector<float> configuration, int relativePosHandle, int parentHandle) {
+std::vector<int> Module_Bone::createBone(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
 	if (settings->verbose) {
-		cout << "Creating Bone" << endl;
+        std::cout << "Creating Bone" << std::endl;
 	}
-	vector<int> partHandles;
+    std::vector<int> partHandles;
     partHandles = createCube(configuration, relativePosHandle, parentHandle);
 	return partHandles;
 }
 
-int Module_Bone::createModule(vector<float> configuration, int relativePosHandle, int parentHandle) {
-	vector<int> shapes;
-	vector<int> joints;
-	vector<int> dummies;
-	vector<int> sensors;
+int Module_Bone::createModule(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
+    std::vector<int> shapes;
+    std::vector<int> joints;
+    std::vector<int> dummies;
+    std::vector<int> sensors;
 
-	// These three vectors need to be populated with the appropriate parts when constructing the skeleton
-	vector<int> partHandles = createBone(configuration, relativePosHandle, parentHandle);
-    cout << "DEBUG - partHandles.size(): " << partHandles.size() << endl;
+    // These three std::vectors need to be populated with the appropriate parts when constructing the skeleton
+    std::vector<int> partHandles = createBone(configuration, relativePosHandle, parentHandle);
+    std::cout << "DEBUG - partHandles.size(): " << partHandles.size() << std::endl;
 	if (partHandles.size() < 1) {
-		cout << "ERROR: No parts have been created for the bones." << endl;
+        std::cout << "ERROR: No parts have been created for the bones." << std::endl;
 		return -1;
 	}
 	int miscHandle = partHandles[0];
@@ -53,7 +52,7 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	int shapesStorage[100]; // stores up to 20 shapes
 	simGetObjectSelection(shapesStorage);
 	int selectionSize = simGetObjectSelectionSize();
-    cout << "DEBUG - selectionSize: " << selectionSize << endl;
+    std::cout << "DEBUG - selectionSize: " << selectionSize << std::endl;
 	for (int i = 0; i < selectionSize; i++) {
 		int objectType = simGetObjectType(shapesStorage[i]);
 		if (objectType == sim_object_shape_type) {
@@ -75,15 +74,15 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	simRemoveObjectFromSelection(sim_handle_all, miscHandle);
 
 	if (shapes.size() < 1) {
-		cout << "ERROR: No shapes have been created for the bones." << endl;
+        std::cout << "ERROR: No shapes have been created for the bones." << std::endl;
 		return -1;
 	}
 
 	// get the difference between the parent attachment configurations and the main handle of the object?
 
 	if (settings->verbose) {
-		cout << "creating force sensor" << endl;
-        cout << "shape and dummy handles size = " << shapes.size() << ", " << dummies.size() << endl;
+        std::cout << "creating force sensor" << std::endl;
+        std::cout << "shape and dummy handles size = " << shapes.size() << ", " << dummies.size() << std::endl;
 	}
 	int fsParams[5];
 	fsParams[0] = 0;
@@ -131,15 +130,15 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	simGetObjectPosition(miscHandle, relativePosHandle, objectOrigin);
 
 	if (settings->verbose) {
-		cout << "Done creating force sensor" << endl;
+        std::cout << "Done creating force sensor" << std::endl;
 	}
 
 
 	for (int n = 0; n < dummies.size(); n++) {
 		// add a connection site for every dummy object in the model
-		vector<shared_ptr<SITE>> site;
+        std::vector<std::shared_ptr<SITE>> site;
 		for (int i = 0; i < 4; i++) {
-			site.push_back(shared_ptr<SITE>(new SITE));
+            site.push_back(std::shared_ptr<SITE>(new SITE));
 			site[i]->x = 0.0;
 			site[i]->y = 0.0;
 			site[i]->z = 0.0;
@@ -174,14 +173,14 @@ int Module_Bone::createModule(vector<float> configuration, int relativePosHandle
 	}
 //	controlHandles.push_back(joint);
 	if (settings->verbose) {
-		cout << "Done creating misc module" << endl;
+        std::cout << "Done creating misc module" << std::endl;
 	}
 	moduleHandle = miscHandle;
 	return miscHandle;
 }
 
-vector<int> Module_Bone::getFreeSites(vector<int> targetSites) {
-	vector<int> tempFreeSites;
+std::vector<int> Module_Bone::getFreeSites(std::vector<int> targetSites) {
+    std::vector<int> tempFreeSites;
 	for (int i = 0; i < targetSites.size(); i++) {
 		for (int j = 0; j < freeSites.size(); j++) {
 			if (targetSites[i] == freeSites[j]) {
@@ -191,7 +190,7 @@ vector<int> Module_Bone::getFreeSites(vector<int> targetSites) {
 	}
 	return tempFreeSites;
 }
-vector<int> Module_Bone::getObjectHandles() {
+std::vector<int> Module_Bone::getObjectHandles() {
 	return objectHandles;
 }
 
@@ -199,8 +198,8 @@ void Module_Bone::setModuleColor() {
 
 }
 
-shared_ptr<ER_Module> Module_Bone::clone() {
-	shared_ptr<Module_Bone> clonedModule = make_unique<Module_Bone>(*this);
+std::shared_ptr<ER_Module> Module_Bone::clone() {
+    std::shared_ptr<Module_Bone> clonedModule = std::make_unique<Module_Bone>(*this);
 //	clonedModule->control = control->clone();
 	return clonedModule;
 }
@@ -211,9 +210,9 @@ void Module_Bone::removeModule() {
 	}
 }
 
-vector<float> Module_Bone::updateModule(vector<float> input) {
+std::vector<float> Module_Bone::updateModule(std::vector<float> input) {
 //	controlModule();
-	vector<float> output = ER_Module::updateModule(input);
+    std::vector<float> output = ER_Module::updateModule(input);
 //	energy = energy - energyDissipationRate;
 	float pos[3];
 	if (controlHandles.size() > 0) {
@@ -227,7 +226,7 @@ vector<float> Module_Bone::updateModule(vector<float> input) {
 				this->broken = true;
 			}
 			else if (!broken) {
-				//			vector<float> sensorValues;
+                //			std::vector<float> sensorValues;
 					//		sensorValues.push_back(0);
 					//		output = controlModule(sensorValues); // sensor values set to zero, no intrinsic sensors in the servo module
 				controlModule(output[0]);
@@ -238,13 +237,13 @@ vector<float> Module_Bone::updateModule(vector<float> input) {
 	return output; // 
 }
 
-stringstream Module_Bone::getModuleParams() {
+std::stringstream Module_Bone::getModuleParams() {
 	// needs to save variables of the module
-	stringstream ss;
-	ss << "#ModuleType:," << 4 << endl;  // make sure this is the same number as in the module factory
+    std::stringstream ss;
+    ss << "#ModuleType:," << 4 << std::endl;  // make sure this is the same number as in the module factory
 	/*ss << "#siteParameters:,";
 	for (int i = 0; i < siteConfigurations.size(); i++) {
-		ss << "/t,#site:," << 1 << "," << endl;
+        ss << "/t,#site:," << 1 << "," << std::endl;
 		for (int j = 0; j < siteConfigurations[i].size(); j++) {
 			ss << siteConfigurations[i][j].x << ",";
 			ss << siteConfigurations[i][j].y << ",";
@@ -254,15 +253,15 @@ stringstream Module_Bone::getModuleParams() {
 			ss << siteConfigurations[i][j].rZ << ",";
 		}
 	}
-	ss << endl;*/
+    ss << std::endl;*/
 	return ss;
 }
 
-void Module_Bone::setModuleParams(vector<string> values) {
+void Module_Bone::setModuleParams(std::vector<std::string> values) {
 	ER_Module::setControlParams(values);
 	/*for (int it = 0; it < values.size(); it++) {
 		string tmp = values[it];
-		vector<string> controlParams;
+        std::vector<string> controlParams;
 		if (tmp == "#ControlParams:") {
 			it++;
 			controlParams.push_back(tmp);
@@ -276,9 +275,9 @@ void Module_Bone::setModuleParams(vector<string> values) {
 
 
 void Module_Bone::createControl() {
-	//	cout << "creating Rodrigo genome" << endl; 
+    //	std::cout << "creating Rodrigo genome" << std::endl;
 	// Do not use!
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 	//control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings); // 0 is ANN
 	//control = controlFactory->createNewControlGenome(1, randomNum, settings); // 0 is ANN
 	control = controlFactory->createNewControlGenome(settings->controlType, randomNum, settings);
@@ -288,37 +287,37 @@ void Module_Bone::createControl() {
 
 void Module_Bone::controlModule(float input) {
 	//	control->update(sensorValues);
-//	vector<float> output = control->update(sensorValues);
+//	std::vector<float> output = control->update(sensorValues);
 //	if (output.size() != 1) {
-	//	cout << "ERROR:: output size is not 1, but should be" << endl;
+    //	std::cout << "ERROR:: output size is not 1, but should be" << std::endl;
 //	}
-//	cout << "output[0] = " << input << endl;
+//	std::cout << "output[0] = " << input << std::endl;
 	simSetJointTargetPosition(controlHandles[0], 0.5 * input * M_PI);
 //	return output;
 }
 
-vector<float> Module_Bone::getPosition() {
-	vector<float> positionVector;
+std::vector<float> Module_Bone::getPosition() {
+    std::vector<float> positionvector;
 	float pos[3];
 	simGetObjectPosition(objectHandles[1], -1, pos);
-	positionVector.push_back(pos[0]);
-	positionVector.push_back(pos[1]);
-	positionVector.push_back(pos[2]);
-	return positionVector;
+    positionvector.push_back(pos[0]);
+    positionvector.push_back(pos[1]);
+    positionvector.push_back(pos[2]);
+    return positionvector;
 }
 
-stringstream Module_Bone::getControlParams() {
-	stringstream ss;
-	ss << "#ControlType," << settings->controlType << endl; // CUSTOM_ANN
+std::stringstream Module_Bone::getControlParams() {
+    std::stringstream ss;
+    ss << "#ControlType," << settings->controlType << std::endl; // CUSTOM_ANN
 	ss << control->getControlParams().str();
-	ss << "#EndControl," << endl;
-	ss << endl;
+    ss << "#EndControl," << std::endl;
+    ss << std::endl;
 	return ss;
 }
 
-vector<int> Module_Bone::createCube(vector<float> configuration, int relativePosHandle, int parentHandle) {
+std::vector<int> Module_Bone::createCube(std::vector<float> configuration, int relativePosHandle, int parentHandle) {
     // All functionality of the bone should be added here.
-    vector<int> partHandles;
+    std::vector<int> partHandles;
     // Create parent dummy
     int dummy = simCreateDummy(0.1, NULL);
     float dR[3];
@@ -362,7 +361,7 @@ vector<int> Module_Bone::createCube(vector<float> configuration, int relativePos
     partHandles.push_back(cube);
 
     // Create children dummies
-    vector<int> dummies;
+    std::vector<int> dummies;
     for (int i = 0; i < 5; i++) {
         dummies.push_back(simCreateDummy(0.01, nullptr));
     }

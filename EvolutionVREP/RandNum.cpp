@@ -1,7 +1,6 @@
 #include "RandNum.h"
 #include <iostream>
 #include <cmath>
-using namespace std;
 
 RandNum::RandNum(int seed)
 {
@@ -28,7 +27,7 @@ int RandNum::randInt(int range, int offset) {
 		return value;
 	}
 	else {
-		cout << "ERROR: random range was 0, check your code" << endl;
+        std::cout << "ERROR: random range was 0, check your code" << std::endl;
 		return 0;
 	}
 //	cout << "randInt = " << value << endl;

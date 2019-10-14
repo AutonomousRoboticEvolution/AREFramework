@@ -2,9 +2,6 @@
 #include "v_repLib.h"
 #include <cassert>
 
-using namespace std;
-
-
 ObjectCreator::ObjectCreator(){}
 ObjectCreator::~ObjectCreator(){}
 ObjectRemover::ObjectRemover(){}
@@ -14,20 +11,20 @@ RetrieveVREPInfo::~RetrieveVREPInfo(){}
 SetVREPInfo::SetVREPInfo(){}
 SetVREPInfo::~SetVREPInfo(){}
 
-void SetVREPInfo::v_nameObject(string name, int handle) {
-	string objectName = name + to_string(handle);
+void SetVREPInfo::v_nameObject(std::string name, int handle) {
+    std::string objectName = name + std::to_string(handle);
 	simSetObjectName(handle, objectName.c_str());
 }
 
 int ObjectCreator::v_createCube(int bitvalue, float size[3], float position[3],
-	float orientation[3], float mass, int parentHandle, string name, bool handleInName, bool renderable) {
-	vector<float> objectParameters;
+    float orientation[3], float mass, int parentHandle, std::string name, bool handleInName, bool renderable) {
+    std::vector<float> objectParameters;
 	int objectHandle = simCreatePureShape(0, bitvalue, size, mass, NULL);
 	simSetObjectPosition(objectHandle, parentHandle, position);
 	simSetObjectOrientation(objectHandle, parentHandle, orientation);
-	string objectName;
+    std::string objectName;
 	if (handleInName == true) {
-		objectName = name + to_string(objectHandle);
+        objectName = name + std::to_string(objectHandle);
 	}
 	else {
 		objectName = name;
@@ -38,7 +35,7 @@ int ObjectCreator::v_createCube(int bitvalue, float size[3], float position[3],
 }
 
 int ObjectCreator::v_createRevoluteJoint(int bitvalue, float size[3], float position[3],
-	float orientation[3], float mass, int parentHandle, string name, bool handleInName, bool renderable)
+    float orientation[3], float mass, int parentHandle, std::string name, bool handleInName, bool renderable)
 {
 	int jointHandle = simCreateJoint(sim_joint_revolute_subtype, sim_jointmode_force, 0, size, NULL, NULL);
 	simSetObjectPosition(jointHandle, parentHandle, position);
@@ -47,9 +44,9 @@ int ObjectCreator::v_createRevoluteJoint(int bitvalue, float size[3], float posi
 	simSetObjectIntParameter(jointHandle, 2000, 1);
 	simSetObjectIntParameter(jointHandle, 2001, 1);
 
-	string objectName;
+    std::string objectName;
 	if (handleInName == true) {
-		objectName = name + to_string(jointHandle);
+        objectName = name + std::to_string(jointHandle);
 	}
 	else {
 		objectName = name;
@@ -60,7 +57,7 @@ int ObjectCreator::v_createRevoluteJoint(int bitvalue, float size[3], float posi
 
 // bitValue
 int ObjectCreator::v_createVisionSensor(int bitvalue, float size[3], float position[3],
-	float orientation[3], float mass, int parentHandle, string name, bool handleInName, bool renderable, int resolution[2]) {
+    float orientation[3], float mass, int parentHandle, std::string name, bool handleInName, bool renderable, int resolution[2]) {
 
 	int sensorResolution[4] = { resolution[0], resolution[1], 0, 0 };
 	//	floatParams(input) : 11 floating point parameters :
@@ -79,7 +76,7 @@ int ObjectCreator::v_createVisionSensor(int bitvalue, float size[3], float posit
 	float sensorColor[3] = { 1.0, 1.0, 1.0 };
 	int visionHandle = 0;
 	visionHandle = simCreateVisionSensor(bitvalue, sensorResolution, sensorFloatArray, sensorColor);
-	string visionName = name + to_string(visionHandle);
+    std::string visionName = name + std::to_string(visionHandle);
 	simSetObjectName(visionHandle, visionName.c_str());
 	if (parentHandle < 1) {
 		simSetObjectParent(visionHandle, sim_handle_scene, true);
@@ -98,7 +95,7 @@ int ObjectCreator::v_createVisionSensor(int bitvalue, float size[3], float posit
 	return visionHandle;
 }
 
-bool RetrieveVREPInfo::v_checkObjectCollision(int, vector<int>, vector<int>) {
+bool RetrieveVREPInfo::v_checkObjectCollision(int, std::vector<int>, std::vector<int>) {
 	return true;
 }
 
@@ -115,11 +112,11 @@ int RetrieveVREPInfo::v_getParent(int childHandle) {
 	return simGetObjectParent(childHandle);
 }
 
-vector<int> RetrieveVREPInfo::v_getObjectHandlesInTree(int parentHandle) {
+std::vector<int> RetrieveVREPInfo::v_getObjectHandlesInTree(int parentHandle) {
 	simAddObjectToSelection(sim_handle_tree, parentHandle);
 	int selectionSize = simGetObjectSelectionSize();
-	int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a vector for some reason
-	vector<int> objectHandles;
+    int tempObjectHandles[1024]; // temporarily stores the object Handles as they cannot be inserted directly in a std::vector for some reason
+    std::vector<int> objectHandles;
 	//s_objectAmount = selectionSize;
 	simGetObjectSelection(tempObjectHandles);
 	int objectCounter = 0;

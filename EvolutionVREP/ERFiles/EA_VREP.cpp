@@ -1,7 +1,5 @@
 #include "EA_VREP.h"
 
-using namespace std;
-
 EA_VREP::EA_VREP()
 {
 }
@@ -12,7 +10,7 @@ EA_VREP::~EA_VREP()
 
 void EA_VREP::init()
 {
-	gf = unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
+    gf = std::unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
 }
 
 void EA_VREP::selection()
@@ -27,7 +25,7 @@ void EA_VREP::mutation()
 {
 }
 
-void EA_VREP::initializePopulation(shared_ptr<Settings> st, bool client)
+void EA_VREP::initializePopulation(std::shared_ptr<Settings> st, bool client)
 {
 	settings = st;
 	if (client) {

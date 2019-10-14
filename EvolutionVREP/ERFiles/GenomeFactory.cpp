@@ -1,7 +1,5 @@
 #include "GenomeFactory.h"
 
-using namespace std;
-
 GenomeFactory::GenomeFactory()
 {
 }
@@ -10,27 +8,27 @@ GenomeFactory::~GenomeFactory()
 {
 }
 
-shared_ptr<Genome> GenomeFactory::createGenome(int type, shared_ptr<RandNum> rn, shared_ptr<Settings> st)
+std::shared_ptr<Genome> GenomeFactory::createGenome(int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
 	switch (type) {
         case 1:
         {
-            unique_ptr<Genome> m_genome(new DefaultGenome);  //create a genome??
+            std::unique_ptr<Genome> m_genome(new DefaultGenome);  //create a genome??
             m_genome->randomNum = rn;
             m_genome->settings = st;
-            //cout << m_genome->settings->COLOR_LSYSTEM << endl;
+            //std::cout << m_genome->settings->COLOR_LSYSTEM << std::endl;
             return m_genome;
         }
         case 0: {
-            cout << "ERROR: You started a client-server application. You cannot instantiate objects that depend on V-REP's libraries." << endl;
+            std::cout << "ERROR: You started a client-server application. You cannot instantiate objects that depend on V-REP's libraries." << std::endl;
         }
 	}
-	return unique_ptr<Genome>();
+    return std::unique_ptr<Genome>();
 }
 
-shared_ptr<Genome> GenomeFactory::copyGenome(shared_ptr<Genome> parent)
+std::shared_ptr<Genome> GenomeFactory::copyGenome(std::shared_ptr<Genome> parent)
 {
-	shared_ptr<Genome> cloneGenome;
+    std::shared_ptr<Genome> cloneGenome;
 	cloneGenome = parent->clone();
 	return cloneGenome;
 }

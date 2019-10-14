@@ -2,8 +2,6 @@
 #include <iostream>
 #include <algorithm>
 
-using namespace std;
-
 Development::Development()
 {
 	modular = true;
@@ -26,13 +24,13 @@ int Development::getAmountBrokenModules()
 	return amountBrokenModules;
 }
 
-//vector <shared_ptr<ER_Module>> Development::getCreatedModules() {
+//std::vector <std::shared_ptr<ER_Module>> Development::getCreatedModules() {
 //	return createdModules;
 //}
 
 void Development::createAtPosition(float x, float y, float z)
 {
-	cout << "x, y, z: " << x << ", " << y << ", " << z << endl;
+    std::cout << "x, y, z: " << x << ", " << y << ", " << z << std::endl;
 	float position[3];
 
 	position[0] = x;
@@ -40,45 +38,45 @@ void Development::createAtPosition(float x, float y, float z)
 	position[2] = z;
 }
 
-void Development::crossover(shared_ptr<Morphology> partnerMorph, float cr)
+void Development::crossover(std::shared_ptr<Morphology> partnerMorph, float cr)
 {
 
 }
 
 void Development::printSome()
 {
-	cout << "printing some from Development" << endl;
+    std::cout << "printing some from Development" << std::endl;
 }
 
 
 void Development::saveGenome(int indNum, float fitness)
 {
-	ofstream genomeFile;
-	ostringstream genomeFileName;
+    std::ofstream genomeFile;
+    std::ostringstream genomeFileName;
 	genomeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/genome" << indNum << ".csv";
 //	genomeFileName << indNum << ".csv";
-	// std::cout << "Saving genome to " << genomeFileName.str() << std::std::endl;
+    // std::std::cout << "Saving genome to " << genomeFileName.str() << std::std::std::endl;
 	genomeFile.open(genomeFileName.str());
 	if (!genomeFile) {
-		std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
+        std::cerr << "Error opening file \"" << genomeFileName.str() << "\" to save genome." << std::endl;
 	}
 
 	const std::string genomeText = this->generateGenome(indNum, fitness);
-	genomeFile << genomeText << std::endl;
+    genomeFile << genomeText << std::endl;
 	genomeFile.close();
 }
 
 
 bool Development::loadGenome(int individualNumber, int sceneNum)
 {
-	ostringstream genomeFileName;
+    std::ostringstream genomeFileName;
 
 	if (settings->morphologyType == settings->MODULAR_PHENOTYPE) {
 		genomeFileName << settings->repository + "/morphologies" << sceneNum << "/phenotype" << individualNumber << ".csv";
-		std::cout << "Loading phenotype" << genomeFileName.str() << std::endl;
-		ifstream genomeFile(genomeFileName.str());
+        std::cout << "Loading phenotype" << genomeFileName.str() << std::endl;
+        std::ifstream genomeFile(genomeFileName.str());
 		if (!genomeFile) {
-			std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+            std::cerr << "Could not load " << genomeFileName.str() << std::endl;
 			return false;
 			//		std::exit(1);
 		}
@@ -88,10 +86,10 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 	}
 	else {
 		genomeFileName << settings->repository + "/morphologies" << sceneNum << "/genome" << individualNumber << ".csv";
-		std::cout << "Loading genome" << genomeFileName.str() << std::endl;
-		ifstream genomeFile(genomeFileName.str());
+        std::cout << "Loading genome" << genomeFileName.str() << std::endl;
+        std::ifstream genomeFile(genomeFileName.str());
 		if (!genomeFile) {
-			std::cerr << "Could not load " << genomeFileName.str() << std::endl;
+            std::cerr << "Could not load " << genomeFileName.str() << std::endl;
 			return false;
 			//		std::exit(1);
 		}
@@ -105,7 +103,7 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 
 bool Development::loadGenome(std::istream &input, int individualNumber)
 {
-	std::cout << "Cannot instantiate development class, also, should become abstract" << endl;
+    std::cout << "Cannot instantiate development class, also, should become abstract" << std::endl;
 	return false;
 }
 
@@ -148,35 +146,35 @@ int Development::getMaxChilds(int t)
 	}
 }
 
-//vector<shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
+//std::vector<std::shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
 //}
 
-void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
+void Development::savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
 {
 	if (settings->verbose) {
-		cout << "saving direct phenotype genome " << endl << "-------------------------------- " << endl;
+        std::cout << "saving direct phenotype genome " << std::endl << "-------------------------------- " << std::endl;
 	}
 	//	int evolutionType = 0; // regular evolution, will be changed in the future. 
 	int amountExpressedModules = createdModules.size();
 	
-	ofstream phenotypeFile;
-	ostringstream phenotypeFileName;
+    std::ofstream phenotypeFile;
+    std::ostringstream phenotypeFileName;
 	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
 
 	phenotypeFile.open(phenotypeFileName.str());
-	phenotypeFile << "#Individual:" << indNum << endl;
-	phenotypeFile << "#Fitness:," << fitness << endl;
-	phenotypeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << endl << endl;
-	//	cout << "#AmountStates:," << amountStates << "," << endl << endl;
+    phenotypeFile << "#Individual:" << indNum << std::endl;
+    phenotypeFile << "#Fitness:," << fitness << std::endl;
+    phenotypeFile << "#AmountExpressedModules:," << amountExpressedModules << "," << std::endl << std::endl;
+    //	std::cout << "#AmountStates:," << amountStates << "," << std::endl << std::endl;
 
-	phenotypeFile << "Module Parameters Start Here: ," << endl << endl;
+    phenotypeFile << "Module Parameters Start Here: ," << std::endl << std::endl;
 	for (int i = 0; i < createdModules.size(); i++) {
-		phenotypeFile << "#Module:," << i << endl;
-		phenotypeFile << "#ModuleType:," << createdModules[i]->type << endl;
+        phenotypeFile << "#Module:," << i << std::endl;
+        phenotypeFile << "#ModuleType:," << createdModules[i]->type << std::endl;
 		
-		phenotypeFile << "#ModuleParent:," << createdModules[i]->parent << endl;
-		phenotypeFile << "#ParentSite:," << createdModules[i]->parentSite << endl;
-		phenotypeFile << "#Orientation:," << createdModules[i]->orientation << endl;
+        phenotypeFile << "#ModuleParent:," << createdModules[i]->parent << std::endl;
+        phenotypeFile << "#ParentSite:," << createdModules[i]->parentSite << std::endl;
+        phenotypeFile << "#Orientation:," << createdModules[i]->orientation << std::endl;
 
 		// TODO: EB: This shouldn't be here. This offsets the coordinates so it can be printabled.
         if(createdModules[i]->absPos[0] > 0) createdModules[i]->absPos[0] += 0.003;
@@ -188,31 +186,31 @@ void Development::savePhenotype(vector<shared_ptr<BASEMODULEPARAMETERS>> created
         phenotypeFile << "#AbsPosition:," << createdModules[i]->absPos[0] << "," << createdModules[i]->absPos[1] << "," << createdModules[i]->absPos[2] << std::endl;
         phenotypeFile << "#AbsOrientation:," << createdModules[i]->absOri[0] << "," << createdModules[i]->absOri[1] << "," << createdModules[i]->absOri[2] << std::endl;
 
-		phenotypeFile << "#ControlParams:," << endl;
+        phenotypeFile << "#ControlParams:," << std::endl;
 		phenotypeFile << createdModules[i]->control->getControlParams().str();
-		phenotypeFile << "#EndControlParams" << endl;
-		phenotypeFile << "#EndOfModule," << endl << endl;
+        phenotypeFile << "#EndControlParams" << std::endl;
+        phenotypeFile << "#EndOfModule," << std::endl << std::endl;
 	}
-	phenotypeFile << "End Module Parameters" << endl;
+    phenotypeFile << "End Module Parameters" << std::endl;
 	phenotypeFile.close();
 }
 
-std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
+std::vector<std::shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
 {
-	cout << "loading direct phenotype genome " << endl << "-------------------------------- " << endl;
+    std::cout << "loading direct phenotype genome " << std::endl << "-------------------------------- " << std::endl;
 
-	vector<shared_ptr<BASEMODULEPARAMETERS>> bmp;
-	ostringstream phenotypeFileName;
+    std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> bmp;
+    std::ostringstream phenotypeFileName;
 	phenotypeFileName << settings->repository + "/morphologies" << settings->sceneNum << "/phenotype" << indNum << ".csv";
 	//	phenotypeFileName << "files/morphologies0/genome9137.csv";
-	cout << phenotypeFileName.str() << endl;
-	ifstream phenotypeFile(phenotypeFileName.str());
-	string value;
-	list<string> values;
+    std::cout << phenotypeFileName.str() << std::endl;
+    std::ifstream phenotypeFile(phenotypeFileName.str());
+    std::string value;
+    std::list<std::string> values;
 	while (phenotypeFile.good()) {
 		getline(phenotypeFile, value, ',');
-		//		cout << value << ",";
-		if (value.find('\n') != string::npos) {
+        //		std::cout << value << ",";
+        if (value.find('\n') != std::string::npos) {
 			split_line(value, "\n", values);
 		}
 		else {
@@ -220,16 +218,16 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 		}
 	}
 	int moduleNum;
-	vector<string> moduleValues;
-	vector<string> controlValues;
+    std::vector<std::string> moduleValues;
+    std::vector<std::string> controlValues;
 	bool checkingModule = false;
 	bool checkingControl = false;
 
-	list<string>::const_iterator it = values.begin();
+    std::list<std::string>::const_iterator it = values.begin();
 	for (it = values.begin(); it != values.end(); it++) {
-		string tmp = *it;
+        std::string tmp = *it;
 		if (settings->verbose) {
-			cout << "," << tmp;
+            std::cout << "," << tmp;
 		}
 		if (checkingModule == true) {
 			moduleValues.push_back(tmp);
@@ -241,7 +239,7 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 			it++;
 			tmp = *it;
 			fitness = atof(tmp.c_str());
-			//		cout << "Fitness was " << fitness << endl; 
+            //		std::cout << "Fitness was " << fitness << std::endl;
 		}
 		if (tmp == "#phenValue;") {
 			it++;
@@ -251,10 +249,10 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 		if (tmp == "#Module:") {
 			it++;
 			tmp = *it;
-			bmp.push_back(shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
+            bmp.push_back(std::shared_ptr<BASEMODULEPARAMETERS>(new BASEMODULEPARAMETERS));
 			moduleNum = bmp.size() - 1;// atoi(tmp.c_str());
 			checkingModule = true;
-			//		cout << "moduleNum set to " << moduleNum << endl; 
+            //		std::cout << "moduleNum set to " << moduleNum << std::endl;
 		}
 		else if (tmp == "#ModuleParent:")
 		{
@@ -266,7 +264,7 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 		{
 			it++;
 			tmp = *it;
-			//genome->moduleParameters.push_back(shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
+            //genome->moduleParameters.push_back(std::shared_ptr<MODULEPARAMETERS>(new MODULEPARAMETERS));
 			bmp[moduleNum]->type = atoi(tmp.c_str());
 		}
 		else if (tmp == "#ParentSite:")
@@ -289,7 +287,7 @@ std::vector<shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBase
 			//			lGenome->lParameters[moduleNum]->module->setModuleParams(moduleValues);
 			moduleValues.clear();
 			if (checkingControl == true) {
-				unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+                std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 				bmp[moduleNum]->control = controlFactory->createNewControlGenome(atoi(controlValues[2].c_str()), randomNum, settings); // 0 is ANN
 			//	lGenome->lParameters[moduleNum]->control->init(1, 2, 1);
 				bmp[moduleNum]->control->setControlParams(controlValues);
@@ -314,10 +312,10 @@ void Development::initCustomMorphology()
 }
 
 
-shared_ptr<Morphology> Development::clone() const
+std::shared_ptr<Morphology> Development::clone() const
 {
 	BaseMorphology::clone();
-	return make_unique<Development>(*this);
+    return std::make_unique<Development>(*this);
 }
 
 void Development::update()
@@ -337,7 +335,7 @@ int Development::mutateControlERLGenome(float mutationRate)
 
 void Development::create()
 {
-    cout << "CANNOT CREAT DEVELOPMENT GENOME" << endl;
+    std::cout << "CANNOT CREAT DEVELOPMENT GENOME" << std::endl;
 }
 
 void Development::mutate()
@@ -376,8 +374,8 @@ void Development::shiftRobotPosition()
 					size[j] = size[j] * 2;
 				}
 
-				vector<vector<float>> cubeVertex; // 8 points in 3d space
-				vector<vector<float>> points;
+                std::vector<std::vector<float>> cubeVertex; // 8 points in 3d space
+                std::vector<std::vector<float>> points;
 				points.resize(8);
 
 				float objectMatrix[12] = { 0,0,0,0,0,0,0,0,0,0,0,0 };
@@ -416,7 +414,7 @@ void Development::shiftRobotPosition()
 				points[7].push_back(rotationOrigin[1] - (0.5 * size[1]));
 				points[7].push_back(rotationOrigin[2] - (0.5 * size[2]));
 
-				vector<vector<float>> rotatedPoints;
+                std::vector<std::vector<float>> rotatedPoints;
 				rotatedPoints.resize(8);
 				for (int j = 0; j < 8; j++) {
 					rotatedPoints[j].push_back((points[j][0] * objectMatrix[0]) + (points[j][1] * objectMatrix[1]) + (points[j][2] * objectMatrix[2]));
@@ -444,13 +442,13 @@ void Development::shiftRobotPosition()
 	simGetObjectPosition(mainHandle, -1, tmpPos);
 	if (settings->environmentType == settings->ROUGH) {
 		if (settings->verbose) {
-            cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << endl;
+            std::cout << "Shifty Shifter !!!!!!!!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
         }
 	    newRobotPos[0] = tmpPos[0];
 		newRobotPos[1] = tmpPos[1];
 		newRobotPos[2] = (-minimumObjectPos + 0.001) + 0.35;
-		cout << "newRobotPos = " << newRobotPos[2] << endl;
-		cout << "obPos = " << minimumObjectPos << endl;
+        std::cout << "newRobotPos = " << newRobotPos[2] << std::endl;
+        std::cout << "obPos = " << minimumObjectPos << std::endl;
 	}
 	else {
 		newRobotPos[0] = tmpPos[0];
@@ -461,34 +459,34 @@ void Development::shiftRobotPosition()
 	simSetObjectPosition(mainHandle, mainHandle, newRobotPos);
 	//	float postpos[3];
 	//	simGetObjectPosition(mainHandle, -1, postpos);
-	//	cout << "postpos: " << postpos[2] << endl;
+    //	std::cout << "postpos: " << postpos[2] << std::endl;
 }
 
 int Development::getMainHandle()
 {
     if (createdModules.empty()) {
         std::string error_message = "ERROR: No module could be created, check initial position of the first module. ";
-        std::cerr << error_message << endl;
+        std::cerr << error_message << std::endl;
         throw std::runtime_error(error_message);
     } else {
         return createdModules[0]->moduleHandle;
     }
 }
 
-//vector<float> Development::eulerToDirectionalVector(vector<float> eulerAngles)
+//std::vector<float> Development::eulerToDirectionalstd::vector(std::vector<float> eulerAngles)
 //{
 //	Eigen::Matrix3f m;
-//	m = AngleAxisf(eulerAngles[0], Vector3f::UnitX())
-//		* AngleAxisf(eulerAngles[1], Vector3f::UnitY())
-//		* AngleAxisf(eulerAngles[2], Vector3f::UnitZ());
-//	//	cout << m << endl << "is unitary " << m.isUnitary() << endl;
-//	AngleAxisf AA = AngleAxisf(1 * M_PI, Vector3f::UnitZ());
-//	vector<float> directionalVector;
-//	directionalVector.push_back(m(6));
-//	directionalVector.push_back(m(7));
-//	directionalVector.push_back(m(8));
+//	m = AngleAxisf(eulerAngles[0], std::vector3f::UnitX())
+//		* AngleAxisf(eulerAngles[1], std::vector3f::UnitY())
+//		* AngleAxisf(eulerAngles[2], std::vector3f::UnitZ());
+//	//	std::cout << m << std::endl << "is unitary " << m.isUnitary() << std::endl;
+//	AngleAxisf AA = AngleAxisf(1 * M_PI, std::vector3f::UnitZ());
+//	std::vector<float> directionalstd::vector;
+//	directionalstd::vector.push_back(m(6));
+//	directionalstd::vector.push_back(m(7));
+//	directionalstd::vector.push_back(m(8));
 //
-//	return directionalVector;
+//	return directionalstd::vector;
 //}
 
 void Development::checkGenome(int individualNumber, int sceneNum)
@@ -502,7 +500,7 @@ void Development::checkControl(int individual, int sceneNum)
 }
 
 /// Check whether two components are colliding
-bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exceptionHandles)
+bool Development::checkLCollisions(std::shared_ptr<ER_Module> module, std::vector<int> exceptionHandles)
 {
     // TODO EB: Implement a way to ignore visuals.
     for (int n = 0; n < module->objectHandles.size(); n++) {
@@ -539,20 +537,20 @@ bool Development::checkLCollisions(shared_ptr<ER_Module> module, vector<int> exc
 bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
 {
     bool bViabilityResult;
-    vector<int> exception;
+    std::vector<int> exception;
     exception.push_back(iParentHandle);
     for (int p = 0; p < createdModules[createdModulesSize - 1]->objectHandles.size(); p++) {
         exception.push_back(createdModules[createdModulesSize - 1]->objectHandles[p]);
     }
     if (checkLCollisions(createdModules[createdModulesSize - 1], exception) == false || settings->bCollidingOrgans) {
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - PASSED." << std::endl;
         }
         bViabilityResult = true;
     }
     else{
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Collission check - FAILED." << std::endl;
         }
         bViabilityResult = false;
     }
@@ -565,13 +563,13 @@ bool Development::bCheckGround(int createdModulesSize)
     bool bViabilityResult;
     if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - PASSED."  << std::endl;
         }
         bViabilityResult = true;
     }
     else{
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename << " Above ground check - FAILED." << std::endl;
         }
         bViabilityResult = false;
     }
@@ -596,23 +594,23 @@ bool Development::bCheckOrientation(int createdModulesSize)
                 ((createdModules[createdModulesSize - 1]->absOri[0] < 0.0872665 && createdModules[createdModulesSize - 1]->absOri[0] > -0.0872665) && (createdModules[createdModulesSize - 1]->absOri[1] > -0.0872665 && createdModules[createdModulesSize - 1]->absOri[1] < 0.0872665) && (abs(createdModules[createdModulesSize - 1]->absOri[2]) > 3.05433 && abs(createdModules[createdModulesSize - 1]->absOri[2]) < 3.22886)) ||
                 settings->bNonprintableOrientations){
             if (settings->verbose) {
-                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                     << " Good orientation - PASSED." << endl;
+                std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - PASSED." << std::endl;
             }
             bViabilityResult = true;
         }
         else{
             if (settings->verbose) {
-                cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                     << " Good orientation - FAILED." << endl;
+                std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                     << " Good orientation - FAILED." << std::endl;
             }
             bViabilityResult = false;
         }
     }
     else { // If organ is not brain or sensor
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                 << " Good orientation - PASSED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Good orientation - PASSED." << std::endl;
         }
         bViabilityResult = true;
     }
@@ -656,15 +654,15 @@ bool Development::bCheckOrgansNumber(int createdModulesSize)
     if(((createdModules[createdModulesSize - 1]->type == 14 && motorCounter >= 2) ||
         (createdModules[createdModulesSize - 1]->type == 15 && sensorCounter >= 2)) && !settings->bAnyOrgansNumber){
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                 << " Organs number check - FAILED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - FAILED." << std::endl;
         }
         bViabilityResult = false;
     }
     else{
         if (settings->verbose) {
-            cout << "Component: " << createdModules[createdModulesSize - 1]->filename
-                 << " Organs number check - PASSED." << endl;
+            std::cout << "Component: " << createdModules[createdModulesSize - 1]->filename
+                 << " Organs number check - PASSED." << std::endl;
         }
         bViabilityResult = true;
     }

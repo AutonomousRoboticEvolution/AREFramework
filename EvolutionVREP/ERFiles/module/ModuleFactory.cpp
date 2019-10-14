@@ -1,8 +1,6 @@
 #include "ModuleFactory.h"
 #include <iostream>
 
-using namespace std; 
-
 ModuleFactory::ModuleFactory()
 {
 }
@@ -11,15 +9,15 @@ ModuleFactory::~ModuleFactory()
 {
 }
 
-shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_ptr<RandNum> rn, shared_ptr<Settings> st) {
+std::shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st) {
     switch (moduleType) {
         case DEFAULTMODULE: {
-            cout << "ERROR: Module not specified yet, see ModuleFactory.cpp" << endl;
+            std::cout << "ERROR: Module not specified yet, see ModuleFactory.cpp" << std::endl;
             return NULL;
         }
         case CUBE: {
-            //	cout << "creating cube genome" << endl;
-            shared_ptr<ER_Module> module(new Module_Cube);
+            //	std::cout << "creating cube genome" << std::endl;
+            std::shared_ptr<ER_Module> module(new Module_Cube);
             module->randomNum = rn;
             module->settings = st;
             module->type = CUBE;
@@ -30,7 +28,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             if (st->evolutionType == st->EMBODIED_EVOLUTION) {
                 // used to be to evolve real robot directly
             } else {
-                shared_ptr<ER_Module> module(new Module_Servo);
+                std::shared_ptr<ER_Module> module(new Module_Servo);
                 module->randomNum = rn;
                 module->settings = st;
                 module->type = SERVO;
@@ -39,7 +37,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             }
         }
         case BRAIN: {
-            shared_ptr<ER_Module> module(new Module_Misc);
+            std::shared_ptr<ER_Module> module(new Module_Misc);
             module->randomNum = rn;
             module->settings = st;
             module->type = 13;
@@ -48,7 +46,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         case WHEEL: {
-            shared_ptr<ER_Module> module(new Module_Misc);
+            std::shared_ptr<ER_Module> module(new Module_Misc);
             module->randomNum = rn;
             module->settings = st;
             module->type = 14;
@@ -57,7 +55,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         case SENSOR: {
-            shared_ptr<ER_Module> module(new Module_Misc);
+            std::shared_ptr<ER_Module> module(new Module_Misc);
             module->randomNum = rn;
             module->settings = st;
             module->type = 15;
@@ -66,7 +64,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         case ARE_SERVO: {
-            shared_ptr<ER_Module> module(new Module_Misc);
+            std::shared_ptr<ER_Module> module(new Module_Misc);
             module->randomNum = rn;
             module->settings = st;
             module->type = 16;
@@ -75,7 +73,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         case EXAMPLE: {
-            shared_ptr<ER_Module> module(new Module_Misc);
+            std::shared_ptr<ER_Module> module(new Module_Misc);
             module->randomNum = rn;
             module->settings = st;
             module->type = 18;
@@ -84,7 +82,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         case BONE: {
-            shared_ptr<ER_Module> module(new Module_Bone);
+            std::shared_ptr<ER_Module> module(new Module_Bone);
             module->randomNum = rn;
             module->settings = st;
             module->type = 17;
@@ -93,7 +91,7 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
             return module;
         }
         default: {
-            cout << "ERROR: Module type not specified, returning NULL" << endl;
+            std::cout << "ERROR: Module type not specified, returning NULL" << std::endl;
             return NULL;
         }
 
@@ -101,11 +99,11 @@ shared_ptr<ER_Module> ModuleFactory::createModuleGenome(int moduleType, shared_p
     return NULL;
 }
 
-shared_ptr<ER_Module> ModuleFactory::copyModuleGenome(shared_ptr<ER_Module> parent)
+std::shared_ptr<ER_Module> ModuleFactory::copyModuleGenome(std::shared_ptr<ER_Module> parent)
 {
-	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
+    std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);
 //	ControlFactory *controlFactory = new ControlFactory(); 
-	shared_ptr<ER_Module> cloneModule;
+    std::shared_ptr<ER_Module> cloneModule;
 	cloneModule = parent->clone();
 	if (cloneModule->control != NULL) {
 		cloneModule->control = controlFactory->copyControlGenome(parent->control);

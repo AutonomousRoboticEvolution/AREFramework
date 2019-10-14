@@ -23,31 +23,30 @@
 #include "../ERFiles/EA_MultiNEAT.h"
 #include <ctime>
 
-using namespace std;
 
 clock_t tStart;
 clock_t sysTime;
 
 void saveLog(int counter) {
-	ofstream logFile;
-	logFile.open("files/timeLog.csv", ios::app);
-	clock_t now = clock();
+    std::ofstream logFile;
+    logFile.open("files/timeLog.csv", std::ios::app);
+    std::clock_t now = std::clock();
 	//	double deltaSysTime = difftime((double) time(0), sysTime) ;
 	int deltaSysTime = now - sysTime;
-	logFile << "time after generation " << counter << " = ," << deltaSysTime  << "," << endl;
+    logFile << "time after generation " << counter << " = ," << deltaSysTime  << "," << std::endl;
 	sysTime = clock();
 	logFile.close();
 }
 
 int main(int argc, char* argv[])
 {
-	unique_ptr<ClientEA> client = unique_ptr<ClientEA>(new ClientEA);
+    std::unique_ptr<ClientEA> client = std::unique_ptr<ClientEA>(new ClientEA);
 	std::vector<std::string> arguments(argv + 1, argv + argc);
-    client->settings = shared_ptr<Settings>(new Settings);
-	string destination;
+    client->settings = std::shared_ptr<Settings>(new Settings);
+    std::string destination;
 	if (arguments.size() > 0) {
 		destination = arguments[0];
-		cout << "arguments are: ";
+        std::cout << "arguments are: ";
 		for (int i = 0; i < arguments.size(); i++) {
 			std::cout << arguments[i] << ", ";
 		}
@@ -67,13 +66,13 @@ int main(int argc, char* argv[])
 		// needs to be fixed at some point
 		client->settings->sceneNum = run;
 		client->settings->seed = run;
-		client->randNum = shared_ptr<RandNum>(new RandNum(run));
+        client->randNum = std::shared_ptr<RandNum>(new RandNum(run));
 		// client->randNum->setSeed(atoi(arguments[1].c_str()));
 		srand(run);
 	}
 	else {
 		client->settings->seed = 0;
-		client->randNum = shared_ptr<RandNum>(new RandNum(0));
+        client->randNum = std::shared_ptr<RandNum>(new RandNum(0));
 		// client->randNum->setSeed(0); // not initialized
 		srand(0);
 	}
@@ -120,13 +119,13 @@ int main(int argc, char* argv[])
 	//	tStart = clock();
 	//	client->ea->agePop(); // should be in update function of EA
 		if (!client->evaluatePop()) {
-			std::cout << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << endl;
+            std::cout << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << std::endl;
 			break;
 		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
 		//client->settings->saveSettings(); // IS IN EVALUATEPOP
 		if (client->settings->verbose) {
-			std::cout << "Just saved settings <right aftel evaluate pop>" << endl;
+            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
 		}
 		if (client->settings->generation % client->settings->xGenerations == 0 && client->settings->generation!=0) {
 			std::cout << "Generation interval reached, quitting simulator. " << std::endl;

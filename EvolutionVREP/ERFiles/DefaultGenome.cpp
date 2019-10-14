@@ -1,9 +1,7 @@
 #include "DefaultGenome.h"
 #include <iostream>
 
-using namespace std;
-
-DefaultGenome::DefaultGenome(shared_ptr<RandNum> rn, shared_ptr<Settings> st)
+DefaultGenome::DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
 	randomNum = rn;
 	settings = st;
@@ -19,11 +17,11 @@ DefaultGenome::~DefaultGenome() {
 	}*/
 }
 
-shared_ptr<Genome> DefaultGenome::clone() const
+std::shared_ptr<Genome> DefaultGenome::clone() const
 {
-	shared_ptr<DefaultGenome> genome = make_unique<DefaultGenome>(*this);
+    std::shared_ptr<DefaultGenome> genome = std::make_unique<DefaultGenome>(*this);
 	genome->morph = this->morph->clone();
-	return genome;
+    return std::move(genome);
 }
 
 void DefaultGenome::createInitialMorphology(int individualNumber) {
@@ -54,9 +52,9 @@ const std::string DefaultGenome::generateGenome() const
 }
 
 void DefaultGenome::checkGenome() {
-	cout << "mainHandle = " << morph->getMainHandle() << endl;
+    std::cout << "mainHandle = " << morph->getMainHandle() << std::endl;
 	if (morph == NULL) {
-		cout << "morph is null, cannot run evolution without a morphology being loaded" << endl;
+        std::cout << "morph is null, cannot run evolution without a morphology being loaded" << std::endl;
 	}
 	if (settings->verbose) {
 		// prints some debugging information in the terminal
@@ -64,9 +62,9 @@ void DefaultGenome::checkGenome() {
 	}
 }
 
-shared_ptr<Genome> DefaultGenome::cloneGenome()
+std::shared_ptr<Genome> DefaultGenome::cloneGenome()
 {
-	shared_ptr<DefaultGenome> cloned = make_unique<DefaultGenome>(*this);
+    std::shared_ptr<DefaultGenome> cloned = std::make_unique<DefaultGenome>(*this);
 	cloned->morph = morph->clone();
 	return cloned;
 }
@@ -74,52 +72,52 @@ shared_ptr<Genome> DefaultGenome::cloneGenome()
 
 std::shared_ptr<MorphologyFactory> DefaultGenome::newMorphologyFactory()
 {
-	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
 	return morphologyFactory;
 }
 
 bool DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
 	if (settings->verbose) {
-		cout << "Loading genome " << indNum << endl;
+        std::cout << "Loading genome " << indNum << std::endl;
 	}
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
+    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 
 	bool load = morph->loadGenome(indNum, sceneNum);
 	if (settings->verbose && load == true) {
-		cout << "Succesfully loaded genome " << indNum << endl;
+        std::cout << "Succesfully loaded genome " << indNum << std::endl;
 	}
 	return load;
 }
 
 bool DefaultGenome::loadMorphologyGenome(std::istream &input, int indNum) {
 	if (settings->verbose) {
-		cout << "Loading genome " << indNum << endl;
+        std::cout << "Loading genome " << indNum << std::endl;
 	}
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
+    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 
 	bool load = morph->loadGenome(input, indNum);
 	if (settings->verbose && load == true) {
-		cout << "Succesfully loaded genome " << indNum << endl;
+        std::cout << "Succesfully loaded genome " << indNum << std::endl;
 	}
 	return load;
 }
 
 void DefaultGenome::loadBaseMorphology(int indNum, int sceneNum) {
 	// This is an old piece of code that I didn't want to delete yet.
-	cout << "about to load base morphology" << endl;
+    std::cout << "about to load base morphology" << std::endl;
 	morph->loadBaseMorphology(indNum, sceneNum);
 }
 
 void DefaultGenome::init_noMorph() {
 	// For debugging. Shouldn't be used otherwise.
 	int m_type = settings->morphologyType;
-	shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
 	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
 	morphologyFactory.reset();
 	//morph->init_noMorph();
@@ -150,7 +148,7 @@ void DefaultGenome::init() {
 
 void DefaultGenome::mutate() {
 	if (morph == NULL) {
-		cout << "ERROR: morph == NULL" << endl;
+        std::cout << "ERROR: morph == NULL" << std::endl;
 	}
 	// TODO: The morphology mutation rate should be gathered from the settings file in the mutate function?
 	morph->mutate();

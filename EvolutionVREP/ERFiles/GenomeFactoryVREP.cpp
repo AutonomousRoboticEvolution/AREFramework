@@ -2,54 +2,52 @@
 
 #include <memory>
 
-using namespace std;
-
 GenomeFactoryVREP::GenomeFactoryVREP()
 {}
 
 GenomeFactoryVREP::~GenomeFactoryVREP()
 {}
 
-shared_ptr<Genome> GenomeFactoryVREP::createGenome(int type, shared_ptr<RandNum> rn, shared_ptr<Settings> st)
+std::shared_ptr<Genome> GenomeFactoryVREP::createGenome(int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
 	switch (type) {
 	case 1:
 	{
 		if (st->verbose) {
-			cout << "Creating default genome" << endl;
+            std::cout << "Creating default genome" << std::endl;
 		}
-		unique_ptr<Genome> m_genome(new DefaultGenome);
+        std::unique_ptr<Genome> m_genome(new DefaultGenome);
 		m_genome->randomNum = rn;
 		m_genome->settings = st;
-		cout << m_genome->settings->COLOR_LSYSTEM << endl;
+        std::cout << m_genome->settings->COLOR_LSYSTEM << std::endl;
 		return m_genome;
 	}
 	case 0: {
 		if (st->verbose) {
-			cout << "Creating default V-REP genome" << endl;
+            std::cout << "Creating default V-REP genome" << std::endl;
 		}
-		unique_ptr<Genome> m_genome(new DefaultGenomeVREP);
+        std::unique_ptr<Genome> m_genome(new DefaultGenomeVREP);
 		m_genome->randomNum = rn;
 		m_genome->settings = st;
 		return m_genome;
 	}
 	}
-	return unique_ptr<Genome>();
+    return std::unique_ptr<Genome>();
 }
 
-shared_ptr<Genome> GenomeFactoryVREP::convertToGenomeVREP(shared_ptr<Genome> gn)
+std::shared_ptr<Genome> GenomeFactoryVREP::convertToGenomeVREP(std::shared_ptr<Genome> gn)
 {
-	shared_ptr<Genome> vrepGenome(new DefaultGenomeVREP); 
+    std::shared_ptr<Genome> vrepGenome(new DefaultGenomeVREP);
 	vrepGenome->randomNum = gn->randomNum;
 	vrepGenome->settings = gn->settings;
-	unique_ptr<MorphologyFactoryVREP> mf = std::make_unique<MorphologyFactoryVREP>();
+    std::unique_ptr<MorphologyFactoryVREP> mf = std::make_unique<MorphologyFactoryVREP>();
 	// vrepGenome->morph.reset();
-	// shared_ptr<Morphology> m = mf->convertMorph(gn->morph);
+    // std::shared_ptr<Morphology> m = mf->convertMorph(gn->morph);
 	vrepGenome->morph = mf->convertMorph(gn->morph);
 	if (vrepGenome->morph->control) {
 		vrepGenome->morph->control = gn->morph->control->clone();
 	}
 	// gn->clone();
 	mf.reset();
-	return vrepGenome;// shared_ptr<Genome>();
+    return vrepGenome;// std::shared_ptr<Genome>();
 }
