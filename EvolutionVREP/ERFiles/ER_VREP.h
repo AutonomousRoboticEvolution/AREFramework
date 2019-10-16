@@ -53,7 +53,9 @@ public:
 	///store the current genome
     std::shared_ptr<Genome> currentGenome;
 	///used to create a genome
-    std::shared_ptr<GenomeFactoryVREP> genomeFactory;
+//    std::shared_ptr<GenomeFactoryVREP> genomeFactory;
+    std::function<std::shared_ptr<Genome>
+        (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> createGenome;
 
     std::function<std::shared_ptr<Environment>(const std::shared_ptr<Settings>&)> environmentFactory;
 

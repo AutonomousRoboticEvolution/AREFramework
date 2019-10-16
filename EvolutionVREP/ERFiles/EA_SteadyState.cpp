@@ -132,7 +132,6 @@ void EA_SteadyState::createNewGenRandomSelect()
     }
     std::vector<std::shared_ptr<Genome>> populationGenomesBuffer;
 
-    std::shared_ptr<MorphologyFactory> mfact(new MorphologyFactory);
     for (int i = 0; i < populationGenomes.size() - additionalInds.size(); i++) {
         int parent = randomNum->randInt(populationGenomes.size(), 0);
         if (settings->verbose) {
@@ -182,7 +181,6 @@ void EA_SteadyState::createNewGenRandomSelect()
         // populationGenomes[i]->saveGenome(-populationGenomes[i]->individualNumber);
     }
     populationGenomesBuffer.clear();
-    mfact.reset();
 }
 
 void EA_SteadyState::replaceNewPopRandom(int numAttempts)

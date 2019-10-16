@@ -58,4 +58,7 @@ public:
 	/// Load all the population genomes?
 	void loadPopulationGenomes();
 	virtual std::shared_ptr<Morphology> getMorph() = 0;
+
+    std::function<std::shared_ptr<Genome>
+        (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> createGenome;
 };

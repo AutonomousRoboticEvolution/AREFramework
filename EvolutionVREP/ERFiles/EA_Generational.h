@@ -30,5 +30,7 @@ public:
 	virtual void loadBestIndividualGenome(int sceneNum) {}; // not used
 	void createNewGenRandomSelect();
 	void replaceNewPopRandom();
+    std::shared_ptr<Morphology> copyMorphologyGenome(std::shared_ptr<Morphology> parentMorphology);
+
 };
 

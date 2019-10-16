@@ -37,8 +37,8 @@ void ER_VREP::initializeServer()
 /// Initialize a genome factory to create genomes when the simulation is running
 void ER_VREP::initializeSimulation()
 {
-	genomeFactory = std::make_unique<GenomeFactoryVREP>();
-	genomeFactory->randomNum = randNum;
+//	genomeFactory = std::make_unique<GenomeFactoryVREP>();
+//	genomeFactory->randomNum = randNum;
 	// Environment factory is used to create the environment
 //    EnvironmentFactory environmentFactory;
 //	environment = environmentFactory.createNewEnvironment(settings);
@@ -398,7 +398,7 @@ std::shared_ptr<Morphology> ER_VREP::getMorphology(Genome* g)
 bool ER_VREP::loadIndividual(int individualNum)
 {
 	std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
-	currentGenome = genomeFactory->createGenome(0, randNum, settings);
+    currentGenome = createGenome(0, randNum, settings);
 	// try to load from signal
 	simInt signalLength = -1;
 	simInt signalLengthVerify = -1;
@@ -531,7 +531,7 @@ void ER_VREP::loadBestIndividualGenome(int sceneNum)
 	randNum->setSeed(settings->seed + bestInd * bestInd);
 
 	currentGenome.reset();
-	currentGenome = genomeFactory->createGenome(1, randNum, settings);
+    currentGenome = createGenome(1, randNum, settings);
 	currentGenome->init();	//	cout << "loading" << endl;
 	currentGenome->loadGenome(bestInd, settings->sceneNum);
 }
