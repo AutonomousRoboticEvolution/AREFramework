@@ -121,7 +121,8 @@ void ER_VREP::startOfSimulation()
             else
             {
                 ea->nextGenGenomes[currentInd]->init();
-                currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
+//                currentGenome = genomeFactory->convertToGenomeVREP(ea->nextGenGenomes[currentInd]);
+                currentGenome = ea->nextGenGenomes[currentInd]->clone();
                 currentGenome->create();
                 currentMorphology = currentGenome->morph->clone(); // two different classes sharing the same parameter; essential function... But for what? I forgot...
             }
@@ -137,8 +138,9 @@ void ER_VREP::startOfSimulation()
 			}
 			else {
 				loadBestIndividualGenome(settings->sceneNum);
-				currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
-				currentGenome->create();
+//				currentGenome = genomeFactory->convertToGenomeVREP(currentGenome);
+                currentGenome = ea->nextGenGenomes[currentInd]->clone();
+                currentGenome->create();
 				currentMorphology = currentGenome->morph;
 			}
 		}
