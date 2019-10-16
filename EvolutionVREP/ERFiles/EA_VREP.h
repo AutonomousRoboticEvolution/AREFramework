@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "EA.h"
-#include "GenomeFactoryVREP.h"
 
 
 class EA_VREP :
@@ -11,7 +10,6 @@ class EA_VREP :
 public:
 	EA_VREP();
 	~EA_VREP();
-    std::unique_ptr <GenomeFactoryVREP> gf;
 	void init();
 	void selection();
 	void replacement();

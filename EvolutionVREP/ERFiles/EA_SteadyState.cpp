@@ -63,13 +63,11 @@ void EA_SteadyState::initializePopulation()
     if (settings->verbose) {
         std::cout << "Creating initial population" << std::endl;
     }
-    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
     for (int i = 0; i < settings->populationSize; i++) {
-        nextGenGenomes.push_back(gf->createGenome(1, randomNum, settings));
+        nextGenGenomes.push_back(createGenome(1, randomNum, settings));
         nextGenGenomes[i]->fitness = 0;
         nextGenGenomes[i]->individualNumber = i;
     }
-    gf.reset();
 }
 
 void EA_SteadyState::loadPopulationGenomes(int scenenum)

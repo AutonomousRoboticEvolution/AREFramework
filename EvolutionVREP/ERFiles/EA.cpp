@@ -127,7 +127,7 @@ void EA::savePopFitness(int generation)
 
 void EA::loadPopulationGenomes()
 {
-    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
+
 	for (int i = 0; i < settings->indNumbers.size(); i++) {
         std::cout << "loading individual " << settings->indNumbers[i] << std::endl;
         populationGenomes.push_back(createGenome(1, randomNum, settings));
@@ -137,5 +137,5 @@ void EA::loadPopulationGenomes()
 		populationGenomes[i]->individualNumber = settings->indNumbers[i];
 		//cout << "called fitness = " << popFitness[i] << endl;
 	}
-	gf.reset();
+
 }

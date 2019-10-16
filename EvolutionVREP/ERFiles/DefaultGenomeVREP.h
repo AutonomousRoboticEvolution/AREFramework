@@ -4,8 +4,6 @@
 #include <vector>
 #include "Settings.h"
 #include "DefaultGenome.h"
-#include "control/ControlFactory.h"
-#include "morphology/MorphologyFactoryVREP.h"
 #include "../RandNum.h"
 
 
@@ -26,8 +24,8 @@ public:
 	typedef std::shared_ptr<Control> ControlPointer;
 	void init() override;
 
-protected:
-	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory() override;
+//protected:
+//	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory() override;
 };
 
 

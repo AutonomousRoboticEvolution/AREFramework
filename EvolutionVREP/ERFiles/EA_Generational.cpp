@@ -39,12 +39,11 @@ void EA_Generational::mutation()
 
 void EA_Generational::initializePopulation()
 {
-    std::unique_ptr<GenomeFactory> gf = std::make_unique<GenomeFactory>();
 
 	if (settings->client) {
 		for (int i = 0; i < settings->populationSize; i++)
 		{
-			populationGenomes.push_back(gf->createGenome(1, randomNum, settings));
+            populationGenomes.push_back(createGenome(1, randomNum, settings));
 			populationGenomes[i]->fitness = 0;
 		}
 	}
@@ -58,7 +57,6 @@ void EA_Generational::initializePopulation()
 		//	popFitness.push_back(0);
 		//}
 	}
-	gf.reset();
 }
 
 void EA_Generational::selectIndividuals()

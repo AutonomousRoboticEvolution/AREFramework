@@ -1,7 +1,7 @@
 #pragma once
 
-#include "GenomeFactory.h"
-#include "Genome.h"
+//#include "Genome.h"
+#include "DefaultGenome.h"
 #include "Settings.h"
 #include <multineat/Population.h>
 

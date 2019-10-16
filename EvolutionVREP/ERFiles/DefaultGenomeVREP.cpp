@@ -12,11 +12,11 @@ DefaultGenomeVREP::~DefaultGenomeVREP()
 {
 }
 
-std::shared_ptr<MorphologyFactory> DefaultGenomeVREP::newMorphologyFactory()
-{
-    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
-	return morphologyFactory;
-}
+//std::shared_ptr<MorphologyFactory> DefaultGenomeVREP::newMorphologyFactory()
+//{
+//    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
+//	return morphologyFactory;
+//}
 
 bool DefaultGenomeVREP::loadGenome(int indNum, int sceneNum)
 {
@@ -36,10 +36,13 @@ void DefaultGenomeVREP::init()
 {
 	// This function calls a VREP based morphology factory which contains VREP specific functions. 
 	int m_type = settings->morphologyType;
-    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
-	morph->init();
+//    std::shared_ptr<MorphologyFactoryVREP> morphologyFactory(new MorphologyFactoryVREP);
+//	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+//	morphologyFactory.reset();
+
+    morph = morphologyFactory(m_type, randomNum, settings);
+
+    morph->init();
 	// The control creation is the same as the one in DefaultGenome::init(). Code can be improved.
 	if (m_type == -1) { // not used
 //        std::unique_ptr<ControlFactory> controlFactory(new ControlFactory);

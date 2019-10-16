@@ -2,8 +2,6 @@
 
 #include <memory>
 #include <vector>
-#include "morphology/MorphologyFactory.h"
-#include "control/ControlFactory.h"
 #include "Settings.h"
 #include "Genome.h"
 #include "../RandNum.h"
@@ -46,9 +44,10 @@ public:
 
     std::function<std::shared_ptr<Control>
         (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> controlFactory;
+    std::function<std::shared_ptr<Morphology>
+        (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> morphologyFactory;
 
-
-protected:
+//protected:
 	// virtual functions to extend with simulator specific classes
-	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory();
+//	virtual std::shared_ptr<MorphologyFactory> newMorphologyFactory();
 };

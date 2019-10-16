@@ -70,20 +70,22 @@ std::shared_ptr<Genome> DefaultGenome::cloneGenome()
 }
 
 
-std::shared_ptr<MorphologyFactory> DefaultGenome::newMorphologyFactory()
-{
-    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	return morphologyFactory;
-}
+//std::shared_ptr<MorphologyFactory> DefaultGenome::newMorphologyFactory()
+//{
+//    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+//	return morphologyFactory;
+//}
 
 bool DefaultGenome::loadMorphologyGenome(int indNum, int sceneNum) {
 	if (settings->verbose) {
         std::cout << "Loading genome " << indNum << std::endl;
 	}
 	int m_type = settings->morphologyType;
-    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
+//    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
+//	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+//    morphologyFactory.reset();
+    morph = morphologyFactory(m_type, randomNum, settings);
+
 
 	bool load = morph->loadGenome(indNum, sceneNum);
 	if (settings->verbose && load == true) {
@@ -97,9 +99,12 @@ bool DefaultGenome::loadMorphologyGenome(std::istream &input, int indNum) {
         std::cout << "Loading genome " << indNum << std::endl;
 	}
 	int m_type = settings->morphologyType;
-    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
+//    std::shared_ptr<MorphologyFactory> morphologyFactory = this->newMorphologyFactory();
+//	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+//	morphologyFactory.reset();
+
+    morph = morphologyFactory(m_type, randomNum, settings);
+
 
 	bool load = morph->loadGenome(input, indNum);
 	if (settings->verbose && load == true) {
@@ -117,9 +122,12 @@ void DefaultGenome::loadBaseMorphology(int indNum, int sceneNum) {
 void DefaultGenome::init_noMorph() {
 	// For debugging. Shouldn't be used otherwise.
 	int m_type = settings->morphologyType;
-    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
-	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
-	morphologyFactory.reset();
+//    std::shared_ptr<MorphologyFactory> morphologyFactory(new MorphologyFactory);
+//	morph = morphologyFactory->createMorphologyGenome(m_type, randomNum, settings);
+//	morphologyFactory.reset();
+
+    morph = morphologyFactory(m_type, randomNum, settings);
+
 	//morph->init_noMorph();
 	//if (m_type == -1) {
 	//	unique_ptr<ControlFactory> controlFactory(new ControlFactory);
@@ -136,8 +144,11 @@ void DefaultGenome::savePhenotype(int indNum, int sceneNum)
 void DefaultGenome::init() {
 	// To initialize a genome
 	int m_type = settings->morphologyType;
-	MorphologyFactory morphologyFactory;
-	morph = morphologyFactory.createMorphologyGenome(m_type, randomNum, settings);
+//	MorphologyFactory morphologyFactory;
+//	morph = morphologyFactory.createMorphologyGenome(m_type, randomNum, settings);
+
+    morph = morphologyFactory(m_type, randomNum, settings);
+
 	morph->init();
 //	if (m_type == -1) { // not used
 //		unique_ptr<ControlFactory> controlFactory(new ControlFactory);
