@@ -26,7 +26,6 @@ find_package(MultiNEAT REQUIRED)
 find_package(PolyVox REQUIRED)
 
 FILE(GLOB_RECURSE SOURCES "RandNum.cpp" "ERFiles/*.cpp"  "ERFiles/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
-FILE(GLOB_RECURSE HEADERS "ERFiles/*.h")
 
 add_library(ER_library STATIC ${SOURCES})
 

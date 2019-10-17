@@ -46,3 +46,16 @@ public:
 //	vector<ANN> aNN;
 //	vector<FixedPosition> fixedControl;
 };
+
+
+class ControlFactory
+{
+public:
+    typedef std::shared_ptr<ControlFactory> Ptr;
+
+    ControlFactory(){}
+    ~ControlFactory(){}
+
+    virtual std::shared_ptr<Control> controlFactory(int,std::shared_ptr<RandNum>,std::shared_ptr<Settings>) = 0;
+
+};

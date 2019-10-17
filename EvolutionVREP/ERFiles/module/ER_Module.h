@@ -14,7 +14,10 @@ class ER_Module // Abstract Class
 {
 public:
 	ER_Module();
-	~ER_Module();
+    ER_Module(ControlFactory::Ptr factory);
+
+    ~ER_Module();
+
 
 	std::shared_ptr<RandNum> randomNum;
     std::shared_ptr<Settings> settings;
@@ -140,7 +143,7 @@ public:
 
     std::function<
         std::shared_ptr<Control>
-            (int type,std::shared_ptr<RandNum> rn,std::shared_ptr<Settings> st)>
+            (int,std::shared_ptr<RandNum>,std::shared_ptr<Settings>)>
                 controlFactory;
 	
 };

@@ -1,12 +1,6 @@
 #include "DefaultGenomeVREP.h"
 #include <iostream>
 
-DefaultGenomeVREP::DefaultGenomeVREP(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
-{
-	randomNum = rn;
-	settings = st;
-	genomeFitness = 0;
-}
 
 DefaultGenomeVREP::~DefaultGenomeVREP()
 {

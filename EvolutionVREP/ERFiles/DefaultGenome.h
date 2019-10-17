@@ -10,7 +10,8 @@ class DefaultGenome : public Genome
 {
 public:
 	DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
-	DefaultGenome() {};
+        DefaultGenome(MorphologyFactory::Ptr factory,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
+        DefaultGenome() {};
 
 	~DefaultGenome();
 	virtual std::shared_ptr<Genome> clone() const override;
