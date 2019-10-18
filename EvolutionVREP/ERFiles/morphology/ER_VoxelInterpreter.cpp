@@ -1,7 +1,7 @@
 #include "ER_VoxelInterpreter.h"
 
 ER_VoxelInterpreter::ER_VoxelInterpreter(unsigned int id)
-    : id(id)
+    : id(id), EvolvedMorphology ()
 {
     mainHandle = 0;
 }

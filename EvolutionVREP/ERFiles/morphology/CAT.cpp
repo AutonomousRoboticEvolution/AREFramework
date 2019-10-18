@@ -3,7 +3,7 @@
 #include <iostream>
 #include <fstream>
 
-CAT::CAT()
+CAT::CAT() : FixedBaseMorphology ()
 {
     va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }

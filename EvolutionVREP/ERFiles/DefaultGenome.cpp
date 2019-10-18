@@ -6,20 +6,13 @@ DefaultGenome::DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settin
 	randomNum = rn;
 	settings = st;
 	genomeFitness = 0;
+
+    if(!load_exp_plugin<Morphology::Factory>
+            (morphologyFactory,settings->exp_plugin_name,"morphologyFactory"))
+        exit(1);
 }
 
 
-DefaultGenome::DefaultGenome(MorphologyFactory::Ptr factory,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
-{
-    randomNum = rn;
-    settings = st;
-    genomeFitness = 0;
-
-    morphologyFactory = std::bind(&MorphologyFactory::morphologyFactory,factory,
-                                  std::placeholders::_1,
-                                  std::placeholders::_2,
-                                  std::placeholders::_3);
-}
 
 
 DefaultGenome::~DefaultGenome() {

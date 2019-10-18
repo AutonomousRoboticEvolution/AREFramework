@@ -104,7 +104,7 @@ public:
 		FORWARD_NEGX = 10,
 		FORWARD_NEGY = 11,
 		FORWARD_NEGXY = 12
-	};
+    };
     /// Used to define which morphology to evolve
 	enum MorphologyType
 	{
@@ -120,28 +120,28 @@ public:
         INTEGRATION = 22
 	};
 
-	enum ControlType
+    enum ControlType
     {
-	    /// Neural network that changes the topology of the network as well
-		ANN_DEFAULT = 0,
-		/// Neural network that doesn't change it's topology
-		ANN_CUSTOM = 1,
-		/// Compositional pattern producing network as interpreted by Frank; not original implementation from stanley (2007)
-		ANN_CPPN = 2,
-	//	ANN_NEAT = 4,
-	    /// Used to define the directionality of communication between neural networks of neighbouring modules
-		ANN_DISTRIBUTED_UP = 3,
+        /// Neural network that changes the topology of the network as well
+        ANN_DEFAULT = 0,
+        /// Neural network that doesn't change it's topology
+        ANN_CUSTOM = 1,
+        /// Compositional pattern producing network as interpreted by Frank; not original implementation from stanley (2007)
+        ANN_CPPN = 2,
+    //	ANN_NEAT = 4,
         /// Used to define the directionality of communication between neural networks of neighbouring modules
-		ANN_DISTRIBUTED_DOWN = 4,
+        ANN_DISTRIBUTED_UP = 3,
         /// Used to define the directionality of communication between neural networks of neighbouring modules
-		ANN_DISTRIBUTED_BOTH = 5,
+        ANN_DISTRIBUTED_DOWN = 4,
+        /// Used to define the directionality of communication between neural networks of neighbouring modules
+        ANN_DISTRIBUTED_BOTH = 5,
         /// Should be used for calling the ANN used in NEAT
-		ANN_NEAT = 6,
-		/// Can be used to specify leaky integrators in the ANN
-		LEAKY_ANN_CONTROL = 7,  // TODO: adjustable leakiness parameter
+        ANN_NEAT = 6,
+        /// Can be used to specify leaky integrators in the ANN
+        LEAKY_ANN_CONTROL = 7,  // TODO: adjustable leakiness parameter
         /// Fixed structure ANN
-		ANN_FIXED_STRUCTURE = 8
-	};
+        ANN_FIXED_STRUCTURE = 8
+    };
 
 	enum EvolutionType {
 	    /// deprecated
@@ -179,15 +179,15 @@ public:
 	MoveDirection moveDirection = DISTANCE_XY;			// This is used to modify the fitness function by specifying the direction. By default
 														// it is set to DISTANCE_XY which is the horizontal distance moved
 	MorphologyType morphologyType = CAT_MORPHOLOGY;		// Type of morphology used
-	ControlType controlType = ANN_DEFAULT;				// Specifies the type of controller used
-	SelectionType selectionType = RANDOM_SELECTION;		// What is the selection operator (TODO: Not used yet but adviced)
+    ControlType controlType = ANN_DEFAULT;				// Specifies the type of controller used
+    SelectionType selectionType = RANDOM_SELECTION;		// What is the selection operator (TODO: Not used yet but adviced)
 	ReplacementType replacementType = RANDOM_REPLACEMENT;// What is the replacement operator (TODO: Not used yet but adviced)
 
 	int indCounter;					// record the number of individuals
 	int sceneNum;					// Experiment ID
 	bool sendGenomeAsSignal = false;// When false, genome is saved as csv and loaded in server. true opens a port and passes the genome as a stringstream from client to server
-	bool client;					// Stating whether the instance is in client mode. DEPRECATED
-	float mutationRate = 0.1; 		// mutation rate...
+    bool client;					// Stating whether the instance is in client mode. DEPRECATED
+    float mutationRate = 0.1; 		// mutation rate...
 	float morphMutRate = 0.1;		// morphology mutation rate...
 	int generation = 0;				// Tracks the generation. Used in single thread.
 	int maxGeneration = 1000;		// maximum number of generations
@@ -197,15 +197,17 @@ public:
 	int crossover = 0;				// Using crossover (int value for potentially using different crossover strategies)
 	float crossoverRate = 0;		// Rate at which crossover happens. Variable can be used like mutation rate
 
-	int ageInds = 0;				// Whether age should be used (deprecated) (TODO: DELETE : DEPRECATED)
-	int maxAge = 0;					// An absolute maximum age could be set. (TODO: DELETE : DEPRECATED)
-	int minAge = 0;					// Minimum age, death cannot occur before this (TODO: DELETE : DEPRECATED)
-	float deathProb = 0;			// Probability of individuals being removed at random from the population (TODO: DELETE : DEPRECATED)
+    int ageInds = 0;				// Whether age should be used (deprecated) (TODO: DELETE : DEPRECATED)
+    int maxAge = 0;					// An absolute maximum age could be set. (TODO: DELETE : DEPRECATED)
+    int minAge = 0;					// Minimum age, death cannot occur before this (TODO: DELETE : DEPRECATED)
+    float deathProb = 0;			// Probability of individuals being removed at random from the population (TODO: DELETE : DEPRECATED)
 
 	std::vector<int> indNumbers;			// Vector storing the IDs of the individuals in the current population. This vector can be used to load all individuals from a specific generation
     std::vector<float> indFits;			// Vector storing the fitness values of the individuals in the current population
 	int seed = 0;					// Random seed passed to the random number generator (TODO: random number generator names are slightly different)
 
+
+    std::string exp_plugin_name; //name of the shared library corresponding to your experiment.
 
 	/*enum LSystemType{
 	DEFAULT_LSYSTEM = 0,

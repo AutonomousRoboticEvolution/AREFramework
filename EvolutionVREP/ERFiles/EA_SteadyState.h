@@ -9,8 +9,8 @@
 class EA_SteadyState : public EA
 {
 public:
-	EA_SteadyState();
-	~EA_SteadyState() override;
+    EA_SteadyState() : EA(){}
+    ~EA_SteadyState(){}
 
 	void split_line(std::string & line, std::string delim, std::list<std::string>& values) override;
 

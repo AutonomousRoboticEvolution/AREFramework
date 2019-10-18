@@ -4,10 +4,6 @@
 #include <cmath>
 #include <unistd.h>
 
-Module_Misc::Module_Misc()
-{
-	
-}
 
 Module_Misc::~Module_Misc()
 {

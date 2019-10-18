@@ -2,7 +2,11 @@
 #include <iostream>
 
 Morphology::~Morphology()
-{}
+{
+    if(!load_exp_plugin<Control::Factory>
+            (controlFactory,settings->exp_plugin_name,"controlFactory"))
+        exit(1);
+}
 
 std::vector<std::shared_ptr<ER_Module>> Morphology::getCreatedModules()
 {

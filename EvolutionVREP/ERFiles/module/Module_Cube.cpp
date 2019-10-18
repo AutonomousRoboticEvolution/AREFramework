@@ -3,11 +3,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Module_Cube::Module_Cube()
-{
-
-}
-
 
 Module_Cube::~Module_Cube()
 {

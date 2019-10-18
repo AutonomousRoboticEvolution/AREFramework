@@ -7,7 +7,7 @@ class Module_Cube :
 	public ER_Module
 {
 public:
-	Module_Cube();
+    Module_Cube() : ER_Module (){}
 	~Module_Cube();
 	int init();
 	int mutate(float mutationRate);

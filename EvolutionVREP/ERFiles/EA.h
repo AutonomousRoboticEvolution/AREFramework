@@ -4,7 +4,7 @@
 #include "DefaultGenome.h"
 #include "Settings.h"
 #include <multineat/Population.h>
-
+#include "../exp_plugin_loader.hpp"
 
 class EA
 {

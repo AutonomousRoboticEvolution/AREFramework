@@ -4,15 +4,7 @@
 #include <cmath>
 #include <math.h>
 
-Module_Bone::Module_Bone()
-{
-	
-}
 
-Module_Bone::~Module_Bone()
-{
-	removeModule();
-}
 
 int Module_Bone::init() {
 	return -1;

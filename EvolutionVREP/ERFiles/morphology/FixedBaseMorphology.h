@@ -7,8 +7,8 @@ class FixedBaseMorphology :
 	public BaseMorphology
 {
 public:
-	FixedBaseMorphology();
-	~FixedBaseMorphology();
+    FixedBaseMorphology() : BaseMorphology() {}
+    ~FixedBaseMorphology(){}
 	void init();
 	void addDefaultMorphology();
 	void saveGenome(int indNum,float fitness);

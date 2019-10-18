@@ -7,7 +7,7 @@ class Module_Servo :
 	public ER_Module
 {
 public:
-	Module_Servo();
+    Module_Servo() : ER_Module(){}
 	~Module_Servo();
 	int init();
 	int mutate(float mutationRate);

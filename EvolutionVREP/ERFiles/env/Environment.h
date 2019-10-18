@@ -12,6 +12,9 @@
 class Environment
 {
 public:
+    typedef std::shared_ptr<Environment> (Factory)(const std::shared_ptr<Settings>&);
+
+
 	Environment();
 	~Environment();
 	/**
@@ -46,15 +49,4 @@ public:
 	///maximum simulation time
 	float maxTime = 0.0;
 	int type = 0;
-};
-
-class EnvironmentFactory
-{
-public:
-    typedef std::shared_ptr<EnvironmentFactory> Ptr;
-
-    EnvironmentFactory(){}
-    ~EnvironmentFactory(){}
-
-    virtual std::shared_ptr<Environment> environmentFactory(const std::shared_ptr<Settings>&) = 0;
 };

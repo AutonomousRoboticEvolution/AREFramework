@@ -1,14 +1,6 @@
 #include "FixedBaseMorphology.h"
 #include <iostream>
 
-FixedBaseMorphology::FixedBaseMorphology()
-{
-}
-
-FixedBaseMorphology::~FixedBaseMorphology()
-{
-//	std::cout << "should delete FixedBaseMorphology" << std::endl;
-}
 
 void FixedBaseMorphology::init() {
     std::cout << "FixedBaseMorphology.init() is called" << std::endl;

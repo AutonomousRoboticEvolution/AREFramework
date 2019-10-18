@@ -34,8 +34,8 @@ class BaseMorphology : public Morphology
 {
 
 public:
-	BaseMorphology();
-	virtual ~BaseMorphology();
+    BaseMorphology() : Morphology (){}
+    virtual ~BaseMorphology(){}
 	
 	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
 	virtual std::shared_ptr<Morphology> clone() const override;

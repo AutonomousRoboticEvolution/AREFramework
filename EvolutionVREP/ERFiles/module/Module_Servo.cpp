@@ -3,10 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-Module_Servo::Module_Servo()
-{
-	
-}
+
 
 Module_Servo::~Module_Servo()
 {

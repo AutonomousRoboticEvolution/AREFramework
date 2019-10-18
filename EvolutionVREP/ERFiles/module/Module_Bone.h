@@ -7,8 +7,8 @@ class Module_Bone :
 	public ER_Module
 {
 public:
-	Module_Bone();
-	~Module_Bone();
+    Module_Bone() : ER_Module(){}
+    ~Module_Bone(){}
 
 
 	int init() override;

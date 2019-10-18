@@ -2,7 +2,7 @@
 #include <iostream>
 #include <algorithm>
 
-EvolvedMorphology::EvolvedMorphology()
+EvolvedMorphology::EvolvedMorphology() : BaseMorphology ()
 {
 	modular = true;
 }

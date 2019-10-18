@@ -8,13 +8,13 @@
 #include "v_repLib.h"
 #include "../control/Control.h"
 #include "../../RandNum.h"
+#include "../../exp_plugin_loader.hpp"
 
 
 class ER_Module // Abstract Class
 {
 public:
 	ER_Module();
-    ER_Module(ControlFactory::Ptr factory);
 
     ~ER_Module();
 

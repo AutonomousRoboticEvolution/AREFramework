@@ -4,7 +4,7 @@
 #include <fstream>
 
 
-CATVREP::CATVREP()
+CATVREP::CATVREP() : CAT ()
 {
     va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
 }

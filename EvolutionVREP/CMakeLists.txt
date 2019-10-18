@@ -48,6 +48,7 @@ add_library(v_repExtER SHARED
 
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
+    dlibxx dl
 )
 
 target_include_directories(ER_library
@@ -55,7 +56,7 @@ target_include_directories(ER_library
     ${PolyVox_INCLUDE_DIRS}
 )
 
-target_link_libraries(v_repExtER ER_library)
+target_link_libraries(v_repExtER ER_library dlibxx dl)
 
 target_include_directories(v_repExtER PUBLIC
     "${VREP_FOLDER}/programming/include"

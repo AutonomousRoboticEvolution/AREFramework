@@ -10,6 +10,9 @@
 class Genome
 {
 public:
+    typedef std::shared_ptr<Genome> (Factory)
+        (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
+
 	Genome();
 	virtual ~Genome();
     	/// simulation setting shared by genome and EA

@@ -85,6 +85,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
 
+
+
 	vrepLib = loadVrepLibrary(temp.c_str());
 	if (vrepLib == NULL)
 	{
@@ -107,6 +109,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		unloadVrepLibrary(vrepLib);
 		return(0); // Means error, V-REP will unload this plugin
 	}
+
+
 
     startEvolution = true;
 	if (startEvolution) {

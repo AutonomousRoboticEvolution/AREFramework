@@ -3,11 +3,6 @@
 #include <memory>
 
 
-EA_SteadyState::EA_SteadyState()
-{}
-
-EA_SteadyState::~EA_SteadyState()
-{}
 
 void EA_SteadyState::split_line(std::string &line, std::string delim, std::list<std::string> &values)
 {

@@ -13,6 +13,7 @@
 //#include "env/EnvironmentFactory.h"
 #include "v_repLib.h"
 #include "EA_Factory.h"
+#include "../exp_plugin_loader.hpp"
 
 class ER_VREP : public CER
 {
@@ -53,11 +54,10 @@ public:
 	///store the current genome
     std::shared_ptr<Genome> currentGenome;
 	///used to create a genome
-//    std::shared_ptr<GenomeFactoryVREP> genomeFactory;
-    std::function<std::shared_ptr<Genome>
-        (int type, std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)> createGenome;
+    std::function<Genome::Factory> genomeFactory;
 
-    std::function<std::shared_ptr<Environment>(const std::shared_ptr<Settings>&)> environmentFactory;
+    ///used to create the environment
+    std::function<Environment::Factory> environmentFactory;
 
 	/// Logs information about the fitness of each individual, best individual and list of individuals.
 	void saveSettings() override;

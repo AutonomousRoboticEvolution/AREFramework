@@ -5,14 +5,12 @@ ER_Module::ER_Module()
 	moduleColor[0] = 0.5;
 	moduleColor[1] = 0.5;
 	moduleColor[2] = 0.5;    
+
+    if(!load_exp_plugin<Control::Factory>
+            (controlFactory,settings->exp_plugin_name,"controlFactory"))
+        exit(1);
 }
 
-ER_Module::ER_Module(ControlFactory::Ptr factory){
-    controlFactory = std::bind(&ControlFactory::controlFactory,factory,
-                               std::placeholders::_1,
-                               std::placeholders::_2,
-                               std::placeholders::_3);
-}
 
 static double _cm[256][3] = {
   { 0.001462, 0.000466, 0.013866 },

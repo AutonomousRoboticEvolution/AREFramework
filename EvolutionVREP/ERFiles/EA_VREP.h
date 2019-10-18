@@ -8,8 +8,8 @@ class EA_VREP :
 	public EA
 {
 public:
-	EA_VREP();
-	~EA_VREP();
+    EA_VREP() : EA(){}
+    ~EA_VREP(){}
 	void init();
 	void selection();
 	void replacement();

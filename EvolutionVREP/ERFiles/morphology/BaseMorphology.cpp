@@ -24,14 +24,6 @@ void BaseMorphology::split_line(std::string& line, std::string delim, std::list<
 	}
 }
 
-BaseMorphology::BaseMorphology()
-{
-}
-
-
-BaseMorphology::~BaseMorphology()
-{
-}
 
 void BaseMorphology::mutate(){
     std::cout << "Cannot Mutate Base Morphology: check settings" << std::endl;

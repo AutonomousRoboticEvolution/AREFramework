@@ -5,13 +5,13 @@
 #include "Settings.h"
 #include "Genome.h"
 #include "../RandNum.h"
+#include "../exp_plugin_loader.hpp"
 
 class DefaultGenome : public Genome
 {
 public:
 	DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
-        DefaultGenome(MorphologyFactory::Ptr factory,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
-        DefaultGenome() {};
+    DefaultGenome() {};
 
 	~DefaultGenome();
 	virtual std::shared_ptr<Genome> clone() const override;

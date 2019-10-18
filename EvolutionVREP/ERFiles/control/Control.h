@@ -11,6 +11,10 @@
 class Control
 {
 public:
+
+    typedef std::shared_ptr<Control> (Factory)
+        (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
+
 	Control(){};
 	virtual ~Control();
     /**

@@ -33,7 +33,6 @@ Settings::Settings()
 	maxNumberModules = 20;
 	morphologyType = CUSTOM_MORPHOLOGY;
 	environmentType = DEFAULT_ENV;
-	controlType = ANN_DEFAULT;
 	populationSize = 100;
 	energyDissipationRate = 0.0;
 	lIncrements = 4; // not used, should be somewhere else?

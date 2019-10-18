@@ -1,12 +1,6 @@
 #include "EA_VREP.h"
 
-EA_VREP::EA_VREP()
-{
-}
 
-EA_VREP::~EA_VREP()
-{
-}
 
 void EA_VREP::init()
 {

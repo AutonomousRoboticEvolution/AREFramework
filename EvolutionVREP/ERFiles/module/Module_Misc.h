@@ -7,7 +7,7 @@ class Module_Misc :
 	public ER_Module
 {
 public:
-	Module_Misc();
+    Module_Misc() : ER_Module() {}
 	~Module_Misc();
 
 

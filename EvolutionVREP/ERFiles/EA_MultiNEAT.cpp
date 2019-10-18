@@ -9,7 +9,7 @@
 #include <memory>
 #include <cmath>
 
-EA_MultiNEAT::EA_MultiNEAT()
+EA_MultiNEAT::EA_MultiNEAT() : EA()
 {
     if (not settings or settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }

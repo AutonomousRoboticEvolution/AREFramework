@@ -12,8 +12,7 @@ class DefaultGenomeVREP : public DefaultGenome
 public:
     DefaultGenomeVREP(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
         : DefaultGenome(rn,st){};
-    DefaultGenomeVREP(MorphologyFactory::Ptr factory,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
-        : DefaultGenome(factory,rn,st){}
+
 	DefaultGenomeVREP() {};
 
 	~DefaultGenomeVREP();
