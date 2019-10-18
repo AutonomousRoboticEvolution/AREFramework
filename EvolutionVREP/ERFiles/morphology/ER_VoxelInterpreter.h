@@ -5,11 +5,11 @@
 */
 #pragma once
 
-#include "Development.h"
+#include "EvolvedMorphology.h"
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 
-class ER_VoxelInterpreter : public Development
+class ER_VoxelInterpreter : public EvolvedMorphology
 {
 public:
     ER_VoxelInterpreter(unsigned int id);

@@ -6,11 +6,11 @@
 #include "BaseMorphology.h"
 
 
-class Development :	public BaseMorphology
+class EvolvedMorphology : public BaseMorphology
 {
 public:
-	Development();
-	~Development();
+	EvolvedMorphology();
+	~EvolvedMorphology();
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules() override;
@@ -42,18 +42,21 @@ public:
 		float absPos[3];
         float absOri[3];
 	};
-
+    // Override methods
+    void init() override;
+    void mutate() override;
+    void create() override;
+    void update() override;
+    void createAtPosition(float x, float y, float z) override;
+    virtual void saveGenome(int individual, float fitness) override;
+    virtual bool loadGenome(int individualNumber, int sceneNum) override;
+    virtual bool loadGenome(std::istream &input, int individualNumber) override;
 
 	void savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness);
 	void savePhenotype(int ind, float fitness) override {};
 
     std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> loadBasePhenotype(int indNum);
 	void loadPhenotype(int ind) {};
-
-	void init() override;
-	void mutate() override;
-	void create() override;
-    void update() override;
 
 	int mutateERLGenome(float mutationRate);
 	int mutateControlERLGenome(float mutationRate);
@@ -62,7 +65,6 @@ public:
 	int getMaxChilds(int moduleType);
 	//vector<shared_ptr<ER_Module>> loadPhenotype(int indNum);
 	// object creators
-	void createAtPosition(float x, float y, float z) override;
 
 //    std::vector<float> eulerToDirectionalVector(std::vector<float> eulerAngles);
 
@@ -80,10 +82,6 @@ public:
 	float positionFirstObject[3] = { 0.0f, 0.0f, 0.1f };
 
 	void initCustomMorphology();
-
-	virtual void saveGenome(int individual, float fitness) override;
-	virtual bool loadGenome(int individualNumber, int sceneNum) override;
-	virtual bool loadGenome(std::istream &input, int individualNumber) override;
 
 	//void recallAndCreate();
 	void crossover(std::shared_ptr<Morphology>, float crossoverRate) override;

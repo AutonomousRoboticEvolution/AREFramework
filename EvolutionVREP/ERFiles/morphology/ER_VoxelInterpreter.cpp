@@ -106,7 +106,7 @@ void ER_VoxelInterpreter::mutate()
 
 void ER_VoxelInterpreter::update()
 {
-    Development::update();
+    EvolvedMorphology::update();
 }
 
 void ER_VoxelInterpreter::create()

@@ -1,19 +1,19 @@
-#include "Development.h"
+#include "EvolvedMorphology.h"
 #include <iostream>
 #include <algorithm>
 
-Development::Development()
+EvolvedMorphology::EvolvedMorphology()
 {
 	modular = true;
 }
 
 
-Development::~Development()
+EvolvedMorphology::~EvolvedMorphology()
 {
 	createdModules.clear();
 }
 
-int Development::getAmountBrokenModules()
+int EvolvedMorphology::getAmountBrokenModules()
 {
 	int amountBrokenModules = 0;
 	for (int i = 0; i < createdModules.size(); i++) {
@@ -24,11 +24,11 @@ int Development::getAmountBrokenModules()
 	return amountBrokenModules;
 }
 
-//std::vector <std::shared_ptr<ER_Module>> Development::getCreatedModules() {
+//std::vector <std::shared_ptr<ER_Module>> EvolvedMorphology::getCreatedModules() {
 //	return createdModules;
 //}
 
-void Development::createAtPosition(float x, float y, float z)
+void EvolvedMorphology::createAtPosition(float x, float y, float z)
 {
     std::cout << "x, y, z: " << x << ", " << y << ", " << z << std::endl;
 	float position[3];
@@ -38,18 +38,18 @@ void Development::createAtPosition(float x, float y, float z)
 	position[2] = z;
 }
 
-void Development::crossover(std::shared_ptr<Morphology> partnerMorph, float cr)
+void EvolvedMorphology::crossover(std::shared_ptr<Morphology> partnerMorph, float cr)
 {
 
 }
 
-void Development::printSome()
+void EvolvedMorphology::printSome()
 {
-    std::cout << "printing some from Development" << std::endl;
+    std::cout << "printing some from EvolvedMorphology" << std::endl;
 }
 
 
-void Development::saveGenome(int indNum, float fitness)
+void EvolvedMorphology::saveGenome(int indNum, float fitness)
 {
     std::ofstream genomeFile;
     std::ostringstream genomeFileName;
@@ -67,7 +67,7 @@ void Development::saveGenome(int indNum, float fitness)
 }
 
 
-bool Development::loadGenome(int individualNumber, int sceneNum)
+bool EvolvedMorphology::loadGenome(int individualNumber, int sceneNum)
 {
     std::ostringstream genomeFileName;
 
@@ -101,14 +101,14 @@ bool Development::loadGenome(int individualNumber, int sceneNum)
 
 }
 
-bool Development::loadGenome(std::istream &input, int individualNumber)
+bool EvolvedMorphology::loadGenome(std::istream &input, int individualNumber)
 {
     std::cout << "Cannot instantiate development class, also, should become abstract" << std::endl;
 	return false;
 }
 
 
-void Development::init_noMorph()
+void EvolvedMorphology::init_noMorph()
 {
 }
 
@@ -118,7 +118,7 @@ void Development::init_noMorph()
  * \param t
  * \return 
  */
-int Development::getMaxChilds(int t)
+int EvolvedMorphology::getMaxChilds(int t)
 {
 	if (t == 4 || t == 9) {
 		return 3; 
@@ -146,10 +146,10 @@ int Development::getMaxChilds(int t)
 	}
 }
 
-//std::vector<std::shared_ptr<ER_Module>> Development::loadPhenotype(int indNum) {
+//std::vector<std::shared_ptr<ER_Module>> EvolvedMorphology::loadPhenotype(int indNum) {
 //}
 
-void Development::savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
+void EvolvedMorphology::savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS>> createdModules, int indNum, float fitness)
 {
 	if (settings->verbose) {
         std::cout << "saving direct phenotype genome " << std::endl << "-------------------------------- " << std::endl;
@@ -195,7 +195,7 @@ void Development::savePhenotype(std::vector<std::shared_ptr<BASEMODULEPARAMETERS
 	phenotypeFile.close();
 }
 
-std::vector<std::shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loadBasePhenotype(int indNum)
+std::vector<std::shared_ptr<EvolvedMorphology::BASEMODULEPARAMETERS>> EvolvedMorphology::loadBasePhenotype(int indNum)
 {
     std::cout << "loading direct phenotype genome " << std::endl << "-------------------------------- " << std::endl;
 
@@ -304,47 +304,47 @@ std::vector<std::shared_ptr<Development::BASEMODULEPARAMETERS>> Development::loa
 }
 
 
-void Development::init()
+void EvolvedMorphology::init()
 {
 }
 
-void Development::initCustomMorphology()
+void EvolvedMorphology::initCustomMorphology()
 {
 }
 
 
-std::shared_ptr<Morphology> Development::clone() const
+std::shared_ptr<Morphology> EvolvedMorphology::clone() const
 {
 	BaseMorphology::clone();
-    return std::make_unique<Development>(*this);
+    return std::make_unique<EvolvedMorphology>(*this);
 }
 
-void Development::update()
+void EvolvedMorphology::update()
 {
 
 }
 
-int Development::mutateERLGenome(float mutationRate)
-{
-	return 1;
-}
-
-int Development::mutateControlERLGenome(float mutationRate)
+int EvolvedMorphology::mutateERLGenome(float mutationRate)
 {
 	return 1;
 }
 
-void Development::create()
+int EvolvedMorphology::mutateControlERLGenome(float mutationRate)
+{
+	return 1;
+}
+
+void EvolvedMorphology::create()
 {
     std::cout << "CANNOT CREAT DEVELOPMENT GENOME" << std::endl;
 }
 
-void Development::mutate()
+void EvolvedMorphology::mutate()
 {
 	mutateERLGenome(settings->morphMutRate);
 }
 
-void Development::updateCreatedModules()
+void EvolvedMorphology::updateCreatedModules()
 {
 	// TODO temporary location of function below
 	for (int i = 0; i < createdModules.size(); i++) {
@@ -354,7 +354,7 @@ void Development::updateCreatedModules()
 	}
 }
 
-void Development::shiftRobotPosition()
+void EvolvedMorphology::shiftRobotPosition()
 {
 	updateCreatedModules();
 
@@ -463,7 +463,7 @@ void Development::shiftRobotPosition()
     //	std::cout << "postpos: " << postpos[2] << std::endl;
 }
 
-int Development::getMainHandle()
+int EvolvedMorphology::getMainHandle()
 {
     if (createdModules.empty()) {
         std::string error_message = "ERROR: No module could be created, check initial position of the first module. ";
@@ -474,7 +474,7 @@ int Development::getMainHandle()
     }
 }
 
-//std::vector<float> Development::eulerToDirectionalstd::vector(std::vector<float> eulerAngles)
+//std::vector<float> EvolvedMorphology::eulerToDirectionalstd::vector(std::vector<float> eulerAngles)
 //{
 //	Eigen::Matrix3f m;
 //	m = AngleAxisf(eulerAngles[0], std::vector3f::UnitX())
@@ -490,18 +490,18 @@ int Development::getMainHandle()
 //	return directionalstd::vector;
 //}
 
-void Development::checkGenome(int individualNumber, int sceneNum)
+void EvolvedMorphology::checkGenome(int individualNumber, int sceneNum)
 {
 
 }
 
-void Development::checkControl(int individual, int sceneNum)
+void EvolvedMorphology::checkControl(int individual, int sceneNum)
 {
 	checkGenome(individual, sceneNum);
 }
 
 /// Check whether two components are colliding
-bool Development::checkLCollisions(std::shared_ptr<ER_Module> module, std::vector<int> exceptionHandles)
+bool EvolvedMorphology::checkLCollisions(std::shared_ptr<ER_Module> module, std::vector<int> exceptionHandles)
 {
     // TODO EB: Implement a way to ignore visuals.
     for (int n = 0; n < module->objectHandles.size(); n++) {
@@ -535,7 +535,7 @@ bool Development::checkLCollisions(std::shared_ptr<ER_Module> module, std::vecto
 }
 
 /// Check for collisions. If there is a colliding object, remove it from the genome representation.
-bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
+bool EvolvedMorphology::bCheckCollision(int iParentHandle, int createdModulesSize)
 {
     bool bViabilityResult;
     std::vector<int> exception;
@@ -559,7 +559,7 @@ bool Development::bCheckCollision(int iParentHandle, int createdModulesSize)
 }
 
 /// Check for ground. If object is above the ground, it can be created
-bool Development::bCheckGround(int createdModulesSize)
+bool EvolvedMorphology::bCheckGround(int createdModulesSize)
 {
     bool bViabilityResult;
     if(0.0 < createdModules[createdModulesSize - 1]->absPos[2] || settings->bOrgansAbovePrintingBed) {
@@ -578,7 +578,7 @@ bool Development::bCheckGround(int createdModulesSize)
 }
 
 /// Check for orientation. If the orientation of the organ is printable
-bool Development::bCheckOrientation(int createdModulesSize)
+bool EvolvedMorphology::bCheckOrientation(int createdModulesSize)
 {
     bool bViabilityResult;
     // If the orientation of the organ is printable
@@ -619,7 +619,7 @@ bool Development::bCheckOrientation(int createdModulesSize)
 }
 
 /// Check of number of organs.
-bool Development::bCheckOrgansNumber(int createdModulesSize)
+bool EvolvedMorphology::bCheckOrgansNumber(int createdModulesSize)
 {
     bool bViabilityResult = true;
     int brainCounter = 0;
