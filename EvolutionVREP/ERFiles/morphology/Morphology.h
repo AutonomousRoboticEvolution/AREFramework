@@ -85,3 +85,16 @@ public:
 	int amountIncrement = 1;
     std::shared_ptr<NEAT::NeuralNetwork> neat_net;
 };
+
+
+class MorphologyFactory
+{
+public:
+    typedef std::shared_ptr<MorphologyFactory> Ptr;
+
+    MorphologyFactory(){}
+    ~MorphologyFactory(){}
+
+    virtual std::shared_ptr<Morphology> morphologyFactory(int,std::shared_ptr<RandNum>,std::shared_ptr<Settings>) = 0;
+
+};

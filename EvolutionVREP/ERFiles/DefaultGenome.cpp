@@ -8,6 +8,20 @@ DefaultGenome::DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settin
 	genomeFitness = 0;
 }
 
+
+DefaultGenome::DefaultGenome(MorphologyFactory::Ptr factory,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
+{
+    randomNum = rn;
+    settings = st;
+    genomeFitness = 0;
+
+    morphologyFactory = std::bind(&MorphologyFactory::morphologyFactory,factory,
+                                  std::placeholders::_1,
+                                  std::placeholders::_2,
+                                  std::placeholders::_3);
+}
+
+
 DefaultGenome::~DefaultGenome() {
 	/*if (morph) {
 		morph->~Morphology();

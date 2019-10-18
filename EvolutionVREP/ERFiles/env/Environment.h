@@ -48,3 +48,13 @@ public:
 	int type = 0;
 };
 
+class EnvironmentFactory
+{
+public:
+    typedef std::shared_ptr<EnvironmentFactory> Ptr;
+
+    EnvironmentFactory(){}
+    ~EnvironmentFactory(){}
+
+    virtual std::shared_ptr<Environment> environmentFactory(const std::shared_ptr<Settings>&) = 0;
+};
