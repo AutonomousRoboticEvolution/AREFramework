@@ -3,7 +3,7 @@
 
 Morphology::~Morphology()
 {
-    if(!load_exp_plugin<Control::Factory>
+    if(!load_fct_exp_plugin<Control::Factory>
             (controlFactory,settings->exp_plugin_name,"controlFactory"))
         exit(1);
 }

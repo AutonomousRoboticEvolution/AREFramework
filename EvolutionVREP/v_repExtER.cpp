@@ -116,7 +116,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 	if (startEvolution) {
 		// Construct classes
 		ERVREP = std::make_unique<ER_VREP>();   // The class used to handle the EA
-		ERVREP->settings = std::make_shared<Settings>();  // Initialize settings in the constructor
+
+        std::shared_ptr<Settings> settings = std::make_shared<Settings>();
+        settings->readSettings(simGetStringParameter(sim_stringparam_app_arg4));
+        if(settings->load_external_settings)
+            if(!load_class_exp_plugin<Settings>(settings,settings->exp_plugin_name,"create_settings"))
+                exit(1);
+
+        ERVREP->settings = std::move(settings);  // Initialize settings in the constructor
 
         if(ERVREP->settings->verbose){
             std::cout << " " << std::endl; // Make output more readable

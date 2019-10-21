@@ -208,6 +208,7 @@ public:
 
 
     std::string exp_plugin_name; //name of the shared library corresponding to your experiment.
+    bool load_external_settings = false;
 
 	/*enum LSystemType{
 	DEFAULT_LSYSTEM = 0,
@@ -263,7 +264,8 @@ public:
     std::vector<int> envObjectHandles;	// Object handles of the environment objects (TODO: DELETE : DEPRECATED)
 
 	void readSettings();			// Reading a .csv settings file
-	void saveSettings();			// Saving a .csv settings file
+    void readSettings(const std::string& filename);
+    void saveSettings();			// Saving a .csv settings file
 	bool autoDeleteSettings = true;
 
 	/// Viability variables

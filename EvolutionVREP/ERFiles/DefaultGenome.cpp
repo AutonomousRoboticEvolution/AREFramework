@@ -7,7 +7,7 @@ DefaultGenome::DefaultGenome(std::shared_ptr<RandNum> rn, std::shared_ptr<Settin
 	settings = st;
 	genomeFitness = 0;
 
-    if(!load_exp_plugin<Morphology::Factory>
+    if(!load_fct_exp_plugin<Morphology::Factory>
             (morphologyFactory,settings->exp_plugin_name,"morphologyFactory"))
         exit(1);
 }

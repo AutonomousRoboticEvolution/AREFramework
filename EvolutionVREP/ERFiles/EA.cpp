@@ -4,7 +4,7 @@
 
 EA::EA()
 {
-    if(!load_exp_plugin<Genome::Factory>
+    if(!load_fct_exp_plugin<Genome::Factory>
             (createGenome,settings->exp_plugin_name,"genomeFactory"))
         exit(1);
 }

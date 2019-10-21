@@ -10,7 +10,7 @@
 #include <ctime>
 #include <memory>
 #include "ERFiles/ER_VREP.h"
-
+#include "exp_plugin_loader.hpp"
 
 /// an unique pointer to ER_VREP class
 std::unique_ptr<ER_VREP> ERVREP;

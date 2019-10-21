@@ -11,11 +11,11 @@
 
 ER_VREP::ER_VREP()
 {
-    if(!load_exp_plugin<Environment::Factory>
+    if(!load_fct_exp_plugin<Environment::Factory>
             (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
         exit(1);
 
-    if(!load_exp_plugin<Genome::Factory>
+    if(!load_fct_exp_plugin<Genome::Factory>
             (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
         exit(1);
 }

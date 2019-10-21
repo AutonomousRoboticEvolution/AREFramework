@@ -648,6 +648,12 @@ void Settings::readSettings()
 	std::cout << "Loaded Settings" << std::endl;
 }
 
+void Settings::readSettings(const std::string& filename)
+{
+    repository = filename;
+    readSettings();
+}
+
 void Settings::saveSettings()
 {
 	std::ofstream settingsFile;
