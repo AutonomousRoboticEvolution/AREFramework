@@ -8,14 +8,21 @@ from helperFunctions import makeTransform
 import math
 import numpy as np
 
-def makeFile(location="BRL"):
+def makeFile(location):
 
 	# location specific variables:
 	if location == "BRL":
-		ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.02 / 1000 , -0.67789 , 0.748-0.0005 , math.radians(180),0,0 ]).tolist() #6.315
-		PRINTER_1_ORIGIN = makeTransform( [ 0.3345 , 0.106, 0.0819 , 0 , 0 , math.radians( -90 ) ] ) .tolist()
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.02 / 1000 , -0.67789 , 0.748-0.0005 , math.radians(180),0,0 ]).tolist()  # 6.315
+		PRINTER_1_ORIGIN = makeTransform( [ 0.3345 , 0.106 , 0.0819 , 0 , 0 , math.radians( -90 ) ] ) .tolist()
 		CABLE_BANK_1_ORIGIN = (makeTransform([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90) ]) * makeTransform([-0.002,-0.001,-0.005]) ).tolist()
 		ORGAN_BANK_1_ORIGIN = makeTransform([-0.400 , -0.1598 , -7.4/1000 , 0 , 0 ,math.radians(90) ]).tolist()
+		gripper_TCP_A = (makeTransform([0.184766,0,0.141915,math.radians(45),0,math.radians(90)])*makeTransform([0.003-0.89/1000+0.0025,-0.006+0.24/1000,6.875/1000])).tolist()
+	elif location == "YRK":
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.02 / 1000 , -0.67789 , 0.748-0.0005 , math.radians(180),0,0 ]).tolist()  #  NEEDS UPDATING
+		PRINTER_1_ORIGIN = makeTransform( [0.3912 , 0.0648 , 0.0810 , 0 , 0 , math.radians( -90 )] ) .tolist()
+		CABLE_BANK_1_ORIGIN = (makeTransform([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90) ]) * makeTransform([-0.002,-0.001,-0.005]) ).tolist() #  NEEDS UPDATING
+		ORGAN_BANK_1_ORIGIN = makeTransform([-0.3723 , -0.1988 , -8.1/1000 , 0 , 0 ,math.radians(90) ]).tolist()
+		gripper_TCP_A = (makeTransform([0.19326,0.00401,0.14262,math.radians(45),0,math.radians(90)])).tolist()
 	else:
 		raise Exception("unknown location given for making configuration file")
 
@@ -62,7 +69,7 @@ def makeFile(location="BRL"):
 
 		"gripper":{
 			"EXPECTED_STARTUP_MESSAGE":"I am the transmitter",
-			"TCP_A": (makeTransform([0.184766,0,0.141915,math.radians(45),0,math.radians(90)])*makeTransform([0.003-0.89/1000+0.0025,-0.006+0.24/1000,6.875/1000])).tolist(),
+			"TCP_A": gripper_TCP_A,
 			# "TCP_A": (makeTransform( [0,0,0, math.radians(45),0,math.radians(-270)] ) * makeTransform([0.002,-30/1000,231/1000])).tolist(),
 			"TCP_B": (makeTransform( [0,0,0, math.radians(-45),0,math.radians(90)] ) * makeTransform([0,0,0,0,0,math.radians(180)]) * makeTransform([-2/1000,19/1000,261/1000]) * makeTransform([0,0.001,0.006]) ).tolist(),
 			"READY_MESSAGE":"ready",

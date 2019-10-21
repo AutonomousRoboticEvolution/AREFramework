@@ -66,6 +66,7 @@ class UR5Robot:
         # wait for the UR to be set-up (this happens in the other thread we just started):
         while not self.UR5isConnected:
             time.sleep ( 0.1 )
+        debugPrint("UR5 is setup and ready")
         self.setMoveSpeed ( self.speedValueNormal )
         debugPrint("UR5 set up, going to home")
         self.moveArmToJointAngles( self.HOME_POSITIONS[ "home" ] )
@@ -222,8 +223,11 @@ class UR5Robot:
                 if msg == b'UR_ready':
                     # print("UR is ready")
                     self.isReadyForNextCommand = True
+                    if not self.UR5isConnected:
+                        self.UR5isConnected = True
                 elif msg == b'starting_point':
                     self.__isExpectingHomePosition = True
+                    debugPrint("__isExpectingHomePosition set true",messageVerbosity=3)
                 elif msg == b'sending_pose':
                     self.__isExpectingRequestedPose = True
                 elif msg.decode ( 'utf-8' ) [ 0:2 ] == 'p[':
@@ -700,10 +704,10 @@ class GripperHandler:
                 retryCount += 1
                 debugPrint ("Gripper message back was: " + str ( self.lastSerialMessageReceived ) ,messageVerbosity=3)
                 time.sleep(0.1)
-            if retryCount > 30: # I give up!
+            if retryCount > 1: #30: # I give up!
                 # raise serial.SerialException ( "Arduino unable to communicate with gripper" )
                 hasSent = True
-                errorCode =1
+                # errorCode =1
         debugPrint("Gripper communication took "+str(retryCount)+" retries",messageVerbosity=2)
         return errorCode
 
@@ -714,11 +718,13 @@ class GripperHandler:
 
         while not (self.RF_GRIPPER_READY_MESSAGE in str(self.lastSerialMessageReceived)):
             while self.arduino.in_waiting:
+                time.sleep(0.1)
                 self.lastSerialMessageReceived = self.arduino.readline ()
-            debugPrint ( "New message in: " + str ( self.lastSerialMessageReceived ) ,messageVerbosity=3)
+            debugPrint ( "New message from gripper in: " + str ( self.lastSerialMessageReceived ) ,messageVerbosity=3)
         debugPrint ( "Arduino is ready for us to send, clearing buffer..." ,messageVerbosity=3)
         while self.arduino.in_waiting:
-            debugPrint (self.arduino.readline (),messageVerbosity=3)
+            # debugPrint ( str(self.arduino.readline ()),messageVerbosity=3)
+            self.arduino.readline ()
 
         messageToSend = 'a' + str ( ValueA ) + 'b' + str ( ValueB ) + '\r'
         debugPrint ( "Sending message: " + str ( messageToSend.encode () ) ,messageVerbosity=3)
