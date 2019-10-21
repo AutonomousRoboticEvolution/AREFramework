@@ -136,16 +136,12 @@ set_target_properties(v_repExtER PROPERTIES
 install(TARGETS v_repExtER DESTINATION ${VREP_LIB_FOLDER})
 
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
-    target_compile_definitions(v_repExtER PUBLIC "__WINDOWS__")
     target_compile_definitions(ER_library PUBLIC "__WINDOWS__")
 elseif(APPLE)
-    target_compile_definitions(v_repExtER PUBLIC "__APPLE__")
     target_compile_definitions(ER_library PUBLIC "__APPLE__")
-elseif(UNIX)    
-    target_compile_definitions(v_repExtER PUBLIC "__linux")
+elseif(UNIX)
     target_compile_definitions(ER_library PUBLIC "__linux")
 endif()
 
 add_subdirectory(ERClient)
-add_subdirectory(MPI)
 add_subdirectory(VREP_Files)
