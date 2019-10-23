@@ -9,6 +9,9 @@
 class EA
 {
 public:
+
+    typedef std::shared_ptr<EA> (Factory)(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st);
+
     EA(){}
     EA(const Settings& st);
 	virtual ~EA();

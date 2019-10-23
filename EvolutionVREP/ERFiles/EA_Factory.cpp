@@ -43,7 +43,7 @@ std::shared_ptr<EA> EA_Factory::createEA(std::shared_ptr<RandNum> rn, std::share
             if (st->verbose) {
                 std::cout << "Creating EA: MultiNEAT" << std::endl;
             }
-            std::unique_ptr<EA> m_ea(new EA_MultiNEAT);
+            std::unique_ptr<EA> m_ea(new EA_MultiNEAT(*st));
             m_ea->randomNum = rn;
             m_ea->settings = st;
             return m_ea;

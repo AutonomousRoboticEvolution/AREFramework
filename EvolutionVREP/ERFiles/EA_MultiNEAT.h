@@ -12,7 +12,7 @@ class EA_MultiNEAT : public EA
 {
 public:
     EA_MultiNEAT();
-
+    EA_MultiNEAT(const Settings&);
     ~EA_MultiNEAT() override;
 
     // Basic functions from EA class

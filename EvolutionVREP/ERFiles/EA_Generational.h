@@ -7,6 +7,7 @@ class EA_Generational : public EA
 {
 public:
 	EA_Generational();
+    EA_Generational(const Settings& st) : EA(st){}
 	~EA_Generational();
 
 	void setFitness(int individual, float fitness);

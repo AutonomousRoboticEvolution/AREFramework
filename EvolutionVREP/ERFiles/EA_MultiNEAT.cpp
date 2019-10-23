@@ -9,14 +9,23 @@
 #include <memory>
 #include <cmath>
 
-EA_MultiNEAT::EA_MultiNEAT() : EA()
+EA_MultiNEAT::EA_MultiNEAT()
 {
-    if (not settings or settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    if (not settings or settings->verbose)
+        std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+}
+
+EA_MultiNEAT::EA_MultiNEAT(const Settings& st) : EA(st)
+{
+    if (not settings or settings->verbose)
+        std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+
 }
 
 EA_MultiNEAT::~EA_MultiNEAT()
 {
-    if (not settings or settings->verbose) std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
+    if (not settings or settings->verbose)
+        std::cerr << "EA_MultiNEAT::" << __func__ << std::endl;
 }
 
 /// Initialiase EA.
