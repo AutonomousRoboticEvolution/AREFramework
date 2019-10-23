@@ -1,0 +1,44 @@
+#include "../RandNum.h"
+#include "Settings.h"
+#include "DummyEnv.h"
+#include "morphology/CAT.h"
+#include "DummyControl.h"
+#include "DefaultGenome.h"
+#include "EA_SteadyState.h"
+
+
+
+extern "C" std::shared_ptr<Environment> environmentFactory(const std::shared_ptr<Settings>& st)
+{
+   std::shared_ptr<Environment> env(new DummyEnv);
+    env->settings = st;
+    return env;
+}
+
+
+extern "C" std::shared_ptr<Morphology> morphologyFactory(int type,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
+{
+    std::shared_ptr<Morphology> fixedBaseMorph(new FixedBaseMorphology);
+    return fixedBaseMorph;
+}
+
+extern "C" std::shared_ptr<Control> controlFactory(int type,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
+{
+    std::shared_ptr<Control> ctrl(new DummyControl);
+    ctrl->randomNum = rn;
+    ctrl->settings = st;
+    return ctrl;
+}
+
+extern "C" std::shared_ptr<Genome> genomeFactory(int type,std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
+{
+    std::shared_ptr<Genome> dfgenome(new DefaultGenome(rn,st));
+    return dfgenome;
+}
+
+extern "C" std::shared_ptr<EA> EAFactory(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
+{
+    std::shared_ptr<EA> ea(new EA_SteadyState(*st));
+    ea->randomNum = rn;
+    return ea;
+}
