@@ -5,6 +5,7 @@
 #include "DummyControl.h"
 #include "DefaultGenome.h"
 #include "EA_SteadyState.h"
+#include "EA_MultiNEAT.h"
 
 
 
@@ -38,7 +39,12 @@ extern "C" std::shared_ptr<Genome> genomeFactory(int type,std::shared_ptr<RandNu
 
 extern "C" std::shared_ptr<EA> EAFactory(std::shared_ptr<RandNum> rn, std::shared_ptr<Settings> st)
 {
-    std::shared_ptr<EA> ea(new EA_SteadyState(*st));
+    std::shared_ptr<EA> ea;
+    if(st->evolutionType == Settings::STEADY_STATE)
+        ea.reset(new EA_SteadyState(*st));
+    else if (st->evolutionType == Settings::EA_MULTINEAT)
+        ea.reset(new EA_MultiNEAT(*st));
+
     ea->randomNum = rn;
     return ea;
 }

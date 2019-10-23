@@ -26,8 +26,6 @@ int load_fct_exp_plugin(std::function<fct_type>& fct, const std::string& plugin_
 
     libhandler.close();
 
-    std::cout << "Function " << fct_name << " successfully loaded" << std::endl;
-
     return 1;
 }
 
