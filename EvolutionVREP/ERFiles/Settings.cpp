@@ -42,7 +42,7 @@ Settings::Settings()
     initialInputNeurons = 1;
     initialInterNeurons = 1;
     initialOutputNeurons = 1;
-	evolutionType = EA_MULTINEAT;
+    evolutionType = STEADY_STATE;
 	seed = 0;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;

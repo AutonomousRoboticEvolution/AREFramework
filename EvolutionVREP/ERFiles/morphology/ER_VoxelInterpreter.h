@@ -13,6 +13,7 @@ class ER_VoxelInterpreter : public EvolvedMorphology
 {
 public:
     ER_VoxelInterpreter(unsigned int id);
+    ER_VoxelInterpreter(unsigned int id, const Settings& st);
     ~ER_VoxelInterpreter();
 
     /**

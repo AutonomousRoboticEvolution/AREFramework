@@ -59,6 +59,8 @@ public:
     ///used to create the environment
     std::function<Environment::Factory> environmentFactory;
 
+    std::function<EA::Factory> EAFactory;
+
 	/// Logs information about the fitness of each individual, best individual and list of individuals.
 	void saveSettings() override;
 

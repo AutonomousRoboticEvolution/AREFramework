@@ -6,6 +6,13 @@ ER_VoxelInterpreter::ER_VoxelInterpreter(unsigned int id)
     mainHandle = 0;
 }
 
+ER_VoxelInterpreter::ER_VoxelInterpreter(unsigned int id, const Settings& st)
+    : id(id), EvolvedMorphology (st)
+{
+    mainHandle = 0;
+}
+
+
 ER_VoxelInterpreter::~ER_VoxelInterpreter()
 {
     simRemoveObject(mainHandle);

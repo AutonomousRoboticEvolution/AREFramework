@@ -9,8 +9,9 @@
 class EvolvedMorphology : public BaseMorphology
 {
 public:
-        EvolvedMorphology();
-	~EvolvedMorphology();
+     EvolvedMorphology();
+     EvolvedMorphology(const Settings&);
+     ~EvolvedMorphology();
 //	typedef shared_ptr<ER_Module> ModulePointer;
 //	vector <shared_ptr<ER_Module>> getCreatedModules();
 	int getAmountBrokenModules() override;

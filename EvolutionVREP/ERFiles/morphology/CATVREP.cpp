@@ -4,10 +4,11 @@
 #include <fstream>
 
 
-CATVREP::CATVREP() : CAT ()
-{
-    va = std::shared_ptr<VestibularAttributes>(new VestibularAttributes);
-}
+CATVREP::CATVREP() : CAT (){}
+
+
+CATVREP::CATVREP(const Settings& st) : CAT (st){}
+
 
 
 CATVREP::~CATVREP()

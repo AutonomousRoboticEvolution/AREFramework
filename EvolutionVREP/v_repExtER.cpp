@@ -118,10 +118,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 		ERVREP = std::make_unique<ER_VREP>();   // The class used to handle the EA
 
         std::shared_ptr<Settings> settings = std::make_shared<Settings>();
-        settings->readSettings(simGetStringParameter(sim_stringparam_app_arg4));
+        settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));
+        settings->sceneNum = 0;
+        std::cout << "readSettings" << std::endl;
+        settings->readSettings();
         if(settings->load_external_settings)
             if(!load_class_exp_plugin<Settings>(settings,settings->exp_plugin_name,"create_settings"))
                 exit(1);
+
+        std::cout << "---------------------------------" << std::endl;
+        std::cout << "loading experiement : " << settings->exp_plugin_name << std::endl;
+        std::cout << "---------------------------------" << std::endl;
 
         ERVREP->settings = std::move(settings);  // Initialize settings in the constructor
 

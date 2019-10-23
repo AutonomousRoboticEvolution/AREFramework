@@ -17,8 +17,9 @@ public:
     typedef std::shared_ptr<Morphology> (Factory)
         (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
 
-	Morphology(){};
-	virtual ~Morphology();
+    Morphology(){}
+    Morphology(const Settings& settings);
+    virtual ~Morphology(){}
     std::shared_ptr<Settings> settings;
     std::shared_ptr<RandNum> randomNum;
 	virtual std::shared_ptr<Morphology> clone() const = 0;

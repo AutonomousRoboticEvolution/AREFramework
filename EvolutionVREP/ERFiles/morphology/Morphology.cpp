@@ -1,8 +1,8 @@
 #include "Morphology.h"
 #include <iostream>
 
-Morphology::~Morphology()
-{
+Morphology::Morphology(const Settings& st){
+    settings.reset(new Settings(st));
     if(!load_fct_exp_plugin<Control::Factory>
             (controlFactory,settings->exp_plugin_name,"controlFactory"))
         exit(1);

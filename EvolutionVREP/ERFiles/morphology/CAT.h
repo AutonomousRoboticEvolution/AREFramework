@@ -8,7 +8,8 @@ class CAT : public FixedBaseMorphology
 public:
 	CAT();
 	~CAT();
-	float fitness;
+    CAT(const Settings& st);
+    float fitness;
 	void init_noMorph();
 	/**
 		@brief This method creates the morphology and its control

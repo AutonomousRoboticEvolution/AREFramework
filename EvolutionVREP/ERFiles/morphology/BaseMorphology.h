@@ -34,7 +34,8 @@ class BaseMorphology : public Morphology
 {
 
 public:
-    BaseMorphology() : Morphology (){}
+    BaseMorphology(){}
+    BaseMorphology(const Settings& st) : Morphology(st){}
     virtual ~BaseMorphology(){}
 	
 	void split_line(std::string& line, std::string delim, std::list<std::string>& values);

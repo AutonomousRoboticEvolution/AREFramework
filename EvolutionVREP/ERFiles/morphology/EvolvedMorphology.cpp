@@ -7,6 +7,12 @@ EvolvedMorphology::EvolvedMorphology() : BaseMorphology ()
 	modular = true;
 }
 
+EvolvedMorphology::EvolvedMorphology(const Settings& st) : BaseMorphology (st)
+{
+    modular = true;
+}
+
+
 
 EvolvedMorphology::~EvolvedMorphology()
 {

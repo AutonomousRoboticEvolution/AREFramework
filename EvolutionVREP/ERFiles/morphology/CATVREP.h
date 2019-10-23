@@ -7,6 +7,7 @@ class CATVREP : public CAT
 {
 public:
 	CATVREP();
+    CATVREP(const Settings&);
 	~CATVREP();
 	virtual void createMorphology() {};
 //	virtual void mutate(float mutationRate){};

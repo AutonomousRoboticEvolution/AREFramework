@@ -35,14 +35,17 @@ void ER_VREP::initializeServer()
             (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
         exit(1);
 
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+        exit(1);
+
     environment = environmentFactory(settings);
 	// initialize the environment
 	environment->init();
-    std::unique_ptr<EA_Factory> eaf(new EA_Factory);
-	ea = eaf->createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+
+    ea = EAFactory(randNum, settings); // unique_ptr<EA>(new EA_VREP);
 	ea->randomNum = randNum;
 	ea->init();
-	eaf.reset();
 }
 
 /// Initialize a genome factory to create genomes when the simulation is running
@@ -63,12 +66,14 @@ void ER_VREP::initializeSimulation()
             (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
         exit(1);
 
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+        exit(1);
+
     std::cout << "external factories loaded !" << std::endl;
 
     environment = environmentFactory(settings);
-    EA_Factory eaf;
-	ea = eaf.createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);
-	ea->randomNum = randNum;
+    ea = EAFactory(randNum, settings);	ea->randomNum = randNum;
 	ea->init();
 	environment->init();
 }

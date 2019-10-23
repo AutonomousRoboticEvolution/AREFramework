@@ -7,7 +7,8 @@ class FixedBaseMorphology :
 	public BaseMorphology
 {
 public:
-    FixedBaseMorphology() : BaseMorphology() {}
+    FixedBaseMorphology(){}
+    FixedBaseMorphology(const Settings &st) : BaseMorphology(st){}
     ~FixedBaseMorphology(){}
 	void init();
 	void addDefaultMorphology();

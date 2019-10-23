@@ -25,9 +25,9 @@ endif()
 find_package(MultiNEAT REQUIRED)
 find_package(PolyVox REQUIRED)
 
-FILE(GLOB_RECURSE SOURCES "RandNum.cpp" "ERFiles/*.cpp"  "ERFiles/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
+FILE(GLOB_RECURSE SOURCES "RandNum.cpp" "ERFiles/*.cpp" "ERFiles/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
 
-add_library(ER_library STATIC ${SOURCES})
+add_library(ER_library SHARED ${SOURCES})
 
 target_include_directories(ER_library PUBLIC
     "${VREP_FOLDER}/programming/include"
@@ -38,7 +38,7 @@ target_include_directories(ER_library PUBLIC
 
 set_target_properties(ER_library PROPERTIES 
     CXX_STANDARD 14
-    # COMPILE_FLAGS "-w"
+#    COMPILE_FLAGS "-w"
     POSITION_INDEPENDENT_CODE ON
 )
 
@@ -55,6 +55,8 @@ target_include_directories(ER_library
     PRIVATE
     ${PolyVox_INCLUDE_DIRS}
 )
+
+install(TARGETS ER_library DESTINATION lib)
 
 target_link_libraries(v_repExtER ER_library dlibxx dl)
 
@@ -80,3 +82,5 @@ endif()
 
 add_subdirectory(ERClient)
 add_subdirectory(VREP_Files)
+
+add_subdirectory(examples)
