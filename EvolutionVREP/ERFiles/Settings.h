@@ -18,6 +18,72 @@ class Settings
 {
 public:
 	Settings();
+    Settings(const Settings& st) :
+        startingCondition(st.startingCondition),
+        instanceType(st.instanceType),
+        evolutionType(st.evolutionType),
+        fitnessType(st.fitnessType),
+        environmentType(st.environmentType),
+        moveDirection(st.moveDirection),
+        morphologyType(st.morphologyType),
+        controlType(st.controlType),
+        selectionType(st.selectionType),
+        replacementType(st.replacementType),
+        indCounter(st.indCounter),
+        sceneNum(st.sceneNum),
+        sendGenomeAsSignal(st.sendGenomeAsSignal),
+        mutationRate(st.mutationRate),
+        morphMutRate(st.morphMutRate),
+        generation(st.generation),
+        maxGeneration(st.maxGeneration),
+        xGenerations(st.xGenerations),
+        populationSize(st.populationSize),
+        individualCounter(st.individualCounter),
+        crossover(st.crossover),
+        crossoverRate(st.crossoverRate),
+        ageInds(st.ageInds),
+        maxAge(st.maxAge),
+        minAge(st.minAge),
+        deathProb(st.deathProb),
+        indNumbers(st.indNumbers),
+        indFits(st.indFits),
+        exp_plugin_name(st.exp_plugin_name),
+        load_external_settings(st.load_external_settings),
+        useVarModules(st.useVarModules),
+        maxForce(st.maxForce),
+        maxForceSensor(st.maxForceSensor),
+        maxForce_ForceSensor(st.maxForce_ForceSensor),
+        maxTorque_ForceSensor(st.maxTorque_ForceSensor),
+        consecutiveThresholdViolations(st.consecutiveThresholdViolations),
+        maxNumberModules(st.maxNumberModules),
+        moduleTypes(st.moduleTypes),
+        maxModuleTypes(st.maxModuleTypes),
+        numberOfModules(st.numberOfModules),
+        repository(st.repository),
+        initialModuleType(st.initialModuleType),
+        energyDissipationRate(st.energyDissipationRate),
+        lIncrements(st.lIncrements),
+        bestIndividual(st.bestIndividual),
+        loadInd(st.loadInd),
+        verbose(st.verbose),
+        colorization(st.colorization),
+        killWhenNotConnected(st.killWhenNotConnected),
+        shouldReopenConnections(st.shouldReopenConnections),
+        createPatternNeurons(st.createPatternNeurons),
+        initialInputNeurons(st.initialInputNeurons),
+        initialInterNeurons(st.initialInterNeurons),
+        initialOutputNeurons(st.initialOutputNeurons),
+        initialAmountConnectionsNeurons(st.initialAmountConnectionsNeurons),
+        maxAddedNeurons(st.maxAddedNeurons),
+        savePhenotype(st.savePhenotype),
+        envObjectHandles(st.envObjectHandles),
+        autoDeleteSettings(st.autoDeleteSettings),
+        bOrgansAbovePrintingBed(st.bOrgansAbovePrintingBed),
+        bCollidingOrgans(st.bCollidingOrgans),
+        bNonprintableOrientations(st.bNonprintableOrientations),
+        bAnyOrgansNumber(st.bAnyOrgansNumber),
+        loadFromQueue(st.loadFromQueue)
+    {}
 	virtual ~Settings();
     /// Type of fitness function
 	enum FitnessType {
@@ -255,18 +321,18 @@ public:
 
 
 	// neural network parameters
-	int initialInputNeurons = 3;	// Initial number of input neurons
-	int initialInterNeurons = 1;	// Initial number of interneurons
-	int initialOutputNeurons = 3;	// Initial number of output neurons
-	int initialAmountConnectionsNeurons = 3; // Initial number of connections for each neuron
-	int	maxAddedNeurons = 4;		// The maximum number of neurons that can be added in one call of the mutation operator
-	bool savePhenotype = true;		// Whether to save the phenotype or not
+    int initialInputNeurons = 3;	// Initial number of input neurons
+    int initialInterNeurons = 1;	// Initial number of interneurons
+    int initialOutputNeurons = 3;	// Initial number of output neurons
+    int initialAmountConnectionsNeurons = 3; // Initial number of connections for each neuron
+    int	maxAddedNeurons = 4;		// The maximum number of neurons that can be added in one call of the mutation operator
+    bool savePhenotype = true;		// Whether to save the phenotype or not
     std::vector<int> envObjectHandles;	// Object handles of the environment objects (TODO: DELETE : DEPRECATED)
 
 	void readSettings();			// Reading a .csv settings file
     void readSettings(const std::string& filename);
     void saveSettings();			// Saving a .csv settings file
-	bool autoDeleteSettings = true;
+    bool autoDeleteSettings = false;
 
 	/// Viability variables
 	// Allow organs above printing bed

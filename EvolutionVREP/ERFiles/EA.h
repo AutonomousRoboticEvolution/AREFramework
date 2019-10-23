@@ -9,7 +9,8 @@
 class EA
 {
 public:
-	EA();
+    EA(){}
+    EA(const Settings& st);
 	virtual ~EA();
 
     virtual void split_line(std::string & line, std::string delim, std::list<std::string>& values);

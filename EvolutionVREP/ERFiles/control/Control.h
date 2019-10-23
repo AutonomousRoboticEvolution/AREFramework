@@ -1,4 +1,6 @@
 #pragma once
+#ifndef CONTROL_H
+#define CONTROL_H
 
 #include <vector>
 #include <memory>
@@ -15,8 +17,8 @@ public:
     typedef std::shared_ptr<Control> (Factory)
         (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
 
-	Control(){};
-	virtual ~Control();
+    Control(){}
+    virtual ~Control(){}
     /**
     @brief Specify the number of neurons in input layer, hidden layer, and output layer
     @param input number of neuron in input layer
@@ -52,14 +54,4 @@ public:
 };
 
 
-class ControlFactory
-{
-public:
-    typedef std::shared_ptr<ControlFactory> Ptr;
-
-    ControlFactory(){}
-    ~ControlFactory(){}
-
-    virtual std::shared_ptr<Control> controlFactory(int,std::shared_ptr<RandNum>,std::shared_ptr<Settings>) = 0;
-
-};
+#endif //CONTROL_H

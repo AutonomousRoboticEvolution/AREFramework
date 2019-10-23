@@ -11,13 +11,7 @@
 
 ER_VREP::ER_VREP()
 {
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
-        exit(1);
 
-    if(!load_fct_exp_plugin<Genome::Factory>
-            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
-        exit(1);
 }
 
 ER_VREP::~ER_VREP()
@@ -33,7 +27,13 @@ void ER_VREP::initializeServer()
 //    std::unique_ptr<EnvironmentFactory> environmentFactory(new EnvironmentFactory);
 //	environment = environmentFactory->createNewEnvironment(settings);
 //	environmentFactory.reset();
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+        exit(1);
 
+    if(!load_fct_exp_plugin<Genome::Factory>
+            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
+        exit(1);
 
     environment = environmentFactory(settings);
 	// initialize the environment
@@ -53,6 +53,18 @@ void ER_VREP::initializeSimulation()
 	// Environment factory is used to create the environment
 //    EnvironmentFactory environmentFactory;
 //	environment = environmentFactory.createNewEnvironment(settings);
+
+    std::cout << "initialize simulation" << std::endl;
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+        exit(1);
+
+    if(!load_fct_exp_plugin<Genome::Factory>
+            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
+        exit(1);
+
+    std::cout << "external factories loaded !" << std::endl;
+
     environment = environmentFactory(settings);
     EA_Factory eaf;
 	ea = eaf.createEA(randNum, settings); // unique_ptr<EA>(new EA_VREP);

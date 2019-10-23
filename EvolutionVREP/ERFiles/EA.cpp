@@ -2,13 +2,13 @@
 
 #include <memory>
 
-EA::EA()
-{
+
+EA::EA(const Settings& st){
+    settings = std::make_shared<Settings>(st);
     if(!load_fct_exp_plugin<Genome::Factory>
             (createGenome,settings->exp_plugin_name,"genomeFactory"))
         exit(1);
 }
-
 
 EA::~EA()
 {

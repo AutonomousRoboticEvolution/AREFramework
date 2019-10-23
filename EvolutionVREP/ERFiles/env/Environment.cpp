@@ -25,7 +25,7 @@ void Environment::init() {
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
 	// Sets time step
-	simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
+    simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
 }
 
 void Environment::print() {

@@ -16,7 +16,7 @@ Settings::Settings()
 	moduleTypes.push_back(15);
 	moduleTypes.push_back(16);
     moduleTypes.push_back(17);
-	autoDeleteSettings = true;
+    autoDeleteSettings = false;
     // Assign maximum number of components for each type
 	for (size_t i = 0; i < moduleTypes.size(); i++) {
 		std::vector <int> tmpMaxModuleTypes;
@@ -39,16 +39,16 @@ Settings::Settings()
 //	controlType = ANN_DEFAULT;
 	verbose = true;
 	//verbose = true;
-	initialInputNeurons = 1;
-	initialInterNeurons = 1;
-	initialOutputNeurons = 1;
+    initialInputNeurons = 1;
+    initialInterNeurons = 1;
+    initialOutputNeurons = 1;
 	evolutionType = EA_MULTINEAT;
 	seed = 0;
 	morphMutRate = 0.1;
 	mutationRate = 0.1;
 	maxGeneration = 600;
-	initialAmountConnectionsNeurons = 1;
-	maxAddedNeurons = 2;
+    initialAmountConnectionsNeurons = 1;
+    maxAddedNeurons = 2;
 	xGenerations = 50;
 	savePhenotype = true;
 	sendGenomeAsSignal = true;
@@ -142,7 +142,7 @@ void Settings::readSettings()
 					instanceType = INSTANCE_REGULAR; 
 				}
 			}
-			if (tmp == "#evolutionType") {
+            else if (tmp == "#evolutionType") {
 				it++;
 				tmp = *it;
 				int tmpInt = atoi(tmp.c_str());
@@ -161,6 +161,16 @@ void Settings::readSettings()
 					break;
 				}
 			}
+            else if(tmp == "#expPluginName"){
+                it++;
+                tmp = *it;
+                exp_plugin_name = tmp;
+            }
+            else if(tmp == "#extSettingsClass"){
+                it++;
+                tmp = *it;
+                load_external_settings = atoi(tmp.c_str());
+            }
 			else if (tmp == "#fitnessType") {
 				it++;
 				tmp = *it;
@@ -686,6 +696,9 @@ void Settings::saveSettings()
 	settingsFile << ",#verbose," << verbose << "," << std::endl;
 	settingsFile << ",#useVarModules," << useVarModules << "," << std::endl;
 	settingsFile << ",#maxNumberModules," << maxNumberModules << "," << std::endl;
+    settingsFile << ",#expPluginName," << exp_plugin_name << "," << std::endl;
+    settingsFile << ",#extSettingsClass," << load_external_settings << "," << std::endl;
+
 
 	// Viability
     settingsFile << ",#collidingorgans," << bCollidingOrgans << "," << std::endl;
