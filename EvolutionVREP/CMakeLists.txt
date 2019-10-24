@@ -83,4 +83,4 @@ endif()
 add_subdirectory(ERClient)
 add_subdirectory(VREP_Files)
 
-add_subdirectory(examples)
+add_subdirectory(experiments)

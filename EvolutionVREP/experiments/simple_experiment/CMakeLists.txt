@@ -2,12 +2,12 @@ cmake_minimum_required(VERSION 3.0)
 
 
 add_library(simple_experiment SHARED
-    simple_experiment/factories.cpp
-    simple_experiment/DummyEnv.cpp
-    simple_experiment/DummyControl.cpp
-    simple_experiment/settings.cpp)
+    factories.cpp
+    DummyEnv.cpp
+    DummyControl.cpp
+    settings.cpp)
 target_include_directories(simple_experiment PUBLIC
-    "../ERFiles"
+    "../../ERFiles"
     "${VREP_FOLDER}/programming/include"
     )
 target_link_libraries(simple_experiment ER_library)
