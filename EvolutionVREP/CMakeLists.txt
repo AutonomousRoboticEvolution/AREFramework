@@ -25,11 +25,12 @@ endif()
 find_package(MultiNEAT REQUIRED)
 find_package(PolyVox REQUIRED)
 
-FILE(GLOB_RECURSE SOURCES "RandNum.cpp" "ERFiles/*.cpp" "ERFiles/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
+FILE(GLOB_RECURSE SOURCES "src/ARE/*" "src/misc/*" "iunclude/ARE/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
 
 add_library(ER_library SHARED ${SOURCES})
 
 target_include_directories(ER_library PUBLIC
+    "include"
     "${VREP_FOLDER}/programming/include"
 )
 
@@ -43,7 +44,7 @@ set_target_properties(ER_library PROPERTIES
 )
 
 add_library(v_repExtER SHARED 
-    v_repExtER.cpp
+    src/plugin/v_repExtER.cpp
 )
 
 target_link_libraries(ER_library

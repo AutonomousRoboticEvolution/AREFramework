@@ -1,0 +1,43 @@
+#include "ARE/EA_VREP.h"
+
+
+
+void EA_VREP::init()
+{
+//    gf = std::unique_ptr<GenomeFactoryVREP>(new GenomeFactoryVREP);
+}
+
+void EA_VREP::selection()
+{
+}
+
+void EA_VREP::replacement()
+{
+}
+
+void EA_VREP::mutation()
+{
+}
+
+void EA_VREP::initializePopulation(std::shared_ptr<Settings> st, bool client)
+{
+	settings = st;
+	if (client) {
+		for (int i = 0; i < st->populationSize; i++)
+		{
+            populationGenomes.push_back(createGenome(1, randomNum, st));
+			populationGenomes[i]->fitness = 0;
+			// for easy access of fitness values (used by client-server)
+			//popFitness.push_back(0);
+		}
+	}
+	else {
+		for (int i = 0; i < st->populationSize; i++)
+		{
+            populationGenomes.push_back(createGenome(0, randomNum, st));
+			populationGenomes[i]->fitness = 0;
+			// for easy access of fitness values (used by client-server)
+			//popFitness.push_back(0);
+		}
+	}
+}
