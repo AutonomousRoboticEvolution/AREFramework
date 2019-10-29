@@ -1,11 +1,11 @@
-#include "../RandNum.h"
-#include "Settings.h"
+#include "misc/RandNum.h"
+#include "ARE/Settings.h"
 #include "DummyEnv.h"
-#include "morphology/CAT.h"
+#include "ARE/CAT.h"
 #include "DummyControl.h"
-#include "DefaultGenome.h"
-#include "EA_SteadyState.h"
-#include "EA_MultiNEAT.h"
+#include "ARE/DefaultGenome.h"
+#include "ARE/EA_SteadyState.h"
+#include "ARE/EA_MultiNEAT.h"
 
 
 

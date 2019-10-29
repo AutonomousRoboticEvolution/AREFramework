@@ -7,7 +7,6 @@ add_library(simple_experiment SHARED
     DummyControl.cpp
     settings.cpp)
 target_include_directories(simple_experiment PUBLIC
-    "../../ERFiles"
     "${VREP_FOLDER}/programming/include"
     )
 target_link_libraries(simple_experiment ER_library)

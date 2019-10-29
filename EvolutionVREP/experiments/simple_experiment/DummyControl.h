@@ -2,7 +2,7 @@
 #ifndef DUMMY_CONTROL_H
 #define DUMMY_CONTROL_H
 
-#include "control/Control.h"
+#include "ARE/Control.h"
 #include <memory>
 #include <vector>
 

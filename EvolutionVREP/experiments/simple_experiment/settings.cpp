@@ -1,4 +1,4 @@
-#include "Settings.h"
+#include "ARE/Settings.h"
 
 class ExpSettings : public Settings {
 public:

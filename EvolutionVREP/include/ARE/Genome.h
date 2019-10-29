@@ -15,8 +15,8 @@ public:
     typedef std::shared_ptr<Genome> (Factory)
         (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
 
-	Genome();
-	virtual ~Genome();
+    Genome(){}
+    virtual ~Genome(){}
     	/// simulation setting shared by genome and EA
     std::shared_ptr<Settings> settings;
 	/// random number generator

@@ -14,7 +14,7 @@
     - The third argumt defines where the repository is
 */
 
-#include "v_repExtER.h"
+#include "plugin/v_repExtER.h"
 //#include "luaFunctionData.h"
 #include <iostream>
 #include <fstream>
