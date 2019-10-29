@@ -12,6 +12,7 @@
 #include "../ERFiles/EA.h"
 #include "../ERFiles/EA_SteadyState.h"
 #include "../ERFiles/EA_Factory.h"
+#include "../exp_plugin_loader.hpp"
 #include "SlaveConnection.h"
 
 
@@ -70,5 +71,6 @@ public:
 	
 	ClientEA();
 	~ClientEA();
+
 };
 

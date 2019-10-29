@@ -32,12 +32,13 @@ bool ClientEA::init(int amountPorts, int startPort)
 			continue; // jump back to beginning loop
 		}
 	}
-	std::unique_ptr<EA_Factory> eaf = std::make_unique<EA_Factory>();
-	ea = eaf->createEA(randNum, settings);
+    std::function<EA::Factory> eaFactory;
+    load_fct_exp_plugin<EA::Factory>(eaFactory,settings->exp_plugin_name,"EAFactory");
+    ea = eaFactory(randNum, settings);
 	// ea = shared_ptr<EA>(new EA_SteadyState());
 	// ea->setSettings(settings, randNum);
 	ea->init();
-	eaf.reset();
+
 	return true;
 }
 
