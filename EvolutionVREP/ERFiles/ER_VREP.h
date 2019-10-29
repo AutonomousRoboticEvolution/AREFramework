@@ -12,7 +12,6 @@
 #include "env/Environment.h"
 //#include "env/EnvironmentFactory.h"
 #include "v_repLib.h"
-#include "EA_Factory.h"
 #include "../exp_plugin_loader.hpp"
 
 class ER_VREP : public CER
