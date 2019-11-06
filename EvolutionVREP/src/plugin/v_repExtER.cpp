@@ -127,7 +127,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
                 exit(1);
 
         std::cout << "---------------------------------" << std::endl;
-        std::cout << "loading experiement : " << settings->exp_plugin_name << std::endl;
+        std::cout << "loading experiment : " << settings->exp_plugin_name << std::endl;
         std::cout << "---------------------------------" << std::endl;
 
         ERVREP->settings = std::move(settings);  // Initialize settings in the constructor
