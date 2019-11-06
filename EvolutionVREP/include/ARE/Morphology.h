@@ -4,50 +4,85 @@
 
 #include <vector>
 #include <memory>
-#include <multineat/NeuralNetwork.h>
-//#include "../env/Environment.h" // impossible, environment already includes morphology
+#include <multineat/Substrate.h>
 #include "ARE/ER_Module.h"
-#include "ARE/Control.h"
 #include "misc/RandNum.h"
 #include "ARE/Settings.h"
+#include "ARE/Phenotype.h"
 
 
-class Morphology // Abstract Class
+namespace are {
+
+struct ObjectParameters {
+    float size[3];
+    float position[3];
+    float orientation[3];
+    float mass;
+    int parent; // points to custom ID
+    int type;
+    int state; // only used for LSystems?
+};
+
+
+struct JointParameters {
+    float size[3];
+    float position[3];
+    float orientation[3];
+    float angleLimits[2];
+    float maxForce;
+    float maxVelocity;
+    int parent; // points to custom ID
+    int type;
+    int state;
+};
+
+
+//Abstract Class
+class Morphology
 {
 public:
 
-    typedef std::shared_ptr<Morphology> (Factory)
-        (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
+    typedef std::shared_ptr<Morphology> Ptr;
+    typedef std::shared_ptr<const Morphology> ConstPtr;
+    typedef Morphology::Ptr (Factory)(int,misc::RandNum::Ptr, Settings::Ptr);
 
     Morphology(){}
     Morphology(const Settings& settings);
+    Morphology(const Morphology& morph) :
+        modular(morph.modular),
+        phenValue(morph.phenValue),
+        maxModuleTypes(morph.maxModuleTypes),
+        minimumHeight(morph.minimumHeight),
+        amountIncrement(morph.amountIncrement),
+        settings(morph.settings),
+        randomNum(morph.randomNum),
+        createdModules(morph.createdModules),
+        substrate(morph.substrate)
+    {}
     virtual ~Morphology(){}
-    std::shared_ptr<Settings> settings;
-    std::shared_ptr<RandNum> randomNum;
-	virtual std::shared_ptr<Morphology> clone() const = 0;
-    std::vector<std::shared_ptr<ER_Module> > createdModules;
+
+    virtual Morphology::Ptr clone() const = 0;
 
     /// This method initialize the morph
-	virtual void init() = 0;
-	virtual void init_noMorph() = 0;
-	virtual void clearMorph() = 0;
-	virtual void savePhenotype(int ind, float fitness) = 0;
-
-	/// This method mutate the morphology
-	virtual void mutate() = 0;
+    virtual void init_noMorph() {};
+    virtual void clearMorph(){};
+    virtual void savePhenotype(int ind, float fitness){};
 
 	/// This method creates the morphology
 	virtual void create() = 0;
 	virtual void createAtPosition(float x, float y, float z) = 0;
 
 	/// This method updates the control of the morphology
-	virtual void update() = 0; 
+    virtual void update() = 0; //DEPRECATED : Should be deleted
 
-
-	// saving
-	virtual void saveGenome(int indNum, float fitness) = 0;
-	virtual const std::string generateGenome(int indNum, float fitness) const = 0;
-	virtual float getFitness() = 0;
+    // operators of the evolutionary algorithm
+    virtual void crossover(std::shared_ptr<Morphology>, float cr){};
+    void grow() {};
+    virtual void mutate();
+    virtual bool loadGenome(int individualNumber, int sceneNum);
+    virtual bool loadGenome(std::istream &input, int individualNumber);
+    virtual void saveGenome(int indNum, float fitness);
+    virtual const std::string generateGenome(int indNum, float fitness) const;
 
 	// cloning
 	virtual void saveBaseMorphology(int indNum, float fitness) = 0; // currently not used
@@ -55,42 +90,44 @@ public:
 	virtual void loadBaseMorphology(int indNum, int sceneNum) = 0;
 //	virtual void setMainHandlePosition(float position[3]) = 0;
 //	virtual void createMorphology() = 0; // create actual morphology in init
-	virtual void printSome() = 0; 
+    virtual void printSome(){};
 
-	virtual std::vector<int> getObjectHandles(int) =0;
-	virtual std::vector<int> getJointHandles(int) =0;
-	virtual std::vector<int> getAllHandles(int) = 0;
+    virtual std::vector<int> getObjectHandles(int){};
+    virtual std::vector<int> getJointHandles(int){};
+    virtual std::vector<int> getAllHandles(int){};
 
-	virtual bool loadGenome(int individualNumber, int sceneNum) = 0;
-	virtual bool loadGenome(std::istream &input, int individualNumber) = 0;
-	virtual void crossover(std::shared_ptr<Morphology>, float crossoverRate) = 0;
-//	virtual void checkControl(int individual, int sceneNum) =0;
 	bool modular = false;
 //	typedef shared_ptr<ER_Module> ModulePointer;
 
 	// modular functions
 	// This function is needed to implement fluid dynamics on modules...
-	virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules() = 0;
-	virtual int getAmountBrokenModules() = 0;
+    virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules();
+    virtual int getAmountBrokenModules(){};
 
-	float phenValue = -1.0;
-	virtual void setPhenValue() = 0;
+    virtual void setPhenValue();
+    float getPhenValue(){return phenValue;}
 
 
-    std::vector<std::vector <int> > maxModuleTypes;
-//	typedef shared_ptr<Control> ControlPointer;
-	///control of part of morphology 
-    std::shared_ptr<Control> control;
+    std::vector<std::vector<int>> maxModuleTypes;
 
-    std::function<
-        std::shared_ptr<Control>
-            (int type,std::shared_ptr<RandNum> rn,std::shared_ptr<Settings> st)>
-                controlFactory;
-public:
-	virtual int getMainHandle() = 0;
+    virtual int getMainHandle(){return mainHandle;}
+
+    const NEAT::Substrate &get_substrate(){return substrate;}
+
+protected:
+    float phenValue = -1.0;
+
+    int mainHandle;
+    float morphFitness;
 	float minimumHeight = 0;
 	int amountIncrement = 1;
-    std::shared_ptr<NEAT::NeuralNetwork> neat_net;
+
+    Settings::Ptr settings;
+    misc::RandNum::Ptr randomNum;
+    std::vector<std::shared_ptr<ER_Module> > createdModules;
+    NEAT::Substrate substrate;
 };
+
+}//are
 
 #endif //MORPHOLOGY_H
