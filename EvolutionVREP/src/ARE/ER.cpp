@@ -26,20 +26,143 @@
 
 using namespace are;
 
-ER::ER()
+/// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
+/// settings file. A random number class will also be created and all other files refer to this class
+void ER::initialize()
 {
-	// to initialize ER
+
+    if (settings->verbose) {
+        std::cout << "ER initialize" << std::endl;
+    }
+    settings->indCounter = 0;
+    if (settings->evolutionType != settings->EMBODIED_EVOLUTION
+     && settings->instanceType == settings->INSTANCE_REGULAR)
+    {
+        settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
+        initializeSimulation(); // Initialize simulation
+    }
+    else if (settings->evolutionType != settings->EMBODIED_EVOLUTION
+          && settings->instanceType == settings->INSTANCE_SERVER
+          && settings->startingCondition != settings->COND_LOAD_BEST)
+    {
+        settings->client = false; // V-REP plugin will receive genomes from ea client
+        initializeServer();
+    }
 }
 
-ER::~ER()
-{}
+/*!
+ * Initializes ER as a server to accept genomes from client.
+ *
+ */
+void ER::initializeServer()
+{
 
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+        exit(1);
+
+//    if(!load_fct_exp_plugin<Genome::Factory>
+//            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
+//        exit(1);
+
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+        exit(1);
+
+    environment = environmentFactory(settings);
+    // initialize the environment
+    environment->init();
+
+    ea = EAFactory(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+    ea->randomNum = randNum;
+    ea->init();
+}
+
+/// Initialize a genome factory to create genomes when the simulation is running
 void ER::initializeSimulation()
 {
-	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
-	//	simSet = RECALLBEST;
-	// }
+//	genomeFactory = std::make_unique<GenomeFactoryVREP>();
+//	genomeFactory->randomNum = randNum;
+    // Environment factory is used to create the environment
+//    EnvironmentFactory environmentFactory;
+//	environment = environmentFactory.createNewEnvironment(settings);
+
+    std::cout << "initialize simulation" << std::endl;
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+        exit(1);
+
+//    if(!load_fct_exp_plugin<Genome::Factory>
+//            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
+//        exit(1);
+
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+        exit(1);
+
+    std::cout << "external factories loaded !" << std::endl;
+
+    environment = environmentFactory(settings);
+    ea = EAFactory(randNum, settings);
+    ea->randomNum = randNum;
+    ea->init();
+    environment->init();
 }
+
+
+/// When V-REP starts, this function is called. Depending on the settings, it initializes the properties of the
+/// individual of the optimization strategy chosen.
+void ER::startOfSimulation()
+{
+   currentInd = ea->getNextInd();
+   currentIndIndex = 0;
+}
+
+
+void ER::handleSimulation()
+{
+
+    /* This function is called every simulation step. Note that the behavior of
+    * the robot drastically changes when slowing down the simulation since this
+    * function will be called more often. All simulated individuals will be
+    * updated until the maximum simulation time, as specified in the environment
+    * class, is reached.
+    */
+    if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+        simStopSimulation();
+        return;
+    }
+    simulationTime += simGetSimulationTimeStep();
+    environment->updateEnv(currentInd->get_morphology());
+//    if (settings->evolutionType == settings->EA_MULTINEAT) {
+//        ea->epoch();
+//    } else {
+////        currentGenome->update();
+//    }
+    if (simGetSimulationTime() > environment->maxTime) {
+        simStopSimulation();
+    }
+}
+
+void ER::endOfSimulation()
+{
+    if (settings->indCounter >= ea->populationGenomes.size())
+    {
+        double fitness = environment->fitnessFunction(currentInd);
+        ea->setFitness(currentIndIndex,fitness);
+        settings->indCounter++;
+    }
+    if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0)
+    {
+        ea->epoch();
+        ea->savePopFitness(generation);
+        generation++;
+        saveSettings();
+        newGenerations++;
+    }
+
+}
+
 
 void ER::loadIndividual(int individualNum, int sceneNum)
 {
@@ -49,23 +172,7 @@ void ER::loadIndividual(int individualNum, int sceneNum)
 
 }
 
-// TODO: Should this be deleted?
-void ER::initialize()
-{
-    settings.reset(new Settings);
-    misc::RandNum::Ptr newRandNum(new misc::RandNum(settings->seed));
-	randNum = newRandNum;
-	newRandNum.reset(); //destroy the pointer
-	settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));  //pass the setting number from argument
-	settings->readSettings();
 
-	//TODO : Factory
-//    ea = std::unique_ptr<EA>(new EA_SteadyState); // default evolutionary algorithm
-//	ea->setSettings(settings, randNum);  //specify the setting and random number for EA
-//	ea->init();
-
-	initializeSimulation();  //empty function?
-}
 
 void ER::saveSettings()
 {
