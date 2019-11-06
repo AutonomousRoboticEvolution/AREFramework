@@ -2,6 +2,8 @@
 #include <iostream>
 #include <cmath>
 
+using namespace misc;
+
 RandNum::RandNum(int seed)
 {
 	srand(seed);
