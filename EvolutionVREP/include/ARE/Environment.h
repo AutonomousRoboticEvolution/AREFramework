@@ -7,14 +7,20 @@
 #include <iostream>
 #include <memory>
 #include "v_repLib.h"
-#include "ARE/DefaultGenome.h"
+#include "ARE/Genome.h"
 #include "ARE/ER_Module.h"
+#include "ARE/Morphology.h"
 
+
+namespace are {
 
 class Environment
 {
 public:
-    typedef std::shared_ptr<Environment> (Factory)(const std::shared_ptr<Settings>&);
+
+    typedef std::shared_ptr<Environment> Ptr;
+    typedef std::shared_ptr<const Environment> ConstPtr;
+    typedef Environment::Ptr (Factory)(const Settings::Ptr&);
 
 
 	Environment();
@@ -23,7 +29,6 @@ public:
 	@brief Initialize the default environment scene and simulation time step size
 	*/
 	virtual void init() = 0;
-	typedef std::shared_ptr<Morphology> MorphologyPointer;
 	/**
 	@brief Calculate the fitness value of the robot
 	@param morph The pointer of the robot (morphology)
@@ -33,7 +38,7 @@ public:
 	@brief update the info of the objects (e.g. robot) in the environments
 	@param morph The pointer of the robot (morphology)
 	*/
-	virtual float updateEnv(MorphologyPointer morph) = 0;
+    virtual float updateEnv(Morphology::Ptr morph) = 0;
 	/**
 	@brief Print debug information
 	*/
@@ -52,5 +57,7 @@ public:
 	float maxTime = 0.0;
 	int type = 0;
 };
+
+}//are
 
 #endif //ENVIRONMENT_H

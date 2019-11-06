@@ -1,5 +1,7 @@
 #include "ARE/Environment.h"
 
+using namespace are;
+
 Environment::Environment()
 {	
 }
