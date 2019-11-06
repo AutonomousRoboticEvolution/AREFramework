@@ -24,36 +24,24 @@
 
 #include "ARE/ER.h"
 
-CER::CER()
+using namespace are;
+
+ER::ER()
 {
 	// to initialize ER
 }
 
-CER::~CER()
+ER::~ER()
 {}
 
-void CER::split_line(std::string& line, std::string delim, std::list<std::string>& values)
-{
-	size_t pos = 0;
-    while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
-        std::string p = line.substr(0, pos);
-		values.push_back(p);
-		line = line.substr(pos + 1);
-	}
-
-	if (!line.empty()) {
-		values.push_back(line);
-	}
-}
-
-void CER::initializeSimulation()
+void ER::initializeSimulation()
 {
 	// if (atoi(simGetStringParameter(sim_stringparam_app_arg2)) == 9) {
 	//	simSet = RECALLBEST;
 	// }
 }
 
-void CER::loadIndividual(int individualNum, int sceneNum)
+void ER::loadIndividual(int individualNum, int sceneNum)
 {
     std::cout << "ERROR:" << std::endl;
     std::cout << "	Trying to load an individual in a non-VREP instance, " << std::endl;
@@ -62,24 +50,24 @@ void CER::loadIndividual(int individualNum, int sceneNum)
 }
 
 // TODO: Should this be deleted?
-void CER::initialize()
+void ER::initialize()
 {
-    settings = std::shared_ptr<Settings>(new Settings);
-    std::shared_ptr<RandNum> newRandNum(new RandNum(settings->seed));
+    settings.reset(new Settings);
+    misc::RandNum::Ptr newRandNum(new misc::RandNum(settings->seed));
 	randNum = newRandNum;
 	newRandNum.reset(); //destroy the pointer
 	settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));  //pass the setting number from argument
 	settings->readSettings();
 
 	//TODO : Factory
-    ea = std::unique_ptr<EA>(new EA_SteadyState); // default evolutionary algorithm
-	ea->setSettings(settings, randNum);  //specify the setting and random number for EA
-	ea->init();
+//    ea = std::unique_ptr<EA>(new EA_SteadyState); // default evolutionary algorithm
+//	ea->setSettings(settings, randNum);  //specify the setting and random number for EA
+//	ea->init();
 
 	initializeSimulation();  //empty function?
 }
 
-void CER::saveSettings()
+void ER::saveSettings()
 {
 	if (settings->verbose) {
         std::cout << "Saving settings" << std::endl;
@@ -89,7 +77,7 @@ void CER::saveSettings()
 	settings->individualCounter = settings->indCounter;
     std::vector<int> indNums;
 	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		indNums.push_back(ea->populationGenomes[i]->individualNumber); // must be set when saving
+        indNums.push_back(ea->populationGenomes[i]->get_individualNumber()); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
@@ -97,12 +85,12 @@ void CER::saveSettings()
 	int bestIndividual = 0;
 	float bestFitness = 0;
 	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-		if (bestFitness < ea->populationGenomes[i]->fitness) {
-			bestFitness = ea->populationGenomes[i]->fitness;
+        if (bestFitness < ea->populationGenomes[i]->get_fitness()) {
+            bestFitness = ea->populationGenomes[i]->get_fitness();
 			bestInd = i;
-			bestIndividual = ea->populationGenomes[bestInd]->individualNumber;
+            bestIndividual = ea->populationGenomes[bestInd]->get_individualNumber();
 			if (settings->verbose) {
-                std::cout << "Best individual has number " << ea->populationGenomes[bestInd]->individualNumber << std::endl;
+                std::cout << "Best individual has number " << ea->populationGenomes[bestInd]->get_individualNumber() << std::endl;
 			}
 		}
 	}

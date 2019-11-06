@@ -15,28 +15,26 @@
 #include <thread>
 #include <vector>
 
-#include "ARE/EA_VREP.h"
-#include "ARE/EA_SteadyState.h"
+#include "EA.h"
+//#include "ARE/EA_VREP.h"
+//#include "ARE/EA_SteadyState.h"
 #include "misc/RandNum.h"
+#include "misc/utilities.h"
 
 
-class CER
+namespace are {
+
+class ER
 {
 public:
-	CER();
-	virtual ~CER();
 
-	/**
-       @brief This method splits lines
-	*/
-	void split_line(std::string& line, std::string delim, std::list<std::string>& values);
+    std::unique_ptr<ER> Ptr;
+    std::unique_ptr<const ER> ConstPtr;
 
-	///pointer to settting of EA
-	std::shared_ptr<Settings> settings;
-	/// pointer to EA
-	std::unique_ptr<EA> ea;
-	/// pointer to random number generator of EA
-	std::shared_ptr<RandNum> randNum;
+    ER();
+    virtual ~ER();
+
+
 
     virtual void saveSettings();
 
@@ -56,6 +54,16 @@ public:
 	/// not used here
 	void loadIndividual(int individualNum, int sceneNum);
 
+protected:
+    ///pointer to settting of EA
+    Settings::Ptr settings;
+    /// pointer to EA
+    EA::Ptr ea;
+    /// pointer to random number generator of EA
+    misc::RandNum::Ptr randNum;
+
 };
+
+}//are
 
 #endif //ER_H
