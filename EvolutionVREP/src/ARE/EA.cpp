@@ -2,6 +2,7 @@
 
 #include <memory>
 
+using namespace are;
 
 EA::EA(const Settings& st){
     settings = std::make_shared<Settings>(st);
@@ -14,36 +15,19 @@ EA::~EA()
 {
 }
 
-void EA::split_line(std::string& line, std::string delim, std::list<std::string>& values)
-{
-	size_t pos = 0;
-    while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
-        std::string p = line.substr(0, pos);
-		values.push_back(p);
-		line = line.substr(pos + 1);
-	}
-    while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
-        std::string p = line.substr(0, pos);
-		values.push_back(p);
-		line = line.substr(pos + 1);
-	}
 
-	if (!line.empty()) {
-		values.push_back(line);
-	}
-}
-
-void EA::setSettings(std::shared_ptr<Settings> st, std::shared_ptr<RandNum> rn)
+void EA::setSettings(Settings::Ptr st, misc::RandNum::Ptr rn)
 {
 	settings = st;
 	randomNum = rn;
 }
 
 
-
-void EA::init()
-{
-	// Nothing to initialize anymore. 
+void EA::epoch(){
+    evaluation();
+    selection();
+    replacement();
+    mutation();
 }
 
 
@@ -101,27 +85,27 @@ void EA::savePopFitness(int generation)
     savePopFile.open(saveFileName.c_str(), std::ios::out | std::ios::ate | std::ios::app);
 	savePopFile << "generation " << generation << ": ,";
 	for (int i = 0; i < populationGenomes.size(); i++) {
-		savePopFile /*<< " ind " << i << ": " */ << populationGenomes[i]->fitness << ",";
+        savePopFile /*<< " ind " << i << ": " */ << populationGenomes[i]->get_fitness() << ",";
 	}
 	float avgFitness = 0;
 	for (int i = 0; i < populationGenomes.size(); i++) {
-		avgFitness += populationGenomes[i]->fitness;
+        avgFitness += populationGenomes[i]->get_fitness();
 	}
 	avgFitness = avgFitness / populationGenomes.size();
 	savePopFile << "avg: ," << avgFitness << ",";
 	int bestInd = 0;
 	float bestFitness = 0;
 	for (int i = 0; i < populationGenomes.size(); i++) {
-		if (bestFitness < populationGenomes[i]->fitness) {
-			bestFitness = populationGenomes[i]->fitness;
+        if (bestFitness < populationGenomes[i]->get_fitness()) {
+            bestFitness = populationGenomes[i]->get_fitness();
 			bestInd = i;
 		}
 	}
-	savePopFile << "ind: ," << populationGenomes[bestInd]->individualNumber << ",";
+    savePopFile << "ind: ," << populationGenomes[bestInd]->get_individualNumber() << ",";
 	savePopFile << "fitness: ," << bestFitness << ",";
 	savePopFile << "individuals: ,";
 	for (int i = 0; i < populationGenomes.size(); i++) {
-		savePopFile << populationGenomes[i]->individualNumber << ",";
+        savePopFile << populationGenomes[i]->get_individualNumber() << ",";
 	}
     savePopFile << std::endl;
 	savePopFile.close();
@@ -136,8 +120,8 @@ void EA::loadPopulationGenomes()
         populationGenomes.push_back(createGenome(1, randomNum, settings));
 		populationGenomes[i]->loadGenome(settings->indNumbers[i], settings->sceneNum);
 		//cout << "Make sure the following is correct" << endl;
-		populationGenomes[i]->fitness = settings->indFits[i];
-		populationGenomes[i]->individualNumber = settings->indNumbers[i];
+        populationGenomes[i]->set_fitness(settings->indFits[i]);
+        populationGenomes[i]->set_individualNumber(settings->indNumbers[i]);
 		//cout << "called fitness = " << popFitness[i] << endl;
 	}
 
