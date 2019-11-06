@@ -12,6 +12,7 @@
 #include "misc/RandNum.h"
 #include "ARE/exp_plugin_loader.hpp"
 
+namespace are {
 
 class ER_Module // Abstract Class
 {
@@ -21,8 +22,8 @@ public:
     ~ER_Module();
 
 
-	std::shared_ptr<RandNum> randomNum;
-    std::shared_ptr<Settings> settings;
+    misc::RandNum::Ptr randomNum;
+    Settings::Ptr settings;
 	int parent; // number of the parent as stored in createdModules
 	int parentSite;
 	int orientation;	// orientation relative ro parent connection site 
@@ -101,7 +102,7 @@ public:
 	virtual void updateMorph(int num);
 
 	/// Used to update the module, can receive additional input values from environment or adjacent modules
-	virtual std::vector<float> updateModule(std::vector<float> input) = 0; // should return output
+    virtual std::vector<double> updateModule(const std::vector<double> &input) = 0; // should return output
 	int moduleID = 0;
 	void setModuleID(int id);
 
@@ -124,7 +125,6 @@ public:
 	/// Handles of objects that can pass an input to the controller (e.g. sensors)
     std::vector<int> inputHandles;
     /// Appends an input vector to the existing input of the module
-	void addInput(std::vector<float>);
 
 //	vector<vector<float>> dragFacet; // four points for each face with drag. 
 
@@ -143,11 +143,10 @@ public:
 
 	virtual void setModuleColor() = 0; 
 
-    std::function<
-        std::shared_ptr<Control>
-            (int,std::shared_ptr<RandNum>,std::shared_ptr<Settings>)>
-                controlFactory;
+    std::function<Control::Factory> controlFactory;
 	
 };
+
+}//are
 
 #endif //ER_MODULE_H

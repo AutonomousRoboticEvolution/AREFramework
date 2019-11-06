@@ -1,5 +1,7 @@
 #include "ARE/ER_Module.h"
 
+using namespace are;
+
 ER_Module::ER_Module()
 {
 	moduleColor[0] = 0.5;
@@ -475,11 +477,11 @@ void ER_Module::updateParentModuleMorphology(int num)
 void ER_Module::updateMorph(int num) {
 }
 
-std::vector<float> ER_Module::updateModule(std::vector<float> input)
+std::vector<double> ER_Module::updateModule(const std::vector<double>& input)
 {
-	colorModule(moduleColor, control->cf);
+    colorModule(moduleColor, control->get_cf());
 	if (control) {
-		addInput(input);//update input accoring to new input
+        control->addInput(input);//update input accoring to new input
 	}
 	if (settings->environmentType == settings->SUN_BASIC
 		|| settings->environmentType == settings->SUN_CONSTRAINED
@@ -487,7 +489,7 @@ std::vector<float> ER_Module::updateModule(std::vector<float> input)
 		|| settings->environmentType == settings->SUN_MOVING
 		|| settings->environmentType == settings->SUN_BLOCKED) {
 	}
-    std::vector<float> output;
+    std::vector<double> output;
 	if (not broken) {
 		output = control->update(input);//update inputLayer, recurrentLayer and outputLayer
 		for (int i = 0; i < output.size(); i++) {
@@ -507,12 +509,6 @@ std::vector<float> ER_Module::updateModule(std::vector<float> input)
 }
 
 
-void ER_Module::addInput(std::vector<float> input)
-{
-	if (control) {
-		control->addInput(input);
-	}
-}
 
 
 
