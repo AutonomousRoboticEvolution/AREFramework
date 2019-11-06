@@ -1,5 +1,7 @@
 #include "ARE/Settings.h"
 
+using namespace are;
+
 /// The settings that are set in the constructor are mainly for debugging purposes.
 Settings::Settings()
 {
@@ -69,25 +71,6 @@ Settings::Settings()
 Settings::~Settings()
 {}
 
-void Settings::split_line(std::string& line, const std::string& delim, std::list<std::string>& values)
-{
-	size_t pos = 0;
-	while ((pos = line.find(delim, (pos + 0))) != std::string::npos) {
-        std::string p = line.substr(0, pos);
-		values.push_back(p);
-		line = line.substr(pos + 1);
-	}
-	while ((pos = line.find(delim, (pos + 1))) != std::string::npos) {
-        std::string p = line.substr(0, pos);
-		values.push_back(p);
-		line = line.substr(pos + 1);
-	}
-
-	if (!line.empty()) {
-		values.push_back(line);
-	}
-}
-
 void Settings::readSettings()
 {
 	bool fileExists = false;
@@ -116,7 +99,7 @@ void Settings::readSettings()
 		while (file.good()) {
 			getline(file, value, ','); // read a string until next comma: http://www.cplusplus.com/reference/string/getline/
 			if (value.find('\n') != std::string::npos) {
-				split_line(value, "\n", values);
+                misc::split_line(value, "\n", values);
 			}
 			else {
 				values.push_back(value);
@@ -170,6 +153,11 @@ void Settings::readSettings()
                 it++;
                 tmp = *it;
                 load_external_settings = atoi(tmp.c_str());
+            }
+            else if(tmp == "#vrepFolder"){
+                it++;
+                tmp = *it;
+                vrep_folder = tmp;
             }
 			else if (tmp == "#fitnessType") {
 				it++;
