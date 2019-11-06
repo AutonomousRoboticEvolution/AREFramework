@@ -5,54 +5,97 @@
 #include <vector>
 #include <memory>
 #include "ARE/Settings.h"
-#include "ARE/Morphology.h"
 #include "misc/RandNum.h"
+#include "ARE/Phenotype.h"
 
-
+namespace are {
 class Genome
 {
 public:
-    typedef std::shared_ptr<Genome> (Factory)
-        (int,std::shared_ptr<RandNum>, std::shared_ptr<Settings>);
+
+    typedef std::shared_ptr<Genome> Ptr;
+    typedef std::shared_ptr<const Genome> ConstPtr;
+    typedef Genome::Ptr (Factory)(int, misc::RandNum::Ptr, Settings::Ptr);
 
     Genome(){}
-    virtual ~Genome(){}
-    	/// simulation setting shared by genome and EA
-    std::shared_ptr<Settings> settings;
-	/// random number generator
-    std::shared_ptr<RandNum> randomNum;
-	/// morph is part of genome
-    std::shared_ptr<Morphology> morph;
-	/// Can be used for a adding a centralized controller
-    std::shared_ptr<Control> control;
-	bool initialized = false;
+    Genome(const misc::RandNum::Ptr &rn, const Settings::Ptr &st);
+    Genome(const Genome& gen) :
+        settings(gen.settings),
+        randomNum(gen.randomNum),
+        initialized(gen.initialized),
+        fitness(gen.fitness),
+        genomeFitness(gen.genomeFitness),
+        isEvaluated(gen.isEvaluated),
+        individualNumber(gen.individualNumber)
+    {}
+    virtual ~Genome();
 
-	/// fitness value; make vector for multi-objective
-	float fitness;
-	/// mark the end of evaluation for a generation
-	bool isEvaluated = false; 
+    /// This method deep copies the genome
+    virtual Genome::Ptr clone() const = 0;
 
-	/// mark the ID of individual
-	int individualNumber;
-	/// Initialize the morph and its control
-	virtual void init() = 0;
-    /// Creates the phenotype
-	virtual void create() = 0;
-    /// This function is called every frame (updates the phenotype)
-	virtual void update() = 0;
-	/// This method deep copies the genome
-	virtual std::shared_ptr<Genome> clone() const = 0;
-	virtual void mutate() = 0;
-	virtual void savePhenotype(int indNum, int sceneNum) = 0;
-    /// loads genome from .csv
-	virtual bool loadGenome(int indNum, int sceneNum) = 0;
-    /// loads genome from signal : TODO BUG????
-    virtual bool loadGenome(std::istream &input, int indNum) = 0;
-    virtual void saveGenome(int indNum) = 0;
-    /// Returns a genome string from existing genome
-	virtual const std::string generateGenome() const = 0;
-	/// prints out a few genome debugging statements
-	virtual void checkGenome() = 0; // for debugging
+    /// Initialize the morph and its control
+    virtual void init() = 0;
+
+
+    virtual Phenotype::Ptr develop() = 0;
+
+    virtual void mutate() = 0;
+
+//    virtual void savePhenotype(int indNum, int sceneNum);
+//    /// loads genome from .csv
+//    virtual bool loadGenome(int indNum, int sceneNum);
+//    /// loads genome from signal : TODO BUG????
+//    virtual bool loadGenome(std::istream &input, int indNum) ;
+//    virtual void saveGenome(int indNum){};
+
+
+
+//    /// Returns a genome string from existing genome
+//    virtual const std::string generateGenome() const{}
+
+//    /// prints out a few genome debugging statements
+//    virtual void checkGenome(); // for debugging
+//    void clearGenome();
+
+
+
+    //Getters & Setters
+    float get_fitness(){return fitness;}
+    void set_fitness(float f){fitness = f;}
+    int get_individualNumber(){return individualNumber;}
+    void set_individualNumber(int in){individualNumber =in;}
+
+protected:
+    /// simulation setting shared by genome and EA
+    Settings::Ptr settings;
+    /// random number generator
+    misc::RandNum::Ptr randomNum;
+
+    bool initialized = false;
+
+    /// fitness value; make vector for multi-objective
+    float fitness;
+    float genomeFitness;
+    /// mark the end of evaluation for a generation
+    bool isEvaluated = false;
+
+    /// mark the ID of individual
+    int individualNumber;
 };
+
+/**
+ * @brief The EmptyGenome class is meant to be used when no genome is needed.
+ */
+class EmptyGenome : public Genome
+{
+public:
+    Genome::Ptr clone() const{return nullptr;}
+    void init(){}
+    Phenotype::Ptr develop(){return nullptr;}
+    void mutate(){}
+};
+
+
+}//are
 
 #endif //GENOME_H
