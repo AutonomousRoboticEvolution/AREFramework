@@ -1,0 +1,81 @@
+#include "EA_HyperNEAT.h"
+
+using namespace are;
+
+void EA_HyperNEAT::init()
+{
+    NEAT::Parameters params = NEAT::Parameters();
+    /// Set parameters for NEAT
+    params.PopulationSize = settings->populationSize;
+    params.DynamicCompatibility = true;
+    params.CompatTreshold = 2.0;
+    params.YoungAgeTreshold = 15;
+    params.SpeciesMaxStagnation = 100;
+    params.OldAgeTreshold = 35;
+    params.MinSpecies = 5;
+    params.MaxSpecies = 10;
+    params.RouletteWheelSelection = false;
+
+    params.MutateRemLinkProb = 0.02;
+    params.RecurrentProb = 0.0;
+    params.OverallMutationRate = 0.15;
+    params.MutateAddLinkProb = 0.08;
+    params.MutateAddNeuronProb = 0.01;
+    params.MutateWeightsProb = 0.90;
+    params.MaxWeight = 8.0;
+    params.WeightMutationMaxPower = 0.2;
+    params.WeightReplacementMaxPower = 1.0;
+
+    params.MutateActivationAProb = 0.0;
+    params.ActivationAMutationMaxPower = 0.5;
+    params.MinActivationA = 0.05;
+    params.MaxActivationA = 6.0;
+
+    params.MutateNeuronActivationTypeProb = 0.03;
+
+    params.ActivationFunction_SignedSigmoid_Prob = 0.0;
+    params.ActivationFunction_UnsignedSigmoid_Prob = 0.0;
+    params.ActivationFunction_Tanh_Prob = 1.0;
+    params.ActivationFunction_TanhCubic_Prob = 0.0;
+    params.ActivationFunction_SignedStep_Prob = 1.0;
+    params.ActivationFunction_UnsignedStep_Prob = 0.0;
+    params.ActivationFunction_SignedGauss_Prob = 1.0;
+    params.ActivationFunction_UnsignedGauss_Prob = 0.0;
+    params.ActivationFunction_Abs_Prob = 0.0;
+    params.ActivationFunction_SignedSine_Prob = 1.0;
+    params.ActivationFunction_UnsignedSine_Prob = 0.0;
+    params.ActivationFunction_Linear_Prob = 1.0;
+
+    initPopulation(params);
+
+}
+
+void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
+{
+    NEAT::Genome neat_genome(0, 3, 3, 5, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
+    neat_population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
+
+    for (size_t i = 0; i < settings->populationSize; i++)
+    {
+        CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
+        EmptyGenome::Ptr no_gen(new EmptyGenome);
+
+        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        population.push_back(ind);
+    }
+}
+
+void EA_HyperNEAT::epoch(){
+    neat_population->Epoch();
+    population.clear();
+    for (int i = 0; i < settings->populationSize; i++)
+    {
+        CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
+        EmptyGenome::Ptr no_gen(new EmptyGenome);
+        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        population.push_back(ind);
+    }
+
+
+
+}
