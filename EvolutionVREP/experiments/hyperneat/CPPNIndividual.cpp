@@ -2,6 +2,17 @@
 
 using namespace are;
 
+void CPPNIndividual::update(double delta_time)
+{
+    std::vector<double> inputs = morphology->update();
+    std::vector<double> outputs = control->update(inputs);
+    std::vector<int> jointHandles = morphology->get_jointHandles();
+
+    assert(jointHandles.size() == outputs.size());
+
+    for (size_t i = 0; i < outputs.size(); i++)
+        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
+}
 
 void CPPNIndividual::createMorphology()
 {
@@ -16,6 +27,7 @@ void CPPNIndividual::createControler()
     NEAT::Substrate subs = morphology->get_substrate();
     gen.BuildHyperNEATPhenotype(
                 std::dynamic_pointer_cast<NNControl>(control)->nn,subs);
+
 }
 
 

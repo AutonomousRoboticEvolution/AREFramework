@@ -14,9 +14,3 @@ Individual::~Individual(){
     morphology.reset();
     control.reset();
 }
-
-
-void Individual::update(const std::vector<double> &inputs, double delta_time){
-    morphology->update();
-    outputs = control->update(inputs);
-}

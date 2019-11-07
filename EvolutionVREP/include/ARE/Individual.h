@@ -27,7 +27,7 @@ public:
     virtual ~Individual();
 
 
-    virtual void update(const std::vector<double> &inputs,double delta_time);
+    virtual void update(double delta_time) = 0;
 
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
@@ -35,6 +35,8 @@ public:
     const Control::Ptr &get_control(){return control;}
     const Genome::Ptr &get_morph_genome(){return morphGenome;}
     const Genome::Ptr &get_ctrl_genome(){return ctrlGenome;}
+    void setFitness(double f){fitness = f;}
+    double getFitness(){return fitness;}
 
 protected:
     std::vector<double> outputs;

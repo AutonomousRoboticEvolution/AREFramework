@@ -13,12 +13,24 @@ public:
 
     void create() override;
     void createAtPosition(float,float,float) override;
-    void update() override {}
+    std::vector<double> update() override;
+
+
     void saveBaseMorphology(int,float) override {}
     void loadBaseMorphology(int,int) override {}
 
-    void setPosition(float,float,float);
 
+
+    void setPosition(float,float,float);
+    std::vector<int> get_jointHandles(){return jointHandles;}
+
+protected:
+    void getObjectHandles() override;
+
+private:
+    std::vector<int> jointHandles;
+    std::vector<int> proxHandles;
+    int cameraHandle;
 };
 
 }

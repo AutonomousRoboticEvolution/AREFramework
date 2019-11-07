@@ -75,7 +75,4 @@ void EA_HyperNEAT::epoch(){
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
         population.push_back(ind);
     }
-
-
-
 }

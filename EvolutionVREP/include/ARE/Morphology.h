@@ -73,7 +73,7 @@ public:
 	virtual void createAtPosition(float x, float y, float z) = 0;
 
 	/// This method updates the control of the morphology
-    virtual void update() = 0; //DEPRECATED : Should be deleted
+    virtual std::vector<double> update() = 0;
 
     // operators of the evolutionary algorithm
     virtual void crossover(std::shared_ptr<Morphology>, float cr){};
@@ -91,10 +91,6 @@ public:
 //	virtual void setMainHandlePosition(float position[3]) = 0;
 //	virtual void createMorphology() = 0; // create actual morphology in init
     virtual void printSome(){};
-
-    virtual std::vector<int> getObjectHandles(int){};
-    virtual std::vector<int> getJointHandles(int){};
-    virtual std::vector<int> getAllHandles(int){};
 
 	bool modular = false;
 //	typedef shared_ptr<ER_Module> ModulePointer;
@@ -115,6 +111,14 @@ public:
     const NEAT::Substrate &get_substrate(){return substrate;}
 
 protected:
+
+
+    /**
+     * @brief Use this method to get the handles of the robot's components
+     * @param parentHandle
+     */
+    virtual void getObjectHandles() = 0;
+
     float phenValue = -1.0;
 
     int mainHandle;
