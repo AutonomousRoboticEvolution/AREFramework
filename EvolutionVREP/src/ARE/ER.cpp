@@ -114,8 +114,7 @@ void ER::initializeSimulation()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
-   currentInd = ea->getNextInd();
-   currentIndIndex = 0;
+   currentInd = ea->getIndividual(currentIndIndex);
 }
 
 
@@ -150,7 +149,7 @@ void ER::endOfSimulation()
     {
         double fitness = environment->fitnessFunction(currentInd);
         ea->setFitness(currentIndIndex,fitness);
-        settings->indCounter++;
+        currentIndIndex++;
     }
     if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0)
     {

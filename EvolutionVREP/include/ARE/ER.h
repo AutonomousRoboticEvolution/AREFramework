@@ -84,7 +84,7 @@ protected:
 
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)
-    int currentIndIndex = 0;
+    size_t currentIndIndex = 0;
     /// generation counter
     int generation = 0;
     /// When recalling an evolutionary run, not only the generation is counted, but also the newGenerations. This allows the user to run evolution with generational intervals.

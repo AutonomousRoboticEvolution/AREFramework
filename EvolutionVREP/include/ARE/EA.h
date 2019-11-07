@@ -59,7 +59,10 @@ public:
     /// This method initilizes setting for EA and random number generator seed
     void setSettings(Settings::Ptr st, misc::RandNum::Ptr rn);
     /// This method sets the fitness value of an individual
-    virtual void setFitness(int individual, float fitness) = 0;
+    virtual void setFitness(size_t indIndex, float fitness)
+    {
+        population[indIndex]->setFitness(fitness);
+    }
 
     virtual void epoch();
 
@@ -70,8 +73,11 @@ public:
     virtual void replacement(){};		// replacement operator
     virtual void mutation(){};		// mutation operator
     virtual void end(){};				// last call to the EA, when simulation stops
-    /// Creates the individual in VREP
-    virtual void createIndividual(int indNum) = 0;
+
+    Individual::Ptr getIndividual(size_t index);
+    size_t getPopSize(){return population.size();}
+
+
     /// Load an individual
     void loadIndividual(int individualNum, int sceneNum);
     /// Save the population fitness values
@@ -81,7 +87,7 @@ public:
     /// Load the best individual based on the evolutionary progression documen
     virtual void loadBestIndividualGenome(int sceneNum) = 0;
     /// Load all the population genomes?
-    void loadPopulationGenomes();
+//    void loadPopulationGenomes();
     virtual std::shared_ptr<Morphology> getMorph() = 0;
 
     std::function<Genome::Factory> createGenome;
