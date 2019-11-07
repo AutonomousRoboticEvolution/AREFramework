@@ -3,6 +3,7 @@
 #define SETTINGS_H
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <fstream> // ifstream
 #include <list>
