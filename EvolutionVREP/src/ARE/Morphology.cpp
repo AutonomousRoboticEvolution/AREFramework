@@ -7,11 +7,11 @@ Morphology::Morphology(const Settings& st){
     settings.reset(new Settings(st));
 }
 
-std::vector<std::shared_ptr<ER_Module>> Morphology::getCreatedModules()
-{
-	std::vector<std::shared_ptr<ER_Module>> nullVec;
-	return nullVec;
-}
+//std::vector<std::shared_ptr<ER_Module>> Morphology::getCreatedModules()
+//{
+//	std::vector<std::shared_ptr<ER_Module>> nullVec;
+//	return nullVec;
+//}
 
 
 void Morphology::setPhenValue()

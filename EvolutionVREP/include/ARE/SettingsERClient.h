@@ -9,6 +9,7 @@
 #include <vector>
 #include "ARE/Settings.h"
 
+namespace are {
 
 class SettingsERClient : public Settings // This settings class does not contain any dynamixel dependencies. Used for cluster evolution
 {
@@ -16,5 +17,7 @@ public:
 	SettingsERClient();
 	virtual ~SettingsERClient();
 };
+
+} //are
 
 #endif //SETTINGSERCLIENT_H

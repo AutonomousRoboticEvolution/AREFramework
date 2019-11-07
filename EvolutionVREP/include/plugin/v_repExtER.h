@@ -11,11 +11,11 @@
 
 #include <ctime>
 #include <memory>
-#include "ARE/ER_VREP.h"
+#include "ARE/ER.h"
 #include "ARE/exp_plugin_loader.hpp"
 
 /// an unique pointer to ER_VREP class
-std::unique_ptr<ER_VREP> ERVREP;
+are::ER::Ptr ERVREP;
 // TODO: EB  do we need these variables? I guess they are used for client-server mode.
 int counter = 0;
 int timeCount = 0;

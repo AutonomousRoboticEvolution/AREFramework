@@ -13,7 +13,7 @@ Environment::~Environment()
 
 void Environment::sceneLoader() {
 	simCloseScene();
-    simLoadScene(settings->scene_path);//todo add in settings
+    simLoadScene(settings->scene_path.c_str());
 //    "scenes/DefaultERLight.ttt"
 }
 

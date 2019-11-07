@@ -163,13 +163,63 @@ void ER::endOfSimulation()
 }
 
 
-void ER::loadIndividual(int individualNum, int sceneNum)
+bool ER::loadIndividual(int individualNum)
 {
-    std::cout << "ERROR:" << std::endl;
-    std::cout << "	Trying to load an individual in a non-VREP instance, " << std::endl;
-    std::cout << "	Make sure you're using ER_VREP to load robots. " << std::endl;
+    std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
+   //     currentGenome = genomeFactory(0, randNum, settings);
+        // try to load from signal
+        simInt signalLength = -1;
+        simInt signalLengthVerify = -1;
+        simChar* signal = simGetStringSignal("individualGenome", &signalLength);
+        simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
 
+        if (settings->verbose) {
+            if (signal != nullptr && signalLength != signalLengthVerify) {
+                std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
+                std::cout << signalLength << " != " << signalLengthVerify << std::endl;
+            }
+            std::cout << "loading genome " << individualNum << " from ";
+        }
+
+        bool load = false;
+        if (signal != nullptr && signalLength == signalLengthVerify)
+        {
+            // load from signal
+            if (settings->verbose) {
+                std::cout << " signal." << std::endl;
+            }
+
+            const std::string individualGenome((char*)signal, signalLength);
+            std::istringstream individualGenomeStream(individualGenome);
+         //   load = currentGenome->loadGenome(individualGenomeStream, individualNum);
+        }
+        else
+        {
+            // load from file
+            if (settings->verbose) {
+                std::cout << " file." << std::endl;
+            }
+            if (settings->evolutionType == settings->EA_MULTINEAT) {
+             //   ea->loadPopulationGenomes();
+                // ea->createIndividual(individualNum); // this actually sets the NEAT genome
+              //  individualToBeLoaded = individualNum;
+                load = true;
+            }
+            else {
+//               / load = currentGenome->loadGenome(individualNum, settings->sceneNum);
+            }
+        }
+
+        if (signal != nullptr) {
+            simReleaseBuffer(signal);
+        }
+
+//        currentGenome->set_individualNumber(individualNum);
+        std::cout << "loaded" << std::endl;
+        return load;
 }
+
+
 
 
 

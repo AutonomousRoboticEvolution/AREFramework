@@ -1,6 +1,7 @@
 #include "DummyEnv.h"
 
 
+using namespace are;
 
 void DummyEnv::init()
 {
@@ -9,11 +10,11 @@ void DummyEnv::init()
 	maxTime = 60.0;
 }
 
-float DummyEnv::fitnessFunction(MorphologyPointer morph)
+double DummyEnv::fitnessFunction(Individual::Ptr ind)
 {
-	float fitness = 0;
+    double fitness = 0;
 	
-    int mainHandle = morph->getMainHandle();
+    int mainHandle = ind->get_morpholgy()->getMainHandle();
     float pos[3];
     simGetObjectPosition(mainHandle, -1, pos);
     fitness = pos[0] + pos[1] + pos[2];

@@ -3,7 +3,8 @@
 #include "DummyEnv.h"
 #include "ARE/CAT.h"
 #include "DummyControl.h"
-#include "ARE/DefaultGenome.h"
+#include "ARE/Genome.h"
+#include "ARE/FixedBaseMorphology.h"
 #include "ARE/EA_SteadyState.h"
 #include "ARE/EA_MultiNEAT.h"
 

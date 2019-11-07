@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <multineat/Substrate.h>
-#include "ARE/ER_Module.h"
+//#include "ARE/ER_Module.h"
 #include "misc/RandNum.h"
 #include "ARE/Settings.h"
 #include "ARE/Phenotype.h"
@@ -56,7 +56,7 @@ public:
         amountIncrement(morph.amountIncrement),
         settings(morph.settings),
         randomNum(morph.randomNum),
-        createdModules(morph.createdModules),
+//        createdModules(morph.createdModules),
         substrate(morph.substrate)
     {}
     virtual ~Morphology(){}
@@ -97,7 +97,7 @@ public:
 
 	// modular functions
 	// This function is needed to implement fluid dynamics on modules...
-    virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules();
+//    virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules();
     virtual int getAmountBrokenModules(){};
 
     virtual void setPhenValue();
@@ -128,7 +128,7 @@ protected:
 
     Settings::Ptr settings;
     misc::RandNum::Ptr randomNum;
-    std::vector<std::shared_ptr<ER_Module> > createdModules;
+//    std::vector<std::shared_ptr<ER_Module> > createdModules;
     NEAT::Substrate substrate;
 };
 

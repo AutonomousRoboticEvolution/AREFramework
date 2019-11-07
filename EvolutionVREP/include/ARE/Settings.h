@@ -92,7 +92,8 @@ public:
         bNonprintableOrientations(st.bNonprintableOrientations),
         bAnyOrgansNumber(st.bAnyOrgansNumber),
         loadFromQueue(st.loadFromQueue),
-        vrep_folder(st.vrep_folder)
+        vrep_folder(st.vrep_folder),
+        scene_path(st.scene_path)
     {}
     virtual ~Settings();
     /// Type of fitness function
@@ -286,6 +287,7 @@ public:
     std::string exp_plugin_name; //name of the shared library corresponding to your experiment.
     bool load_external_settings = false;
     std::string vrep_folder;
+    std::string scene_path;
 
     /*enum LSystemType{
     DEFAULT_LSYSTEM = 0,

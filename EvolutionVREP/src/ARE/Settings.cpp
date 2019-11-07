@@ -159,6 +159,11 @@ void Settings::readSettings()
                 tmp = *it;
                 vrep_folder = tmp;
             }
+            else if(tmp == "#scenePath"){
+                it++;
+                tmp = *it;
+                scene_path = tmp;
+            }
 			else if (tmp == "#fitnessType") {
 				it++;
 				tmp = *it;

@@ -26,10 +26,8 @@ class ER
 {
 public:
 
-    std::unique_ptr<ER> Ptr;
-    std::unique_ptr<const ER> ConstPtr;
-
-    typedef double (Fitness)(const Individual::Ptr& ind);
+    typedef std::unique_ptr<ER> Ptr;
+    typedef std::unique_ptr<const ER> ConstPtr;
 
     ER();
     virtual ~ER();
@@ -46,7 +44,7 @@ public:
 
 
 	/// not used here
-	void loadIndividual(int individualNum, int sceneNum);
+    bool loadIndividual(int individualNum);
 
     ///////////////////////
     /// V-REP Functions ///
@@ -63,6 +61,14 @@ public:
     /// At the end of the simulation the fitness value of the simulated individual is retrieved and stored in the
     /// appropriate files.
     void endOfSimulation();
+
+    //GETTERS & SETTERS
+    const Settings::Ptr &get_settings(){return settings;}
+    void set_settings(const Settings::Ptr &sett){settings.reset(sett.get());}
+    const misc::RandNum::Ptr &get_randNum(){return randNum;}
+    void set_randNum(const misc::RandNum::Ptr &rn){randNum.reset(rn.get());}
+    void set_startRun(bool b){startRun = b;}
+    bool get_startRun(){return startRun;}
 
 protected:
     ///pointer to settting of EA

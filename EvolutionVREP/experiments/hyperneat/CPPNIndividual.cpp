@@ -6,7 +6,8 @@ void CPPNIndividual::update(double delta_time)
 {
     std::vector<double> inputs = morphology->update();
     std::vector<double> outputs = control->update(inputs);
-    std::vector<int> jointHandles = morphology->get_jointHandles();
+    std::vector<int> jointHandles =
+            std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
 
     assert(jointHandles.size() == outputs.size());
 

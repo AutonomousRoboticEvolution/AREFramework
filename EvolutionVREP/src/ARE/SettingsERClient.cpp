@@ -1,6 +1,8 @@
 #pragma once
 #include "ARE/SettingsERClient.h"
 
+using namespace are;
+
 SettingsERClient::SettingsERClient() {
 	// set default module parameters
 	moduleTypes.push_back(1);

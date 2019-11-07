@@ -5,6 +5,7 @@
 #include "ARE/CPPNGenome.h"
 #include "ARE/NNControl.h"
 #include "EPuckMorphology.h"
+#include "v_repLib.h"
 
 namespace are {
 

@@ -15,11 +15,6 @@ Genome::~Genome() {
     randomNum.reset();
 }
 
-Genome::Ptr Genome::clone() const
-{
-    Genome::Ptr genome = std::make_unique<Genome>(*this);
-    return genome;
-}
 
 //bool Genome::loadGenome(int indNum, int sceneNum)
 //{
