@@ -8,8 +8,8 @@
 #include <memory>
 #include "v_repLib.h"
 #include "ARE/Genome.h"
-#include "ARE/ER_Module.h"
-#include "ARE/Morphology.h"
+
+#include "ARE/Individual.h"
 
 
 namespace are {
@@ -28,17 +28,17 @@ public:
 	/**
 	@brief Initialize the default environment scene and simulation time step size
 	*/
-	virtual void init() = 0;
+    virtual void init();
 	/**
 	@brief Calculate the fitness value of the robot
 	@param morph The pointer of the robot (morphology)
 	*/
-	virtual float fitnessFunction(MorphologyPointer morph) = 0;
+    virtual double fitnessFunction(const Individual::Ptr &ind) = 0;
 	/**
 	@brief update the info of the objects (e.g. robot) in the environments
 	@param morph The pointer of the robot (morphology)
 	*/
-    virtual float updateEnv(Morphology::Ptr morph) = 0;
+    virtual float updateEnv(const Morphology::Ptr &morph) = 0;
 	/**
 	@brief Print debug information
 	*/
@@ -46,7 +46,7 @@ public:
 	/**
 	@brief Load a specific scence
 	*/
-	void sceneLoader();
+    void sceneLoader();
 	///setting of the environment	
     std::shared_ptr<Settings> settings;
 	///handle of the object in the environment	

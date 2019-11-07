@@ -13,13 +13,15 @@ Environment::~Environment()
 
 void Environment::sceneLoader() {
 	simCloseScene();
-	simLoadScene("scenes/DefaultERLight.ttt");
+    simLoadScene(settings->scene_path);//todo add in settings
+//    "scenes/DefaultERLight.ttt"
 }
 
 void Environment::init() {
     if(settings->verbose){
         std::cout << "Initialize Environment" << std::endl;
     }
+    sceneLoader();
     // Every time the environment is created, it removes all objects and creates them again
 	envObjectHandles.clear();
 	initialPos.resize(3);
@@ -34,10 +36,10 @@ void Environment::print() {
     std::cout << "Environment is here" << std::endl;
 }
 
-float Environment::fitnessFunction(MorphologyPointer morph) {
-	float fitness = 0.0;
-    std::cout << "empty morphology" << std::endl;
-	return fitness;
-}
+//float Environment::fitnessFunction(Individual::Ptr morph) {
+//	float fitness = 0.0;
+//    std::cout << "empty morphology" << std::endl;
+//	return fitness;
+//}
 
 
