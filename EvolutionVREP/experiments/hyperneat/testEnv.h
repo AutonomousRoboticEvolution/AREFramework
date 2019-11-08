@@ -1,6 +1,7 @@
 #ifndef TESTENV_H
 #define TESTENV_H
 
+#include <cmath>
 #include "ARE/Environment.h"
 #include "ARE/Individual.h"
 
@@ -9,15 +10,22 @@ namespace are {
 class TestEnv : public Environment
 {
 public:
-    TestEnv() : Environment(){}
+    TestEnv() : Environment()
+    {
+        initial_position.resize(3);
+        final_position.resize(3);
+    }
     ~TestEnv(){}
 //    void init() override;
 
     double fitnessFunction(const Individual::Ptr &ind) override;
-    float updateEnv(const Morphology::Ptr &morph) override;
+    float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;
+private:
+    std::vector<double> initial_position;
+    std::vector<double> final_position;
 };
 
 } //are

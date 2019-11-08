@@ -29,8 +29,8 @@ public:
     typedef std::unique_ptr<ER> Ptr;
     typedef std::unique_ptr<const ER> ConstPtr;
 
-    ER();
-    virtual ~ER();
+    ER(){}
+    virtual ~ER(){}
 
 
     void initialize();

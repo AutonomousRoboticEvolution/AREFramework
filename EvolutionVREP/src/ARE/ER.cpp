@@ -74,7 +74,7 @@ void ER::initializeServer()
     environment->init();
 
     ea = EAFactory(randNum, settings); // unique_ptr<EA>(new EA_VREP);
-    ea->randomNum = randNum;
+
     ea->init();
 }
 
@@ -104,7 +104,6 @@ void ER::initializeSimulation()
 
     environment = environmentFactory(settings);
     ea = EAFactory(randNum, settings);
-    ea->randomNum = randNum;
     ea->init();
     environment->init();
 }
@@ -132,7 +131,7 @@ void ER::handleSimulation()
         return;
     }
     simulationTime += simGetSimulationTimeStep();
-    environment->updateEnv(currentInd->get_morphology());
+    environment->updateEnv(simulationTime,currentInd->get_morphology());
 //    if (settings->evolutionType == settings->EA_MULTINEAT) {
 //        ea->epoch();
 //    } else {
@@ -145,20 +144,21 @@ void ER::handleSimulation()
 
 void ER::endOfSimulation()
 {
-    if (settings->indCounter >= ea->populationGenomes.size())
+    if(currentIndIndex < ea->get_population().size())
     {
         double fitness = environment->fitnessFunction(currentInd);
         ea->setFitness(currentIndIndex,fitness);
         currentIndIndex++;
     }
-    if (settings->indCounter % ea->nextGenGenomes.size() == 0 && settings->indCounter != 0)
+    else
     {
         ea->epoch();
-        ea->savePopFitness(generation);
+//        ea->savePopFitness(generation);
         generation++;
         saveSettings();
-        newGenerations++;
+        currentIndIndex = 0;
     }
+
 
 }
 
@@ -232,21 +232,21 @@ void ER::saveSettings()
 	// TODO : remove redundancy
 	settings->individualCounter = settings->indCounter;
     std::vector<int> indNums;
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-        indNums.push_back(ea->populationGenomes[i]->get_individualNumber()); // must be set when saving
+    for (size_t i = 0; i < ea->get_population().size(); i++) {
+        indNums.push_back(ea->get_population()[i]->get_individual_id()); // must be set when saving
 	}
 	settings->indNumbers = indNums;
 
 	int bestInd = 0;
 	int bestIndividual = 0;
 	float bestFitness = 0;
-	for (int i = 0; i < ea->populationGenomes.size(); i++) {
-        if (bestFitness < ea->populationGenomes[i]->get_fitness()) {
-            bestFitness = ea->populationGenomes[i]->get_fitness();
+    for (size_t i = 0; i < ea->get_population().size(); i++) {
+        if (bestFitness < ea->get_population()[i]->getFitness()) {
+            bestFitness = ea->get_population()[i]->getFitness();
 			bestInd = i;
-            bestIndividual = ea->populationGenomes[bestInd]->get_individualNumber();
+            bestIndividual = ea->get_population()[bestInd]->get_individual_id();
 			if (settings->verbose) {
-                std::cout << "Best individual has number " << ea->populationGenomes[bestInd]->get_individualNumber() << std::endl;
+                std::cout << "Best individual has number " << ea->get_population()[bestInd]->get_individual_id() << std::endl;
 			}
 		}
 	}

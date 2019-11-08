@@ -60,7 +60,13 @@ void saveLog(int num)
 }
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
-{ // This is called just once, at the start of V-REP.
+{
+    std::cout << "---------------------------" << std::endl
+              << "STARTING WITH ARE FRAMEWORK" << std::endl
+              << "---------------------------" << std::endl;
+
+
+    // This is called just once, at the start of V-REP.
 	// Dynamically load and bind V-REP functions:
 	char curDirAndFile[1024];
 #ifdef _WIN32

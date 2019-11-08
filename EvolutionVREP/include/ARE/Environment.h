@@ -38,7 +38,7 @@ public:
 	@brief update the info of the objects (e.g. robot) in the environments
 	@param morph The pointer of the robot (morphology)
 	*/
-    virtual float updateEnv(const Morphology::Ptr &morph) = 0;
+    virtual float updateEnv(float simulationTime, const Morphology::Ptr &morph) = 0;
 	/**
 	@brief Print debug information
 	*/

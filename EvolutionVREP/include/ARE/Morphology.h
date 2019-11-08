@@ -2,6 +2,7 @@
 #ifndef MORPHOLOGY_H
 #define MORPHOLOGY_H
 
+#include <iostream>
 #include <vector>
 #include <memory>
 #include <multineat/Substrate.h>
@@ -64,9 +65,9 @@ public:
     virtual Morphology::Ptr clone() const = 0;
 
     /// This method initialize the morph
-    virtual void init_noMorph() {};
-    virtual void clearMorph(){};
-    virtual void savePhenotype(int ind, float fitness){};
+    virtual void init_noMorph(){}
+    virtual void clearMorph(){}
+    virtual void savePhenotype(int ind, float fitness){}
 
 	/// This method creates the morphology
 	virtual void create() = 0;
@@ -76,8 +77,8 @@ public:
     virtual std::vector<double> update() = 0;
 
     // operators of the evolutionary algorithm
-    virtual void crossover(std::shared_ptr<Morphology>, float cr){};
-    void grow() {};
+    virtual void crossover(std::shared_ptr<Morphology>, float cr){}
+    void grow(){}
     virtual void mutate();
     virtual bool loadGenome(int individualNumber, int sceneNum);
     virtual bool loadGenome(std::istream &input, int individualNumber);
@@ -90,7 +91,7 @@ public:
 	virtual void loadBaseMorphology(int indNum, int sceneNum) = 0;
 //	virtual void setMainHandlePosition(float position[3]) = 0;
 //	virtual void createMorphology() = 0; // create actual morphology in init
-    virtual void printSome(){};
+    virtual void printSome(){}
 
 	bool modular = false;
 //	typedef shared_ptr<ER_Module> ModulePointer;
@@ -98,7 +99,7 @@ public:
 	// modular functions
 	// This function is needed to implement fluid dynamics on modules...
 //    virtual std::vector <std::shared_ptr<ER_Module>> getCreatedModules();
-    virtual int getAmountBrokenModules(){};
+    virtual int getAmountBrokenModules(){}
 
     virtual void setPhenValue();
     float getPhenValue(){return phenValue;}

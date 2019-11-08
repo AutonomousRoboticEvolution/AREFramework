@@ -37,6 +37,7 @@ public:
     const Genome::Ptr &get_ctrl_genome(){return ctrlGenome;}
     void setFitness(double f){fitness = f;}
     double getFitness(){return fitness;}
+    int get_individual_id(){return individual_id;}
 
 protected:
     std::vector<double> outputs;
@@ -45,6 +46,8 @@ protected:
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;
     Control::Ptr control;
+
+    int individual_id;
 
     std::function<Genome::Factory> createGenome;
 

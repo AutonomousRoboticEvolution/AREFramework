@@ -1,0 +1,4 @@
+#extPluginName,/usr/local/lib/libhyperneat.so,
+#extSettingsClass,0
+#vrepFolder,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#scenePath,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/models/robots/mobile/e-puck.ttm

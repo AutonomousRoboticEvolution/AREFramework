@@ -35,15 +35,12 @@ public:
     virtual ~EA();
 
 
-    ///set the environment type, evolution type...
-    Settings::Ptr settings;
-    ///random number generator for EA
-    misc::RandNum::Ptr randomNum;
+
 
     /// container of current population genomes
-    std::vector<Genome::Ptr> populationGenomes;
+//    std::vector<Genome::Ptr> populationGenomes;
     /// container of next generation genomes
-    std::vector<Genome::Ptr> nextGenGenomes;
+//    std::vector<Genome::Ptr> nextGenGenomes;
     /// used in NEAT
     std::string neatSaveFile = "/testNEAT";
 
@@ -68,7 +65,7 @@ public:
 
     /// This method initilizes a population of genomes
     virtual void init() = 0;    // initializes EA
-    virtual void evaluation() = 0;  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
+    virtual void evaluation(){};  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
     virtual void selection(){};		// selection operator
     virtual void replacement(){};		// replacement operator
     virtual void mutation(){};		// mutation operator
@@ -83,19 +80,27 @@ public:
     /// Save the population fitness values
     void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
     /// Save the population fitness values
-    virtual void savePopFitness(int generation);
+//    virtual void savePopFitness(int generation);
     /// Load the best individual based on the evolutionary progression documen
-    virtual void loadBestIndividualGenome(int sceneNum) = 0;
+//    virtual void loadBestIndividualGenome(int sceneNum) = 0;
     /// Load all the population genomes?
 //    void loadPopulationGenomes();
-    virtual std::shared_ptr<Morphology> getMorph() = 0;
+//    virtual std::shared_ptr<Morphology> getMorph() = 0;
 
     std::function<Genome::Factory> createGenome;
 
+    //GETTERS & SETTERS
     const std::vector<Individual::Ptr> &get_population(){return population;}
+    const Settings::Ptr get_settings(){return settings;}
+    const misc::RandNum::Ptr get_randomNum(){return randomNum;}
+    void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
 protected:
     std::vector<Individual::Ptr> population;
+    ///set the environment type, evolution type...
+    Settings::Ptr settings;
+    ///random number generator for EA
+    misc::RandNum::Ptr randomNum;
 };
 
 }//are

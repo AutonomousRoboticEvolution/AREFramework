@@ -1,5 +1,4 @@
 #include "ARE/Morphology.h"
-#include <iostream>
 
 using namespace are;
 

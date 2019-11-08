@@ -5,7 +5,8 @@ add_library(hyperneat SHARED
     EA_HyperNEAT.cpp
     CPPNIndividual.cpp
     EPuckMorphology.cpp
-    testEnv.cpp)
+    testEnv.cpp
+    factories.cpp)
 target_include_directories(hyperneat PUBLIC
     "${VREP_FOLDER}/programming/include"
     )

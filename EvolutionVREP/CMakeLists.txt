@@ -25,7 +25,7 @@ endif()
 find_package(MultiNEAT REQUIRED)
 find_package(PolyVox REQUIRED)
 
-FILE(GLOB_RECURSE SOURCES "src/ARE/*" "src/misc/*" "iunclude/ARE/EA_MultiNEAT.h" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
+FILE(GLOB_RECURSE SOURCES "src/ARE/*" "src/misc/*" "${VREP_FOLDER}/programming/common/v_repLib.cpp")
 
 add_library(ER_library SHARED ${SOURCES})
 
@@ -58,6 +58,7 @@ target_include_directories(ER_library
 )
 
 install(TARGETS ER_library DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
 
 target_link_libraries(v_repExtER ER_library dlibxx dl)
 
