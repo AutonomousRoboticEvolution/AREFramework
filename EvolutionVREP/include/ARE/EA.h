@@ -17,10 +17,10 @@ public:
 
     typedef std::unique_ptr<EA> Ptr;
     typedef std::unique_ptr<const EA> ConstPtr;
-    typedef EA::Ptr (Factory)(misc::RandNum::Ptr,Settings::Ptr);
+    typedef EA::Ptr (Factory)(const misc::RandNum::Ptr&,const settings::ParametersMapPtr&);
 
     EA(){}
-    EA(const Settings& st);
+    EA(const settings::ParametersMapPtr& param);
     //no copyable object
 //    EA(const EA& ea) :
 //        settings(ea.settings),
@@ -54,7 +54,7 @@ public:
     // std::vector<float> nextGenFitness; // used by client-server
     std::vector<int> popNextIndNumbers;
     /// This method initilizes setting for EA and random number generator seed
-    void setSettings(Settings::Ptr st, misc::RandNum::Ptr rn);
+    void setSettings(const settings::ParametersMapPtr &param, const misc::RandNum::Ptr &rn);
     /// This method sets the fitness value of an individual
     virtual void setFitness(size_t indIndex, float fitness)
     {
@@ -76,9 +76,9 @@ public:
 
 
     /// Load an individual
-    void loadIndividual(int individualNum, int sceneNum);
+//    void loadIndividual(int individualNum, int sceneNum){}
     /// Save the population fitness values
-    void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
+//    void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
     /// Save the population fitness values
 //    virtual void savePopFitness(int generation);
     /// Load the best individual based on the evolutionary progression documen
@@ -91,14 +91,14 @@ public:
 
     //GETTERS & SETTERS
     const std::vector<Individual::Ptr> &get_population(){return population;}
-    const Settings::Ptr get_settings(){return settings;}
+    const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const misc::RandNum::Ptr get_randomNum(){return randomNum;}
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
 protected:
     std::vector<Individual::Ptr> population;
     ///set the environment type, evolution type...
-    Settings::Ptr settings;
+    settings::ParametersMapPtr parameters;
     ///random number generator for EA
     misc::RandNum::Ptr randomNum;
 };

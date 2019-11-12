@@ -63,8 +63,8 @@ public:
     void endOfSimulation();
 
     //GETTERS & SETTERS
-    const Settings::Ptr &get_settings(){return settings;}
-    void set_settings(const Settings::Ptr &sett){settings.reset(sett.get());}
+    const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const misc::RandNum::Ptr &get_randNum(){return randNum;}
     void set_randNum(const misc::RandNum::Ptr &rn){randNum.reset(rn.get());}
     void set_startRun(bool b){startRun = b;}
@@ -72,7 +72,8 @@ public:
 
 protected:
     ///pointer to settting of EA
-    Settings::Ptr settings;
+    //Settings::Ptr settings;
+    settings::ParametersMapPtr parameters;
     /// pointer to EA
     EA::Ptr ea;
     /// pointer to random number generator of EA
@@ -98,6 +99,7 @@ protected:
     /// Indicates whether to start the simulation in server mode (received genome)
     bool startRun = true;
     float simulationTime = 0;
+    bool client = false;
 };
 
 }//are

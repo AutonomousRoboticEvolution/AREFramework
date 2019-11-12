@@ -15,12 +15,12 @@ public:
 
     typedef std::shared_ptr<Genome> Ptr;
     typedef std::shared_ptr<const Genome> ConstPtr;
-    typedef Genome::Ptr (Factory)(int, misc::RandNum::Ptr, Settings::Ptr);
+    typedef Genome::Ptr (Factory)(int, misc::RandNum::Ptr);
 
     Genome(){}
-    Genome(const misc::RandNum::Ptr &rn, const Settings::Ptr &st);
+    Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param);
     Genome(const Genome& gen) :
-        settings(gen.settings),
+        parameters(gen.parameters),
         randomNum(gen.randomNum),
         initialized(gen.initialized),
         fitness(gen.fitness),
@@ -64,10 +64,12 @@ public:
     void set_fitness(float f){fitness = f;}
     int get_individualNumber(){return individualNumber;}
     void set_individualNumber(int in){individualNumber =in;}
+    void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
+    const settings::ParametersMapPtr &get_parameters(){return parameters;}
 
 protected:
     /// simulation setting shared by genome and EA
-    Settings::Ptr settings;
+    settings::ParametersMapPtr parameters;
     /// random number generator
     misc::RandNum::Ptr randomNum;
 

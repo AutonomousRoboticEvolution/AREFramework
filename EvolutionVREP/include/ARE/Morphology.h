@@ -45,17 +45,16 @@ public:
 
     typedef std::shared_ptr<Morphology> Ptr;
     typedef std::shared_ptr<const Morphology> ConstPtr;
-    typedef Morphology::Ptr (Factory)(int,misc::RandNum::Ptr, Settings::Ptr);
+    typedef Morphology::Ptr (Factory)(int,misc::RandNum::Ptr);
 
     Morphology(){}
-    Morphology(const Settings& settings);
+    Morphology(const settings::ParametersMapPtr &param) : parameters(param){}
     Morphology(const Morphology& morph) :
         modular(morph.modular),
         phenValue(morph.phenValue),
         maxModuleTypes(morph.maxModuleTypes),
         minimumHeight(morph.minimumHeight),
         amountIncrement(morph.amountIncrement),
-        settings(morph.settings),
         randomNum(morph.randomNum),
 //        createdModules(morph.createdModules),
         substrate(morph.substrate)
@@ -79,11 +78,11 @@ public:
     // operators of the evolutionary algorithm
     virtual void crossover(std::shared_ptr<Morphology>, float cr){}
     void grow(){}
-    virtual void mutate();
-    virtual bool loadGenome(int individualNumber, int sceneNum);
-    virtual bool loadGenome(std::istream &input, int individualNumber);
-    virtual void saveGenome(int indNum, float fitness);
-    virtual const std::string generateGenome(int indNum, float fitness) const;
+    virtual void mutate(){}
+    virtual bool loadGenome(int individualNumber, int sceneNum){}
+    virtual bool loadGenome(std::istream &input, int individualNumber){}
+//    virtual void saveGenome(int indNum, float fitness);
+    virtual const std::string generateGenome(int indNum, float fitness) const{}
 
 	// cloning
 	virtual void saveBaseMorphology(int indNum, float fitness) = 0; // currently not used
@@ -107,9 +106,11 @@ public:
 
     std::vector<std::vector<int>> maxModuleTypes;
 
+    //GETTERS & SETTERS
     virtual int getMainHandle(){return mainHandle;}
-
     const NEAT::Substrate &get_substrate(){return substrate;}
+    void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
+    const settings::ParametersMapPtr &get_parameters(){return parameters;}
 
 protected:
 
@@ -127,9 +128,9 @@ protected:
 	float minimumHeight = 0;
 	int amountIncrement = 1;
 
-    Settings::Ptr settings;
     misc::RandNum::Ptr randomNum;
-//    std::vector<std::shared_ptr<ER_Module> > createdModules;
+    settings::ParametersMapPtr parameters;
+
     NEAT::Substrate substrate;
 };
 

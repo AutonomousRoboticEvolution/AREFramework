@@ -18,7 +18,7 @@ double TestEnv::fitnessFunction(const Individual::Ptr &ind){
 float TestEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     int morphHandle = morph->getMainHandle();
 
-    float *pos = nullptr;
+    float pos[3];
     simGetObjectPosition(morphHandle,-1,pos);
 
     if(simulationTime < simGetSimulationTimeStep()*2)

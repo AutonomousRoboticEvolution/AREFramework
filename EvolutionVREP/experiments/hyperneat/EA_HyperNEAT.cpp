@@ -6,7 +6,8 @@ void EA_HyperNEAT::init()
 {
     NEAT::Parameters params = NEAT::Parameters();
     /// Set parameters for NEAT
-    params.PopulationSize = settings->populationSize;
+    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    params.PopulationSize = pop_size;
     params.DynamicCompatibility = true;
     params.CompatTreshold = 2.0;
     params.YoungAgeTreshold = 15;
@@ -52,15 +53,18 @@ void EA_HyperNEAT::init()
 
 void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 {
-    NEAT::Genome neat_genome(0, 3, 3, 5, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
+    NEAT::Genome neat_genome(0, 4, 5, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
     neat_population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
 
-    for (size_t i = 0; i < settings->populationSize; i++)
+
+    for (size_t i = 0; i < params.PopulationSize ; i++)
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);
 
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        ind->set_parameters(parameters);
+//        ind->init();
         population.push_back(ind);
     }
 }
@@ -68,7 +72,8 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 void EA_HyperNEAT::epoch(){
     neat_population->Epoch();
     population.clear();
-    for (int i = 0; i < settings->populationSize; i++)
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    for (int i = 0; i < pop_size ; i++)
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);

@@ -15,14 +15,16 @@ class CPPNGenome : public Genome
 {
 public:
     CPPNGenome() : Genome(){}
-    CPPNGenome(const misc::RandNum::Ptr &rn, const Settings::Ptr &st) :
-        Genome(rn,st){}
+    CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
+        Genome(rn,param){}
     CPPNGenome(const NEAT::Genome &neat_gen) : neat_genome(neat_gen){}
     CPPNGenome(const CPPNGenome &gen) :
         Genome(gen),neat_genome(gen.neat_genome){}
     ~CPPNGenome() override {}
 
-    Genome::Ptr clone() const override;
+    Genome::Ptr clone() const override {
+        return std::make_shared<CPPNGenome>(*this);
+    }
 
 
     void init() override {}

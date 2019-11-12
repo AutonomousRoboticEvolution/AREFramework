@@ -8,6 +8,7 @@ namespace are {
 class EPuckMorphology : public Morphology
 {
 public:
+    EPuckMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
     Morphology::Ptr clone() const override
         {return std::make_shared<EPuckMorphology>(*this);}
 

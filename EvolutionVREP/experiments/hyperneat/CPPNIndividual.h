@@ -13,13 +13,12 @@ class CPPNIndividual : public Individual
 {
 public :
     CPPNIndividual() : Individual(){}
-    CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
-        Individual(morph_gen,ctrl_gen){}
+    CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
 
     void update(double delta_time);
 
 protected:
-    void createControler() override;
+    void createController() override;
     void createMorphology() override;
 };
 

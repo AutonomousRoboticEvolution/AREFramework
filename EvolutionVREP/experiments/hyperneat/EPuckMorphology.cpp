@@ -5,10 +5,10 @@ using namespace are;
 
 void EPuckMorphology::create()
 {
-    std::string path_epuck_m = settings->vrep_folder + "models/epuck.ttm";
+    std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#vrepFolder").value
+            + "models/robots/mobile/e-puck.ttm";
     simLoadModel(path_epuck_m.c_str());
-
-    int epuckHandle = simGetObjectHandle("ePuck_respondableBody");
+    int epuckHandle = simGetObjectHandle("ePuck");
 
     mainHandle = epuckHandle;
 
@@ -31,6 +31,9 @@ void EPuckMorphology::create()
                                  {0.5,M_PI},{0.5,-5.*M_PI/6.},
                                  {0.5,-2.*M_PI/3.},{0.5,-M_PI/2.},
                                  {0.5,-M_PI/3.},{0.5,-M_PI/6.}};
+
+    substrate.m_allow_hidden_hidden_links = true;
+    substrate.m_query_weights_only = true;
 
     std::cout << "Epuck Created" << std::endl;
 }

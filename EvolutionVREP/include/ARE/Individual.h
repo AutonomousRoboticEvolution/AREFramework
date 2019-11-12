@@ -21,11 +21,17 @@ public:
         morphGenome(ind.morphGenome),
         ctrlGenome(ind.ctrlGenome),
         morphology(ind.morphology),
-        control(ind.control),
-        createGenome(ind.createGenome)
+        control(ind.control)
+//        createGenome(ind.createGenome)
     {}
     virtual ~Individual();
 
+
+    virtual void init()
+    {
+        createMorphology();
+        createController();
+    }
 
     virtual void update(double delta_time) = 0;
 
@@ -38,6 +44,8 @@ public:
     void setFitness(double f){fitness = f;}
     double getFitness(){return fitness;}
     int get_individual_id(){return individual_id;}
+    void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
+    const settings::ParametersMapPtr &get_parameters(){return parameters;}
 
 protected:
     std::vector<double> outputs;
@@ -46,20 +54,16 @@ protected:
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;
     Control::Ptr control;
+    settings::ParametersMapPtr parameters;
 
     int individual_id;
 
-    std::function<Genome::Factory> createGenome;
+//    std::function<Genome::Factory> createGenome;
 
-    virtual void createControler() = 0;
+    virtual void createController() = 0;
     virtual void createMorphology() = 0;
 
-private:
-    virtual void init()
-    {
-        createMorphology();
-        createControler();
-    }
+
 
 };
 

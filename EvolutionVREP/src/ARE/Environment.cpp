@@ -2,26 +2,18 @@
 
 using namespace are;
 
-Environment::Environment()
-{	
-}
-
-Environment::~Environment()
-{
-
-}
-
 void Environment::sceneLoader() {
 	simCloseScene();
-    simLoadScene(settings->scene_path.c_str());
+    simLoadScene(settings::getParameter<settings::String>(parameters,"#scenePath").value.c_str());
 //    "scenes/DefaultERLight.ttt"
 }
 
 void Environment::init() {
-    if(settings->verbose){
+    if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value){
         std::cout << "Initialize Environment" << std::endl;
     }
     sceneLoader();
+    maxTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     // Every time the environment is created, it removes all objects and creates them again
 	envObjectHandles.clear();
 	initialPos.resize(3);
@@ -36,10 +28,6 @@ void Environment::print() {
     std::cout << "Environment is here" << std::endl;
 }
 
-//float Environment::fitnessFunction(Individual::Ptr morph) {
-//	float fitness = 0.0;
-//    std::cout << "empty morphology" << std::endl;
-//	return fitness;
-//}
+
 
 

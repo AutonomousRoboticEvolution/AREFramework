@@ -30,22 +30,20 @@ using namespace are;
 /// settings file. A random number class will also be created and all other files refer to this class
 void ER::initialize()
 {
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-    if (settings->verbose) {
+    if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
-    settings->indCounter = 0;
-    if (settings->evolutionType != settings->EMBODIED_EVOLUTION
-     && settings->instanceType == settings->INSTANCE_REGULAR)
+//    settings->indCounter = 0;
+     if(instance_type == settings::INSTANCE_REGULAR)
     {
-        settings->client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
+        client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
         initializeSimulation(); // Initialize simulation
     }
-    else if (settings->evolutionType != settings->EMBODIED_EVOLUTION
-          && settings->instanceType == settings->INSTANCE_SERVER
-          && settings->startingCondition != settings->COND_LOAD_BEST)
-    {
-        settings->client = false; // V-REP plugin will receive genomes from ea client
+    else if (instance_type == settings::INSTANCE_SERVER)    {
+        client = false; // V-REP plugin will receive genomes from ea client
         initializeServer();
     }
 }
@@ -56,9 +54,10 @@ void ER::initialize()
  */
 void ER::initializeServer()
 {
+    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
     if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+            (environmentFactory,exp_plugin_name,"environmentFactory"))
         exit(1);
 
 //    if(!load_fct_exp_plugin<Genome::Factory>
@@ -66,14 +65,14 @@ void ER::initializeServer()
 //        exit(1);
 
     if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+            (EAFactory,exp_plugin_name,"EAFactory"))
         exit(1);
 
-    environment = environmentFactory(settings);
+    environment = environmentFactory(parameters);
     // initialize the environment
     environment->init();
 
-    ea = EAFactory(randNum, settings); // unique_ptr<EA>(new EA_VREP);
+    ea = EAFactory(randNum, parameters); // unique_ptr<EA>(new EA_VREP);
 
     ea->init();
 }
@@ -87,9 +86,12 @@ void ER::initializeSimulation()
 //    EnvironmentFactory environmentFactory;
 //	environment = environmentFactory.createNewEnvironment(settings);
 
+    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
+
+
     std::cout << "initialize simulation" << std::endl;
     if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,settings->exp_plugin_name,"environmentFactory"))
+            (environmentFactory,exp_plugin_name,"environmentFactory"))
         exit(1);
 
 //    if(!load_fct_exp_plugin<Genome::Factory>
@@ -97,13 +99,13 @@ void ER::initializeSimulation()
 //        exit(1);
 
     if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,settings->exp_plugin_name,"EAFactory"))
+            (EAFactory,exp_plugin_name,"EAFactory"))
         exit(1);
 
     std::cout << "external factories loaded !" << std::endl;
 
-    environment = environmentFactory(settings);
-    ea = EAFactory(randNum, settings);
+    environment = environmentFactory(parameters);
+    ea = EAFactory(randNum, parameters);
     ea->init();
     environment->init();
 }
@@ -114,6 +116,7 @@ void ER::initializeSimulation()
 void ER::startOfSimulation()
 {
    currentInd = ea->getIndividual(currentIndIndex);
+   currentInd->init();
 }
 
 
@@ -126,18 +129,15 @@ void ER::handleSimulation()
     * updated until the maximum simulation time, as specified in the environment
     * class, is reached.
     */
-    if (settings->instanceType == settings->INSTANCE_DEBUGGING) {
+    if (settings::getParameter<settings::Integer>(parameters,"#instanceType").value
+            == settings::INSTANCE_DEBUGGING) {
         simStopSimulation();
         return;
     }
     simulationTime += simGetSimulationTimeStep();
     environment->updateEnv(simulationTime,currentInd->get_morphology());
-//    if (settings->evolutionType == settings->EA_MULTINEAT) {
-//        ea->epoch();
-//    } else {
-////        currentGenome->update();
-//    }
-    if (simGetSimulationTime() > environment->maxTime) {
+
+    if (simGetSimulationTime() > environment->get_maxTime()) {
         simStopSimulation();
     }
 }
@@ -154,8 +154,8 @@ void ER::endOfSimulation()
     {
         ea->epoch();
 //        ea->savePopFitness(generation);
-        generation++;
-        saveSettings();
+//        generation++;
+//        saveSettings();
         currentIndIndex = 0;
     }
 
@@ -163,96 +163,87 @@ void ER::endOfSimulation()
 }
 
 
-bool ER::loadIndividual(int individualNum)
-{
-    std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
-   //     currentGenome = genomeFactory(0, randNum, settings);
-        // try to load from signal
-        simInt signalLength = -1;
-        simInt signalLengthVerify = -1;
-        simChar* signal = simGetStringSignal("individualGenome", &signalLength);
-        simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
+//bool ER::loadIndividual(int individualNum)
+//{
+//    std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
+//   //     currentGenome = genomeFactory(0, randNum, settings);
+//        // try to load from signal
+//        simInt signalLength = -1;
+//        simInt signalLengthVerify = -1;
+//        simChar* signal = simGetStringSignal("individualGenome", &signalLength);
+//        simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
 
-        if (settings->verbose) {
-            if (signal != nullptr && signalLength != signalLengthVerify) {
-                std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
-                std::cout << signalLength << " != " << signalLengthVerify << std::endl;
-            }
-            std::cout << "loading genome " << individualNum << " from ";
-        }
+//        if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
+//            if (signal != nullptr && signalLength != signalLengthVerify) {
+//                std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
+//                std::cout << signalLength << " != " << signalLengthVerify << std::endl;
+//            }
+//            std::cout << "loading genome " << individualNum << " from ";
+//        }
 
-        bool load = false;
-        if (signal != nullptr && signalLength == signalLengthVerify)
-        {
-            // load from signal
-            if (settings->verbose) {
-                std::cout << " signal." << std::endl;
-            }
+//        bool load = false;
+//        if (signal != nullptr && signalLength == signalLengthVerify)
+//        {
+//            // load from signal
+//            if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
+//                std::cout << " signal." << std::endl;
+//            }
 
-            const std::string individualGenome((char*)signal, signalLength);
-            std::istringstream individualGenomeStream(individualGenome);
-         //   load = currentGenome->loadGenome(individualGenomeStream, individualNum);
-        }
-        else
-        {
-            // load from file
-            if (settings->verbose) {
-                std::cout << " file." << std::endl;
-            }
-            if (settings->evolutionType == settings->EA_MULTINEAT) {
-             //   ea->loadPopulationGenomes();
-                // ea->createIndividual(individualNum); // this actually sets the NEAT genome
-              //  individualToBeLoaded = individualNum;
-                load = true;
-            }
-            else {
-//               / load = currentGenome->loadGenome(individualNum, settings->sceneNum);
-            }
-        }
+//            const std::string individualGenome((char*)signal, signalLength);
+//            std::istringstream individualGenomeStream(individualGenome);
+//         //   load = currentGenome->loadGenome(individualGenomeStream, individualNum);
+//        }
+//        else
+//        {
+//            // load from file
+//            if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
+//                std::cout << " file." << std::endl;
+//            }
+//        }
 
-        if (signal != nullptr) {
-            simReleaseBuffer(signal);
-        }
+//        if (signal != nullptr) {
+//            simReleaseBuffer(signal);
+//        }
 
-//        currentGenome->set_individualNumber(individualNum);
-        std::cout << "loaded" << std::endl;
-        return load;
-}
+////        currentGenome->set_individualNumber(individualNum);
+//        std::cout << "loaded" << std::endl;
+//        return load;
+//}
 
 
 
 
 
-void ER::saveSettings()
-{
-	if (settings->verbose) {
-        std::cout << "Saving settings" << std::endl;
-	}
-	settings->generation = generation;
-	// TODO : remove redundancy
-	settings->individualCounter = settings->indCounter;
-    std::vector<int> indNums;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        indNums.push_back(ea->get_population()[i]->get_individual_id()); // must be set when saving
-	}
-	settings->indNumbers = indNums;
+//void ER::saveSettings()
+//{
+//    if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
+//        std::cout << "Saving settings" << std::endl;
+//	}
+//	settings->generation = generation;
+//	// TODO : remove redundancy
+//	settings->individualCounter = settings->indCounter;
+//    std::vector<int> indNums;
+//    for (size_t i = 0; i < ea->get_population().size(); i++) {
+//        indNums.push_back(ea->get_population()[i]->get_individual_id()); // must be set when saving
+//	}
+//	settings->indNumbers = indNums;
 
-	int bestInd = 0;
-	int bestIndividual = 0;
-	float bestFitness = 0;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        if (bestFitness < ea->get_population()[i]->getFitness()) {
-            bestFitness = ea->get_population()[i]->getFitness();
-			bestInd = i;
-            bestIndividual = ea->get_population()[bestInd]->get_individual_id();
-			if (settings->verbose) {
-                std::cout << "Best individual has number " << ea->get_population()[bestInd]->get_individual_id() << std::endl;
-			}
-		}
-	}
-	settings->bestIndividual = bestIndividual;
-	settings->saveSettings();
-	if (settings->verbose) {
-        std::cout << "Settings saved" << std::endl;
-	}
-}
+//	int bestInd = 0;
+//	int bestIndividual = 0;
+//	float bestFitness = 0;
+//    for (size_t i = 0; i < ea->get_population().size(); i++) {
+//        if (bestFitness < ea->get_population()[i]->getFitness()) {
+//            bestFitness = ea->get_population()[i]->getFitness();
+//			bestInd = i;
+//            bestIndividual = ea->get_population()[bestInd]->get_individual_id();
+//			if (settings->verbose) {
+//                std::cout << "Best individual has number " << ea->get_population()[bestInd]->get_individual_id() << std::endl;
+//			}
+//		}
+//	}
+//	settings->bestIndividual = bestIndividual;
+//	settings->saveSettings();
+//	if (settings->verbose) {
+//        std::cout << "Settings saved" << std::endl;
+//	}
+//}

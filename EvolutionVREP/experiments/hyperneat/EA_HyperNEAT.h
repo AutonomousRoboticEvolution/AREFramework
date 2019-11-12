@@ -12,7 +12,7 @@ class EA_HyperNEAT : public EA
 {
 public:
     EA_HyperNEAT() : EA(){}
-    EA_HyperNEAT(const Settings& st) : EA(st){}
+    EA_HyperNEAT(const settings::ParametersMapPtr& param) : EA(param){}
     ~EA_HyperNEAT() override {}
 
     void init() override;

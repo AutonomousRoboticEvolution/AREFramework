@@ -6,7 +6,8 @@
 
 namespace misc {
 
-static void split_line(std::string& line, std::string delim, std::list<std::string>& values);
+void split_line(const std::string &line,const std::string &delim,
+                std::list<std::string> &values);
 
 }//misc
 

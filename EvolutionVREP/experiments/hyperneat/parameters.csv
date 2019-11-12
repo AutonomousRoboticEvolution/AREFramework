@@ -1,0 +1,10 @@
+#expPluginName,string,/usr/local/lib/libhyperneat.so
+#extSettingsClass,bool,0
+#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#scenePath,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/models/robots/mobile/e-puck.ttm
+#populationSize,int,400
+#maxEvalTime,float,25
+#numberOfGeneration,int,4000
+#repository,string,/home/leni/are-logs
+#verbose,bool,1
+#instanceType,int,0

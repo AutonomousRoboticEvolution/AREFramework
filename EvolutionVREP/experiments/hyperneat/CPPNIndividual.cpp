@@ -2,6 +2,15 @@
 
 using namespace are;
 
+CPPNIndividual::CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
+    Individual(morph_gen,ctrl_gen)
+{
+//    createMorphology();
+//    createController();
+}
+
+
+
 void CPPNIndividual::update(double delta_time)
 {
     std::vector<double> inputs = morphology->update();
@@ -17,18 +26,19 @@ void CPPNIndividual::update(double delta_time)
 
 void CPPNIndividual::createMorphology()
 {
-    morphology.reset(new EPuckMorphology);
+    morphology.reset(new EPuckMorphology(parameters));
     morphology->createAtPosition(0,0,0);
 }
 
-void CPPNIndividual::createControler()
+void CPPNIndividual::createController()
 {
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(ctrlGenome)->get_neat_genome();
     NEAT::Substrate subs = morphology->get_substrate();
-    gen.BuildHyperNEATPhenotype(
-                std::dynamic_pointer_cast<NNControl>(control)->nn,subs);
-
+    control.reset(new NNControl);
+    NEAT::NeuralNetwork nn;
+    gen.BuildHyperNEATPhenotype(nn,subs);
+    std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
 }
 
 

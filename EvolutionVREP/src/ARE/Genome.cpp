@@ -2,16 +2,16 @@
 
 using namespace are;
 
-Genome::Genome(const misc::RandNum::Ptr &rn, const Settings::Ptr &st)
+Genome::Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param)
 {
     randomNum = rn;
-    settings = st;
+    parameters = param;
     genomeFitness = 0;
 }
 
 
 Genome::~Genome() {
-    settings.reset();
+    parameters.reset();
     randomNum.reset();
 }
 
