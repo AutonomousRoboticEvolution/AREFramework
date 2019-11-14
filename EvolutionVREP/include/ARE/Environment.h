@@ -26,27 +26,27 @@ public:
     Environment(){}
 
     ~Environment(){}
-	/**
-	@brief Initialize the default environment scene and simulation time step size
-	*/
+    /**
+        @brief Initialize the default environment scene and simulation time step size
+        */
     virtual void init();
-	/**
-	@brief Calculate the fitness value of the robot
-	@param morph The pointer of the robot (morphology)
-	*/
+    /**
+        @brief Calculate the fitness value of the robot
+        @param morph The pointer of the robot (morphology)
+        */
     virtual double fitnessFunction(const Individual::Ptr &ind) = 0;
-	/**
-	@brief update the info of the objects (e.g. robot) in the environments
-	@param morph The pointer of the robot (morphology)
-	*/
+    /**
+        @brief update the info of the objects (e.g. robot) in the environments
+        @param morph The pointer of the robot (morphology)
+        */
     virtual float updateEnv(float simulationTime, const Morphology::Ptr &morph) = 0;
-	/**
-	@brief Print debug information
-	*/
-	void print(); 
-	/**
-	@brief Load a specific scence
-	*/
+    /**
+        @brief Print debug information
+        */
+    void print();
+    /**
+        @brief Load a specific scence
+        */
     void sceneLoader();
 
     //GETTERS & SETTERS
@@ -56,15 +56,15 @@ public:
     float get_maxTime(){return maxTime;}
 
 protected:
-	///setting of the environment	
+    ///setting of the environment
     settings::ParametersMapPtr parameters;
-	///handle of the object in the environment	
+    ///handle of the object in the environment
     std::vector<int> envObjectHandles;
-	///initial position of the object
+    ///initial position of the object
     std::vector<float> initialPos;
-	///maximum simulation time
-	float maxTime = 0.0;
-	int type = 0;
+    ///maximum simulation time
+    float maxTime = 0.0;
+    int type = 0;
 };
 
 }//are

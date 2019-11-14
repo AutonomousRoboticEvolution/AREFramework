@@ -65,10 +65,11 @@ public:
 
     /// This method initilizes a population of genomes
     virtual void init() = 0;    // initializes EA
-    virtual void evaluation(){};  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
-    virtual void selection(){};		// selection operator
-    virtual void replacement(){};		// replacement operator
-    virtual void mutation(){};		// mutation operator
+    virtual void evaluation(){}  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
+    virtual void selection(){}  	// selection operator
+    virtual void replacement(){}		// replacement operator
+    virtual void mutation(){}		// mutation operator
+    virtual void crossover(){}
     virtual void end(){};				// last call to the EA, when simulation stops
 
     Individual::Ptr getIndividual(size_t index);

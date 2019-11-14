@@ -10,10 +10,7 @@ class Phenotype
 public:
     typedef std::shared_ptr<Phenotype> Ptr;
     typedef std::shared_ptr<const Phenotype> ConstPtr;
-
     Phenotype(){}
-
-
 };
 
 }
