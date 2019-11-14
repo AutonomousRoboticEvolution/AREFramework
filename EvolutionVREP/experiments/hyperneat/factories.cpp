@@ -1,7 +1,8 @@
 #include "testEnv.h"
 #include "EA_HyperNEAT.h"
 
-extern "C" are::Environment::Ptr environmentFactory(const are::settings::ParametersMapPtr& param)
+extern "C" are::Environment::Ptr environmentFactory
+    (const are::settings::ParametersMapPtr& param)
 {
     are::Environment::Ptr env(new are::TestEnv);
     env->set_parameters(param);

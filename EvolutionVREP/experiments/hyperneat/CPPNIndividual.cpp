@@ -9,7 +9,10 @@ CPPNIndividual::CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& c
 //    createController();
 }
 
-
+Individual::Ptr CPPNIndividual::clone()
+{
+    return std::make_shared<CPPNIndividual>(*this);
+}
 
 void CPPNIndividual::update(double delta_time)
 {

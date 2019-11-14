@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.0)
 add_library(hyperneat SHARED
     EA_HyperNEAT.cpp
     CPPNIndividual.cpp
+    CPPNGenome.cpp
+    NNControl.cpp
     EPuckMorphology.cpp
     testEnv.cpp
     factories.cpp)

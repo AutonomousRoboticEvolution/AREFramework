@@ -15,11 +15,15 @@ public :
     CPPNIndividual() : Individual(){}
     CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
 
+    Individual::Ptr clone();
+
     void update(double delta_time);
+
 
 protected:
     void createController() override;
     void createMorphology() override;
+
 };
 
 }//are
