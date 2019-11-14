@@ -123,21 +123,21 @@ T getParameter(const ParametersMap &params,const std::string& name)
 ParametersMap loadParameters(const std::string& file);
 void saveParameters(const std::string& file,const ParametersMapPtr &param); //todo
 
-class Property
+struct Property
 {
-public:
-
     typedef std::shared_ptr<Property> Ptr;
     typedef std::shared_ptr<const Property> ConstPtr;
 
-    Property();
+    Property(){}
     Property(const Property& prop) :
         generation(prop.generation)
     {}
 
     //Properties
     int generation = 0;
-
+    std::vector<int> indNumbers;
+    std::vector<double> indFits;
+    int indCounter = 0;
 };
 
 } //settings
