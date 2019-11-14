@@ -26,6 +26,7 @@ public:
     {}
     virtual ~Individual();
 
+    virtual Individual::Ptr clone() = 0;
 
     virtual void init()
     {
@@ -34,6 +35,11 @@ public:
     }
 
     virtual void update(double delta_time) = 0;
+    void mutate()
+    {
+        morphGenome->mutate();
+        ctrlGenome->mutate();
+    }
 
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
@@ -44,8 +50,11 @@ public:
     void setFitness(double f){fitness = f;}
     double getFitness(){return fitness;}
     int get_individual_id(){return individual_id;}
+    void set_individual_id(int i){individual_id = i;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    bool isEvaluated(){return isEval;}
+    void set_isEvaluated(bool b){isEval = b;}
 
 protected:
     std::vector<double> outputs;
@@ -55,8 +64,9 @@ protected:
     Morphology::Ptr morphology;
     Control::Ptr control;
     settings::ParametersMapPtr parameters;
+    bool isEval;
 
-    int individual_id;
+    int individual_id; //TODO id system
 
 //    std::function<Genome::Factory> createGenome;
 
