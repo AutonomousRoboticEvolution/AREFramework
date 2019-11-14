@@ -27,8 +27,10 @@ void EA::epoch(){
     evaluation();
     selection();
     replacement();
+    crossover();
     mutation();
 }
+
 
 Individual::Ptr EA::getIndividual(size_t index)
 {

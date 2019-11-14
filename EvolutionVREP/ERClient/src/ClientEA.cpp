@@ -1,9 +1,12 @@
 #include "ERClient/ClientEA.h"
 // #define DO_NOT_USE_SHARED_MEMORY
 
+using namespace are;
+using namespace are::client;
+
 void sendGenomeSignal(std::unique_ptr<SlaveConnection> &slave, const std::string &individualGenome)
 {
-	simxInt individualGenomeLength = individualGenome.size();
+    simxInt individualGenomeLength = individualGenome.size();
 	slave->setStringSignal("individualGenome", individualGenome);
 	slave->setIntegerSignal("individualGenomeLenght", individualGenomeLength);
 }
@@ -26,17 +29,16 @@ bool ClientEA::init(int amountPorts, int startPort)
 			serverInstances.push_back(std::move(new_slave));
 		} else {
 			std::cerr << "Could not connect to V-REP on port " << new_slave->port() << std::endl;
-			if (settings->killWhenNotConnected) {
+            if (settings::getParameter<settings::Boolean>(parameters,"#killWhenNotConnected").value) {
 				return false;
 			}
 			continue; // jump back to beginning loop
 		}
 	}
     std::function<EA::Factory> eaFactory;
-    load_fct_exp_plugin<EA::Factory>(eaFactory,settings->exp_plugin_name,"EAFactory");
-    ea = eaFactory(randNum, settings);
-	// ea = shared_ptr<EA>(new EA_SteadyState());
-	// ea->setSettings(settings, randNum);
+    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
+    load_fct_exp_plugin<EA::Factory>(eaFactory,exp_plugin_name,"EAFactory");
+    ea = eaFactory(randNum, parameters);
 	ea->init();
 
 	return true;
@@ -49,18 +51,15 @@ bool ClientEA::init(int amountPorts, int startPort)
 
 void ClientEA::initGA()
 {
-	// init GA
-	if (settings->evolutionType == settings->EA_MULTINEAT) {
-		// doesn't need to be initialized?? (constructor initializes neat) 
-		// TODO change the name of the NEAT file. 
-	}
-	else {
-		for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-			ea->nextGenGenomes[i]->init();
-			ea->nextGenGenomes[i]->morph->saveGenome(i, 0.0);
-			ea->nextGenGenomes[i]->individualNumber = i;
-		}
-	}
+
+    ea->init();
+
+//    for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
+//        ea->nextGenGenomes[i]->init();
+//        ea->nextGenGenomes[i]->morph->saveGenome(i, 0.0);
+//        ea->nextGenGenomes[i]->individualNumber = i;
+//    }
+
 	extApi_sleepMs(500);
 }
 
@@ -124,13 +123,15 @@ bool ClientEA::confirmConnections()
 
 bool ClientEA::evaluatePop()
 {
-	int tries = 0;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
+    int tries = 0;
 	int pauseTime = 100; // milliseconds
 	// communicate with all ports
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "number server instances = " << serverInstances.size() << std::endl;
 	}
-	if (settings->shouldReopenConnections) {
+    if (shouldReopenConnections) {
 		reopenConnections();
 	}
 	bool doneEvaluating = false;
@@ -141,7 +142,7 @@ bool ClientEA::evaluatePop()
 		tries = 0;
 	}
 
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "Pushing individuals" << std::endl;
 	}
 
@@ -159,18 +160,22 @@ bool ClientEA::evaluatePop()
 //	else {
 		// following code does not work for NEAT
 		// start by making adding individuals to the queue
-		for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
-			queuedInds.push_back(i);
-		}
+    for(const auto & ind : ea->get_population())
+    {
+        queuedInds.push_back(ind->get_individual_id());
+    }
+//		for (int i = 0; i < ea->nextGenGenomes.size(); i++) {
+//			queuedInds.push_back(i);
+//		}
 //	}
 	int returnValue = -8; // value to see what's going on. 
 
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "Entering while with server size " << serverInstances.size() << std::endl;
 	}
 
 	while (serverInstances.size() > 0) {
-		if (doneEvaluating == true) {
+        if (doneEvaluating) {
 			break;
 		}
 		if (tries > loadingTrials) {
@@ -206,11 +211,11 @@ bool ClientEA::evaluatePop()
 				std::cout << "It seems that server in port " << slave->port() << " could not load the genome. Sending it again. (" << slave->individualNum() << ")" << std::endl;
 				//simxSetIntegerSignal(clientIDs[i], (simxChar*) "sceneNumber", 0, simx_opmode_blocking);
 				slave->setIntegerSignal("individual", slave->individualNum());
-				if (settings->verbose) {
+                if (verbose) {
 					std::cout << "returnV ind 9: " << returnValue << std::endl;
 				}
 				slave->setIntegerSignal("simulationState", 1); 
-				if (settings->verbose) {
+                if (verbose) {
 					std::cout << "returnV state 9: " << returnValue << std::endl;
 				}
 				tries++;
@@ -223,30 +228,30 @@ bool ClientEA::evaluatePop()
 				queuedInds.pop_back();
 				slave->setIndividual(ind);
                 std::cout << "Trying to evaluate " << ind << std::endl;
-				if (settings->evolutionType == settings->EA_MULTINEAT) {
-					slave->setIndividualNum(ind);
-					slave->setIntegerSignal("individual", ind);
-					slave->setIntegerSignal("simulationState", 1);
-					slave->setState(SlaveConnection::State::EVALUATING);
-					std::cout << "evaluating: " << ind << ", num: " << ind << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
+//				if (settings->evolutionType == settings->EA_MULTINEAT) {
+//					slave->setIndividualNum(ind);
+//					slave->setIntegerSignal("individual", ind);
+//					slave->setIntegerSignal("simulationState", 1);
+//					slave->setState(SlaveConnection::State::EVALUATING);
+//					std::cout << "evaluating: " << ind << ", num: " << ind << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
 
-				}
-				else {
+//				}
+//				else {
 					// now set the number in order to load the file properly.
-					int indNum = ea->nextGenGenomes[ind]->individualNumber;
-					slave->setIndividualNum(indNum);
+//                int indNum = ea->nextGenGenomes[ind]->individualNumber;
+//                slave->setIndividualNum(indNum);
 
-					// tell simulator to start evaluating genome
-					if (settings->sendGenomeAsSignal) {
-                        std::cout << "sending genome as signal" << std::endl;
-						const std::string individualGenome = ea->nextGenGenomes[ind]->generateGenome();
-						sendGenomeSignal(slave, individualGenome);
-					}
-					slave->setIntegerSignal("individual", indNum);
-					slave->setIntegerSignal("simulationState", 1);
-					slave->setState(SlaveConnection::State::EVALUATING);
-					std::cout << "evaluating: " << ind << ", num: " << indNum << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
-				}
+                // tell simulator to start evaluating genome
+//                if (settings::getParameter<settings::Boolean>(parameters,"#sendGenomeAsSignal").value) {
+//                    std::cout << "sending genome as signal" << std::endl;
+//                    const std::string individualGenome =
+//                    sendGenomeSignal(slave, individualGenome);
+//                }
+                slave->setIntegerSignal("individual", ind);
+                slave->setIntegerSignal("simulationState", 1);
+                slave->setState(SlaveConnection::State::EVALUATING);
+//                std::cout << "evaluating: " << ind << ", num: " << ind << " of generation " << settings->generation << ", in port " << slave->port() << std::endl;
+//				}
 			
 			}
 			else if (state == 2 && slave->state() == SlaveConnection::State::EVALUATING)
@@ -270,9 +275,9 @@ bool ClientEA::evaluatePop()
 //					}
 //				}
 //				else {
-					ea->nextGenGenomes[slave->individual()]->fitness = fitness;
+                    ea->get_population()[slave->individual()]->setFitness(fitness);
 					// set the genome evaluation to true
-					ea->nextGenGenomes[slave->individual()]->isEvaluated = true;
+                    ea->get_population()[slave->individual()]->set_isEvaluated(true);
 //				}
 				// set the simulation state back to 0 so this v-rep instance can receive another genome. 
 				slave->setIntegerSignal("simulationState", 0);
@@ -302,8 +307,8 @@ bool ClientEA::evaluatePop()
 //			}
 //		}
 //		else{
-			for (int z = 0; z < ea->nextGenGenomes.size(); z++) {
-				if (ea->nextGenGenomes[z]->isEvaluated == false) {
+            for (int z = 0; z < ea->get_population().size(); z++) {
+                if (not ea->get_population()[z]->isEvaluated()) {
 					doneEvaluating = false;
 					break;
 				}
@@ -313,16 +318,16 @@ bool ClientEA::evaluatePop()
 			}
 //		}
 	}
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "Out of while loop" << std::endl;
 	}
 	ea->replacement();
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "Just saved pop fitness " << std::endl;
 	}
 	// save settings after replacement. 
-	settings->indNumbers.clear();
-	settings->indFits.clear();
+//	settings->indNumbers.clear();
+//	settings->indFits.clear();
 //	if (settings->evolutionType == settings->EA_MULTINEAT) {
 //		for (int i = 0; i < ea->population->m_Species.size(); i++) {
 //			for (int j = 0; j < ea->population->m_Species[i].m_Individuals.size(); j++) {
@@ -332,26 +337,26 @@ bool ClientEA::evaluatePop()
 //		}
 //	}
 //	else {
-		for (int i = 0; i < ea->populationGenomes.size(); i++) {
-			if (settings->verbose) {
-				std::cout << "nr of " << i << " is " << ea->populationGenomes[i]->individualNumber << std::endl;
-				std::cout << "fitness of " << i << " is " << ea->populationGenomes[i]->fitness << std::endl;
+        for (int i = 0; i < ea->get_population().size(); i++) {
+            if (verbose) {
+                std::cout << "nr of " << i << " is "
+                          << ea->get_population()[i]->get_individual_id() << std::endl;
+                std::cout << "fitness of " << i << " is "
+                          << ea->get_population()[i]->getFitness() << std::endl;
 			}
-			settings->indNumbers.push_back(ea->populationGenomes[i]->individualNumber);
-			settings->indFits.push_back(ea->populationGenomes[i]->fitness);
+            properties->indNumbers.push_back(ea->get_population()[i]->get_individual_id());
+            properties->indFits.push_back(ea->get_population()[i]->getFitness());
 		}
 		//settings->indFits = ea->popFitness;
 //	}
-	if (settings->verbose) {
+    if (verbose) {
 		std::cout << "Just before saving settings " << std::endl;
 	}
-	if (settings->evolutionType == settings->EA_MULTINEAT) {
-		//ea->savePopFitness(settings->generation, settings->indFits, settings->indNumbers);
-	}
-	else {
-		ea->savePopFitness(settings->generation);
-	}
-	settings->saveSettings();
-    std::cout << "saved settings " << std::endl;
+
+//	else {
+//		ea->savePopFitness(settings->generation);
+//	}
+//	settings->saveSettings();
+//    std::cout << "saved settings " << std::endl;
 	return true;
 }

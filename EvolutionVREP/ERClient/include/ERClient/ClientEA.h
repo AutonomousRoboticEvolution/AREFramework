@@ -10,10 +10,8 @@
 #include "v_repLib.h"
 #include "v_repConst.h"
 
-#include "ARE/SettingsERClient.h"
 #include "misc/RandNum.h"
 #include "ARE/EA.h"
-#include "ARE/EA_SteadyState.h"
 #include "ERClient/SlaveConnection.h"
 #include "ARE/exp_plugin_loader.hpp"
 
@@ -26,6 +24,10 @@ extern "C" {
 }
 
 
+namespace are {
+
+namespace client {
+
 class ClientEA
 {
 public:
@@ -37,8 +39,7 @@ public:
 	// vector<int> portState;
 	// vector<int> portIndividualNum; // actual number for loading genome
 
-	std::shared_ptr<Settings> settings;
-	std::shared_ptr<RandNum> randNum;
+
 //	vector<std::shared_ptr<IND>> queuedInds;
 	// the queued individuals point to the genome array. Not actual number
 	std::vector<int> queuedInds;
@@ -73,6 +74,20 @@ public:
 	ClientEA();
 	~ClientEA();
 
+    settings::Property::Ptr properties;
+
+    //GETTERS & SETTERS
+    const misc::RandNum::Ptr &get_randNum(){return randNum;}
+    void set_randNum(const misc::RandNum &rn){randNum.reset(new misc::RandNum(rn));}
+
+private:
+    settings::ParametersMapPtr parameters;
+    misc::RandNum::Ptr randNum;
+
 };
+
+} //client
+
+} //are
 
 #endif //CLIENTEA_H

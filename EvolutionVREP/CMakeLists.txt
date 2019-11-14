@@ -82,7 +82,7 @@ elseif(UNIX)
     target_compile_definitions(ER_library PUBLIC "__linux")
 endif()
 
-#add_subdirectory(ERClient)
+add_subdirectory(ERClient)
 add_subdirectory(VREP_Files)
 
 add_subdirectory(experiments)

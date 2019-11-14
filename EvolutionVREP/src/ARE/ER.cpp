@@ -144,21 +144,46 @@ void ER::handleSimulation()
 
 void ER::endOfSimulation()
 {
-    if(currentIndIndex < ea->get_population().size())
-    {
-        double fitness = environment->fitnessFunction(currentInd);
-        ea->setFitness(currentIndIndex,fitness);
-        currentIndIndex++;
-    }
-    else
-    {
-        ea->epoch();
-//        ea->savePopFitness(generation);
-//        generation++;
-//        saveSettings();
-        currentIndIndex = 0;
-    }
 
+    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
+    if(instanceType == settings::INSTANCE_SERVER){
+        double fitness = environment->fitnessFunction(currentInd);
+        // Environment independent fitness function:
+        // float fitness = fit->fitnessFunction(currentMorphology);
+//        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+        if(verbose)
+            std::cout << "fitness = " << fitness << std::endl;
+        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+//        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+        int signal[1] = { 2 };
+        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+//        if (settings->savePhenotype) {
+//            currentGenome->fitness = fitness;
+//            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+//        }
+    }else if(instanceType == settings::INSTANCE_REGULAR){
+
+
+        if(currentIndIndex < ea->get_population().size())
+        {
+            double fitness = environment->fitnessFunction(currentInd);
+            if(verbose)
+                std::cout << "fitness = " << fitness << std::endl;
+            ea->setFitness(currentIndIndex,fitness);
+            currentIndIndex++;
+        }
+        else
+        {
+            ea->epoch();
+            //        ea->savePopFitness(generation);
+            //        generation++;
+            //        saveSettings();
+            currentIndIndex = 0;
+        }
+
+    }
 
 }
 

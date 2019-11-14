@@ -20,9 +20,10 @@
 
 // ER files
 #include "ERClient/ClientEA.h"
-#include "ARE/EA_MultiNEAT.h"
 #include <ctime>
 
+using namespace are;
+using namespace are::client;
 
 clock_t tStart;
 clock_t sysTime;
@@ -42,37 +43,41 @@ int main(int argc, char* argv[])
 {
     std::unique_ptr<ClientEA> client = std::unique_ptr<ClientEA>(new ClientEA);
 	std::vector<std::string> arguments(argv + 1, argv + argc);
-    client->settings = std::shared_ptr<Settings>(new Settings);
-    std::string destination;
-	if (arguments.size() > 0) {
-		destination = arguments[0];
+    client->properties.reset(new settings::Property);
+    std::string parameters_file;
+
+    if(arguments.size() <= 0)
+    {
+        std::cout << "usage : TODO";
+        return 1;
+    }
+
+    parameters_file = arguments[0];
+    settings::ParametersMap parameters = settings::loadParameters(parameters_file);
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if(verbose)
+    {
         std::cout << "arguments are: ";
-		for (int i = 0; i < arguments.size(); i++) {
-			std::cout << arguments[i] << ", ";
-		}
-		std::cout << std::endl;
-	}
-	else {
-		destination = "files"; // default location
-	}
-	client->settings->setRepository(destination);
+        for (int i = 0; i < arguments.size(); i++) {
+            std::cout << arguments[i] << ", ";
+        }
+        std::cout << std::endl;
+    }
 
 	// Just to handle settings
 	if (arguments.size() > 1) {
 		int run = atoi(arguments[1].c_str());
-		client->settings->sceneNum = run; // sceneNum will be overridden...
-		client->settings->seed = run; // sceneNum will be overridden...
-		client->settings->readSettings(); // essential, settings need to correspond with server settings
-		// needs to be fixed at some point
-		client->settings->sceneNum = run;
-		client->settings->seed = run;
-        client->randNum = std::shared_ptr<RandNum>(new RandNum(run));
+
+
+//		client->settings->sceneNum = run;
+//		client->settings->seed = run;
+        client->set_randNum(misc::RandNum(run));
 		// client->randNum->setSeed(atoi(arguments[1].c_str()));
 		srand(run);
 	}
 	else {
-		client->settings->seed = 0;
-        client->randNum = std::shared_ptr<RandNum>(new RandNum(0));
+//		client->settings->seed = 0;
+        client->set_randNum(misc::RandNum(0));
 		// client->randNum->setSeed(0); // not initialized
 		srand(0);
 	}
@@ -91,20 +96,22 @@ int main(int argc, char* argv[])
 	}
 
 	// load or initialize EA
-	if (client->settings->generation != 0) {
-		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
-		client->settings->indCounter = (int)((client->settings->generation + 1) * client->settings->populationSize); // could be read from settings instead
-		std::cout << "Loading Genomes" << std::endl;
-		client->ea->loadPopulationGenomes();
-		client->ea->selection(); // create the next gen, indCounter needs to be set first
-		client->settings->generation++; // increment because next gen will be evaluated
-	}
-	else {
+    int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int numberOfGeneration = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
+//    if (client->properties->generation != 0) {
+//		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
+//        client->properties->indCounter = (int)((client->properties->generation + 1) * populationSize); // could be read from settings instead
+//		std::cout << "Loading Genomes" << std::endl;
+//		client->ea->loadPopulationGenomes();
+//		client->ea->selection(); // create the next gen, indCounter needs to be set first
+//		client->settings->generation++; // increment because next gen will be evaluated
+//	}
+//	else {
 		// client->ea->nextGenGenomes.resize(client->settings->populationSize);
 		client->initGA();
-		client->settings->indCounter = 0;
+        client->properties->indCounter = 0;
 
-		if (client->settings->verbose) {
+        if (verbose) {
 			std::cout << "initialized EA " << std::endl;
 		}
 		//client->settings->generation += 1;
@@ -114,8 +121,8 @@ int main(int argc, char* argv[])
 		//		client->settings->indFits.push_back(client->ea->nextGenGenomes[i]->fitness);
 		//	}
 		// }
-	}
-	for (int i = client->settings->generation; i < client->settings->maxGeneration; i++) {
+//	}
+    for (int i = client->properties->generation; i < numberOfGeneration; i++) {
 	//	tStart = clock();
 	//	client->ea->agePop(); // should be in update function of EA
 		if (!client->evaluatePop()) {
@@ -124,23 +131,25 @@ int main(int argc, char* argv[])
 		}
 //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
 		//client->settings->saveSettings(); // IS IN EVALUATEPOP
-		if (client->settings->verbose) {
+        if (verbose) {
             std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
 		}
-		if (client->settings->generation % client->settings->xGenerations == 0 && client->settings->generation!=0) {
-			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
-			break;
-		}
-		client->settings->indCounter += client->settings->populationSize;
-		client->settings->generation = i + 1;
+//        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
+//			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
+//			break;
+//		}
+        client->properties->indCounter += populationSize;
+        client->properties->generation = i + 1;
 
-		client->ea->selection(); // epochs in NEAT
-		if (client->settings->evolutionType == client->settings->EA_MULTINEAT) {
-		    auto *ea = dynamic_cast<EA_MultiNEAT *>(client->ea.get());
-		    std::ostringstream filename;
-		    filename << client->settings->repository << client->ea->neatSaveFile << client->settings->generation;
-			ea->savePopulation(filename.str());
-		}
+        client->ea->epoch();
+
+//		client->ea->selection(); // epochs in NEAT
+//		if (client->settings->evolutionType == client->settings->EA_MULTINEAT) {
+//		    auto *ea = dynamic_cast<EA_MultiNEAT *>(client->ea.get());
+//		    std::ostringstream filename;
+//		    filename << client->settings->repository << client->ea->neatSaveFile << client->settings->generation;
+//			ea->savePopulation(filename.str());
+//		}
 	}
 
 	extApi_sleepMs(5000);
