@@ -79,6 +79,7 @@ public:
     //GETTERS & SETTERS
     const misc::RandNum::Ptr &get_randNum(){return randNum;}
     void set_randNum(const misc::RandNum &rn){randNum.reset(new misc::RandNum(rn));}
+    void set_parameters(const settings::ParametersMap &param){parameters.reset(new settings::ParametersMap(param));}
 
 private:
     settings::ParametersMapPtr parameters;

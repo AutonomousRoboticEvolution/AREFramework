@@ -48,12 +48,13 @@ int main(int argc, char* argv[])
 
     if(arguments.size() <= 0)
     {
-        std::cout << "usage : TODO";
+        std::cout << "usage : TODO" << std::endl;
         return 1;
     }
 
     parameters_file = arguments[0];
     settings::ParametersMap parameters = settings::loadParameters(parameters_file);
+    client->set_parameters(parameters);
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
     {

@@ -14,11 +14,7 @@ public:
     void init() override;
 
     double fitnessFunction(const Individual::Ptr &ind) override;
-    float updateEnv(const Morphology::Ptr &morph) override;
-
-    ///time point to check the status of the robot
-    float timeCheck = 0.0;
-
+    float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 };
 
 } //are

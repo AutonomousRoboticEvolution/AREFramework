@@ -126,13 +126,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         ERVREP = std::make_unique<are::ER>();   // The class used to handle the EA
 
         are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
-                are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg2)));
+                are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
 
         bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
 
       //  settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));
 //        settings->sceneNum = 0;
-        std::cout << "readSettings" << std::endl;
+        if(verbose)
+            std::cout << "Parameters Loaded" << std::endl;
         //settings->readSettings();
 //        if(are_sett::cast<are_sett::String>(parameters->at("#loadExtSettings")))
 //            if(!load_class_exp_plugin<are::Settings>(settings,settings->exp_plugin_name,"create_settings"))
@@ -180,6 +181,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 //            arg2_param_i = atoi(arg2_param);
 //            simReleaseBuffer(arg2_param);
 //        }
+
 
 //        switch (arg2_param_i) {
 //            case 1: /// Run EA in server-client mode

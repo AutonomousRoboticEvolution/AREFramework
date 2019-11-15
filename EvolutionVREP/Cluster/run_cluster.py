@@ -24,8 +24,8 @@ def run_server(rank: int):
         args.vrep,
         '-h',
         f'-g{rank}',
-        '-g1',
-        f'-g{args.repository}',
+        
+        f'-g{args.params}',
         f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
     ])
 
@@ -35,6 +35,7 @@ def run_client():
     return subprocess.Popen([
         args.client,
         args.repository,
+        str(args.params),
         str(args.seed),
         str(args.n_vrep),
     ])
@@ -97,6 +98,10 @@ if __name__ == "__main__":
 
     parser.add_argument('repository', metavar='REPOSITORY', type=str,
                         help='name of the repository to use')
+    
+    parser.add_argument('--params', type=str,
+                        default=0,
+                        help='path to parameters file')
 
     parser.add_argument('--seed', type=int,
                         default=0,

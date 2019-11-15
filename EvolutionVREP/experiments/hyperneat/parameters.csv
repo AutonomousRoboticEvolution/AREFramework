@@ -7,4 +7,5 @@
 #numberOfGeneration,int,4000
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
+#killWhenNotConnected,bool,0
