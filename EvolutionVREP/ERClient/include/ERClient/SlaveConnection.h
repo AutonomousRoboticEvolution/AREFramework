@@ -71,6 +71,8 @@ public:
     void setIndividual(int individual) { _individual = individual; }
     void setIndividualNum(int individualNum) { _individualNum = individualNum; }
     void setState(State state) { _state = state; }
+
+    int get_clientID(){return _clientID;}
 };
 
 class VrepRemoteException: public std::exception

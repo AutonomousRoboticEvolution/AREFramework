@@ -193,6 +193,8 @@ bool ClientEA::evaluatePop()
 			}
 
 			int state;
+            int handle;
+
 			state = slave->getIntegerSignalBuffer("simulationState");
 			//try {
 			// state = slave->getIntegerSignalBuffer("simulationState");
@@ -228,6 +230,9 @@ bool ClientEA::evaluatePop()
 				queuedInds.pop_back();
 				slave->setIndividual(ind);
                 std::cout << "Trying to evaluate " << ind << std::endl;
+                simxInt code = simxLoadModel(slave->get_clientID(),
+                          "/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/models/robots/mobile/e-puck.ttm",
+                                             0,&handle,simx_opmode_blocking);
 //				if (settings->evolutionType == settings->EA_MULTINEAT) {
 //					slave->setIndividualNum(ind);
 //					slave->setIntegerSignal("individual", ind);
@@ -258,7 +263,8 @@ bool ClientEA::evaluatePop()
 			{
 				// This combination signifies that an individual has been evaluated
 				// First retrieve values. (phenValue is not used in this case but will be used in near future experiments
-				float phenValue = slave->getFloatSignal("phenValue");
+//				float phenValue = slave->getFloatSignal("phenValue");
+                simxRemoveModel(slave->get_clientID(),handle,simx_opmode_blocking);
 				float fitness = slave->getFloatSignal("fitness");
 				std::cout << "The fitness of individual " << slave->individualNum() << " is " << fitness << std::endl;
 

@@ -85,15 +85,36 @@ int main(int argc, char* argv[])
 
 	extApi_sleepMs(20000); // wait 20 seconds before connecting to ports, gives v-rep time to start up.
 	//cout << "settings read" << endl;
-	if (arguments.size() > 2) {
-		std::cout << "client should connect to " << arguments[2].c_str() << " (-1) servers" << std::endl;
-		int numberOfCores = atoi(arguments[2].c_str());
-		if (!client->init(numberOfCores - 1)) {
-			return -1; // could not properly connect to servers
-		}
+    int portN = -1;
+    if(arguments.size() > 2)
+    {
+        portN = std::stoi(arguments[2]);
+        if(verbose)
+            std::cout << "connecting to port " << portN << std::endl;
+    }
+
+    if (arguments.size() > 3) {
+        std::cout << "client should connect to " << arguments[3].c_str() << " (-1) servers" << std::endl;
+        int numberOfCores = atoi(arguments[3].c_str());
+        if(portN != -1)
+        {
+            if (!client->init(numberOfCores - 1,portN))
+            {
+                return -1; // could not properly connect to servers
+            }
+        }
+        else
+        {
+            if (!client->init(numberOfCores - 1))
+            {
+                return -1; // could not properly connect to servers
+            }
+        }
 	}
 	else {
-		client->init(2);
+        if(portN != -1)
+            client->init(1,portN);
+        else client->init(1);
 	}
 
 	// load or initialize EA
