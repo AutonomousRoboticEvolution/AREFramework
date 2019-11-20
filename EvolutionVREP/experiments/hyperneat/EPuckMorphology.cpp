@@ -8,8 +8,7 @@ void EPuckMorphology::create()
 {
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#vrepFolder").value
             + "models/robots/mobile/e-puck.ttm";
-    simPauseSimulation();
-    int epuckHandle = simLoadModel("/home/le_goff/e-puck.ttm");
+    int epuckHandle = simLoadModel(path_epuck_m.c_str());
 
     epuckHandle = simGetObjectHandle("ePuck");
     if(epuckHandle == -1)
@@ -29,11 +28,11 @@ void EPuckMorphology::create()
                                 {1,M_PI},{1,5.*M_PI/6.},
                                 {1,2.*M_PI/3.},{1,M_PI/3.},
                                 {1,M_PI/6.},{1,0},
-                                {1,-M_PI/3.},{1,-2.*M_PI/3.},
-                                //Front Camera average RGB
-                                {1,M_PI/2.}, //R
-                                {1,5.*M_PI/12.}, //G
-                                {1,7.*M_PI/12.}}; //B
+                                {1,-M_PI/3.},{1,-2.*M_PI/3.}};
+//                                //Front Camera average RGB
+//                                {1,M_PI/2.}, //R
+//                                {1,5.*M_PI/12.}, //G
+//                                {1,7.*M_PI/12.}}; //B
     substrate.m_output_coords = {{0.8,0},{0.8,M_PI}};
     substrate.m_hidden_coords = {{0,0},
                                  {0.5,0},{0.5,M_PI/6.},
@@ -96,14 +95,16 @@ std::vector<double> EPuckMorphology::update(){
             [](float x, float y, float z) -> double
     {return std::sqrt(x*x + y*y + z*z);};
 
-    float pos[3], norm[3];
+    float pos[4], norm[3];
     int obj_h;
     int det;
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
         simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
-        if(simReadProximitySensor(proxHandles[i],pos,&obj_h,norm) >= 0)
-             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
+        det = simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
+        if(det > 0)
+            sensorValues.push_back(/*norm_L2(pos[0],pos[1],pos[2])*/pos[3]);
+        else if(det == 0) sensorValues.push_back(-1);
         else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
     }
 

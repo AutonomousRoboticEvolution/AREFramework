@@ -47,7 +47,7 @@ public:
 	std::shared_ptr<EA> ea;
 
 	// functions
-	bool init(int amountPorts, int startPort=104000);
+    bool init(int amountPorts, int startPort=19997);
 	void initGA();
 	void quitSimulators();
 
