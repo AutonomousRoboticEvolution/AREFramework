@@ -84,5 +84,5 @@ export LD_LIBRARY_PATH=where/you/want/to/install/lib
 
 ```
 cd VREP_FOLDER
-./vrep.sh -g0 -gpath/to/parameters/file
+./vrep.sh -gpath/to/parameters/file
 ```
