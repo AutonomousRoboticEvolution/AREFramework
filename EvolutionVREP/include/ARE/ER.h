@@ -43,8 +43,7 @@ public:
 
 
 
-	/// not used here
-    bool loadIndividual(int individualNum);
+//    bool loadIndividual(int individualNum);
 
     ///////////////////////
     /// V-REP Functions ///
@@ -69,6 +68,8 @@ public:
     void set_randNum(const misc::RandNum::Ptr &rn){randNum.reset(rn.get());}
     void set_startRun(bool b){startRun = b;}
     bool get_startRun(){return startRun;}
+    void set_currentIndIndex(size_t num){currentIndIndex = num;}
+
 
 protected:
     ///pointer to settting of EA

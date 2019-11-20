@@ -63,6 +63,9 @@ void saveLog(int num)
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
+
+
+
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
@@ -255,6 +258,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
 
     are_sett::ParametersMap param = (*ERVREP->get_parameters());
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+    int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
+
+
 
     if (not ERVREP->get_startRun()) {
         return nullptr;
@@ -304,25 +310,25 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     }
 
     // START NEW SIMULATION
-    if (simulationState == FREE)
+    if (simulationState == FREE && instanceType != are_sett::INSTANCE_SERVER )
     {
         simulationState = STARTING;
         counter = 0;
-        if (are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value != are_sett::INSTANCE_SERVER)
-            simStartSimulation();
+        simStartSimulation();
     }
 
     // client and v-rep plugin communicates using signal and remote api
     int signal[1] = { 0 };
     int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
     simGetIntegerSignal((simChar*) "simulationState", signal);
+
     if (signal[0] == 99)
     {
         std::cout << "should quit the simulator" << std::endl;
         simQuitSimulator(true);
     }
     else if (simulationState == FREE
-          && are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value == are_sett::INSTANCE_SERVER
+          && instanceType == are_sett::INSTANCE_SERVER
           && simGetSimulationState() == sim_simulation_stopped)
     {
         // time out when not receiving commands for 5 minutes.
@@ -351,21 +357,24 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             //simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
 
             simGetIntegerSignal((simChar *) "individual", individual);
-            if (not ERVREP->loadIndividual(individual[0])) {
-                if (verbose) {
-                    std::cout << "Server here, I could not load the specified individual: " << individual[0]
-                              << std::endl;
-                    std::cout << "My signal was " << signal[0] << std::endl;
-                }
-                simSetIntegerSignal((simChar *) "simulationState", 9); // 9 is now the error state
-            } else {
-                // old function:
-                //ER->ea->loadIndividual(individual[0], sceneNumber[0]);
-                //saveLog(1);
-                //cout << "Not loaded: see this comment in code to adjust" << endl;
-                simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
-                loadingPossible = false;
-            }
+            ERVREP->set_currentIndIndex(individual[0]);
+            simulationState = STARTING;
+            simStartSimulation();
+//            if (not ERVREP->loadIndividual(individual[0])) {
+//                if (verbose) {
+//                    std::cout << "Server here, I could not load the specified individual: " << individual[0]
+//                              << std::endl;
+//                    std::cout << "My signal was " << signal[0] << std::endl;
+//                }
+//                simSetIntegerSignal((simChar *) "simulationState", 9); // 9 is now the error state
+//            } else {
+//                // old function:
+//                //ER->ea->loadIndividual(individual[0], sceneNumber[0]);
+//                //saveLog(1);
+//                //cout << "Not loaded: see this comment in code to adjust" << endl;
+//                simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
+//                loadingPossible = false;
+//            }
         }
     }
 

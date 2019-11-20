@@ -115,6 +115,9 @@ void ER::initializeSimulation()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
+   if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
+       std::cout << "Starting Simulation" << std::endl;
+
    currentInd = ea->getIndividual(currentIndIndex);
    currentInd->init();
 }
@@ -135,6 +138,7 @@ void ER::handleSimulation()
         return;
     }
     simulationTime += simGetSimulationTimeStep();
+    currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,currentInd->get_morphology());
 
     if (simGetSimulationTime() > environment->get_maxTime()) {
@@ -190,49 +194,53 @@ void ER::endOfSimulation()
 
 //bool ER::loadIndividual(int individualNum)
 //{
-//    std::cout << "loading individual " << individualNum << ", sceneNum " << settings->sceneNum << std::endl;
-//   //     currentGenome = genomeFactory(0, randNum, settings);
-//        // try to load from signal
-//        simInt signalLength = -1;
-//        simInt signalLengthVerify = -1;
-//        simChar* signal = simGetStringSignal("individualGenome", &signalLength);
-//        simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
+//    bool verbose = settings::cast<settings::Boolean>(parameters->at("#verbose"))->value;
+//    if(verbose)
+//        std::cout << "loading individual " << individualNum << std::endl;
+//    currentInd = ea->getIndividual(individualNum);
 
+//    //     currentGenome = genomeFactory(0, randNum, settings);
+//    // try to load from signal
+//    simInt signalLength = -1;
+//    simInt signalLengthVerify = -1;
+//    simChar* signal = simGetStringSignal("individualGenome", &signalLength);
+//    simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
+
+//    if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
+//        if (signal != nullptr && signalLength != signalLengthVerify) {
+//            std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
+//            std::cout << signalLength << " != " << signalLengthVerify << std::endl;
+//        }
+//        std::cout << "loading genome " << individualNum << " from ";
+//    }
+
+//    bool load = false;
+//    if (signal != nullptr && signalLength == signalLengthVerify)
+//    {
+//        // load from signal
+//        if () {
+//            std::cout << " signal." << std::endl;
+//        }
+
+//        const std::string individual((char*)signal, signalLength);
+//        std::istringstream individualStream(individual);
+//        load = currentGenome->loadGenome(individualGenomeStream, individualNum);
+//    }
+//    else
+//    {
+//        // load from file
 //        if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//            if (signal != nullptr && signalLength != signalLengthVerify) {
-//                std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
-//                std::cout << signalLength << " != " << signalLengthVerify << std::endl;
-//            }
-//            std::cout << "loading genome " << individualNum << " from ";
+//            std::cout << " file." << std::endl;
 //        }
+//    }
 
-//        bool load = false;
-//        if (signal != nullptr && signalLength == signalLengthVerify)
-//        {
-//            // load from signal
-//            if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//                std::cout << " signal." << std::endl;
-//            }
+//    if (signal != nullptr) {
+//        simReleaseBuffer(signal);
+//    }
 
-//            const std::string individualGenome((char*)signal, signalLength);
-//            std::istringstream individualGenomeStream(individualGenome);
-//         //   load = currentGenome->loadGenome(individualGenomeStream, individualNum);
-//        }
-//        else
-//        {
-//            // load from file
-//            if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//                std::cout << " file." << std::endl;
-//            }
-//        }
-
-//        if (signal != nullptr) {
-//            simReleaseBuffer(signal);
-//        }
-
-////        currentGenome->set_individualNumber(individualNum);
-//        std::cout << "loaded" << std::endl;
-//        return load;
+//    //        currentGenome->set_individualNumber(individualNum);
+//    std::cout << "loaded" << std::endl;
+//    return load;
 //}
 
 
