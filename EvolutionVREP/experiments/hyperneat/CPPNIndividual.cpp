@@ -17,6 +17,10 @@ Individual::Ptr CPPNIndividual::clone()
 void CPPNIndividual::update(double delta_time)
 {
     std::vector<double> inputs = morphology->update();
+    for(const double& prox : inputs)
+        std::cout << prox << " ; ";
+    std::cout << std::endl;
+
     std::vector<double> outputs = control->update(inputs);
     std::vector<int> jointHandles =
             std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();

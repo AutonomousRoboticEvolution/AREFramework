@@ -63,6 +63,7 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
         EmptyGenome::Ptr no_gen(new EmptyGenome);
 
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        ind->set_individual_id(i);
         ind->set_parameters(parameters);
 //        ind->init();
         population.push_back(ind);

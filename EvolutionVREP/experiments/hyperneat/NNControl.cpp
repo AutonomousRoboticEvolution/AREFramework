@@ -1,4 +1,4 @@
-#include "ARE/NNControl.h"
+#include "NNControl.h"
 
 using namespace are;
 

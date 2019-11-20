@@ -3,9 +3,9 @@
 using namespace are;
 
 void Environment::sceneLoader() {
-	simCloseScene();
-    simLoadScene(settings::getParameter<settings::String>(parameters,"#scenePath").value.c_str());
-//    "scenes/DefaultERLight.ttt"
+    std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
+    if(simLoadScene(scene_path.c_str()) < 0)
+        std::cerr << "unable to load the scene : " << scene_path << std::endl;
 }
 
 void Environment::init() {
@@ -21,7 +21,7 @@ void Environment::init() {
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
 	// Sets time step
-    simSetFloatingParameter(sim_floatparam_simulation_time_step, 0.050);
+    simSetFloatingParameter(sim_floatparam_simulation_time_step, settings::getParameter<settings::Float>(parameters,"#timeStep").value);
 }
 
 void Environment::print() {

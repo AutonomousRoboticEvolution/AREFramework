@@ -1,4 +1,4 @@
-#include "ARE/CPPNGenome.h"
+#include "CPPNGenome.h"
 
 using namespace are;
 

@@ -2,7 +2,7 @@
 #define EA_HYPERNEAT_H
 
 #include "ARE/EA.h"
-#include "ARE/CPPNGenome.h"
+#include "CPPNGenome.h"
 #include "CPPNIndividual.h"
 #include "EPuckMorphology.h"
 

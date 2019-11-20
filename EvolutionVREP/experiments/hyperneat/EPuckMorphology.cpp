@@ -1,14 +1,25 @@
 #include "EPuckMorphology.h"
 #include "v_repLib.h"
 
+
 using namespace are;
 
 void EPuckMorphology::create()
 {
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#vrepFolder").value
             + "models/robots/mobile/e-puck.ttm";
-    simLoadModel(path_epuck_m.c_str());
-    int epuckHandle = simGetObjectHandle("ePuck");
+    simPauseSimulation();
+    int epuckHandle = simLoadModel("/home/le_goff/e-puck.ttm");
+
+    epuckHandle = simGetObjectHandle("ePuck");
+    if(epuckHandle == -1)
+    {
+        std::cerr << "unable to load epuck model" << std::endl;
+        simChar* lastError = simGetLastError();
+        std::cerr << "simGetLastError : " << lastError << std::endl;
+        simReleaseBuffer(lastError);
+        exit(1);
+    }
 
     mainHandle = epuckHandle;
 
@@ -87,29 +98,33 @@ std::vector<double> EPuckMorphology::update(){
 
     float pos[3], norm[3];
     int obj_h;
+    int det;
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
-        if(simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm) >= 0)
+        simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
+        if(simReadProximitySensor(proxHandles[i],pos,&obj_h,norm) >= 0)
              sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        else std::cerr << "No detection on Proximity Sensor" << std::endl;
-//        simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
+        else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
     }
 
-    float *auxVal = nullptr;
-    int *auxCount = nullptr;
-    if(simHandleVisionSensor(cameraHandle,&auxVal,&auxCount) >= 0)
-    {
-        if(auxCount[0] > 0 || auxCount[1] >=15)
-        {
-            sensorValues.push_back(auxVal[11]);
-            sensorValues.push_back(auxVal[12]);
-            sensorValues.push_back(auxVal[13]);
-        }
-        else std::cerr << "No Value read on the vision sensor" << std::endl;
-        simReleaseBuffer((char *)auxVal);
-        simReleaseBuffer((char *)auxCount);
-    }
-    else std::cerr << "No detection on CAMERA" << std::endl;
+//    float *auxVal = nullptr;
+//    int *auxCount = nullptr;
+//    simHandleVisionSensor(cameraHandle,&auxVal,&auxCount);
+//    if(simReadVisionSensor(cameraHandle,&auxVal,&auxCount) >= 0)
+//    {
+//        for(int i = 0; i < auxCount[0]; i++)
+//            std::cout << auxVal[i] << std::endl;
+//        if(auxCount[0] > 0 && auxCount[1] >=15)
+//        {
+//            sensorValues.push_back(auxVal[11]);
+//            sensorValues.push_back(auxVal[12]);
+//            sensorValues.push_back(auxVal[13]);
+//        }
+//        else std::cerr << "No Value read on the vision sensor" << std::endl;
+//        simReleaseBuffer((char *)auxVal);
+//        simReleaseBuffer((char *)auxCount);
+//    }
+//    else std::cerr << "No detection on CAMERA " << std::endl ;//<< simGetLastError() << std::endl;
 
     return sensorValues;
 
