@@ -7,6 +7,8 @@ extern "C" {
     #include "remoteApi/extApi.h"
 }
 
+using namespace are::client;
+
 void checkReturnValue(simxInt returnValue)
 {
 	if (returnValue == simx_return_ok) {

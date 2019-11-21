@@ -14,6 +14,9 @@ extern "C" {
 
 #define CONNECTION_TIMEOUT 5000
 
+namespace are {
+namespace client {
+
 class SlaveConnection {
 public:
     enum State {
@@ -111,6 +114,8 @@ public:
     }
 };
 
+}//client
+}//are
 
 #undef CONNECTION_TIMEOUT
 
