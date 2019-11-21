@@ -6,11 +6,12 @@ using namespace are;
 
 void EPuckMorphology::create()
 {
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#vrepFolder").value
             + "models/robots/mobile/e-puck.ttm";
-    int epuckHandle = simLoadModel(path_epuck_m.c_str());
+    int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),properties->clientID);
 
-    epuckHandle = simGetObjectHandle("ePuck");
+//    epuckHandle = simGetObjectHandle("ePuck");
     if(epuckHandle == -1)
     {
         std::cerr << "unable to load epuck model" << std::endl;

@@ -13,6 +13,7 @@
 #include <memory>
 #include "ARE/ER.h"
 #include "ARE/exp_plugin_loader.hpp"
+#include "ERClient/clientER.h"
 
 /// an unique pointer to ER_VREP class
 are::ER::Ptr ERVREP;
@@ -25,6 +26,7 @@ bool loadingPossible = true; // Indicate whether the plugin is ready to accept/l
 clock_t sysTime; // Measure simulation time.
 
 enum SimulationState {
+    INITIALIZING,
     FREE,
     STARTING,
     BUSY,
@@ -51,5 +53,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt);
 VREP_DLLEXPORT void v_repEnd();
 /// Handle different message of simulation
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData);
+
+void localMessageHandler(int message);
+void clientMessageHandler(int message);
 
 #endif //V_REPEXTER_H

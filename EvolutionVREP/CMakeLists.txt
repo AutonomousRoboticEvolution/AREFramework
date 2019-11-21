@@ -34,6 +34,7 @@ add_library(ER_library SHARED ${SOURCES})
 
 target_include_directories(ER_library PUBLIC
     "include"
+    "${VREP_FOLDER}/programming/"
     "${VREP_FOLDER}/programming/include"
 )
 
@@ -68,6 +69,8 @@ install(DIRECTORY include/ DESTINATION include)
 target_link_libraries(v_repExtER ER_library dlibxx dl)
 
 target_include_directories(v_repExtER PUBLIC
+    "include"
+    "ERClient/include"
     "${VREP_FOLDER}/programming/include"
 )
 

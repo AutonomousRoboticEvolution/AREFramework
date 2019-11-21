@@ -1,7 +1,7 @@
 /**
-	@file v_repExtER.cpp
+    @file v_repExtER.cpp
     @authors Edgar Buchanan, Wei Li, Matteo de Carlo and Frank Veenstra
-	@brief This files from the three arguments decides whether to start simulation in local or server mode,
+    @brief This files from the three arguments decides whether to start simulation in local or server mode,
     specifies seed and repository.
     @details The plug-in to run needs three arguments: -gX, -gX and gX
     - The first argument defines the seed of the experiment.
@@ -22,24 +22,25 @@
 #include "v_repLib.h"
 
 namespace are_sett = are::settings;
+namespace are_c = are::client;
 
 //CCatContainer* catContainer = NULL;
 //CCreatureCreator* creatureCreator = NULL;
 //CUserInterface* userInterfaceCreator = NULL;
 
 #ifdef _WIN32
-	#ifdef QT_COMPIL
-		#include <direct.h>
-	#else
-		#include <shlwapi.h>
-		#pragma comment(lib, "Shlwapi.lib")
-	#endif
+#ifdef QT_COMPIL
+#include <direct.h>
+#else
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+#endif
 #endif /* _WIN32 */
 #if defined (__linux) || defined (__APPLE__)
-    extern "C" {
-    #include <unistd.h>
-    }
-	#define WIN_AFX_MANAGE_STATE
+extern "C" {
+#include <unistd.h>
+}
+#define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
 #define CONCAT(x,y,z) x y z
@@ -50,15 +51,15 @@ LIBRARY vrepLib;
 ///save time log
 void saveLog(int num)
 {
-	std::ofstream logFile;
-	logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
-	clock_t now = clock();
-//	double deltaSysTime = difftime((double) time(0), sysTime) ;
-	int deltaSysTime = now - sysTime;
-	logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
-	sysTime = clock();
-	counter = 0;
-	logFile.close();
+    std::ofstream logFile;
+    logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
+    clock_t now = clock();
+    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
+    int deltaSysTime = now - sysTime;
+    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
+    sysTime = clock();
+    counter = 0;
+    logFile.close();
 }
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
@@ -72,204 +73,131 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 
     // This is called just once, at the start of V-REP.
-	// Dynamically load and bind V-REP functions:
-	char curDirAndFile[1024];
+    // Dynamically load and bind V-REP functions:
+    char curDirAndFile[1024];
 #ifdef _WIN32
 #ifdef QT_COMPIL
-	_getcwd(curDirAndFile, sizeof(curDirAndFile));
+    _getcwd(curDirAndFile, sizeof(curDirAndFile));
 #else
-	GetModuleFileName(NULL, curDirAndFile, 1023);
-	PathRemoveFileSpec(curDirAndFile);
+    GetModuleFileName(NULL, curDirAndFile, 1023);
+    PathRemoveFileSpec(curDirAndFile);
 #endif
 #elif defined (__linux) || defined (__APPLE__)
-	getcwd(curDirAndFile, sizeof(curDirAndFile));
+    getcwd(curDirAndFile, sizeof(curDirAndFile));
 #endif
 
-	std::string currentDirAndPath(curDirAndFile);
-	std::string temp(currentDirAndPath);
+    std::string currentDirAndPath(curDirAndFile);
+    std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
-	temp += "\\v_rep.dll";
+    temp += "\\v_rep.dll";
 #elif defined (__linux)
-	temp += "/libv_rep.so";
+    temp += "/libv_rep.so";
 #elif defined (__APPLE__)
-	temp += "/libv_rep.dylib";
+    temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
 
 
 
-	vrepLib = loadVrepLibrary(temp.c_str());
-	if (vrepLib == NULL)
-	{
-		std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
-		return(0); // Means error, V-REP will unload this plugin
-	}
-	if (getVrepProcAddresses(vrepLib) == 0)
-	{
-		std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
-		unloadVrepLibrary(vrepLib);
-		return(0); // Means error, V-REP will unload this plugin
-	}
+    vrepLib = loadVrepLibrary(temp.c_str());
+    if (vrepLib == NULL)
+    {
+        std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
+        return(0); // Means error, V-REP will unload this plugin
+    }
+    if (getVrepProcAddresses(vrepLib) == 0)
+    {
+        std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
+        unloadVrepLibrary(vrepLib);
+        return(0); // Means error, V-REP will unload this plugin
+    }
 
-	// Check the V-REP version:
-	int vrepVer;
-	simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
-	if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
-	{
-		std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
-		unloadVrepLibrary(vrepLib);
-		return(0); // Means error, V-REP will unload this plugin
-	}
+    // Check the V-REP version:
+    int vrepVer;
+    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
+    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
+    {
+        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
+        unloadVrepLibrary(vrepLib);
+        return(0); // Means error, V-REP will unload this plugin
+    }
 
 
-
-    startEvolution = true;
-	if (startEvolution) {
-		// Construct classes
-        ERVREP = std::make_unique<are::ER>();   // The class used to handle the EA
-
-        are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
+    are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
                 are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
+    int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
+    bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
 
-        bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
-
-      //  settings->setRepository(simGetStringParameter(sim_stringparam_app_arg3));
-//        settings->sceneNum = 0;
-        if(verbose)
-            std::cout << "Parameters Loaded" << std::endl;
-        //settings->readSettings();
-//        if(are_sett::cast<are_sett::String>(parameters->at("#loadExtSettings")))
-//            if(!load_class_exp_plugin<are::Settings>(settings,settings->exp_plugin_name,"create_settings"))
-//                exit(1);
-
-        if(verbose){
-            std::cout << "---------------------------------" << std::endl;
-            std::cout << "loading experiment : " << are_sett::getParameter<are_sett::String>(parameters,"#expPluginName").value << std::endl;
-            std::cout << "---------------------------------" << std::endl;
-        }
-
-        ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-        ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
+    if(verbose){
+        if(instance_type == are_sett::INSTANCE_REGULAR)
+            std::cout << "Starting in local intance mode" << std::endl;
+        else if(instance_type == are_sett::INSTANCE_SERVER)
+            std::cout << "Starting in server intance mode" << std::endl;
+    }
 
 
-		/// Set all three arguments
-		/// 1: The first argument sets seed and location
-//		int run = 0; // evolutionary run
-//		simChar* arg1_param = simGetStringParameter(sim_stringparam_app_arg1);
-//		if (arg1_param != nullptr) {
-//			run = atoi(arg1_param);
-//            if(verbose){
-//                std::cout << "Run is set to " << arg1_param << std::endl;
-//			}
-//			simReleaseBuffer(arg1_param);
-//		}
-//		/// 3: The third argument sets the repository
-//		simChar* arg3_param = simGetStringParameter(sim_stringparam_app_arg3);
-//		if (arg3_param != nullptr)
-//			simReleaseBuffer(arg3_param);
-//		else {
-//			std::cout << "Argument 3 was NULL" << std::endl;
-//		}
-//		// Read the settings file; specify the ID of experimental run
-//        ERVREP->get_settings()->sceneNum = run;	// sceneNum and seed can be overridden when specified in settings file. Code below will just ensure it is set to run. TODO
-//        ERVREP->get_settings()->readSettings();	// load the settings if the *.csv exists
-//        ERVREP->get_settings()->seed = run;       // these two lines need to be updated; the idea was to overwrite sceneNum abd seed
-//      //used for generating random number using the seed
+    simulationState = INITIALIZING;
+    // Construct classes
+    ERVREP = std::make_unique<are::ER>();   // The class used to handle the EA
 
-		/// 2: The second argument sets the condition for simulation
-//		simChar* arg2_param = simGetStringParameter(sim_stringparam_app_arg2);
-//        int arg2_param_i = -1;
+    if(verbose){
+        std::cout << "Parameters Loaded" << std::endl;
+        std::cout << "---------------------------------" << std::endl;
+        std::cout << "loading experiment : " << are_sett::getParameter<are_sett::String>(parameters,"#expPluginName").value << std::endl;
+        std::cout << "---------------------------------" << std::endl;
+    }
 
-//		if (arg2_param != nullptr) {
-//            arg2_param_i = atoi(arg2_param);
-//            simReleaseBuffer(arg2_param);
-//        }
+    ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
+    ERVREP->initialize();
+    simulationState = FREE;
 
+    if(instance_type == are_sett::INSTANCE_SERVER)
+    {
+        int signal[1] = { 0 };
+        simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
+    }
+    //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
-//        switch (arg2_param_i) {
-//            case 1: /// Run EA in server-client mode
-//                if(verbose){
-//                    std::cout << "Mode: Server-client EA" << std::endl;
-//                }
-//                ERVREP->get_settings()->startingCondition = are::Settings::COND_RUN_EVOLUTION_SERVER;
-//                ERVREP->get_settings()->instanceType = are::Settings::INSTANCE_SERVER;
-//                break;
-//            case 2: /// Run EA in local mode
-//                if(ERVREP->get_settings()->verbose){
-//                    std::cout << "Mode: Local EA" << std::endl;
-//                }
-//                ERVREP->get_settings()->startingCondition = are::Settings::COND_RUN_EVOLUTION_CLIENT;
-//                ERVREP->get_settings()->instanceType = are::Settings::INSTANCE_REGULAR;
-//                ERVREP->set_startRun(true);
-//                break;
-//            case 7:
-//                if(ERVREP->get_settings()->verbose){
-//                    std::cout << "?" << std::endl;
-//                }
-//                ERVREP->get_settings()->instanceType = are::Settings::INSTANCE_REGULAR;
-//                ERVREP->get_settings()->morphologyType = are::Settings::MODULAR_PHENOTYPE;
-//                ERVREP->get_settings()->startingCondition = are::Settings::COND_LOAD_BEST;
-//                break;
-//            case 8:
-//                if(ERVREP->get_settings()->verbose){
-//                    std::cout << "Mode: ?" << std::endl;
-//                }
-//                ERVREP->get_settings()->instanceType = are::Settings::INSTANCE_REGULAR;
-//                ERVREP->get_settings()->startingCondition = are::Settings::COND_LOAD_BEST;
-//                break;
-//            case 9: /// Load best individual
-//                if(ERVREP->get_settings()->verbose){
-//                    std::cout << "Mode: Load best individual ever" << std::endl;
-//                }
-//                ERVREP->get_settings()->instanceType = are::Settings::INSTANCE_REGULAR;  //run EA inside the plug-in untill termination condition is met
-//                ERVREP->get_settings()->startingCondition = are::Settings::COND_LOAD_BEST;
-//                break;
-
-//            default: /// Wrong argument or no second argument, don't run evolution
-//                if(ERVREP->get_settings()->verbose){
-//                    std::cout << "Mode: No second argument, so not running evolution" << std::endl;
-//                }
-//                ERVREP->set_startRun(false);
-//                break;
-//        }
-		// Actual initialization of ER
-		ERVREP->initialize();
-	}
-	int signal[1] = { 0 };
-	simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
-	//cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
-
-	return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
-	// version 1 was for V-REP versions before V-REP 2.5.12
-	// version 2 was for V-REP versions before V-REP 2.6.0
-	// version 5 was for V-REP versions before V-REP 3.1.0
-	// version 6 is for V-REP versions after V-REP 3.1.3
-	// version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
+    return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
+    // version 1 was for V-REP versions before V-REP 2.5.12
+    // version 2 was for V-REP versions before V-REP 2.6.0
+    // version 5 was for V-REP versions before V-REP 3.1.0
+    // version 6 is for V-REP versions after V-REP 3.1.3
+    // version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
 }
 
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-	unloadVrepLibrary(vrepLib); // release the library
+    are_sett::are_properties.reset();
+    unloadVrepLibrary(vrepLib); // release the library
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
-
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+    are_sett::ParametersMapPtr param = ERVREP->get_parameters();
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
-
-
-    if (not ERVREP->get_startRun()) {
-        return nullptr;
+    if(instanceType == are_sett::INSTANCE_REGULAR)
+    {
+        localMessageHandler(message);
     }
+    else if(instanceType == are_sett::INSTANCE_SERVER)
+    {
+        clientMessageHandler(message);
+    }
+    param.reset();
+}
+
+void localMessageHandler(int message){
+    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
-    void *retVal = nullptr;
 
     // ABOUT TO START
     if (message == sim_message_eventcallback_simulationabouttostart)
@@ -282,7 +210,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
     }
-    // MODULE_HANDLE (DEPRECATED)
+    //Runing Simulation
     else if (message == sim_message_eventcallback_modulehandle)
     {
         assert(simulationState == BUSY);
@@ -310,74 +238,80 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     }
 
     // START NEW SIMULATION
-    if (simulationState == FREE && instanceType != are_sett::INSTANCE_SERVER )
+    if (simulationState == FREE)
     {
         simulationState = STARTING;
         counter = 0;
         simStartSimulation();
     }
+}
+
+void clientMessageHandler(int message){
+    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     // client and v-rep plugin communicates using signal and remote api
-    int signal[1] = { 0 };
-    int returnVal = simGetIntegerSignal((simChar*) "simulationState", signal);
-    simGetIntegerSignal((simChar*) "simulationState", signal);
+    int clientState[1] = {10111};
+    simGetIntegerSignal((simChar*) "clientState", clientState);
 
-    if (signal[0] == 99)
+    if (simulationState == FREE
+        && simGetSimulationState() == sim_simulation_stopped)
     {
-        std::cout << "should quit the simulator" << std::endl;
-        simQuitSimulator(true);
-    }
-    else if (simulationState == FREE
-          && instanceType == are_sett::INSTANCE_SERVER
-          && simGetSimulationState() == sim_simulation_stopped)
-    {
-        // time out when not receiving commands for 5 minutes.
-        if (!timerOn) {
-            sysTime = clock();
-            timeElapsed = 0;
-            timerOn = true;
-        } else {
-            // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
-            if (timeElapsed > 300)
-            {
-                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
-                simQuitSimulator(true);
+            // time out when not receiving commands for 5 minutes.
+            if (!timerOn) {
+                sysTime = clock();
+                timeElapsed = 0;
+                timerOn = true;
+            } else {
+                // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+                timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
+                if (timeElapsed > 300)
+                {
+                    std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+                    simQuitSimulator(true);
+                }
             }
+
+            // wait until command is received
+
+    }
+    if (clientState[0] == are_c::IDLE)
+    {
+        timerOn = false;
+        simulationState = STARTING;
+        simSetIntegerSignal("simulationState",are_c::READY);
+    }
+    // ABOUT TO START
+    else if (clientState[0] == are_c::READY)
+    {
+        simStartSimulation();
+        simulationState = BUSY;
+        // Initializes population
+        simSetIntegerSignal("simulationState",are_c::BUSY);
+        if (verbose) {
+            std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
+    }
+    //Runing Simulation
+    else if (message == sim_message_eventcallback_modulehandle)
+    {
+        assert(simulationState == BUSY);
+        ERVREP->handleSimulation(); // handling the simulation.
+        simSetIntegerSignal("simulationState",are_c::BUSY);
+    }
+    // SIMULATION ENDED
+    else if (message == sim_message_eventcallback_simulationended)
+    {
+        assert(simulationState == BUSY);
+        simulationState = CLEANUP;
+        simSetIntegerSignal("simulationState",are_c::FINISH);
 
-        // wait until command is received
-        if (signal[0] == 1)
-        {
-            timerOn = false;
-            simSetIntegerSignal((simChar *) "simulationState", 8);
-            int sceneNumber[1] = {0};
-            int individual[1] = {0};
-            //		cout << "Repository should be files and is " << ER->settings->repository << endl;
-            //simGetIntegerSignal((simChar*) "sceneNumber", sceneNumber); // sceneNumber is currently not used.
-
-            simGetIntegerSignal((simChar *) "individual", individual);
-            ERVREP->set_currentIndIndex(individual[0]);
-            simulationState = STARTING;
-            simStartSimulation();
-//            if (not ERVREP->loadIndividual(individual[0])) {
-//                if (verbose) {
-//                    std::cout << "Server here, I could not load the specified individual: " << individual[0]
-//                              << std::endl;
-//                    std::cout << "My signal was " << signal[0] << std::endl;
-//                }
-//                simSetIntegerSignal((simChar *) "simulationState", 9); // 9 is now the error state
-//            } else {
-//                // old function:
-//                //ER->ea->loadIndividual(individual[0], sceneNumber[0]);
-//                //saveLog(1);
-//                //cout << "Not loaded: see this comment in code to adjust" << endl;
-//                simStartSimulation();   //the genome is loaded succussully; start a simulation and load a genome for evaluation
-//                loadingPossible = false;
-//            }
+        loadingPossible = true;  // start another simulation
+        if (verbose) {
+            std::cout << "SIMULATION ENDED" << std::endl;
         }
     }
 
-	//	simSetIntegerParameter(sim_intparam_error_report_mode, errorModeSaved); // restore previous settings
-	return retVal;
+
+
 }

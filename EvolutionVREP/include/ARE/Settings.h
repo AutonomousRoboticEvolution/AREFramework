@@ -138,7 +138,10 @@ struct Property
     std::vector<int> indNumbers;
     std::vector<double> indFits;
     int indCounter = 0;
+    int clientID;
 };
+
+static Property::Ptr are_properties;
 
 } //settings
 

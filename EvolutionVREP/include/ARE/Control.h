@@ -40,10 +40,13 @@ public:
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
 
 protected:
     misc::RandNum::Ptr randomNum;
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
 };
 
 }//are

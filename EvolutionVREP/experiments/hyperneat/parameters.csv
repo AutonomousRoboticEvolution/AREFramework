@@ -7,6 +7,6 @@
 #numberOfGeneration,int,4000
 #repository,string,/home/le_goff/are-logs
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,1
 #timeStep,float,0.05

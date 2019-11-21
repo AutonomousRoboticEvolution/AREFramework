@@ -2,6 +2,7 @@
 
 using namespace are;
 
+settings::Property::Ptr are_properties;
 
 //std::map<const std::string,settings::Type::Ptr> settings::parameters = load
 

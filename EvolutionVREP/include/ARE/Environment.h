@@ -29,7 +29,7 @@ public:
     /**
         @brief Initialize the default environment scene and simulation time step size
         */
-    virtual void init();
+    virtual void init(int clientID = 0);
     /**
         @brief Calculate the fitness value of the robot
         @param morph The pointer of the robot (morphology)
@@ -47,17 +47,21 @@ public:
     /**
         @brief Load a specific scence
         */
-    void sceneLoader();
+    void sceneLoader(int clientID = 0);
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const std::vector<int> &get_envObjectHandles(){return envObjectHandles;}
     float get_maxTime(){return maxTime;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+
 
 protected:
     ///setting of the environment
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
     ///handle of the object in the environment
     std::vector<int> envObjectHandles;
     ///initial position of the object

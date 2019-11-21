@@ -30,84 +30,31 @@ using namespace are;
 /// settings file. A random number class will also be created and all other files refer to this class
 void ER::initialize()
 {
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
-//    settings->indCounter = 0;
-     if(instance_type == settings::INSTANCE_REGULAR)
-    {
-        client = true; // V-REP opens in client mode itself, this means there is no client-server relationship
-        initializeSimulation(); // Initialize simulation
+
+
+    if(instance_type == settings::INSTANCE_REGULAR){
+        std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
+
+        if(!load_fct_exp_plugin<Environment::Factory>
+                (environmentFactory,exp_plugin_name,"environmentFactory"))
+            exit(1);
+
+        environment = environmentFactory(parameters);
+        environment->init();
+
+        if(!load_fct_exp_plugin<EA::Factory>
+                (EAFactory,exp_plugin_name,"EAFactory"))
+            exit(1);
+
+        ea = EAFactory(randNum, parameters);
+        ea->init();
     }
-    else if (instance_type == settings::INSTANCE_SERVER)    {
-        client = false; // V-REP plugin will receive genomes from ea client
-        initializeServer();
-    }
-}
-
-/*!
- * Initializes ER as a server to accept genomes from client.
- *
- */
-void ER::initializeServer()
-{
-    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
-
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,exp_plugin_name,"environmentFactory"))
-        exit(1);
-
-//    if(!load_fct_exp_plugin<Genome::Factory>
-//            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
-//        exit(1);
-
-    if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,exp_plugin_name,"EAFactory"))
-        exit(1);
-
-    environment = environmentFactory(parameters);
-    // initialize the environment
-    environment->init();
-
-    ea = EAFactory(randNum, parameters); // unique_ptr<EA>(new EA_VREP);
-
-    ea->init();
-}
-
-/// Initialize a genome factory to create genomes when the simulation is running
-void ER::initializeSimulation()
-{
-//	genomeFactory = std::make_unique<GenomeFactoryVREP>();
-//	genomeFactory->randomNum = randNum;
-    // Environment factory is used to create the environment
-//    EnvironmentFactory environmentFactory;
-//	environment = environmentFactory.createNewEnvironment(settings);
-
-    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
-
-
-    std::cout << "initialize simulation" << std::endl;
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,exp_plugin_name,"environmentFactory"))
-        exit(1);
-
-//    if(!load_fct_exp_plugin<Genome::Factory>
-//            (genomeFactory,settings->exp_plugin_name,"genomeFactory"))
-//        exit(1);
-
-    if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,exp_plugin_name,"EAFactory"))
-        exit(1);
-
-    std::cout << "external factories loaded !" << std::endl;
-
-    environment = environmentFactory(parameters);
-    ea = EAFactory(randNum, parameters);
-    ea->init();
-    environment->init();
 }
 
 
@@ -119,29 +66,34 @@ void ER::startOfSimulation()
        std::cout << "Starting Simulation" << std::endl;
 
    currentInd = ea->getIndividual(currentIndIndex);
+   currentInd->set_properties(properties);
    currentInd->init();
 }
 
 
 void ER::handleSimulation()
 {
-
+    int instance_type =
+            settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     /* This function is called every simulation step. Note that the behavior of
     * the robot drastically changes when slowing down the simulation since this
     * function will be called more often. All simulated individuals will be
     * updated until the maximum simulation time, as specified in the environment
     * class, is reached.
     */
-    if (settings::getParameter<settings::Integer>(parameters,"#instanceType").value
-            == settings::INSTANCE_DEBUGGING) {
+    if (instance_type == settings::INSTANCE_DEBUGGING) {
         simStopSimulation();
         return;
     }
     simulationTime += simGetSimulationTimeStep();
-    currentInd->update(simulationTime);
-    environment->updateEnv(simulationTime,currentInd->get_morphology());
 
-    if (simGetSimulationTime() > environment->get_maxTime()) {
+    if(instance_type == settings::INSTANCE_REGULAR){
+        currentInd->update(simulationTime);
+        environment->updateEnv(simulationTime,currentInd->get_morphology());
+    }
+
+    if (simGetSimulationTime() >
+            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
         simStopSimulation();
     }
 }
@@ -149,25 +101,25 @@ void ER::handleSimulation()
 void ER::endOfSimulation()
 {
 
-    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+//    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-    if(instanceType == settings::INSTANCE_SERVER){
-        double fitness = environment->fitnessFunction(currentInd);
-        // Environment independent fitness function:
-        // float fitness = fit->fitnessFunction(currentMorphology);
-//        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-        if(verbose)
-            std::cout << "fitness = " << fitness << std::endl;
-        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-//        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-        int signal[1] = { 2 };
-        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-//        if (settings->savePhenotype) {
-//            currentGenome->fitness = fitness;
-//            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
-//        }
-    }else if(instanceType == settings::INSTANCE_REGULAR){
+//    if(instanceType == settings::INSTANCE_SERVER){
+//        double fitness = environment->fitnessFunction(currentInd);
+//        // Environment independent fitness function:
+//        // float fitness = fit->fitnessFunction(currentMorphology);
+////        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+//        if(verbose)
+//            std::cout << "fitness = " << fitness << std::endl;
+//        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+////        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+//        int signal[1] = { 2 };
+//        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+////        if (settings->savePhenotype) {
+////            currentGenome->fitness = fitness;
+////            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+////        }
+//    }else if(instanceType == settings::INSTANCE_REGULAR){
 
 
         if(currentIndIndex < ea->get_population().size())
@@ -187,7 +139,7 @@ void ER::endOfSimulation()
             currentIndIndex = 0;
         }
 
-    }
+//    }
 
 }
 

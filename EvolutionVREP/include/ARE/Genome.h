@@ -66,10 +66,13 @@ public:
     void set_individualNumber(int in){individualNumber =in;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
 
 protected:
     /// simulation setting shared by genome and EA
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
     /// random number generator
     misc::RandNum::Ptr randomNum;
 

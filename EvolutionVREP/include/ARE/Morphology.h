@@ -59,7 +59,12 @@ public:
 //        createdModules(morph.createdModules),
         substrate(morph.substrate)
     {}
-    virtual ~Morphology(){}
+    virtual ~Morphology()
+    {
+        parameters.reset();
+        properties.reset();
+        randomNum.reset();
+    }
 
     virtual Morphology::Ptr clone() const = 0;
 
@@ -111,6 +116,8 @@ public:
     const NEAT::Substrate &get_substrate(){return substrate;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
 
 protected:
 
@@ -130,6 +137,7 @@ protected:
 
     misc::RandNum::Ptr randomNum;
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
 
     NEAT::Substrate substrate;
 };

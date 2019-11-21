@@ -2,13 +2,14 @@
 
 using namespace are;
 
-void Environment::sceneLoader() {
+void Environment::sceneLoader(int clientID) {
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
-    if(simLoadScene(scene_path.c_str()) < 0)
+    if(sim::loadScene(instance_type,scene_path.c_str(),clientID) < 0)
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
 }
 
-void Environment::init() {
+void Environment::init(int clientID) {
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value){
         std::cout << "Initialize Environment" << std::endl;
     }
@@ -20,8 +21,13 @@ void Environment::init() {
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 	// Sets time step
-    simSetFloatingParameter(sim_floatparam_simulation_time_step, settings::getParameter<settings::Float>(parameters,"#timeStep").value);
+    sim::setFloatingParameter(instance_type,
+                              sim_floatparam_simulation_time_step,
+                              time_step,
+                              clientID);
 }
 
 void Environment::print() {

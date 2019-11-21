@@ -55,6 +55,8 @@ public:
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     bool isEvaluated(){return isEval;}
     void set_isEvaluated(bool b){isEval = b;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
 
 protected:
     std::vector<double> outputs;
@@ -64,6 +66,8 @@ protected:
     Morphology::Ptr morphology;
     Control::Ptr control;
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
+
     bool isEval;
 
     int individual_id; //TODO id system
@@ -72,9 +76,6 @@ protected:
 
     virtual void createController() = 0;
     virtual void createMorphology() = 0;
-
-
-
 };
 
 }

@@ -30,14 +30,17 @@ public:
     typedef std::unique_ptr<const ER> ConstPtr;
 
     ER(){}
-    virtual ~ER(){}
+    virtual ~ER(){
+        parameters.reset();
+        properties.reset();
+        ea.reset();
+        environment.reset();
+        currentInd.reset();
+        randNum.reset();
+    }
 
 
-    void initialize();
-
-    void initializeSimulation();
-    /// Initializes ER as a server to accept genomes from client.
-    void initializeServer();
+    virtual void initialize();
 
     void saveSettings();
 
@@ -50,16 +53,16 @@ public:
     ///////////////////////
     /// Initializes ER as a server to accept genomes from client. If framework is server than just hold information for
     /// one genome. Else, initilizes the first population of individuals.
-    void startOfSimulation();
+    virtual void startOfSimulation();
 
     /// This function is called every simulation step. Note that the behavior of the robot drastically changes when
     /// slowing down the simulation since this function will be called more often. All simulated individuals will be
     /// updated until the maximum simulation time, as specified in the environment class, is reached.
-    void handleSimulation();
+    virtual void handleSimulation();
 
     /// At the end of the simulation the fitness value of the simulated individual is retrieved and stored in the
     /// appropriate files.
-    void endOfSimulation();
+    virtual void endOfSimulation();
 
     //GETTERS & SETTERS
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
@@ -69,12 +72,15 @@ public:
     void set_startRun(bool b){startRun = b;}
     bool get_startRun(){return startRun;}
     void set_currentIndIndex(size_t num){currentIndIndex = num;}
+    const settings::Property::Ptr &get_properties(){return properties;}
+    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
 
 
 protected:
     ///pointer to settting of EA
     //Settings::Ptr settings;
     settings::ParametersMapPtr parameters;
+    settings::Property::Ptr properties;
     /// pointer to EA
     EA::Ptr ea;
     /// pointer to random number generator of EA
