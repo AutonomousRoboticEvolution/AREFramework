@@ -139,8 +139,8 @@ void ER::endOfSimulation()
         }
         if(currentIndIndex >= ea->get_population().size())
         {
-            ea->epoch();
             ea->savePopFitness(generation);
+            ea->epoch();
             if(verbose)
                 std::cout << "generation " << generation << " finished" << std::endl;
             generation++;
