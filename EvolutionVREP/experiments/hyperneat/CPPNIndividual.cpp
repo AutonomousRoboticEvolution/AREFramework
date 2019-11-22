@@ -18,28 +18,29 @@ void CPPNIndividual::update(double delta_time)
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::vector<double> inputs = morphology->update();
 
-    std::cout << "Inputs : ";
-    for(const double& prox : inputs)
-        std::cout << prox << " ; ";
-    std::cout << std::endl;
+//    std::cout << "Inputs : ";
+//    for(const double& prox : inputs)
+//        std::cout << prox << " ; ";
+//    std::cout << std::endl;
 
     std::vector<double> outputs = control->update(inputs);
 
-    std::cout << "Outputs : ";
-    for(const double& o : outputs)
-        std::cout << o << " ; ";
-    std::cout << std::endl;
+//    std::cout << "Outputs : ";
+//    for(const double& o : outputs)
+//        std::cout << o << " ; ";
+//    std::cout << std::endl;
 
     std::vector<int> jointHandles =
             std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
 
     assert(jointHandles.size() == outputs.size());
 
-    sim::pause(instance_type,properties->clientID);
-    for (size_t i = 0; i < outputs.size(); i++)
+//    sim::pauseCommunication(instance_type,1,properties->clientID);
+    for (size_t i = 0; i < outputs.size(); i++){
         sim::setJointVelocity(instance_type,
                               jointHandles[i],static_cast<float>(outputs[i]),properties->clientID);
-    sim::pause(instance_type,properties->clientID);
+    }
+//    sim::pauseCommunication(instance_type,0,properties->clientID);
 }
 
 void CPPNIndividual::createMorphology()

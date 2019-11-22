@@ -79,6 +79,7 @@ void EA_HyperNEAT::epoch(){
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        ind->set_parameters(parameters);
         population.push_back(ind);
     }
 }

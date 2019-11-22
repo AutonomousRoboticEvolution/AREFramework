@@ -29,10 +29,11 @@ int setJointVelocity(int instance_type,
                       float value,
                       int clientID = 0);
 int pause(int instance_type, int clientID = 0);
+void pauseCommunication(int instance_type,int shouldPause,int clientID = 0);
 void setFloatingParameter(int instance_type, int param_name, float value, int clientID = 0);
-void addObjectToSelection(int instance_type, int mode, int handle, int clientID = 0);
-int getObjectSelectionSize(int instance_type, int clientID = 0);
-void getObjectSelection(int instance_type, int* handles, int clientID = 0);
+void setObjectPosition(int instance_type, int hanlde, int base, float* position, int clientID = 0);
+void getObjectPosition(int instance_type, int hanlde, int base, float* position, int clientID = 0);
+int readProximitySensor(int instance_type, int handle, float* pos, int* targetHandle, float* vector, int clientID = 0);
 
 }
 #endif //UTILITIES_H

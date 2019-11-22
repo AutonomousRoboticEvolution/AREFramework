@@ -9,7 +9,8 @@ void Environment::sceneLoader(int clientID) {
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
 }
 
-void Environment::init(int clientID) {
+void Environment::init(int clID) {
+    clientID = clID;
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value){
         std::cout << "Initialize Environment" << std::endl;
     }

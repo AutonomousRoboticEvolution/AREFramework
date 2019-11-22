@@ -141,7 +141,6 @@ struct Property
     int clientID;
 };
 
-static Property::Ptr are_properties;
 
 } //settings
 

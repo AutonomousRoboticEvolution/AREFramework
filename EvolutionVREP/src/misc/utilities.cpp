@@ -1,7 +1,7 @@
 #include "misc/utilities.h"
 
 void misc::split_line(const std::string& line, const std::string& delim,
-                std::list<std::string>& values){
+                      std::list<std::string>& values){
     size_t pos = 0;
     std::string l = line;
     while ((pos = l.find(delim, (pos + 1))) != std::string::npos) {
@@ -12,7 +12,7 @@ void misc::split_line(const std::string& line, const std::string& delim,
     }
 
     if (!l.empty()) {
-//        split_line(l,delim,values);
+        //        split_line(l,delim,values);
         values.push_back(l);
     }
 }
@@ -37,8 +37,8 @@ int sim::loadModel(int instance_type, const std::string &model_path,int clientID
 }
 
 int sim::setJointVelocity(int instance_type,
-                           int jointHandle,
-                           float value,
+                          int jointHandle,
+                          float value,
                           int clientID){
     if(instance_type == are::settings::INSTANCE_REGULAR)
         return simSetJointTargetVelocity(jointHandle,value);
@@ -54,6 +54,12 @@ int sim::pause(int instance_type, int clientID)
         return simxPauseSimulation(clientID,simx_opmode_oneshot);
 }
 
+void sim::pauseCommunication(int instance_type, int shouldPause, int clientID)
+{
+    if(instance_type == are::settings::INSTANCE_SERVER)
+        simxPauseCommunication(clientID,shouldPause);
+}
+
 void sim::setFloatingParameter(int instance_type, int param_name, float value, int clientID)
 {
     if(instance_type == are::settings::INSTANCE_REGULAR)
@@ -62,10 +68,32 @@ void sim::setFloatingParameter(int instance_type, int param_name, float value, i
         simxSetFloatingParameter(clientID,param_name,value,simx_opmode_oneshot);
 }
 
-void sim::addObjectToSelection(int instance_type, int mode, int handle, int clientID)
+
+void sim::setObjectPosition(int instance_type, int handle, int base, float *position, int clientID)
 {
     if(instance_type == are::settings::INSTANCE_REGULAR)
-        simAddObjectToSelection(mode,handle);
+        simSetObjectPosition(handle,base,position);
     else if(instance_type == are::settings::INSTANCE_SERVER)
-        simxaddobject
+        simxSetObjectPosition(clientID,handle,base,position,simx_opmode_oneshot);
+}
+
+
+void sim::getObjectPosition(int instance_type, int handle, int base, float *position, int clientID)
+{
+    if(instance_type == are::settings::INSTANCE_REGULAR)
+        simGetObjectPosition(handle,base,position);
+    else if(instance_type == are::settings::INSTANCE_SERVER)
+        simxGetObjectPosition(clientID,handle,base,position,simx_opmode_oneshot);
+}
+
+
+int sim::readProximitySensor(int instance_type, int handle, float *pos, int *targetHandle, float *vector, int clientID)
+{
+    if(instance_type == are::settings::INSTANCE_REGULAR)
+        return simReadProximitySensor(handle,pos,targetHandle,vector);
+    else if(instance_type == are::settings::INSTANCE_SERVER){
+        simxUChar det;
+        simxReadProximitySensor(clientID,handle,&det,pos,targetHandle,vector,simx_opmode_streaming);
+        return static_cast<int>(det);
+    }
 }

@@ -85,7 +85,11 @@ void ER::handleSimulation()
         simStopSimulation();
         return;
     }
+
     simulationTime += simGetSimulationTimeStep();
+    if(instance_type == settings::INSTANCE_SERVER)
+        simSetFloatSignal("simulationTime",simulationTime);
+
 
     if(instance_type == settings::INSTANCE_REGULAR){
         currentInd->update(simulationTime);
@@ -121,6 +125,9 @@ void ER::endOfSimulation()
 ////        }
 //    }else if(instanceType == settings::INSTANCE_REGULAR){
 
+        if(verbose)
+            std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+
 
         if(currentIndIndex < ea->get_population().size())
         {
@@ -130,11 +137,13 @@ void ER::endOfSimulation()
             ea->setFitness(currentIndIndex,fitness);
             currentIndIndex++;
         }
-        else
+        if(currentIndIndex >= ea->get_population().size())
         {
             ea->epoch();
-            //        ea->savePopFitness(generation);
-            //        generation++;
+            ea->savePopFitness(generation);
+            if(verbose)
+                std::cout << "generation " << generation << " finished" << std::endl;
+            generation++;
             //        saveSettings();
             currentIndIndex = 0;
         }

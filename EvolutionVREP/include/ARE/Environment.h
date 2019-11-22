@@ -29,7 +29,7 @@ public:
     /**
         @brief Initialize the default environment scene and simulation time step size
         */
-    virtual void init(int clientID = 0);
+    virtual void init(int clID = 0);
     /**
         @brief Calculate the fitness value of the robot
         @param morph The pointer of the robot (morphology)
@@ -69,6 +69,7 @@ protected:
     ///maximum simulation time
     float maxTime = 0.0;
     int type = 0;
+    int clientID = 0;
 };
 
 }//are

@@ -88,6 +88,7 @@ void ER::updateSimulation()
     {
         int state = slave->getIntegerSignal("simulationState");
 
+
         if(state == IDLE)
         {
             slave->setIntegerSignal("clientState",IDLE);
@@ -99,20 +100,21 @@ void ER::updateSimulation()
             startOfSimulation();
             currentInd->get_properties()->clientID = slave->get_clientID();
             currentInd->init();
+            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
             slave->setIntegerSignal("clientState",READY);
         }
         else if(state == BUSY)
         {
-            ///@todo simulation time
-            currentInd->update(0);
-            environment->updateEnv(0,currentInd->get_morphology());
+            float simTime = slave->getFloatSignal("simulationTime");
+            currentInd->update(simTime);
+            environment->updateEnv(simTime,currentInd->get_morphology());
             slave->setIntegerSignal("clientState",BUSY);
 
         }
         else if(state == FINISH)
         {
             endOfSimulation();
-            sim_init = false;
+            slave->setIntegerSignal("clientState",IDLE);
         }
         else if(state == ERROR)
         {

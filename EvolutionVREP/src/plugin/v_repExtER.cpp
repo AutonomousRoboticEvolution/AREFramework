@@ -146,7 +146,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         std::cout << "loading experiment : " << are_sett::getParameter<are_sett::String>(parameters,"#expPluginName").value << std::endl;
         std::cout << "---------------------------------" << std::endl;
     }
-
+    are_sett::Property::Ptr properties(new are_sett::Property);
+    ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
     ERVREP->initialize();
@@ -170,7 +171,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-    are_sett::are_properties.reset();
     unloadVrepLibrary(vrepLib); // release the library
 }
 
@@ -257,24 +257,28 @@ void clientMessageHandler(int message){
     if (simulationState == FREE
         && simGetSimulationState() == sim_simulation_stopped)
     {
-            // time out when not receiving commands for 5 minutes.
-            if (!timerOn) {
-                sysTime = clock();
-                timeElapsed = 0;
-                timerOn = true;
-            } else {
-                // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-                timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
-                if (timeElapsed > 300)
-                {
-                    std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
-                    simQuitSimulator(true);
-                }
-            }
+        simSetIntegerSignal("simulationState",are_c::IDLE);
 
-            // wait until command is received
+        // time out when not receiving commands for 5 minutes.
+        if (!timerOn) {
+            sysTime = clock();
+            timeElapsed = 0;
+            timerOn = true;
+        } else {
+            // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
+            if (timeElapsed > 300)
+            {
+                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+                simQuitSimulator(true);
+            }
+        }
+
+        // wait until command is received
 
     }
+
+
     if (clientState[0] == are_c::IDLE)
     {
         timerOn = false;
@@ -282,27 +286,27 @@ void clientMessageHandler(int message){
         simSetIntegerSignal("simulationState",are_c::READY);
     }
     // ABOUT TO START
-    else if (clientState[0] == are_c::READY)
+    else if (clientState[0] == are_c::READY && simulationState == STARTING)
     {
-        simStartSimulation();
+//        simStartSimulation();
         simulationState = BUSY;
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);
+        simSetFloatSignal("simulationTime",0);
+//        extApi_sleepMs(50);
         if (verbose) {
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
     }
     //Runing Simulation
-    else if (message == sim_message_eventcallback_modulehandle)
+    else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
     {
-        assert(simulationState == BUSY);
         ERVREP->handleSimulation(); // handling the simulation.
         simSetIntegerSignal("simulationState",are_c::BUSY);
     }
     // SIMULATION ENDED
     else if (message == sim_message_eventcallback_simulationended)
     {
-        assert(simulationState == BUSY);
         simulationState = CLEANUP;
         simSetIntegerSignal("simulationState",are_c::FINISH);
 
