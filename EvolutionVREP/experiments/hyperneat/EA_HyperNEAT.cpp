@@ -71,6 +71,8 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 }
 
 void EA_HyperNEAT::epoch(){
+    for(int i = 0; i < population.size(); i++)
+        neat_population->AccessGenomeByIndex(i).SetFitness(population[i]->getFitness());
     neat_population->Epoch();
     population.clear();
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
