@@ -29,6 +29,7 @@ void EA::epoch(){
     replacement();
     crossover();
     mutation();
+    data_saving();
 }
 
 

@@ -96,6 +96,7 @@ void ER::updateSimulation()
         }
         else if(state == READY)
         {
+            ///@todo start in slave to handle errors
             environment->init(slave->get_clientID());
             startOfSimulation();
             currentInd->get_properties()->clientID = slave->get_clientID();
