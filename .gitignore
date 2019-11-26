@@ -6,6 +6,11 @@
 html/
 latex/
 cmake-build-*/
- __pycache__/
- .idea/
- RoboFab/Documentation/*
+*/__pycache__/
+*/.idea/
+
+RoboFab/Documentation/*
+RoboFab/blueprints/*
+RoboFab/controllers/*
+RoboFab/gcode/*
+RoboFab/meshes/*

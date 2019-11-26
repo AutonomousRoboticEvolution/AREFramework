@@ -24,14 +24,10 @@ DO_ORGAN_INSERTIONS = 0
 DO_CABLE_INSERTIONS = 0
 DO_SEND_CONTROLLER_TO_ROBOT = 0
 
-# Make the settings file then extract the settings from it
-makeConfigurationFile(location="YRK")
-configurationData = json.load ( open ( 'configuration_YRK.json' ) ) # <--- change this depending on if you're in York or BRL
-
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
 class RoboFab_host:
-    def __init__(self):
+    def __init__(self , configurationData):
         debugPrint("Creating a RoboFab_host object")
 
 
@@ -211,9 +207,9 @@ class RoboFab_host:
         # self.UR5.moveBetweenStations("organ_bank")
         # self.UR5.setTCP(self.gripperTCP_A)
         # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.organBank.origin * makeTransform([0,0,0 , math.pi, 0 ,0]) )
-        self.UR5.moveBetweenStations("printer")
-        self.UR5.setTCP(self.gripperTCP_A)
-        self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
+        # self.UR5.moveBetweenStations("printer")
+        # self.UR5.setTCP(self.gripperTCP_A)
+        # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
         # self.UR5.moveBetweenStations("AF")
         # self.UR5.setTCP(self.gripperTCP_A)
         # self.UR5.moveArm( makeTransform([0,0,-0.2]) * self.AF.originNoRotation * makeTransform([0,0,0 , 0, math.pi ,0]) * makeTransform([0,0,0,0,0,math.pi]) )
@@ -229,8 +225,12 @@ class RoboFab_host:
 if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
+    # Make the settings file then extract the settings from it
+    makeConfigurationFile(location="BRL")
+    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+
     # startup
-    RoboFab = RoboFab_host ()
+    RoboFab = RoboFab_host (configurationData)
 
 
     # open blueprint file

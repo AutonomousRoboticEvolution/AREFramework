@@ -10,6 +10,7 @@ import threading
 import math
 import numpy as np
 from helperFunctions import debugPrint, makeTransform, connect2USB, convertPoseToTransform, convertTransformToPose, findAngleBetweenTransforms
+from toolSerialCommunication import GripperHandler
 
 # temporary, experimental settings - may be incorporated into config file later
 USE_FORCE_FOR_ASSEMBLY_FIXTURE_ATTACHMENT = False
@@ -32,7 +33,7 @@ class UR5Robot:
         self.disableServoOnFinish = configurationData ["UR5"] ["disableServoOnFinish"]
 
         # connect to the remote controlled gripper via arduino:
-        self.gripper = GripperHandler ( configurationData[ "gripper" ] )
+        self.gripper = GripperHandler ( configurationData)
 
         # Set up ethernet connection to the UR5 control box:
         laptopAddress = configurationData ["network"] ["COMPUTER_ADDRESS"]
@@ -191,15 +192,9 @@ class UR5Robot:
 
     def setGripperPosition (self, newGripperPower:float, AorB:str = 'A'):
         # set newGripperPower: 0.0 = fully open, 1.0 = fully closed
+        # this function just passes the values down to the gripper, after ensuring the UR5 is in position using the sendNothingToArm() function
         self.sendNothingToArm()
-        if AorB == 'A':
-            self.gripper.currentPowerGripperA = newGripperPower
-        elif AorB == 'B':
-            self.gripper.currentPowerGripperB = newGripperPower
-        else:
-            raise ValueError("AorB should be 'A' or 'B', was: "+AorB)
-        self.gripper.updateSerial ()
-        time.sleep(0.5)
+        self.gripper.setGripperPosition (newGripperPower,AorB)
 
     ## Get the current end effector position as a transform matrix (from UR base frame)
     def getCurrentPosition ( self ):
@@ -637,97 +632,4 @@ class UR5Robot:
         self.setMoveSpeed ( self.speedValueNormal )
 
 
-class GripperHandler:
-
-    def __init__ ( self, configurationData ):
-
-        self.RF_GRIPPER_READY_MESSAGE = configurationData [ "READY_MESSAGE" ]
-        self.RF_GRIPPER_SUCCESS_MESSAGE: bytes = configurationData [ "SUCCESS_MESSAGE" ]
-        self.MIN_SERVO_VALUE = float ( configurationData [ "min_servo_value" ] )  # absolute lowest the servo will accept
-        self.MAX_SERVO_VALUE = float ( configurationData [ "max_servo_value" ] )  # absolute highest the servo will accept
-        self.gripperAOpen = float ( configurationData [ "A_open_position" ] )
-        self.gripperAClosed = float ( configurationData [ "A_closed_position" ] )
-        self.gripperBOpen = float ( configurationData [ "B_open_position" ] )
-        self.gripperBClosed = float ( configurationData [ "B_closed_position" ] )
-
-        self.currentPowerGripperA = 0.5
-        self.currentPowerGripperB = 0.5
-
-        self.lastSerialMessageReceived = ''
-        self.isEnabled = True
-
-        self.arduino = connect2USB(configurationData [ "EXPECTED_STARTUP_MESSAGE" ])
-
-        # settings for arduino serial comms:
-        self.arduino.write_timeout = 1
-
-        isError = self.updateSerial () # apply the starting positions
-        if isError:
-            raise serial.SerialException("Cannot connect to gripper")
-
-    def saturate ( self, val ):
-        if val > self.MAX_SERVO_VALUE:
-            return self.MAX_SERVO_VALUE
-        elif val < self.MIN_SERVO_VALUE:
-            return self.MIN_SERVO_VALUE
-        else:
-            return val
-
-    def disableServos(self):
-        self.isEnabled = False
-        self.updateSerial()
-
-    def updateSerial ( self ):
-        debugPrint("Updating Gripper",messageVerbosity=2)
-        if self.isEnabled:
-            rawServoValueA = self.saturate (
-                int ( self.gripperAOpen + self.currentPowerGripperA * (self.gripperAClosed - self.gripperAOpen) ) )
-            rawServoValueB = self.saturate(
-                int(self.gripperBOpen + self.currentPowerGripperB * (self.gripperBClosed - self.gripperBOpen)))
-        else: # sending zero cause the servos to turn off (and stop buzzing!)
-            rawServoValueA = 0
-            rawServoValueB = 0
-
-        debugPrint ( "Raw Servo A: " + str ( rawServoValueA ) ,messageVerbosity=3)
-        debugPrint ( "Raw Servo B: " + str ( rawServoValueB ) ,messageVerbosity=3 )
-
-        hasSent = False
-        retryCount = 0
-        while not hasSent:
-            errorCode=0
-            self.sendRawGripperValues ( rawServoValueA, rawServoValueB )
-            time.sleep(0.1)
-            self.lastSerialMessageReceived = self.arduino.readline ()
-            if self.RF_GRIPPER_SUCCESS_MESSAGE in str(self.lastSerialMessageReceived):
-                hasSent = True
-            else:
-                retryCount += 1
-                debugPrint ("Gripper message back was: " + str ( self.lastSerialMessageReceived ) ,messageVerbosity=3)
-                time.sleep(0.1)
-            if retryCount > 1: #30: # I give up!
-                # raise serial.SerialException ( "Arduino unable to communicate with gripper" )
-                hasSent = True
-                # errorCode =1
-        debugPrint("Gripper communication took "+str(retryCount)+" retries",messageVerbosity=2)
-        return errorCode
-
-    def sendRawGripperValues ( self, ValueA=1500, ValueB=1500 ):
-
-        debugPrint (
-            "I've been told to send values to the serial port of " + str ( ValueA ) + " and " + str ( ValueB ) ,messageVerbosity=3)
-
-        while not (self.RF_GRIPPER_READY_MESSAGE in str(self.lastSerialMessageReceived)):
-            while self.arduino.in_waiting:
-                time.sleep(0.1)
-                self.lastSerialMessageReceived = self.arduino.readline ()
-            debugPrint ( "New message from gripper in: " + str ( self.lastSerialMessageReceived ) ,messageVerbosity=3)
-        debugPrint ( "Arduino is ready for us to send, clearing buffer..." ,messageVerbosity=3)
-        while self.arduino.in_waiting:
-            # debugPrint ( str(self.arduino.readline ()),messageVerbosity=3)
-            self.arduino.readline ()
-
-        messageToSend = 'a' + str ( ValueA ) + 'b' + str ( ValueB ) + '\r'
-        debugPrint ( "Sending message: " + str ( messageToSend.encode () ) ,messageVerbosity=3)
-        self.arduino.write ( messageToSend.encode () )
-        debugPrint("sent",messageVerbosity=2)
 

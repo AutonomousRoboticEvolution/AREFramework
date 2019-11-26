@@ -17,12 +17,27 @@ def makeFile(location):
 		CABLE_BANK_1_ORIGIN = (makeTransform([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90) ]) * makeTransform([-0.002,-0.001,-0.005]) ).tolist()
 		ORGAN_BANK_1_ORIGIN = makeTransform([-0.400 , -0.1598 , -7.4/1000 , 0 , 0 ,math.radians(90) ]).tolist()
 		gripper_TCP_A = (makeTransform([0.184766,0,0.141915,math.radians(45),0,math.radians(90)])*makeTransform([0.003-0.89/1000+0.0025,-0.006+0.24/1000,6.875/1000])).tolist()
+
+		# define what constitutes "open" and "closed" for the servos on the gripper:
+		A_open_position = 2100
+		A_closed_position = 1220
+		B_open_position = 2100
+		B_closed_position = 1350
+
+
 	elif location == "YRK":
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransform([4.02 / 1000 , -0.67789 , 0.748-0.0005 , math.radians(180),0,0 ]).tolist()  #  NEEDS UPDATING
 		PRINTER_1_ORIGIN = makeTransform( [0.3912 , 0.0648 , 0.0810 , 0 , 0 , math.radians( -90 )] ) .tolist()
 		CABLE_BANK_1_ORIGIN = (makeTransform([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90) ]) * makeTransform([-0.002,-0.001,-0.005]) ).tolist() #  NEEDS UPDATING
 		ORGAN_BANK_1_ORIGIN = makeTransform([-0.3723 , -0.1988 , -8.1/1000 , 0 , 0 ,math.radians(90) ]).tolist()
 		gripper_TCP_A = (makeTransform([0.19326,0.00401,0.14262,math.radians(45),0,math.radians(90)])).tolist()
+
+		# define what constitutes "open" and "closed" for the servos on the gripper:
+		A_open_position = 2100
+		A_closed_position = 1220
+		B_open_position = 2100
+		B_closed_position = 1350
+
 	else:
 		raise Exception("unknown location given for making configuration file")
 
@@ -43,7 +58,9 @@ def makeFile(location):
 
 		"network":{
 			"COMPUTER_ADDRESS":"192.168.2.253",
-			"PORT_FOR_UR5":30000
+			"ROBOT_IP_ADDRESS":"192.168.2.252",
+			"PORT_FOR_UR5":30000,
+			"PORT_FOR_GRIPPER":54321
 		},
 
 		"UR5":{
@@ -68,18 +85,18 @@ def makeFile(location):
 		},
 
 		"gripper":{
-			"EXPECTED_STARTUP_MESSAGE":"I am the transmitter",
+			"STARTUP_MESSAGE":"a0b0",
+			"EXPECTED_STARTUP_REPLY":"I am the gripper",
 			"TCP_A": gripper_TCP_A,
 			# "TCP_A": (makeTransform( [0,0,0, math.radians(45),0,math.radians(-270)] ) * makeTransform([0.002,-30/1000,231/1000])).tolist(),
 			"TCP_B": (makeTransform( [0,0,0, math.radians(-45),0,math.radians(90)] ) * makeTransform([0,0,0,0,0,math.radians(180)]) * makeTransform([-2/1000,19/1000,261/1000]) * makeTransform([0,0.001,0.006]) ).tolist(),
-			"READY_MESSAGE":"ready",
-			"SUCCESS_MESSAGE":"success",
+			"SUCCESS_MESSAGE":"OK",
 			"min_servo_value":900,
 			"max_servo_value":2100,
-			"A_open_position":2100,
-			"A_closed_position":1220,
-			"B_open_position":2100,
-			"B_closed_position":1350
+			"A_open_position":A_open_position,
+			"A_closed_position":A_closed_position,
+			"B_open_position":B_open_position,
+			"B_closed_position":B_closed_position
 		},
 
 		# Defines properties of each organ type
