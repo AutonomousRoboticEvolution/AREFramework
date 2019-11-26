@@ -65,6 +65,7 @@ protected:
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;
     Control::Ptr control;
+
     settings::ParametersMapPtr parameters;
     settings::Property::Ptr properties;
 

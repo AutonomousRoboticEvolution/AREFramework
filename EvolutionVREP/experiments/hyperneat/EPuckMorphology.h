@@ -16,12 +16,6 @@ public:
     void createAtPosition(float,float,float) override;
     std::vector<double> update() override;
 
-
-    void saveBaseMorphology(int,float) override {}
-    void loadBaseMorphology(int,int) override {}
-
-
-
     void setPosition(float,float,float);
     std::vector<int> get_jointHandles(){return jointHandles;}
 
