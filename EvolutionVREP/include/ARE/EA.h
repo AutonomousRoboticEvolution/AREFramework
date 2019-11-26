@@ -8,6 +8,7 @@
 #include <multineat/Population.h>
 #include "ARE/exp_plugin_loader.hpp"
 #include "ARE/Individual.h"
+#include "ARE/Logging.h"
 
 namespace are{
 
@@ -35,23 +36,6 @@ public:
     virtual ~EA();
 
 
-
-
-    /// container of current population genomes
-//    std::vector<Genome::Ptr> populationGenomes;
-    /// container of next generation genomes
-//    std::vector<Genome::Ptr> nextGenGenomes;
-    /// used in NEAT
-    std::string neatSaveFile = "/testNEAT";
-
-
-
-    /// storage vectors
-    /// This genome will be evaluated so needs to be assigned
-    // std::shared_ptr<Genome> newGenome; // for creating one genome at a time
-    // std::vector<int> popIndNumbers;
-    // std::vector<float> popFitness; // used by client-server
-    // std::vector<float> nextGenFitness; // used by client-server
     std::vector<int> popNextIndNumbers;
     /// This method initilizes setting for EA and random number generator seed
     void setSettings(const settings::ParametersMapPtr &param, const misc::RandNum::Ptr &rn);
@@ -62,15 +46,8 @@ public:
     }
 
     virtual void epoch();
-
-    /// This method initilizes a population of genomes
     virtual void init() = 0;    // initializes EA
-    virtual void evaluation(){}  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
-    virtual void selection(){}  	// selection operator
-    virtual void replacement(){}		// replacement operator
-    virtual void mutation(){}		// mutation operator
-    virtual void crossover(){}
-    virtual void end(){};				// last call to the EA, when simulation stops
+
 
     Individual::Ptr getIndividual(size_t index);
     size_t getPopSize(){return population.size();}
@@ -90,6 +67,8 @@ public:
 
     std::function<Genome::Factory> createGenome;
 
+    void addLog(const Logging::Ptr& log){logs.push_back(log);}
+
     //GETTERS & SETTERS
     const std::vector<Individual::Ptr> &get_population(){return population;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
@@ -97,11 +76,22 @@ public:
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
 protected:
+    /// This method initilizes a population of genomes
+    virtual void evaluation(){}  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
+    virtual void selection(){}  	// selection operator
+    virtual void replacement(){}		// replacement operator
+    virtual void mutation(){}		// mutation operator
+    virtual void crossover(){}
+    virtual void end(){};				// last call to the EA, when simulation stops
+
+    void saveLogs();
+
     std::vector<Individual::Ptr> population;
     ///set the environment type, evolution type...
     settings::ParametersMapPtr parameters;
     ///random number generator for EA
     misc::RandNum::Ptr randomNum;
+    std::vector<Logging::Ptr> logs;
 };
 
 }//are

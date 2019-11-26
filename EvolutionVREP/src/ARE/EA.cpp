@@ -13,6 +13,12 @@ EA::EA(const settings::ParametersMapPtr& param){
 
 EA::~EA()
 {
+    randomNum.reset();
+    parameters.reset();
+    for(auto& log : logs)
+        log.reset();
+    for(auto& ind : population)
+        ind.reset();
 }
 
 
@@ -35,6 +41,11 @@ void EA::epoch(){
 Individual::Ptr EA::getIndividual(size_t index)
 {
     return population[index];
+}
+
+void EA::saveLogs(){
+    for(const auto & log: logs)
+        log->saveLog();
 }
 
 //void EA::loadIndividual(int individualNum, int sceneNum) {
