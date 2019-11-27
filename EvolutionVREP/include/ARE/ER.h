@@ -19,6 +19,7 @@
 #include "misc/RandNum.h"
 #include "misc/utilities.h"
 #include "ARE/Environment.h"
+#include "ARE/Logging.h"
 
 namespace are {
 
@@ -37,6 +38,8 @@ public:
         environment.reset();
         currentInd.reset();
         randNum.reset();
+        for(auto& log : logs)
+            log.reset();
     }
 
 
@@ -95,6 +98,12 @@ protected:
 
     ///used to create the EA Algorithm
     std::function<EA::Factory> EAFactory;
+
+    std::function<Logging::Factory> loggingFactory;
+
+    std::vector<Logging::Ptr> logs;
+
+    void saveLogs();
 
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)

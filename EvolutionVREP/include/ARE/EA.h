@@ -8,7 +8,6 @@
 #include <multineat/Population.h>
 #include "ARE/exp_plugin_loader.hpp"
 #include "ARE/Individual.h"
-#include "ARE/Logging.h"
 
 namespace are{
 
@@ -58,7 +57,7 @@ public:
     /// Save the population fitness values
 //    void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
     /// Save the population fitness values
-    virtual void savePopFitness(int generation);
+
     /// Load the best individual based on the evolutionary progression documen
 //    virtual void loadBestIndividualGenome(int sceneNum) = 0;
     /// Load all the population genomes?
@@ -67,13 +66,15 @@ public:
 
     std::function<Genome::Factory> createGenome;
 
-    void addLog(const Logging::Ptr& log){logs.push_back(log);}
 
     //GETTERS & SETTERS
     const std::vector<Individual::Ptr> &get_population(){return population;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const misc::RandNum::Ptr get_randomNum(){return randomNum;}
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+    void set_generation(int gen){generation = gen;}
+    int get_generation(){return generation;}
+    void incr_generation(){generation++;}
 
 protected:
     /// This method initilizes a population of genomes
@@ -84,14 +85,14 @@ protected:
     virtual void crossover(){}
     virtual void end(){};				// last call to the EA, when simulation stops
 
-    void saveLogs();
 
     std::vector<Individual::Ptr> population;
     ///set the environment type, evolution type...
     settings::ParametersMapPtr parameters;
     ///random number generator for EA
     misc::RandNum::Ptr randomNum;
-    std::vector<Logging::Ptr> logs;
+
+    int generation = 0;
 };
 
 }//are

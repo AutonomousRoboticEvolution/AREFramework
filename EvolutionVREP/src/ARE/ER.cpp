@@ -54,6 +54,12 @@ void ER::initialize()
 
         ea = EAFactory(randNum, parameters);
         ea->init();
+
+        if(!load_fct_exp_plugin<Logging::Factory>
+                (loggingFactory,exp_plugin_name,"loggingFactory"))
+            exit(1);
+
+        loggingFactory(logs,parameters);
     }
 }
 
@@ -62,12 +68,12 @@ void ER::initialize()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
-   if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
-       std::cout << "Starting Simulation" << std::endl;
+    if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
+        std::cout << "Starting Simulation" << std::endl;
 
-   currentInd = ea->getIndividual(currentIndIndex);
-   currentInd->set_properties(properties);
-   currentInd->init();
+    currentInd = ea->getIndividual(currentIndIndex);
+    currentInd->set_properties(properties);
+    currentInd->init();
 }
 
 
@@ -105,51 +111,54 @@ void ER::handleSimulation()
 void ER::endOfSimulation()
 {
 
-//    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    //    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-//    if(instanceType == settings::INSTANCE_SERVER){
-//        double fitness = environment->fitnessFunction(currentInd);
-//        // Environment independent fitness function:
-//        // float fitness = fit->fitnessFunction(currentMorphology);
-////        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-//        if(verbose)
-//            std::cout << "fitness = " << fitness << std::endl;
-//        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-////        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-//        int signal[1] = { 2 };
-//        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-////        if (settings->savePhenotype) {
-////            currentGenome->fitness = fitness;
-////            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
-////        }
-//    }else if(instanceType == settings::INSTANCE_REGULAR){
+    //    if(instanceType == settings::INSTANCE_SERVER){
+    //        double fitness = environment->fitnessFunction(currentInd);
+    //        // Environment independent fitness function:
+    //        // float fitness = fit->fitnessFunction(currentMorphology);
+    ////        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+    //        if(verbose)
+    //            std::cout << "fitness = " << fitness << std::endl;
+    //        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+    ////        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+    //        int signal[1] = { 2 };
+    //        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+    ////        if (settings->savePhenotype) {
+    ////            currentGenome->fitness = fitness;
+    ////            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+    ////        }
+    //    }else if(instanceType == settings::INSTANCE_REGULAR){
 
+    if(verbose)
+        std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+
+
+    if(currentIndIndex < ea->get_population().size())
+    {
+        double fitness = environment->fitnessFunction(currentInd);
         if(verbose)
-            std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+            std::cout << "fitness = " << fitness << std::endl;
+        ea->setFitness(currentIndIndex,fitness);
+        currentIndIndex++;
+    }
+    if(currentIndIndex >= ea->get_population().size())
+    {
+        saveLogs();
+        ea->epoch();
+        if(verbose)
+            std::cout << "generation " << generation << " finished" << std::endl;
+        ea->incr_generation();
+        currentIndIndex = 0;
 
+    }
+}
 
-        if(currentIndIndex < ea->get_population().size())
-        {
-            double fitness = environment->fitnessFunction(currentInd);
-            if(verbose)
-                std::cout << "fitness = " << fitness << std::endl;
-            ea->setFitness(currentIndIndex,fitness);
-            currentIndIndex++;
-        }
-        if(currentIndIndex >= ea->get_population().size())
-        {
-            ea->savePopFitness(generation);
-            ea->epoch();
-            if(verbose)
-                std::cout << "generation " << generation << " finished" << std::endl;
-            generation++;
-            //        saveSettings();
-            currentIndIndex = 0;
-        }
-
-//    }
-
+void ER::saveLogs()
+{
+    for(const auto &log : logs)
+        log->saveLog(ea);
 }
 
 

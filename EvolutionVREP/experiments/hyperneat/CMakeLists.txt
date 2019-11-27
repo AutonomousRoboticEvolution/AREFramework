@@ -8,7 +8,8 @@ add_library(hyperneat SHARED
     NNControl.cpp
     EPuckMorphology.cpp
     testEnv.cpp
-    factories.cpp)
+    factories.cpp
+    Loggings.cpp)
 target_include_directories(hyperneat PUBLIC
     "${VREP_FOLDER}/programming/include"
     )

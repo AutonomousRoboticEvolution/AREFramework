@@ -2,23 +2,24 @@
 #define LOGGING_H
 
 #include <memory>
-//#include "ARE/EA.h"
+#include "ARE/EA.h"
 
 namespace are {
 
 class Logging
 {
 public:
-
     typedef std::shared_ptr<Logging> Ptr;
     typedef std::shared_ptr<const Logging> ConstPtr;
+    typedef void (Factory) (std::vector<Logging::Ptr>&,
+                            const settings::ParametersMapPtr &);
 
     Logging(){}
     Logging(const std::string &file){logFile = file;}
     Logging(const Logging& l) : logFile(l.logFile){}
     virtual ~Logging(){}
 
-    virtual void saveLog() = 0;
+    virtual void saveLog(const EA::Ptr& ea) = 0;
     virtual void loadLog(const std::string &file = std::string()) = 0;
 
     //SETTERS && GETTERS

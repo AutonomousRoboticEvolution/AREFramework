@@ -15,8 +15,6 @@ EA::~EA()
 {
     randomNum.reset();
     parameters.reset();
-    for(auto& log : logs)
-        log.reset();
     for(auto& ind : population)
         ind.reset();
 }
@@ -41,11 +39,6 @@ void EA::epoch(){
 Individual::Ptr EA::getIndividual(size_t index)
 {
     return population[index];
-}
-
-void EA::saveLogs(){
-    for(const auto & log: logs)
-        log->saveLog();
 }
 
 //void EA::loadIndividual(int individualNum, int sceneNum) {
@@ -88,44 +81,6 @@ void EA::saveLogs(){
 //    std::cout << "GENERATION SAVED" << std::endl;
 //}
 
-
-void EA::savePopFitness(int generation)
-{
-    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
-
-    std::cout << "SAVING GENERATION" << std::endl << std::endl;
-    std::ofstream savePopFile;
-    std::string saveFileName;
-    saveFileName = repository + "/SavedGenerations" + std::to_string(generation) + ".csv";
-    savePopFile.open(saveFileName.c_str(), std::ios::out | std::ios::ate | std::ios::app);
-    savePopFile << "generation " << generation << ": ,";
-    for (int i = 0; i < population.size(); i++) {
-        savePopFile << " ind " << i << ": " << population[i]->getFitness() << ",";
-    }
-    float avgFitness = 0;
-    for (int i = 0; i < population.size(); i++) {
-        avgFitness += population[i]->getFitness();
-    }
-    avgFitness = avgFitness / population.size();
-    savePopFile << "avg: ," << avgFitness << ",";
-    int bestInd = 0;
-    float bestFitness = 0;
-    for (int i = 0; i < population.size(); i++) {
-        if (bestFitness < population[i]->getFitness()) {
-            bestFitness = population[i]->getFitness();
-            bestInd = i;
-        }
-    }
-    savePopFile << "ind: ," << population[bestInd]->get_individual_id() << ",";
-    savePopFile << "fitness: ," << bestFitness << ",";
-    savePopFile << "individuals: ,";
-    for (int i = 0; i < population.size(); i++) {
-        savePopFile << population[i]->get_individual_id() << ",";
-    }
-    savePopFile << std::endl;
-    savePopFile.close();
-    std::cout << "GENERATION SAVED" << std::endl;
-}
 
 //void EA::loadPopulationGenomes()
 //{

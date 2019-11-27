@@ -7,7 +7,8 @@ using namespace are;
 void EPuckMorphology::create()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    std::string path_epuck_m = "/home/le_goff/epuck_changedsensor3.ttm";
+
+    std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#epuckPath").value;
     int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),properties->clientID);
 
 //    epuckHandle = simGetObjectHandle("ePuck");
