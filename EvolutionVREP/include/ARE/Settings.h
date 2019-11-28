@@ -38,7 +38,7 @@ class Boolean : public Type
 {
 public:
     Boolean(){name = "bool";}
-    bool value;
+    bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
 };
 
@@ -46,7 +46,7 @@ class Integer : public Type
 {
 public:
     Integer(){name = "int";}
-    int value;
+    int value = 0;
     void fromString(const std::string& str){value = std::stoi(str);}
 };
 
@@ -54,7 +54,7 @@ class Float : public Type
 {
 public:
     Float(){name = "float";}
-    float value;
+    float value = 0.0;
     void fromString(const std::string& str){value = std::stof(str);}
 };
 
@@ -63,7 +63,7 @@ class Double : public Type
 {
 public:
     Double(){name = "double";}
-    double value;
+    double value = 0.0;
     void fromString(const std::string& str){value = std::stod(str);}
 };
 
@@ -71,7 +71,7 @@ class String : public Type
 {
 public:
     String(){name = "string";}
-    std::string value;
+    std::string value = "";
     void fromString(const std::string& str){value = str;}
 };
 
@@ -96,7 +96,6 @@ enum InstanceType {
 
 typedef std::map<const std::string,const Type::ConstPtr> ParametersMap;
 typedef std::shared_ptr<ParametersMap> ParametersMapPtr;
-//static std::map<const std::string,Type::Ptr> parameters;
 
 template<typename T>
 T getParameter(const ParametersMapPtr &params,const std::string& name)
