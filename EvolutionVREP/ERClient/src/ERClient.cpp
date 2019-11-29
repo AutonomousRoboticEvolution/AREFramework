@@ -98,14 +98,14 @@ int main(int argc, char* argv[])
         int numberOfCores = atoi(arguments[3].c_str());
         if(portN != -1)
         {
-            if (!client->init(numberOfCores - 1,portN))
+            if (!client->init(numberOfCores /*- 1*/,portN))
             {
                 return -1; // could not properly connect to servers
             }
         }
         else
         {
-            if (!client->init(numberOfCores - 1))
+            if (!client->init(numberOfCores /*- 1*/))
             {
                 return -1; // could not properly connect to servers
             }
@@ -150,9 +150,7 @@ int main(int argc, char* argv[])
     //	}
     // }
     //	}
-    for (client->get_properties()->generation = 0;
-         client->get_properties()->generation < numberOfGeneration;
-         client->get_properties()->generation++) {
+    while (client->get_ea()->get_generation() < numberOfGeneration) {
         //	tStart = clock();
         //	client->ea->agePop(); // should be in update function of EA
         if (!client->execute()) {
@@ -161,9 +159,9 @@ int main(int argc, char* argv[])
         }
         //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
         //client->settings->saveSettings(); // IS IN EVALUATEPOP
-        if (verbose) {
-            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
-        }
+//        if (verbose) {
+//            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
+//        }
         //        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
         //			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
         //			break;

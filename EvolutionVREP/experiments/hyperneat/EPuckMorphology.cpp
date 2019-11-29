@@ -9,7 +9,7 @@ void EPuckMorphology::create()
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#epuckPath").value;
-    int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),properties->clientID);
+    int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
 
 //    epuckHandle = simGetObjectHandle("ePuck");
     if(epuckHandle == -1)
@@ -64,7 +64,7 @@ void EPuckMorphology::setPosition(float x, float y, float z)
 
     sim::setObjectPosition(
                 settings::getParameter<settings::Integer>(parameters,"#instanceType").value,
-                mainHandle, -1, epuckPos,properties->clientID);
+                mainHandle, -1, epuckPos,client_id);
 }
 
 void EPuckMorphology::getObjectHandles()
@@ -103,14 +103,14 @@ void EPuckMorphology::getObjectHandles()
     {
         int nbrObj = 0;
         int* handles = nullptr;
-        simxGetObjects(properties->clientID,sim_object_proximitysensor_type,&nbrObj,&handles,simx_opmode_blocking);
+        simxGetObjects(client_id,sim_object_proximitysensor_type,&nbrObj,&handles,simx_opmode_blocking);
 
         if(verbose)
             std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
         for(int i = 0; i < nbrObj ; i++)
             proxHandles.push_back(handles[i]);
 
-        simxGetObjects(properties->clientID,sim_object_joint_type,&nbrObj,&handles,simx_opmode_blocking);
+        simxGetObjects(client_id,sim_object_joint_type,&nbrObj,&handles,simx_opmode_blocking);
         if(verbose)
             std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
         for(int i = 0; i < nbrObj ; i++)
@@ -132,17 +132,17 @@ std::vector<double> EPuckMorphology::update(){
     float pos[4], norm[3];
     int obj_h;
     int det;
-    sim::pauseCommunication(instance_type,1,properties->clientID);
+    sim::pauseCommunication(instance_type,1,client_id);
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
 //        simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
-        det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,properties->clientID);
+        det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,client_id);
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
         else if(det == 0) sensorValues.push_back(-1);
         else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
     }
-    sim::pauseCommunication(instance_type,0,properties->clientID);
+    sim::pauseCommunication(instance_type,0,client_id);
 
 //    float *auxVal = nullptr;
 //    int *auxCount = nullptr;

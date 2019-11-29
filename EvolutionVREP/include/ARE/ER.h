@@ -77,6 +77,7 @@ public:
     void set_currentIndIndex(size_t num){currentIndIndex = num;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+    const EA::Ptr &get_ea(){return ea;}
 
 
 protected:

@@ -57,6 +57,8 @@ public:
     void set_isEvaluated(bool b){isEval = b;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+    void set_client_id(int cid){client_id = cid;}
+    int get_client_id(){return client_id;}
 
 protected:
     std::vector<double> outputs;
@@ -73,6 +75,7 @@ protected:
 
     int individual_id; //TODO id system
 
+    int client_id;
 //    std::function<Genome::Factory> createGenome;
 
     virtual void createController() = 0;

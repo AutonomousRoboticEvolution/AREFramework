@@ -5,6 +5,7 @@
 #include <list>
 #include "ARE/Settings.h"
 #include "v_repLib.h"
+#include "ERClient/SlaveConnection.h"
 
 extern "C" {
 #include "v_repConst.h"

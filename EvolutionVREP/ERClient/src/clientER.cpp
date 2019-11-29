@@ -48,9 +48,9 @@ bool ER::execute()
     int tries = 0;
     int pauseTime = 100; // milliseconds
     // communicate with all ports
-    if (verbose) {
-        std::cout << "number server instances = " << serverInstances.size() << std::endl;
-    }
+//    if (verbose) {
+//        std::cout << "number server instances = " << serverInstances.size() << std::endl;
+//    }
     if (shouldReopenConnections) {
         reopenConnections();
     }
@@ -88,6 +88,7 @@ void ER::updateSimulation()
     {
         int state = slave->getIntegerSignal("simulationState");
 
+        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
         if(state == IDLE)
         {
@@ -99,7 +100,7 @@ void ER::updateSimulation()
             ///@todo start in slave to handle errors
             environment->init(slave->get_clientID());
             startOfSimulation();
-            currentInd->get_properties()->clientID = slave->get_clientID();
+            currentInd->set_client_id(slave->get_clientID());
             currentInd->init();
             simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
             slave->setIntegerSignal("clientState",READY);
@@ -184,6 +185,6 @@ bool ER::confirmConnections()
         }
     }
 
-    std::cout << "Connections confirmed" << std::endl;
+//    std::cout << "Connections confirmed" << std::endl;
     return true;
 }

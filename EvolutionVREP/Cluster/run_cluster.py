@@ -23,8 +23,6 @@ def run_server(rank: int):
     return subprocess.Popen([
         args.vrep,
         '-h',
-        f'-g{rank}',
-        
         f'-g{args.params}',
         f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
     ])
@@ -34,9 +32,9 @@ def run_client():
     print('Starting client')
     return subprocess.Popen([
         args.client,
-        args.repository,
         str(args.params),
         str(args.seed),
+        str(args.port_start),
         str(args.n_vrep),
     ])
 

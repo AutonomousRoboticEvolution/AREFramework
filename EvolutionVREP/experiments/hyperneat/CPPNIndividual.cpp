@@ -35,18 +35,18 @@ void CPPNIndividual::update(double delta_time)
 
     assert(jointHandles.size() == outputs.size());
 
-//    sim::pauseCommunication(instance_type,1,properties->clientID);
+    sim::pauseCommunication(instance_type,1,client_id);
     for (size_t i = 0; i < outputs.size(); i++){
         sim::setJointVelocity(instance_type,
-                              jointHandles[i],static_cast<float>(outputs[i]),properties->clientID);
+                              jointHandles[i],static_cast<float>(outputs[i]),client_id);
     }
-//    sim::pauseCommunication(instance_type,0,properties->clientID);
+    sim::pauseCommunication(instance_type,0,client_id);
 }
 
 void CPPNIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
-    morphology->set_properties(properties);
+    morphology->set_client_id(client_id);
     morphology->createAtPosition(0,0,0);
 }
 
@@ -56,7 +56,7 @@ void CPPNIndividual::createController()
             std::dynamic_pointer_cast<CPPNGenome>(ctrlGenome)->get_neat_genome();
     NEAT::Substrate subs = morphology->get_substrate();
     control.reset(new NNControl);
-    control->set_properties(properties);
+//    control->set_properties(properties);
     NEAT::NeuralNetwork nn;
     gen.BuildHyperNEATPhenotype(nn,subs);
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
