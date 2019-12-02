@@ -4,6 +4,7 @@
 #include <ARE/Genome.h>
 #include <ARE/Control.h>
 #include <ARE/Morphology.h>
+#include <ARE/Learner.h>
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
@@ -84,6 +85,7 @@ protected:
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;
     Control::Ptr control;
+    Learner::Ptr learner;
 
     settings::ParametersMapPtr parameters;
     settings::Property::Ptr properties;
