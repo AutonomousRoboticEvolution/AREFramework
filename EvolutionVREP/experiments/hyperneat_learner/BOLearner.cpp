@@ -8,8 +8,6 @@ BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &tar
 //    Params::opt_cmaes::set_lbound(-cmd_arguments.boundary()); ?
 //    Params::opt_cmaes::set_ubound(cmd_arguments.boundary()); ?
 
-
-
     int max_opt_eval = settings::getParameter<settings::Integer>(parameters,"#maxOptEval").value;
     Params::opt_cmaes::set_max_fun_evals(5);
     Params::opt_cmaes::set_fun_tolerance(5);
@@ -17,8 +15,6 @@ BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &tar
     Params::opt_cmaes::set_elitism(0);
     Params::opt_cmaes::set_lambda(-1);
 
-    blackdrops::RolloutInfo::init_state = init_pos;
-    blackdrops::RolloutInfo::target = target_pos;
 }
 
 void BOLearner::update(const Control::Ptr & ctrl)
@@ -32,7 +28,8 @@ void BOLearner::update(const Control::Ptr & ctrl)
 
     _policy.set_params(nn_params);
 
-    learn(1, 5, true);
+    learn_model();
+    optimize_policy(0); ///@todo find how to set properly this argument
 
     for(int i = 0; i < nn.m_connections.size(); i++)
         nn.m_connections[i].m_weight = _policy.params()[i];

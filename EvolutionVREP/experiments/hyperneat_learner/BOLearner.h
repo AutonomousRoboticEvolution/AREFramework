@@ -103,6 +103,8 @@ struct ARESystem :
 //    Eigen::VectorXd add_noise(const Eigen::VectorXd &original_state) const;
 //    Eigen::VectorXd policy_transform(const Eigen::VectorXd &original_state, blackdrops::RolloutInfo *info) const;
 
+
+
 };
 
 struct RewardFunction : public blackdrops::reward::Reward<RewardFunction> {
@@ -138,6 +140,10 @@ public:
     //GETTERS & SETTERS
     MGP_t get_model(){return _model;}
     void set_observation(obs_t obs){_observations = obs;}
+    void set_rolloutInfo(blackdrops::RolloutInfo &info){rolloutInfo = info;}
+
+private:
+    blackdrops::RolloutInfo rolloutInfo;
 };
 }//are
 #endif //BOLEARNER_H

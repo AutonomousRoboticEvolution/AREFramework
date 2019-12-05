@@ -141,7 +141,8 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        currentIndIndex++;
+        if(ea->update())
+            currentIndIndex++;
     }
     if(currentIndIndex >= ea->get_population().size())
     {

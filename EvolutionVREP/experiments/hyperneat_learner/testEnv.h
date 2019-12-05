@@ -10,6 +10,7 @@ namespace are {
 class TestEnv : public Environment
 {
 public:
+
     TestEnv() : Environment()
     {
         initial_position.resize(3);
