@@ -161,7 +161,20 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
+
+ 	if(ea->update())
+            currentIndIndex++;
     }
+    if(currentIndIndex >= ea->get_population().size())
+    {
+        saveLogs();
+        ea->epoch();
+        if(verbose)
+            std::cout << "generation " << generation << " finished" << std::endl;
+        ea->incr_generation();
+        currentIndIndex = 0;
+
+   }
 }
 
 void ER::saveLogs()

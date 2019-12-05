@@ -70,6 +70,30 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
     }
 }
 
+
+
+bool EA_HyperNEAT::update()
+{
+    Individual::Ptr ind = population[currentIndIndex];
+    observations.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->get_observation());
+    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(observations);
+
+    if(currentFitnesses.size() == 2)
+    {
+        population[currentIndIndex]->setFitness(computeFitness());
+        currentFitnesses.clear();
+        ind.reset();
+        return true;
+    }
+    ind.reset();
+    return false;
+}
+
+void EA_HyperNEAT::setFitness(size_t indIndex, float fitness){
+    currentIndIndex = indIndex;
+    currentFitnesses.push_back(fitness);
+}
+
 void EA_HyperNEAT::epoch(){
     for(int i = 0; i < population.size(); i++)
         neat_population->AccessGenomeByIndex(i).SetFitness(population[i]->getFitness());

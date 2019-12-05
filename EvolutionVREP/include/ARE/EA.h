@@ -8,6 +8,7 @@
 #include <multineat/Population.h>
 #include "ARE/exp_plugin_loader.hpp"
 #include "ARE/Individual.h"
+#include "ARE/Environment.h"
 
 namespace are{
 
@@ -44,6 +45,15 @@ public:
         population[indIndex]->setFitness(fitness);
     }
 
+    /**
+     * @brief Update method is called after each evaluation of an individual.
+     * @return If the algorithm can continue to the next ind
+     */
+    virtual bool update(){return true;}
+
+    /**
+     * @brief Epoch method is called at the end of each generation
+     */
     virtual void epoch();
     virtual void init() = 0;    // initializes EA
 

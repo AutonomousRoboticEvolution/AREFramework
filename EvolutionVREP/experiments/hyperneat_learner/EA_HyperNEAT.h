@@ -17,10 +17,18 @@ public:
 
     void init() override;
     void initPopulation(const NEAT::Parameters&);
+    bool update() override;
     void epoch() override;
+
+    float computeFitness();
+
+    void setFitness(size_t indIndex, float fitness);
 
 private:
     std::unique_ptr<NEAT::Population> neat_population;
+    std::vector<float> currentFitnesses;
+    size_t currentIndIndex;
+    obs_t observations;
 };
 
 }
