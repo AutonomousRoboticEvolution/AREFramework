@@ -1,9 +1,10 @@
-#expPluginName,string,/usr/local/lib/libhyperneat.so
+#expPluginName,string,/usr/local/lib/libhyperneat_learner.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/scenes/defaultER.ttt
+#epuckPath,string,/home/le_goff/epuck_changedsensor3.ttm
 #populationSize,int,40
-#maxEvalTime,float,50
+#maxEvalTime,float,10
 #numberOfGeneration,int,400
 #repository,string,/home/le_goff/are-logs
 #verbose,bool,1

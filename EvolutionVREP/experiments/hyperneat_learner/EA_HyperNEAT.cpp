@@ -61,12 +61,17 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);
+        BOLearner::Ptr learner(new BOLearner);
 
-        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome,learner));
         ind->set_individual_id(i);
         ind->set_parameters(parameters);
 //        ind->init();
         population.push_back(ind);
+
+        ctrlgenome.reset();
+        no_gen.reset();
+        learner.reset();
     }
 }
 
@@ -75,8 +80,8 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 bool EA_HyperNEAT::update()
 {
     Individual::Ptr ind = population[currentIndIndex];
-    observations.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->get_observation());
-    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(observations);
+    for(auto & obs : std::dynamic_pointer_cast<CPPNIndividual>(ind)->get_observations())
+        observations.push_back(obs);
 
     if(currentFitnesses.size() == 2)
     {
@@ -85,6 +90,10 @@ bool EA_HyperNEAT::update()
         ind.reset();
         return true;
     }
+
+    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(observations);
+
+
     ind.reset();
     return false;
 }
@@ -104,8 +113,15 @@ void EA_HyperNEAT::epoch(){
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);
-        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome));
+        BOLearner::Ptr learner(new BOLearner);
+
+        CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome,learner));
         ind->set_parameters(parameters);
         population.push_back(ind);
+
+
+        ctrlgenome.reset();
+        no_gen.reset();
+        learner.reset();
     }
 }

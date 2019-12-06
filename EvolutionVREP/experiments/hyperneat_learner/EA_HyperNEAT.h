@@ -20,7 +20,7 @@ public:
     bool update() override;
     void epoch() override;
 
-    float computeFitness();
+    float computeFitness(){}
 
     void setFitness(size_t indIndex, float fitness);
 
