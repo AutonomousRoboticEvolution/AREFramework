@@ -151,7 +151,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
     ERVREP->initialize();
     simulationState = FREE;
-
+    properties.reset();
     if(instance_type == are_sett::INSTANCE_SERVER)
     {
         int signal[1] = { 0 };
@@ -176,7 +176,7 @@ VREP_DLLEXPORT void v_repEnd()
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
     are_sett::ParametersMapPtr param = ERVREP->get_parameters();
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
     if(instanceType == are_sett::INSTANCE_REGULAR)

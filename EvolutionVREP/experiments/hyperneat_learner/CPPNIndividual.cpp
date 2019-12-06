@@ -24,6 +24,10 @@ Individual::Ptr CPPNIndividual::clone()
 void CPPNIndividual::update(double delta_time)
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    float timeStep = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
+
+
     std::vector<double> inputs = morphology->update();
 
 //    std::cout << "Inputs : ";
@@ -31,12 +35,9 @@ void CPPNIndividual::update(double delta_time)
 //        std::cout << prox << " ; ";
 //    std::cout << std::endl;
 
-    float pos[3];
-    sim::getObjectPosition(instance_type,morphology->getMainHandle(),-1,pos); ///@todo for client/server mode;
-    previous_state.resize(3);
-    previous_state(0) = pos[0];
-    previous_state(1) = pos[1];
-    previous_state(2) = pos[2];
+    previous_state.resize(inputs.size());
+    for(int i = 0; i < inputs.size(); i++)
+        previous_state(i) = inputs[i];
 
     std::vector<double> outputs = control->update(inputs);
     command.resize(2);
@@ -60,11 +61,17 @@ void CPPNIndividual::update(double delta_time)
     }
 //    sim::pauseCommunication(instance_type,0,properties->clientID);
 
-    sim::getObjectPosition(instance_type,morphology->getMainHandle(),-1,pos); ///@todo for client/server mode;
-    current_state.resize(3);
-    current_state(0) = pos[0];
-    current_state(1) = pos[1];
-    current_state(2) = pos[2];
+    inputs = morphology->update();
+
+
+    current_state.resize(inputs.size());
+    for(int i = 0; i < inputs.size(); i++)
+        current_state(i) = inputs[i];
+
+    int totalSteps = evalTime/timeStep;
+    int nbrOfSteps = delta_time/timeStep;
+    if(nbrOfSteps%(totalSteps/20) == 0)
+        observations.push_back(get_observation());
 
 }
 
@@ -88,7 +95,7 @@ void CPPNIndividual::createController()
 }
 
 
-void CPPNIndividual::update_learner(const obs_t &obs)
+void CPPNIndividual::update_learner(const std::vector<s_obs_t> &obs)
 {
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
     learner->update(control);
