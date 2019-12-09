@@ -12,7 +12,7 @@ namespace are {
 class CPPNIndividual : public Individual
 {
 public :
-    using s_obs_t = std::tuple<Eigen::VectorXd,Eigen::VectorXd,Eigen::VectorXd>;
+    using s_obs_t = std::tuple<Eigen::VectorXd,Eigen::VectorXd,Eigen::VectorXd>; //single observation
 
     CPPNIndividual() : Individual(){}
     CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
@@ -24,7 +24,7 @@ public :
 
 
 
-    void update_learner(const obs_t &obs);
+    void update_learner(const std::vector<s_obs_t> &obs);
 
     std::vector<s_obs_t> get_observations(){return observations;}
 

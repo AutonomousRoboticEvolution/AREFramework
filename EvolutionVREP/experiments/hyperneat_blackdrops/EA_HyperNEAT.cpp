@@ -56,7 +56,6 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
     NEAT::Genome neat_genome(0, 4, 5, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
     neat_population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
 
-
     for (size_t i = 0; i < params.PopulationSize ; i++)
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));

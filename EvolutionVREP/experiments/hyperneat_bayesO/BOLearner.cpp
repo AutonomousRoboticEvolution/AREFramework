@@ -2,11 +2,7 @@
 
 using namespace are;
 namespace lb = limbo;
-namespace bd = blackdrops;
 BO_DECLARE_DYN_PARAM(int, PolicyParams::nn_policy, hidden_neurons);
-BO_DECLARE_DYN_PARAM(bool, Params::blackdrops, verbose);
-BO_DECLARE_DYN_PARAM(bool, Params::blackdrops, stochastic);
-BO_DECLARE_DYN_PARAM(double, Params::blackdrops, boundary);
 
 BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, max_fun_evals);
 BO_DECLARE_DYN_PARAM(double, Params::opt_cmaes, fun_tolerance);
@@ -23,7 +19,6 @@ BO_DECLARE_DYN_PARAM(bool, Params::opt_cmaes, handle_uncertainty);
 BOLearner::BOLearner() :
     bd::BlackDROPS<Params, MGP_t, ARESystem, bd::policy::NNPolicy<PolicyParams>, policy_opt_t, RewardFunction>()
 {
-    Params::blackdrops::set_boundary(1.);
     Params::opt_cmaes::set_lbound(-1.);
     Params::opt_cmaes::set_ubound(1.);
 
@@ -33,15 +28,13 @@ BOLearner::BOLearner() :
     Params::opt_cmaes::set_elitism(1);
     Params::opt_cmaes::set_lambda(-1);
     Params::opt_cmaes::set_handle_uncertainty(true);
-    Params::blackdrops::set_verbose(true);
-    Params::blackdrops::set_stochastic(true);
+
 }
 
 
 BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &target_pos) :
     bd::BlackDROPS<Params, MGP_t, ARESystem, bd::policy::NNPolicy<PolicyParams>, policy_opt_t, RewardFunction>()
 {
-    Params::blackdrops::set_boundary(1.);
     Params::opt_cmaes::set_lbound(-1.);
     Params::opt_cmaes::set_ubound(1.);
 
@@ -79,36 +72,22 @@ void BOLearner::update(const Control::Ptr & ctrl)
 {
     NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
 
-
     int nbr_hidden = nn.m_neurons.size() - (nn.m_num_inputs + nn.m_num_outputs);
 
     PolicyParams::nn_policy::set_hidden_neurons(nbr_hidden);
 
-    _policy = bd::policy::NNPolicy<PolicyParams>();
+    auto func = [&](Eigen::VectorXd x) -> Eigen::VectorXd
+    {
+        std::vector<double> input(x.rows());
+        for(int i = 0; i < input.size(); i++)
+            input[i] = x(i);
+        std::vector<double> output = ctrl->update(input);
+        Eigen::VectorXd y(output.size());
+        for(int i = 0; i < output.size(); i++)
+            y(i) = output[i];
+    };
 
-    Eigen::VectorXd nn_params(nn.m_connections.size());
-    for(int i = 0; i < nn.m_connections.size(); i++)
-        nn_params(i) = nn.m_connections[i].m_weight;
 
-    _policy.set_params(nn_params);
 
-    _boundary = Params::blackdrops::boundary();
-    _random_policies = false;
 
-    std::cout << "LEARN MODEL" << std::endl;
-    learn_model();
-    std::cout << "Optimize Policy" << std::endl;
-    nn_params = _policy_optimizer(
-                std::bind(&BOLearner::_optimize_policy, this, std::placeholders::_1, std::placeholders::_2),
-                nn_params, true);
-    _policy.set_params(nn_params);
-//    std::vector<double> R;
-//    _robot.execute_dummy(_policy,_model,_reward,Params::blackdrops::T(),R);
-
-//    optimize_policy(0); ///@todo find how to set properly this argument
-
-    for(int i = 0; i < nn.m_connections.size(); i++)
-        nn.m_connections[i].m_weight = _policy.params()[i];
-
-    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
 }
