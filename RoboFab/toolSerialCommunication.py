@@ -4,7 +4,7 @@ import socket # for talking directly to gripper over ethernet
 
 from helperFunctions import debugPrint
 
-# Handles all the communication with the gripper (via the serial connection of the UR5 tool).
+## Handles all the communication with the gripper (via the serial connection of the UR5 tool).
 class GripperHandler:
 
     def __init__ ( self, configurationData ):
@@ -33,7 +33,7 @@ class GripperHandler:
         debugPrint("attempting to connect...",messageVerbosity=2)
         self.sock.connect((UR5Address,gripperPort))
 
-    # quick helper function. Returns the input value is it is in the range between MIN_SERVO_VALUE and MAX_SERVO_VALUE, otherwise returns the relevant MIN or MAX value.
+    ## quick helper function. Returns the input value is it is in the range between MIN_SERVO_VALUE and MAX_SERVO_VALUE, otherwise returns the relevant MIN or MAX value.
     def saturate ( self, val ):
         if val > self.MAX_SERVO_VALUE:
             return self.MAX_SERVO_VALUE
@@ -42,17 +42,17 @@ class GripperHandler:
         else:
             return val
 
-    # puts the servo motors into "idle", so they won't make a noise or apply any force
+    ## puts the servo motors into "idle", so they won't make a noise or apply any force
     def disableServos(self):
         self.isEnabled = False
         self.updateSerial()
 
-    # close the socket that connects to the gripper via UR5
+    ## close the socket that connects to the gripper via UR5
     def stop(self):
         self.sock.send(b'stop')
         self.sock.close()
 
-    # Actually send the current values to the gripper.
+    ## Actually send the current values to the gripper.
     def updateSerial ( self ):
         debugPrint("Updating Gripper",messageVerbosity=2)
         if self.isEnabled:
@@ -76,25 +76,8 @@ class GripperHandler:
 
         time.sleep(0.1)
 
-        # data_in = self.sock.recv(4096)
 
-        # data_in = bytearray()
-        # while True:
-        #     c=self.sock.recv(1024)
-        #     print(c)
-        #     print(chr(0xff))
-        #     if c=='\n' or c=='':
-        #         break
-        #     else:
-        #         data_in += c
-        #
-        # debugPrint("reply was : " + str(data_in), messageVerbosity=2)
-        # if str(data_in) == configurationData["gripper"]["SUCCESS_MESSAGE"]:
-        #     debugPrint("that's good", messageVerbosity=2)
-        # else:
-        #     debugPrint("that's bad", messageVerbosity=2)
-
-    # Used to set a value to a gripper. The input newGripperPower: 0.0 = fully open, 1.0 = fully closed
+    ## Used to set a value to a gripper. The input newGripperPower: 0.0 = fully open, 1.0 = fully closed
     def setGripperPosition (self, newGripperPower:float, AorB:str = 'A'):
         if AorB == 'A':
             self.currentPowerGripperA = newGripperPower

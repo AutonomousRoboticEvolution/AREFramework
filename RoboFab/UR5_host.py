@@ -190,9 +190,9 @@ class UR5Robot:
         # time.sleep(0.1)
         self.sendString('nothing')  # to reset waitForArmToBeReady
 
+    ## Set newGripperPower: 0.0 = fully open, 1.0 = fully closed.
+    # This function just passes the values down to the gripper, after ensuring the UR5 is in position using the sendNothingToArm() function
     def setGripperPosition (self, newGripperPower:float, AorB:str = 'A'):
-        # set newGripperPower: 0.0 = fully open, 1.0 = fully closed
-        # this function just passes the values down to the gripper, after ensuring the UR5 is in position using the sendNothingToArm() function
         self.sendNothingToArm()
         self.gripper.setGripperPosition (newGripperPower,AorB)
 
