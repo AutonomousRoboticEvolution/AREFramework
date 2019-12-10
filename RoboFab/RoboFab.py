@@ -23,6 +23,7 @@ DO_MOVE_FROM_PRINTER_TO_ASSEMBLY_FIXTURE = 0 # requires DO_CORE_ORGAN_INSERT
 DO_ORGAN_INSERTIONS = 0
 DO_CABLE_INSERTIONS = 0
 DO_SEND_CONTROLLER_TO_ROBOT = 0
+DO_GO_HOME_AT_FINISH = 0
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -94,19 +95,19 @@ class RoboFab_host:
 
         # currently manually define the fixture rotation desired for each motor organ
         # todo: compute these properly
-        # self.myRobot.organsList[1].requiredAssemblyFixtureRotationRadians = math.radians(30)
-        # self.myRobot.organsList[1].flipGripperOrientation = True
-        # self.myRobot.organsList[1].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(1.5)
-        # self.myRobot.organsList[2].requiredAssemblyFixtureRotationRadians = math.radians(30)
-        # self.myRobot.organsList[2].flipGripperOrientation = True
-        # self.myRobot.organsList[2].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
-        #
-        # self.myRobot.organsList[3].requiredAssemblyFixtureRotationRadians = math.radians(120)
-        # self.myRobot.organsList[3].flipGripperOrientation = False
-        # self.myRobot.organsList[3].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
-        # self.myRobot.organsList[4].requiredAssemblyFixtureRotationRadians = math.radians(-60)
-        # self.myRobot.organsList[4].flipGripperOrientation = False
-        # self.myRobot.organsList[4].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(0)
+        self.myRobot.organsList[1].requiredAssemblyFixtureRotationRadians = math.radians(30)
+        self.myRobot.organsList[1].flipGripperOrientation = True
+        self.myRobot.organsList[1].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(1.5)
+        self.myRobot.organsList[2].requiredAssemblyFixtureRotationRadians = math.radians(30)
+        self.myRobot.organsList[2].flipGripperOrientation = True
+        self.myRobot.organsList[2].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
+
+        self.myRobot.organsList[3].requiredAssemblyFixtureRotationRadians = math.radians(120)
+        self.myRobot.organsList[3].flipGripperOrientation = False
+        self.myRobot.organsList[3].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
+        self.myRobot.organsList[4].requiredAssemblyFixtureRotationRadians = math.radians(-60)
+        self.myRobot.organsList[4].flipGripperOrientation = False
+        self.myRobot.organsList[4].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(0)
 
 
         #information on where the cables need to go - currently manually defined.
@@ -186,7 +187,8 @@ class RoboFab_host:
         else:
             debugPrint( "Cable insertions skipped" )
 
-        self.UR5.moveBetweenStations("home")
+        if DO_GO_HOME_AT_FINISH:
+         self.UR5.moveBetweenStations("home")
 
         if DO_SEND_CONTROLLER_TO_ROBOT:
             debugPrint("Trying to connect")
@@ -210,9 +212,25 @@ class RoboFab_host:
         # self.UR5.moveBetweenStations("printer")
         # self.UR5.setTCP(self.gripperTCP_A)
         # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
+
+        # # Code for simple coiled cable demo:
+        # pickup_point = makeTransform([0.1445,-0.3691,-0.002 , math.radians(180),0,0])
+        # dropoff_point = makeTransform([0.0095,-0.36906,0.00387 , math.radians(180),0,0]) * makeTransform([0,0,0,0,0,math.radians(90)])
         # self.UR5.moveBetweenStations("AF")
         # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( makeTransform([0,0,-0.2]) * self.AF.originNoRotation * makeTransform([0,0,0 , 0, math.pi ,0]) * makeTransform([0,0,0,0,0,math.pi]) )
+        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.1]) )
+        # self.UR5.setGripperPosition(0.35)
+        # self.UR5.moveArm( pickup_point )
+        # self.UR5.setGripperPosition(1.0)
+        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.125]) )
+        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
+        # self.UR5.setMoveSpeed(self.UR5.speedValueSlow)
+        # self.UR5.moveArm( dropoff_point )
+        # self.UR5.setGripperPosition(0.0)
+        # self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
+        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
+        #
+        # self.UR5.moveBetweenStations("AF")
 
         return 0
 
@@ -226,7 +244,7 @@ if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # Make the settings file then extract the settings from it
-    makeConfigurationFile(location="BRL")
+    makeConfigurationFile(location="BRL") # <--- change this depending on if you're in York or BRL
     configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
 
     # startup
