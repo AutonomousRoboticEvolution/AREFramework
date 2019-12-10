@@ -1,0 +1,6 @@
+/Documentation/
+/configuration*.json
+/blueprints/
+
+/.idea/
+/__pycache__/
