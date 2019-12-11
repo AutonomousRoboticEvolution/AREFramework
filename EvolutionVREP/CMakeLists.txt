@@ -23,6 +23,7 @@ else()
 endif()
 
 find_package(MultiNEAT REQUIRED)
+message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 find_package(PolyVox REQUIRED)
 
 FILE(GLOB_RECURSE SOURCES

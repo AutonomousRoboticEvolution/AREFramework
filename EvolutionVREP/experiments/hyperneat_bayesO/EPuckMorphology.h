@@ -12,6 +12,7 @@ public:
     Morphology::Ptr clone() const override
         {return std::make_shared<EPuckMorphology>(*this);}
 
+    void initSubstrate();
     void create() override;
     void createAtPosition(float,float,float) override;
     std::vector<double> update() override;

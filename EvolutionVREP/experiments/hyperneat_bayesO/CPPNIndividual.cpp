@@ -30,24 +30,9 @@ void CPPNIndividual::update(double delta_time)
 
     std::vector<double> inputs = morphology->update();
 
-//    std::cout << "Inputs : ";
-//    for(const double& prox : inputs)
-//        std::cout << prox << " ; ";
-//    std::cout << std::endl;
-
-    previous_state.resize(inputs.size());
-    for(int i = 0; i < inputs.size(); i++)
-        previous_state(i) = inputs[i];
 
     std::vector<double> outputs = control->update(inputs);
-    command.resize(2);
-    command(0) = outputs[0];
-    command(1) = outputs[1];
 
-//    std::cout << "Outputs : ";
-//    for(const double& o : outputs)
-//        std::cout << o << " ; ";
-//    std::cout << std::endl;
 
     std::vector<int> jointHandles =
             std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
@@ -60,18 +45,6 @@ void CPPNIndividual::update(double delta_time)
                               jointHandles[i],static_cast<float>(outputs[i]),properties->clientID);
     }
 //    sim::pauseCommunication(instance_type,0,properties->clientID);
-
-    inputs = morphology->update();
-
-
-    current_state.resize(inputs.size());
-    for(int i = 0; i < inputs.size(); i++)
-        current_state(i) = inputs[i];
-
-    int totalSteps = evalTime/timeStep;
-    int nbrOfSteps = delta_time/timeStep;
-    if(nbrOfSteps%(totalSteps/20) == 0)
-        observations.push_back(get_observation());
 
 }
 
@@ -95,8 +68,17 @@ void CPPNIndividual::createController()
 }
 
 
-void CPPNIndividual::update_learner(const std::vector<s_obs_t> &obs)
+void CPPNIndividual::update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl)
 {
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
+    std::dynamic_pointer_cast<BOLearner>(learner)->set_samples(spl);
     learner->update(control);
 }
+
+void CPPNIndividual::update_learner_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl)
+{
+    std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
+    std::dynamic_pointer_cast<BOLearner>(learner)->set_samples(spl);
+    std::dynamic_pointer_cast<BOLearner>(learner)->update_model();
+}
+

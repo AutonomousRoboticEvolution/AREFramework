@@ -18,7 +18,7 @@ public:
         parameters.reset();
     }
 
-    virtual void update(const Control::Ptr&) = 0;
+    virtual void update(Control::Ptr&) = 0;
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}

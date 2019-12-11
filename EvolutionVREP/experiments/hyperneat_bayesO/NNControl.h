@@ -3,6 +3,7 @@
 
 #include "ARE/Control.h"
 #include <multineat/NeuralNetwork.h>
+#include <Eigen/Core>
 
 namespace are {
 
@@ -19,6 +20,7 @@ public:
 
     std::vector<double> update(const std::vector<double> &sensorValues) override;
 
+    const Eigen::VectorXd &get_weights();
 
     NEAT::NeuralNetwork nn;
 

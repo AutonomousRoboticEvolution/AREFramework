@@ -3,6 +3,7 @@
 
 #include "ARE/Control.h"
 #include <multineat/NeuralNetwork.h>
+#include <eigen3/Eigen/Core>
 
 namespace are {
 

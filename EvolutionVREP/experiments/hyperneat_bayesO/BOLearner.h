@@ -20,13 +20,16 @@ struct Params {
         BO_PARAM(int, stats_enabled, true);
     };
     struct stop_maxiterations {
-        BO_PARAM(int, iterations, 100);
+        BO_PARAM(int, iterations, 10);
     };
     struct stop_mintolerance {
         BO_PARAM(double, tolerance, -0.1);
     };
     struct acqui_ei {
-        BO_PARAM(double, jitter, 0.0);
+        BO_PARAM(double, jitter, 10.0);
+    };
+    struct acqui_gpucb {
+        BO_PARAM(double, delta, 0.1);
     };
     struct init_randomsampling {
         BO_PARAM(int, samples, 10);
@@ -34,6 +37,7 @@ struct Params {
     struct kernel : public lb::defaults::kernel {
         BO_PARAM(double, noise, 1e-10);
     };
+
     struct kernel_squared_exp_ard : public lb::defaults::kernel_squared_exp_ard {
     };
     struct opt_rprop : public lb::defaults::opt_rprop {
@@ -58,31 +62,30 @@ struct Params {
     };
 };
 
+//template <typename Params>
+//struct DistanceToTarget {
+//    using result_type = double;
+//    DistanceToTarget(const Eigen::Vector2d& target) : _target(target) {}
 
+//    double operator()(const Eigen::VectorXd& x) const
+//    {
+//        return -(x - _target).norm();
+//    }
 
-
-struct PolicyParams {
-    struct nn_policy {
-        BO_PARAM(size_t, input_size, 8);
-        BO_PARAM(size_t, output_size, 2);
-        BO_PARAM_ARRAY(double, max_u, 1., 1.); // @max_action - here you should fill the absolute max value for each action dimension
-        BO_DYN_PARAM(int, hidden_neurons);
-        BO_PARAM_ARRAY(double, limits, 1., 1., 1., 1., 1., 1.,1.,1.); // @normalization_factor - here you should fill the normalization factors for the inputs of the policy (absolute values)
-        BO_PARAM(double, af, 1.0);
-    };
-};
-
+//protected:
+//    Eigen::Vector2d _target;
+//};
 
 
 using kernel_t = lb::kernel::SquaredExpARD<Params>;
-using mean_t = lb::mean::Constant<Params>;
+using mean_t = lb::mean::Data<Params>;
 using gp_opt_t = lb::model::gp::KernelLFOpt<Params>;
 
-using gp_t = lb::model::MultiGP<Params, lb::model::GP, kernel_t, mean_t, gp_opt_t>;
+using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::EI<Params, gp_t>;
+using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
@@ -101,18 +104,24 @@ class BOLearner :
 {
 public:
 
+    typedef std::shared_ptr<BOLearner> Ptr;
+    typedef std::shared_ptr<const BOLearner> ConstPtr;
 
     BOLearner();
-    BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &target_position);
-    void update(const Control::Ptr &ctrl);
+    void update(Control::Ptr &ctrl);
+    void init_model(int input_size);
+    void update_model();
+
 
     //GETTERS & SETTERS
     model_t get_model(){return _model;}
     void set_observation(std::vector<Eigen::VectorXd> &obs){_observations = obs;}
     void set_samples(std::vector<Eigen::VectorXd> &s){_samples = s;}
+    const model_t& model() const {return _model;}
 
 private:
     model_t _model;
+    Eigen::VectorXd _initial_pos;
 };
 }//are
 #endif //BOLEARNER_H
