@@ -14,6 +14,10 @@ struct CPPN : public Phenotype
 class CPPNGenome : public Genome
 {
 public:
+
+    typedef std::shared_ptr<CPPNGenome> Ptr;
+    typedef std::shared_ptr<const CPPNGenome> ConstPtr;
+
     CPPNGenome() : Genome(){}
     CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){}

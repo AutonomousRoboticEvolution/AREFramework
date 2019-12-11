@@ -1,10 +1,10 @@
-#expPluginName,string,/usr/local/lib/libhyperneat_learner.so
+#expPluginName,string,/usr/local/lib/libhyperneat_bayesO.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/scenes/defaultER.ttt
 #epuckPath,string,/home/le_goff/epuck_changedsensor3.ttm
-#populationSize,int,40
-#maxEvalTime,float,10
+#populationSize,int,100
+#maxEvalTime,float,30
 #numberOfGeneration,int,400
 #repository,string,/home/le_goff/are-logs
 #verbose,bool,1
@@ -12,3 +12,9 @@
 #killWhenNotConnected,bool,1
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
+#fitnessFile,string,fitnesses.csv
+#reinitLearner,bool,1
+#numberBOIteration,int,20
+#globalBOData,bool,1
+#BODataRatio,float,0.10
+#seed,int,-1

@@ -53,7 +53,7 @@ void EA_HyperNEAT::init()
 
 void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 {
-    NEAT::Genome neat_genome(0, 4, 5, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
+    NEAT::Genome neat_genome(0, 5, 5, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 0);
     neat_population = std::make_unique<NEAT::Population>(neat_genome, params, true, 1.0, randomNum->getSeed());
 
 
@@ -63,9 +63,21 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
         EmptyGenome::Ptr no_gen(new EmptyGenome);
         BOLearner::Ptr learner(new BOLearner);
 
+        learner->set_parameters(parameters);
+
+        EPuckMorphology morph(parameters);
+        morph.initSubstrate();
+        NEAT::NeuralNetwork nn;
+        NEAT::Substrate subs =  morph.get_substrate();
+        NEAT::Genome gen = ctrlgenome->get_neat_genome();
+        gen.BuildHyperNEATPhenotype(nn,subs);
+        learner->init_model(nn.m_connections.size());
+
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome,learner));
         ind->set_individual_id(i);
         ind->set_parameters(parameters);
+
+
 //        ind->init();
         population.push_back(ind);
 
@@ -79,19 +91,60 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 
 bool EA_HyperNEAT::update()
 {
-    Individual::Ptr ind = population[currentIndIndex];
-    for(auto & obs : std::dynamic_pointer_cast<CPPNIndividual>(ind)->get_observations())
-        observations.push_back(obs);
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
+    bool globalBOData = settings::getParameter<settings::Boolean>(parameters,"#globalBOData").value;
+    float BODataRatio = settings::getParameter<settings::Float>(parameters,"#BODataRatio").value;
 
-    if(currentFitnesses.size() == 2)
+    if(generation > 0 && currentFitnesses.size() == 1){
+        partialObs.clear();
+        partialSpl.clear();
+        for(int i = 0; i < observations.size(); i++)
+        {
+            if(randomNum->randFloat(0,1) < BODataRatio){
+                partialObs.push_back(observations[i]);
+                partialSpl.push_back(samples[i]);
+            }
+        }
+    }
+
+    Individual::Ptr ind = population[currentIndIndex];
+
+    //add last fitness and NN weights in the database for the Bayesian optimizer
+    Eigen::VectorXd o(1);
+    o(0) = ind->getFitness();
+    observations.push_back(o);
+    partialObs.push_back(o);
+
+    auto connections = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_connections;
+    Eigen::VectorXd s(connections.size());
+    int i = 0;
+    for(const auto &conn : connections){
+        s(i) = conn.m_weight;
+        i++;
+    }
+    samples.push_back(s);
+    partialSpl.push_back(s);
+
+    if(verbose)
+        std::cout << "Size of dataset for BO : " <<  partialObs.size() << std::endl;
+
+    if(currentFitnesses.size() == nbr_bo_iter || generation == 0)
     {
-        population[currentIndIndex]->setFitness(computeFitness());
+        ind->setFitness(computeFitness());
         currentFitnesses.clear();
         ind.reset();
+        if(!globalBOData){
+            observations.clear();
+            samples.clear();
+        }
         return true;
     }
 
-    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(observations);
+
+    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(partialObs, partialSpl);
+    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner_model(partialObs, partialSpl);
+
 
 
     ind.reset();
@@ -103,9 +156,26 @@ void EA_HyperNEAT::setFitness(size_t indIndex, float fitness){
     currentFitnesses.push_back(fitness);
 }
 
+///@todo add novelty
+float EA_HyperNEAT::computeFitness(){
+    float fit;
+    fit = currentFitnesses.back() + (currentFitnesses.back() - currentFitnesses.front());
+    return fit;
+}
+
+///@todo change how the learner it passed through the generations. Have to modify MultiNeat Epoch
 void EA_HyperNEAT::epoch(){
-    for(int i = 0; i < population.size(); i++)
+    bool reinit_learner = settings::getParameter<settings::Boolean>(parameters,"#reinitLearner").value;
+
+    std::vector<BOLearner::Ptr> learners;
+    for(int i = 0; i < population.size(); i++){
         neat_population->AccessGenomeByIndex(i).SetFitness(population[i]->getFitness());
+        if(!reinit_learner){
+            BOLearner::Ptr l = std::dynamic_pointer_cast<BOLearner>(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getLearner());
+            learners.push_back(l);
+            l.reset();
+        }
+    }
     neat_population->Epoch();
     population.clear();
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
@@ -113,15 +183,21 @@ void EA_HyperNEAT::epoch(){
     {
         CPPNGenome::Ptr ctrlgenome(new CPPNGenome(neat_population->AccessGenomeByIndex(i)));
         EmptyGenome::Ptr no_gen(new EmptyGenome);
-        BOLearner::Ptr learner(new BOLearner);
+        BOLearner::Ptr learner;
+        if(reinit_learner){
+            learner.reset(new BOLearner);
+            learner->set_parameters(parameters);
+        }
+        else learner = learners[i];
 
         CPPNIndividual::Ptr ind(new CPPNIndividual(no_gen,ctrlgenome,learner));
         ind->set_parameters(parameters);
-        population.push_back(ind);
 
+        population.push_back(ind);
 
         ctrlgenome.reset();
         no_gen.reset();
-        learner.reset();
     }
 }
+
+

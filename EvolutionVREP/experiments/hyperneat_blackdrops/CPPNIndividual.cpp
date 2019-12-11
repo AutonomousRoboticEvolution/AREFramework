@@ -95,8 +95,9 @@ void CPPNIndividual::createController()
 }
 
 
-void CPPNIndividual::update_learner(const std::vector<are::CPPNIndividual::s_obs_t> &obs)
+void CPPNIndividual::update_learner(const std::vector<s_obs_t> &obs)
 {
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
     learner->update(control);
 }
+

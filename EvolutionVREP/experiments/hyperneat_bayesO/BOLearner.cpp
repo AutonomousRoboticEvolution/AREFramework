@@ -2,7 +2,6 @@
 
 using namespace are;
 namespace lb = limbo;
-BO_DECLARE_DYN_PARAM(int, PolicyParams::nn_policy, hidden_neurons);
 
 BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, max_fun_evals);
 BO_DECLARE_DYN_PARAM(double, Params::opt_cmaes, fun_tolerance);
@@ -16,8 +15,7 @@ BO_DECLARE_DYN_PARAM(bool, Params::opt_cmaes, handle_uncertainty);
 
 
 
-BOLearner::BOLearner() :
-    bd::BlackDROPS<Params, MGP_t, ARESystem, bd::policy::NNPolicy<PolicyParams>, policy_opt_t, RewardFunction>()
+BOLearner::BOLearner()
 {
     Params::opt_cmaes::set_lbound(-1.);
     Params::opt_cmaes::set_ubound(1.);
@@ -28,26 +26,14 @@ BOLearner::BOLearner() :
     Params::opt_cmaes::set_elitism(1);
     Params::opt_cmaes::set_lambda(-1);
     Params::opt_cmaes::set_handle_uncertainty(true);
-
+    _current_iteration = 0;
 }
 
-
-BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &target_pos) :
-    bd::BlackDROPS<Params, MGP_t, ARESystem, bd::policy::NNPolicy<PolicyParams>, policy_opt_t, RewardFunction>()
+void BOLearner::init_model(int input_size)
 {
-    Params::opt_cmaes::set_lbound(-1.);
-    Params::opt_cmaes::set_ubound(1.);
-
-    int max_opt_eval = settings::getParameter<settings::Integer>(parameters,"#maxOptEval").value;
-    Params::opt_cmaes::set_max_fun_evals(5);
-    Params::opt_cmaes::set_fun_tolerance(5);
-    Params::opt_cmaes::set_restarts(1);
-    Params::opt_cmaes::set_elitism(0);
-    Params::opt_cmaes::set_lambda(-1);
-    Params::blackdrops::set_verbose(true);
-    Params::blackdrops::set_stochastic(true);
-
+    _model = model_t(input_size,1);
 }
+
 
 //void BOLearner::optimize()
 //{
@@ -68,26 +54,53 @@ BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &tar
 //    return cmasols.get_best_seen_candidate().get_x_dvec();
 //}
 
-void BOLearner::update(const Control::Ptr & ctrl)
+void BOLearner::update(Control::Ptr & ctrl)
 {
-    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    using acqui_optimizer_t =
+    typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
 
-    int nbr_hidden = nn.m_neurons.size() - (nn.m_num_inputs + nn.m_num_outputs);
+    int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    Eigen::VectorXd starting_point = _samples.back();
 
-    PolicyParams::nn_policy::set_hidden_neurons(nbr_hidden);
+//    lb::FirstElem aggr;
 
-    auto func = [&](Eigen::VectorXd x) -> Eigen::VectorXd
+    const auto aggr = [=](const Eigen::VectorXd& x) -> double
     {
-        std::vector<double> input(x.rows());
-        for(int i = 0; i < input.size(); i++)
-            input[i] = x(i);
-        std::vector<double> output = ctrl->update(input);
-        Eigen::VectorXd y(output.size());
-        for(int i = 0; i < output.size(); i++)
-            y(i) = output[i];
+        double avg = 0;
+        for(const auto &o : _observations)
+            avg += o(0);
+        return avg/static_cast<double>(_observations.size());
     };
 
+    _model.compute(_samples,_observations);
+
+    acqui_optimizer_t acqui_optimizer;
+
+    acquisition_function_t acqui(_model, _current_iteration);
+
+    auto acqui_optimization =
+            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, aggr, g); };
+
+    Eigen::VectorXd new_sample = acqui_optimizer(acqui_optimization, starting_point, false);
 
 
+    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    for(int i = 0; i < nbr_weights; i++)
+        nn.m_connections[i].m_weight = new_sample(i);
 
+    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
+
+    if(verbose)
+        std::cout << "Delta between previous and current weights : " << (starting_point - new_sample).norm() << std::endl;
+
+    _current_iteration++;
+    //        _update_stats(*this, aggr);
+
+}
+
+void BOLearner::update_model()
+{
+    _model.add_sample(_samples.back(), _observations.back());
+    _model.optimize_hyperparams();
 }

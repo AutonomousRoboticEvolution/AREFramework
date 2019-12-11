@@ -20,7 +20,7 @@ public:
     bool update() override;
     void epoch() override;
 
-    float computeFitness(){}
+    float computeFitness();
 
     void setFitness(size_t indIndex, float fitness);
 
@@ -28,7 +28,10 @@ private:
     std::unique_ptr<NEAT::Population> neat_population;
     std::vector<float> currentFitnesses;
     size_t currentIndIndex;
-    obs_t observations;
+    std::vector<Eigen::VectorXd> observations;
+    std::vector<Eigen::VectorXd> samples;
+    std::vector<Eigen::VectorXd> partialObs;
+    std::vector<Eigen::VectorXd> partialSpl;
 };
 
 }

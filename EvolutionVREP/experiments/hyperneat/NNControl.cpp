@@ -9,3 +9,4 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
     nn.Activate();
     return nn.Output();
 }
+

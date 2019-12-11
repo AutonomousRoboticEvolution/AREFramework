@@ -66,7 +66,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
 
 
-
+    srand(time(NULL));
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
@@ -127,6 +127,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
                 are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
+    int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
 
     if(verbose){
         if(instance_type == are_sett::INSTANCE_REGULAR)
@@ -148,7 +149,10 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::Property::Ptr properties(new are_sett::Property);
     ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-    ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
+    if(seed < 0)
+        seed = rand();
+
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(seed)); //todo change
     ERVREP->initialize();
     simulationState = FREE;
     properties.reset();

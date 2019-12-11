@@ -75,7 +75,7 @@ BOLearner::BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &tar
 //    return cmasols.get_best_seen_candidate().get_x_dvec();
 //}
 
-void BOLearner::update(const Control::Ptr & ctrl)
+void BOLearner::update(Control::Ptr & ctrl)
 {
     NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
 

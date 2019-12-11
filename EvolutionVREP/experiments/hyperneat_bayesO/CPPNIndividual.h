@@ -12,8 +12,6 @@ namespace are {
 class CPPNIndividual : public Individual
 {
 public :
-    using s_obs_t = std::tuple<Eigen::VectorXd,Eigen::VectorXd,Eigen::VectorXd>; //single observation
-
     CPPNIndividual() : Individual(){}
     CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
     CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen, const BOLearner::Ptr& l);
@@ -24,25 +22,16 @@ public :
 
 
 
-    void update_learner(const std::vector<s_obs_t> &obs);
+    void update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
+    void update_learner_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
+    const Learner::Ptr &getLearner(){return learner;}
 
-    std::vector<s_obs_t> get_observations(){return observations;}
+
+
 
 protected:
     void createController() override;
     void createMorphology() override;
-
-private:
-    s_obs_t get_observation()
-    {
-        return std::make_tuple(previous_state,command,current_state);
-    }
-
-    Eigen::VectorXd previous_state;
-    Eigen::VectorXd command;
-    Eigen::VectorXd current_state;
-    std::vector<s_obs_t> observations;
-
 };
 
 }//are

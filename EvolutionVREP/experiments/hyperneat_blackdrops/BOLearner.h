@@ -133,7 +133,7 @@ class BOLearner :
 public:
     BOLearner();
     BOLearner(const Eigen::VectorXd &init_pos, const Eigen::VectorXd &target_position);
-    void update(const Control::Ptr &ctrl);
+    void update(Control::Ptr &ctrl);
 
     //GETTERS & SETTERS
     MGP_t get_model(){return _model;}
