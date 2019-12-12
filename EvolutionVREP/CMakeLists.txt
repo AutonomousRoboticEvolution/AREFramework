@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
+add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT VREP_FOLDER)

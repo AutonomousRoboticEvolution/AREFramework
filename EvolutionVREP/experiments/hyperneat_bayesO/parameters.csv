@@ -12,7 +12,7 @@
 #killWhenNotConnected,bool,1
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
-#fitnessFile,string,fitnesses.csv
+#fitnessFile,string,fitnesses_hnmfbo.csv
 #reinitLearner,bool,1
 #numberBOIteration,int,20
 #globalBOData,bool,1
