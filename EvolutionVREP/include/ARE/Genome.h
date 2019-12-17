@@ -8,6 +8,9 @@
 #include "misc/RandNum.h"
 #include "ARE/Phenotype.h"
 
+#include <boost/serialization/map.hpp>
+#include <boost/serialization/shared_ptr.hpp>
+
 namespace are {
 class Genome
 {
@@ -21,12 +24,9 @@ public:
     Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param);
     Genome(const Genome& gen) :
         parameters(gen.parameters),
+        properties(gen.properties),
         randomNum(gen.randomNum),
-        initialized(gen.initialized),
-        fitness(gen.fitness),
-        genomeFitness(gen.genomeFitness),
-        isEvaluated(gen.isEvaluated),
-        individualNumber(gen.individualNumber)
+        initialized(gen.initialized)
     {}
     virtual ~Genome();
 
@@ -36,38 +36,21 @@ public:
     /// Initialize the morph and its control
     virtual void init() = 0;
 
-
     virtual Phenotype::Ptr develop() = 0;
 
     virtual void mutate() = 0;
 
-//    virtual void savePhenotype(int indNum, int sceneNum);
-//    /// loads genome from .csv
-//    virtual bool loadGenome(int indNum, int sceneNum);
-//    /// loads genome from signal : TODO BUG????
-//    virtual bool loadGenome(std::istream &input, int indNum) ;
-//    virtual void saveGenome(int indNum){};
-
-
-
-//    /// Returns a genome string from existing genome
-//    virtual const std::string generateGenome() const{}
-
-//    /// prints out a few genome debugging statements
-//    virtual void checkGenome(); // for debugging
-//    void clearGenome();
-
-
-
     //Getters & Setters
-    float get_fitness(){return fitness;}
-    void set_fitness(float f){fitness = f;}
-    int get_individualNumber(){return individualNumber;}
-    void set_individualNumber(int in){individualNumber =in;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & initialized;
+    }
 
 protected:
     /// simulation setting shared by genome and EA
@@ -77,15 +60,6 @@ protected:
     misc::RandNum::Ptr randomNum;
 
     bool initialized = false;
-
-    /// fitness value; make vector for multi-objective
-    float fitness;
-    float genomeFitness;
-    /// mark the end of evaluation for a generation
-    bool isEvaluated = false;
-
-    /// mark the ID of individual
-    int individualNumber;
 };
 
 /**
@@ -98,6 +72,14 @@ public:
     void init(){}
     Phenotype::Ptr develop(){return nullptr;}
     void mutate(){}
+
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & boost::serialization::base_object<Genome>(*this);
+    }
+
+
 };
 
 

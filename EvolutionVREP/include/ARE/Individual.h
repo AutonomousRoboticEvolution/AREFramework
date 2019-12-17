@@ -5,6 +5,9 @@
 #include <ARE/Control.h>
 #include <ARE/Morphology.h>
 
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/map.hpp>
+
 namespace are {
 
 class Individual
@@ -28,9 +31,9 @@ public:
 
     virtual Individual::Ptr clone() = 0;
 
-    virtual void init()
+    virtual void init(bool loadRobot = false)
     {
-        createMorphology();
+        createMorphology(loadRobot);
         createController();
     }
 
@@ -60,6 +63,20 @@ public:
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
+    virtual std::string to_string();
+    virtual void from_string(const std::string &str);
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & fitness;
+        arch & ctrlGenome;
+        arch & morphGenome;
+        arch & isEval;
+        arch & individual_id;
+        arch & client_id;
+    }
+
 protected:
     std::vector<double> outputs;
     double fitness;
@@ -79,8 +96,10 @@ protected:
 //    std::function<Genome::Factory> createGenome;
 
     virtual void createController() = 0;
-    virtual void createMorphology() = 0;
+    virtual void createMorphology(bool loadRobot) = 0;
 };
+
+
 
 }
 
