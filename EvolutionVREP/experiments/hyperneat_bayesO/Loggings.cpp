@@ -2,7 +2,7 @@
 
 using namespace are;
 
-void FitnessLog::saveLog(const EA::Ptr &ea)
+void FitnessLog::saveLog(are::EA::Ptr &ea)
 {
     std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
     int generation = ea->get_generation();
