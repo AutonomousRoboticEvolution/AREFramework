@@ -14,7 +14,6 @@ add_library(hyperneat_bayesO SHARED
 target_include_directories(hyperneat_bayesO PUBLIC
     "${VREP_FOLDER}/programming/include"
     "${LIMBO_FOLDER}/src/"
-    "${LIMBO_FOLDER}/exp/blackdrops/include"
     "/usr/include/eigen3"
     )
 target_link_libraries(hyperneat_bayesO ER_library cmaes rt)

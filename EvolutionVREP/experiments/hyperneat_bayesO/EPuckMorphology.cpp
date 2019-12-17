@@ -136,17 +136,15 @@ std::vector<double> EPuckMorphology::update(){
     float pos[4], norm[3];
     int obj_h;
     int det;
-    sim::pauseCommunication(instance_type,1,properties->clientID);
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
 //        simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
         det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,properties->clientID);
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        else if(det == 0) sensorValues.push_back(-1);
+        else if(det == 0) sensorValues.push_back(0);
         else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
     }
-    sim::pauseCommunication(instance_type,0,properties->clientID);
 
 //    float *auxVal = nullptr;
 //    int *auxCount = nullptr;

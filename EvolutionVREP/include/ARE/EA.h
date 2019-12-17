@@ -58,8 +58,8 @@ public:
     virtual void init() = 0;    // initializes EA
 
 
-    Individual::Ptr getIndividual(size_t index);
-    size_t getPopSize(){return population.size();}
+    Individual::Ptr getIndividual(size_t index) const;
+    size_t getPopSize() const {return population.size();}
 
 
     /// Load an individual
@@ -78,12 +78,12 @@ public:
 
 
     //GETTERS & SETTERS
-    const std::vector<Individual::Ptr> &get_population(){return population;}
-    const settings::ParametersMapPtr &get_parameters(){return parameters;}
-    const misc::RandNum::Ptr get_randomNum(){return randomNum;}
+    const std::vector<Individual::Ptr> &get_population() const {return population;}
+    const settings::ParametersMapPtr &get_parameters() const {return parameters;}
+    const misc::RandNum::Ptr get_randomNum() const {return randomNum;}
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     void set_generation(int gen){generation = gen;}
-    int get_generation(){return generation;}
+    int get_generation() const {return generation;}
     void incr_generation(){generation++;}
 
 protected:
@@ -93,7 +93,7 @@ protected:
     virtual void replacement(){}		// replacement operator
     virtual void mutation(){}		// mutation operator
     virtual void crossover(){}
-    virtual void end(){};				// last call to the EA, when simulation stops
+    virtual void end(){}				// last call to the EA, when simulation stops
 
 
     std::vector<Individual::Ptr> population;

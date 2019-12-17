@@ -42,6 +42,8 @@ public:
         ctrlGenome->mutate();
     }
 
+    void initRandNum(int seed = 0){randNum.reset(new misc::RandNum(seed));}
+
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
     const Morphology::Ptr &get_morphology(){return morphology;}
@@ -58,6 +60,8 @@ public:
     void set_isEvaluated(bool b){isEval = b;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+    const Learner::Ptr & get_learner(){return learner;}
+
 
 protected:
     std::vector<double> outputs;
@@ -70,6 +74,8 @@ protected:
 
     settings::ParametersMapPtr parameters;
     settings::Property::Ptr properties;
+
+    misc::RandNum::Ptr randNum;
 
     bool isEval;
 

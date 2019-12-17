@@ -143,6 +143,7 @@ void ER::endOfSimulation()
         ea->setFitness(currentIndIndex,fitness);
         if(ea->update())
             currentIndIndex++;
+        saveLogs(false);
     }
     if(currentIndIndex >= ea->get_population().size())
     {
@@ -156,10 +157,13 @@ void ER::endOfSimulation()
     }
 }
 
-void ER::saveLogs()
+void ER::saveLogs(bool endOfGen)
 {
-    for(const auto &log : logs)
-        log->saveLog(ea);
+    for(const auto &log : logs){
+        if(log->isEndOfGen() == endOfGen){
+            log->saveLog(ea);
+        }
+    }
 }
 
 

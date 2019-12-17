@@ -9,7 +9,7 @@ namespace are{
 class FitnessLog : public Logging
 {
 public:
-    void saveLog(const EA::Ptr & ea);
+    void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };
 }//are

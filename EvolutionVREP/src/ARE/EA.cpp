@@ -36,7 +36,7 @@ void EA::epoch(){
 }
 
 
-Individual::Ptr EA::getIndividual(size_t index)
+Individual::Ptr EA::getIndividual(size_t index) const
 {
     return population[index];
 }
