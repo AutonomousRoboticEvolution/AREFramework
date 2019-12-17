@@ -15,7 +15,6 @@ Individual::Ptr CPPNIndividual::clone()
 
 void CPPNIndividual::update(double delta_time)
 {
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::vector<double> inputs = morphology->update();
 
 //    std::cout << "Inputs : ";
@@ -35,19 +34,29 @@ void CPPNIndividual::update(double delta_time)
 
     assert(jointHandles.size() == outputs.size());
 
-    sim::pauseCommunication(instance_type,1,client_id);
     for (size_t i = 0; i < outputs.size(); i++){
-        sim::setJointVelocity(instance_type,
-                              jointHandles[i],static_cast<float>(outputs[i]),client_id);
+        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
     }
-    sim::pauseCommunication(instance_type,0,client_id);
 }
 
-void CPPNIndividual::createMorphology()
+void CPPNIndividual::createMorphology(bool loadRobot)
 {
+    int instance_type = settings::INSTANCE_REGULAR;//getParameter<settings::Integer>(parameters,"#instanceType").value;
     morphology.reset(new EPuckMorphology(parameters));
     morphology->set_client_id(client_id);
-    morphology->createAtPosition(0,0,0);
+
+    if(instance_type == settings::INSTANCE_SERVER){
+        if(loadRobot){
+            std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+        }else{
+//            while(simGetObjectHandle("ePuck_respondableBody") < 0) //wait for the robot model to be loaded in v-rep
+//                std::cout << "wait for robor model" << std::endl;
+            morphology->createAtPosition(0,0,0);
+        }
+    }else{
+        std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+        morphology->createAtPosition(0,0,0);
+    }
 }
 
 void CPPNIndividual::createController()
@@ -62,4 +71,23 @@ void CPPNIndividual::createController()
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
 }
 
+std::string CPPNIndividual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<CPPNIndividual>();
+    oarch.register_type<CPPNGenome>();
+    oarch.register_type<EmptyGenome>();
+    oarch << *this;
+    return sstream.str();
+}
 
+void CPPNIndividual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<CPPNIndividual>();
+    iarch.register_type<CPPNGenome>();
+    iarch.register_type<EmptyGenome>();
+    iarch >> *this;
+}
