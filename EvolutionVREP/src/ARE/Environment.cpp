@@ -3,9 +3,8 @@
 using namespace are;
 
 void Environment::sceneLoader(int clientID) {
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
-    if(sim::loadScene(instance_type,scene_path.c_str(),clientID) < 0)
+    if(simLoadScene(scene_path.c_str()) < 0)
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
 }
 
@@ -22,13 +21,9 @@ void Environment::init(int clID) {
 	initialPos[0] = 0.0;
 	initialPos[1] = 0.0;
 	initialPos[2] = 0.1;
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 	// Sets time step
-    sim::setFloatingParameter(instance_type,
-                              sim_floatparam_simulation_time_step,
-                              time_step,
-                              clientID);
+    simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
 }
 
 void Environment::print() {

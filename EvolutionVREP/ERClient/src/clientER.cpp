@@ -10,6 +10,7 @@ int ER::init(int nbrOfInst, int port){
             // new_slave->setState(SlaveConnection::State::FREE);
             new_slave->getIntegerSignalStreaming("simulationState");
             serverInstances.push_back(std::move(new_slave));
+
         } else {
             std::cerr << "Could not connect to V-REP on port " << new_slave->port() << std::endl;
             if (settings::getParameter<settings::Boolean>(parameters,"#killWhenNotConnected").value) {
@@ -27,11 +28,11 @@ void ER::initialize(){
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
 
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,exp_plugin_name,"environmentFactory"))
-        exit(1);
+//    if(!load_fct_exp_plugin<Environment::Factory>
+//            (environmentFactory,exp_plugin_name,"environmentFactory"))
+//        exit(1);
 
-    environment = environmentFactory(parameters);
+//    environment = environmentFactory(parameters);
 
     if(!load_fct_exp_plugin<EA::Factory>
             (EAFactory,exp_plugin_name,"EAFactory"))
@@ -80,6 +81,40 @@ void ER::startOfSimulation(){
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);
+//    currentInd->init(true);
+}
+
+void ER::endOfSimulation(){
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
+    if(verbose)
+        std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+
+
+    if(currentIndIndex < ea->get_population().size())
+    {
+        float fitness = currentInd->getFitness();
+        if(verbose)
+            std::cout << "fitness = " << fitness << std::endl;
+        ea->setFitness(currentIndIndex,fitness);
+        currentIndIndex++;
+    }
+    if(currentIndIndex >= ea->get_population().size())
+    {
+        saveLogs();
+        ea->epoch();
+        if(verbose)
+            std::cout << "generation " << generation << " finished" << std::endl;
+        ea->incr_generation();
+        currentIndIndex = 0;
+
+    }
+    if(generation >= nbrOfGen){
+        std::cout << "---------------------" << std::endl;
+        std::cout << "Evolution is Finished" << std::endl;
+        std::cout << "---------------------" << std::endl;
+        exit(0);
+    }
 }
 
 void ER::updateSimulation()
@@ -98,23 +133,23 @@ void ER::updateSimulation()
         else if(state == READY)
         {
             ///@todo start in slave to handle errors
-            environment->init(slave->get_clientID());
+//            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
             startOfSimulation();
             currentInd->set_client_id(slave->get_clientID());
-            currentInd->init();
-            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
+            slave->setStringSignal("currentInd",currentInd->to_string());
             slave->setIntegerSignal("clientState",READY);
         }
         else if(state == BUSY)
         {
             float simTime = slave->getFloatSignal("simulationTime");
-            currentInd->update(simTime);
-            environment->updateEnv(simTime,currentInd->get_morphology());
             slave->setIntegerSignal("clientState",BUSY);
 
         }
         else if(state == FINISH)
         {
+            std::string message;
+            slave->getStringSignal("currentInd",message);
+            currentInd->from_string(message);
             endOfSimulation();
             slave->setIntegerSignal("clientState",IDLE);
         }

@@ -4,6 +4,11 @@
 #include "ARE/ER.h"
 #include "ERClient/SlaveConnection.h"
 
+#include <boost/archive/text_oarchive.hpp>
+
+
+#include <boost/interprocess/managed_shared_memory.hpp>
+
 extern "C" {
 #include "v_repConst.h"
 #include "remoteApi/extApiPlatform.h"
@@ -28,6 +33,7 @@ public:
     int init(int nbrOfInst,int port = 19997);
     void initialize();
     void startOfSimulation();
+    void endOfSimulation();
     void updateSimulation();
     bool execute();
 

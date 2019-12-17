@@ -16,6 +16,10 @@ public:
     void createAtPosition(float,float,float) override;
     std::vector<double> update() override;
 
+    void loadModel();
+    void initSubstrate();
+
+
     void setPosition(float,float,float);
     std::vector<int> get_jointHandles(){return jointHandles;}
 

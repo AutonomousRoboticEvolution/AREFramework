@@ -6,12 +6,19 @@ using namespace are;
 
 void EPuckMorphology::create()
 {
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    mainHandle = simGetObjectHandle("ePuck_respondableBody");
+    getObjectHandles();
+    initSubstrate();
+    std::cout << "Epuck Created" << std::endl;
+}
+
+void EPuckMorphology::loadModel(){
+    std::cout << "load model" << std::endl;
+    int instance_type = settings::INSTANCE_REGULAR;//getParameter<settings::Integer>(parameters,"#instanceType").value;
+
 
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#epuckPath").value;
     int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
-
-//    epuckHandle = simGetObjectHandle("ePuck");
     if(epuckHandle == -1)
     {
         std::cerr << "unable to load epuck model" << std::endl;
@@ -22,9 +29,9 @@ void EPuckMorphology::create()
     }
 
     mainHandle = epuckHandle;
+}
 
-    getObjectHandles();
-
+void EPuckMorphology::initSubstrate(){
     substrate.m_input_coords = {//Proximity center
                                 {1,M_PI},{1,5.*M_PI/6.},
                                 {1,2.*M_PI/3.},{1,M_PI/3.},
@@ -45,8 +52,6 @@ void EPuckMorphology::create()
 
     substrate.m_allow_hidden_hidden_links = true;
     substrate.m_query_weights_only = true;
-
-    std::cout << "Epuck Created" << std::endl;
 }
 
 void EPuckMorphology::createAtPosition(float x, float y, float z)
@@ -63,14 +68,14 @@ void EPuckMorphology::setPosition(float x, float y, float z)
     epuckPos[2] = z;
 
     sim::setObjectPosition(
-                settings::getParameter<settings::Integer>(parameters,"#instanceType").value,
+                settings::INSTANCE_REGULAR,
                 mainHandle, -1, epuckPos,client_id);
 }
 
 void EPuckMorphology::getObjectHandles()
 {
 
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    int instance_type = settings::INSTANCE_REGULAR; //getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(instance_type == settings::INSTANCE_REGULAR)
@@ -121,7 +126,7 @@ void EPuckMorphology::getObjectHandles()
 
 std::vector<double> EPuckMorphology::update(){
 
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    int instance_type = settings::INSTANCE_REGULAR;//settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     std::vector<double> sensorValues;
 
@@ -132,7 +137,7 @@ std::vector<double> EPuckMorphology::update(){
     float pos[4], norm[3];
     int obj_h;
     int det;
-    sim::pauseCommunication(instance_type,1,client_id);
+//    sim::pauseCommunication(instance_type,1,client_id);
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
 //        simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
@@ -142,7 +147,7 @@ std::vector<double> EPuckMorphology::update(){
         else if(det == 0) sensorValues.push_back(-1);
         else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
     }
-    sim::pauseCommunication(instance_type,0,client_id);
+//    sim::pauseCommunication(instance_type,0,client_id);
 
 //    float *auxVal = nullptr;
 //    int *auxCount = nullptr;

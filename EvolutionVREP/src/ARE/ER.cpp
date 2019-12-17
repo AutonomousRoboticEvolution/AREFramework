@@ -25,42 +25,43 @@
 #include "ARE/ER.h"
 
 using namespace are;
+namespace interproc = boost::interprocess;
+
 
 /// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
 /// settings file. A random number class will also be created and all other files refer to this class
 void ER::initialize()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
 
+    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-    if(instance_type == settings::INSTANCE_REGULAR){
-        std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-        if(!load_fct_exp_plugin<Environment::Factory>
-                (environmentFactory,exp_plugin_name,"environmentFactory"))
-            exit(1);
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,exp_plugin_name,"environmentFactory"))
+        exit(1);
 
-        environment = environmentFactory(parameters);
-        environment->init();
+    environment = environmentFactory(parameters);
+    environment->init();
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,exp_plugin_name,"loggingFactory"))
+        exit(1);
 
-        if(!load_fct_exp_plugin<EA::Factory>
-                (EAFactory,exp_plugin_name,"EAFactory"))
-            exit(1);
+    loggingFactory(logs,parameters);
 
-        ea = EAFactory(randNum, parameters);
-        ea->init();
 
-        if(!load_fct_exp_plugin<Logging::Factory>
-                (loggingFactory,exp_plugin_name,"loggingFactory"))
-            exit(1);
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,exp_plugin_name,"EAFactory"))
+        exit(1);
+    ea = EAFactory(randNum, parameters);
+    ea->init();
 
-        loggingFactory(logs,parameters);
-    }
+
+
 }
 
 
@@ -76,6 +77,17 @@ void ER::startOfSimulation()
     currentInd->init();
 }
 
+void ER::initIndividual(){
+    simInt length;
+    std::string mess(simGetStringSignal("currentInd",&length));
+    if(length == 0){
+        std::cerr << "No individual received" << std::endl;
+        return;
+    }
+    currentInd = ea->getIndividual(0);
+    currentInd->from_string(mess);
+    currentInd->init();
+}
 
 void ER::handleSimulation()
 {
@@ -97,10 +109,9 @@ void ER::handleSimulation()
         simSetFloatSignal("simulationTime",simulationTime);
 
 
-    if(instance_type == settings::INSTANCE_REGULAR){
-        currentInd->update(simulationTime);
-        environment->updateEnv(simulationTime,currentInd->get_morphology());
-    }
+    currentInd->update(simulationTime);
+    environment->updateEnv(simulationTime,currentInd->get_morphology());
+
 
     if (simGetSimulationTime() >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
@@ -115,22 +126,22 @@ void ER::endOfSimulation()
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
-    //    if(instanceType == settings::INSTANCE_SERVER){
-    //        double fitness = environment->fitnessFunction(currentInd);
-    //        // Environment independent fitness function:
-    //        // float fitness = fit->fitnessFunction(currentMorphology);
-    ////        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-    //        if(verbose)
-    //            std::cout << "fitness = " << fitness << std::endl;
-    //        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-    ////        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-    //        int signal[1] = { 2 };
-    //        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-    ////        if (settings->savePhenotype) {
-    ////            currentGenome->fitness = fitness;
-    ////            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
-    ////        }
-    //    }else if(instanceType == settings::INSTANCE_REGULAR){
+//        if(instanceType == settings::INSTANCE_SERVER){
+//            double fitness = environment->fitnessFunction(currentInd);
+//            // Environment independent fitness function:
+//            // float fitness = fit->fitnessFunction(currentMorphology);
+//    //        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
+//            if(verbose)
+//                std::cout << "fitness = " << fitness << std::endl;
+//            simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
+//    //        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
+//            int signal[1] = { 2 };
+//            simSetIntegerSignal((simChar*) "simulationState", signal[0]);
+//    //        if (settings->savePhenotype) {
+//    //            currentGenome->fitness = fitness;
+//    //            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
+//    //        }
+//        }else if(instanceType == settings::INSTANCE_REGULAR){
 
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;

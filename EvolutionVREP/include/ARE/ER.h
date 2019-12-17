@@ -15,6 +15,8 @@
 #include <thread>
 #include <vector>
 
+#include <boost/interprocess/managed_shared_memory.hpp>
+
 #include "ARE/EA.h"
 #include "misc/RandNum.h"
 #include "misc/utilities.h"
@@ -67,6 +69,8 @@ public:
     /// appropriate files.
     virtual void endOfSimulation();
 
+    void initIndividual();
+
     //GETTERS & SETTERS
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
@@ -78,6 +82,7 @@ public:
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const EA::Ptr &get_ea(){return ea;}
+    const Individual::Ptr &get_currentInd(){return currentInd;}
 
 
 protected:
@@ -115,6 +120,7 @@ protected:
     bool startRun = true;
     float simulationTime = 0;
     bool client = false;
+    int clientID = 0;
 };
 
 }//are

@@ -56,7 +56,7 @@ add_library(v_repExtER SHARED
 
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
-    dlibxx dl
+    dlibxx dl rt
 )
 
 target_include_directories(ER_library
