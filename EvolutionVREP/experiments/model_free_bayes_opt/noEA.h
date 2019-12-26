@@ -32,6 +32,7 @@ private:
     size_t currentIndIndex;
     std::vector<Eigen::VectorXd> observations;
     std::vector<Eigen::VectorXd> samples;
+    NEAT::Parameters neat_params;
 };
 
 }
