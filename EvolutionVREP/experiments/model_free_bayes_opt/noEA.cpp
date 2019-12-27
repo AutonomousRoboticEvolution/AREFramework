@@ -105,7 +105,7 @@ void noEA::epoch(){
     population.clear();
     EmptyGenome::Ptr no_gen(new EmptyGenome);
     NEATGenome::Ptr neatGen(new NEATGenome);
-    NEAT::Genome neat_genome(0,9,6,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
+    NEAT::Genome neat_genome(0,9,16,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
     neatGen->neat_genome = neat_genome;
     BOLearner::Ptr learner(new BOLearner);
     learner->set_parameters(parameters);

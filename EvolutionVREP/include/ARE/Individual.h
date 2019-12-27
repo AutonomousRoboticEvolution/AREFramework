@@ -32,7 +32,8 @@ public:
     virtual void init()
     {
         createMorphology();
-        createController();
+        if(control == nullptr)
+            createController();
     }
 
     virtual void update(double delta_time) = 0;
@@ -43,6 +44,8 @@ public:
     }
 
     void initRandNum(int seed = 0){randNum.reset(new misc::RandNum(seed));}
+
+    bool isInit(){return (control != nullptr && morphology != nullptr);}
 
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
