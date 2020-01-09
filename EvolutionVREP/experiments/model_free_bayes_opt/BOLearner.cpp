@@ -61,6 +61,7 @@ void BOLearner::update(Control::Ptr & ctrl)
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
 
     int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
     Eigen::VectorXd starting_point = _samples.back();
 
 //    lb::FirstElem aggr;
@@ -86,8 +87,14 @@ void BOLearner::update(Control::Ptr & ctrl)
 
 
     NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
-    for(int i = 0; i < nbr_weights; i++)
+    int i = 0;
+    for(; i < nbr_weights; i++)
         nn.m_connections[i].m_weight = new_sample(i);
+    int j = 0;
+    for(; i < nbr_weights+nbr_bias; i++){
+        nn.m_neurons[j].m_bias = new_sample(i);
+        j++;
+    }
 
     std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
 

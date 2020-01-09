@@ -30,6 +30,9 @@ void BOLog::saveLog(EA::Ptr &ea)
 
 void LearnerSerialLog::saveLog(EA::Ptr &ea){
     std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
-    limbo::serialize::TextArchive tarch(repository + std::string("/") + logFile);
+    int dataset_size = std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->dataset_size();
+    std::stringstream sstream;
+    sstream << repository << std::string("/") << logFile << "_" << ea->get_generation() << "_" << dataset_size;
+    limbo::serialize::TextArchive tarch(sstream.str());
     std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->model().save<limbo::serialize::TextArchive>(tarch);
 }

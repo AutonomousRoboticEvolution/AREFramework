@@ -62,12 +62,18 @@ bool noEA::update()
     observations.push_back(o);
 
     auto connections = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_connections;
-    Eigen::VectorXd s(connections.size());
+    auto neurons = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_neurons;
+    Eigen::VectorXd s(connections.size() + neurons.size());
     int i = 0;
     for(const auto &conn : connections){
         s(i) = conn.m_weight;
         i++;
     }
+    for(const auto &neu : neurons){
+        s(i) = neu.m_bias;
+        i++;
+    }
+
     samples.push_back(s);
 
     if(verbose)
@@ -102,17 +108,20 @@ float noEA::computeFitness(){
 
 void noEA::epoch(){
 
+    int rnd_i = randomNum->randInt(0,population.size());
+    BOIndividual::Ptr ind = population[rnd_i];
+
     population.clear();
-    EmptyGenome::Ptr no_gen(new EmptyGenome);
-    NEATGenome::Ptr neatGen(new NEATGenome);
-    NEAT::Genome neat_genome(0,9,16,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
-    neatGen->neat_genome = neat_genome;
-    BOLearner::Ptr learner(new BOLearner);
-    learner->set_parameters(parameters);
-    BOIndividual::Ptr ind(new BOIndividual(no_gen,neatGen,learner));
-    ind->set_parameters(parameters);
-    ind->initRandNum(randomNum->getSeed());
+
     population.push_back(ind);
 }
 
-
+//EmptyGenome::Ptr no_gen(new EmptyGenome);
+//NEATGenome::Ptr neatGen(new NEATGenome);
+//NEAT::Genome neat_genome(0,9,16,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
+//neatGen->neat_genome = neat_genome;
+//BOLearner::Ptr learner(new BOLearner);
+//learner->set_parameters(parameters);
+//BOIndividual::Ptr ind(new BOIndividual(no_gen,neatGen,learner));
+//ind->set_parameters(parameters);
+//ind->initRandNum(randomNum->getSeed());

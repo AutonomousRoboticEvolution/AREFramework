@@ -3,7 +3,7 @@
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/scenes/defaultER.ttt
 #epuckPath,string,/home/le_goff/epuck_changedsensor3.ttm
-#populationSize,int,100
+#populationSize,int,2
 #maxEvalTime,float,30
 #numberOfGeneration,int,2
 #repository,string,/home/le_goff/are-logs
@@ -12,8 +12,8 @@
 #killWhenNotConnected,bool,1
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
-#numberBOIteration,int,100
+#numberBOIteration,int,5
 #seed,int,-1
-#BOSamplesFile,string,bo_data.csv
+#BOSamplesFile,string,bo_data_1.csv
 #LearnerSerialFile,string,model
 #initRandMagnitude,float,8.

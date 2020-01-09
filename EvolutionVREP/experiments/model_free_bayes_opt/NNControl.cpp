@@ -7,6 +7,7 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
     nn.Flush();
     nn.Input(sensorValues);
     nn.ActivateUseInternalBias();
+//    nn.Activate();
     return nn.Output();
 }
 const Eigen::VectorXd &NNControl::get_weights(){

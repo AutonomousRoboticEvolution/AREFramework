@@ -71,7 +71,7 @@ public:
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const misc::RandNum::Ptr &get_randNum(){return randNum;}
-    void set_randNum(const misc::RandNum::Ptr &rn){randNum.reset(rn.get());}
+    void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
     void set_startRun(bool b){startRun = b;}
     bool get_startRun(){return startRun;}
     void set_currentIndIndex(size_t num){currentIndIndex = num;}

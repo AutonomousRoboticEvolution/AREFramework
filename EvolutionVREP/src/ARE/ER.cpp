@@ -155,6 +155,12 @@ void ER::endOfSimulation()
         currentIndIndex = 0;
 
     }
+    int max_gen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
+    if(ea->get_generation() >= max_gen){
+        std::cout << "maximum number of generations reach. Stopping ..." << std::endl;
+        simQuitSimulator(true);
+        exit(1);
+    }
 }
 
 void ER::saveLogs(bool endOfGen)
