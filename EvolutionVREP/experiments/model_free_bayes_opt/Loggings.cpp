@@ -10,7 +10,7 @@ void BOLog::saveLog(EA::Ptr &ea)
     Eigen::VectorXd spl = static_cast<const noEA*>(ea.get())->getLastSpl();
 
     std::ofstream saveFile;
-    saveFile.open(repository + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
+    saveFile.open(repository + std::string("/") +  Logging::log_folder + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
     if(!saveFile)
     {
         std::cerr << "unable to open : " << logFile << std::endl;
@@ -32,7 +32,7 @@ void LearnerSerialLog::saveLog(EA::Ptr &ea){
     std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
     int dataset_size = std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->dataset_size();
     std::stringstream sstream;
-    sstream << repository << std::string("/") << logFile << "_" << ea->get_generation() << "_" << dataset_size;
+    sstream << repository << "/" << Logging::log_folder << "/" << logFile << "_" << ea->get_generation() << "_" << dataset_size;
     limbo::serialize::TextArchive tarch(sstream.str());
     std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->model().save<limbo::serialize::TextArchive>(tarch);
 }
