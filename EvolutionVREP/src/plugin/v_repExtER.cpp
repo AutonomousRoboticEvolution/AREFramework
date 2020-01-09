@@ -151,8 +151,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
     if(seed < 0)
         seed = rand();
-
-    ERVREP->set_randNum(std::make_shared<misc::RandNum>(seed)); //todo change
+    misc::RandNum rn(seed);
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn)); //todo change
     ERVREP->initialize();
     simulationState = FREE;
     properties.reset();

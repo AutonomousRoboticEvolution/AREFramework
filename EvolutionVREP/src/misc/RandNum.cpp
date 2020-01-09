@@ -8,6 +8,7 @@ RandNum::RandNum(int seed)
 {
 	srand(seed);
 	std::cout << "seed set to " << seed << std::endl;
+    m_seed = seed;
 }
 
 

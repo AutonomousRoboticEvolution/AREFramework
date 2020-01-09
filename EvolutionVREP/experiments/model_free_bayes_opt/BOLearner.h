@@ -28,6 +28,9 @@ struct Params {
     struct acqui_ei {
         BO_PARAM(double, jitter, 10.0);
     };
+    struct acqui_ucb {
+ 	 BO_PARAM(double, alpha, 0.1);
+    };
     struct acqui_gpucb {
         BO_PARAM(double, delta, 0.1);
     };
@@ -85,7 +88,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
+using acqui_t = lb::acqui::UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
@@ -117,6 +120,7 @@ public:
     model_t get_model(){return _model;}
     void set_observation(std::vector<Eigen::VectorXd> &obs){_observations = obs;}
     void set_samples(std::vector<Eigen::VectorXd> &s){_samples = s;}
+    int dataset_size(){return _samples.size();}
     const model_t& model() const {return _model;}
 
 private:
