@@ -32,6 +32,9 @@ void ER::initialize()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+
+    Logging::create_log_folder(exp_name);
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;

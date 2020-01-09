@@ -9,6 +9,10 @@ namespace are {
 class Logging
 {
 public:
+
+    static void create_log_folder(const std::string &exp_name);
+    static std::string log_folder;
+
     typedef std::shared_ptr<Logging> Ptr;
     typedef std::shared_ptr<const Logging> ConstPtr;
     typedef void (Factory) (std::vector<Logging::Ptr>&,
@@ -21,6 +25,7 @@ public:
 
     virtual void saveLog(EA::Ptr& ea) = 0;
     virtual void loadLog(const std::string &file = std::string()) = 0;
+
 
     //SETTERS && GETTERS
     const std::string &get_logFile(){return logFile;}
