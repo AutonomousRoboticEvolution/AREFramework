@@ -88,7 +88,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::UCB<Params, gp_t>;
+using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
