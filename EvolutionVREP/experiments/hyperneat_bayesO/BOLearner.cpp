@@ -61,9 +61,21 @@ void BOLearner::update(Control::Ptr & ctrl)
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
 
     int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
     Eigen::VectorXd starting_point = _samples.back();
 
 //    lb::FirstElem aggr;
+    if(_current_iteration == 0){
+        _best_sample = _samples.back();
+        _best_observ = _observations.back();
+        _best_fitness = _observations.back()(0); //here fitness == observation
+    }
+    if(_best_fitness < _observations.back()(0)){
+        _best_sample = _samples.back();
+        _best_observ = _observations.back();
+        _best_fitness = _observations.back()(0); //here fitness == observation
+    }
+
 
     const auto aggr = [=](const Eigen::VectorXd& x) -> double
     {
@@ -86,8 +98,14 @@ void BOLearner::update(Control::Ptr & ctrl)
 
 
     NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
-    for(int i = 0; i < nbr_weights; i++)
+    int i = 0;
+    for(; i < nbr_weights; i++)
         nn.m_connections[i].m_weight = new_sample(i);
+    int j = 0;
+    for(; i < nbr_weights+nbr_bias; i++){
+        nn.m_neurons[j].m_bias = new_sample(i);
+        j++;
+    }
 
     std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
 
@@ -103,4 +121,21 @@ void BOLearner::update_model()
 {
     _model.add_sample(_samples.back(), _observations.back());
     _model.optimize_hyperparams();
+}
+
+void BOLearner::best_ctrl(Control::Ptr &ctrl){
+
+    int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
+    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    int i = 0;
+    for(; i < nbr_weights; i++)
+        nn.m_connections[i].m_weight = _best_sample(i);
+    int j = 0;
+    for(; i < nbr_weights+nbr_bias; i++){
+        nn.m_neurons[j].m_bias = _best_sample(i);
+        j++;
+    }
+
+    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
 }

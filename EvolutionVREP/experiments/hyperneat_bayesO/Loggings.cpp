@@ -8,7 +8,7 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
     int generation = ea->get_generation();
 
     std::ofstream savePopFile;
-    savePopFile.open(repository + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
+    savePopFile.open(repository + std::string("/") + Logging::log_folder + std::string("/")  + logFile, std::ios::out | std::ios::ate | std::ios::app);
     if(!savePopFile)
     {
         std::cerr << "unable to open : " << logFile << std::endl;

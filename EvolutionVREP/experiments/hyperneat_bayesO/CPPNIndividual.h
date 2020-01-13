@@ -26,7 +26,7 @@ public :
     void update_learner_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
     const Learner::Ptr &getLearner(){return learner;}
 
-
+    void best_ctrl(){std::dynamic_pointer_cast<BOLearner>(learner)->best_ctrl(control);}
 
 
 protected:

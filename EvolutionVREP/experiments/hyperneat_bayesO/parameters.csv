@@ -1,3 +1,4 @@
+#experiment_name,string,hyperneat_mfbo
 #expPluginName,string,/usr/local/lib/libhyperneat_bayesO.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
@@ -14,7 +15,7 @@
 #shouldReopenConnections,bool,0
 #fitnessFile,string,fitnesses_hnmfbo.csv
 #reinitLearner,bool,1
-#numberBOIteration,int,20
+#numberBOIteration,int,10
 #globalBOData,bool,1
-#BODataRatio,float,0.10
+#BODataRatio,float,0.25
 #seed,int,-1
