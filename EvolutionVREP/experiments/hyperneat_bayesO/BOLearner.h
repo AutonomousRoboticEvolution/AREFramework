@@ -31,6 +31,9 @@ struct Params {
     struct acqui_gpucb {
         BO_PARAM(double, delta, 0.1);
     };
+    struct acqui_ucb {
+        BO_PARAM(double, alpha, 0.1);
+    };
     struct init_randomsampling {
         BO_PARAM(int, samples, 10);
     };
@@ -85,7 +88,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
+using acqui_t = lb::acqui::UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
@@ -111,17 +114,23 @@ public:
     void update(Control::Ptr &ctrl);
     void init_model(int input_size);
     void update_model();
-
+    void best_ctrl(Control::Ptr &ctrl);
 
     //GETTERS & SETTERS
     model_t get_model(){return _model;}
     void set_observation(std::vector<Eigen::VectorXd> &obs){_observations = obs;}
     void set_samples(std::vector<Eigen::VectorXd> &s){_samples = s;}
     const model_t& model() const {return _model;}
+    Eigen::VectorXd get_best_sample(){return _best_sample;}
+    Eigen::VectorXd get_best_observ(){return _best_observ;}
+    float get_best_fitness(){return _best_fitness;}
 
 private:
     model_t _model;
     Eigen::VectorXd _initial_pos;
+    Eigen::VectorXd _best_sample;
+    Eigen::VectorXd _best_observ;
+    float _best_fitness; //for later when observ != fitness
 };
 }//are
 #endif //BOLEARNER_H
