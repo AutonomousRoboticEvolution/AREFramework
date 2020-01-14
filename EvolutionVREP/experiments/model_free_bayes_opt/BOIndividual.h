@@ -21,8 +21,8 @@ public :
 
     void update(double delta_time);
 
+    void compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
     void update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
-    void update_learner_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
     const Learner::Ptr &getLearner(){return learner;}
 
 

@@ -88,8 +88,11 @@ bool noEA::update()
         return true;
     }
 
+    if(currentFitnesses.size() == 1){
+        std::dynamic_pointer_cast<BOIndividual>(ind)->compute_model(observations,samples);
+    }
+
     std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner(observations, samples);
-    std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner_model(observations, samples);
 
     ind.reset();
     return false;
