@@ -26,7 +26,15 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
     std::string fit_log_file = are::settings::getParameter<are::settings::String>(param,"#fitnessFile").value;
-    are::FitnessLog::Ptr log(new are::FitnessLog);
-    log->set_logFile(fit_log_file);
+    are::FitnessLog::Ptr log(new are::FitnessLog(fit_log_file));
     logs.push_back(log);
+    
+    std::string bo_log_file = are::settings::getParameter<are::settings::String>(param,"#BOSamplesFile").value;
+    are::BOLog::Ptr bolog(new are::BOLog(bo_log_file));
+    logs.push_back(bolog);
+
+    std::string learner_log_file = are::settings::getParameter<are::settings::String>(param,"#LearnerSerialFile").value;
+    are::LearnerSerialLog::Ptr lslog(new are::LearnerSerialLog(learner_log_file));
+    logs.push_back(lslog);
+
 }

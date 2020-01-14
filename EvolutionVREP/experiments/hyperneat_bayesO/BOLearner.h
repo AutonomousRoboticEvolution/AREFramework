@@ -113,6 +113,7 @@ public:
     BOLearner();
     void update(Control::Ptr &ctrl);
     void init_model(int input_size);
+    void compute_model();
     void update_model();
     void best_ctrl(Control::Ptr &ctrl);
 
@@ -124,6 +125,8 @@ public:
     Eigen::VectorXd get_best_sample(){return _best_sample;}
     Eigen::VectorXd get_best_observ(){return _best_observ;}
     float get_best_fitness(){return _best_fitness;}
+    int dataset_size(){return _samples.size();}
+
 
 private:
     model_t _model;
