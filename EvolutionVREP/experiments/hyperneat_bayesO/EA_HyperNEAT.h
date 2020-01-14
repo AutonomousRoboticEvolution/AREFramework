@@ -24,8 +24,8 @@ public:
 
     void setFitness(size_t indIndex, float fitness);
     int getNumberOfEval() const {return currentFitnesses.size();}
-    Eigen::VectorXd getLastObs() const {return observations.back();}
-    Eigen::VectorXd getLastSpl() const {return samples.back();}
+    Eigen::VectorXd getLastObs() const {return partialObs.back();}
+    Eigen::VectorXd getLastSpl() const {return partialSpl.back();}
 
 
 private:

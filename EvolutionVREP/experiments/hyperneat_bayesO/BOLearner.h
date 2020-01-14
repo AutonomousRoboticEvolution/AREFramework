@@ -26,7 +26,7 @@ struct Params {
         BO_PARAM(double, tolerance, -0.1);
     };
     struct acqui_ei {
-        BO_PARAM(double, jitter, 10.0);
+        BO_PARAM(double, jitter, 1.0);
     };
     struct acqui_gpucb {
         BO_PARAM(double, delta, 0.1);

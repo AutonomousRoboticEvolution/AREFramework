@@ -47,6 +47,7 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
 void BOLog::saveLog(EA::Ptr &ea)
 {
     std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
+    int generation = static_cast<const EA_HyperNEAT*>(ea.get())->get_generation();
     int eval = static_cast<const EA_HyperNEAT*>(ea.get())->getNumberOfEval();
     Eigen::VectorXd obs = static_cast<const EA_HyperNEAT*>(ea.get())->getLastObs();
     Eigen::VectorXd spl = static_cast<const EA_HyperNEAT*>(ea.get())->getLastSpl();
@@ -58,11 +59,13 @@ void BOLog::saveLog(EA::Ptr &ea)
         std::cerr << "unable to open : " << logFile << std::endl;
 	return;
     }
+
+    saveFile << "generation " << generation << ": ,";
     saveFile << "evaluation " << eval << ": ,";
-    saveFile << "observation : ,";
+    saveFile << "observation ,";
     for(int i = 0; i < obs.rows(); i++)
 	    saveFile << obs(i) << ",";
-    saveFile << "sample : ,";
+    saveFile << "sample ,";
     for(int i = 0; i < spl.rows(); i++)
 	    saveFile << spl(i) << ",";
 
