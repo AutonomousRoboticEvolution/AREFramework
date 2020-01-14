@@ -88,7 +88,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::EI<Params, gp_t>;
+using acqui_t = lb::acqui::UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
@@ -113,6 +113,7 @@ public:
     BOLearner();
     void update(Control::Ptr &ctrl);
     void init_model(int input_size);
+    void compute_model();
     void update_model();
 
 
