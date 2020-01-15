@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
         //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
         //client->settings->saveSettings(); // IS IN EVALUATEPOP
 //        if (verbose) {
-//            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
+//            std::cout << "Just saved settings <right after evaluate pop>" << std::endl;
 //        }
         //        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
         //			std::cout << "Generation interval reached, quitting simulator. " << std::endl;

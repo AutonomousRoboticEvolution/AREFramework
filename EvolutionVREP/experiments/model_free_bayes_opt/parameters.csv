@@ -5,7 +5,7 @@
 #scenePath,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/scenes/defaultER.ttt
 #epuckPath,string,/home/le_goff/epuck_changedsensor3.ttm
 #populationSize,int,20
-#maxEvalTime,float,30
+#maxEvalTime,float,60
 #numberOfGeneration,int,2
 #repository,string,/home/le_goff/are-logs
 #verbose,bool,1
