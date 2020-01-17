@@ -156,7 +156,6 @@ void ER::endOfSimulation()
             std::cout << "generation " << generation << " finished" << std::endl;
         ea->incr_generation();
         currentIndIndex = 0;
-
     }
     int max_gen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
     if(ea->get_generation() >= max_gen){

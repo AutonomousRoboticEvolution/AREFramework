@@ -29,7 +29,11 @@ struct Params {
         BO_PARAM(double, jitter, 1.0);
     };
     struct acqui_ucb {
+<<<<<<< Updated upstream
  	 BO_PARAM(double, alpha, 0.1);
+=======
+        BO_PARAM(double, alpha, 0.1);
+>>>>>>> Stashed changes
     };
     struct acqui_gpucb {
         BO_PARAM(double, delta, 0.1);
