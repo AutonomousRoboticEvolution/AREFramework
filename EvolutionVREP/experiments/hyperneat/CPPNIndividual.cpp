@@ -39,24 +39,11 @@ void CPPNIndividual::update(double delta_time)
     }
 }
 
-void CPPNIndividual::createMorphology(bool loadRobot)
+void CPPNIndividual::createMorphology()
 {
-    int instance_type = settings::INSTANCE_REGULAR;//getParameter<settings::Integer>(parameters,"#instanceType").value;
     morphology.reset(new EPuckMorphology(parameters));
-    morphology->set_client_id(client_id);
-
-    if(instance_type == settings::INSTANCE_SERVER){
-        if(loadRobot){
-            std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-        }else{
-//            while(simGetObjectHandle("ePuck_respondableBody") < 0) //wait for the robot model to be loaded in v-rep
-//                std::cout << "wait for robor model" << std::endl;
-            morphology->createAtPosition(0,0,0);
-        }
-    }else{
-        std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-        morphology->createAtPosition(0,0,0);
-    }
+    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    morphology->createAtPosition(0,0,0);
 }
 
 void CPPNIndividual::createController()

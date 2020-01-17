@@ -135,7 +135,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
             std::cout << "Starting in server intance mode" << std::endl;
     }
 
-
     simulationState = INITIALIZING;
     // Construct classes
     ERVREP = std::make_unique<are::ER>();   // The class used to handle the EA
@@ -282,9 +281,6 @@ void clientMessageHandler(int message){
 
     }
 
-
-
-
     // ABOUT TO START
     if (message == sim_message_eventcallback_simulationabouttostart)
     {
@@ -330,6 +326,9 @@ void clientMessageHandler(int message){
     }else if(clientState[0] == are_c::READY && simulationState == STARTING){
         simStartSimulation();
     }
-
+    else if(clientState[0] == 99){
+        std::cout << "Stop Instance !" << std::endl;
+        exit(0);
+    }
 
 }

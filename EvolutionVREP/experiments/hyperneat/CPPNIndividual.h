@@ -34,7 +34,7 @@ public :
     void from_string(const std::string &str);
 protected:
     void createController() override;
-    void createMorphology(bool loadRobot) override;
+    void createMorphology() override;
 
 };
 

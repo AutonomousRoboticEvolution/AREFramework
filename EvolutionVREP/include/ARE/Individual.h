@@ -31,9 +31,9 @@ public:
 
     virtual Individual::Ptr clone() = 0;
 
-    virtual void init(bool loadRobot = false)
+    virtual void init()
     {
-        createMorphology(loadRobot);
+        createMorphology();
         createController();
     }
 
@@ -96,7 +96,7 @@ protected:
 //    std::function<Genome::Factory> createGenome;
 
     virtual void createController() = 0;
-    virtual void createMorphology(bool loadRobot) = 0;
+    virtual void createMorphology() = 0;
 };
 
 

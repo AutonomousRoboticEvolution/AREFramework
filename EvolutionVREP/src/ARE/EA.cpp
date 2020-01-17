@@ -41,47 +41,6 @@ Individual::Ptr EA::getIndividual(size_t index)
     return population[index];
 }
 
-//void EA::loadIndividual(int individualNum, int sceneNum) {
-
-//}
-
-//void EA::savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popIndividuals) {
-//    std::cout << "SAVING GENERATION" << std::endl << std::endl;
-//    std::ofstream savePopFile;
-//    std::string saveFileName;
-
-//    saveFileName = settings::cast<settings::String>(parameters->at("#repository"))->value + "/SavedGenerations" + std::to_string(settings->sceneNum) + ".csv";
-//    savePopFile.open(saveFileName.c_str(), std::ios::out | std::ios::ate | std::ios::app);
-//	savePopFile << "generation " << generation << ": ,";
-//	for (int i = 0; i < popfit.size(); i++) {
-//		savePopFile /*<< " ind " << i << ": " */ << popfit[i] << ",";
-//	}
-//	float avgFitness = 0;
-//	for (int i = 0; i < popfit.size(); i++) {
-//		avgFitness += popfit[i];
-//	}
-//	avgFitness = avgFitness / popfit.size();
-//	savePopFile << "avg: ," << avgFitness << ",";
-//	int bestInd = 0;
-//	float bestFitness = 0;
-//	for (int i = 0; i < popfit.size(); i++) {
-//		if (bestFitness < popfit[i]) {
-//			bestFitness = popfit[i];
-//			bestInd = i;
-//		}
-//	}
-//	savePopFile << "ind: ," << popIndividuals[bestInd] << ",";
-//	savePopFile << "fitness: ," << bestFitness << ",";
-//	savePopFile << "individuals: ,";
-//	for (int i = 0; i < popIndividuals.size(); i++) {
-//		savePopFile << popIndividuals[i] << ",";
-//	}
-//    savePopFile << std::endl;
-//	savePopFile.close();
-//    std::cout << "GENERATION SAVED" << std::endl;
-//}
-
-
 //void EA::loadPopulationGenomes()
 //{
 

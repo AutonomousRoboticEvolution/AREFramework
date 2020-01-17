@@ -34,6 +34,12 @@ void ER::initialize(){
 
 //    environment = environmentFactory(parameters);
 
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,exp_plugin_name,"loggingFactory"))
+        exit(1);
+
+    loggingFactory(logs,parameters);
+
     if(!load_fct_exp_plugin<EA::Factory>
             (EAFactory,exp_plugin_name,"EAFactory"))
         exit(1);
@@ -81,7 +87,6 @@ void ER::startOfSimulation(){
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);
-//    currentInd->init(true);
 }
 
 void ER::endOfSimulation(){
@@ -123,7 +128,7 @@ void ER::updateSimulation()
     {
         int state = slave->getIntegerSignal("simulationState");
 
-        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
+//        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
         if(state == IDLE)
         {
@@ -172,7 +177,7 @@ void ER::quitSimulation()
 {
     for (auto &slave: serverInstances) {
         std::cout << "closing simulator " << slave->port() << std::endl;
-        slave->setIntegerSignal("simulationState", 99);
+        slave->setIntegerSignal("clientState", 99);
         slave->disconnect();
     }
     serverInstances.clear();

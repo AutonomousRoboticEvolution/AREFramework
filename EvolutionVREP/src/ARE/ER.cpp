@@ -122,7 +122,7 @@ void ER::handleSimulation()
 void ER::endOfSimulation()
 {
 
-    //    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
@@ -146,30 +146,38 @@ void ER::endOfSimulation()
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
 
+    if(instanceType == settings::INSTANCE_REGULAR){
+        if(currentIndIndex < ea->get_population().size())
+        {
+            double fitness = environment->fitnessFunction(currentInd);
+            if(verbose)
+                std::cout << "fitness = " << fitness << std::endl;
+            ea->setFitness(currentIndIndex,fitness);
+            currentIndIndex++;
+        }
 
-    if(currentIndIndex < ea->get_population().size())
-    {
+        if(currentIndIndex >= ea->get_population().size())
+        {
+            saveLogs();
+            ea->epoch();
+            if(verbose)
+                std::cout << "generation " << generation << " finished" << std::endl;
+            ea->incr_generation();
+            currentIndIndex = 0;
+
+        }
+        if(generation >= nbrOfGen){
+            std::cout << "---------------------" << std::endl;
+            std::cout << "Evolution is Finished" << std::endl;
+            std::cout << "---------------------" << std::endl;
+            exit(0);
+        }
+    }
+    else if(instanceType == settings::INSTANCE_SERVER){
         double fitness = environment->fitnessFunction(currentInd);
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        currentIndIndex++;
-    }
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        saveLogs();
-        ea->epoch();
-        if(verbose)
-            std::cout << "generation " << generation << " finished" << std::endl;
-        ea->incr_generation();
-        currentIndIndex = 0;
-
-    }
-    if(generation >= nbrOfGen){
-        std::cout << "---------------------" << std::endl;
-        std::cout << "Evolution is Finished" << std::endl;
-        std::cout << "---------------------" << std::endl;
-        exit(0);
     }
 }
 

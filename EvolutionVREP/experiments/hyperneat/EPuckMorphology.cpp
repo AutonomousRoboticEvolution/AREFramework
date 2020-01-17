@@ -18,7 +18,9 @@ void EPuckMorphology::loadModel(){
 
 
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#epuckPath").value;
-    int epuckHandle = sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
+    int epuckHandle = simLoadModel(path_epuck_m.c_str());
+
+            //sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
     if(epuckHandle == -1)
     {
         std::cerr << "unable to load epuck model" << std::endl;
@@ -75,52 +77,73 @@ void EPuckMorphology::setPosition(float x, float y, float z)
 void EPuckMorphology::getObjectHandles()
 {
 
-    int instance_type = settings::INSTANCE_REGULAR; //getParameter<settings::Integer>(parameters,"#instanceType").value;
+//    int instance_type = settings::INSTANCE_REGULAR; //getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-    if(instance_type == settings::INSTANCE_REGULAR)
-    {
-        simAddObjectToSelection(sim_handle_tree, mainHandle);
-        size_t select_size = static_cast<size_t>(simGetObjectSelectionSize());
-        if(verbose)
-            std::cout << "MORPHOLOGY INIT " << select_size << " objects selected in the epuck tree" << std::endl;
-        int obj_handles[select_size];
-        simGetObjectSelection(obj_handles);
+    int nbrObj = 0;
+    int* handles = nullptr;
+    handles = simGetObjectsInTree(mainHandle,sim_object_proximitysensor_type,1,&nbrObj);
 
-        for (size_t i = 0; i < select_size; i++)
-        {
-            if(simGetObjectType(obj_handles[i]) == sim_object_joint_type)
-                jointHandles.push_back(obj_handles[i]);
-            else if(simGetObjectType(obj_handles[i]) == sim_object_visionsensor_type){
-                if(verbose)
-                    std::cout << "MORPHOLOGY INIT camera added" << std::endl;
-                cameraHandle = obj_handles[i];
-            }
-            else if(simGetObjectType(obj_handles[i]) == sim_object_proximitysensor_type)
-                proxHandles.push_back(obj_handles[i]);
-        }
-        if(verbose){
-            std::cout << "MORPHOLOGY INIT number of joint handles : " << jointHandles.size() << std::endl;
-            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << proxHandles.size() << std::endl;
-        }
-    }
-    else if(instance_type == settings::INSTANCE_SERVER)
-    {
-        int nbrObj = 0;
-        int* handles = nullptr;
-        simxGetObjects(client_id,sim_object_proximitysensor_type,&nbrObj,&handles,simx_opmode_blocking);
+    if(verbose)
+        std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
+    for(int i = 0; i < nbrObj ; i++)
+        proxHandles.push_back(handles[i]);
 
-        if(verbose)
-            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
-        for(int i = 0; i < nbrObj ; i++)
-            proxHandles.push_back(handles[i]);
+    handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);
+    if(verbose)
+        std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
+    for(int i = 0; i < nbrObj ; i++)
+        jointHandles.push_back(handles[i]);
 
-        simxGetObjects(client_id,sim_object_joint_type,&nbrObj,&handles,simx_opmode_blocking);
-        if(verbose)
-            std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
-        for(int i = 0; i < nbrObj ; i++)
-            jointHandles.push_back(handles[i]);
-    }
+//    if(instance_type == settings::INSTANCE_REGULAR)
+//    {
+//        simAddObjectToSelection(sim_handle_tree, mainHandle);
+//        size_t select_size = static_cast<size_t>(simGetObjectSelectionSize());
+//        if(select_size == 0){
+//            std::cerr << "No element of the e-puck found with handle of : " << mainHandle << std::endl;
+//            simChar* lastError = simGetLastError();
+//            std::cerr << "simGetLastError : " << lastError << std::endl;
+//            simReleaseBuffer(lastError);
+//        }
+//        if(verbose)
+//            std::cout << "MORPHOLOGY INIT " << select_size << " objects selected in the epuck tree" << std::endl;
+//        int obj_handles[select_size];
+//        simGetObjectSelection(obj_handles);
+
+//        for (size_t i = 0; i < select_size; i++)
+//        {
+//            if(simGetObjectType(obj_handles[i]) == sim_object_joint_type)
+//                jointHandles.push_back(obj_handles[i]);
+//            else if(simGetObjectType(obj_handles[i]) == sim_object_visionsensor_type){
+//                if(verbose)
+//                    std::cout << "MORPHOLOGY INIT camera added" << std::endl;
+//                cameraHandle = obj_handles[i];
+//            }
+//            else if(simGetObjectType(obj_handles[i]) == sim_object_proximitysensor_type)
+//                proxHandles.push_back(obj_handles[i]);
+//        }
+//        if(verbose){
+//            std::cout << "MORPHOLOGY INIT number of joint handles : " << jointHandles.size() << std::endl;
+//            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << proxHandles.size() << std::endl;
+//        }
+//    }
+//    else if(instance_type == settings::INSTANCE_SERVER)
+//    {
+//        int nbrObj = 0;
+//        int* handles = nullptr;
+//        simxGetObjects(client_id,sim_object_proximitysensor_type,&nbrObj,&handles,simx_opmode_blocking);
+
+//        if(verbose)
+//            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
+//        for(int i = 0; i < nbrObj ; i++)
+//            proxHandles.push_back(handles[i]);
+
+//        simxGetObjects(client_id,sim_object_joint_type,&nbrObj,&handles,simx_opmode_blocking);
+//        if(verbose)
+//            std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
+//        for(int i = 0; i < nbrObj ; i++)
+//            jointHandles.push_back(handles[i]);
+//    }
 
 }
 
