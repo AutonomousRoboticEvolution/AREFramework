@@ -137,7 +137,9 @@ void ER::endOfSimulation()
             if(verbose)
                 std::cout << "fitness = " << fitness << std::endl;
             ea->setFitness(currentIndIndex,fitness);
-            currentIndIndex++;
+            if(ea->update())
+              currentIndIndex++;
+            saveLogs(false);
         }
 
         if(currentIndIndex >= ea->get_population().size())
@@ -165,23 +167,8 @@ void ER::endOfSimulation()
 
  	if(ea->update())
             currentIndIndex++;
-        saveLogs(false);
     }
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        saveLogs();
-        ea->epoch();
-        if(verbose)
-            std::cout << "generation " << generation << " finished" << std::endl;
-        ea->incr_generation();
-        currentIndIndex = 0;
-    }
-    int max_gen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
-    if(ea->get_generation() >= max_gen){
-        std::cout << "maximum number of generations reach. Stopping ..." << std::endl;
-        simQuitSimulator(true);
-        exit(1);
-    }
+    
 }
 
 void ER::saveLogs(bool endOfGen)

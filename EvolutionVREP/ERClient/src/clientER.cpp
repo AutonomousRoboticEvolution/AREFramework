@@ -103,6 +103,7 @@ void ER::endOfSimulation(){
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
         currentIndIndex++;
+    	saveLogs(false);
     }
     if(currentIndIndex >= ea->get_population().size())
     {
