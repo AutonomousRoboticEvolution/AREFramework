@@ -28,7 +28,10 @@ class ER : public are::ER
 {
 public:
     ER(){}
-    ~ER(){}
+    ~ER(){
+    	for(auto& si : serverInstances)
+		si.reset();
+    }
 
     int init(int nbrOfInst,int port = 19997);
     void initialize();

@@ -257,6 +257,9 @@ void clientMessageHandler(int message){
     int clientState[1] = {10111};
     simGetIntegerSignal((simChar*) "clientState", clientState);
 
+    if(clientState[0] == 99)
+    	std::cout << "Received 99 : order to stop" << std::endl;
+
     if (simulationState == FREE
         && simGetSimulationState() == sim_simulation_stopped)
     {
@@ -328,7 +331,7 @@ void clientMessageHandler(int message){
     }
     else if(clientState[0] == 99){
         std::cout << "Stop Instance !" << std::endl;
-        exit(0);
+        simQuitSimulator(true);
     }
 
 }

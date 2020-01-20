@@ -144,12 +144,12 @@ void ER::endOfSimulation()
             saveLogs();
             ea->epoch();
             if(verbose)
-                std::cout << "generation " << generation << " finished" << std::endl;
+                std::cout << "generation " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
 
         }
-        if(generation >= nbrOfGen){
+        if(ea->get_generation() >= nbrOfGen){
             std::cout << "---------------------" << std::endl;
             std::cout << "Evolution is Finished" << std::endl;
             std::cout << "---------------------" << std::endl;

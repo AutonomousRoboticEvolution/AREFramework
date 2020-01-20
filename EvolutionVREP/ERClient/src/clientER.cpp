@@ -109,7 +109,7 @@ void ER::endOfSimulation(){
         saveLogs();
         ea->epoch();
         if(verbose)
-            std::cout << "generation " << generation << " finished" << std::endl;
+            std::cout << "generation " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();
         currentIndIndex = 0;
 
@@ -118,7 +118,6 @@ void ER::endOfSimulation(){
         std::cout << "---------------------" << std::endl;
         std::cout << "Evolution is Finished" << std::endl;
         std::cout << "---------------------" << std::endl;
-        exit(0);
     }
 }
 
