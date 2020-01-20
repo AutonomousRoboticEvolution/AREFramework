@@ -15,17 +15,22 @@ def run_server(rank: int):
     print(f'Starting server rank {rank} listening on port {server_port}')
 
     # parameters
-    # [1] rank
-    # [2] type of run
-    #       - 1 SERVER
-    #       - 9 RECALL
-    # [3] repository
-    return subprocess.Popen([
-        args.vrep,
-        '-h',
-        f'-g{args.params}',
-        f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-    ])
+    # [1] path to the parameter file
+    # [2] server port
+    if(not args.xvbf) :
+        return subprocess.Popen([
+            args.vrep,
+            '-h',
+            f'-g{args.params}',
+            f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
+        ])
+    else :
+        return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
+            args.vrep,
+            '-h',
+            f'-g{args.params}',
+            f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
+        ])
 
 
 def run_client():
@@ -33,7 +38,6 @@ def run_client():
     return subprocess.Popen([
         args.client,
         str(args.params),
-        str(args.seed),
         str(args.port_start),
         str(args.n_vrep),
     ])
@@ -93,17 +97,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('n_vrep', metavar='N', type=int,
                         help='Number of VREP instances')
-
-    parser.add_argument('repository', metavar='REPOSITORY', type=str,
-                        help='name of the repository to use')
     
+    parser.add_argument('--xvbf',type=int,default='0',help='run with xvfb')
+
     parser.add_argument('--params', type=str,
                         default=0,
                         help='path to parameters file')
-
-    parser.add_argument('--seed', type=int,
-                        default=0,
-                        help='random seed')
 
     parser.add_argument('--client', type=str,
                         default='ERClient',

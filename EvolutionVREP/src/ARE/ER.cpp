@@ -126,23 +126,6 @@ void ER::endOfSimulation()
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
-//        if(instanceType == settings::INSTANCE_SERVER){
-//            double fitness = environment->fitnessFunction(currentInd);
-//            // Environment independent fitness function:
-//            // float fitness = fit->fitnessFunction(currentMorphology);
-//    //        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-//            if(verbose)
-//                std::cout << "fitness = " << fitness << std::endl;
-//            simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-//    //        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-//            int signal[1] = { 2 };
-//            simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-//    //        if (settings->savePhenotype) {
-//    //            currentGenome->fitness = fitness;
-//    //            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
-//    //        }
-//        }else if(instanceType == settings::INSTANCE_REGULAR){
-
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
 
