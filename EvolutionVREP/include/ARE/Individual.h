@@ -9,6 +9,7 @@
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
 
+
 namespace are {
 
 class Individual
@@ -83,7 +84,6 @@ public:
         arch & client_id;
     }
    const Learner::Ptr & get_learner(){return learner;}
-
 
 protected:
     std::vector<double> outputs;

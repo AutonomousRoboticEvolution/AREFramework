@@ -164,11 +164,9 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-
- 	if(ea->update())
+        if(ea->update())
             currentIndIndex++;
     }
-    
 }
 
 void ER::saveLogs(bool endOfGen)
