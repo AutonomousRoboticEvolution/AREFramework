@@ -33,10 +33,15 @@ namespace interproc = boost::interprocess;
 void ER::initialize()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-    Logging::create_log_folder(exp_name);
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+
+    if(instance_type == settings::INSTANCE_REGULAR){
+        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+
+        Logging::create_log_folder(repository + std::string("/") + exp_name);
+    }
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
@@ -88,6 +93,7 @@ void ER::initIndividual(){
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();
+    evalIsFinish = false;
 }
 
 void ER::handleSimulation()
@@ -164,8 +170,7 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        if(ea->update())
-            currentIndIndex++;
+        evalIsFinish = ea->update();
     }
 }
 

@@ -83,7 +83,7 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
-
+    bool get_evalIsFinish(){return evalIsFinish;}
 
 protected:
     ///pointer to settting of EA
@@ -108,6 +108,8 @@ protected:
     std::function<Logging::Factory> loggingFactory;
 
     std::vector<Logging::Ptr> logs;
+
+    bool evalIsFinish;
 
     void saveLogs(bool endOfGen = true);
 

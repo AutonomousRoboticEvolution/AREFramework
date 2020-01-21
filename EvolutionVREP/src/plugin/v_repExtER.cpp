@@ -152,7 +152,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if(seed < 0)
         seed = rand();
     misc::RandNum rn(seed);
-    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn)); //todo change
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
     simulationState = FREE;
     properties.reset();
@@ -312,14 +312,28 @@ void clientMessageHandler(int message){
     {
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
-        std::string indString = ERVREP->get_currentInd()->to_string();
-        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-        simSetIntegerSignal("simulationState",are_c::FINISH);
+        
+	if(ERVREP->get_evalIsFinish()){
+	
+	  std::string indString = ERVREP->get_currentInd()->to_string();
+          simSetStringSignal("currentInd",indString.c_str(),indString.size());
+          simSetIntegerSignal("simulationState",are_c::FINISH);
 
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
+          loadingPossible = true;  // start another simulation
+     	  if (verbose) {
+            std::cout << "EVALUATION ENDED" << std::endl;
+          }
+	}
+	else{
+	  simSetIntegerSignal("simulationState",are_c::BUSY);
+	  simStartSimulation();
+
+	  if (verbose) {
             std::cout << "SIMULATION ENDED" << std::endl;
-        }
+          }
+	}
+
+
     }
 
     if (clientState[0] == are_c::IDLE)
