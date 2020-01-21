@@ -69,15 +69,11 @@ void EPuckMorphology::setPosition(float x, float y, float z)
     epuckPos[1] = y;
     epuckPos[2] = z;
 
-    sim::setObjectPosition(
-                settings::INSTANCE_REGULAR,
-                mainHandle, -1, epuckPos,client_id);
+    simSetObjectPosition(mainHandle,-1,epuckPos);
 }
 
 void EPuckMorphology::getObjectHandles()
 {
-
-//    int instance_type = settings::INSTANCE_REGULAR; //getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     int nbrObj = 0;
@@ -94,62 +90,9 @@ void EPuckMorphology::getObjectHandles()
         std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
     for(int i = 0; i < nbrObj ; i++)
         jointHandles.push_back(handles[i]);
-
-//    if(instance_type == settings::INSTANCE_REGULAR)
-//    {
-//        simAddObjectToSelection(sim_handle_tree, mainHandle);
-//        size_t select_size = static_cast<size_t>(simGetObjectSelectionSize());
-//        if(select_size == 0){
-//            std::cerr << "No element of the e-puck found with handle of : " << mainHandle << std::endl;
-//            simChar* lastError = simGetLastError();
-//            std::cerr << "simGetLastError : " << lastError << std::endl;
-//            simReleaseBuffer(lastError);
-//        }
-//        if(verbose)
-//            std::cout << "MORPHOLOGY INIT " << select_size << " objects selected in the epuck tree" << std::endl;
-//        int obj_handles[select_size];
-//        simGetObjectSelection(obj_handles);
-
-//        for (size_t i = 0; i < select_size; i++)
-//        {
-//            if(simGetObjectType(obj_handles[i]) == sim_object_joint_type)
-//                jointHandles.push_back(obj_handles[i]);
-//            else if(simGetObjectType(obj_handles[i]) == sim_object_visionsensor_type){
-//                if(verbose)
-//                    std::cout << "MORPHOLOGY INIT camera added" << std::endl;
-//                cameraHandle = obj_handles[i];
-//            }
-//            else if(simGetObjectType(obj_handles[i]) == sim_object_proximitysensor_type)
-//                proxHandles.push_back(obj_handles[i]);
-//        }
-//        if(verbose){
-//            std::cout << "MORPHOLOGY INIT number of joint handles : " << jointHandles.size() << std::endl;
-//            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << proxHandles.size() << std::endl;
-//        }
-//    }
-//    else if(instance_type == settings::INSTANCE_SERVER)
-//    {
-//        int nbrObj = 0;
-//        int* handles = nullptr;
-//        simxGetObjects(client_id,sim_object_proximitysensor_type,&nbrObj,&handles,simx_opmode_blocking);
-
-//        if(verbose)
-//            std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
-//        for(int i = 0; i < nbrObj ; i++)
-//            proxHandles.push_back(handles[i]);
-
-//        simxGetObjects(client_id,sim_object_joint_type,&nbrObj,&handles,simx_opmode_blocking);
-//        if(verbose)
-//            std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
-//        for(int i = 0; i < nbrObj ; i++)
-//            jointHandles.push_back(handles[i]);
-//    }
-
 }
 
 std::vector<double> EPuckMorphology::update(){
-
-    int instance_type = settings::INSTANCE_REGULAR;//settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     std::vector<double> sensorValues;
 
@@ -160,37 +103,13 @@ std::vector<double> EPuckMorphology::update(){
     float pos[4], norm[3];
     int obj_h;
     int det;
-//    sim::pauseCommunication(instance_type,1,client_id);
     for (size_t i = 0; i < proxHandles.size(); i++)
     {
-//        simHandleProximitySensor(proxHandles[i],pos,&obj_h,norm);
-        det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,client_id);
+        det = simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        else if(det == 0) sensorValues.push_back(-1);
-        else std::cerr << "No detection on Proximity Sensor" << std::endl; //<< simGetLastError() << std::endl;
+        else if(det == 0) sensorValues.push_back(0);
+        else std::cerr << "No detection on Proximity Sensor" << std::endl;
     }
-//    sim::pauseCommunication(instance_type,0,client_id);
-
-//    float *auxVal = nullptr;
-//    int *auxCount = nullptr;
-//    simHandleVisionSensor(cameraHandle,&auxVal,&auxCount);
-//    if(simReadVisionSensor(cameraHandle,&auxVal,&auxCount) >= 0)
-//    {
-//        for(int i = 0; i < auxCount[0]; i++)
-//            std::cout << auxVal[i] << std::endl;
-//        if(auxCount[0] > 0 && auxCount[1] >=15)
-//        {
-//            sensorValues.push_back(auxVal[11]);
-//            sensorValues.push_back(auxVal[12]);
-//            sensorValues.push_back(auxVal[13]);
-//        }
-//        else std::cerr << "No Value read on the vision sensor" << std::endl;
-//        simReleaseBuffer((char *)auxVal);
-//        simReleaseBuffer((char *)auxCount);
-//    }
-//    else std::cerr << "No detection on CAMERA " << std::endl ;//<< simGetLastError() << std::endl;
-
     return sensorValues;
-
 }

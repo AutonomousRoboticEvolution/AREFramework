@@ -4,14 +4,13 @@ using namespace are;
 
 void FitnessLog::saveLog(are::EA::Ptr &ea)
 {
-    std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
     int generation = ea->get_generation();
 
     std::ofstream savePopFile;
-    savePopFile.open(repository + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
+    savePopFile.open(Logging::log_folder + std::string("/")  + logFile, std::ios::out | std::ios::ate | std::ios::app);
     if(!savePopFile)
     {
-        std::cerr << "unable to open : " << logFile << std::endl;
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + logFile << std::endl;
         return;
     }
     savePopFile << "generation " << generation << ": ,";
