@@ -43,7 +43,7 @@ void CPPNIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
     std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-    morphology->createAtPosition(0,0,0);
+    morphology->createAtPosition(-0.575,0.1,0.05);
 }
 
 void CPPNIndividual::createController()

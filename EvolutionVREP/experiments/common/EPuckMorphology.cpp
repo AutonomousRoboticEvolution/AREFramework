@@ -14,8 +14,6 @@ void EPuckMorphology::create()
 
 void EPuckMorphology::loadModel(){
     std::cout << "load model" << std::endl;
-    int instance_type = settings::INSTANCE_REGULAR;//getParameter<settings::Integer>(parameters,"#instanceType").value;
-
 
     std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#epuckPath").value;
     int epuckHandle = simLoadModel(path_epuck_m.c_str());
@@ -90,6 +88,8 @@ void EPuckMorphology::getObjectHandles()
         std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
     for(int i = 0; i < nbrObj ; i++)
         jointHandles.push_back(handles[i]);
+
+    simReleaseBuffer((simChar*)handles);
 }
 
 std::vector<double> EPuckMorphology::update(){

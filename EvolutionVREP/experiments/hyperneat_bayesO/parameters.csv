@@ -6,7 +6,7 @@
 #epuckPath,string,/home/le_goff/epuck_changedsensor3.ttm
 #populationSize,int,20
 #maxEvalTime,float,60
-#numberOfGeneration,int,400
+#numberOfGeneration,int,100
 #repository,string,/home/le_goff/are-logs
 #verbose,bool,1
 #instanceType,int,0

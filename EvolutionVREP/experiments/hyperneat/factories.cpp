@@ -1,12 +1,13 @@
-#include "testEnv.h"
+#include "mazeEnv.h"
 #include "EA_HyperNEAT.h"
 #include "Loggings.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::TestEnv);
+    are::Environment::Ptr env(new are::MazeEnv);
     env->set_parameters(param);
+//    std::dynamic_pointer_cast<are::MazeEnv>(env)->init();
     return env;
 }
 
