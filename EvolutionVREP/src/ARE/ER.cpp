@@ -55,7 +55,6 @@ void ER::initialize()
         exit(1);
 
     environment = environmentFactory(parameters);
-    environment->init();
     if(!load_fct_exp_plugin<Logging::Factory>
             (loggingFactory,exp_plugin_name,"loggingFactory"))
         exit(1);
@@ -77,6 +76,8 @@ void ER::startOfSimulation()
 {
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
+
+    environment->init();
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);

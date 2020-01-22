@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
-
+import datetime
+import sys
 
 def run_servers(n: int):
     processes = []
@@ -13,7 +14,10 @@ def run_servers(n: int):
 def run_server(rank: int):
     server_port = args.port_start + rank
     print(f'Starting server rank {rank} listening on port {server_port}')
-
+    time = datetime.datetime.today()
+    formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
+    logfilename = "./sim_" + str(rank) + "_" + formated_time + ".out";    
+    logfile = open(logfilename,'w+')
     # parameters
     # [1] path to the parameter file
     # [2] server port
@@ -23,24 +27,28 @@ def run_server(rank: int):
             '-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ])
+        ],stdout=logfile + ".out",stderr=logfile + ".err")
     else :
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
             args.vrep,
             '-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ])
+        ],stdout=logfile)
 
 
 def run_client():
     print('Starting client')
+    time = datetime.datetime.today()
+    formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
+    logfilename = "./client_" + formated_time + ".out";
+    logfile = open(logfilename,'w+')
     return subprocess.Popen([
         args.client,
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])
+    ],stdout=logfile)
 
 
 def wait(servers, client, timeout=None):
@@ -58,6 +66,7 @@ def kill(servers, client):
     else:
         processes = servers + [client]
     for p in processes:
+        p.stdout.close()
         p.terminate()
     try:
         wait(servers, client, timeout=30)
@@ -69,6 +78,7 @@ def kill(servers, client):
 
 
 def main():
+
     servers = []
     client = None
     try:

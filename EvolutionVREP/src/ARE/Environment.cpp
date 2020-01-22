@@ -2,14 +2,13 @@
 
 using namespace are;
 
-void Environment::sceneLoader(int clientID) {
+void Environment::sceneLoader() {
     std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
     if(simLoadScene(scene_path.c_str()) < 0)
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
 }
 
-void Environment::init(int clID) {
-    clientID = clID;
+void Environment::init() {
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value){
         std::cout << "Initialize Environment" << std::endl;
     }
