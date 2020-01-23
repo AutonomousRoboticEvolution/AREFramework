@@ -294,6 +294,7 @@ void clientMessageHandler(int message){
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
 //        simStartSimulation();
+        ERVREP->initEnv();
         ERVREP->initIndividual();//startOfSimulation();
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);

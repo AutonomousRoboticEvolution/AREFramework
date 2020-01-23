@@ -27,7 +27,7 @@ def run_server(rank: int):
             '-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ],stdout=logfile + ".out",stderr=logfile + ".err")
+        ],stdout=logfile)
     else :
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
             args.vrep,

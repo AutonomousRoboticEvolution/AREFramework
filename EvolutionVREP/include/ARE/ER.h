@@ -70,6 +70,7 @@ public:
     virtual void endOfSimulation();
 
     void initIndividual();
+    void initEnv(){environment->init();}
 
     //GETTERS & SETTERS
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
