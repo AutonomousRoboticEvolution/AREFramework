@@ -1,10 +1,14 @@
 #include "mazeEnv.h"
 #include "v_repLib.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace are;
 
 void MazeEnv::init(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
+    randNum.setSeed(rand());
 
     Environment::init();
 
@@ -12,31 +16,52 @@ void MazeEnv::init(){
 
     //Generate small variations
 
-//    simAddObjectToSelection(sim_handle_all,0);
-//    int nbrObj = simGetObjectSelectionSize();
+
+
+    simAddObjectToSelection(sim_handle_all,0);
+    int nbrObj = simGetObjectSelectionSize();
+    if(verbose)
+        std::cout << "Number of object selected : " << nbrObj << std::endl;
+
+    float variation_ratio = settings::getParameter<settings::Float>(parameters,"#variationRatio").value;
+
+
+    //    int nbrObj = 0;
+    int handles[nbrObj];
+//    handles = simGetObjectsInTree(sim_handle_all,sim_object_shape_type,1,&nbrObj);
+
 //    if(verbose)
-//        std::cout << "Number of object selected : " << nbrObj << std::endl;
+//        std::cout << "Number of shapes found : " << nbrObj << std::endl;
 
-//    float variation_ratio = settings::getParameter<settings::Float>(parameters,"#variationRatio").value;
-////    int nbrObj = 0;
-//    int handles[nbrObj];
-////    handles = simGetObjectsInTree(sim_handle_all,sim_object_shape_type,1,&nbrObj);
+    simGetObjectSelection(handles);
 
-////    if(verbose)
-////        std::cout << "Number of shapes found : " << nbrObj << std::endl;
+    float angles[3];
+    for(int i = 0; i < nbrObj; i++){
+        std::string objName = simGetObjectName(handles[i]);
+        std::vector<std::string> strs;
+        boost::split(strs,objName,boost::is_any_of("_"));
+        if(strs[0] != "Wall")
+            continue;
+        simGetObjectOrientation(handles[i],-1,angles);
+        angles[0] = randNum.randFloat(-variation_ratio,variation_ratio) + angles[0];
+        angles[1] = angles[1];
+        angles[2] = randNum.randFloat(-variation_ratio,variation_ratio) + angles[2];
+        simSetObjectOrientation(handles[i],-1,angles);
+    }
 
-//    simGetObjectSelection(handles);
+    std::string model_path = settings::getParameter<settings::String>(parameters,"#modelPath").value;
 
-//    float angles[3];
-//    for(int i = 0; i < nbrObj; i++){
-//        if(simGetObjectType(handles[i]) != sim_object_shape_type)
-//            continue;
-//        simGetObjectOrientation(handles[i],-1,angles);
-//        angles[0] = variation_ratio*angles[0] + angles[0];
-//        angles[1] = variation_ratio*angles[1] + angles[1];
-//        angles[2] = variation_ratio*angles[2] + angles[2];
-//        simSetObjectOrientation(handles[i],-1,angles);
-//    }
+    for(int i = 0; i < 60*variation_ratio; i++){
+        std::string small_heap = model_path +std::string("/ellipsoid.ttm");
+        int handle = simLoadModel(small_heap.c_str());
+        if(handle < 0)
+            std::cerr << "unable to load model : " << model_path << "/small_heap.ttm" << std::endl;
+        float pos[3];
+        pos[0] = randNum.randFloat(-0.78,0.78);
+        pos[1] = randNum.randFloat(-0.78,0.78);
+        pos[2] = -0.02;
+        simSetObjectPosition(handle,-1,pos);
+    }
 }
 
 double MazeEnv::fitnessFunction(const Individual::Ptr &ind){

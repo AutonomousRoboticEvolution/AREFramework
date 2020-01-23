@@ -10,10 +10,11 @@ namespace are {
 class MazeEnv : public Environment
 {
 public:
-    MazeEnv() : Environment()
+    MazeEnv() : Environment(), randNum(0)
     {
         target_position.resize(3);
         final_position.resize(3);
+
     }
     ~MazeEnv(){}
     void init() override;
@@ -23,9 +24,13 @@ public:
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;
+
+    void init_randNum(int seed){randNum.setSeed(seed);}
+
 private:
     std::vector<double> target_position;
     std::vector<double> final_position;
+    misc::RandNum randNum;
 };
 
 } //are

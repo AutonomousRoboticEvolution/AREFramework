@@ -24,8 +24,8 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
     avgFitness = avgFitness / ea->get_population().size();
     savePopFile << "avg: ," << avgFitness << ",";
     int bestInd = 0;
-    float bestFitness = 0;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
+    float bestFitness = ea->get_population()[0]->getFitness();
+    for (size_t i = 1; i < ea->get_population().size(); i++) {
         if (bestFitness < ea->get_population()[i]->getFitness()) {
             bestFitness = ea->get_population()[i]->getFitness();
             bestInd = i;
