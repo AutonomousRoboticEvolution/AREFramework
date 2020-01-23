@@ -15,23 +15,12 @@ void MazeEnv::init(){
     target_position = {-0.575,0.575,0.05};
 
     //Generate small variations
-
-
-
     simAddObjectToSelection(sim_handle_all,0);
     int nbrObj = simGetObjectSelectionSize();
-    if(verbose)
-        std::cout << "Number of object selected : " << nbrObj << std::endl;
 
     float variation_ratio = settings::getParameter<settings::Float>(parameters,"#variationRatio").value;
 
-
-    //    int nbrObj = 0;
     int handles[nbrObj];
-//    handles = simGetObjectsInTree(sim_handle_all,sim_object_shape_type,1,&nbrObj);
-
-//    if(verbose)
-//        std::cout << "Number of shapes found : " << nbrObj << std::endl;
 
     simGetObjectSelection(handles);
 
