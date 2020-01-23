@@ -143,7 +143,7 @@ void ER::updateSimulation()
         }
         else if(state == BUSY)
         {
-            float simTime = slave->getFloatSignal("simulationTime");
+//            float simTime = slave->getFloatSignal("simulationTime");
             slave->setIntegerSignal("clientState",BUSY);
 
         }

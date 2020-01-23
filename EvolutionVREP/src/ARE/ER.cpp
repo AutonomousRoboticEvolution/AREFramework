@@ -77,6 +77,8 @@ void ER::startOfSimulation()
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
+    simulationTime = 0;
+
     environment->init();
 
     currentInd = ea->getIndividual(currentIndIndex);
@@ -113,13 +115,11 @@ void ER::handleSimulation()
     }
 
     simulationTime += simGetSimulationTimeStep();
-    if(instance_type == settings::INSTANCE_SERVER)
-        simSetFloatSignal("simulationTime",simulationTime);
-
+//    if(instance_type == settings::INSTANCE_SERVER)
+//        simSetFloatSignal("simulationTime",simulationTime);
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,currentInd->get_morphology());
-
 
     if (simGetSimulationTime() >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
