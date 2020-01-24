@@ -112,7 +112,7 @@ bool EA_HyperNEAT::update()
 
     //add last fitness and NN weights in the database for the Bayesian optimizer
     Eigen::VectorXd o(1);
-    o(0) = ind->getFitness();
+    o(0) = currentFitnesses.back();
     partialObs.push_back(o);
 
 

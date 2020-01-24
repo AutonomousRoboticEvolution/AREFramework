@@ -58,7 +58,7 @@ bool noEA::update()
 
     //add last fitness and NN weights in the database for the Bayesian optimizer
     Eigen::VectorXd o(1);
-    o(0) = ind->getFitness();
+    o(0) = currentFitnesses.back();
     observations.push_back(o);
 
     auto connections = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_connections;
@@ -81,7 +81,6 @@ bool noEA::update()
 
     if(currentFitnesses.size() == nbr_bo_iter || generation == 0)
     {
-        ind->setFitness(computeFitness());
         currentFitnesses.clear();
         ind.reset();
 
@@ -103,11 +102,6 @@ void noEA::setFitness(size_t indIndex, float fitness){
     currentFitnesses.push_back(fitness);
 }
 
-float noEA::computeFitness(){
-    float fit;
-    fit = currentFitnesses.back() + (currentFitnesses.back() - currentFitnesses.front());
-    return fit;
-}
 
 void noEA::epoch(){
 

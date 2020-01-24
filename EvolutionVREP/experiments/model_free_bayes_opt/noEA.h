@@ -19,7 +19,6 @@ public:
     bool update() override;
     void epoch() override;
 
-    float computeFitness();
 
     void setFitness(size_t indIndex, float fitness);
     int getNumberOfEval() const {return currentFitnesses.size();}
