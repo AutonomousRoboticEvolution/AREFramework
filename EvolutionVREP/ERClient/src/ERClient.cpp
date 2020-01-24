@@ -40,22 +40,39 @@ void saveLog(int counter) {
 
 int main(int argc, char* argv[])
 {
-    std::unique_ptr<client::ER> client(new client::ER);
-    std::vector<std::string> arguments(argv + 1, argv + argc);
-    std::string parameters_file;
 
-    if(arguments.size() <= 0)
+    srand(time(NULL));
+
+    if(argc != 4)
     {
-        std::cout << "usage : TODO" << std::endl;
+        std::cout << "usage :" << std::endl;
+        std::cout << "\targ1 - path to the parameter file" << std::endl;
+        std::cout << "\targ2 - port of the first simulator instance" << std::endl;
+        std::cout << "\targ3 - number of simulator instances" << std::endl;
         return 1;
     }
 
-    parameters_file = arguments[0];
+    std::unique_ptr<client::ER> client(new client::ER);
+    std::vector<std::string> arguments(argv + 1, argv + argc);
+    std::string parameters_file = argv[1];
+    int port = atoi(argv[2]);
+    int nbInst = atoi(argv[3]);
+
+    //Load the parameters
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
                 settings::loadParameters(parameters_file));
     client->set_properties(std::make_shared<settings::Property>(settings::Property()));
     client->set_parameters(parameters);
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    //-
+
+    //todo take the seed
+    int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
+    if(seed < 0)
+        seed = rand();
+    misc::RandNum rn(seed);
+    client->set_randNum(std::make_shared<misc::RandNum>(rn));
+
+            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
     {
         std::cout << "arguments are: ";
@@ -65,105 +82,33 @@ int main(int argc, char* argv[])
         std::cout << std::endl;
     }
 
-    // Just to handle settings
-    if (arguments.size() > 1) {
-        int run = atoi(arguments[1].c_str());
-
-
-        //		client->settings->sceneNum = run;
-        //		client->settings->seed = run;
-        client->set_randNum(std::make_shared<misc::RandNum>(misc::RandNum(run)));
-        // client->randNum->setSeed(atoi(arguments[1].c_str()));
-        srand(run);
-    }
-    else {
-        //		client->settings->seed = 0;
-        client->set_randNum(std::make_shared<misc::RandNum>(misc::RandNum(0)));
-        // client->randNum->setSeed(0); // not initialized
-        srand(0);
-    }
-
-    //	extApi_sleepMs(20000); // wait 20 seconds before connecting to ports, gives v-rep time to start up.
-    //cout << "settings read" << endl;
-    int portN = -1;
-    if(arguments.size() > 2)
+    if (!client->init(nbInst,port))
     {
-        portN = std::stoi(arguments[2]);
-        if(verbose)
-            std::cout << "connecting to port " << portN << std::endl;
-    }
-
-    if (arguments.size() > 3) {
-        std::cout << "client should connect to " << arguments[3].c_str() << " (-1) servers" << std::endl;
-        int numberOfCores = atoi(arguments[3].c_str());
-        if(portN != -1)
-        {
-            if (!client->init(numberOfCores - 1,portN))
-            {
-                return -1; // could not properly connect to servers
-            }
-        }
-        else
-        {
-            if (!client->init(numberOfCores - 1))
-            {
-                return -1; // could not properly connect to servers
-            }
-        }
-    }
-    else {
-        if(portN != -1){
-            if(!client->init(1,portN))
-                return -1;
-        }
-        else {
-            if(!client->init(1))
-                return -1;
-        }
+        std::cerr << "Client unable to connect to the simulators instances !" << std::endl;
+        return -1; // could not properly connect to servers
     }
 
     // load or initialize EA
     int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     int numberOfGeneration = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
-    //    if (client->properties->generation != 0) {
-    //		std::cout << "Generation was not zero. Setting individual number to <generation>*<populationSize>" << std::endl;
-    //        client->properties->indCounter = (int)((client->properties->generation + 1) * populationSize); // could be read from settings instead
-    //		std::cout << "Loading Genomes" << std::endl;
-    //		client->ea->loadPopulationGenomes();
-    //		client->ea->selection(); // create the next gen, indCounter needs to be set first
-    //		client->settings->generation++; // increment because next gen will be evaluated
-    //	}
-    //	else {
-    // client->ea->nextGenGenomes.resize(client->settings->populationSize);
-    //		client->initGA();
-    //        client->properties->indCounter = 0;
     client->get_properties()->indCounter = 0;
 
     if (verbose) {
         std::cout << "initialized EA " << std::endl;
     }
-    //client->settings->generation += 1;
-    //if (client->settings->indNumbers.size() < 1) {
-    //	for (int i = 0; i < client->ea->nextGenGenomes.size(); i++) {
-    //		client->settings->indNumbers.push_back(client->ea->nextGenGenomes[i]->individualNumber);
-    //		client->settings->indFits.push_back(client->ea->nextGenGenomes[i]->fitness);
-    //	}
-    // }
-    //	}
-    for (client->get_properties()->generation = 0;
-         client->get_properties()->generation < numberOfGeneration;
-         client->get_properties()->generation++) {
+    while (client->get_ea()->get_generation() < numberOfGeneration) {
         //	tStart = clock();
         //	client->ea->agePop(); // should be in update function of EA
+
         if (!client->execute()) {
-            std::cout << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << std::endl;
+            std::cerr << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << std::endl;
             break;
         }
         //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
         //client->settings->saveSettings(); // IS IN EVALUATEPOP
-        if (verbose) {
-            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
-        }
+        //        if (verbose) {
+        //            std::cout << "Just saved settings <right after evaluate pop>" << std::endl;
+        //        }
         //        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
         //			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
         //			break;

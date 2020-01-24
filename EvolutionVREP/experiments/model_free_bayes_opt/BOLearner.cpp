@@ -54,9 +54,14 @@ void BOLearner::init_model(int input_size)
 //    return cmasols.get_best_seen_candidate().get_x_dvec();
 //}
 
+void BOLearner::compute_model(){
+    _model.compute(_samples,_observations);
+}
+
 void BOLearner::update(Control::Ptr & ctrl)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
     using acqui_optimizer_t =
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
 
@@ -74,7 +79,7 @@ void BOLearner::update(Control::Ptr & ctrl)
         return avg/static_cast<double>(_observations.size());
     };
 
-    _model.compute(_samples,_observations);
+    std::cout << "start acquisition" << std::endl;
 
     acqui_optimizer_t acqui_optimizer;
 
@@ -84,6 +89,7 @@ void BOLearner::update(Control::Ptr & ctrl)
             [&](const Eigen::VectorXd& x, bool g) { return acqui(x, aggr, g); };
 
     Eigen::VectorXd new_sample = acqui_optimizer(acqui_optimization, starting_point, false);
+    std::cout << "finish acquisition" << std::endl;
 
 
     NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
@@ -108,6 +114,8 @@ void BOLearner::update(Control::Ptr & ctrl)
 
 void BOLearner::update_model()
 {
+    std::cout << "add samples" << std::endl;
     _model.add_sample(_samples.back(), _observations.back());
+    std::cout << "optimize hyperparams" << std::endl;
     _model.optimize_hyperparams();
 }

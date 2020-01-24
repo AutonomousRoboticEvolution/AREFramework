@@ -41,7 +41,8 @@ void BOIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
     morphology->set_properties(properties);
-    morphology->createAtPosition(0,0,0);
+    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    morphology->createAtPosition(-0.575,0.1,0.05);
 }
 
 void BOIndividual::createController()
@@ -53,18 +54,17 @@ void BOIndividual::createController()
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
 }
 
+void BOIndividual::compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl){
+    std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
+    std::dynamic_pointer_cast<BOLearner>(learner)->set_samples(spl);
+    std::dynamic_pointer_cast<BOLearner>(learner)->compute_model();
+}
 
 void BOIndividual::update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl)
 {
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
     std::dynamic_pointer_cast<BOLearner>(learner)->set_samples(spl);
-    learner->update(control);
-}
-
-void BOIndividual::update_learner_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl)
-{
-    std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);
-    std::dynamic_pointer_cast<BOLearner>(learner)->set_samples(spl);
     std::dynamic_pointer_cast<BOLearner>(learner)->update_model();
+    learner->update(control);
 }
 

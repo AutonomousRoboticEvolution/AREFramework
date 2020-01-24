@@ -1,5 +1,5 @@
-#ifndef TESTENV_H
-#define TESTENV_H
+#ifndef MAZEENV_H
+#define MAZEENV_H
 
 #include <cmath>
 #include "ARE/Environment.h"
@@ -7,17 +7,16 @@
 
 namespace are {
 
-class TestEnv : public Environment
+class MazeEnv : public Environment
 {
 public:
-
-    TestEnv() : Environment()
+    MazeEnv() : Environment()
     {
-        initial_position.resize(3);
+        target_position.resize(3);
         final_position.resize(3);
     }
-    ~TestEnv(){}
-//    void init() override;
+    ~MazeEnv(){}
+    void init() override;
 
     double fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
@@ -25,10 +24,10 @@ public:
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 private:
-    std::vector<double> initial_position;
+    std::vector<double> target_position;
     std::vector<double> final_position;
 };
 
 } //are
 
-#endif //TESTENV_H
+#endif //MAZEENV_H

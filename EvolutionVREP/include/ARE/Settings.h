@@ -40,6 +40,12 @@ public:
     Boolean(){name = "bool";}
     bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
 };
 
 class Integer : public Type
@@ -48,6 +54,12 @@ public:
     Integer(){name = "int";}
     int value = 0;
     void fromString(const std::string& str){value = std::stoi(str);}
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
 };
 
 class Float : public Type
@@ -56,6 +68,12 @@ public:
     Float(){name = "float";}
     float value = 0.0;
     void fromString(const std::string& str){value = std::stof(str);}
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
 };
 
 
@@ -65,6 +83,12 @@ public:
     Double(){name = "double";}
     double value = 0.0;
     void fromString(const std::string& str){value = std::stod(str);}
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
 };
 
 class String : public Type
@@ -73,6 +97,12 @@ public:
     String(){name = "string";}
     std::string value = "";
     void fromString(const std::string& str){value = str;}
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
 };
 
 Type::Ptr buildType(const std::string &name);

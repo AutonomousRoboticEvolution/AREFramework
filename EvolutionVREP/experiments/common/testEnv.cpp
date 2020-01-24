@@ -17,12 +17,11 @@ double TestEnv::fitnessFunction(const Individual::Ptr &ind){
 
 float TestEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
 
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     float timeStep = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
     int morphHandle = morph->getMainHandle();
 
     float pos[3];
-    sim::getObjectPosition(instance_type, morphHandle, -1, pos, clientID);
+    simGetObjectPosition(morphHandle, -1, pos);
 
     if(simulationTime < timeStep*2)
     {

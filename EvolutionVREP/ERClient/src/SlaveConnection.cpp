@@ -171,14 +171,16 @@ void SlaveConnection::setFloatSignal(const std::string& signalName, simxFloat st
     );
 }
 
-// const std::string SlaveConnection::getStringSignal(const std::string& signalName) const
-// {
-//     simxFloat states[1];
-//     checkReturnValue(
-//         simxGetStringSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking)
-//     );
-//     return states[0];
-// }
+void SlaveConnection::getStringSignal(const std::string& signalName, std::string &message) const
+{
+    simxUChar *states;
+    simInt length;
+    checkReturnValue(
+                simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)
+                );
+    message = (char*)states;
+
+}
 
 void SlaveConnection::setStringSignal(const std::string& signalName, const std::string& state)
 {

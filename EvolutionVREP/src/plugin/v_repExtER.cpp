@@ -136,7 +136,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
             std::cout << "Starting in server intance mode" << std::endl;
     }
 
-
     simulationState = INITIALIZING;
     // Construct classes
     ERVREP = std::make_unique<are::ER>();   // The class used to handle the EA
@@ -153,7 +152,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if(seed < 0)
         seed = rand();
     misc::RandNum rn(seed);
-    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn)); //todo change
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
     simulationState = FREE;
     properties.reset();
@@ -251,6 +250,10 @@ void localMessageHandler(int message){
 }
 
 void clientMessageHandler(int message){
+
+    if(message == sim_message_eventcallback_modelloaded)
+        return;
+
     are_sett::ParametersMap param = (*ERVREP->get_parameters());
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
@@ -282,44 +285,69 @@ void clientMessageHandler(int message){
 
     }
 
-
-    if (clientState[0] == are_c::IDLE)
-    {
-        timerOn = false;
-        simulationState = STARTING;
-        simSetIntegerSignal("simulationState",are_c::READY);
-    }
     // ABOUT TO START
-    else if (clientState[0] == are_c::READY && simulationState == STARTING)
+    if (message == sim_message_eventcallback_simulationabouttostart)
     {
-//        simStartSimulation();
         simulationState = BUSY;
+
+        if (verbose) {
+            std::cout << "SIMULATION ABOUT TO START" << std::endl;
+        }
+//        simStartSimulation();
+        ERVREP->initEnv();
+        ERVREP->initIndividual();//startOfSimulation();
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);
         simSetFloatSignal("simulationTime",0);
 //        extApi_sleepMs(50);
-        if (verbose) {
-            std::cout << "SIMULATION ABOUT TO START" << std::endl;
-        }
+
     }
     //Runing Simulation
     else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
     {
         ERVREP->handleSimulation(); // handling the simulation.
         simSetIntegerSignal("simulationState",are_c::BUSY);
-    }
+    }\
     // SIMULATION ENDED
     else if (message == sim_message_eventcallback_simulationended)
     {
         simulationState = CLEANUP;
-        simSetIntegerSignal("simulationState",are_c::FINISH);
+        ERVREP->endOfSimulation();
+        
+	if(ERVREP->get_evalIsFinish()){
+	
+	  std::string indString = ERVREP->get_currentInd()->to_string();
+          simSetStringSignal("currentInd",indString.c_str(),indString.size());
+          simSetIntegerSignal("simulationState",are_c::FINISH);
 
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
+          loadingPossible = true;  // start another simulation
+     	  if (verbose) {
+            std::cout << "EVALUATION ENDED" << std::endl;
+          }
+	}
+	else{
+	  simSetIntegerSignal("simulationState",are_c::BUSY);
+	  simStartSimulation();
+
+	  if (verbose) {
             std::cout << "SIMULATION ENDED" << std::endl;
-        }
+          }
+	}
+
+
     }
 
-
+    if (clientState[0] == are_c::IDLE)
+    {
+        timerOn = false;
+        simulationState = STARTING;
+        simSetIntegerSignal("simulationState",are_c::READY);
+    }else if(clientState[0] == are_c::READY && simulationState == STARTING){
+        simStartSimulation();
+    }
+    else if(clientState[0] == 99){
+        std::cout << "Stop Instance !" << std::endl;
+        simQuitSimulator(true);
+    }
 
 }

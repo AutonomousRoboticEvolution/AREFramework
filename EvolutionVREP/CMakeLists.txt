@@ -40,6 +40,7 @@ add_library(ER_library SHARED ${SOURCES})
 
 target_include_directories(ER_library PUBLIC
     "include"
+    "ERClient/include"
     "${VREP_FOLDER}/programming/"
     "${VREP_FOLDER}/programming/include"
 )
@@ -64,7 +65,7 @@ add_library(v_repExtER SHARED
 
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
-    dlibxx dl
+    dlibxx dl rt
 )
 
 target_include_directories(ER_library

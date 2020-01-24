@@ -15,7 +15,6 @@ Individual::Ptr CPPNIndividual::clone()
 
 void CPPNIndividual::update(double delta_time)
 {
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::vector<double> inputs = morphology->update();
 
 //    std::cout << "Inputs : ";
@@ -35,19 +34,16 @@ void CPPNIndividual::update(double delta_time)
 
     assert(jointHandles.size() == outputs.size());
 
-//    sim::pauseCommunication(instance_type,1,properties->clientID);
     for (size_t i = 0; i < outputs.size(); i++){
-        sim::setJointVelocity(instance_type,
-                              jointHandles[i],static_cast<float>(outputs[i]),properties->clientID);
+        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
     }
-//    sim::pauseCommunication(instance_type,0,properties->clientID);
 }
 
 void CPPNIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
-    morphology->set_properties(properties);
-    morphology->createAtPosition(0,0,0);
+    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    morphology->createAtPosition(-0.575,0.1,0.05);
 }
 
 void CPPNIndividual::createController()
@@ -56,10 +52,29 @@ void CPPNIndividual::createController()
             std::dynamic_pointer_cast<CPPNGenome>(ctrlGenome)->get_neat_genome();
     NEAT::Substrate subs = morphology->get_substrate();
     control.reset(new NNControl);
-    control->set_properties(properties);
+//    control->set_properties(properties);
     NEAT::NeuralNetwork nn;
     gen.BuildHyperNEATPhenotype(nn,subs);
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
 }
 
+std::string CPPNIndividual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<CPPNIndividual>();
+    oarch.register_type<CPPNGenome>();
+    oarch.register_type<EmptyGenome>();
+    oarch << *this;
+    return sstream.str();
+}
 
+void CPPNIndividual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<CPPNIndividual>();
+    iarch.register_type<CPPNGenome>();
+    iarch.register_type<EmptyGenome>();
+    iarch >> *this;
+}

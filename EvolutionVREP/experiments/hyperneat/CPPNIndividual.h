@@ -19,7 +19,19 @@ public :
 
     void update(double delta_time);
 
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & fitness;
+        arch & ctrlGenome;
+        arch & morphGenome;
+        arch & isEval;
+        arch & individual_id;
+        arch & client_id;
+    }
 
+    std::string to_string();
+    void from_string(const std::string &str);
 protected:
     void createController() override;
     void createMorphology() override;

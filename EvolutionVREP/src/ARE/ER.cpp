@@ -25,45 +25,48 @@
 #include "ARE/ER.h"
 
 using namespace are;
+namespace interproc = boost::interprocess;
+
 
 /// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
 /// settings file. A random number class will also be created and all other files refer to this class
 void ER::initialize()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-    Logging::create_log_folder(exp_name);
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+
+    if(instance_type == settings::INSTANCE_REGULAR){
+        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+
+        Logging::create_log_folder(repository + std::string("/") + exp_name);
+    }
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
 
+    std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-    if(instance_type == settings::INSTANCE_REGULAR){
-        std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-        if(!load_fct_exp_plugin<Environment::Factory>
-                (environmentFactory,exp_plugin_name,"environmentFactory"))
-            exit(1);
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,exp_plugin_name,"environmentFactory"))
+        exit(1);
 
-        environment = environmentFactory(parameters);
-        environment->init();
+    environment = environmentFactory(parameters);
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,exp_plugin_name,"loggingFactory"))
+        exit(1);
 
-        if(!load_fct_exp_plugin<EA::Factory>
-                (EAFactory,exp_plugin_name,"EAFactory"))
-            exit(1);
+    loggingFactory(logs,parameters);
 
-        ea = EAFactory(randNum, parameters);
-        ea->init();
 
-        if(!load_fct_exp_plugin<Logging::Factory>
-                (loggingFactory,exp_plugin_name,"loggingFactory"))
-            exit(1);
-
-        loggingFactory(logs,parameters);
-    }
+    if(!load_fct_exp_plugin<EA::Factory>
+            (EAFactory,exp_plugin_name,"EAFactory"))
+        exit(1);
+    ea = EAFactory(randNum, parameters);
+    ea->init();
 }
 
 
@@ -74,11 +77,27 @@ void ER::startOfSimulation()
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
+    simulationTime = 0;
+
+    environment->init();
+
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);
     currentInd->init();
 }
 
+void ER::initIndividual(){
+    simInt length;
+    std::string mess(simGetStringSignal("currentInd",&length));
+    if(length == 0){
+        std::cerr << "No individual received" << std::endl;
+        return;
+    }
+    currentInd = ea->getIndividual(0);
+    currentInd->from_string(mess);
+    currentInd->init();
+    evalIsFinish = false;
+}
 
 void ER::handleSimulation()
 {
@@ -96,14 +115,11 @@ void ER::handleSimulation()
     }
 
     simulationTime += simGetSimulationTimeStep();
-    if(instance_type == settings::INSTANCE_SERVER)
-        simSetFloatSignal("simulationTime",simulationTime);
+//    if(instance_type == settings::INSTANCE_SERVER)
+//        simSetFloatSignal("simulationTime",simulationTime);
 
-
-    if(instance_type == settings::INSTANCE_REGULAR){
-        currentInd->update(simulationTime);
-        environment->updateEnv(simulationTime,currentInd->get_morphology());
-    }
+    currentInd->update(simulationTime);
+    environment->updateEnv(simulationTime,currentInd->get_morphology());
 
     if (simGetSimulationTime() >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
@@ -114,54 +130,48 @@ void ER::handleSimulation()
 void ER::endOfSimulation()
 {
 
-    //    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
-    //    if(instanceType == settings::INSTANCE_SERVER){
-    //        double fitness = environment->fitnessFunction(currentInd);
-    //        // Environment independent fitness function:
-    //        // float fitness = fit->fitnessFunction(currentMorphology);
-    ////        float phenValue = currentGenome->morph->phenValue; // phenValue is used for morphological protection algorithm
-    //        if(verbose)
-    //            std::cout << "fitness = " << fitness << std::endl;
-    //        simSetFloatSignal((simChar*) "fitness", fitness); // set fitness value to be received by client
-    ////        simSetFloatSignal((simChar*) "phenValue", phenValue); // set phenValue, for morphological protection
-    //        int signal[1] = { 2 };
-    //        simSetIntegerSignal((simChar*) "simulationState", signal[0]);
-    ////        if (settings->savePhenotype) {
-    ////            currentGenome->fitness = fitness;
-    ////            currentGenome->savePhenotype(currentGenome->individualNumber, settings->sceneNum);
-    ////        }
-    //    }else if(instanceType == settings::INSTANCE_REGULAR){
+    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
 
+    if(instanceType == settings::INSTANCE_REGULAR){
+        if(currentIndIndex < ea->get_population().size())
+        {
+            double fitness = environment->fitnessFunction(currentInd);
+            if(verbose)
+                std::cout << "fitness = " << fitness << std::endl;
+            ea->setFitness(currentIndIndex,fitness);
+            if(ea->update())
+              currentIndIndex++;
+            saveLogs(false);
+        }
 
-    if(currentIndIndex < ea->get_population().size())
-    {
+        if(currentIndIndex >= ea->get_population().size())
+        {
+            saveLogs();
+            ea->epoch();
+            if(verbose)
+                std::cout << "generation " << ea->get_generation() << " finished" << std::endl;
+            ea->incr_generation();
+            currentIndIndex = 0;
+
+        }
+        if(ea->get_generation() >= nbrOfGen){
+            std::cout << "---------------------" << std::endl;
+            std::cout << "Evolution is Finished" << std::endl;
+            std::cout << "---------------------" << std::endl;
+            exit(0);
+        }
+    }
+    else if(instanceType == settings::INSTANCE_SERVER){
         double fitness = environment->fitnessFunction(currentInd);
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        if(ea->update())
-            currentIndIndex++;
-        saveLogs(false);
-    }
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        saveLogs();
-        ea->epoch();
-        if(verbose)
-            std::cout << "generation " << generation << " finished" << std::endl;
-        ea->incr_generation();
-        currentIndIndex = 0;
-    }
-    int max_gen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
-    if(ea->get_generation() >= max_gen){
-        std::cout << "maximum number of generations reach. Stopping ..." << std::endl;
-        simQuitSimulator(true);
-        exit(1);
+        evalIsFinish = ea->update();
     }
 }
 

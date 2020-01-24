@@ -96,8 +96,6 @@ bool EA_HyperNEAT::update()
     bool globalBOData = settings::getParameter<settings::Boolean>(parameters,"#globalBOData").value;
     float BODataRatio = settings::getParameter<settings::Float>(parameters,"#BODataRatio").value;
 
-
-
     if(generation > 0 && currentFitnesses.size() == 1){
         partialObs.clear();
         partialSpl.clear();
@@ -115,7 +113,6 @@ bool EA_HyperNEAT::update()
     //add last fitness and NN weights in the database for the Bayesian optimizer
     Eigen::VectorXd o(1);
     o(0) = ind->getFitness();
-    observations.push_back(o);
     partialObs.push_back(o);
 
 
@@ -132,8 +129,6 @@ bool EA_HyperNEAT::update()
         s(i) = neu.m_bias;
         i++;
     }
-
-    samples.push_back(s);
     partialSpl.push_back(s);
 
     if(verbose)
@@ -141,9 +136,19 @@ bool EA_HyperNEAT::update()
 
     if(currentFitnesses.size() == nbr_bo_iter || generation == 0)
     {
-        if(generation > 0)
-	    std::dynamic_pointer_cast<CPPNIndividual>(ind)->best_ctrl();
+        if(generation > 0){
+            std::dynamic_pointer_cast<CPPNIndividual>(ind)->best_ctrl();
+            o(0) = std::dynamic_pointer_cast<BOLearner>(population[currentIndIndex]->get_learner())->get_best_fitness();
+            observations.push_back(o);
+            samples.push_back(std::dynamic_pointer_cast<BOLearner>(population[currentIndIndex]->get_learner())->get_best_sample());
+        }
+        else {
+            observations.push_back(o);
+            samples.push_back(s);
+        }
         ind->setFitness(computeFitness());
+
+
         currentFitnesses.clear();
         ind.reset();
         if(!globalBOData){
@@ -153,8 +158,10 @@ bool EA_HyperNEAT::update()
         return true;
     }
 
+    if(currentFitnesses.size() == 1){
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->compute_model(partialObs,partialSpl);
+    }
     std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner(partialObs, partialSpl);
-    std::dynamic_pointer_cast<CPPNIndividual>(ind)->update_learner_model(partialObs, partialSpl);
 
     ind.reset();
     return false;
@@ -170,7 +177,7 @@ float EA_HyperNEAT::computeFitness(){
     float fit;
     float best_fit;
     if(generation == 0)
-	best_fit = currentFitnesses.back();
+        best_fit = currentFitnesses.back();
     else    
     	best_fit = std::dynamic_pointer_cast<BOLearner>(population[currentIndIndex]->get_learner())->get_best_fitness();
     fit = best_fit + (best_fit - currentFitnesses.front());

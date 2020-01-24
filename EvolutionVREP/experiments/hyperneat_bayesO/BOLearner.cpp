@@ -54,6 +54,10 @@ void BOLearner::init_model(int input_size)
 //    return cmasols.get_best_seen_candidate().get_x_dvec();
 //}
 
+void BOLearner::compute_model(){
+    _model.compute(_samples,_observations);
+}
+
 void BOLearner::update(Control::Ptr & ctrl)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;

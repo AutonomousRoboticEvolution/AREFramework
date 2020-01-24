@@ -1,11 +1,11 @@
-#include "testEnv.h"
+#include "mazeEnv.h"
 #include "noEA.h"
 #include "Loggings.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::TestEnv);
+    are::Environment::Ptr env(new are::MazeEnv);
     env->set_parameters(param);
     return env;
 }

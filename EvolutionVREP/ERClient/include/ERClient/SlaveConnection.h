@@ -60,7 +60,7 @@ public:
     void setIntegerSignal(const std::string& signalName, simxInt state);
     simxFloat getFloatSignal(const std::string& signalName) const;
     void setFloatSignal(const std::string& signalName, simxFloat state);
-    // const std::string getStringSignal(const std::string& signalName) const;
+    void getStringSignal(const std::string& signalName, std::string &message) const;
     void setStringSignal(const std::string& signalName, const std::string &state);
 
     bool operator!() const;

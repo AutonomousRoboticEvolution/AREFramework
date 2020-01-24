@@ -14,3 +14,18 @@ Individual::~Individual(){
     morphology.reset();
     control.reset();
 }
+
+std::string Individual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch << *this;
+    return sstream.str();
+}
+
+void Individual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch >> *this;
+}

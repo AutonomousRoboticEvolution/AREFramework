@@ -1,6 +1,7 @@
 #ifndef CPPNGENOME_H
 #define CPPNGENOME_H
 
+#include <boost/serialization/export.hpp>
 #include "ARE/Genome.h"
 #include <multineat/Genome.h>
 
@@ -33,9 +34,18 @@ public:
 
     const NEAT::Genome &get_neat_genome(){return neat_genome;}
 
+    friend class boost::serialization::access;
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & boost::serialization::base_object<Genome>(*this);
+        arch & neat_genome;
+    }
+
 private:
     NEAT::Genome neat_genome;
 };
+
 
 }
 

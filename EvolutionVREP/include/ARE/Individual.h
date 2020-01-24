@@ -6,6 +6,10 @@
 #include <ARE/Morphology.h>
 #include <ARE/Learner.h>
 
+#include <boost/serialization/shared_ptr.hpp>
+#include <boost/serialization/map.hpp>
+
+
 namespace are {
 
 class Individual
@@ -63,8 +67,23 @@ public:
     void set_isEvaluated(bool b){isEval = b;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
-    const Learner::Ptr & get_learner(){return learner;}
+    void set_client_id(int cid){client_id = cid;}
+    int get_client_id(){return client_id;}
 
+    virtual std::string to_string();
+    virtual void from_string(const std::string &str);
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & fitness;
+        arch & ctrlGenome;
+        arch & morphGenome;
+        arch & isEval;
+        arch & individual_id;
+        arch & client_id;
+    }
+   const Learner::Ptr & get_learner(){return learner;}
 
 protected:
     std::vector<double> outputs;
@@ -84,11 +103,14 @@ protected:
 
     int individual_id; //TODO id system
 
+    int client_id;
 //    std::function<Genome::Factory> createGenome;
 
     virtual void createController() = 0;
     virtual void createMorphology() = 0;
 };
+
+
 
 }
 

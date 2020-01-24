@@ -26,7 +26,7 @@ struct Params {
         BO_PARAM(double, tolerance, -0.1);
     };
     struct acqui_ei {
-        BO_PARAM(double, jitter, 10.0);
+        BO_PARAM(double, jitter, 1.0);
     };
     struct acqui_gpucb {
         BO_PARAM(double, delta, 0.1);
@@ -113,6 +113,7 @@ public:
     BOLearner();
     void update(Control::Ptr &ctrl);
     void init_model(int input_size);
+    void compute_model();
     void update_model();
     void best_ctrl(Control::Ptr &ctrl);
 
@@ -124,6 +125,8 @@ public:
     Eigen::VectorXd get_best_sample(){return _best_sample;}
     Eigen::VectorXd get_best_observ(){return _best_observ;}
     float get_best_fitness(){return _best_fitness;}
+    int dataset_size(){return _samples.size();}
+
 
 private:
     model_t _model;
