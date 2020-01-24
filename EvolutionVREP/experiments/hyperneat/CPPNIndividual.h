@@ -25,9 +25,6 @@ public :
         arch & fitness;
         arch & ctrlGenome;
         arch & morphGenome;
-        arch & isEval;
-        arch & individual_id;
-        arch & client_id;
     }
 
     std::string to_string();
