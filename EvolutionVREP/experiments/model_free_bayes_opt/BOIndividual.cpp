@@ -42,8 +42,11 @@ void BOIndividual::createMorphology()
     morphology.reset(new EPuckMorphology(parameters));
     morphology->set_properties(properties);
     std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-    morphology->createAtPosition(-0.575,0.1,0.05);
-}
+    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
+    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    morphology->createAtPosition(init_x,init_y,init_z);}
 
 void BOIndividual::createController()
 {
