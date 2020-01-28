@@ -6,13 +6,15 @@
 using namespace are;
 
 void MazeEnv::init(){
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     randNum.setSeed(rand());
 
     Environment::init();
 
-    target_position = {-0.575,0.575,0.05};
+
+    target_position = {settings::getParameter<settings::Float>(parameters,"#target_x").value,
+                       settings::getParameter<settings::Float>(parameters,"#target_y").value,
+                       settings::getParameter<settings::Float>(parameters,"#target_z").value};
 
     //Generate small variations
     simAddObjectToSelection(sim_handle_all,0);
@@ -38,19 +40,19 @@ void MazeEnv::init(){
         simSetObjectOrientation(handles[i],-1,angles);
     }
 
-    std::string model_path = settings::getParameter<settings::String>(parameters,"#modelPath").value;
+//    std::string model_path = settings::getParameter<settings::String>(parameters,"#modelPath").value;
 
-    for(int i = 0; i < 60*variation_ratio; i++){
-        std::string small_heap = model_path +std::string("/ellipsoid.ttm");
-        int handle = simLoadModel(small_heap.c_str());
-        if(handle < 0)
-            std::cerr << "unable to load model : " << model_path << "/small_heap.ttm" << std::endl;
-        float pos[3];
-        pos[0] = randNum.randFloat(-0.78,0.78);
-        pos[1] = randNum.randFloat(-0.78,0.78);
-        pos[2] = -0.02;
-        simSetObjectPosition(handle,-1,pos);
-    }
+//    for(int i = 0; i < 60*variation_ratio; i++){
+//        std::string small_heap = model_path +std::string("/ellipsoid.ttm");
+//        int handle = simLoadModel(small_heap.c_str());
+//        if(handle < 0)
+//            std::cerr << "unable to load model : " << model_path << "/small_heap.ttm" << std::endl;
+//        float pos[3];
+//        pos[0] = randNum.randFloat(-0.78,0.78);
+//        pos[1] = randNum.randFloat(-0.78,0.78);
+//        pos[2] = -0.02;
+//        simSetObjectPosition(handle,-1,pos);
+//    }
 }
 
 double MazeEnv::fitnessFunction(const Individual::Ptr &ind){

@@ -67,6 +67,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 
     srand(time(NULL));
+    srand(rand());
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
