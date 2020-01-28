@@ -34,14 +34,21 @@ public:
 
     ER(){}
     virtual ~ER(){
-        parameters.reset();
-        properties.reset();
-        ea.reset();
-        environment.reset();
-        currentInd.reset();
-        randNum.reset();
+        if(parameters.get())
+            parameters.reset();
+        if(properties.get())
+            properties.reset();
+        if(ea.get())
+            ea.reset();
+        if(environment.get())
+            environment.reset();
+        if(currentInd.get())
+            currentInd.reset();
+        if(randNum.get())
+            randNum.reset();
         for(auto& log : logs)
-            log.reset();
+            if(log.get())
+                log.reset();
     }
 
 

@@ -84,7 +84,7 @@ void ER::initIndividual(){
         std::cerr << "No individual received" << std::endl;
         return;
     }
-    currentInd = ea->getIndividual(currentIndIndex);
+    currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();
 }
@@ -161,7 +161,7 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        currentIndIndex++;
+//        currentIndIndex++;
     }
 }
 
