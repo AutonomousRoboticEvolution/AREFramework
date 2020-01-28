@@ -6,7 +6,7 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
 {
     nn.Flush();
     nn.Input(sensorValues);
-    nn.Activate();
+    nn.ActivateUseInternalBias();
     return nn.Output();
 }
 
