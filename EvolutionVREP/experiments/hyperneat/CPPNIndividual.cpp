@@ -75,6 +75,7 @@ std::string CPPNIndividual::to_string()
 }
 
 void CPPNIndividual::from_string(const std::string &str){
+    std::cout << "CPPNIndividual" << std::endl;
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);

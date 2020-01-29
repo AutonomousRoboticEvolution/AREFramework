@@ -179,6 +179,7 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
                 simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)
                 );
     message = (char*)states;
+    message.resize(length);
 
 }
 

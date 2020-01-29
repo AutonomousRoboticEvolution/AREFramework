@@ -24,6 +24,7 @@ std::string Individual::to_string()
 }
 
 void Individual::from_string(const std::string &str){
+    std::cout << "Individual" <<std::endl;
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);

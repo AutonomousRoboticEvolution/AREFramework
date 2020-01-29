@@ -138,7 +138,8 @@ void ER::updateSimulation()
 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
             startOfSimulation();
             currentInd->set_client_id(slave->get_clientID());
-            slave->setStringSignal("currentInd",currentInd->to_string());
+            std::string mess = currentInd->to_string();
+            slave->setStringSignal("currentInd",mess);
             slave->setIntegerSignal("clientState",READY);
         }
         else if(state == BUSY)

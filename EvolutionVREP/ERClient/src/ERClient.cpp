@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
         return -1; // could not properly connect to servers
     }
 
-    boost::filesystem::copy_file(parameters_file,are::Logging::log_folder);
+    boost::filesystem::copy_file(parameters_file,are::Logging::log_folder + std::string("/parameters.csv"));
 
     // load or initialize EA
     int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;

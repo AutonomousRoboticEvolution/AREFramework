@@ -93,6 +93,8 @@ void ER::initIndividual(){
         std::cerr << "No individual received" << std::endl;
         return;
     }
+
+    mess.resize(length);
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();

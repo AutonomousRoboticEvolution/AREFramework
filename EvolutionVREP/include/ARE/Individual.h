@@ -8,7 +8,8 @@
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
-
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 
 namespace are {
 
