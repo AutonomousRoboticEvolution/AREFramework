@@ -21,6 +21,7 @@
 // ER files
 #include "ERClient/clientER.h"
 #include <ctime>
+#include <boost/filesystem.hpp>
 
 using namespace are;
 
@@ -72,7 +73,7 @@ int main(int argc, char* argv[])
     misc::RandNum rn(seed);
     client->set_randNum(std::make_shared<misc::RandNum>(rn));
 
-            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
     {
         std::cout << "arguments are: ";
@@ -87,6 +88,8 @@ int main(int argc, char* argv[])
         std::cerr << "Client unable to connect to the simulators instances !" << std::endl;
         return -1; // could not properly connect to servers
     }
+
+    boost::filesystem::copy_file(parameters_file,are::Logging::log_folder);
 
     // load or initialize EA
     int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;

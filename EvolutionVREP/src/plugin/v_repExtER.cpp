@@ -20,6 +20,8 @@
 #include <fstream>
 #include <memory>
 #include "v_repLib.h"
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace are_sett = are::settings;
 namespace are_c = are::client;
@@ -157,6 +159,27 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->initialize();
     simulationState = FREE;
     properties.reset();
+
+    if(instance_type == are_sett::INSTANCE_REGULAR){
+        boost::filesystem::copy_file(simGetStringParameter(sim_stringparam_app_arg1),are::Logging::log_folder + std::string("/parameters.csv"));
+//        std::fstream fs(are::Logging::log_folder + std::string("/parameters.csv"));
+//        std::string line;
+//        std::vector<std::string> l;
+//        std::streampos spos;
+//        while(std::getline(fs,line)){
+//            if(boost::split(l,line,boost::is_any_of(","))[0] == "#seed"){
+//                std::string end_of_file;
+//                while(std::getline(fs,line))
+//                    end_of_file += line + std::string("\n");
+//                fs.seekp(spos);
+//                fs << "#seed,int," << seed << std::endl; // << end_of_file;
+//                break;
+//            }
+//            spos = fs.tellg();
+//        }
+//        fs.close();
+    }
+
     if(instance_type == are_sett::INSTANCE_SERVER)
     {
         int signal[1] = { 0 };

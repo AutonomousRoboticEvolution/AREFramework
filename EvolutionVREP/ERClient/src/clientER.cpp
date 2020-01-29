@@ -151,7 +151,6 @@ void ER::updateSimulation()
         {
             std::string message;
             slave->getStringSignal("currentInd",message);
-            std::cout << message << std::endl;
             currentInd->from_string(message);
             endOfSimulation();
             slave->setIntegerSignal("clientState",IDLE);
