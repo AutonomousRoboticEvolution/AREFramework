@@ -85,7 +85,6 @@ def main():
     try:
         import time
         servers = run_servers(args.n_vrep)
-        time.sleep(10)
         client = run_client()
 
         

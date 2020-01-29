@@ -24,7 +24,7 @@ public :
     {
         arch & fitness;
         arch & ctrlGenome;
-        arch & morphGenome;
+//        arch & morphGenome;
     }
 
     std::string to_string();
