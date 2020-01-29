@@ -29,6 +29,7 @@ def run_server(rank: int):
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)
     else :
+        print("run with xvbf")
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
             args.vrep,
             '-h',
@@ -82,10 +83,12 @@ def main():
     servers = []
     client = None
     try:
+        import time
         servers = run_servers(args.n_vrep)
+        time.sleep(10)
         client = run_client()
 
-        import time
+        
         time.sleep(1)
 
     except:
@@ -108,7 +111,7 @@ if __name__ == "__main__":
     parser.add_argument('n_vrep', metavar='N', type=int,
                         help='Number of VREP instances')
     
-    parser.add_argument('--xvbf',type=int,default='0',help='run with xvfb')
+    parser.add_argument('--xvbf',type=int,default=0,help='run with xvfb')
 
     parser.add_argument('--params', type=str,
                         default=0,
