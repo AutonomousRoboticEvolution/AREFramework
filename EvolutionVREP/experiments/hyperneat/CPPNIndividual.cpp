@@ -43,7 +43,12 @@ void CPPNIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
     std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-    morphology->createAtPosition(0,0,0);
+
+    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
+    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    morphology->createAtPosition(init_x,init_y,init_z);
 }
 
 void CPPNIndividual::createController()
@@ -64,7 +69,7 @@ std::string CPPNIndividual::to_string()
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
     oarch.register_type<CPPNGenome>();
-    oarch.register_type<EmptyGenome>();
+//    oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
 }
@@ -75,6 +80,6 @@ void CPPNIndividual::from_string(const std::string &str){
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
     iarch.register_type<CPPNGenome>();
-    iarch.register_type<EmptyGenome>();
+//    iarch.register_type<EmptyGenome>();
     iarch >> *this;
 }

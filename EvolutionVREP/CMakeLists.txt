@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(ER)
 
+add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT VREP_FOLDER)
@@ -23,12 +25,16 @@ else()
 endif()
 
 find_package(MultiNEAT REQUIRED)
+message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 find_package(PolyVox REQUIRED)
 
 FILE(GLOB_RECURSE SOURCES
     "src/ARE/*"
     "src/misc/*"
-    "${VREP_FOLDER}/programming/common/v_repLib.cpp")
+    "${VREP_FOLDER}/programming/common/v_repLib.cpp"
+    "${VREP_FOLDER}/programming/remoteApi/extApi.c"
+    "${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c"
+    "${VREP_FOLDER}/programming/common/shared_memory.c")
 
 add_library(ER_library SHARED ${SOURCES})
 
@@ -38,7 +44,10 @@ target_include_directories(ER_library PUBLIC
     "${VREP_FOLDER}/programming/"
     "${VREP_FOLDER}/programming/include"
 )
-
+target_compile_definitions(ER_library PUBLIC
+    "NON_MATLAB_PARSING"
+    "MAX_EXT_API_CONNECTIONS=255"
+)
 
 
 # tool to help remove the warnings when using GCC

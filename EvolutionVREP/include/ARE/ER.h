@@ -77,12 +77,13 @@ public:
     virtual void endOfSimulation();
 
     void initIndividual();
+    void initEnv(){environment->init();}
 
     //GETTERS & SETTERS
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const misc::RandNum::Ptr &get_randNum(){return randNum;}
-    void set_randNum(const misc::RandNum::Ptr &rn){randNum.reset(rn.get());}
+    void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
     void set_startRun(bool b){startRun = b;}
     bool get_startRun(){return startRun;}
     void set_currentIndIndex(size_t num){currentIndIndex = num;}
@@ -90,7 +91,7 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
-
+    bool get_evalIsFinish(){return evalIsFinish;}
 
 protected:
     ///pointer to settting of EA
@@ -116,7 +117,9 @@ protected:
 
     std::vector<Logging::Ptr> logs;
 
-    void saveLogs();
+    bool evalIsFinish;
+
+    void saveLogs(bool endOfGen = true);
 
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)

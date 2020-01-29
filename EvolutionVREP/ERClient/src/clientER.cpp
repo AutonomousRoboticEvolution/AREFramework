@@ -26,13 +26,10 @@ int ER::init(int nbrOfInst, int port){
 void ER::initialize(){
 
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
-
-//    if(!load_fct_exp_plugin<Environment::Factory>
-//            (environmentFactory,exp_plugin_name,"environmentFactory"))
-//        exit(1);
-
-//    environment = environmentFactory(parameters);
+    Logging::create_log_folder(repository + std::string("/") + exp_name);
 
     if(!load_fct_exp_plugin<Logging::Factory>
             (loggingFactory,exp_plugin_name,"loggingFactory"))
@@ -103,6 +100,7 @@ void ER::endOfSimulation(){
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
         currentIndIndex++;
+    	saveLogs(false);
     }
     if(currentIndIndex >= ea->get_population().size())
     {
@@ -145,7 +143,7 @@ void ER::updateSimulation()
         }
         else if(state == BUSY)
         {
-            float simTime = slave->getFloatSignal("simulationTime");
+//            float simTime = slave->getFloatSignal("simulationTime");
             slave->setIntegerSignal("clientState",BUSY);
 
         }

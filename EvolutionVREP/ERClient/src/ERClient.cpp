@@ -21,6 +21,7 @@
 // ER files
 #include "ERClient/clientER.h"
 #include <ctime>
+#include <boost/filesystem.hpp>
 
 using namespace are;
 
@@ -40,14 +41,16 @@ void saveLog(int counter) {
 
 int main(int argc, char* argv[])
 {
-   
+
+    srand(time(NULL));
+
     if(argc != 4)
     {
         std::cout << "usage :" << std::endl;
-	std::cout << "\targ1 - path to the parameter file" << std::endl;
-	std::cout << "\targ2 - port of the first simulator instance" << std::endl;
-    	std::cout << "\targ3 - number of simulator instances" << std::endl;
-    	return 1;
+        std::cout << "\targ1 - path to the parameter file" << std::endl;
+        std::cout << "\targ2 - port of the first simulator instance" << std::endl;
+        std::cout << "\targ3 - number of simulator instances" << std::endl;
+        return 1;
     }
 
     std::unique_ptr<client::ER> client(new client::ER);
@@ -55,17 +58,20 @@ int main(int argc, char* argv[])
     std::string parameters_file = argv[1];
     int port = atoi(argv[2]);
     int nbInst = atoi(argv[3]);
-	
+
     //Load the parameters
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
                 settings::loadParameters(parameters_file));
     client->set_properties(std::make_shared<settings::Property>(settings::Property()));
     client->set_parameters(parameters);
-    //-	
+    //-
 
     //todo take the seed
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
-    client->set_randNum(std::make_shared<misc::RandNum>(0));    
+    if(seed < 0)
+        seed = rand();
+    misc::RandNum rn(seed);
+    client->set_randNum(std::make_shared<misc::RandNum>(rn));
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
@@ -79,10 +85,12 @@ int main(int argc, char* argv[])
 
     if (!client->init(nbInst,port))
     {
-	std::cerr << "Client unable to connect to the simulators instances !" << std::endl;
-	return -1; // could not properly connect to servers
+        std::cerr << "Client unable to connect to the simulators instances !" << std::endl;
+        return -1; // could not properly connect to servers
     }
-       
+
+    boost::filesystem::copy_file(parameters_file,are::Logging::log_folder);
+
     // load or initialize EA
     int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     int numberOfGeneration = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
@@ -94,16 +102,16 @@ int main(int argc, char* argv[])
     while (client->get_ea()->get_generation() < numberOfGeneration) {
         //	tStart = clock();
         //	client->ea->agePop(); // should be in update function of EA
-       
-	if (!client->execute()) {
+
+        if (!client->execute()) {
             std::cerr << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << std::endl;
             break;
         }
         //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
         //client->settings->saveSettings(); // IS IN EVALUATEPOP
-//        if (verbose) {
-//            std::cout << "Just saved settings <right aftel evaluate pop>" << std::endl;
-//        }
+        //        if (verbose) {
+        //            std::cout << "Just saved settings <right after evaluate pop>" << std::endl;
+        //        }
         //        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
         //			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
         //			break;

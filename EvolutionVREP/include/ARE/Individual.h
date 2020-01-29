@@ -4,9 +4,11 @@
 #include <ARE/Genome.h>
 #include <ARE/Control.h>
 #include <ARE/Morphology.h>
+#include <ARE/Learner.h>
 
 #include <boost/serialization/shared_ptr.hpp>
 #include <boost/serialization/map.hpp>
+
 
 namespace are {
 
@@ -34,7 +36,8 @@ public:
     virtual void init()
     {
         createMorphology();
-        createController();
+        if(control == nullptr)
+            createController();
     }
 
     virtual void update(double delta_time) = 0;
@@ -43,6 +46,10 @@ public:
         morphGenome->mutate();
         ctrlGenome->mutate();
     }
+
+    void initRandNum(int seed = 0){randNum.reset(new misc::RandNum(seed));}
+
+    bool isInit(){return (control != nullptr && morphology != nullptr);}
 
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
@@ -73,6 +80,7 @@ public:
         arch & ctrlGenome;
         arch & morphGenome;
     }
+   const Learner::Ptr & get_learner(){return learner;}
 
 protected:
     std::vector<double> outputs;
@@ -81,9 +89,12 @@ protected:
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;
     Control::Ptr control;
+    Learner::Ptr learner;
 
     settings::ParametersMapPtr parameters;
     settings::Property::Ptr properties;
+
+    misc::RandNum::Ptr randNum;
 
     bool isEval;
 

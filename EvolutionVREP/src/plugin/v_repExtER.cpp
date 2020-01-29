@@ -20,6 +20,8 @@
 #include <fstream>
 #include <memory>
 #include "v_repLib.h"
+#include <boost/filesystem.hpp>
+#include <boost/algorithm/string.hpp>
 
 namespace are_sett = are::settings;
 namespace are_c = are::client;
@@ -66,7 +68,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
 
 
-
+    srand(time(NULL));
+    srand(rand());
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
@@ -127,6 +130,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
                 are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
+    int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
 
     if(verbose){
         if(instance_type == are_sett::INSTANCE_REGULAR)
@@ -148,9 +152,33 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::Property::Ptr properties(new are_sett::Property);
     ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-    ERVREP->set_randNum(std::make_shared<misc::RandNum>(0)); //todo change
+    if(seed < 0)
+        seed = rand();
+    misc::RandNum rn(seed);
+    ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
     simulationState = FREE;
+    properties.reset();
+
+    if(instance_type == are_sett::INSTANCE_REGULAR){
+        boost::filesystem::copy_file(simGetStringParameter(sim_stringparam_app_arg1),are::Logging::log_folder + std::string("/parameters.csv"));
+//        std::fstream fs(are::Logging::log_folder + std::string("/parameters.csv"));
+//        std::string line;
+//        std::vector<std::string> l;
+//        std::streampos spos;
+//        while(std::getline(fs,line)){
+//            if(boost::split(l,line,boost::is_any_of(","))[0] == "#seed"){
+//                std::string end_of_file;
+//                while(std::getline(fs,line))
+//                    end_of_file += line + std::string("\n");
+//                fs.seekp(spos);
+//                fs << "#seed,int," << seed << std::endl; // << end_of_file;
+//                break;
+//            }
+//            spos = fs.tellg();
+//        }
+//        fs.close();
+    }
 
     if(instance_type == are_sett::INSTANCE_SERVER)
     {
@@ -176,7 +204,7 @@ VREP_DLLEXPORT void v_repEnd()
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
     are_sett::ParametersMapPtr param = ERVREP->get_parameters();
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
     if(instanceType == are_sett::INSTANCE_REGULAR)
@@ -257,9 +285,6 @@ void clientMessageHandler(int message){
     int clientState[1] = {10111};
     simGetIntegerSignal((simChar*) "clientState", clientState);
 
-    if(clientState[0] == 99)
-    	std::cout << "Received 99 : order to stop" << std::endl;
-
     if (simulationState == FREE
         && simGetSimulationState() == sim_simulation_stopped)
     {
@@ -293,6 +318,7 @@ void clientMessageHandler(int message){
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
 //        simStartSimulation();
+        ERVREP->initEnv();
         ERVREP->initIndividual();//startOfSimulation();
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);
@@ -311,14 +337,28 @@ void clientMessageHandler(int message){
     {
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
-        std::string indString = ERVREP->get_currentInd()->to_string();
-        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-        simSetIntegerSignal("simulationState",are_c::FINISH);
+        
+	if(ERVREP->get_evalIsFinish()){
+	
+	  std::string indString = ERVREP->get_currentInd()->to_string();
+          simSetStringSignal("currentInd",indString.c_str(),indString.size());
+          simSetIntegerSignal("simulationState",are_c::FINISH);
 
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
+          loadingPossible = true;  // start another simulation
+     	  if (verbose) {
+            std::cout << "EVALUATION ENDED" << std::endl;
+          }
+	}
+	else{
+	  simSetIntegerSignal("simulationState",are_c::BUSY);
+	  simStartSimulation();
+
+	  if (verbose) {
             std::cout << "SIMULATION ENDED" << std::endl;
-        }
+          }
+	}
+
+
     }
 
     if (clientState[0] == are_c::IDLE)

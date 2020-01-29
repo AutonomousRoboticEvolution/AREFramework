@@ -29,7 +29,7 @@ public:
     /**
         @brief Initialize the default environment scene and simulation time step size
         */
-    virtual void init(int clID = 0);
+    virtual void init();
     /**
         @brief Calculate the fitness value of the robot
         @param morph The pointer of the robot (morphology)
@@ -47,7 +47,7 @@ public:
     /**
         @brief Load a specific scence
         */
-    void sceneLoader(int clientID = 0);
+    void sceneLoader();
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}

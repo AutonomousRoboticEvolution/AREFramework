@@ -34,6 +34,15 @@ void ER::initialize()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+
+    if(instance_type == settings::INSTANCE_REGULAR){
+        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+
+        Logging::create_log_folder(repository + std::string("/") + exp_name);
+    }
+
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
@@ -46,7 +55,6 @@ void ER::initialize()
         exit(1);
 
     environment = environmentFactory(parameters);
-    environment->init();
     if(!load_fct_exp_plugin<Logging::Factory>
             (loggingFactory,exp_plugin_name,"loggingFactory"))
         exit(1);
@@ -59,9 +67,6 @@ void ER::initialize()
         exit(1);
     ea = EAFactory(randNum, parameters);
     ea->init();
-
-
-
 }
 
 
@@ -71,6 +76,10 @@ void ER::startOfSimulation()
 {
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
+
+    simulationTime = 0;
+
+    environment->init();
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);
@@ -87,6 +96,7 @@ void ER::initIndividual(){
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();
+    evalIsFinish = false;
 }
 
 void ER::handleSimulation()
@@ -105,13 +115,11 @@ void ER::handleSimulation()
     }
 
     simulationTime += simGetSimulationTimeStep();
-    if(instance_type == settings::INSTANCE_SERVER)
-        simSetFloatSignal("simulationTime",simulationTime);
-
+//    if(instance_type == settings::INSTANCE_SERVER)
+//        simSetFloatSignal("simulationTime",simulationTime);
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,currentInd->get_morphology());
-
 
     if (simGetSimulationTime() >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
@@ -136,7 +144,9 @@ void ER::endOfSimulation()
             if(verbose)
                 std::cout << "fitness = " << fitness << std::endl;
             ea->setFitness(currentIndIndex,fitness);
-            currentIndIndex++;
+            if(ea->update())
+              currentIndIndex++;
+            saveLogs(false);
         }
 
         if(currentIndIndex >= ea->get_population().size())
@@ -162,13 +172,17 @@ void ER::endOfSimulation()
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
 //        currentIndIndex++;
+
     }
 }
 
-void ER::saveLogs()
+void ER::saveLogs(bool endOfGen)
 {
-    for(const auto &log : logs)
-        log->saveLog(ea);
+    for(const auto &log : logs){
+        if(log->isEndOfGen() == endOfGen){
+            log->saveLog(ea);
+        }
+    }
 }
 
 

@@ -45,7 +45,6 @@ public:
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
-
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -73,11 +72,10 @@ public:
     Phenotype::Ptr develop(){return nullptr;}
     void mutate(){}
 
-    template <class archive>
-    void serialize(archive &arch, const unsigned int v)
-    {
-        arch & boost::serialization::base_object<Genome>(*this);
-    }
+//    template <class archive>
+//    void serialize(archive &arch, const unsigned int v)
+//    {
+//    }
 
 
 };
