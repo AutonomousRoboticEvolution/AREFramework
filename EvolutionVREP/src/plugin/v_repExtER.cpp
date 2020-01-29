@@ -162,22 +162,22 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
         boost::filesystem::copy_file(simGetStringParameter(sim_stringparam_app_arg1),are::Logging::log_folder + std::string("/parameters.csv"));
-//        std::fstream fs(are::Logging::log_folder + std::string("/parameters.csv"));
-//        std::string line;
-//        std::vector<std::string> l;
-//        std::streampos spos;
-//        while(std::getline(fs,line)){
-//            if(boost::split(l,line,boost::is_any_of(","))[0] == "#seed"){
-//                std::string end_of_file;
-//                while(std::getline(fs,line))
-//                    end_of_file += line + std::string("\n");
-//                fs.seekp(spos);
-//                fs << "#seed,int," << seed << std::endl; // << end_of_file;
-//                break;
-//            }
-//            spos = fs.tellg();
-//        }
-//        fs.close();
+        //        std::fstream fs(are::Logging::log_folder + std::string("/parameters.csv"));
+        //        std::string line;
+        //        std::vector<std::string> l;
+        //        std::streampos spos;
+        //        while(std::getline(fs,line)){
+        //            if(boost::split(l,line,boost::is_any_of(","))[0] == "#seed"){
+        //                std::string end_of_file;
+        //                while(std::getline(fs,line))
+        //                    end_of_file += line + std::string("\n");
+        //                fs.seekp(spos);
+        //                fs << "#seed,int," << seed << std::endl; // << end_of_file;
+        //                break;
+        //            }
+        //            spos = fs.tellg();
+        //        }
+        //        fs.close();
     }
 
     if(instance_type == are_sett::INSTANCE_SERVER)
@@ -204,7 +204,7 @@ VREP_DLLEXPORT void v_repEnd()
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
     are_sett::ParametersMapPtr param = ERVREP->get_parameters();
-//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+    //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
     if(instanceType == are_sett::INSTANCE_REGULAR)
@@ -286,7 +286,7 @@ void clientMessageHandler(int message){
     simGetIntegerSignal((simChar*) "clientState", clientState);
 
     if (simulationState == FREE
-        && simGetSimulationState() == sim_simulation_stopped)
+            && simGetSimulationState() == sim_simulation_stopped)
     {
         simSetIntegerSignal("simulationState",are_c::IDLE);
 
@@ -317,13 +317,13 @@ void clientMessageHandler(int message){
         if (verbose) {
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
-//        simStartSimulation();
+        //        simStartSimulation();
         ERVREP->initEnv();
         ERVREP->initIndividual();//startOfSimulation();
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);
         simSetFloatSignal("simulationTime",0);
-//        extApi_sleepMs(50);
+        //        extApi_sleepMs(50);
 
     }
     //Runing Simulation
@@ -337,29 +337,20 @@ void clientMessageHandler(int message){
     {
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
-        
-	if(ERVREP->get_evalIsFinish()){
-	
-	  std::string indString = ERVREP->get_currentInd()->to_string();
-          simSetStringSignal("currentInd",indString.c_str(),indString.size());
-          simSetIntegerSignal("simulationState",are_c::FINISH);
 
-          loadingPossible = true;  // start another simulation
-     	  if (verbose) {
-            std::cout << "EVALUATION ENDED" << std::endl;
-          }
-	}
-	else{
-	  simSetIntegerSignal("simulationState",are_c::BUSY);
-	  simStartSimulation();
+        std::string indString = ERVREP->get_currentInd()->to_string();
+        simSetStringSignal("currentInd",indString.c_str(),indString.size());
+        simSetIntegerSignal("simulationState",are_c::FINISH);
 
-	  if (verbose) {
+        loadingPossible = true;  // start another simulation
+        if (verbose) {
             std::cout << "SIMULATION ENDED" << std::endl;
-          }
-	}
-
-
+        }
     }
+
+
+
+
 
     if (clientState[0] == are_c::IDLE)
     {

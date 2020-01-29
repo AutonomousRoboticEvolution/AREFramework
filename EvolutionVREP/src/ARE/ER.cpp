@@ -96,7 +96,6 @@ void ER::initIndividual(){
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();
-    evalIsFinish = false;
 }
 
 void ER::handleSimulation()
@@ -115,8 +114,8 @@ void ER::handleSimulation()
     }
 
     simulationTime += simGetSimulationTimeStep();
-//    if(instance_type == settings::INSTANCE_SERVER)
-//        simSetFloatSignal("simulationTime",simulationTime);
+    //    if(instance_type == settings::INSTANCE_SERVER)
+    //        simSetFloatSignal("simulationTime",simulationTime);
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,currentInd->get_morphology());
@@ -145,7 +144,7 @@ void ER::endOfSimulation()
                 std::cout << "fitness = " << fitness << std::endl;
             ea->setFitness(currentIndIndex,fitness);
             if(ea->update())
-              currentIndIndex++;
+                currentIndIndex++;
             saveLogs(false);
         }
 
@@ -171,7 +170,7 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-//        currentIndIndex++;
+        //        currentIndIndex++;
 
     }
 }
