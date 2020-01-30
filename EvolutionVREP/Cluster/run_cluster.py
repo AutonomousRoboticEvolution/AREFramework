@@ -22,7 +22,7 @@ def run_server(rank: int):
     # [1] path to the parameter file
     # [2] server port
     if(not args.xvbf) :
-        return subprocess.Popen([
+        return subprocess.Popen([#"gdb","--ex=r","--args",
             args.vrep,
             '-h',
             f'-g{args.params}',

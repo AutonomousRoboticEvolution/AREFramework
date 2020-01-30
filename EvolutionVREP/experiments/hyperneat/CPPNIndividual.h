@@ -22,9 +22,7 @@ public :
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
-        std::cout << "serialisation of fitness" << std::endl;
         arch & fitness;
-        std::cout << "serialisation of ctrlGenome" << std::endl;
         arch & ctrlGenome;
 //        arch & morphGenome;
     }
