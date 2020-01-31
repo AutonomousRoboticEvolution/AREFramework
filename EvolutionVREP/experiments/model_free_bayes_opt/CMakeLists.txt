@@ -6,8 +6,10 @@ add_library(model_free_bayes_opt SHARED
     ../common/NNControl.cpp
     ../common/EPuckMorphology.cpp
     ../common/mazeEnv.cpp
+    ../common/testEnv.cpp
     factories.cpp
-    Loggings.cpp
+    ../common/Loggings.cpp
+    BOLoggings.cpp
     BOLearner.cpp
     NEATGenome.cpp
     )

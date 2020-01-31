@@ -10,7 +10,8 @@ add_library(hyperneat SHARED
     ../common/testEnv.cpp
     ../common/mazeEnv.cpp
     factories.cpp
-    Loggings.cpp)
+    ../common/Loggings.cpp
+    HNLoggings.cpp)
 target_include_directories(hyperneat PUBLIC
     "${VREP_FOLDER}/programming/include"
     "../common/"

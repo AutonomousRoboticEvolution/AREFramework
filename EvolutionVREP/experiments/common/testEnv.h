@@ -14,12 +14,15 @@ public:
     {
         initial_position.resize(3);
         final_position.resize(3);
+        name = "testEnv";
     }
     ~TestEnv(){}
 //    void init() override;
 
     double fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
+
+    const std::vector<double> &get_final_position(){return final_position;}
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;

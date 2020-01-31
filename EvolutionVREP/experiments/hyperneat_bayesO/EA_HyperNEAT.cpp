@@ -89,7 +89,7 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
 
 
 
-bool EA_HyperNEAT::update()
+bool EA_HyperNEAT::update(const Environment::Ptr &env)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
@@ -114,8 +114,6 @@ bool EA_HyperNEAT::update()
     Eigen::VectorXd o(1);
     o(0) = currentFitnesses.back();
     partialObs.push_back(o);
-
-
 
     auto connections = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_connections;
     auto neurons = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_neurons;
@@ -147,6 +145,14 @@ bool EA_HyperNEAT::update()
             samples.push_back(s);
         }
         ind->setFitness(computeFitness());
+
+        if(env->get_name() == "mazeEnv")
+            std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(
+                        std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        else if(env->get_name() == "testEnv")
+            std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(
+                        std::dynamic_pointer_cast<TestEnv>(env)->get_final_position());
+        else std::cerr << "unknown environment" << std::endl;
 
 
         currentFitnesses.clear();

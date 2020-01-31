@@ -5,6 +5,8 @@
 #include "CPPNGenome.h"
 #include "CPPNIndividual.h"
 #include "EPuckMorphology.h"
+#include "mazeEnv.h"
+#include "testEnv.h"
 
 namespace are {
 
@@ -17,7 +19,7 @@ public:
 
     void init() override;
     void initPopulation(const NEAT::Parameters&);
-    bool update() override;
+    bool update(const Environment::Ptr&) override;
     void epoch() override;
 
     float computeFitness();

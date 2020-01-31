@@ -16,6 +16,8 @@
 #fitnessFile,string,fitnesses_hnmfbo.csv
 #BOSamplesFile,string,bo_data.csv
 #LearnerSerialFile,string,model
+#evalTimeFile,string,eval_durations.csv
+#behavDescFile,string,final_pos.csv
 #reinitLearner,bool,1
 #numberBOIteration,int,10
 #globalBOData,bool,1

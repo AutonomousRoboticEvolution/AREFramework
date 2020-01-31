@@ -48,11 +48,12 @@ void noEA::init(){
 
 }
 
-bool noEA::update()
+bool noEA::update(const Environment::Ptr & env)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
 
+    numberEvaluation++;
 
     Individual::Ptr ind = population[currentIndIndex];
 
@@ -78,6 +79,13 @@ bool noEA::update()
 
     if(verbose)
         std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
+
+    if(env->get_name() == "mazeEnv")
+        final_position = std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position();
+    else if(env->get_name() == "testEnv")
+        final_position = std::dynamic_pointer_cast<TestEnv>(env)->get_final_position();
+
+    else std::cerr << "unknown environment" << std::endl;
 
     if(currentFitnesses.size() == nbr_bo_iter || generation == 0)
     {

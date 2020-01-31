@@ -27,10 +27,14 @@ public :
 
     void best_ctrl(){std::dynamic_pointer_cast<BOLearner>(learner)->best_ctrl(control);}
 
+    void set_final_position(const std::vector<double> fp){final_position = fp;}
+    const std::vector<double> get_final_position(){return final_position;}
 
 protected:
     void createController() override;
     void createMorphology() override;
+
+    std::vector<double> final_position;
 };
 
 }//are

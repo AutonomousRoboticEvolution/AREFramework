@@ -74,6 +74,8 @@ void ER::initialize()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
+    ea->set_startEvalTime(hr_clock::now());
+
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
@@ -87,6 +89,8 @@ void ER::startOfSimulation()
 }
 
 void ER::initIndividual(){
+    ea->set_startEvalTime(hr_clock::now());
+
     simInt length;
     std::string mess(simGetStringSignal("currentInd",&length));
     if(length == 0){
@@ -145,8 +149,9 @@ void ER::endOfSimulation()
             if(verbose)
                 std::cout << "fitness = " << fitness << std::endl;
             ea->setFitness(currentIndIndex,fitness);
-            if(ea->update())
+            if(ea->update(environment))
               currentIndIndex++;
+            ea->set_endEvalTime(hr_clock::now());
             saveLogs(false);
         }
 
@@ -176,7 +181,7 @@ void ER::endOfSimulation()
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
 //        currentIndIndex++;
-        evalIsFinish = ea->update();
+        evalIsFinish = ea->update(environment);
     }
 }
 

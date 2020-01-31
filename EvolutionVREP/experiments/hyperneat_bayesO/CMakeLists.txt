@@ -9,7 +9,8 @@ add_library(hyperneat_bayesO SHARED
     ../common/testEnv.cpp
     ../common/mazeEnv.cpp
     factories.cpp
-    Loggings.cpp
+    ../common/Loggings.cpp
+    HNBOLoggings.cpp
     BOLearner.cpp
     )
 target_include_directories(hyperneat_bayesO PUBLIC

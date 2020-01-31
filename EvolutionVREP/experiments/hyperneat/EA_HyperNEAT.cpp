@@ -49,6 +49,7 @@ void EA_HyperNEAT::init()
 
     initPopulation(params);
 
+    startEvalTime = hr_clock::now();
 }
 
 void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
@@ -67,6 +68,28 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
         ind->set_parameters(parameters);
         population.push_back(ind);
     }
+}
+
+void EA_HyperNEAT::setFitness(size_t indIndex, float fitness){
+    currentIndIndex = indIndex;
+    population[indIndex]->setFitness(fitness);
+}
+
+bool EA_HyperNEAT::update(const Environment::Ptr& env){
+    endEvalTime = hr_clock::now();
+    numberEvaluation++;
+
+    Individual::Ptr ind = population[currentIndIndex];
+
+    if(env->get_name() == "mazeEnv")
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+    else if(env->get_name() == "testEnv")
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(
+                    std::dynamic_pointer_cast<TestEnv>(env)->get_final_position());
+    else std::cerr << "unknown environment" << std::endl;
+
+    return true;
 }
 
 void EA_HyperNEAT::epoch(){

@@ -5,6 +5,8 @@
 #include "BOIndividual.h"
 #include "EPuckMorphology.h"
 #include "NEATGenome.h"
+#include "testEnv.h"
+#include "mazeEnv.h"
 
 namespace are {
 
@@ -16,7 +18,7 @@ public:
     ~noEA() override {}
 
     void init() override;
-    bool update() override;
+    bool update(const Environment::Ptr&) override;
     void epoch() override;
 
 
@@ -25,6 +27,7 @@ public:
     Eigen::VectorXd getLastObs() const {return observations.back();}
     Eigen::VectorXd getLastSpl() const {return samples.back();}
 
+    const std::vector<double>& get_final_position() const {return final_position;}
 
 private:
     std::vector<float> currentFitnesses;
@@ -32,6 +35,7 @@ private:
     std::vector<Eigen::VectorXd> observations;
     std::vector<Eigen::VectorXd> samples;
     NEAT::Parameters neat_params;
+    std::vector<double> final_position;
 };
 
 }
