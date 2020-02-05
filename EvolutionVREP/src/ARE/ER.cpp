@@ -182,6 +182,7 @@ void ER::endOfSimulation()
         ea->setFitness(currentIndIndex,fitness);
 //        currentIndIndex++;
         evalIsFinish = ea->update(environment);
+        simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }
 

@@ -35,8 +35,8 @@ public:
 
     int init(int nbrOfInst,int port = 19997);
     void initialize();
-    void startOfSimulation();
-    void endOfSimulation();
+    void startOfSimulation(int slaveIndex);
+    void endOfSimulation(int slaveIndex);
     void updateSimulation();
     bool execute();
 
@@ -49,6 +49,8 @@ private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
     int loadingTrials = 1000;
     bool sim_init = false;
+    std::vector<Individual::Ptr> currentIndVec;
+    std::vector<int> currentIndexVec;
 
 };
 
