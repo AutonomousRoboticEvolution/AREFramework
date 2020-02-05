@@ -40,8 +40,14 @@ void CPPNIndividual::update(double delta_time)
 void CPPNIndividual::createMorphology()
 {
     morphology.reset(new EPuckMorphology(parameters));
+    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+
     morphology->set_properties(properties);
-    morphology->createAtPosition(0,0,0);
+    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
+    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    morphology->createAtPosition(init_x,init_y,init_z);
 }
 
 void CPPNIndividual::createController()
@@ -56,7 +62,26 @@ void CPPNIndividual::createController()
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
 }
 
+std::string CPPNIndividual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<CPPNIndividual>();
+    oarch.register_type<CPPNGenome>();
+//    oarch.register_type<EmptyGenome>();
+    oarch << *this;
+    return sstream.str();
+}
 
+void CPPNIndividual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<CPPNIndividual>();
+    iarch.register_type<CPPNGenome>();
+//    iarch.register_type<EmptyGenome>();
+    iarch >> *this;
+}
 
 void CPPNIndividual::compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl){
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);

@@ -6,7 +6,7 @@
 #epuckPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/epuck_big.ttm
 #modelPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,20
-#maxEvalTime,float,90
+#maxEvalTime,float,120
 #numberOfGeneration,int,10
 #variationRatio,float,0.2
 #repository,string,/home/le_goff/are-logs
@@ -14,8 +14,8 @@
 #evalTimeFile,string,eval_durations.csv
 #behavDescFile,string,final_pos.csv
 #verbose,bool,1
-#instanceType,int,0
-#killWhenNotConnected,bool,1
+#instanceType,int,1
+#killWhenNotConnected,bool,0
 #timeStep,float,1.
 #shouldReopenConnections,bool,0
 #seed,int,-1

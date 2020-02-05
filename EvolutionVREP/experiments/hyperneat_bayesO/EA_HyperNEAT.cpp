@@ -69,7 +69,7 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
         morph.initSubstrate();
         NEAT::NeuralNetwork nn;
         NEAT::Substrate subs =  morph.get_substrate();
-        NEAT::Genome gen = ctrlgenome->get_neat_genome();
+        NEAT::Genome gen = std::dynamic_pointer_cast<CPPNGenome>(ctrlgenome)->get_neat_genome();
         gen.BuildHyperNEATPhenotype(nn,subs);
         learner->init_model(nn.m_connections.size());
 
