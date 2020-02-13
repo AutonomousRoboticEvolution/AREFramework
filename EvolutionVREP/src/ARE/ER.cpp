@@ -101,6 +101,7 @@ void ER::initIndividual(){
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
     currentInd->init();
+    evalIsFinish = false;
 }
 
 void ER::handleSimulation()

@@ -91,6 +91,7 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
+    bool get_evalIsFinish(){return evalIsFinish;}
 
 protected:
     ///pointer to settting of EA
@@ -128,6 +129,8 @@ protected:
     float simulationTime = 0;
     bool client = false;
     int clientID = 0;
+
+    bool evalIsFinish;
 };
 
 }//are
