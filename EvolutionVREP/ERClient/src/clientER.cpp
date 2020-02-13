@@ -85,13 +85,14 @@ void ER::startOfSimulation(int slaveIndex){
         std::cout << "Starting Simulation" << std::endl;
 
     currentIndVec[slaveIndex] = ea->getIndividual(currentIndIndex);
+    currentIndexVec[slaveIndex] = currentIndIndex;
     currentIndVec[slaveIndex]->set_properties(properties);
 }
 
 void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
-        std::cout << "individual " << currentIndexVec[slaveIdx] << " is evaluated" << std::endl;
+        std::cout << "individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
 
 
        float fitness = currentIndVec[slaveIndex]->getFitness();
@@ -111,6 +112,8 @@ void ER::updateSimulation()
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
+    bool all_instances_finish = true;
+
     for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
     {
         int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
@@ -122,7 +125,7 @@ void ER::updateSimulation()
             serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
             return;
         }
-        else if(state == READY)
+        else if(state == READY && currentIndIndex < ea->get_population().size())
         {
             ///@todo start in slave to handle errors
 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
@@ -160,8 +163,9 @@ void ER::updateSimulation()
                       << "\t BUSY : 2" << std::endl
                       << "\t FINISH : 3" << std::endl
                       << "\t ERROR : 9" << std::endl;
+    	all_instances_finish = all_instances_finish && (state == READY);
     }
-    if(currentIndIndex >= ea->get_population().size())
+    if(currentIndIndex >= ea->get_population().size() && all_instances_finish)
     {
         saveLogs();
         ea->epoch();
@@ -170,7 +174,7 @@ void ER::updateSimulation()
         ea->incr_generation();
         currentIndIndex = 0;
     }
-    if(ea->get_generation() >= nbrOfGen){
+    if(ea->get_generation() >= nbrOfGen && all_instances_finish){
         if(verbose)
         {
             std::cout << "---------------------" << std::endl;
