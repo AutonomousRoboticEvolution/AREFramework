@@ -4,6 +4,8 @@
 #include "ARE/Logging.h"
 #include "ARE/Individual.h"
 
+#include "ARE/EA.h"
+
 namespace are{
 
 class FitnessLog : public Logging
@@ -14,6 +16,13 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class EvalTimeLog : public Logging
+{
+public:
+    EvalTimeLog(const std::string &file) : Logging(file,false){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
 
 }//are
 #endif //LOGGINGS_H

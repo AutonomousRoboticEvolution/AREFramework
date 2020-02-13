@@ -74,6 +74,8 @@ void ER::initialize()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
+    ea->set_startEvalTime(hr_clock::now());
+
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
@@ -87,13 +89,14 @@ void ER::startOfSimulation()
 }
 
 void ER::initIndividual(){
+    ea->set_startEvalTime(hr_clock::now());
+
     simInt length;
     std::string mess(simGetStringSignal("currentInd",&length));
     if(length == 0){
         std::cerr << "No individual received" << std::endl;
         return;
     }
-
     mess.resize(length);
     currentInd = ea->getIndividual(0);
     currentInd->from_string(mess);
@@ -145,8 +148,9 @@ void ER::endOfSimulation()
             if(verbose)
                 std::cout << "fitness = " << fitness << std::endl;
             ea->setFitness(currentIndIndex,fitness);
-            if(ea->update())
-                currentIndIndex++;
+            if(ea->update(environment))
+              currentIndIndex++;
+            ea->set_endEvalTime(hr_clock::now());
             saveLogs(false);
         }
 
@@ -155,15 +159,18 @@ void ER::endOfSimulation()
             saveLogs();
             ea->epoch();
             if(verbose)
-                std::cout << "-_- GENERATION _-_" << ea->get_generation() << " finished" << std::endl;
+                std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
 
         }
         if(ea->get_generation() >= nbrOfGen){
-            std::cout << "---------------------" << std::endl;
-            std::cout << "Evolution is Finished" << std::endl;
-            std::cout << "---------------------" << std::endl;
+            if(verbose)
+            {
+                std::cout << "---------------------" << std::endl;
+                std::cout << "Evolution is Finished" << std::endl;
+                std::cout << "---------------------" << std::endl;
+            }
             exit(0);
         }
     }
@@ -172,8 +179,8 @@ void ER::endOfSimulation()
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndIndex,fitness);
-        //        currentIndIndex++;
-
+        evalIsFinish = ea->update(environment);
+        simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }
 

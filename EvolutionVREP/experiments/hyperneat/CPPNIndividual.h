@@ -14,6 +14,8 @@ class CPPNIndividual : public Individual
 public :
     CPPNIndividual() : Individual(){}
     CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
+    CPPNIndividual(const CPPNIndividual& ind) :
+        Individual(ind), final_position(ind.final_position){}
 
     Individual::Ptr clone();
 
@@ -25,14 +27,20 @@ public :
         arch & fitness;
         arch & ctrlGenome;
 //        arch & morphGenome;
+        arch & final_position;
     }
 
     std::string to_string();
     void from_string(const std::string &str);
+
+    void set_final_position(const std::vector<double> fp){final_position = fp;}
+    const std::vector<double> get_final_position(){return final_position;}
+
 protected:
     void createController() override;
     void createMorphology() override;
 
+    std::vector<double> final_position;
 };
 
 }//are

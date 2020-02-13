@@ -337,6 +337,26 @@ void clientMessageHandler(int message){
     {
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
+       
+        if(ERVREP->get_evalIsFinish()){
+
+            std::string indString = ERVREP->get_currentInd()->to_string();
+            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            simSetIntegerSignal("simulationState",are_c::FINISH);
+
+            loadingPossible = true;  // start another simulation
+            if (verbose) {
+                std::cout << "EVALUATION ENDED" << std::endl;
+            }
+        }
+        else{
+            simSetIntegerSignal("simulationState",are_c::BUSY);
+            simStartSimulation();
+
+            if (verbose) {
+                std::cout << "SIMULATION ENDED" << std::endl;
+            }
+        }
 
         std::string indString = ERVREP->get_currentInd()->to_string();
         simSetStringSignal("currentInd",indString.c_str(),indString.size());

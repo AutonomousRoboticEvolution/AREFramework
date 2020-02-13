@@ -2,6 +2,8 @@
 #ifndef EA_H
 #define EA_H
 
+#include <chrono>
+
 //#include "Genome.h"
 #include "ARE/Genome.h"
 #include "ARE/Settings.h"
@@ -10,7 +12,10 @@
 #include "ARE/Individual.h"
 #include "ARE/Environment.h"
 
+
 namespace are{
+
+typedef std::chrono::high_resolution_clock hr_clock;
 
 class EA
 {
@@ -49,7 +54,11 @@ public:
      * @brief Update method is called after each evaluation of an individual.
      * @return If the algorithm can continue to the next ind
      */
-    virtual bool update(){return true;}
+    virtual bool update(const Environment::Ptr&)
+    {
+        numberEvaluation++;
+        return true;
+    }
 
     /**
      * @brief Epoch method is called at the end of each generation
@@ -86,6 +95,16 @@ public:
     int get_generation() const {return generation;}
     void incr_generation(){generation++;}
 
+    int get_numberEvaluation() const {return numberEvaluation;}
+
+    std::chrono::nanoseconds getEvalCompTime() const {
+        return std::chrono::duration_cast<std::chrono::nanoseconds>
+               (endEvalTime - startEvalTime);
+    }
+    void set_startEvalTime(const hr_clock::time_point& t){startEvalTime = t;}
+    void set_endEvalTime(const hr_clock::time_point& t){endEvalTime = t;}
+
+
 protected:
     /// This method initilizes a population of genomes
     virtual void evaluation(){}  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
@@ -103,6 +122,10 @@ protected:
     misc::RandNum::Ptr randomNum;
 
     int generation = 0;
+    int numberEvaluation = 0;
+
+    hr_clock::time_point startEvalTime;
+    hr_clock::time_point endEvalTime;
 };
 
 }//are

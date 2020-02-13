@@ -24,6 +24,14 @@ public:
 
 
     Environment(){}
+    Environment(const Environment& env) :
+        parameters(env.parameters),
+        properties(env.properties),
+        envObjectHandles(env.envObjectHandles),
+        initialPos(env.initialPos),
+        maxTime(env.maxTime),
+        type(env.type),
+        name(env.name){}
 
     ~Environment(){}
     /**
@@ -56,7 +64,7 @@ public:
     float get_maxTime(){return maxTime;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
-
+    const std::string &get_name(){return name;}
 
 protected:
     ///setting of the environment
@@ -69,7 +77,7 @@ protected:
     ///maximum simulation time
     float maxTime = 0.0;
     int type = 0;
-    int clientID = 0;
+    std::string name;
 };
 
 }//are

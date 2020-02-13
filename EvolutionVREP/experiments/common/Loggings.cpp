@@ -7,12 +7,9 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
     int generation = ea->get_generation();
 
     std::ofstream savePopFile;
-    savePopFile.open(Logging::log_folder + std::string("/")  + logFile, std::ios::out | std::ios::ate | std::ios::app);
-    if(!savePopFile)
-    {
-        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + logFile << std::endl;
+    if(!openOLogFile(savePopFile))
         return;
-    }
+
     savePopFile << "generation " << generation << ": ,";
     for (size_t i = 0; i < ea->get_population().size(); i++) {
         savePopFile << " ind " << i << ": " << ea->get_population()[i]->getFitness() << ",";
@@ -40,3 +37,18 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
     savePopFile << std::endl;
     savePopFile.close();
 }
+
+void EvalTimeLog::saveLog(EA::Ptr &ea){
+
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
+
+    int nbEval = ea->get_numberEvaluation();
+    std::chrono::nanoseconds eval_time = ea->getEvalCompTime();
+
+    logFileStream << nbEval <<  ", " << eval_time.count() << std::endl;
+
+    logFileStream.close();
+}
+

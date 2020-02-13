@@ -26,6 +26,8 @@ public:
     virtual void saveLog(EA::Ptr& ea) = 0;
     virtual void loadLog(const std::string &file = std::string()) = 0;
 
+    bool openOLogFile(std::ofstream&);
+    bool openILogFile(std::ifstream&);
 
     //SETTERS && GETTERS
     const std::string &get_logFile(){return logFile;}

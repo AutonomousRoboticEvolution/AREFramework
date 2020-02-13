@@ -14,7 +14,7 @@ public:
     {
         target_position.resize(3);
         final_position.resize(3);
-
+        name = "mazeEnv";
     }
     ~MazeEnv(){}
     void init() override;
@@ -26,6 +26,8 @@ public:
     float timeCheck = 0.0;
 
     void init_randNum(int seed){randNum.setSeed(seed);}
+
+    const std::vector<double> &get_final_position(){return final_position;}
 
 private:
     std::vector<double> target_position;

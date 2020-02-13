@@ -19,6 +19,8 @@ int ER::init(int nbrOfInst, int port){
             continue; // jump back to beginning loop
         }
     }
+    currentIndVec.resize(serverInstances.size());
+    currentIndexVec.resize(serverInstances.size());
     initialize();
     return true;
 }
@@ -78,83 +80,74 @@ bool ER::execute()
     return true;
 }
 
-void ER::startOfSimulation(){
+void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    currentInd = ea->getIndividual(currentIndIndex);
-    currentInd->set_properties(properties);
+    currentIndVec[slaveIndex] = ea->getIndividual(currentIndIndex);
+    currentIndexVec[slaveIndex] = currentIndIndex;
+    currentIndVec[slaveIndex]->set_properties(properties);
 }
 
-void ER::endOfSimulation(){
+void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
     if(verbose)
-        std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+        std::cout << "individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
 
 
-    if(currentIndIndex < ea->get_population().size())
-    {
-        float fitness = currentInd->getFitness();
+       float fitness = currentIndVec[slaveIndex]->getFitness();
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
-        ea->setFitness(currentIndIndex,fitness);
-        currentIndIndex++;
+        ea->setFitness(currentIndexVec[slaveIndex],fitness);
+//        if(evalIsFinish)
+//            currentIndIndex++;
+        ea->set_endEvalTime(hr_clock::now());
     	saveLogs(false);
-    }
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        saveLogs();
-        ea->epoch();
-        if(verbose)
-            std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
-        ea->incr_generation();
-        currentIndIndex = 0;
-
-    }
-    if(ea->get_generation() >= nbrOfGen){
-        std::cout << "---------------------" << std::endl;
-        std::cout << "Evolution is Finished" << std::endl;
-        std::cout << "---------------------" << std::endl;
-    }
 }
 
 void ER::updateSimulation()
 {
-    for(const auto &slave : serverInstances)
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
+
+    bool all_instances_finish = true;
+
+    for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
     {
-        int state = slave->getIntegerSignal("simulationState");
+        int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
 
 //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
         if(state == IDLE)
         {
-            slave->setIntegerSignal("clientState",IDLE);
+            serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
             return;
         }
-        else if(state == READY)
+        else if(state == READY && currentIndIndex < ea->get_population().size())
         {
             ///@todo start in slave to handle errors
 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
-            startOfSimulation();
-            currentInd->set_client_id(slave->get_clientID());
-            std::string mess = currentInd->to_string();
-            slave->setStringSignal("currentInd",mess);
-            slave->setIntegerSignal("clientState",READY);
+            ea->set_startEvalTime(hr_clock::now());
+            startOfSimulation(slaveIdx);
+            currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
+            serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
+            serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
+            currentIndIndex++;
         }
         else if(state == BUSY)
         {
 //            float simTime = slave->getFloatSignal("simulationTime");
-            slave->setIntegerSignal("clientState",BUSY);
+            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
 
         }
         else if(state == FINISH)
         {
             std::string message;
-            slave->getStringSignal("currentInd",message);
-            currentInd->from_string(message);
-            endOfSimulation();
-            slave->setIntegerSignal("clientState",IDLE);
+            serverInstances[slaveIdx]->getStringSignal("currentInd",message);
+            currentIndVec[slaveIdx]->from_string(message);
+            evalIsFinish = serverInstances[slaveIdx]->getIntegerSignal("evalIsFinish");
+            endOfSimulation(slaveIdx);
+            serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
         }
         else if(state == ERROR)
         {
@@ -168,6 +161,24 @@ void ER::updateSimulation()
                       << "\t BUSY : 2" << std::endl
                       << "\t FINISH : 3" << std::endl
                       << "\t ERROR : 9" << std::endl;
+    	all_instances_finish = all_instances_finish && (state == READY);
+    }
+    if(currentIndIndex >= ea->get_population().size() && all_instances_finish)
+    {
+        saveLogs();
+        ea->epoch();
+        if(verbose)
+            std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
+        ea->incr_generation();
+        currentIndIndex = 0;
+    }
+    if(ea->get_generation() >= nbrOfGen && all_instances_finish){
+        if(verbose)
+        {
+            std::cout << "---------------------" << std::endl;
+            std::cout << "Evolution is Finished" << std::endl;
+            std::cout << "---------------------" << std::endl;
+        }
     }
 }
 

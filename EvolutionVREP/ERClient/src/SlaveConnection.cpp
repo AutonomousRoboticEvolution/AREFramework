@@ -180,7 +180,6 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
                 );
     message = (char*)states;
     message.resize(length);
-
 }
 
 void SlaveConnection::setStringSignal(const std::string& signalName, const std::string& state)

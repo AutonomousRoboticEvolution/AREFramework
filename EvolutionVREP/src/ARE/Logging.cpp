@@ -30,3 +30,27 @@ void are::Logging::create_log_folder(const std::string &exp_name){
 }
 
 
+bool are::Logging::openOLogFile(std::ofstream &logFileStream){
+    logFileStream.open(Logging::log_folder + std::string("/")  + logFile, std::ios::out | std::ios::ate | std::ios::app);
+
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + logFile << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+
+bool are::Logging::openILogFile(std::ifstream &logFileStream){
+    logFileStream.open(Logging::log_folder + std::string("/")  + logFile);
+
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + logFile << std::endl;
+        return false;
+    }
+
+    return true;
+}
