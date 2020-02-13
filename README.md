@@ -14,9 +14,9 @@ In order to install this plu-in please open terminal in the current project and 
 ```
 mkdir build
 cd build
-cmake ..
+cmake -DCMAKE_INSTALL_PREFIX=where/you/want/to/install ..
 make
-make install
+make install # add sudo if the install prefix is /usr/local/
 ```
 If you would like to use CLion IDE with this project please follow the instructions in the [report](https://www.overleaf.com/8988212588bdkjhpfdtckz).
 

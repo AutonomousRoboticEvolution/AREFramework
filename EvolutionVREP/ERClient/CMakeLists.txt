@@ -2,10 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 find_package(Threads REQUIRED)
 
-set(SOURCES
-    ClientEA.cpp
-    ERClient.cpp
-    SlaveConnection.cpp
+FILE(GLOB_RECURSE SOURCES
+    "src/*"
     "${VREP_FOLDER}/programming/remoteApi/extApi.c"
     "${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c"
     "${VREP_FOLDER}/programming/common/shared_memory.c"
@@ -13,6 +11,7 @@ set(SOURCES
 
 add_executable(ERClient ${SOURCES})
 target_include_directories(ERClient PUBLIC 
+    "include"
     "${VREP_FOLDER}/programming"
     "${VREP_FOLDER}/programming/include"
 )
