@@ -90,14 +90,11 @@ void ER::startOfSimulation(int slaveIndex){
 
 void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
     if(verbose)
-        std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+        std::cout << "individual " << currentIndexVec[slaveIdx] << " is evaluated" << std::endl;
 
 
-    if(currentIndIndex < ea->get_population().size())
-    {
-        float fitness = currentIndVec[slaveIndex]->getFitness();
+       float fitness = currentIndVec[slaveIndex]->getFitness();
         if(verbose)
             std::cout << "fitness = " << fitness << std::endl;
         ea->setFitness(currentIndexVec[slaveIndex],fitness);
@@ -105,29 +102,14 @@ void ER::endOfSimulation(int slaveIndex){
 //            currentIndIndex++;
         ea->set_endEvalTime(hr_clock::now());
     	saveLogs(false);
-    }
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        saveLogs();
-        ea->epoch();
-        if(verbose)
-            std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
-        ea->incr_generation();
-        currentIndIndex = 0;
-
-    }
-    if(ea->get_generation() >= nbrOfGen){
-        if(verbose)
-        {
-            std::cout << "---------------------" << std::endl;
-            std::cout << "Evolution is Finished" << std::endl;
-            std::cout << "---------------------" << std::endl;
-        }
-    }
+   
+   
 }
 
 void ER::updateSimulation()
 {
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
     for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
     {
@@ -178,6 +160,23 @@ void ER::updateSimulation()
                       << "\t BUSY : 2" << std::endl
                       << "\t FINISH : 3" << std::endl
                       << "\t ERROR : 9" << std::endl;
+    }
+    if(currentIndIndex >= ea->get_population().size())
+    {
+        saveLogs();
+        ea->epoch();
+        if(verbose)
+            std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
+        ea->incr_generation();
+        currentIndIndex = 0;
+    }
+    if(ea->get_generation() >= nbrOfGen){
+        if(verbose)
+        {
+            std::cout << "---------------------" << std::endl;
+            std::cout << "Evolution is Finished" << std::endl;
+            std::cout << "---------------------" << std::endl;
+        }
     }
 }
 
