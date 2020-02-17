@@ -92,17 +92,16 @@ void ER::startOfSimulation(int slaveIndex){
 void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
-        std::cout << "individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
+        std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
 
-
-       float fitness = currentIndVec[slaveIndex]->getFitness();
-        if(verbose)
-            std::cout << "fitness = " << fitness << std::endl;
-        ea->setFitness(currentIndexVec[slaveIndex],fitness);
-//        if(evalIsFinish)
-//            currentIndIndex++;
-        ea->set_endEvalTime(hr_clock::now());
-    	saveLogs(false);
+    float fitness = currentIndVec[slaveIndex]->getFitness();
+    if(verbose)
+        std::cout << "Slave : " << slaveIndex << " fitness = " << fitness << std::endl;
+    ea->setFitness(currentIndexVec[slaveIndex],fitness);
+    //        if(evalIsFinish)
+    //            currentIndIndex++;
+    ea->set_endEvalTime(hr_clock::now());
+    saveLogs(false);
 }
 
 void ER::updateSimulation()
@@ -153,6 +152,9 @@ void ER::updateSimulation()
         {
             std::cerr << "An error happened on the server side" << std::endl;
         }
+	else if(state == READY && currentIndIndex >= ea->get_population().size()){
+        std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting a new generation" << std::endl;
+	}
         else
             std::cerr << "state value unknown : " << state << std::endl
                       << "Possible states are : " << std::endl
