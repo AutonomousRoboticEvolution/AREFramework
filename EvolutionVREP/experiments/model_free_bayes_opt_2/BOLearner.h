@@ -123,6 +123,7 @@ public:
     void set_samples(std::vector<Eigen::VectorXd> &s){_samples = s;}
     int dataset_size(){return _samples.size();}
     const model_t& model() const {return _model;}
+    void set_target(const Eigen::VectorXd& target){_target = target;}
 
 private:
     model_t _model;

@@ -22,7 +22,7 @@ public :
     void update(double delta_time);
 
     void compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
-    void update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
+    void update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl, const Eigen::VectorXd &target);
     const Learner::Ptr &getLearner(){return learner;}
 
     void set_final_position(const std::vector<double> fp){final_position = fp;}

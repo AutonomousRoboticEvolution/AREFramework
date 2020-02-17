@@ -107,7 +107,11 @@ bool noEA::update(const Environment::Ptr & env)
         std::dynamic_pointer_cast<BOIndividual>(ind)->compute_model(observations,samples);
     }
 
-    std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner(observations, samples);
+    std::vector<double> t = std::dynamic_pointer_cast<MazeEnv>(env)->get_target_position();
+    Eigen::VectorXd target(3);
+    target << t[0], t[1], t[2];
+
+    std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner(observations, samples,target);
 
     ind.reset();
     return false;
