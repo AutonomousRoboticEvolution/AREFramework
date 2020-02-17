@@ -23,6 +23,7 @@ public:
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
     const std::vector<double> &get_final_position(){return final_position;}
+    const std::vector<double> &get_target_position(){return target_position;}
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;
