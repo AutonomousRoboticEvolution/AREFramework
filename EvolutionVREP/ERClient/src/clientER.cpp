@@ -54,9 +54,9 @@ bool ER::execute()
     int tries = 0;
     int pauseTime = 100; // milliseconds
     // communicate with all ports
-//    if (verbose) {
-//        std::cout << "number server instances = " << serverInstances.size() << std::endl;
-//    }
+    //    if (verbose) {
+    //        std::cout << "number server instances = " << serverInstances.size() << std::endl;
+    //    }
     if (shouldReopenConnections) {
         reopenConnections();
     }
@@ -65,18 +65,18 @@ bool ER::execute()
     if (!confirmConnections()) {
         return false;
     }
-//    else {
-//        tries = 0;
-//    }
+    //    else {
+    //        tries = 0;
+    //    }
     updateSimulation();
-//    while(serverInstances.size() > 0)
-//    {
-//        if (doneEvaluating) {
-//            break;
-//        }
+    //    while(serverInstances.size() > 0)
+    //    {
+    //        if (doneEvaluating) {
+    //            break;
+    //        }
 
-//        updateSimulation();
-//    }
+    //        updateSimulation();
+    //    }
     return true;
 }
 
@@ -114,18 +114,18 @@ void ER::updateSimulation()
     for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
     {
         int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
+        all_instances_finish = all_instances_finish && (state == READY) && (currentIndIndex >= ea->get_population().size());
 
-//        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
+        //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
         if(state == IDLE)
         {
             serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
-            return;
         }
         else if(state == READY && currentIndIndex < ea->get_population().size())
         {
             ///@todo start in slave to handle errors
-//            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
+            //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
             ea->set_startEvalTime(hr_clock::now());
             startOfSimulation(slaveIdx);
             currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
@@ -135,7 +135,7 @@ void ER::updateSimulation()
         }
         else if(state == BUSY)
         {
-//            float simTime = slave->getFloatSignal("simulationTime");
+            //            float simTime = slave->getFloatSignal("simulationTime");
             serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
 
         }
@@ -152,9 +152,9 @@ void ER::updateSimulation()
         {
             std::cerr << "An error happened on the server side" << std::endl;
         }
-	else if(state == READY && currentIndIndex >= ea->get_population().size()){
-        std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting a new generation" << std::endl;
-	}
+        else if(state == READY && currentIndIndex >= ea->get_population().size()){
+            std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting a new generation" << std::endl;
+        }
         else
             std::cerr << "state value unknown : " << state << std::endl
                       << "Possible states are : " << std::endl
@@ -163,7 +163,6 @@ void ER::updateSimulation()
                       << "\t BUSY : 2" << std::endl
                       << "\t FINISH : 3" << std::endl
                       << "\t ERROR : 9" << std::endl;
-    	all_instances_finish = all_instances_finish && (state == READY);
     }
     if(currentIndIndex >= ea->get_population().size() && all_instances_finish)
     {
@@ -231,11 +230,11 @@ bool ER::confirmConnections()
             continue;
         }
         if (tries > loadingTrials) {
-        std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than 1000 times." << std::endl;
+            std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than 1000 times." << std::endl;
             return false;
         }
     }
 
-//    std::cout << "Connections confirmed" << std::endl;
+    //    std::cout << "Connections confirmed" << std::endl;
     return true;
 }
