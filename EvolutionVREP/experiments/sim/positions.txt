@@ -2,15 +2,23 @@ all in metre
 ARE_arena :
     start & target:
     	- 0;0;0.05 #centre
+<<<<<<< HEAD
 		- 0.75;-0.75;0.05 #bottom right corner 
 		- -0.75;-0.75;0.05 #bottom left corner 
 		- -0.75;0.75;0.05 #upper left corner
 		- 0.75;0.75;0.05 #upper right corner
+=======
+		- 0.625;-0.625;0.05 #bottom right corner 
+		- -0.625;-0.625;0.05 #bottom left corner 
+		- -0.625;0.625;0.05 #upper left corner
+		- 0.625;0.625;0.05 #upper right corner
+>>>>>>> add new environments
 
 middle_wall :
     start & target:
     	- 0;-0.5;0.05 #bottom part
     	- 0;0.5;0.05 #upper part
+<<<<<<< HEAD
 		- 0.75;-0.75;0.05 #bottom right corner 
 		- -0.75;-0.75;0.05 #bottom left corner 
 		- -0.75;0.75;0.05 #upper left corner
@@ -24,11 +32,20 @@ escape_room :
 		- -0.75;-0.75;0.05 #bottom left corner 
 		- -0.75;0.75;0.05 #upper left corner
 		- 0.75;0.75;0.05 #upper right corner
+=======
+		- 0.625;-0.625;0.05 #bottom right corner 
+		- -0.625;-0.625;0.05 #bottom left corner 
+		- -0.625;0.625;0.05 #upper left corner
+		- 0.625;0.625;0.05 #upper right corner
+
+escape_room :
+>>>>>>> add new environments
 
 
 easy_race :
 	start -> target
 		- 0;0;0.05 -> #bottom left corner or #upper right corner
+<<<<<<< HEAD
 		- 0.75;0.75;0.05 -> -0.75;-0.75;0.05
 		- -0.75;-0.75;0.05 -> 0.75;0.75;0.05
 
@@ -36,6 +53,15 @@ race :
 	start -> target :
 		- -0.75;0.75;0.05 -> 0.75;0.75;0.05 #left to right
 		- 0.75;0.75;0.05 -> -0.75;0.75;0.05 #right to left
+=======
+		- 0.625;0.625;0.05 -> -0.625;-0.625;0.05
+		- -0.625;-0.625;0.05 -> 0.625;0.625;0.05
+
+race : 
+	start -> target :
+		- -0.75;0.75;0.05 -> 7.5;7.5;0.05 #left to right
+		- 0.75;0.75;0.05 -> -7.5;7.5;0.05 #right to left
+>>>>>>> add new environments
 		- 0;0.725;0.05 -> #left or #right
 
 hard_race :
@@ -56,11 +82,19 @@ ARE_hard_maze :
     	- 0.75;-0.75;0.05 #bottom dead end
 
 multi_maze :
+<<<<<<< HEAD
 	start : -1.25;1.25;0.05 #centre
 	target (& start) :
 		- -0.75;0.75;0.05 #upper left part
 		- -0.15;-0.875;0.05 #bottom left part
 		- 0.;-0.5;0.05 #bottom right part
+=======
+	start : 1.25;1.25;0.05 #centre
+	target (& start) :
+		- -0.75;0.75;0.05 #upper left part
+		- -0.15;-0.875;0.05 #bottom left part
+		- 0.8;-0.55;0.05 #bottom right part
+>>>>>>> add new environments
 		- 0.5;0.75;0.05  #upper right upper part
 		- 0.75;0.45;0.05 #upper right bottom part 
 
