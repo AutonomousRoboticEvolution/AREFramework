@@ -2,7 +2,7 @@
 #expPluginName,string,/usr/local/lib/libmodel_free_bayes_opt_2.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
-#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/arena.ttt
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
 #epuckPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/epuck_big.ttm
 #modelPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,20
