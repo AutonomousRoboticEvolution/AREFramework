@@ -23,6 +23,8 @@ public:
 
     NEAT::NeuralNetwork nn;
 
+
+
 };
 
 }
