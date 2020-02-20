@@ -77,6 +77,7 @@ void EA_HyperNEAT::setObjectives(size_t indIndex, const std::vector<double> &obj
     population[indIndex]->setObjectives(objectives);
 }
 
+
 bool EA_HyperNEAT::update(const Environment::Ptr& env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;

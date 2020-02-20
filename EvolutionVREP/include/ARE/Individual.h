@@ -31,7 +31,6 @@ public:
         parameters(ind.parameters),
         learner(ind.learner),
         randNum(ind.randNum)
-
     {}
     virtual ~Individual();
 

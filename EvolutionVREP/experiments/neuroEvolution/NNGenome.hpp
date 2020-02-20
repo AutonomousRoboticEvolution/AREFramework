@@ -16,11 +16,12 @@ public:
     typedef std::shared_ptr<const NNGenome> ConstPtr;
 
 
-    NNGenome() : Genome() {
-        rng.Seed(randomNum->getSeed());
+    NNGenome() : Genome() {}
+    NNGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param) :
+        Genome(rn,param){
     }
-    NNGenome(const NEATGenome &ngen) :
-        Genome(ngen), neat_genome(ngen.neat_genome){}
+    NNGenome(const NNGenome &ngen) :
+        Genome(ngen), nn_genome(ngen.nn_genome){}
 
     Genome::Ptr clone() const override {
         return std::make_shared<NNGenome>(*this);
@@ -28,13 +29,24 @@ public:
 
 
     void init() override;
+    void init(NEAT::RNG &rng);
     Phenotype::Ptr develop() override{}
-    void mutate() override;
+    void mutate(NEAT::RNG &rng);
+    void mutate() override{}
+
+    const NEAT::Genome& get_nn_genome(){return nn_genome;}
+
+    friend class boost::serialization::access;
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & boost::serialization::base_object<Genome>(*this);
+        arch & nn_genome;
+    }
 
 private:
     NEAT::Genome nn_genome;
     NEAT::Parameters neat_parameters;
-    NEAT::RNG rng;
 };
 
 }

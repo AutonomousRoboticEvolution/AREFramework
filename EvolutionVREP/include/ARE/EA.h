@@ -97,6 +97,8 @@ public:
     //GETTERS & SETTERS
     Individual::Ptr getIndividual(size_t index) const;
     size_t getPopSize() const {return population.size();}
+
+    //GETTERS & SETTERS
     const std::vector<Individual::Ptr> &get_population() const {return population;}
     const settings::ParametersMapPtr &get_parameters() const {return parameters;}
     const misc::RandNum::Ptr get_randomNum() const {return randomNum;}

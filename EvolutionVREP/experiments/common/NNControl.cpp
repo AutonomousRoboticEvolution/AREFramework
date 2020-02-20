@@ -7,6 +7,7 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
     bool useInternalBias = settings::getParameter<settings::Boolean>(parameters,"#UseInternalBias").value;
 
     nn.Flush();
+
     nn.Input(sensorValues);
 
     //First activation to activate the hidden layer
