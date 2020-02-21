@@ -128,7 +128,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
-
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
                 are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;

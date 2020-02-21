@@ -45,7 +45,7 @@ void noEA::init(){
         learner->set_parameters(parameters);
     	BOIndividual::Ptr ind(new BOIndividual(no_gen,neatGen,learner));
         ind->set_parameters(parameters);
-        ind->initRandNum(randomNum->getSeed());
+        ind->set_randNum(randomNum);
         population.push_back(ind);
     }
 
