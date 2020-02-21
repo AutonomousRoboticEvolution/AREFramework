@@ -24,6 +24,7 @@ else()
     endif()
 endif()
 
+find_package(Boost REQUIRED random)
 find_package(MultiNEAT REQUIRED)
 message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 find_package(PolyVox REQUIRED)
@@ -66,6 +67,7 @@ add_library(v_repExtER SHARED
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
     dlibxx dl rt
+    ${Boost_LIBRARIES}
 )
 
 target_include_directories(ER_library
@@ -76,7 +78,7 @@ target_include_directories(ER_library
 install(TARGETS ER_library DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
-target_link_libraries(v_repExtER ER_library dlibxx dl)
+target_link_libraries(v_repExtER ER_library dlibxx dl ${Boost_LIBRARIES})
 
 target_include_directories(v_repExtER PUBLIC
     "include"
