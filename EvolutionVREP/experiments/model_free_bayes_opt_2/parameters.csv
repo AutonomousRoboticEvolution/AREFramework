@@ -28,3 +28,4 @@
 #init_x,float,-0.6
 #init_y,float,0.6
 #init_z,float,0.05
+#UseInternalBias,bool,1

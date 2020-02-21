@@ -51,7 +51,7 @@ void BOIndividual::createMorphology()
 void BOIndividual::createController()
 {
     control.reset(new NNControl);
-    control->set_properties(properties); 
+    control->set_parameters(parameters);
     NEAT::NeuralNetwork nn;
     std::dynamic_pointer_cast<NEATGenome>(ctrlGenome)->neat_genome.BuildPhenotype(nn);
     std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
