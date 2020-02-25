@@ -145,3 +145,15 @@ bool BasicEA::update(const Environment::Ptr & env){
     return true;
 }
 
+//bool BasicEA::update(const Environment::Ptr & env){
+//    endEvalTime = hr_clock::now();
+//    numberEvaluation++;
+
+//    Individual::Ptr ind = population[currentIndIndex];
+
+//    std::dynamic_pointer_cast<NNIndividual>(ind)->set_final_position(
+//                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+
+
+//    return true;
+//}

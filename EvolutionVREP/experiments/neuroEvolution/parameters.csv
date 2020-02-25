@@ -27,7 +27,7 @@
 #NNType,int,0
 #NbrInputNeurones,int,8
 #NbrOutputNeurones,int,2
-#NbrHiddenNeurones,int,2
+#NbrHiddenNeurones,int,16
 #tournamentSize,int,2
 #UseInternalBias,bool,1
 #mutationType,int,2

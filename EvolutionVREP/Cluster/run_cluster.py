@@ -49,7 +49,7 @@ def run_client(args):
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])
+    ],stdout=logfile)
 
 
 def wait(servers, client, timeout=None):

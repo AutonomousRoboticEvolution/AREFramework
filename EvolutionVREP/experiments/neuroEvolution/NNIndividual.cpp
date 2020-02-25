@@ -5,7 +5,6 @@ using namespace are;
 void NNIndividual::createController(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<NNGenome>(ctrlGenome)->get_nn_genome();
-    NEAT::Substrate subs = morphology->get_substrate();
     control.reset(new NNControl);
     control->set_parameters(parameters);
     NEAT::NeuralNetwork nn;
