@@ -145,7 +145,7 @@ bool BasicEA::update(const Environment::Ptr & env){
     return true;
 }
 
-void BasicEA::setFitness(size_t indIdx, double fitness){
+void BasicEA::setFitness(size_t indIdx, float fitness){
     currentIndIndex = indIdx;
     population[indIdx]->setFitness(fitness);
 }
