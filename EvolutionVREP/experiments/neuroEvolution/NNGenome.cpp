@@ -11,6 +11,7 @@ void NNGenome::init(NEAT::RNG &rng){
 
 void NNGenome::init()
 {
+    std::cout << "init GENOME" << std::endl;
     //Useful parameters for mutation of the weights within MultiNEAT
     neat_parameters.MutateWeightsSevereProb = settings::getParameter<settings::Float>(parameters,"#MutateWeightsSevereProb").value;
     neat_parameters.WeightMutationRate = settings::getParameter<settings::Float>(parameters,"#WeightMutationRate").value;
