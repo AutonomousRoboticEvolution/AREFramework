@@ -33,6 +33,7 @@ public:
     Phenotype::Ptr develop() override{}
     void mutate(NEAT::RNG &rng);
     void mutate() override{}
+    Genome::Ptr crossover(const Genome::Ptr &);
 
     const NEAT::Genome& get_nn_genome(){return nn_genome;}
 

@@ -145,9 +145,9 @@ bool BasicEA::update(const Environment::Ptr & env){
     return true;
 }
 
-void BasicEA::setFitness(size_t indIdx, float fitness){
+void BasicEA::setObjectives(size_t indIdx, const std::vector<double> &objectives){
     currentIndIndex = indIdx;
-    population[indIdx]->setFitness(fitness);
+    population[indIdx]->setObjectives(objectives);
 }
 
 bool BasicEA::update(const Environment::Ptr & env){

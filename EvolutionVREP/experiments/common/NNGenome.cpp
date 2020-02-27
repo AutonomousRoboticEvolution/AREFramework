@@ -42,3 +42,8 @@ void NNGenome::mutate(NEAT::RNG &rng){
     nn_genome.Mutate_LinkWeights(neat_parameters,rng);
     nn_genome.Mutate_NeuronBiases(neat_parameters,rng);
 }
+
+Genome::Ptr NNGenome::crossover(const Genome::Ptr &gen){
+    //No Crossover, just simple cloning
+    return std::dynamic_pointer_cast<NNGenome>(clone());
+}
