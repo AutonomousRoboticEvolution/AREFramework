@@ -36,10 +36,6 @@ void NNIndividual::update(double delta_time){
 
     std::vector<double> inputs = morphology->update();
 
-    for(const double input : inputs)
-        std::cout << input << ",";
-    std::cout << std::endl;
-
     std::vector<double> outputs = control->update(inputs);
     std::vector<int> jointHandles;
     if(robot == "EPuck"){
