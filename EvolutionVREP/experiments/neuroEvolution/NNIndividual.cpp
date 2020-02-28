@@ -13,8 +13,16 @@ void NNIndividual::createController(){
 }
 
 void NNIndividual::createMorphology(){
-    morphology.reset(new EPuckMorphology(parameters));
-    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
+
+    if(robot == "EPuck"){
+        morphology.reset(new EPuckMorphology(parameters));
+        std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    }
+    else if(robot == "AREPuck"){
+        morphology.reset(new AREPuckMorphology(parameters));
+        std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->loadModel();
+    }
 
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
@@ -24,14 +32,23 @@ void NNIndividual::createMorphology(){
 }
 
 void NNIndividual::update(double delta_time){
+    std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
+
     std::vector<double> inputs = morphology->update();
 
+    for(const double input : inputs)
+        std::cout << input << ",";
+    std::cout << std::endl;
+
     std::vector<double> outputs = control->update(inputs);
-
-
-    std::vector<int> jointHandles =
-            std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
-
+    std::vector<int> jointHandles;
+    if(robot == "EPuck"){
+       jointHandles =
+               std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
+    }else if(robot == "AREPuck"){
+        jointHandles =
+                std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->get_jointHandles();
+    }
     assert(jointHandles.size() == outputs.size());
 
     for (size_t i = 0; i < outputs.size(); i++){

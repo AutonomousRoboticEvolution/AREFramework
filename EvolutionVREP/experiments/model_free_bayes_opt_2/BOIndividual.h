@@ -3,6 +3,7 @@
 
 #include "ARE/Individual.h"
 #include "EPuckMorphology.h"
+#include "AREPuckMorphology.h"
 #include "BOLearner.h"
 #include "v_repLib.h"
 

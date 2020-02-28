@@ -5,6 +5,7 @@ add_library(model_free_bayes_opt_2 SHARED
     BOIndividual.cpp
     ../common/NNControl.cpp
     ../common/EPuckMorphology.cpp
+    ../common/AREPuckMorphology.cpp
     ../common/mazeEnv.cpp
     ../common/testEnv.cpp
     factories.cpp
