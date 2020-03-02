@@ -117,9 +117,9 @@ bool noEA::update(const Environment::Ptr & env)
     return false;
 }
 
-void noEA::setFitness(size_t indIndex, float fitness){
+void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
     currentIndIndex = indIndex;
-    currentFitnesses.push_back(fitness);
+    currentFitnesses.push_back(obj[0]);
 }
 
 

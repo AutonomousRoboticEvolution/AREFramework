@@ -22,7 +22,7 @@ public:
     void epoch() override;
 
 
-    void setFitness(size_t indIndex, float fitness);
+    void setObjectives(size_t indIndex, const std::vector<double> &objectives);
     int getNumberOfEval() const {return currentFitnesses.size();}
     Eigen::VectorXd getLastObs() const {return observations.back();}
     Eigen::VectorXd getLastSpl() const {return samples.back();}
