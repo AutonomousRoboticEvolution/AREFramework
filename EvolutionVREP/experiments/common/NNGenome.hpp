@@ -36,6 +36,9 @@ public:
     Genome::Ptr crossover(const Genome::Ptr &);
 
     const NEAT::Genome& get_nn_genome(){return nn_genome;}
+    void buildPhenotype(NEAT::NeuralNetwork &nn){
+        nn_genome.BuildPhenotype(nn);
+    }
 
     friend class boost::serialization::access;
     template <class archive>
