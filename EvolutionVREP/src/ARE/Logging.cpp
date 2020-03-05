@@ -59,6 +59,7 @@ bool are::Logging::openILogFile(std::ifstream &logFileStream){
     return true;
 }
 
+
 bool are::Logging::openOLogFile(std::ofstream &logFileStream, const std::string &log_file){
     logFileStream.open(Logging::log_folder + std::string("/")  + log_file, std::ios::out | std::ios::ate | std::ios::app);
 
