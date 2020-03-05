@@ -1,5 +1,5 @@
-#ifndef HN_LOGGINGS_H
-#define HN_LOGGINGS_H
+#ifndef NE_LOGGINGS_H
+#define NE_LOGGINGS_H
 
 #include "ARE/Logging.h"
 
@@ -17,4 +17,4 @@ public:
 
 }//are
 
-#endif //HN_LOGGINGS_H
+#endif //NE_LOGGINGS_H
