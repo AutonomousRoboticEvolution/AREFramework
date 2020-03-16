@@ -66,9 +66,27 @@ void BOIndividual::createController()
 {
     control.reset(new NNControl);
     control->set_parameters(parameters);
-    NEAT::NeuralNetwork nn;
-    std::dynamic_pointer_cast<NEATGenome>(ctrlGenome)->neat_genome.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<NNControl>(control)->nn = nn;
+
+    if(genType == settings::NEAT){
+//todo
+    }else if(genType == settings::NN){
+        NEAT::NeuralNetwork &nn = std::dynamic_pointer_cast<NNControl>(control)->nn;
+        std::dynamic_pointer_cast<NNGenome>(ctrlGenome)->buildPhenotype(nn);
+    }else if(genType == settings::NNPARAM){
+        std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
+        std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
+
+        NNGenome nn_constructor;
+        nn_constructor.set_parameters(parameters);
+        nn_constructor.init();
+        NEAT::NeuralNetwork &nn = std::dynamic_pointer_cast<NNControl>(control)->nn;
+        nn_constructor.buildPhenotype(nn);
+
+        for(int i = 0; i < weights.size(); i++)
+            nn.m_connections[i].m_weight = weights[i];
+        for(int i = 0; i < bias.size(); i++)
+            nn.m_neurons[i].m_bias = bias[i];
+    }
 }
 
 void BOIndividual::compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl){

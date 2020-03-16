@@ -7,7 +7,9 @@
 #include "BOLearner.h"
 #include "v_repLib.h"
 
-#include "NEATGenome.h"
+#include "NNGenome.hpp"
+#include "NNParamGenome.hpp"
+#include "settings.hpp"
 
 namespace are {
 
@@ -28,6 +30,8 @@ public :
 
     void set_final_position(const std::vector<double> fp){final_position = fp;}
     const std::vector<double> get_final_position(){return final_position;}
+
+    int genType = 1;
 
 protected:
     void createController() override;

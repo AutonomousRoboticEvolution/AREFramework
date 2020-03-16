@@ -10,6 +10,7 @@ add_library(model_free_bayes_opt_2 SHARED
     ../common/testEnv.cpp
     factories.cpp
     ../common/Loggings.cpp
+    ../common/NNGenome.cpp
     BOLoggings.cpp
     BOLearner.cpp
     NEATGenome.cpp

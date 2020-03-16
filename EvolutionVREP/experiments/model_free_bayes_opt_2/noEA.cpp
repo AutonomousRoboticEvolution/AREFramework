@@ -1,54 +1,89 @@
 #include "noEA.h"
 
 using namespace are;
+namespace fs = boost::filesystem;
 
 void noEA::init(){
-    /// Set parameters for NEAT
-    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    float max = settings::getParameter<settings::Float>(parameters,"#initRandMagnitude").value;
-    neat_params.PopulationSize = pop_size;
-    neat_params.DynamicCompatibility = true;
-    neat_params.CompatTreshold = 2.0;
-    neat_params.YoungAgeTreshold = 15;
-    neat_params.SpeciesMaxStagnation = 100;
-    neat_params.OldAgeTreshold = 35;
-    neat_params.MinSpecies = 5;
-    neat_params.MaxSpecies = 10;
-    neat_params.RouletteWheelSelection = false;
+    bool start_from_random = settings::getParameter<settings::Boolean>(parameters,"#startFromRandom").value;
+    if(start_from_random){
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        rng.Seed(randomNum->getSeed());
 
-    neat_params.MutateRemLinkProb = 0.02;
-    neat_params.RecurrentProb = 0.0;
-    neat_params.OverallMutationRate = 0.15;
-    neat_params.MutateAddLinkProb = 0.08;
-    neat_params.MutateAddNeuronProb = 0.01;
-    neat_params.MutateWeightsProb = 0.90;
-    neat_params.MaxWeight = 8.0;
-    neat_params.WeightMutationMaxPower = 0.2;
-    neat_params.WeightReplacementMaxPower = 1.0;
+        for(int i = 0; i < pop_size; i++){
+            EmptyGenome::Ptr morph_gen(new EmptyGenome);
+            NNGenome::Ptr ctrl_gen(new NNGenome(randomNum,parameters));
+            ctrl_gen->init(rng);
+            BOLearner::Ptr learner(new BOLearner);
+            learner->set_parameters(parameters);
+            Individual::Ptr ind(new BOIndividual(morph_gen,ctrl_gen,learner));
+            ind->set_parameters(parameters);
+            ind->set_randNum(randomNum);
+            population.push_back(ind);
+        }
+        return;
+    }
 
-    neat_params.MutateActivationAProb = 0.0;
-    neat_params.ActivationAMutationMaxPower = 0.5;
-    neat_params.MinActivationA = 0.05;
-    neat_params.MaxActivationA = 6.0;
+    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
+    int genType = settings::getParameter<settings::Integer>(parameters,"#genType").value;
+    std::string filename;
+    std::vector<std::string> split_str, gen_files;
+    for(const auto &dirit : fs::directory_iterator(fs::path(folder_to_load))){
+        filename = dirit.path().string();
+        boost::split(split_str,filename,boost::is_any_of("/"));
+        boost::split(split_str,split_str.back(),boost::is_any_of("_"));
+        if(split_str[0] == "genome" &&
+                std::stoi(split_str[1]) == generation){
+            gen_files.push_back(filename);
+        }
+    }
 
-    NEAT::Genome neat_genome(0,9,16,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
-    std::unique_ptr<NEAT::Population> neat_population = std::make_unique<NEAT::Population>(neat_genome,neat_params, true, 1.0, randomNum->getSeed());
+    for(const std::string& file: gen_files){
+        EmptyGenome::Ptr morph_gen(new EmptyGenome);
+        Genome::Ptr genome;
 
-    for(int i = 0; i < pop_size; i++){
-        EmptyGenome::Ptr no_gen(new EmptyGenome);
-        NEATGenome::Ptr neatGen(new NEATGenome);
-        neatGen->neat_genome = neat_population->AccessGenomeByIndex(i);
-        for(auto &link_genes : neatGen->neat_genome.m_LinkGenes){
-            link_genes.SetWeight(randomNum->randFloat(-max,max));
+        if(genType == settings::NEAT){
+            //todo
+        }
+        else if(genType == settings::NN){
+            genome.reset(new NNGenome(randomNum,parameters));
+            NEAT::Genome neat_genome(file.c_str());
+            std::dynamic_pointer_cast<NNGenome>(genome)->set_nn_genome(neat_genome);
+        }else if(genType == settings::NNPARAM){
+            genome.reset(new NNParamGenome(randomNum,parameters));
+            NNParamGenome::Ptr nngenome = std::dynamic_pointer_cast<NNParamGenome>(genome);
+            std::ifstream logFileStream;
+            logFileStream.open(file);
+            std::string line;
+            std::getline(logFileStream,line);
+            int nbr_weights = std::stoi(line);
+            std::getline(logFileStream,line);
+            int nbr_bias = std::stoi(line);
+
+            std::vector<double> weights;
+            for(int i = 0; i < nbr_weights; i++){
+                std::getline(logFileStream,line);
+                weights.push_back(std::stod(line));
+            }
+            nngenome->set_weights(weights);
+
+
+            std::vector<double> biases;
+            for(int i = 0; i < nbr_bias; i++){
+                std::getline(logFileStream,line);
+                biases.push_back(std::stod(line));
+            }
+            nngenome->set_biases(biases);
+
+
         }
         BOLearner::Ptr learner(new BOLearner);
         learner->set_parameters(parameters);
-    	BOIndividual::Ptr ind(new BOIndividual(no_gen,neatGen,learner));
+        Individual::Ptr ind(new BOIndividual(morph_gen,genome,learner));
         ind->set_parameters(parameters);
-        ind->set_randNum(randomNum);
+        std::dynamic_pointer_cast<BOIndividual>(ind)->genType = genType;
         population.push_back(ind);
     }
-
 
 }
 
@@ -133,12 +168,4 @@ void noEA::epoch(){
     population.push_back(ind);
 }
 
-//EmptyGenome::Ptr no_gen(new EmptyGenome);
-//NEATGenome::Ptr neatGen(new NEATGenome);
-//NEAT::Genome neat_genome(0,9,16,2,false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,1,neat_params,1);
-//neatGen->neat_genome = neat_genome;
-//BOLearner::Ptr learner(new BOLearner);
-//learner->set_parameters(parameters);
-//BOIndividual::Ptr ind(new BOIndividual(no_gen,neatGen,learner));
-//ind->set_parameters(parameters);
-//ind->initRandNum(randomNum->getSeed());
+

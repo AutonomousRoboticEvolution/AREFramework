@@ -1,12 +1,16 @@
 #ifndef EA_HYPERNEAT_H
 #define EA_HYPERNEAT_H
 
+#include <boost/filesystem.hpp>
+
 #include "ARE/EA.h"
 #include "BOIndividual.h"
 #include "EPuckMorphology.h"
-#include "NEATGenome.h"
+#include "NNGenome.hpp"
+#include "NNParamGenome.hpp"
 #include "testEnv.h"
 #include "mazeEnv.h"
+#include "settings.hpp"
 
 namespace are {
 
@@ -34,8 +38,8 @@ private:
     size_t currentIndIndex;
     std::vector<Eigen::VectorXd> observations;
     std::vector<Eigen::VectorXd> samples;
-    NEAT::Parameters neat_params;
     std::vector<double> final_position;
+    NEAT::RNG rng;
 };
 
 }
