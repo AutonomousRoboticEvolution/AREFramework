@@ -11,7 +11,12 @@ enum genomeType {
     NNPARAM = 2
 };
 
-} 
+enum genomeType {
+    NEAT = 0,
+    NN = 1,
+    NNPARAM = 2
+};
+
 }
 
 #endif

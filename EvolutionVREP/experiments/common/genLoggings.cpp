@@ -25,8 +25,13 @@ void NNParamGenomeLog::loadLog(const std::string &log_file, EA::Ptr &ea){
     if(!openILogFile(logFileStream, log_file))
         return;
 
-//    logFileStream.
+//    logFileStream
+
     std::string gen_str;
+    for(std::string line; std::getline(logFileStream,line);)
+        gen_str += line;
+
+//    ea->
 }
 
 void NNGenomeLog::saveLog(EA::Ptr &ea)

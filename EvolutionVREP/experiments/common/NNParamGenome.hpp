@@ -68,6 +68,7 @@ public:
         return sstr.str();
     }
 
+
     friend class boost::serialization::access;
     template <class archive>
     void serialize(archive &arch, const unsigned int v)

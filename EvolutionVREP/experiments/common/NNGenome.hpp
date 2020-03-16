@@ -36,6 +36,7 @@ public:
     Genome::Ptr crossover(const Genome::Ptr &);
 
     const NEAT::Genome& get_nn_genome(){return nn_genome;}
+    void set_nn_genome(const NEAT::Genome& nng){nn_genome = nng;}
     void buildPhenotype(NEAT::NeuralNetwork &nn){
         nn_genome.BuildPhenotype(nn);
     }

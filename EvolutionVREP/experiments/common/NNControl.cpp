@@ -8,6 +8,11 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
 
     nn.Flush();
 
+//    std::cout << "sensor values : ";
+//    for(double sv : sensorValues)
+//        std::cout << sv << "; ";
+//    std::cout << std::endl;
+
     nn.Input(sensorValues);
 
     //First activation to activate the hidden layer
