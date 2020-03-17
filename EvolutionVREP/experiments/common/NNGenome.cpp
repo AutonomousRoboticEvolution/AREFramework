@@ -30,11 +30,6 @@ void NNGenome::init()
     else if(nn_type == settings::CTRNN)
         nn_genome = NEAT::Genome(0,nbr_input+1,nbr_hidden,nbr_output,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,neat_parameters);
 
-
-
-//    for(auto &link_genes : nn_genome.m_LinkGenes){
-//        link_genes.SetWeight(randomNum->randFloat(-neat_parameters.MaxWeight,neat_parameters.MaxWeight));
-//    }
 }
 
 void NNGenome::mutate(NEAT::RNG &rng){
