@@ -6,6 +6,7 @@ using namespace are;
 void CMAES::init(){
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     std::vector<double> initial_point;
 
@@ -14,7 +15,7 @@ void CMAES::init(){
     rng.Seed(randomNum->getSeed());
     nn_gen->init(rng);
     NEAT::NeuralNetwork nn;
-    nn_gen->get_nn_genome().BuildPhenotype(nn);
+    nn_gen->buildPhenotype(nn);
     int nbr_weights = nn.m_connections.size();
     int nbr_bias = nn.m_neurons.size();
     int i = 0;
@@ -30,6 +31,7 @@ void CMAES::init(){
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
 
     cmaes::CMAParameters<> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed());
+    cmaParam.set_quiet(verbose);
 
     cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
 
