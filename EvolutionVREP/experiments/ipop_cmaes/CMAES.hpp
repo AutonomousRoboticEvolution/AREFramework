@@ -8,18 +8,18 @@
 #include "mazeEnv.h"
 
 namespace cmaes = libcmaes;
+using geno_pheno_t = cmaes::GenoPheno<cmaes::NoBoundStrategy>;
+using cov_update_t = cmaes::CovarianceUpdate;
+using ipop_cmaes_t = cmaes::IPOPCMAStrategy<cov_update_t,geno_pheno_t>;
+using eostrat_t = cmaes::ESOStrategy<cmaes::CMAParameters<geno_pheno_t>,cmaes::CMASolutions,cmaes::CMAStopCriteria<geno_pheno_t>>;
 
 namespace are{
 
-class CMAES_EXPORT customCMAStrategy : public cmaes::IPOPCMAStrategy<cmaes::CovarianceUpdate,cmaes::GenoPheno<cmaes::NoBoundStrategy>>
+class customCMAStrategy : public ipop_cmaes_t
 {
 private:
 //    cmaes::FitFunc emptyObj = [](const double*,const int&) -> double{};
 
-    using geno_pheno_t = cmaes::GenoPheno<cmaes::NoBoundStrategy>;
-    using cov_update_t = cmaes::CovarianceUpdate;
-    using ipop_cmaes_t = cmaes::IPOPCMAStrategy<cov_update_t,geno_pheno_t>;
-    using eostrat_t = cmaes::ESOStrategy<cmaes::CMAParameters<geno_pheno_t>,cmaes::CMASolutions,cmaes::CMAStopCriteria<geno_pheno_t>>;
 
 public:
 
@@ -45,6 +45,8 @@ public:
     }
 
     ~customCMAStrategy() {}
+
+    bool pop_stagnation();
 
     dMat ask()
     {
@@ -78,7 +80,7 @@ public:
     bool stop()
     {
         std::cout << "FTarget " << _parameters.get_ftarget() << std::endl;
-        return ipop_cmaes_t::stop();
+        return pop_stagnation() || ipop_cmaes_t::stop();
     }
 
     void capture_best_solution(cmaes::CMASolutions& best_run){
@@ -122,7 +124,7 @@ public:
 
     void setObjectives(size_t indIdx, const std::vector<double> &objectives);
 
-    bool is_finish(){return _is_finish;}
+    bool is_finish();
 
 private:
     customCMAStrategy::Ptr cmaStrategy;

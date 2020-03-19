@@ -3,6 +3,28 @@
 
 using namespace are;
 
+bool customCMAStrategy::pop_stagnation(){
+    std::vector<double> fvalues;
+    for(int i = 0; i < _parameters.lambda(); i++)
+       fvalues.push_back(_solutions.get_candidate(i).get_fvalue());
+
+    double mean=0.0;
+    for(double fv : fvalues)
+        mean+=fv;
+    mean = mean/static_cast<double>(fvalues.size());
+
+    double stddev = 0.0;
+    for(double fv : fvalues)
+        stddev+= (fv - mean)*(fv-mean);
+
+    stddev = sqrt(stddev/static_cast<double>(fvalues.size()-1));
+    cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << "pop standard deviation : " << stddev << std::endl;
+
+    if(stddev <= 0.05){
+        return true;
+    }else return false;
+}
+
 void CMAES::init(){
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
@@ -137,4 +159,8 @@ bool CMAES::update(const Environment::Ptr & env){
 
 
     return true;
+}
+
+bool CMAES::is_finish(){
+    return _is_finish;
 }
