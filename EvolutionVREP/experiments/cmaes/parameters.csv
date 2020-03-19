@@ -6,7 +6,7 @@
 #robotPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck.ttm
 #robot,string,AREPuck
 #modelPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
-#populationSize,int,200
+#populationSize,int,20
 #maxEvalTime,float,60
 #numberOfGeneration,int,100
 #variationRatio,float,0
@@ -15,7 +15,7 @@
 #evalTimeFile,string,eval_durations.csv
 #behavDescFile,string,final_pos.csv
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,1.
 #shouldReopenConnections,bool,0
@@ -32,7 +32,7 @@
 #WeightReplacementRate,float,0.2
 #WeightReplacementMaxPower,float,1.0
 #MaxWeight,float,10.0
-#NNType,int,0
+#NNType,int,1
 #NbrInputNeurones,int,4
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,16

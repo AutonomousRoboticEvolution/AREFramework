@@ -58,7 +58,8 @@ public:
 
     bool stop()
     {
-        return cmaes::CMAStrategy<cmaes::CovarianceUpdate>::stop();
+        _solutions.best_candidate().get_x();
+
     }
 
     void set_population(const std::vector<Individual::Ptr>& pop){_pop = pop;}

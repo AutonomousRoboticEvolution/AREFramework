@@ -16,6 +16,7 @@
 #killWhenNotConnected,bool,1
 #timeStep,float,1.
 #shouldReopenConnections,bool,0
+#numberBOIteration,int,100
 #seed,int,-1
 #BOSamplesFile,string,bo_data.csv
 #LearnerSerialFile,string,model
@@ -35,7 +36,7 @@
 #WeightReplacementRate,float,0.2
 #WeightReplacementMaxPower,float,1.0
 #MaxWeight,float,10.0
-#NNType,int,0
+#NNType,int,1
 #NbrInputNeurones,int,4
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,16
