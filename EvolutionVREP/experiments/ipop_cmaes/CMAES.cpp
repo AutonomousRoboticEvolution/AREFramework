@@ -205,5 +205,5 @@ bool CMAES::update(const Environment::Ptr & env){
 
 bool CMAES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-    return _is_finish && nb_eval >= maxNbrEval;
+    return _is_finish || nb_eval >= maxNbrEval;
 }
