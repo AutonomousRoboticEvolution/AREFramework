@@ -130,7 +130,8 @@ void CMAES::init(){
 void CMAES::epoch(){
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
+    bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
+    bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
 
 
     int pop_size = cmaStrategy->get_parameters().lambda();
@@ -138,7 +139,7 @@ void CMAES::epoch(){
     cmaStrategy->set_population(population);
     cmaStrategy->eval();
     cmaStrategy->tell();
-    if(cmaStrategy->stop()){
+    if(withRestart && cmaStrategy->stop()){
         if(verbose)
             std::cout << "Restart !" << std::endl;
 
@@ -148,7 +149,9 @@ void CMAES::epoch(){
             _is_finish = true;
             return;
         }
-        cmaStrategy->lambda_inc();
+
+        if(incrPop)
+            cmaStrategy->lambda_inc();
         cmaStrategy->reset_search_state();
     }
 
