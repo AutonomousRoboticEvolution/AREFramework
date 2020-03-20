@@ -3,6 +3,20 @@
 
 using namespace are;
 
+std::map<int,std::string> customCMAStrategy::scriterias = {{cmaes::CONT,"OK"},
+                                                           {cmaes::AUTOMAXITER,"The automatically set maximal number of iterations per run has been reached"},
+                                                           {cmaes::TOLHISTFUN,"[Success] The optimization has converged"},
+                                                           {cmaes::EQUALFUNVALS,"[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function"},
+                                                           {cmaes::TOLX,"[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)"},
+                                                           {cmaes::TOLUPSIGMA,"[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization."},
+                                                           {cmaes::STAGNATION,"[Partial Success] Median of newest values is not smaller than the median of older values"},
+                                                           {cmaes::CONDITIONCOV,"[Error] The covariance matrix's condition numfber exceeds 1e14. Check out the formulation of your problem"},
+                                                           {cmaes::NOEFFECTAXIS,"[Partial Success] Mean remains constant along search axes"},
+                                                           {cmaes::NOEFFECTCOOR,"[Partial Success] Mean remains constant in coordinates"},
+                                                           {cmaes::MAXFEVALS,"The maximum number of function evaluations allowed for optimization has been reached"},
+                                                           {cmaes::MAXITER,"The maximum number of iterations specified for optimization has been reached"},
+                                                           {cmaes::FTARGET,"[Success] The objective function target value has been reached"}};
+
 bool customCMAStrategy::pop_stagnation(){
     std::vector<double> fvalues;
     for(int i = 0; i < _parameters.lambda(); i++)
@@ -21,6 +35,35 @@ bool customCMAStrategy::pop_stagnation(){
     cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << "pop standard deviation : " << stddev << std::endl;
 
     if(stddev <= 0.05){
+        std::stringstream sstr;
+        sstr << "Stopping : standard deviation of the population is smaller than 0.05 : " << stddev;
+        log_stopping_criterias.push_back(sstr.str());
+        cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+        return true;
+    }else return false;
+}
+
+bool customCMAStrategy::best_sol_stagnation(){
+    if(best_fitnesses.size() < 5)
+        return false;
+    double mean = 0.0;
+    for(size_t i = best_fitnesses.size() - 5
+        ; i < best_fitnesses.size(); i++){
+        mean += best_fitnesses[i];
+    }
+    mean = mean/5.f;
+    double stddev = 0.0;
+    for(size_t i = best_fitnesses.size() - 5
+        ; i < best_fitnesses.size(); i++){
+        stddev += (best_fitnesses[i] - mean)*(best_fitnesses[i] - mean);
+    }
+    stddev = sqrt(stddev/4.0);
+
+    if(stddev <= 0.05){
+        std::stringstream sstr;
+        sstr << "Stopping : standard deviation of the last 5 best fitnesses is smaller than 0.05 : " << stddev;
+        log_stopping_criterias.push_back(sstr.str());
+        cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
         return true;
     }else return false;
 }

@@ -15,6 +15,8 @@ using eostrat_t = cmaes::ESOStrategy<cmaes::CMAParameters<geno_pheno_t>,cmaes::C
 
 namespace are{
 
+
+
 class customCMAStrategy : public ipop_cmaes_t
 {
 private:
@@ -23,7 +25,7 @@ private:
 
 public:
 
-
+    static std::map<int,std::string> scriterias;
 
     typedef std::shared_ptr<customCMAStrategy> Ptr;
 
@@ -47,6 +49,7 @@ public:
     ~customCMAStrategy() {}
 
     bool pop_stagnation();
+    bool best_sol_stagnation();
 
     dMat ask()
     {
@@ -75,12 +78,16 @@ public:
     void tell()
     {
         ipop_cmaes_t::tell();
+        best_fitnesses.push_back(_solutions.best_candidate().get_fvalue());
     }
 
     bool stop()
     {
-        std::cout << "FTarget " << _parameters.get_ftarget() << std::endl;
-        return pop_stagnation() || ipop_cmaes_t::stop();
+        bool ipop_stop = ipop_cmaes_t::stop();
+        if(ipop_stop){
+            log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
+        }
+        return best_sol_stagnation() || pop_stagnation() || ipop_stop;
     }
 
     void capture_best_solution(cmaes::CMASolutions& best_run){
@@ -103,9 +110,13 @@ public:
     void set_population(const std::vector<Individual::Ptr>& pop){_pop = pop;}
     void set_elitist_restart(bool er){elitist_restart = er;}
 
+    std::vector<std::string> log_stopping_criterias;
+
+
 private:
     std::vector<Individual::Ptr> _pop;
     bool elitist_restart = false;
+    std::vector<double> best_fitnesses;
 
 };
 
@@ -125,6 +136,13 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives);
 
     bool is_finish();
+
+    bool restarted(){return !cmaStrategy->log_stopping_criterias.empty();}
+    std::string pop_stopping_criterias(){
+        std::string res = cmaStrategy->log_stopping_criterias.back();
+        cmaStrategy->log_stopping_criterias.pop_back();
+        return res;
+    }
 
 private:
     customCMAStrategy::Ptr cmaStrategy;
