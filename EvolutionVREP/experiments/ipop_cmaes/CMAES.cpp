@@ -196,14 +196,14 @@ bool CMAES::update(const Environment::Ptr & env){
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
 
 
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-
+    nb_eval++;
 
 
     return true;
 }
 
 bool CMAES::is_finish(){
-    return _is_finish;
+    int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
+    return _is_finish && nb_eval >= maxNbrEval;
 }
