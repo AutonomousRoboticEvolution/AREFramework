@@ -151,9 +151,13 @@ void CMAES::epoch(){
             return;
         }
 
-        if(incrPop)
+        if(incrPop){
             cmaStrategy->lambda_inc();
+            pop_size = cmaStrategy->get_parameters().lambda();
+        }
         cmaStrategy->reset_search_state();
+
+
     }
 
     dMat new_samples = cmaStrategy->ask();
