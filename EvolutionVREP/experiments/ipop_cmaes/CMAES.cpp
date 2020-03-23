@@ -64,6 +64,7 @@ bool customCMAStrategy::best_sol_stagnation(){
         sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
         cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+        best_fitnesses.clear();
         return true;
     }else return false;
 }
