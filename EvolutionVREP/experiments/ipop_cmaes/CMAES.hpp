@@ -150,7 +150,6 @@ private:
     cmaes::CMASolutions best_run;
     bool _is_finish = false;
     std::vector<Individual::Ptr> savedPop;
-    int nb_eval;
 };
 
 
