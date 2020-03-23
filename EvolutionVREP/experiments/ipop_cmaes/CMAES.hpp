@@ -87,7 +87,7 @@ public:
         if(ipop_stop){
             log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
         }
-        return best_sol_stagnation() || pop_stagnation() || ipop_stop;
+        return  pop_stagnation() || best_sol_stagnation() || ipop_stop;
     }
 
     void capture_best_solution(cmaes::CMASolutions& best_run){
@@ -109,6 +109,7 @@ public:
 
     void set_population(const std::vector<Individual::Ptr>& pop){_pop = pop;}
     void set_elitist_restart(bool er){elitist_restart = er;}
+    void set_length_of_stagnation(int los){len_of_stag = los;}
 
     std::vector<std::string> log_stopping_criterias;
 
@@ -117,6 +118,7 @@ private:
     std::vector<Individual::Ptr> _pop;
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
+    int len_of_stag = 5;
 
 };
 

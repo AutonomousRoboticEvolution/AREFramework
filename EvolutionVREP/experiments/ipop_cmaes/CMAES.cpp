@@ -44,20 +44,20 @@ bool customCMAStrategy::pop_stagnation(){
 }
 
 bool customCMAStrategy::best_sol_stagnation(){
-    if(best_fitnesses.size() < 5)
+    if(best_fitnesses.size() < len_of_stag)
         return false;
     double mean = 0.0;
-    for(size_t i = best_fitnesses.size() - 5
+    for(size_t i = best_fitnesses.size() - len_of_stag
         ; i < best_fitnesses.size(); i++){
         mean += best_fitnesses[i];
     }
-    mean = mean/5.f;
+    mean = mean/static_cast<float>(len_of_stag);
     double stddev = 0.0;
-    for(size_t i = best_fitnesses.size() - 5
+    for(size_t i = best_fitnesses.size() - len_of_stag
         ; i < best_fitnesses.size(); i++){
         stddev += (best_fitnesses[i] - mean)*(best_fitnesses[i] - mean);
     }
-    stddev = sqrt(stddev/4.0);
+    stddev = sqrt(stddev/static_cast<float>(len_of_stag-1));
 
     if(stddev <= 0.05){
         std::stringstream sstr;
@@ -69,6 +69,7 @@ bool customCMAStrategy::best_sol_stagnation(){
 }
 
 void CMAES::init(){
+    int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
@@ -101,7 +102,7 @@ void CMAES::init(){
 
     cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
     cmaStrategy->set_elitist_restart(elitist_restart);
-
+    cmaStrategy->set_length_of_stagnation(lenStag);
 
     dMat init_samples = cmaStrategy->ask();
 
