@@ -5,6 +5,15 @@ using namespace are;
 std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
 {
     bool useInternalBias = settings::getParameter<settings::Boolean>(parameters,"#UseInternalBias").value;
+    double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
+    boost::mt19937 rng(randomNum->getSeed());
+    std::vector<double> inputs = sensorValues;
+    if(noiselvl > 0.0){
+        for(double &sv : inputs){
+            boost::normal_distribution<> normal(sv,noiselvl);
+            sv = normal(rng);
+        }
+    }
 
     nn.Flush();
 
@@ -13,7 +22,7 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
 //        std::cout << sv << "; ";
 //    std::cout << std::endl;
 
-    nn.Input(sensorValues);
+    nn.Input(inputs);
 
     //First activation to activate the hidden layer
     if(useInternalBias)
@@ -25,6 +34,14 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
         nn.ActivateUseInternalBias();
     else nn.Activate();
 
-    return nn.Output();
+    std::vector<double> output = nn.Output();
+    if(noiselvl > 0.0){
+        for(double &o : output){
+            boost::normal_distribution<> normal(o,noiselvl);
+            o = normal(rng);
+        }
+    }
+
+    return output;
 }
 

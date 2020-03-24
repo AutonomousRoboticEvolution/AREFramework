@@ -5,6 +5,7 @@ using namespace are;
 void CMAESIndividual::createController(){
     control.reset(new NNControl);
     control->set_parameters(parameters);
+    std::dynamic_pointer_cast<NNControl>(control)->set_randonNum(randNum);
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 

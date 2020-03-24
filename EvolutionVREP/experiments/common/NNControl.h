@@ -5,6 +5,9 @@
 #include <multineat/NeuralNetwork.h>
 #include <eigen3/Eigen/Core>
 
+#include <boost/random.hpp>
+#include <boost/random/normal_distribution.hpp>
+
 namespace are {
 
 class NNControl : public Control
@@ -22,6 +25,8 @@ public:
 
 
     NEAT::NeuralNetwork nn;
+
+    void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
 
 
