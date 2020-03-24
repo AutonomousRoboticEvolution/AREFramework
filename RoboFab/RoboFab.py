@@ -18,20 +18,17 @@ from UR5_host import UR5Robot
 from robotConnection import RobotConnection
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_CORE_ORGAN_INSERT = 1
-DO_MOVE_FROM_PRINTER_TO_ASSEMBLY_FIXTURE = 1 # requires DO_CORE_ORGAN_INSERT
-DO_ORGAN_INSERTIONS = 1
-DO_CABLE_INSERTIONS = 1
-DO_SEND_CONTROLLER_TO_ROBOT = 1
-
-# Make the settings file then extract the settings from it
-makeConfigurationFile(location="BRL")
-configurationData = json.load ( open ( 'configuration_BRL.json' ) ) # <--- change this depending on if you're in York or BRL
+DO_CORE_ORGAN_INSERT = 0
+DO_MOVE_FROM_PRINTER_TO_ASSEMBLY_FIXTURE = 0 # requires DO_CORE_ORGAN_INSERT
+DO_ORGAN_INSERTIONS = 0
+DO_CABLE_INSERTIONS = 0
+DO_SEND_CONTROLLER_TO_ROBOT = 0
+DO_GO_HOME_AT_FINISH = 0
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
 class RoboFab_host:
-    def __init__(self):
+    def __init__(self , configurationData):
         debugPrint("Creating a RoboFab_host object")
 
 
@@ -190,7 +187,8 @@ class RoboFab_host:
         else:
             debugPrint( "Cable insertions skipped" )
 
-        self.UR5.moveBetweenStations("home")
+        if DO_GO_HOME_AT_FINISH:
+         self.UR5.moveBetweenStations("home")
 
         if DO_SEND_CONTROLLER_TO_ROBOT:
             debugPrint("Trying to connect")
@@ -208,15 +206,31 @@ class RoboFab_host:
             connection.closePort()
             print("done")
 
-        # self.UR5.moveBetweenStations("cable_preparation")
-        # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
         # self.UR5.moveBetweenStations("organ_bank")
         # self.UR5.setTCP(self.gripperTCP_A)
         # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.organBank.origin * makeTransform([0,0,0 , math.pi, 0 ,0]) )
+        # self.UR5.moveBetweenStations("printer")
+        # self.UR5.setTCP(self.gripperTCP_A)
+        # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
+
+        # # Code for simple coiled cable demo:
+        # pickup_point = makeTransform([0.1445,-0.3691,-0.002 , math.radians(180),0,0])
+        # dropoff_point = makeTransform([0.0095,-0.36906,0.00387 , math.radians(180),0,0]) * makeTransform([0,0,0,0,0,math.radians(90)])
         # self.UR5.moveBetweenStations("AF")
         # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( makeTransform([0,0,-0.2]) * self.AF.originNoRotation * makeTransform([0,0,0 , 0, math.pi ,0]) * makeTransform([0,0,0,0,0,math.pi]) )
+        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.1]) )
+        # self.UR5.setGripperPosition(0.35)
+        # self.UR5.moveArm( pickup_point )
+        # self.UR5.setGripperPosition(1.0)
+        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.125]) )
+        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
+        # self.UR5.setMoveSpeed(self.UR5.speedValueSlow)
+        # self.UR5.moveArm( dropoff_point )
+        # self.UR5.setGripperPosition(0.0)
+        # self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
+        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
+        #
+        # self.UR5.moveBetweenStations("AF")
 
         return 0
 
@@ -229,8 +243,12 @@ class RoboFab_host:
 if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
+    # Make the settings file then extract the settings from it
+    makeConfigurationFile(location="BRL") # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+
     # startup
-    RoboFab = RoboFab_host ()
+    RoboFab = RoboFab_host (configurationData)
 
 
     # open blueprint file
