@@ -8,3 +8,4 @@ latex/
 cmake-build-*/
  __pycache__/
  .idea/
+
