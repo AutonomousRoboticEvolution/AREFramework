@@ -114,10 +114,10 @@ void customCMAStrategy::tell()
 
 bool customCMAStrategy::stop()
 {
+    reached_ft = reach_ftarget();
     bool ipop_stop = ipop_cmaes_t::stop();
     bool pop_stag = pop_stagnation();
     bool best_pop_stag = best_sol_stagnation();
-    reached_ft = reach_ftarget();
 
     if(ipop_stop){
         log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
