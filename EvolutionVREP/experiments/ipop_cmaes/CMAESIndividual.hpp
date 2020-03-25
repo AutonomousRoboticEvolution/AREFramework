@@ -29,6 +29,15 @@ public:
 
     void update(double delta_time) override;
 
+    //specific to the current ARE arenas
+    Eigen::VectorXd descriptor(){
+        Eigen::VectorXd desc(3);
+        desc << (final_position[0]+1)/2., (final_position[1]+1)/2., (final_position[2]+1)/2.;
+        return desc;
+    }
+
+    void addObjective(double obj){objectives.push_back(obj);}
+
     std::string to_string();
     void from_string(const std::string&);
 
@@ -39,6 +48,7 @@ public:
         arch & ctrlGenome;
         arch & final_position;
     }
+
 
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
     const std::vector<double>& get_final_position(){return final_position;}

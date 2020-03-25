@@ -43,13 +43,15 @@ public:
         _stopcriteria.set_criteria_active(cmaes::NOEFFECTCOOR,true);//[Partial Success] Mean remains constant in coordinates
         _stopcriteria.set_criteria_active(cmaes::MAXFEVALS,false);//The maximum number of function evaluations allowed for optimization has been reached
         _stopcriteria.set_criteria_active(cmaes::MAXITER,false);//The maximum number of iterations specified for optimization has been reached
-        _stopcriteria.set_criteria_active(cmaes::FTARGET,true);//[Success] The objective function target value has been reached
+        _stopcriteria.set_criteria_active(cmaes::FTARGET,false);//[Success] The objective function target value has been reached
     }
 
     ~customCMAStrategy() {}
 
+    //custom stop criteria
     bool pop_stagnation();
     bool best_sol_stagnation();
+    bool reach_ftarget();
 
     dMat ask()
     {
@@ -57,17 +59,10 @@ public:
     }
 
     void eval(const dMat &candidates = dMat(0,0),
-              const dMat &phenocandidates=dMat(0,0))
-    {
-        // custom eval.
-        for (int r=0;r<_pop.size();r++)
-        {
-            std::vector<double> genome = std::dynamic_pointer_cast<NNParamGenome>(_pop[r]->get_ctrl_genome())->get_full_genome();
-            dVec x(genome.size());
-            for(int i = 0; i < genome.size(); i++)
-                x(i) = genome[i];
+              const dMat &phenocandidates=dMat(0,0));
 
-            _solutions.get_candidate(r).set_x(x);
+    void tell();
+    bool stop();
 
             _solutions.get_candidate(r).set_fvalue(-_pop[r]->getObjectives()[0]);
 
@@ -94,14 +89,8 @@ public:
         ipop_cmaes_t::capture_best_solution(best_run);
     }
 
-    void reset_search_state()
-    {
-        ipop_cmaes_t::reset_search_state();
-        if(elitist_restart){
-            _parameters.set_x0(_solutions.get_best_seen_candidate().get_x_dvec_ref());
-        }
+    void reset_search_state();
 
-    }
 
     void lambda_inc(){
         ipop_cmaes_t::lambda_inc();
@@ -110,6 +99,10 @@ public:
     void set_population(const std::vector<Individual::Ptr>& pop){_pop = pop;}
     void set_elitist_restart(bool er){elitist_restart = er;}
     void set_length_of_stagnation(int los){len_of_stag = los;}
+    void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
+    void set_novelty_decr(double nd){novelty_decr = nd;}
+
+    bool have_reached_ftarget(){return reached_ft;}
 
     std::vector<std::string> log_stopping_criterias;
 
@@ -119,6 +112,13 @@ private:
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
     int len_of_stag = 5;
+    double novelty_ratio = 0;
+    double start_novelty_ratio = 0;
+    double novelty_decr = 0.05;
+
+    double best_fitness();
+
+    bool reached_ft = false;
 
 };
 
@@ -146,12 +146,17 @@ public:
         return res;
     }
 
+    void novelty(const Individual::Ptr& ind);
+    void update_archive(const Individual::Ptr& ind);
+
 private:
     customCMAStrategy::Ptr cmaStrategy;
     int currentIndIndex;
     cmaes::CMASolutions best_run;
     bool _is_finish = false;
     std::vector<Individual::Ptr> savedPop;
+    std::vector<Eigen::VectorXd> archive;
+    std::vector<double> distances(const Eigen::VectorXd& indDesc);
 };
 
 

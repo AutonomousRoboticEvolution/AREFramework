@@ -17,10 +17,27 @@ std::map<int,std::string> customCMAStrategy::scriterias = {{cmaes::CONT,"OK"},
                                                            {cmaes::MAXITER,"The maximum number of iterations specified for optimization has been reached"},
                                                            {cmaes::FTARGET,"[Success] The objective function target value has been reached"}};
 
+bool customCMAStrategy::reach_ftarget(){
+    cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << "Best fitness : "  << best_fitnesses.back() << std::endl;
+
+    if (_parameters.get_ftarget() != std::numeric_limits<double>::infinity())
+    {
+        if (best_fitnesses.back() <= _parameters.get_ftarget())
+        {
+            std::stringstream sstr;
+            sstr << "stopping criteria fTarget => fvalue=" << best_fitnesses.back() << " / ftarget=" << _parameters.get_ftarget();
+            log_stopping_criterias.push_back(sstr.str());
+            cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
+
 bool customCMAStrategy::pop_stagnation(){
     std::vector<double> fvalues;
-    for(int i = 0; i < _parameters.lambda(); i++)
-       fvalues.push_back(_solutions.get_candidate(i).get_fvalue());
+    for(const auto& ind : _pop)
+       fvalues.push_back(ind->getObjectives()[0]);
 
     double mean=0.0;
     for(double fv : fvalues)
@@ -69,6 +86,63 @@ bool customCMAStrategy::best_sol_stagnation(){
     }else return false;
 }
 
+void customCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
+    // custom eval.
+    for (int r=0;r<_pop.size();r++)
+    {
+        std::vector<double> genome = std::dynamic_pointer_cast<NNParamGenome>(_pop[r]->get_ctrl_genome())->get_full_genome();
+        dVec x(genome.size());
+        for(int i = 0; i < genome.size(); i++)
+            x(i) = genome[i];
+
+        _solutions.get_candidate(r).set_x(x);
+        double fvalue = (1-novelty_ratio)*(1-_pop[r]->getObjectives()[0])
+                + novelty_ratio*(1-_pop[r]->getObjectives()[1]);
+        _solutions.get_candidate(r).set_fvalue(fvalue);
+
+    }
+    update_fevals(candidates.cols());
+}
+
+void customCMAStrategy::tell()
+{
+    ipop_cmaes_t::tell();
+    best_fitnesses.push_back(best_fitness());
+    if(novelty_ratio > 0)
+        novelty_ratio -= novelty_decr;
+}
+
+bool customCMAStrategy::stop()
+{
+    bool ipop_stop = ipop_cmaes_t::stop();
+    bool pop_stag = pop_stagnation();
+    bool best_pop_stag = best_sol_stagnation();
+    reached_ft = reach_ftarget();
+
+    if(ipop_stop){
+        log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
+    }
+    return  reached_ft || pop_stag || best_pop_stag  || ipop_stop;
+}
+
+void customCMAStrategy::reset_search_state()
+{
+    ipop_cmaes_t::reset_search_state();
+    if(elitist_restart){
+        _parameters.set_x0(_solutions.get_best_seen_candidate().get_x_dvec_ref());
+    }
+    novelty_ratio = start_novelty_ratio;
+}
+
+double customCMAStrategy::best_fitness(){
+    double bf = 1.;
+    for(const auto& ind : _pop){
+        if(bf > 1 - ind->getObjectives()[0])
+            bf = 1 - ind->getObjectives()[0];
+    }
+    return bf;
+}
+
 void CMAES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -77,6 +151,8 @@ void CMAES::init(){
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
+    double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
+    double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
 
     std::vector<double> initial_point;
 
@@ -104,6 +180,8 @@ void CMAES::init(){
     cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
     cmaStrategy->set_elitist_restart(elitist_restart);
     cmaStrategy->set_length_of_stagnation(lenStag);
+    cmaStrategy->set_novelty_ratio(novelty_ratio);
+    cmaStrategy->set_novelty_decr(novelty_decr);
 
     dMat init_samples = cmaStrategy->ask();
 
@@ -136,6 +214,12 @@ void CMAES::epoch(){
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
 
 
+    for(const auto& ind : population){
+        novelty(ind);
+        update_archive(ind);
+    }
+
+
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     cmaStrategy->set_population(population);
@@ -146,8 +230,7 @@ void CMAES::epoch(){
             std::cout << "Restart !" << std::endl;
 
         cmaStrategy->capture_best_solution(best_run);
-        int stop_type = cmaStrategy->get_solutions().run_status();
-        if(stop_type == cmaes::FTARGET){
+        if(cmaStrategy->have_reached_ftarget()){
             _is_finish = true;
             return;
         }
@@ -213,4 +296,55 @@ bool CMAES::update(const Environment::Ptr & env){
 bool CMAES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
     return _is_finish || numberEvaluation >= maxNbrEval;
+}
+
+
+void CMAES::novelty(const Individual::Ptr& ind){
+    int kValue = settings::getParameter<settings::Integer>(parameters,"#kValue").value; //usually 15
+
+    Eigen::VectorXd d = std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor();
+    std::vector<double> dist = distances(d);
+
+    std::sort(dist.begin(),dist.end()); // Sorting archive
+    double sum = 0;
+    if(dist.size() >  kValue + 1){
+        //sum = std::accumulate(dist.begin(),dist.begin() + kValue, 0);  \\\ \todo EB: This method is not working
+        for(int i = 0; i < dist.size(); i++){
+            sum += dist[i];
+            if(i >= kValue) break;
+        }
+    }
+    if(isnan(sum/static_cast<double>(kValue))){
+        std::cerr << "NaN found" << std::endl;
+    }
+    std::dynamic_pointer_cast<CMAESIndividual>(ind)->addObjective(sum/static_cast<double>(kValue));
+}
+
+void CMAES::update_archive(const Individual::Ptr &ind){
+
+    double noveltyThr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    double archAddProb = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+    //Update Archive
+    double noveltyValue = ind->getObjectives().back();
+    if(noveltyValue > noveltyThr || randomNum->randFloat(0,1) < archAddProb){
+        if(ind != NULL) {
+            archive.push_back(std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor());
+        }
+        else{
+            std::cerr << "NULL pointer" << std::endl;
+        }
+    }
+
+}
+
+std::vector<double> CMAES::distances(const Eigen::VectorXd& indDesc){
+    std::vector<double> dist;
+    for(const Eigen::VectorXd& desc : archive)
+        dist.push_back((desc - indDesc).norm());
+    /// \todo EB: IMPORTANT Compute Novelty with population as well.
+    // Comparing with population
+    for(const Individual::Ptr& ind : population) {
+        dist.push_back((std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor() - indDesc).norm());
+    }
+    return dist;
 }
