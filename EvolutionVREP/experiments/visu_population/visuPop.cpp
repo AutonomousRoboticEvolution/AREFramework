@@ -8,6 +8,7 @@ void VisuIndividual::createController(){
     int genType = settings::getParameter<settings::Integer>(parameters,"#genType").value;
     control.reset(new NNControl);
     control->set_parameters(parameters);
+    std::dynamic_pointer_cast<NNControl>(control)->set_randonNum(randNum);
 
     if(genType == settings::NEAT){
 //todo
@@ -143,6 +144,7 @@ void VisuPop::init(){
         }
         VisuIndividual::Ptr ind(new VisuIndividual(morph_gen,genome));
         ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
         population.push_back(ind);
     }
 
