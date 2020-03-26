@@ -22,6 +22,7 @@
 #include "v_repLib.h"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <random>
 
 namespace are_sett = are::settings;
 namespace are_c = are::client;
@@ -67,9 +68,6 @@ void saveLog(int num)
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
 
-
-    srand(time(NULL));
-    srand(rand());
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
@@ -152,8 +150,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::Property::Ptr properties(new are_sett::Property);
     ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-    if(seed < 0)
-        seed = rand();
+    if(seed < 0){
+        std::random_device rd;
+        seed = rd();
+    }
+
     misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
@@ -161,23 +162,30 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     properties.reset();
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
-        boost::filesystem::copy_file(simGetStringParameter(sim_stringparam_app_arg1),are::Logging::log_folder + std::string("/parameters.csv"));
-        //        std::fstream fs(are::Logging::log_folder + std::string("/parameters.csv"));
-        //        std::string line;
-        //        std::vector<std::string> l;
-        //        std::streampos spos;
-        //        while(std::getline(fs,line)){
-        //            if(boost::split(l,line,boost::is_any_of(","))[0] == "#seed"){
-        //                std::string end_of_file;
-        //                while(std::getline(fs,line))
-        //                    end_of_file += line + std::string("\n");
-        //                fs.seekp(spos);
-        //                fs << "#seed,int," << seed << std::endl; // << end_of_file;
-        //                break;
-        //            }
-        //            spos = fs.tellg();
-        //        }
-        //        fs.close();
+        //Write parameters in the log folder.
+        std::ofstream ofs(are::Logging::log_folder + std::string("/parameters.csv"));
+        for(const auto &elt : *parameters)
+        {
+            if(elt.first != "#seed"){
+                if(elt.second->name == "bool"){
+                    ofs << elt.first << ",bool," << are_sett::cast<are_sett::Boolean>(elt.second)->value << std::endl;
+                }
+                else if(elt.second->name == "int"){
+                    ofs << elt.first << ",int," << are_sett::cast<are_sett::Integer>(elt.second)->value << std::endl;
+                }
+                else if(elt.second->name == "float"){
+                    ofs << elt.first << ",float," << are_sett::cast<are_sett::Float>(elt.second)->value << std::endl;
+                }
+                else if(elt.second->name == "double"){
+                    ofs << elt.first << ",double," << are_sett::cast<are_sett::Double>(elt.second)->value << std::endl;
+                }
+                else if(elt.second->name == "string"){
+                    ofs << elt.first << ",string," << are_sett::cast<are_sett::String>(elt.second)->value << std::endl;
+                }
+            }
+            else ofs << "#seed" << ",int," << seed << std::endl;
+        }
+        ofs.close();
     }
 
     if(instance_type == are_sett::INSTANCE_SERVER)

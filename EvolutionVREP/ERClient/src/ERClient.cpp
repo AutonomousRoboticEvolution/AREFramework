@@ -89,45 +89,37 @@ int main(int argc, char* argv[])
         return -1; // could not properly connect to servers
     }
 
-    boost::filesystem::copy_file(parameters_file,are::Logging::log_folder + std::string("/parameters.csv"));
+    //Write parameters in the log folder.
+    std::ofstream ofs(are::Logging::log_folder + std::string("/parameters.csv"));
+    for(const auto &elt : *parameters)
+    {
+        if(elt.first != "#seed"){
+            if(elt.second->name == "bool"){
+                ofs << elt.first << ",bool," << settings::cast<settings::Boolean>(elt.second)->value << std::endl;
+            }
+            else if(elt.second->name == "int"){
+                ofs << elt.first << ",int," << settings::cast<settings::Integer>(elt.second)->value << std::endl;
+            }
+            else if(elt.second->name == "float"){
+                ofs << elt.first << ",float," << settings::cast<settings::Float>(elt.second)->value << std::endl;
+            }
+            else if(elt.second->name == "double"){
+                ofs << elt.first << ",double," << settings::cast<settings::Double>(elt.second)->value << std::endl;
+            }
+            else if(elt.second->name == "string"){
+                ofs << elt.first << ",string," << settings::cast<settings::String>(elt.second)->value << std::endl;
+            }
+        }
+        else ofs << "#seed" << ",int," << seed << std::endl;
+    }
+    ofs.close();
  
-    // load or initialize EA
-    int populationSize = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int numberOfGeneration = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
-    client->get_properties()->indCounter = 0;
-
     if (verbose) {
         std::cout << "initialized EA " << std::endl;
     }
-    while (client->get_ea()->get_generation() < numberOfGeneration) {
-        //	tStart = clock();
-        //	client->ea->agePop(); // should be in update function of EA
 
-        if (!client->execute()) {
-            std::cerr << "Something went wrong in the evaluation of the next generation. I am therefore quitting" << std::endl;
-            break;
-        }
-        //		client->ea->savePopFitness(i + 1, client->ea->popFitness);
-        //client->settings->saveSettings(); // IS IN EVALUATEPOP
-        //        if (verbose) {
-        //            std::cout << "Just saved settings <right after evaluate pop>" << std::endl;
-        //        }
-        //        if (client->properties->generation % client->properties->xGenerations == 0 && client->properties->generation!=0) {
-        //			std::cout << "Generation interval reached, quitting simulator. " << std::endl;
-        //			break;
-        //		}
-        client->get_properties()->indCounter += populationSize;
-
-
-        //		client->ea->selection(); // epochs in NEAT
-        //		if (client->settings->evolutionType == client->settings->EA_MULTINEAT) {
-        //		    auto *ea = dynamic_cast<EA_MultiNEAT *>(client->ea.get());
-        //		    std::ostringstream filename;
-        //		    filename << client->settings->repository << client->ea->neatSaveFile << client->settings->generation;
-        //			ea->savePopulation(filename.str());
-        //		}
-    }
-
+    //Main Loop
+    while (client->execute()) usleep(10000);
 
     extApi_sleepMs(5000);
     client->quitSimulation();
