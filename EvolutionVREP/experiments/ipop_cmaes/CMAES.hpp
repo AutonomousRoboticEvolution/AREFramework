@@ -133,6 +133,7 @@ public:
 
     void init();
     void epoch();
+    void init_next_pop();
     bool update(const Environment::Ptr&);
 
     void setObjectives(size_t indIdx, const std::vector<double> &objectives);
@@ -148,6 +149,8 @@ public:
 
     void novelty(const Individual::Ptr& ind);
     void update_archive(const Individual::Ptr& ind);
+
+    const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
 
 private:
     customCMAStrategy::Ptr cmaStrategy;

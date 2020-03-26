@@ -80,6 +80,7 @@ public:
 
     void init();
     void epoch();
+    void init_next_pop();
     bool update(const Environment::Ptr&);
 
     void setObjectives(size_t indIdx, const std::vector<double> &objectives);

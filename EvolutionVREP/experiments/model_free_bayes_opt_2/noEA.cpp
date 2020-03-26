@@ -158,7 +158,7 @@ void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
 }
 
 
-void noEA::epoch(){
+void noEA::init_next_pop(){
 
     int rnd_i = randomNum->randInt(0,population.size());
     BOIndividual::Ptr ind = population[rnd_i];

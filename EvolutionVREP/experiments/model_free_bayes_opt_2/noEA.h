@@ -23,8 +23,7 @@ public:
 
     void init() override;
     bool update(const Environment::Ptr&) override;
-    void epoch() override;
-
+    void init_next_pop();
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives);
     int getNumberOfEval() const {return currentFitnesses.size();}

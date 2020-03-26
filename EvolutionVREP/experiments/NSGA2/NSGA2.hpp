@@ -63,6 +63,8 @@ public:
 
     }
 
+
+
     void mutation(){
         for(const auto& ind : population)
             ind->mutate();
@@ -104,7 +106,9 @@ public:
         for(size_t j = 0; j < extra; j++)
             parents.push_back(front[i][j]);
 
+    }
 
+    void init_next_pop(){
         selection();
         mutation();
 

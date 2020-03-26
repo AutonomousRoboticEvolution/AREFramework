@@ -60,12 +60,13 @@ void CMAES::init(){
 }
 
 void CMAES::epoch(){
-
-    int pop_size = population.size();
-
     cmaStrategy->set_population(population);
     cmaStrategy->eval();
     cmaStrategy->tell();
+}
+
+void CMAES::init_next_pop(){
+    int pop_size = population.size();
 
     dMat new_samples = cmaStrategy->ask();
 

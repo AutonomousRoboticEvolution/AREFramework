@@ -221,9 +221,6 @@ void CMAES::epoch(){
         update_archive(ind);
     }
 
-
-    int pop_size = cmaStrategy->get_parameters().lambda();
-
     cmaStrategy->set_population(population);
     cmaStrategy->eval();
     cmaStrategy->tell();
@@ -237,14 +234,17 @@ void CMAES::epoch(){
             return;
         }
 
-        if(incrPop){
+        if(incrPop)
             cmaStrategy->lambda_inc();
-            pop_size = cmaStrategy->get_parameters().lambda();
-        }
+
         cmaStrategy->reset_search_state();
 
-
     }
+}
+
+void CMAES::init_next_pop(){
+    int pop_size = cmaStrategy->get_parameters().lambda();
+
 
     dMat new_samples = cmaStrategy->ask();
 
