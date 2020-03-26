@@ -1,15 +1,14 @@
 #experimentName,string,hyperneat
 #expPluginName,string,/usr/local/lib/libhyperneat.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
-#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/easy_zigzag_race.ttt
-#epuckPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/epuck_big.ttm
-#modelPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
+#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
+#epuckPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/epuck_big.ttm
+#modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,20
 #maxEvalTime,float,120
 #numberOfGeneration,int,10
-#variationRatio,float,0.2
-#repository,string,/home/le_goff/are-logs
+#repository,string,/home/leni/are-logs
 #fitnessFile,string,fitnesses_hn.csv
 #evalTimeFile,string,eval_durations.csv
 #behavDescFile,string,final_pos.csv
@@ -25,3 +24,4 @@
 #init_x,float,-0.6
 #init_y,float,0.6
 #init_z,float,0.05
+#UseInternalBias,bool,1
