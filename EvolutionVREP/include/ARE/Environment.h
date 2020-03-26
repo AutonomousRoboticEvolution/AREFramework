@@ -42,7 +42,7 @@ public:
         @brief Calculate the fitness value of the robot
         @param morph The pointer of the robot (morphology)
         */
-    virtual double fitnessFunction(const Individual::Ptr &ind) = 0;
+    virtual std::vector<double> fitnessFunction(const Individual::Ptr &ind) = 0;
     /**
         @brief update the info of the objects (e.g. robot) in the environments
         @param morph The pointer of the robot (morphology)
