@@ -24,7 +24,7 @@ public :
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
-        arch & fitness;
+        arch & objectives;
         arch & ctrlGenome;
 //        arch & morphGenome;
         arch & final_position;

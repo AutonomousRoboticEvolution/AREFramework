@@ -44,10 +44,11 @@ public:
     std::vector<int> popNextIndNumbers;
     /// This method initilizes setting for EA and random number generator seed
     void setSettings(const settings::ParametersMapPtr &param, const misc::RandNum::Ptr &rn);
+
     /// This method sets the fitness value of an individual
-    virtual void setFitness(size_t indIndex, float fitness)
+    virtual void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
-        population[indIndex]->setFitness(fitness);
+        population[indIndex]->setObjectives(objectives);
     }
 
     /**
@@ -60,33 +61,23 @@ public:
         return true;
     }
 
+    void incr_nbr_eval(){numberEvaluation++;}
+
     /**
      * @brief Epoch method is called at the end of each generation
      */
     virtual void epoch();
     virtual void init() = 0;    // initializes EA
+    virtual void init_next_pop();
 
-
-    Individual::Ptr getIndividual(size_t index) const;
-    size_t getPopSize() const {return population.size();}
-
-
-    /// Load an individual
-//    void loadIndividual(int individualNum, int sceneNum){}
-    /// Save the population fitness values
-//    void savePopFitness(int generation, std::vector<float> popfit, std::vector<int> popInividuals);
-    /// Save the population fitness values
-
-    /// Load the best individual based on the evolutionary progression documen
-//    virtual void loadBestIndividualGenome(int sceneNum) = 0;
-    /// Load all the population genomes?
-//    void loadPopulationGenomes();
-//    virtual std::shared_ptr<Morphology> getMorph() = 0;
-
-    std::function<Genome::Factory> createGenome;
-
+    virtual bool is_finish(){
+        int maxGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
+        return generation >= maxGen;
+    }
 
     //GETTERS & SETTERS
+    Individual::Ptr getIndividual(size_t index) const;
+    size_t getPopSize() const {return population.size();}
     const std::vector<Individual::Ptr> &get_population() const {return population;}
     const settings::ParametersMapPtr &get_parameters() const {return parameters;}
     const misc::RandNum::Ptr get_randomNum() const {return randomNum;}

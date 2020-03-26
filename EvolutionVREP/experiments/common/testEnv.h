@@ -19,7 +19,7 @@ public:
     ~TestEnv(){}
 //    void init() override;
 
-    double fitnessFunction(const Individual::Ptr &ind) override;
+    std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
     const std::vector<double> &get_final_position(){return final_position;}

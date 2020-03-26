@@ -137,7 +137,6 @@ void ER::endOfSimulation()
 
     int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
@@ -145,10 +144,14 @@ void ER::endOfSimulation()
     if(instanceType == settings::INSTANCE_REGULAR){
         if(currentIndIndex < ea->get_population().size())
         {
-            double fitness = environment->fitnessFunction(currentInd);
-            if(verbose)
-                std::cout << "fitness = " << fitness << std::endl;
-            ea->setFitness(currentIndIndex,fitness);
+            std::vector<double> objectives = environment->fitnessFunction(currentInd);
+            if(verbose){
+                std::cout << "fitnesses = " << std::endl;
+                for(const double fitness : objectives)
+                    std::cout << fitness << std::endl;
+            }
+            ea->setObjectives(currentIndIndex,objectives);
+
             if(ea->update(environment))
               currentIndIndex++;
             ea->set_endEvalTime(hr_clock::now());
@@ -157,15 +160,17 @@ void ER::endOfSimulation()
 
         if(currentIndIndex >= ea->get_population().size())
         {
-            saveLogs();
             ea->epoch();
+            saveLogs();
+            ea->init_next_pop();
+
             if(verbose)
                 std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
 
         }
-        if(ea->get_generation() >= nbrOfGen){
+        if(ea->is_finish()){
             if(verbose)
             {
                 std::cout << "---------------------" << std::endl;
@@ -176,11 +181,16 @@ void ER::endOfSimulation()
         }
     }
     else if(instanceType == settings::INSTANCE_SERVER){
-        double fitness = environment->fitnessFunction(currentInd);
-        if(verbose)
-            std::cout << "fitness = " << fitness << std::endl;
-        ea->setFitness(currentIndIndex,fitness);
+        std::vector<double> objectives = environment->fitnessFunction(currentInd);
+        if(verbose){
+            std::cout << "fitnesses = " << std::endl;
+            for(const double fitness : objectives)
+                std::cout << fitness << std::endl;
+        }
+        ea->setObjectives(currentIndIndex,objectives);
+
         evalIsFinish = ea->update(environment);
+        ea->set_endEvalTime(hr_clock::now());
         simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }

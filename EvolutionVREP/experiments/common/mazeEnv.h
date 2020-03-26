@@ -19,7 +19,7 @@ public:
     ~MazeEnv(){}
     void init() override;
 
-    double fitnessFunction(const Individual::Ptr &ind) override;
+    std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
     ///time point to check the status of the robot
@@ -28,6 +28,7 @@ public:
     void init_randNum(int seed){randNum.setSeed(seed);}
 
     const std::vector<double> &get_final_position(){return final_position;}
+    const std::vector<double> &get_target_position(){return target_position;}
 
 private:
     std::vector<double> target_position;

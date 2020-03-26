@@ -40,6 +40,10 @@ public:
 
     virtual void mutate() = 0;
 
+    virtual Genome::Ptr crossover(const Genome::Ptr&){
+        return clone();
+    }
+
     //Getters & Setters
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}

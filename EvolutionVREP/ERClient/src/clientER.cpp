@@ -53,31 +53,17 @@ bool ER::execute()
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
     int tries = 0;
     int pauseTime = 100; // milliseconds
-    // communicate with all ports
-    //    if (verbose) {
-    //        std::cout << "number server instances = " << serverInstances.size() << std::endl;
-    //    }
+
+
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
-    //    bool doneEvaluating = false;
     if (!confirmConnections()) {
         return false;
     }
-    //    else {
-    //        tries = 0;
-    //    }
-    updateSimulation();
-    //    while(serverInstances.size() > 0)
-    //    {
-    //        if (doneEvaluating) {
-    //            break;
-    //        }
 
-    //        updateSimulation();
-    //    }
-    return true;
+    return updateSimulation();
 }
 
 void ER::startOfSimulation(int slaveIndex){
@@ -94,27 +80,35 @@ void ER::endOfSimulation(int slaveIndex){
     if(verbose)
         std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
 
-    float fitness = currentIndVec[slaveIndex]->getFitness();
-    if(verbose)
-        std::cout << "Slave : " << slaveIndex << " fitness = " << fitness << std::endl;
-    ea->setFitness(currentIndexVec[slaveIndex],fitness);
+    std::vector<double> objectives = currentIndVec[slaveIndex]->getObjectives();
+    if(verbose){
+        std::cout << "Slave : " << slaveIndex << " fitness = ";
+        for(const double obj : objectives)
+            std::cout << obj <<  ", ";
+        std::cout << std::endl;
+    }
+    ea->setObjectives(currentIndexVec[slaveIndex],objectives);
+
+
+
     //        if(evalIsFinish)
     //            currentIndIndex++;
     ea->set_endEvalTime(hr_clock::now());
     saveLogs(false);
 }
 
-void ER::updateSimulation()
+bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int nbrOfGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
 
     bool all_instances_finish = true;
 
     for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
     {
         int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
-        all_instances_finish = all_instances_finish && (state == READY) && (currentIndIndex >= ea->get_population().size());
+        all_instances_finish = all_instances_finish
+                && (state == READY)
+                && (currentIndIndex >= ea->get_population().size());
 
         //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
@@ -136,7 +130,7 @@ void ER::updateSimulation()
         else if(state == BUSY)
         {
             //            float simTime = slave->getFloatSignal("simulationTime");
-            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
+            //serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
 
         }
         else if(state == FINISH)
@@ -147,13 +141,14 @@ void ER::updateSimulation()
             evalIsFinish = serverInstances[slaveIdx]->getIntegerSignal("evalIsFinish");
             endOfSimulation(slaveIdx);
             serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+            ea->incr_nbr_eval();
         }
         else if(state == ERROR)
         {
             std::cerr << "An error happened on the server side" << std::endl;
         }
         else if(state == READY && currentIndIndex >= ea->get_population().size()){
-            std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting a new generation" << std::endl;
+            std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
         }
         else
             std::cerr << "state value unknown : " << state << std::endl
@@ -166,21 +161,25 @@ void ER::updateSimulation()
     }
     if(currentIndIndex >= ea->get_population().size() && all_instances_finish)
     {
-        saveLogs();
         ea->epoch();
+        saveLogs();
+        ea->init_next_pop();
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();
         currentIndIndex = 0;
-    }
-    if(ea->get_generation() >= nbrOfGen && all_instances_finish){
-        if(verbose)
-        {
-            std::cout << "---------------------" << std::endl;
-            std::cout << "Evolution is Finished" << std::endl;
-            std::cout << "---------------------" << std::endl;
+
+        if(ea->is_finish()){
+            if(verbose)
+            {
+                std::cout << "---------------------" << std::endl;
+                std::cout << "Evolution is Finished" << std::endl;
+                std::cout << "---------------------" << std::endl;
+            }
+            return false;
         }
     }
+    return true;
 }
 
 void ER::quitSimulation()

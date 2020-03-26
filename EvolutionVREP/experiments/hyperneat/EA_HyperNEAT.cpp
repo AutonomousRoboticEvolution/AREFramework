@@ -70,9 +70,9 @@ void EA_HyperNEAT::initPopulation(const NEAT::Parameters &params)
     }
 }
 
-void EA_HyperNEAT::setFitness(size_t indIndex, float fitness){
+void EA_HyperNEAT::setObjectives(size_t indIndex, const std::vector<double> &objectives){
     currentIndIndex = indIndex;
-    population[indIndex]->setFitness(fitness);
+    population[indIndex]->setObjectives(objectives);
 }
 
 bool EA_HyperNEAT::update(const Environment::Ptr& env){
@@ -94,8 +94,11 @@ bool EA_HyperNEAT::update(const Environment::Ptr& env){
 
 void EA_HyperNEAT::epoch(){
     for(int i = 0; i < population.size(); i++)
-        neat_population->AccessGenomeByIndex(i).SetFitness(population[i]->getFitness());
+        neat_population->AccessGenomeByIndex(i).SetFitness(population[i]->getObjectives()[0]);
     neat_population->Epoch();
+}
+
+void EA_HyperNEAT::init_next_pop(){
     population.clear();
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     for (int i = 0; i < pop_size ; i++)

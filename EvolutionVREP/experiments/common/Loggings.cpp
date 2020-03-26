@@ -12,19 +12,19 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
 
     savePopFile << "generation " << generation << ": ,";
     for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << " ind " << i << ": " << ea->get_population()[i]->getFitness() << ",";
+        savePopFile << " ind " << i << ": " << ea->get_population()[i]->getObjectives()[0] << ",";
     }
     float avgFitness = 0;
     for (size_t i = 0; i < ea->get_population().size(); i++) {
-        avgFitness += ea->get_population()[i]->getFitness();
+        avgFitness += ea->get_population()[i]->getObjectives()[0];
     }
     avgFitness = avgFitness / ea->get_population().size();
     savePopFile << "avg: ," << avgFitness << ",";
     int bestInd = 0;
-    float bestFitness = ea->get_population()[0]->getFitness();
+    float bestFitness = ea->get_population()[0]->getObjectives()[0];
     for (size_t i = 1; i < ea->get_population().size(); i++) {
-        if (bestFitness < ea->get_population()[i]->getFitness()) {
-            bestFitness = ea->get_population()[i]->getFitness();
+        if (bestFitness < ea->get_population()[i]->getObjectives()[0]) {
+            bestFitness = ea->get_population()[i]->getObjectives()[0];
             bestInd = i;
         }
     }

@@ -3,15 +3,15 @@
 
 using namespace are;
 
-double TestEnv::fitnessFunction(const Individual::Ptr &ind){
+std::vector<double> TestEnv::fitnessFunction(const Individual::Ptr &ind){
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                          (a[1] - b[1])*(a[1] - b[1]) +
                          (a[2] - b[2])*(a[2] - b[2]));
     };
-    double d = distance(initial_position,final_position);
-    ind->setFitness(d);
+    std::vector<double> d(1);
+    d[0] = distance(initial_position,final_position);
     return d;
 }
 
