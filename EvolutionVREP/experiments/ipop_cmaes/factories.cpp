@@ -48,6 +48,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(sclog);
 
     std::string novelty_log_file = are::settings::getParameter<are::settings::String>(param,"#noveltyFile").value;
-    are::NoveltyLog::Ptr nvlog(new are::NoveltyLog(stop_crit_log_file));
+    are::NoveltyLog::Ptr nvlog(new are::NoveltyLog(novelty_log_file));
     logs.push_back(nvlog);
+
+    std::string archive_log_file = are::settings::getParameter<are::settings::String>(param,"#archiveFile").value;
+    are::ArchiveLog::Ptr arclog(new are::ArchiveLog(archive_log_file));
+    logs.push_back(arclog);
 }
