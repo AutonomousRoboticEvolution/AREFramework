@@ -6,8 +6,8 @@ using namespace misc;
 
 RandNum::RandNum(int seed)
 {
-	srand(seed);
-	std::cout << "seed set to " << seed << std::endl;
+    gen.seed(seed);
+    std::cout << "seed set to " << seed << std::endl;
     m_seed = seed;
 }
 
@@ -17,28 +17,17 @@ RandNum::~RandNum()
 }
 
 float RandNum::randFloat(float lower, float upper) {
-	float value = lower + static_cast <float> (rand()) / (static_cast <float> (RAND_MAX / (upper - lower)));
-	value = roundf(value * 1000000) / 1000000;
-//	cout << "randFloat = " << value << endl;
-	return value;
+    boost::random::uniform_real_distribution<> dist(lower,upper);
+    return dist(gen);
 }
 
-int RandNum::randInt(int range, int offset) {
-	int value = 0;
-	if (range != 0) {
-		int value = rand() % range + offset;
-		return value;
-	}
-	else {
-        std::cout << "ERROR: random range was 0, check your code" << std::endl;
-		return 0;
-	}
-//	cout << "randInt = " << value << endl;
-	return value;
+int RandNum::randInt(int lower, int upper) {
+    boost::random::uniform_int_distribution<> dist(lower,upper);
+    return dist(gen);
 }
 
 void RandNum::setSeed(int seed) {
-	srand(seed);
+    gen.seed(seed);
 	m_seed = seed;
 	std::cout << "Seed set to " << seed << std::endl;
 }

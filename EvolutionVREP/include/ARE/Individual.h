@@ -49,7 +49,7 @@ public:
         ctrlGenome->mutate();
     }
 
-    void initRandNum(int seed = 0){randNum.reset(new misc::RandNum(seed));}
+    void set_randNum(const misc::RandNum::Ptr& rn){randNum = rn;}
 
     bool isInit(){return (control != nullptr && morphology != nullptr);}
 

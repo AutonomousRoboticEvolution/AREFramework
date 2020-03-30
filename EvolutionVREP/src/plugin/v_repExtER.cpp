@@ -22,6 +22,7 @@
 #include "v_repLib.h"
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
+#include <random>
 
 namespace are_sett = are::settings;
 namespace are_c = are::client;
@@ -68,8 +69,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
 
 
-    srand(time(NULL));
-    srand(rand());
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
@@ -152,8 +151,10 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::Property::Ptr properties(new are_sett::Property);
     ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-    if(seed < 0)
-        seed = rand();
+    if(seed < 0){
+        std::random_device rd;
+        seed = rd();
+    }
     misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
