@@ -2,7 +2,7 @@
 #expPluginName,string,/usr/local/lib/libvisu_pop.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/escape_room.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/easy_race.ttt
 #robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck-longrange.ttm
 #robot,string,AREPuck
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
@@ -34,7 +34,7 @@
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,16
 #UseInternalBias,bool,1
-#folderToLoad,string,/are_ipop_escape_0/ipop_cmaes_24_2_14-48-24-4196/
-#genToLoad,int,16
-#indToLoad,int,28
+#folderToLoad,string,/are_ipop_easy_novpure_sigma20/ipop_cmaes_28_2_8-7-42-2420/
+#genToLoad,int,53
+#indToLoad,int,-1
 #genType,int,2
