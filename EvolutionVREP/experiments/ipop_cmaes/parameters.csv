@@ -3,8 +3,8 @@
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/escape_room.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck-longrange.ttm
-#robot,string,AREPuck
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/epuck_big.ttm
+#robot,string,EPuck
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,10
 #maxEvalTime,float,60
@@ -12,12 +12,14 @@
 #numberOfGeneration,int,2
 #noiseLevel,double,0.1
 #repository,string,/home/leni/are-logs
-#fitnessFile,string,fitnesses_hn.csv
+#fitnessFile,string,fitnesses.csv
 #evalTimeFile,string,eval_durations.csv
 #behavDescFile,string,final_pos.csv
 #stopCritFile,string,stop_crit.csv
+#noveltyFile,string,novelty.csv
+#archiveFile,string,archive.csv
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #timeStep,float,1.
 #shouldReopenConnections,bool,0
@@ -35,7 +37,7 @@
 #WeightReplacementMaxPower,float,1.0
 #MaxWeight,float,10.0
 #NNType,int,0
-#NbrInputNeurones,int,4
+#NbrInputNeurones,int,8
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,16
 #UseInternalBias,bool,1
@@ -47,6 +49,6 @@
 #lengthOfStagnation,int,5
 #kValue,int,15
 #noveltyThreshold,double,0.9
-#archiveAddingProb,double,0.2
+#archiveAddingProb,double,0.4
 #noveltyRatio,double,1.
 #noveltyDecrement,double,0.05

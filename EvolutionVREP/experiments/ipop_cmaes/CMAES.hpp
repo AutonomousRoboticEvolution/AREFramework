@@ -2,6 +2,7 @@
 #define CMAES_HPP
 
 #include <ARE/EA.h>
+#include "Novelty.hpp"
 #include <libcmaes/cmaes.h>
 #include "NNGenome.hpp"
 #include "CMAESIndividual.hpp"
@@ -147,8 +148,6 @@ public:
         return res;
     }
 
-    void novelty(const Individual::Ptr& ind);
-    void update_archive(const Individual::Ptr& ind);
 
     const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
 
@@ -157,9 +156,7 @@ private:
     int currentIndIndex;
     cmaes::CMASolutions best_run;
     bool _is_finish = false;
-    std::vector<Individual::Ptr> savedPop;
     std::vector<Eigen::VectorXd> archive;
-    std::vector<double> distances(const Eigen::VectorXd& indDesc);
 };
 
 

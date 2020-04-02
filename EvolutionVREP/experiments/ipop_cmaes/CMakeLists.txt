@@ -9,6 +9,7 @@ add_library(IPOP_CMAES SHARED
     ../common/Loggings.cpp
     ../common/NNGenome.cpp
     ../common/genLoggings.cpp
+    ../common/Novelty.cpp
     CMAES.cpp
     CMAESIndividual.cpp
     factories.cpp

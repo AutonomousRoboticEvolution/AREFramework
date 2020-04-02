@@ -1,4 +1,4 @@
-#include "CMAES.hpp"
+ #include "CMAES.hpp"
 
 
 using namespace are;
@@ -156,6 +156,10 @@ void CMAES::init(){
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
 
+    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+
     std::vector<double> initial_point;
 
     NNGenome::Ptr nn_gen(new NNGenome(randomNum,parameters));
@@ -216,10 +220,30 @@ void CMAES::epoch(){
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
 
 
-    for(const auto& ind : population){
-        novelty(ind);
-        update_archive(ind);
+    /** NOVELTY **/
+    if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
+        if(Novelty::k_value >= population.size())
+            Novelty::k_value = population.size()/2;
+        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+
+        std::vector<Eigen::VectorXd> pop_desc;
+        for(const auto& ind : population)
+            pop_desc.push_back(std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor());
+        //compute novelty
+        for(const auto& ind : population){
+            Eigen::VectorXd ind_desc = std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor();
+            double ind_nov = Novelty::sparseness(Novelty::distances(ind_desc,archive,pop_desc));
+            std::dynamic_pointer_cast<CMAESIndividual>(ind)->addObjective(ind_nov);
+        }
+
+        //update archive
+        for(const auto& ind : population){
+            Eigen::VectorXd ind_desc = std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor();
+            double ind_nov = ind->getObjectives().back();
+            Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
+        }
     }
+    /**/
 
     cmaStrategy->set_population(population);
     cmaStrategy->eval();
@@ -290,63 +314,10 @@ bool CMAES::update(const Environment::Ptr & env){
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
 
 
-
-
     return true;
 }
 
 bool CMAES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
     return _is_finish || numberEvaluation >= maxNbrEval;
-}
-
-
-void CMAES::novelty(const Individual::Ptr& ind){
-    int kValue = settings::getParameter<settings::Integer>(parameters,"#kValue").value; //usually 15
-
-    Eigen::VectorXd d = std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor();
-    std::vector<double> dist = distances(d);
-
-    std::sort(dist.begin(),dist.end()); // Sorting archive
-    double sum = 0;
-    if(dist.size() >  kValue + 1){
-        //sum = std::accumulate(dist.begin(),dist.begin() + kValue, 0);  \\\ \todo EB: This method is not working
-        for(int i = 0; i < dist.size(); i++){
-            sum += dist[i];
-            if(i >= kValue) break;
-        }
-    }
-    if(isnan(sum/static_cast<double>(kValue))){
-        std::cerr << "NaN found" << std::endl;
-    }
-    std::dynamic_pointer_cast<CMAESIndividual>(ind)->addObjective(sum/static_cast<double>(kValue));
-}
-
-void CMAES::update_archive(const Individual::Ptr &ind){
-
-    double noveltyThr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    double archAddProb = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
-    //Update Archive
-    double noveltyValue = ind->getObjectives().back();
-    if(noveltyValue > noveltyThr || randomNum->randFloat(0,1) < archAddProb){
-        if(ind != NULL) {
-            archive.push_back(std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor());
-        }
-        else{
-            std::cerr << "NULL pointer" << std::endl;
-        }
-    }
-
-}
-
-std::vector<double> CMAES::distances(const Eigen::VectorXd& indDesc){
-    std::vector<double> dist;
-    for(const Eigen::VectorXd& desc : archive)
-        dist.push_back((desc - indDesc).norm());
-    /// \todo EB: IMPORTANT Compute Novelty with population as well.
-    // Comparing with population
-    for(const Individual::Ptr& ind : population) {
-        dist.push_back((std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor() - indDesc).norm());
-    }
-    return dist;
 }
