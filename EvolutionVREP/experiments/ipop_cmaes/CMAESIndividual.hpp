@@ -31,8 +31,9 @@ public:
 
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor(){
+        double arena_size = settings::getParameter<setting::Double>(parameters,"arenaSize").value;
         Eigen::VectorXd desc(3);
-        desc << (final_position[0]+1)/2., (final_position[1]+1)/2., (final_position[2]+1)/2.;
+        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
         return desc;
     }
 

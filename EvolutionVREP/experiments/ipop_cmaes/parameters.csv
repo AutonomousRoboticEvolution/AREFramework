@@ -24,9 +24,9 @@
 #timeStep,float,1.
 #shouldReopenConnections,bool,0
 #seed,int,-1
-#target_x,float,0.75
-#target_y,float,0.75
-#target_z,float,0.05
+#target_x,double,0.75
+#target_y,double,0.75
+#target_z,double,0.05
 #init_x,float,0.
 #init_y,float,0.
 #init_z,float,0.05
