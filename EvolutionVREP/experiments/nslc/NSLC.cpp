@@ -54,8 +54,14 @@ void NSLC::epoch(){
     }
 
     /** NOVELTY **/
+    if(Novelty::k_value >= population.size())
+        Novelty::k_value = population.size()/2;
+    else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
     
+    std::vector<Eigen::VectorXd> pop_desc;
+    for(const auto& ind : population)
+        pop_desc.push_back(std::dynamic_pointer_cast<NSLCIndividual>(ind)->descriptor());
     std::vector<Eigen::VectorXd> pop_desc;
     for(const auto& ind : population)
         pop_desc.push_back(std::dynamic_pointer_cast<NSLCIndividual>(ind)->descriptor());

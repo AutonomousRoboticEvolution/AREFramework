@@ -49,9 +49,9 @@ void ArchiveLog::saveLog(are::EA::Ptr &ea)
 
     Eigen::VectorXd desc;
 
-    savePopFile << generation << ";" << static_cast<CMAES*>(ea.get())->get_archive().size() << ";";
-    for (size_t i = 0; i < static_cast<CMAES*>(ea.get())->get_archive().size(); i++) {
-        desc = static_cast<CMAES*>(ea.get())->get_archive()[i];
+    savePopFile << generation << ";" << static_cast<NSLC*>(ea.get())->get_archive().size() << ";";
+    for (size_t i = 0; i < static_cast<NSLC*>(ea.get())->get_archive().size(); i++) {
+        desc = static_cast<NSLC*>(ea.get())->get_archive()[i];
         for(size_t j = 0; j < desc.rows() - 1 ; j++)
             savePopFile << desc(j) << ",";
         savePopFile << desc(desc.rows()-1) << ";";
