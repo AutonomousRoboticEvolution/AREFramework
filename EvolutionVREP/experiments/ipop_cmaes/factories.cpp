@@ -34,6 +34,8 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     std::string eval_time_log_file = are::settings::getParameter<are::settings::String>(param,"#evalTimeFile").value;
     are::EvalTimeLog::Ptr etlog(new are::EvalTimeLog(eval_time_log_file));
+    std::dynamic_pointer_cast<are::EvalTimeLog>(etlog)
+            ->set_end_of_gen(are::settings::getParameter<are::settings::Integer>(param,"#instanceType").value == 1);
     logs.push_back(etlog);
 
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;

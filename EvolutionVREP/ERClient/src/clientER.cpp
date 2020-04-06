@@ -100,7 +100,6 @@ void ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-    ea->set_endEvalTime(hr_clock::now());
     saveLogs(false);
 }
 
@@ -173,7 +172,11 @@ bool ER::updateSimulation()
     }
     if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
+
         ea->epoch();
+
+        ea->set_endEvalTime(hr_clock::now());
+
         saveLogs();
         ea->set_startEvalTime(hr_clock::now());
         ea->init_next_pop();
