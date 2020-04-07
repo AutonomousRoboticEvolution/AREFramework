@@ -26,7 +26,7 @@ struct Params {
         BO_PARAM(double, tolerance, -0.1);
     };
     struct acqui_ei {
-        BO_PARAM(double, jitter, 1.0);
+        BO_PARAM(double, jitter, 0.1);
     };
     struct acqui_ucb {
         BO_PARAM(double, alpha, 0.1);
@@ -88,7 +88,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::UCB<Params, gp_t>;
+using acqui_t = lb::acqui::EI<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;

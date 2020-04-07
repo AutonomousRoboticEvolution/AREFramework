@@ -61,6 +61,9 @@ void BOLearner::compute_model(){
 void BOLearner::update(Control::Ptr & ctrl)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    double max_dist = sqrt(2*arena_size*arena_size);
+
 
     using acqui_optimizer_t =
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
@@ -73,7 +76,7 @@ void BOLearner::update(Control::Ptr & ctrl)
 
     const auto dist_to_target = [=](const Eigen::VectorXd& x) -> double
     {
-        return -(x-_target).norm();
+        return (1-(x-_target).norm()/max_dist);
     };
 
     std::cout << "start acquisition" << std::endl;

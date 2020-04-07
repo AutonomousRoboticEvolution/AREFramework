@@ -66,6 +66,7 @@ void BOIndividual::createController()
 {
     control.reset(new NNControl);
     control->set_parameters(parameters);
+    std::dynamic_pointer_cast<NNControl>(control)->set_randonNum(randNum);
 
     if(genType == settings::NEAT){
 //todo
