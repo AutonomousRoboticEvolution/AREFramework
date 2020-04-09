@@ -46,6 +46,7 @@ void ER::initialize(){
     ea = EAFactory(randNum, parameters);
     ea->set_simulator_side(false);
     ea->init();
+    ea->set_simulator_side(false);
     ea->set_startEvalTime(hr_clock::now());
     for(int i = 0; i < ea->get_population().size(); i++)
         indToEval.push_back(i);
@@ -97,7 +98,6 @@ void ER::endOfSimulation(int slaveIndex){
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
     ea->update(environment);
-
     //        if(evalIsFinish)
     //            currentIndIndex++;
     saveLogs(false);
