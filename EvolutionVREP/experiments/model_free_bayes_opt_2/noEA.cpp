@@ -160,7 +160,7 @@ void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
 
 void noEA::init_next_pop(){
 
-    int rnd_i = randomNum->randInt(0,population.size());
+    int rnd_i = randomNum->randInt(0,population.size()-1);
     BOIndividual::Ptr ind = population[rnd_i];
 
     population.clear();

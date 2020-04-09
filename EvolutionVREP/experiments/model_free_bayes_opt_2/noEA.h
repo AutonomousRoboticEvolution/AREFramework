@@ -1,5 +1,5 @@
-#ifndef EA_HYPERNEAT_H
-#define EA_HYPERNEAT_H
+#ifndef NOEA_H
+#define NOEA_H
 
 #include <boost/filesystem.hpp>
 
@@ -43,4 +43,4 @@ private:
 
 }
 
-#endif //EA_HYPERNEAT_H
+#endif //NOEA_H
