@@ -17,7 +17,8 @@ add_library(BO_CMAES SHARED
     BOCMAESLoggings.cpp
     )
 target_include_directories(BO_CMAES PUBLIC
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "${LIMBO_FOLDER}/src/"
     "../common/"
     "/usr/include/eigen3"

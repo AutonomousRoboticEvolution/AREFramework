@@ -27,6 +27,14 @@ BOLearner::BOLearner()
     Params::opt_cmaes::set_lambda(-1);
     Params::opt_cmaes::set_handle_uncertainty(true);
     _current_iteration = 0;
+
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    _max_dist = sqrt(2*arena_size*arena_size);
+
+    _reward = [&](const Eigen::VectorXd& x) -> double
+    {
+        return (1-(x-_target).norm()/_max_dist);
+    };
 }
 
 void BOLearner::init_model(int input_size)
@@ -61,9 +69,6 @@ void BOLearner::compute_model(){
 void BOLearner::update(const NNParamGenome::Ptr & ctrl_gen)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
-
 
     using acqui_optimizer_t =
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
@@ -74,10 +79,7 @@ void BOLearner::update(const NNParamGenome::Ptr & ctrl_gen)
 
 //    lb::FirstElem aggr;
 
-    const auto dist_to_target = [=](const Eigen::VectorXd& x) -> double
-    {
-        return (1-(x-_target).norm()/max_dist);
-    };
+
 
     std::cout << "start acquisition" << std::endl;
 
@@ -86,7 +88,7 @@ void BOLearner::update(const NNParamGenome::Ptr & ctrl_gen)
     acquisition_function_t acqui(_model, _current_iteration);
 
     auto acqui_optimization =
-            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, dist_to_target, g); };
+            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, _reward, g); };
 
     Eigen::VectorXd new_sample = acqui_optimizer(acqui_optimization, starting_point, false);
     std::cout << "finish acquisition" << std::endl;

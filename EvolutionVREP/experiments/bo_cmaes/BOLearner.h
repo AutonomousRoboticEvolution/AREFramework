@@ -119,6 +119,10 @@ public:
     void update_model();
 
 
+    double reward(const Eigen::VectorXd& x){
+        return _reward(x);
+    }
+
     //GETTERS & SETTERS
     model_t get_model(){return _model;}
     void set_observation(std::vector<Eigen::VectorXd> &obs){_observations = obs;}
@@ -130,6 +134,8 @@ public:
 private:
     model_t _model;
     Eigen::VectorXd _target;
+    std::function<double(const Eigen::VectorXd& x)> _reward;
+    double _max_dist;
 };
 }//are
 #endif //BOLEARNER_H

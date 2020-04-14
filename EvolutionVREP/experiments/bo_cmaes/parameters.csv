@@ -10,6 +10,7 @@
 #maxEvalTime,float,60
 #maxNbrEval,int,100
 #numberBOIteration,int,10
+#BOInitDataset,int,10
 #numberOfGeneration,int,2
 #noiseLevel,double,0.1
 #repository,string,/home/leni/are-logs

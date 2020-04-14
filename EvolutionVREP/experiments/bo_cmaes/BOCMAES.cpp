@@ -146,19 +146,21 @@ double customCMAStrategy::best_fitness(){
 }
 
 void BOCMAES::init(){
+
+    int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
+
+    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
-
-    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
     std::vector<double> initial_point;
 
@@ -178,8 +180,7 @@ void BOCMAES::init(){
         initial_point.push_back(nn.m_neurons[j].m_bias);
         j++;
     }
-
-    cmaes::CMAParameters<> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed());
+    cmaes::CMAParameters<> cmaParam(initial_point,step_size,init_bo_dataset,randomNum->getSeed());
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
@@ -188,13 +189,14 @@ void BOCMAES::init(){
     cmaStrategy->set_length_of_stagnation(lenStag);
     cmaStrategy->set_novelty_ratio(novelty_ratio);
     cmaStrategy->set_novelty_decr(novelty_decr);
+    //todo init BO Dataset;
 
     dMat init_samples = cmaStrategy->ask();
 
     std::vector<double> weights(nbr_weights);
     std::vector<double> biases(nbr_bias);
 
-    for(int u = 0; u < pop_size; u++){
+    for(int u = 0; u < init_bo_dataset; u++){
 
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
@@ -215,6 +217,79 @@ void BOCMAES::init(){
 
 }
 
+void BOCMAES::cmaes_init_pop()
+{
+    int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
+
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+
+
+
+
+    //Transfer Knowledge from BO to CMAES by taking the pop_size best solution produced by BO
+    BOLearner learner;
+    std::vector<size_t> idx(observations.size());
+    std::iota(idx.begin(),idx.end(),0);
+
+    std::sort(idx.begin(),idx.end(),
+              [&](const size_t &i1,const size_t &i2) -> bool{return learner.reward(observations[i1]) > learner.reward(observations[i2]);});
+    population.clear();
+
+    NNGenome nn_gen(randomNum,parameters);
+    NEAT::NeuralNetwork nn;
+    nn_gen.buildPhenotype(nn);
+    std::vector<double> weights(nn.m_connections.size());
+    std::vector<double> biases(nn.m_neurons.size());
+
+    Eigen::VectorXd mean_sample;
+
+    for (int i = 0;i < pop_size; i++) {
+
+        mean_sample += samples[idx[i]];
+
+        for(int v = 0; v < weights.size(); v++)
+            weights[v] = samples[idx[i]](v);
+        for(int w = weights.size(); w < weights.size()+biases.size(); w++)
+            biases[w-weights.size()] = samples[idx[i]](w);
+
+        EmptyGenome::Ptr morph_gen(new EmptyGenome);
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        ctrl_gen->set_weights(weights);
+        ctrl_gen->set_biases(biases);
+        BOLearner::Ptr learner(new BOLearner);
+        learner->set_parameters(parameters);
+        Individual::Ptr ind(new BOCMAESIndividual(morph_gen,ctrl_gen,learner));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        ind->setObjectives({learner->reward(observations[idx[i]])});
+        population.push_back(ind);
+    }
+
+
+    mean_sample /= static_cast<double>(pop_size);
+    std::vector<double> initial_point;
+    for(int i = 0; i < mean_sample.rows(); i++)
+        initial_point.push_back(mean_sample(i));
+
+    //Init CMAES
+    double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
+    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
+    double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
+    double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
+
+    cmaes::CMAParameters<> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed());
+    cmaParam.set_ftarget(ftarget);
+    cmaParam.set_quiet(!verbose);
+
+    cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    cmaStrategy->set_elitist_restart(elitist_restart);
+    cmaStrategy->set_length_of_stagnation(lenStag);
+    cmaStrategy->set_novelty_ratio(novelty_ratio);
+    cmaStrategy->set_novelty_decr(novelty_decr);
+}
+
 void BOCMAES::epoch(){
     if(boIsActive){
         if(generation == 0){
@@ -227,6 +302,13 @@ void BOCMAES::epoch(){
         bo_epoch();
     }
     else{
+        int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
+        int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#BOInitDataset").value;
+
+        if(numberEvaluation == nbr_bo_iter + bo_init_dataset)
+        {
+            cmaes_init_pop();
+        }
         cmaes_epoch();
     }
 }
@@ -351,7 +433,7 @@ void BOCMAES::setObjectives(size_t indIdx, const std::vector<double> &objectives
 
 bool BOCMAES::update(const Environment::Ptr & env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#BOInitDataset").value;
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     endEvalTime = hr_clock::now();
@@ -367,7 +449,7 @@ bool BOCMAES::update(const Environment::Ptr & env){
     if(instance_type == settings::INSTANCE_REGULAR || !simulator_side){
         int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
 
-        boIsActive = numberEvaluation - pop_size < nbr_bo_iter;
+        boIsActive = numberEvaluation - bo_init_dataset < nbr_bo_iter;
 
 
         if(boIsActive){

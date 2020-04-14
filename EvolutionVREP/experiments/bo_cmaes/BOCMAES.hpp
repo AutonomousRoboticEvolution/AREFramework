@@ -116,8 +116,8 @@ public:
     void init_next_pop();
     bool update(const Environment::Ptr&);
 
+    void cmaes_init_pop();
     void cmaes_next_pop();
-
     void cmaes_epoch();
     void bo_epoch();
 
