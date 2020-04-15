@@ -103,6 +103,24 @@ void BOIndividual::update_learner(std::vector<Eigen::VectorXd> &obs, std::vector
     std::dynamic_pointer_cast<BOLearner>(learner)->set_target(target);
 
     std::dynamic_pointer_cast<BOLearner>(learner)->update_model();
-    learner->update(control);
+    std::dynamic_pointer_cast<BOLearner>(learner)->update(std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome));
 }
 
+std::string BOIndividual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<BOIndividual>();
+    oarch.register_type<NNParamGenome>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void BOIndividual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<BOIndividual>();
+    iarch.register_type<NNParamGenome>();
+    iarch >> *this;
+}

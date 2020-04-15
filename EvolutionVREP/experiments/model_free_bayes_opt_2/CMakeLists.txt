@@ -12,11 +12,12 @@ add_library(model_free_bayes_opt_2 SHARED
     ../common/Loggings.cpp
     ../common/NNGenome.cpp
     BOLoggings.cpp
-    BOLearner.cpp
+    ../common/BOLearner.cpp
     NEATGenome.cpp
     )
 target_include_directories(model_free_bayes_opt_2 PUBLIC
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "${LIMBO_FOLDER}/src/"
     "/usr/include/eigen3"
     "../common/"

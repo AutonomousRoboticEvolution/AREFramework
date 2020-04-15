@@ -29,6 +29,29 @@ BOLearner::BOLearner()
     _current_iteration = 0;
 }
 
+BOLearner::BOLearner(const settings::ParametersMapPtr &param){
+    Params::opt_cmaes::set_lbound(-1.);
+    Params::opt_cmaes::set_ubound(1.);
+
+    Params::opt_cmaes::set_max_fun_evals(-1);
+    Params::opt_cmaes::set_fun_tolerance(1);
+    Params::opt_cmaes::set_restarts(1);
+    Params::opt_cmaes::set_elitism(1);
+    Params::opt_cmaes::set_lambda(-1);
+    Params::opt_cmaes::set_handle_uncertainty(true);
+    _current_iteration = 0;
+
+    parameters = param;
+
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    _max_dist = sqrt(2*arena_size*arena_size);
+
+    _reward = [&](const Eigen::VectorXd& x) -> double
+    {
+        return (1-(x-_target).norm()/_max_dist);
+    };
+}
+
 void BOLearner::init_model(int input_size)
 {
     _model = model_t(input_size,3);
@@ -58,26 +81,20 @@ void BOLearner::compute_model(){
     _model.compute(_samples,_observations);
 }
 
-void BOLearner::update(Control::Ptr & ctrl)
+void BOLearner::update(const NNParamGenome::Ptr & ctrl_gen)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
-
 
     using acqui_optimizer_t =
     typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
 
-    int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
-    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
+    int nbr_weights = ctrl_gen->get_weights().size();
+    int nbr_bias = ctrl_gen->get_biases().size();
     Eigen::VectorXd starting_point = _samples.back();
 
 //    lb::FirstElem aggr;
 
-    const auto dist_to_target = [=](const Eigen::VectorXd& x) -> double
-    {
-        return (1-(x-_target).norm()/max_dist);
-    };
+
 
     std::cout << "start acquisition" << std::endl;
 
@@ -86,23 +103,22 @@ void BOLearner::update(Control::Ptr & ctrl)
     acquisition_function_t acqui(_model, _current_iteration);
 
     auto acqui_optimization =
-            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, dist_to_target, g); };
+            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, _reward, g); };
 
     Eigen::VectorXd new_sample = acqui_optimizer(acqui_optimization, starting_point, false);
     std::cout << "finish acquisition" << std::endl;
 
 
-    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    std::vector<double> weights, biases;
     int i = 0;
     for(; i < nbr_weights; i++)
-        nn.m_connections[i].m_weight = new_sample(i);
-    int j = 0;
+        weights.push_back(new_sample(i));
     for(; i < nbr_weights+nbr_bias; i++){
-        nn.m_neurons[j].m_bias = new_sample(i);
-        j++;
+        biases.push_back(new_sample(i));
     }
 
-    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
+    ctrl_gen->set_weights(weights);
+    ctrl_gen->set_biases(biases);
 
     if(verbose)
         std::cout << "Delta between previous and current weights : " << (starting_point - new_sample).norm() << std::endl;

@@ -9,6 +9,7 @@
 
 #include "ARE/Learner.h"
 #include "NNControl.h"
+#include "NNParamGenome.hpp"
 
 namespace lb = limbo;
 namespace are {
@@ -32,7 +33,7 @@ struct Params {
         BO_PARAM(double, alpha, 0.1);
     };
     struct acqui_gpucb {
-        BO_PARAM(double, delta, 0.1);
+        BO_PARAM(double, delta, 1.);
     };
     struct init_randomsampling {
         BO_PARAM(int, samples, 10);
@@ -41,7 +42,7 @@ struct Params {
         BO_PARAM(double, noise, 1e-10);
     };
 
-    struct kernel_squared_exp_ard : public lb::defaults::kernel_squared_exp_ard {
+    struct kernel_maternfivehalves : public lb::defaults::kernel_maternfivehalves {
     };
     struct opt_rprop : public lb::defaults::opt_rprop {
     };
@@ -80,7 +81,7 @@ struct Params {
 //};
 
 
-using kernel_t = lb::kernel::SquaredExpARD<Params>;
+using kernel_t = lb::kernel::MaternFiveHalves<Params>;
 using mean_t = lb::mean::Data<Params>;
 using gp_opt_t = lb::model::gp::KernelLFOpt<Params>;
 
@@ -88,7 +89,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::EI<Params, gp_t>;
+using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
@@ -111,11 +112,17 @@ public:
     typedef std::shared_ptr<const BOLearner> ConstPtr;
 
     BOLearner();
-    void update(Control::Ptr &ctrl);
+    BOLearner(const settings::ParametersMapPtr &param);
+    void update(Control::Ptr &ctrl){}
+    void update(const NNParamGenome::Ptr &ctrl_gen);
     void init_model(int input_size);
     void compute_model();
     void update_model();
 
+
+    double reward(const Eigen::VectorXd& x){
+        return _reward(x);
+    }
 
     //GETTERS & SETTERS
     model_t get_model(){return _model;}
@@ -128,6 +135,8 @@ public:
 private:
     model_t _model;
     Eigen::VectorXd _target;
+    std::function<double(const Eigen::VectorXd& x)> _reward;
+    double _max_dist;
 };
 }//are
 #endif //BOLEARNER_H

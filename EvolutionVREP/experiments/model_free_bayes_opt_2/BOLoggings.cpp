@@ -8,13 +8,15 @@ void BehavDescLog::saveLog(EA::Ptr &ea)
     if(!openOLogFile(logFileStream))
         return;
 
-    int numberEval = ea->get_numberEvaluation();
-    std::vector<double> final_position = static_cast<const noEA*>(ea.get())->get_final_position();
+    int generation = ea->get_generation();
 
-    logFileStream << numberEval << ",";
-    for(const double &pos : final_position)
+    logFileStream << "generation," << generation << ",";
+    for(size_t i = 0; i < ea->get_population().size(); i++){
+        logFileStream << i << ",";
+        for(const double &pos :
+            std::dynamic_pointer_cast<BOIndividual>(ea->getIndividual(i))->get_final_position())
             logFileStream << pos << ",";
-
+    }
     logFileStream << std::endl;
 
     logFileStream.close();

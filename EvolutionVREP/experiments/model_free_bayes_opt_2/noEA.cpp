@@ -6,15 +6,32 @@ namespace fs = boost::filesystem;
 void noEA::init(){
     bool start_from_random = settings::getParameter<settings::Boolean>(parameters,"#startFromRandom").value;
     if(start_from_random){
-        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-        rng.Seed(randomNum->getSeed());
+        int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
+        float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
 
-        for(int i = 0; i < pop_size; i++){
+        NNGenome nn_gen(randomNum,parameters);
+        NEAT::NeuralNetwork nn;
+        nn_gen.init();
+        nn_gen.buildPhenotype(nn);
+        int nbr_weights = nn.m_connections.size();
+        int nbr_biases = nn.m_neurons.size();
+
+        Eigen::MatrixXd init_samples = limbo::tools::random_lhs(nbr_weights + nbr_biases,init_bo_dataset);
+
+        std::vector<double> weights(nbr_weights);
+        std::vector<double> biases(nbr_biases);
+
+        for(int i = 0; i < init_bo_dataset; i++){
+            for(int v = 0; v < nbr_weights; v++)
+                weights[v] = max_weight*init_samples(i,v);
+            for(int w = nbr_weights; w < nbr_weights+nbr_biases; w++)
+                biases[w-nbr_weights] = max_weight*init_samples(i,w);
+
             EmptyGenome::Ptr morph_gen(new EmptyGenome);
-            NNGenome::Ptr ctrl_gen(new NNGenome(randomNum,parameters));
-            ctrl_gen->init(rng);
-            BOLearner::Ptr learner(new BOLearner);
-            learner->set_parameters(parameters);
+            NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+            ctrl_gen->set_weights(weights);
+            ctrl_gen->set_biases(biases);
+            BOLearner::Ptr learner(new BOLearner(parameters));
             Individual::Ptr ind(new BOIndividual(morph_gen,ctrl_gen,learner));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -87,85 +104,76 @@ void noEA::init(){
 
 }
 
-bool noEA::update(const Environment::Ptr & env)
-{
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
+void noEA::epoch(){
 
-    numberEvaluation++;
+    if(generation == 0){
+        int rnd_i = randomNum->randInt(0,population.size()-1);
+        BOIndividual::Ptr ind = population[rnd_i];
+        population.clear();
+        population.push_back(ind);
+        currentIndIndex = 0;
+    }
 
     Individual::Ptr ind = population[currentIndIndex];
-
-    //add last fitness and NN weights in the database for the Bayesian optimizer
-    Eigen::VectorXd o(3);
-    std::vector<double> final_pos = std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position();
-    o(0) = final_pos[0];
-    o(1) = final_pos[1];
-    o(2) = final_pos[2];
-
-    observations.push_back(o);
-
-    auto connections = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_connections;
-    auto neurons = std::dynamic_pointer_cast<NNControl>(ind->get_control())->nn.m_neurons;
-    Eigen::VectorXd s(connections.size() + neurons.size());
-    int i = 0;
-    for(const auto &conn : connections){
-        s(i) = conn.m_weight;
-        i++;
-    }
-    for(const auto &neu : neurons){
-        s(i) = neu.m_bias;
-        i++;
-    }
-
-    samples.push_back(s);
-
-    if(verbose)
-        std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
-
-    if(env->get_name() == "mazeEnv")
-        final_position = std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position();
-    else if(env->get_name() == "testEnv")
-        final_position = std::dynamic_pointer_cast<TestEnv>(env)->get_final_position();
-
-    else std::cerr << "unknown environment" << std::endl;
-
-    if(currentFitnesses.size() == nbr_bo_iter || generation == 0)
-    {
-        currentFitnesses.clear();
-        ind.reset();
-
-        return true;
-    }
-
     if(currentFitnesses.size() == 1){
         std::dynamic_pointer_cast<BOIndividual>(ind)->compute_model(observations,samples);
     }
 
-    std::vector<double> t = std::dynamic_pointer_cast<MazeEnv>(env)->get_target_position();
     Eigen::VectorXd target(3);
-    target << t[0], t[1], t[2];
+    target << settings::getParameter<settings::Double>(parameters,"#target_x").value,
+            settings::getParameter<settings::Double>(parameters,"#target_y").value,
+            settings::getParameter<settings::Double>(parameters,"#target_z").value;
 
     std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner(observations, samples,target);
-
     ind.reset();
-    return false;
+}
+
+bool noEA::update(const Environment::Ptr & env)
+{
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+
+    numberEvaluation++;
+    Individual::Ptr ind = population[currentIndIndex];
+
+    if(simulator_side)
+        std::dynamic_pointer_cast<BOIndividual>(ind)->set_final_position(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+
+    if(instance_type == settings::INSTANCE_REGULAR || !simulator_side){
+
+        //add last fitness and NN weights in the database for the Bayesian optimizer
+        Eigen::VectorXd o(3);
+        std::vector<double> final_pos = std::dynamic_pointer_cast<BOIndividual>(ind)->get_final_position();
+        o(0) = final_pos[0];
+        o(1) = final_pos[1];
+        o(2) = final_pos[2];
+
+        observations.push_back(o);
+
+        std::vector<double> nn_params = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        Eigen::VectorXd s(nn_params.size());
+        for(size_t i = 0; i < nn_params.size(); i++)
+            s(i) = nn_params[i];
+
+        samples.push_back(s);
+
+        if(verbose)
+            std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
+
+        ind.reset();
+    }
+    return true;
 }
 
 void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
     currentIndIndex = indIndex;
+    population[currentIndIndex]->setObjectives(obj);
     currentFitnesses.push_back(obj[0]);
 }
 
-
-void noEA::init_next_pop(){
-
-    int rnd_i = randomNum->randInt(0,population.size()-1);
-    BOIndividual::Ptr ind = population[rnd_i];
-
-    population.clear();
-
-    population.push_back(ind);
+bool noEA::is_finish(){
+    int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
+    int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
+    return numberEvaluation >= nbr_bo_iter + init_bo_dataset;
 }
-
-
