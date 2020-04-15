@@ -207,8 +207,7 @@ void BOCMAES::init(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        BOLearner::Ptr learner(new BOLearner);
-        learner->set_parameters(parameters);
+        BOLearner::Ptr learner(new BOLearner(parameters));
         Individual::Ptr ind(new BOCMAESIndividual(morph_gen,ctrl_gen,learner));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -227,7 +226,7 @@ void BOCMAES::cmaes_init_pop()
 
 
     //Transfer Knowledge from BO to CMAES by taking the pop_size best solution produced by BO
-    BOLearner learner;
+    BOLearner learner(parameters);
     std::vector<size_t> idx(observations.size());
     std::iota(idx.begin(),idx.end(),0);
 
@@ -256,8 +255,7 @@ void BOCMAES::cmaes_init_pop()
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        BOLearner::Ptr learner(new BOLearner);
-        learner->set_parameters(parameters);
+        BOLearner::Ptr learner(new BOLearner(parameters));
         Individual::Ptr ind(new BOCMAESIndividual(morph_gen,ctrl_gen,learner));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
