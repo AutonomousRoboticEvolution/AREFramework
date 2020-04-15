@@ -192,11 +192,13 @@ void BOCMAES::cmaes_init_pop()
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
-
-
-
     //Transfer Knowledge from BO to CMAES by taking the pop_size best solution produced by BO
     BOLearner learner(parameters);
+    Eigen::VectorXd target;
+    target << settings::getParameter<settings::Double>(parameters,"#target_x").value,
+            settings::getParameter<settings::Double>(parameters,"#target_y").value,
+            settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    learner.set_target(target);
     std::vector<size_t> idx(observations.size());
     std::iota(idx.begin(),idx.end(),0);
 
@@ -227,10 +229,13 @@ void BOCMAES::cmaes_init_pop()
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
         BOLearner::Ptr learner(new BOLearner(parameters));
+        learner->set_target(target);
         Individual::Ptr ind(new BOCMAESIndividual(morph_gen,ctrl_gen,learner));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         ind->setObjectives({learner->reward(observations[idx[i]])});
+        std::dynamic_pointer_cast<BOCMAESIndividual>(ind)->
+                set_final_position({observations[idx[i]](0),observations[idx[i]](1),observations[idx[i]](2)});
         population.push_back(ind);
     }
 

@@ -132,7 +132,8 @@ public:
         return res;
     }
 
-
+    Eigen::VectorXd getLastObs() const {return observations.back();}
+    Eigen::VectorXd getLastSpl() const {return samples.back();}
     const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
 
 private:

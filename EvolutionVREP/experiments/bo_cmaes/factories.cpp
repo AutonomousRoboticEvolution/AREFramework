@@ -45,10 +45,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::NNParamGenomeLog::Ptr nnpglog(new are::NNParamGenomeLog);
     logs.push_back(nnpglog);
 
-    std::string stop_crit_log_file = are::settings::getParameter<are::settings::String>(param,"#stopCritFile").value;
-    are::StopCritLog::Ptr sclog(new are::StopCritLog(stop_crit_log_file));
-    logs.push_back(sclog);
-
     std::string novelty_log_file = are::settings::getParameter<are::settings::String>(param,"#noveltyFile").value;
     are::NoveltyLog::Ptr nvlog(new are::NoveltyLog(novelty_log_file));
     logs.push_back(nvlog);

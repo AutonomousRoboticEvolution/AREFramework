@@ -22,21 +22,41 @@ void BehavDescLog::saveLog(EA::Ptr &ea)
     logFileStream.close();
 }
 
-void StopCritLog::saveLog(EA::Ptr &ea)
+void BOLog::saveLog(EA::Ptr &ea)
 {
-    if(!static_cast<BOCMAES*>(ea.get())->restarted())
+    std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
+    int eval = ea->get_numberEvaluation();
+    Eigen::VectorXd obs = static_cast<const BOCMAES*>(ea.get())->getLastObs();
+    Eigen::VectorXd spl = static_cast<const BOCMAES*>(ea.get())->getLastSpl();
+
+    std::ofstream saveFile;
+    saveFile.open(Logging::log_folder + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
+    if(!saveFile)
+    {
+        std::cerr << "unable to open : " << logFile << std::endl;
         return;
+    }
+    saveFile << "evaluation " << eval << ": ,";
+    saveFile << "observation : ,";
+    for(int i = 0; i < obs.rows(); i++)
+        saveFile << obs(i) << ",";
+    saveFile << "sample : ,";
+    for(int i = 0; i < spl.rows(); i++)
+        saveFile << spl(i) << ",";
 
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-
-    int generation = ea->get_generation();
-
-    logFileStream << generation << "," << static_cast<BOCMAES*>(ea.get())->pop_stopping_criterias() << std::endl;
-
-    logFileStream.close();
+    saveFile << std::endl;
+    saveFile.close();
 }
+
+void LearnerSerialLog::saveLog(EA::Ptr &ea){
+    std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
+    int dataset_size = std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->dataset_size();
+    std::stringstream sstream;
+    sstream << Logging::log_folder << "/" << logFile << "_" << ea->get_generation() << "_" << dataset_size;
+    limbo::serialize::TextArchive tarch(sstream.str());
+    std::dynamic_pointer_cast<BOLearner>(ea->getIndividual(0)->get_learner())->model().save<limbo::serialize::TextArchive>(tarch);
+}
+
 
 void NoveltyLog::saveLog(are::EA::Ptr &ea)
 {

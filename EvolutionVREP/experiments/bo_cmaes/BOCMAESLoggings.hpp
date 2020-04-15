@@ -2,7 +2,8 @@
 #define BOCMAES_LOGGINGS_H
 
 #include "ARE/Logging.h"
-
+#include <limbo/serialize/text_archive.hpp>
+#include "BOLearner.h"
 #include "BOCMAES.hpp"
 
 
@@ -16,11 +17,20 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class StopCritLog : public Logging
+class BOLog : public Logging
 {
 public:
-    StopCritLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
+    BOLog(const std::string &file) : Logging(file,false){}
+    void saveLog(EA::Ptr &ea);
+    void loadLog(const std::string& logFile){}
+};
+
+
+class LearnerSerialLog : public Logging
+{
+public:
+    LearnerSerialLog(const std::string &file) : Logging(file,false){}
+    void saveLog(EA::Ptr &ea);
     void loadLog(const std::string& logFile){}
 };
 

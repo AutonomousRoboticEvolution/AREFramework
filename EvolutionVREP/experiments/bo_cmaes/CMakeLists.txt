@@ -10,7 +10,7 @@ add_library(BO_CMAES SHARED
     ../common/NNGenome.cpp
     ../common/genLoggings.cpp
     ../common/Novelty.cpp
-    BOLearner.cpp
+    ../common/BOLearner.cpp
     BOCMAES.cpp
     BOCMAESIndividual.cpp
     factories.cpp
