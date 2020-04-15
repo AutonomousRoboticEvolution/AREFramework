@@ -33,7 +33,7 @@ struct Params {
         BO_PARAM(double, alpha, 0.1);
     };
     struct acqui_gpucb {
-        BO_PARAM(double, delta, 0.1);
+        BO_PARAM(double, delta, 1.);
     };
     struct init_randomsampling {
         BO_PARAM(int, samples, 10);
@@ -81,7 +81,7 @@ struct Params {
 //};
 
 
-using kernel_t = lb::kernel::SquaredExpARD<Params>;
+using kernel_t = lb::kernel::MaternFiveHalves<Params>;
 using mean_t = lb::mean::Data<Params>;
 using gp_opt_t = lb::model::gp::KernelLFOpt<Params>;
 
@@ -89,7 +89,7 @@ using gp_t = lb::model::GP<Params, kernel_t, mean_t, gp_opt_t>;
 
 //    using policy_opt_t = lb::opt::Cmaes<Params>;
 
-using acqui_t = lb::acqui::EI<Params, gp_t>;
+using acqui_t = lb::acqui::GP_UCB<Params, gp_t>;
 using acqui_opt_t = lb::opt::Cmaes<Params>;
 using init_t = lb::init::NoInit<Params>;
 using stop_t = lb::stop::MaxIterations<Params>;
