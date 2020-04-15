@@ -42,7 +42,7 @@ struct Params {
         BO_PARAM(double, noise, 1e-10);
     };
 
-    struct kernel_squared_exp_ard : public lb::defaults::kernel_squared_exp_ard {
+    struct kernel_maternfivehalves : public lb::defaults::kernel_maternfivehalves {
     };
     struct opt_rprop : public lb::defaults::opt_rprop {
     };
