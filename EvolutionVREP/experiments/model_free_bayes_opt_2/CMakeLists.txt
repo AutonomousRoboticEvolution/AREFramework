@@ -13,7 +13,6 @@ add_library(model_free_bayes_opt_2 SHARED
     ../common/NNGenome.cpp
     BOLoggings.cpp
     ../common/BOLearner.cpp
-    NEATGenome.cpp
     )
 target_include_directories(model_free_bayes_opt_2 PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
