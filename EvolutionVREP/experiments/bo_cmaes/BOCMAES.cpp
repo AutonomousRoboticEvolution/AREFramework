@@ -156,6 +156,7 @@ void BOCMAES::init(){
 
     NNGenome nn_gen(randomNum,parameters);
     NEAT::NeuralNetwork nn;
+    nn_gen.init();
     nn_gen.buildPhenotype(nn);
     int nbr_weights = nn.m_connections.size();
     int nbr_biases = nn.m_neurons.size();
@@ -205,6 +206,7 @@ void BOCMAES::cmaes_init_pop()
 
     NNGenome nn_gen(randomNum,parameters);
     NEAT::NeuralNetwork nn;
+    nn_gen.init();
     nn_gen.buildPhenotype(nn);
     std::vector<double> weights(nn.m_connections.size());
     std::vector<double> biases(nn.m_neurons.size());
