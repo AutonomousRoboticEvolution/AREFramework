@@ -213,7 +213,7 @@ void BOCMAES::cmaes_init_pop()
     std::vector<double> weights(nn.m_connections.size());
     std::vector<double> biases(nn.m_neurons.size());
 
-    Eigen::VectorXd mean_sample;
+    Eigen::VectorXd mean_sample = Eigen::VectorXd::Zero(samples[0].rows());
 
     for (int i = 0;i < pop_size; i++) {
 
@@ -262,6 +262,8 @@ void BOCMAES::cmaes_init_pop()
     cmaStrategy->set_length_of_stagnation(lenStag);
     cmaStrategy->set_novelty_ratio(novelty_ratio);
     cmaStrategy->set_novelty_decr(novelty_decr);
+
+    cmaStrategy->ask();
 }
 
 void BOCMAES::epoch(){

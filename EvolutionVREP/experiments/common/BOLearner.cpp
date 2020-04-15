@@ -13,8 +13,6 @@ BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, lambda);
 BO_DECLARE_DYN_PARAM(bool, Params::opt_cmaes, handle_uncertainty);
 
 
-
-
 BOLearner::BOLearner()
 {
     Params::opt_cmaes::set_lbound(-1.);
