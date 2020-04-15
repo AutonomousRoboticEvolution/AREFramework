@@ -112,6 +112,7 @@ public:
     typedef std::shared_ptr<const BOLearner> ConstPtr;
 
     BOLearner();
+    BOLearner(const settings::ParametersMapPtr &param);
     void update(Control::Ptr &ctrl){}
     void update(const NNParamGenome::Ptr &ctrl_gen);
     void init_model(int input_size);

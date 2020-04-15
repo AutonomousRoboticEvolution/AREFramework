@@ -303,7 +303,7 @@ void BOCMAES::epoch(){
     }
     else{
         int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
-        int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#BOInitDataset").value;
+        int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
 
         if(numberEvaluation == nbr_bo_iter + bo_init_dataset)
         {
@@ -433,7 +433,7 @@ void BOCMAES::setObjectives(size_t indIdx, const std::vector<double> &objectives
 
 bool BOCMAES::update(const Environment::Ptr & env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#BOInitDataset").value;
+    int bo_init_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     endEvalTime = hr_clock::now();

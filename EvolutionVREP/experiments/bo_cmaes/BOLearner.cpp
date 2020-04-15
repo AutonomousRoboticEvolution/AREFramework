@@ -27,6 +27,21 @@ BOLearner::BOLearner()
     Params::opt_cmaes::set_lambda(-1);
     Params::opt_cmaes::set_handle_uncertainty(true);
     _current_iteration = 0;
+}
+
+BOLearner::BOLearner(const settings::ParametersMapPtr &param){
+    Params::opt_cmaes::set_lbound(-1.);
+    Params::opt_cmaes::set_ubound(1.);
+
+    Params::opt_cmaes::set_max_fun_evals(-1);
+    Params::opt_cmaes::set_fun_tolerance(1);
+    Params::opt_cmaes::set_restarts(1);
+    Params::opt_cmaes::set_elitism(1);
+    Params::opt_cmaes::set_lambda(-1);
+    Params::opt_cmaes::set_handle_uncertainty(true);
+    _current_iteration = 0;
+
+    parameters = param;
 
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     _max_dist = sqrt(2*arena_size*arena_size);
