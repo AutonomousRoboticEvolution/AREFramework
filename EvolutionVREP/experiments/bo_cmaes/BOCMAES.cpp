@@ -148,60 +148,29 @@ double customCMAStrategy::best_fitness(){
 void BOCMAES::init(){
 
     int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
+    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
 
     Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-    int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
-
-    double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
-    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
-    double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
-    double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
-
-    std::vector<double> initial_point;
-
-    NNGenome::Ptr nn_gen(new NNGenome(randomNum,parameters));
-    NEAT::RNG rng;
-    rng.Seed(randomNum->getSeed());
-    nn_gen->init(rng);
+    NNGenome nn_gen(randomNum,parameters);
     NEAT::NeuralNetwork nn;
-    nn_gen->buildPhenotype(nn);
+    nn_gen.buildPhenotype(nn);
     int nbr_weights = nn.m_connections.size();
-    int nbr_bias = nn.m_neurons.size();
-    int i = 0;
-    for(; i < nbr_weights; i++)
-        initial_point.push_back(nn.m_connections[i].m_weight);
-    int j = 0;
-    for(; i < nbr_weights+nbr_bias; i++){
-        initial_point.push_back(nn.m_neurons[j].m_bias);
-        j++;
-    }
-    cmaes::CMAParameters<> cmaParam(initial_point,step_size,init_bo_dataset,randomNum->getSeed());
-    cmaParam.set_ftarget(ftarget);
-    cmaParam.set_quiet(!verbose);
+    int nbr_biases = nn.m_neurons.size();
 
-    cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
-    cmaStrategy->set_elitist_restart(elitist_restart);
-    cmaStrategy->set_length_of_stagnation(lenStag);
-    cmaStrategy->set_novelty_ratio(novelty_ratio);
-    cmaStrategy->set_novelty_decr(novelty_decr);
-    //todo init BO Dataset;
-
-    dMat init_samples = cmaStrategy->ask();
+    Eigen::MatrixXd init_samples = limbo::tools::random_lhs(nbr_weights + nbr_biases,init_bo_dataset);
 
     std::vector<double> weights(nbr_weights);
-    std::vector<double> biases(nbr_bias);
+    std::vector<double> biases(nbr_biases);
 
     for(int u = 0; u < init_bo_dataset; u++){
 
         for(int v = 0; v < nbr_weights; v++)
-            weights[v] = init_samples(v,u);
-        for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
-            biases[w-nbr_weights] = init_samples(w,u);
+            weights[v] = max_weight*init_samples(v,u);
+        for(int w = nbr_weights; w < nbr_weights+nbr_biases; w++)
+            biases[w-nbr_weights] = max_weight*init_samples(w,u);
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
