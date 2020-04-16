@@ -149,6 +149,7 @@ void CMAES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    double max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
@@ -179,9 +180,18 @@ void CMAES::init(){
         j++;
     }
 
-    cmaes::CMAParameters<> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed());
+    double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
+    for(int i = 0; i < nbr_weights+nbr_bias; i++){
+        lb[i] = -max_weight;
+        ub[i] = max_weight;
+    }
+
+    geno_pheno_t gp(lb,ub,nbr_weights+nbr_bias);
+
+    cmaes::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed(),gp);
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
+
 
     cmaStrategy.reset(new customCMAStrategy([](const double*,const int&)->double{},cmaParam));
     cmaStrategy->set_elitist_restart(elitist_restart);
