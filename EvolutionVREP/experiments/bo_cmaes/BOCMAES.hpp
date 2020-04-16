@@ -9,7 +9,7 @@
 #include "mazeEnv.h"
 
 namespace cmaes = libcmaes;
-using geno_pheno_t = cmaes::GenoPheno<cmaes::NoBoundStrategy>;
+using geno_pheno_t = cmaes::GenoPheno<cmaes::pwqBoundStrategy>;
 using cov_update_t = cmaes::CovarianceUpdate;
 using ipop_cmaes_t = cmaes::IPOPCMAStrategy<cov_update_t,geno_pheno_t>;
 using eostrat_t = cmaes::ESOStrategy<cmaes::CMAParameters<geno_pheno_t>,cmaes::CMASolutions,cmaes::CMAStopCriteria<geno_pheno_t>>;
@@ -30,7 +30,7 @@ public:
 
     typedef std::shared_ptr<customCMAStrategy> Ptr;
 
-    customCMAStrategy(cmaes::FitFunc func,cmaes::CMAParameters<> &parameters)
+    customCMAStrategy(cmaes::FitFunc func,cmaes::CMAParameters<geno_pheno_t> &parameters)
         :ipop_cmaes_t(func,parameters)
     {
         _stopcriteria.set_criteria_active(cmaes::AUTOMAXITER,true); //The automatically set maximal number of iterations per run has been reached

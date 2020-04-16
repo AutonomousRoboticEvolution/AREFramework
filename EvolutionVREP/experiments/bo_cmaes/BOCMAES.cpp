@@ -210,8 +210,10 @@ void BOCMAES::cmaes_init_pop()
     NEAT::NeuralNetwork nn;
     nn_gen.init();
     nn_gen.buildPhenotype(nn);
-    std::vector<double> weights(nn.m_connections.size());
-    std::vector<double> biases(nn.m_neurons.size());
+    int nbr_weights = nn.m_connections.size();
+    int nbr_bias = nn.m_neurons.size();
+    std::vector<double> weights(nbr_weights);
+    std::vector<double> biases(nbr_bias);
 
     Eigen::VectorXd mean_sample = Eigen::VectorXd::Zero(samples[0].rows());
 
@@ -247,13 +249,22 @@ void BOCMAES::cmaes_init_pop()
 
     //Init CMAES
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
+    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
 
-    cmaes::CMAParameters<> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed());
+    double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
+    for(int i = 0; i < nbr_weights+nbr_bias; i++){
+        lb[i] = -max_weight;
+        ub[i] = max_weight;
+    }
+    geno_pheno_t gp(lb,ub,nbr_weights+nbr_bias);
+
+
+    cmaes::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed(),gp);
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 

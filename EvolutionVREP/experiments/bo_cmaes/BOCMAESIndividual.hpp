@@ -2,10 +2,8 @@
 #define BOCMAESINDIVIDUAL_HPP
 
 #include <ARE/Individual.h>
-#include <ARE/Genome.h>
 #include "AREPuckMorphology.h"
 #include "EPuckMorphology.h"
-#include "NNControl.h"
 #include "NNGenome.hpp"
 #include "NNParamGenome.hpp"
 #include "BOLearner.h"
