@@ -170,10 +170,12 @@ void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
     currentIndIndex = indIndex;
     population[currentIndIndex]->setObjectives(obj);
     currentFitnesses.push_back(obj[0]);
+    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+    _is_finish = obj[0] <= ftarget;
 }
 
 bool noEA::is_finish(){
     int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
     int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
-    return numberEvaluation >= nbr_bo_iter + init_bo_dataset;
+    return _is_finish || numberEvaluation >= nbr_bo_iter + init_bo_dataset;
 }
