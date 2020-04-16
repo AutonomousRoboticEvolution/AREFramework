@@ -149,7 +149,7 @@ void CMAES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    double max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
+    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
@@ -318,10 +318,12 @@ bool CMAES::update(const Environment::Ptr & env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;
 
-    Individual::Ptr ind = population[currentIndIndex];
+    if(simulator_side){
+        Individual::Ptr ind = population[currentIndIndex];
 
-    std::dynamic_pointer_cast<CMAESIndividual>(ind)->set_final_position(
+        std::dynamic_pointer_cast<CMAESIndividual>(ind)->set_final_position(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+    }
 
 
     return true;
