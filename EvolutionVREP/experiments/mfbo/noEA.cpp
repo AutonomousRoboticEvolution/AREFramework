@@ -23,9 +23,9 @@ void noEA::init(){
 
         for(int i = 0; i < init_bo_dataset; i++){
             for(int v = 0; v < nbr_weights; v++)
-                weights[v] = max_weight*init_samples(i,v);
+                weights[v] = max_weight*(init_samples(i,v)*2.f - 1.f);
             for(int w = nbr_weights; w < nbr_weights+nbr_biases; w++)
-                biases[w-nbr_weights] = max_weight*init_samples(i,w);
+                biases[w-nbr_weights] = max_weight*(init_samples(i,w)*2.f - 1.f);
 
             EmptyGenome::Ptr morph_gen(new EmptyGenome);
             NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
