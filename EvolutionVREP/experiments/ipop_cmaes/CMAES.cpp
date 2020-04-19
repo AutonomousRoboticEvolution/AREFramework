@@ -258,15 +258,17 @@ void CMAES::epoch(){
     cmaStrategy->set_population(population);
     cmaStrategy->eval();
     cmaStrategy->tell();
-    if(withRestart && cmaStrategy->stop()){
+    bool stop = cmaStrategy->stop();
+    if(cmaStrategy->have_reached_ftarget()){
+        _is_finish = true;
+        return;
+    }
+
+    if(withRestart && stop){
         if(verbose)
             std::cout << "Restart !" << std::endl;
 
         cmaStrategy->capture_best_solution(best_run);
-        if(cmaStrategy->have_reached_ftarget()){
-            _is_finish = true;
-            return;
-        }
 
         if(incrPop)
             cmaStrategy->lambda_inc();
