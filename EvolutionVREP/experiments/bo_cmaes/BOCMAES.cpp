@@ -304,7 +304,7 @@ void BOCMAES::bo_epoch(){
     Individual::Ptr ind = population[currentIndIndex];
 
 
-    if(currentFitnesses.size() == 1){
+    if(generation == 0){
         std::dynamic_pointer_cast<BOCMAESIndividual>(ind)->compute_model(observations,samples);
     }
 

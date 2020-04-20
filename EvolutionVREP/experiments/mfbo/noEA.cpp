@@ -115,7 +115,7 @@ void noEA::epoch(){
     }
 
     Individual::Ptr ind = population[currentIndIndex];
-    if(currentFitnesses.size() == 1){
+    if(generation == 0){
         std::dynamic_pointer_cast<BOIndividual>(ind)->compute_model(observations,samples);
     }
 
@@ -169,7 +169,6 @@ bool noEA::update(const Environment::Ptr & env)
 void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
     currentIndIndex = indIndex;
     population[currentIndIndex]->setObjectives(obj);
-    currentFitnesses.push_back(obj[0]);
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     _is_finish = obj[0] <= ftarget;
 }
