@@ -169,9 +169,9 @@ void BOCMAES::init(){
     for(int u = 0; u < init_bo_dataset; u++){
 
         for(int v = 0; v < nbr_weights; v++)
-            weights[v] = max_weight*init_samples(u,v);
+            weights[v] = max_weight*(init_samples(u,v)*2.f - 1.f);
         for(int w = nbr_weights; w < nbr_weights+nbr_biases; w++)
-            biases[w-nbr_weights] = max_weight*init_samples(u,w);
+            biases[w-nbr_weights] = max_weight*(init_samples(u,w)*2.f - 1.f);
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
