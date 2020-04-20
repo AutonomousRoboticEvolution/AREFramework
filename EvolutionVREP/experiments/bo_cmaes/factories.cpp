@@ -52,4 +52,12 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     std::string archive_log_file = are::settings::getParameter<are::settings::String>(param,"#archiveFile").value;
     are::ArchiveLog::Ptr arclog(new are::ArchiveLog(archive_log_file));
     logs.push_back(arclog);
+
+    std::string bo_log_file = are::settings::getParameter<are::settings::String>(param,"#BOSamplesFile").value;
+    are::BOLog::Ptr bolog(new are::BOLog(bo_log_file));
+    logs.push_back(bolog);
+
+    std::string learner_log_file = are::settings::getParameter<are::settings::String>(param,"#LearnerSerialFile").value;
+    are::LearnerSerialLog::Ptr lslog(new are::LearnerSerialLog(learner_log_file));
+    logs.push_back(lslog);
 }
