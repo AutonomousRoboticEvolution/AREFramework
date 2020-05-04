@@ -55,3 +55,10 @@ int RandNum::getSeed()
 {
         return m_seed;
 }
+
+std::vector<double> RandNum::randVectd(double lower, double upper, int size){
+    std::vector<double> res;
+    for(int i = 0; i < size; i++)
+        res.push_back(randDouble(lower,upper));
+    return res;
+}

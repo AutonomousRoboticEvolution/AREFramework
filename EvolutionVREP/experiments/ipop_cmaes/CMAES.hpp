@@ -33,15 +33,15 @@ public:
     customCMAStrategy(cmaes::FitFunc func,cmaes::CMAParameters<geno_pheno_t> &parameters)
         :ipop_cmaes_t(func,parameters)
     {
-        _stopcriteria.set_criteria_active(cmaes::AUTOMAXITER,true); //The automatically set maximal number of iterations per run has been reached
+        _stopcriteria.set_criteria_active(cmaes::AUTOMAXITER,false); //The automatically set maximal number of iterations per run has been reached
         _stopcriteria.set_criteria_active(cmaes::TOLHISTFUN,false);  //[Success] The optimization has converged
-        _stopcriteria.set_criteria_active(cmaes::EQUALFUNVALS,true); //[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function
-        _stopcriteria.set_criteria_active(cmaes::TOLX,true);//[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)
-        _stopcriteria.set_criteria_active(cmaes::TOLUPSIGMA,true);//[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization.
-        _stopcriteria.set_criteria_active(cmaes::STAGNATION,true);//[Partial Success] Median of newest values is not smaller than the median of older values
-        _stopcriteria.set_criteria_active(cmaes::CONDITIONCOV,true);//[Error] The covariance matrix's condition number exceeds 1e14. Check out the formulation of your problem
-        _stopcriteria.set_criteria_active(cmaes::NOEFFECTAXIS,true);//[Partial Success] Mean remains constant along search axes
-        _stopcriteria.set_criteria_active(cmaes::NOEFFECTCOOR,true);//[Partial Success] Mean remains constant in coordinates
+        _stopcriteria.set_criteria_active(cmaes::EQUALFUNVALS,false); //[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function
+        _stopcriteria.set_criteria_active(cmaes::TOLX,false);//[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)
+        _stopcriteria.set_criteria_active(cmaes::TOLUPSIGMA,false);//[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization.
+        _stopcriteria.set_criteria_active(cmaes::STAGNATION,false);//[Partial Success] Median of newest values is not smaller than the median of older values
+        _stopcriteria.set_criteria_active(cmaes::CONDITIONCOV,false);//[Error] The covariance matrix's condition number exceeds 1e14. Check out the formulation of your problem
+        _stopcriteria.set_criteria_active(cmaes::NOEFFECTAXIS,false);//[Partial Success] Mean remains constant along search axes
+        _stopcriteria.set_criteria_active(cmaes::NOEFFECTCOOR,false);//[Partial Success] Mean remains constant in coordinates
         _stopcriteria.set_criteria_active(cmaes::MAXFEVALS,false);//The maximum number of function evaluations allowed for optimization has been reached
         _stopcriteria.set_criteria_active(cmaes::MAXITER,false);//The maximum number of iterations specified for optimization has been reached
         _stopcriteria.set_criteria_active(cmaes::FTARGET,false);//[Success] The objective function target value has been reached
@@ -50,7 +50,8 @@ public:
     ~customCMAStrategy() {}
 
     //custom stop criteria
-    bool pop_stagnation();
+    bool pop_desc_stagnation();
+    bool pop_fit_stagnation();
     bool best_sol_stagnation();
     bool reach_ftarget();
 

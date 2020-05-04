@@ -34,10 +34,40 @@ bool customCMAStrategy::reach_ftarget(){
     return false;
 }
 
-bool customCMAStrategy::pop_stagnation(){
+bool customCMAStrategy::pop_desc_stagnation(){
+   std::vector<Eigen::VectorXd> descriptors;
+   for (const auto& ind: _pop)
+       descriptors.push_back(std::dynamic_pointer_cast<CMAESIndividual>(ind)->descriptor());
+
+   Eigen::VectorXd mean = Eigen::VectorXd::Zero(3);
+   for(Eigen::VectorXd desc : descriptors){
+       mean += desc;
+   }
+   mean = mean/static_cast<double>(descriptors.size());
+
+   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(3);
+   for(Eigen::VectorXd desc : descriptors)
+       stddev += (desc - mean).cwiseProduct(desc - mean);
+
+   bool stop = true;
+   for(int i = 0; i < stddev.rows(); i++)
+       stop = stop && sqrt(stddev(i/static_cast<double>(descriptors.size() - 1))) <= 0.05;
+
+   if(stop){
+       std::stringstream sstr;
+       sstr << "Stopping : standard deviation of the descriptor population is smaller than 0.05 : " << stddev;
+       log_stopping_criterias.push_back(sstr.str());
+       cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+   }
+   return stop;
+}
+
+bool customCMAStrategy::pop_fit_stagnation(){
     std::vector<double> fvalues;
     for(const auto& ind : _pop)
        fvalues.push_back(ind->getObjectives()[0]);
+
+
 
     double mean=0.0;
     for(double fv : fvalues)
@@ -116,7 +146,7 @@ bool customCMAStrategy::stop()
 {
     reached_ft = reach_ftarget();
     bool ipop_stop = ipop_cmaes_t::stop();
-    bool pop_stag = pop_stagnation();
+    bool pop_stag = pop_desc_stagnation();
     bool best_sol_stag = false;
     if(len_of_stag > 0)
         best_sol_stag = best_sol_stagnation();
@@ -129,10 +159,10 @@ bool customCMAStrategy::stop()
 
 void customCMAStrategy::reset_search_state()
 {
-    ipop_cmaes_t::reset_search_state();
-    if(elitist_restart){
+    if(elitist_restart)
         _parameters.set_x0(_solutions.get_best_seen_candidate().get_x_dvec_ref());
-    }
+
+    ipop_cmaes_t::reset_search_state();
     novelty_ratio = start_novelty_ratio;
 }
 
@@ -161,24 +191,15 @@ void CMAES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-    std::vector<double> initial_point;
-
     NNGenome::Ptr nn_gen(new NNGenome(randomNum,parameters));
-    NEAT::RNG rng;
-    rng.Seed(randomNum->getSeed());
-    nn_gen->init(rng);
+    nn_gen->init();
     NEAT::NeuralNetwork nn;
     nn_gen->buildPhenotype(nn);
     int nbr_weights = nn.m_connections.size();
     int nbr_bias = nn.m_neurons.size();
-    int i = 0;
-    for(; i < nbr_weights; i++)
-        initial_point.push_back(nn.m_connections[i].m_weight);
-    int j = 0;
-    for(; i < nbr_weights+nbr_bias; i++){
-        initial_point.push_back(nn.m_neurons[j].m_bias);
-        j++;
-    }
+
+    std::vector<double> initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
+
 
     double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
     for(int i = 0; i < nbr_weights+nbr_bias; i++){
@@ -228,7 +249,7 @@ void CMAES::epoch(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
-
+    bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -274,7 +295,10 @@ void CMAES::epoch(){
             cmaStrategy->lambda_inc();
 
         cmaStrategy->reset_search_state();
-
+        if(!elitist_restart){
+            float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
+            cmaStrategy->get_parameters().set_x0(-max_weight,max_weight);
+        }
     }
 }
 
