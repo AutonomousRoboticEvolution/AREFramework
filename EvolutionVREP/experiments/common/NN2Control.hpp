@@ -65,8 +65,8 @@ public:
 
     static void nbr_parameters(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases){
         nn_t nn(nb_input,nb_hidden,nb_output);
-        nbr_weights = nn.get_nb_neurons();
-        nbr_biases = nn.get_nb_connections();
+        nbr_weights = nn.get_nb_connections();
+        nbr_biases = nn.get_nb_neurons();
     }
 
     nn_t nn;
