@@ -8,6 +8,7 @@
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+
 namespace are {
 
 template<class nn_t>
@@ -53,6 +54,20 @@ public:
 
 
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+
+    void init_nn(int nb_input, int nb_hidden, int nb_output,std::vector<double> weights, std::vector<double> biases){
+        nn = nn_t(nb_input,nb_hidden,nb_output);
+        nn.set_all_weights(weights);
+        nn.set_all_biases(biases);
+        nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        nn.init();
+    }
+
+    static void nbr_parameters(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases){
+        nn_t nn(nb_input,nb_hidden,nb_output);
+        nbr_weights = nn.get_nb_neurons();
+        nbr_biases = nn.get_nb_connections();
+    }
 
     nn_t nn;
 
