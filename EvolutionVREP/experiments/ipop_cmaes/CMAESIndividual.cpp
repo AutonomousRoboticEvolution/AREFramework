@@ -6,34 +6,38 @@ namespace st = settings;
 void CMAESIndividual::createController(){
 
     int nn_type = st::getParameter<settings::Integer>(parameters,"#NNType").value;
-
-    if(nn_type == st::nnType::FFNN)
-        using nn_t = nn2::Mlp<neuron_t,connection_t>;
-    else if(nn_type == st::nnType::ELMAN)
-        using nn_t = nn2::Elman<neuron_t,connection_t>;
-    else if(nn_type == st::nnType::RNN)
-        using nn_t = nn2::Rnn<neuron_t,connection_t>;
-    else {
-        std::cerr << "unknown type of neural network" << std::endl;
-        return;
-    }
-    control.reset(new NN2Control<nn_t>());
-    control->set_parameters(parameters);
-    std::dynamic_pointer_cast<NN2Control<nn_t>>(control)->set_randonNum(randNum);
-    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
-    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
-
     int nb_input = st::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
     int nb_hidden = st::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     int nb_output = st::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
 
-    nn_t nn(nb_input,nb_hidden,nb_output);
-    nn.set_all_weights(weights);
-    nn.set_all_biases(bias);
-    nn.set_all_afparams(std::vector<std::vector<double>>(bias.size(),{1,0}));
-    nn.init();
+    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
+    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-    std::dynamic_pointer_cast<NN2Control<nn_t>>(control)->nn = nn;
+
+    if(nn_type == st::nnType::FFNN){
+        control.reset(new NN2Control<ffnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+    }
+    else if(nn_type == st::nnType::ELMAN){
+        control.reset(new NN2Control<elman_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+
+    }
+    else if(nn_type == st::nnType::RNN){
+        control.reset(new NN2Control<rnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+
 }
 
 void CMAESIndividual::createMorphology(){

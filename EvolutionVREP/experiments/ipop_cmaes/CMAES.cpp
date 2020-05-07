@@ -198,13 +198,23 @@ void CMAES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-    int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    nn_t nn(nb_input,nb_hidden,nb_output);
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
 
-    int nbr_weights = nn.get_nb_connections();
-    int nbr_bias = nn.get_nb_neurons();
+    int nbr_weights, nbr_bias;
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+
 
     std::vector<double> initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
 
