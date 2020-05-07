@@ -5,13 +5,19 @@
 #include <ARE/Genome.h>
 #include "AREPuckMorphology.h"
 #include "EPuckMorphology.h"
-#include "NNControl.h"
+#include "NN2Control.hpp"
 #include "NNGenome.hpp"
 #include "NNParamGenome.hpp"
+#include "nn2/mlp.hpp"
+#include "nn2/elman.hpp"
+#include "nn2/rnn.hpp"
+#include "settings.hpp"
 
 namespace are {
 
-
+using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
+using connection_t = nn2::Connection<double>;
+using nn_t = nn2::Mlp<neuron_t,connection_t>;
 
 class CMAESIndividual : public Individual
 {

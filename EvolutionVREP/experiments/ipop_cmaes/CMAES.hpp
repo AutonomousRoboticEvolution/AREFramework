@@ -16,8 +16,6 @@ using eostrat_t = cmaes::ESOStrategy<cmaes::CMAParameters<geno_pheno_t>,cmaes::C
 
 namespace are{
 
-
-
 class customCMAStrategy : public ipop_cmaes_t
 {
 private:
@@ -113,12 +111,13 @@ private:
     std::vector<Individual::Ptr> _pop;
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
+    std::pair<double,std::vector<double>> best_seen_solution;
     int len_of_stag = 5;
     double novelty_ratio = 0;
     double start_novelty_ratio = 0;
     double novelty_decr = 0.05;
 
-    double best_fitness();
+    double best_fitness(std::vector<double> &);
 
     bool reached_ft = false;
 

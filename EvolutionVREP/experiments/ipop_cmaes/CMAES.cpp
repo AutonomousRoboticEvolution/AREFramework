@@ -111,7 +111,6 @@ bool customCMAStrategy::best_sol_stagnation(){
         sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
         cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
-        best_fitnesses.clear();
         return true;
     }else return false;
 }
@@ -137,9 +136,13 @@ void customCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates
 void customCMAStrategy::tell()
 {
     ipop_cmaes_t::tell();
-    best_fitnesses.push_back(best_fitness());
+    std::vector<double> best_sample;
+    best_fitnesses.push_back(best_fitness(best_sample));
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
+    if(best_fitnesses.back() < best_seen_solution.first || best_fitnesses.size() == 1)
+        best_seen_solution = std::make_pair(best_fitnesses.back(),best_sample);
+    inc_iter();
 }
 
 bool customCMAStrategy::stop()
@@ -160,17 +163,21 @@ bool customCMAStrategy::stop()
 void customCMAStrategy::reset_search_state()
 {
     if(elitist_restart)
-        _parameters.set_x0(_solutions.get_best_seen_candidate().get_x_dvec_ref());
+        _parameters.set_x0(best_seen_solution.second,best_seen_solution.second);
 
     ipop_cmaes_t::reset_search_state();
     novelty_ratio = start_novelty_ratio;
+    best_fitnesses.clear();
 }
 
-double customCMAStrategy::best_fitness(){
+double customCMAStrategy::best_fitness(std::vector<double> &best_sample){
     double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf > 1 - ind->getObjectives()[0])
+        if(bf > 1 - ind->getObjectives()[0]){
             bf = 1 - ind->getObjectives()[0];
+            best_sample = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        }
+
     }
     return bf;
 }
@@ -191,12 +198,13 @@ void CMAES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-    NNGenome::Ptr nn_gen(new NNGenome(randomNum,parameters));
-    nn_gen->init();
-    NEAT::NeuralNetwork nn;
-    nn_gen->buildPhenotype(nn);
-    int nbr_weights = nn.m_connections.size();
-    int nbr_bias = nn.m_neurons.size();
+    int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+    nn_t nn(nb_input,nb_hidden,nb_output);
+
+    int nbr_weights = nn.get_nb_connections();
+    int nbr_bias = nn.get_nb_neurons();
 
     std::vector<double> initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
 
