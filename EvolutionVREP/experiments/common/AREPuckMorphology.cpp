@@ -1,6 +1,4 @@
 #include "AREPuckMorphology.h"
-#include "v_repLib.h"
-
 
 using namespace are;
 
@@ -16,6 +14,8 @@ void AREPuckMorphology::loadModel(){
 
     std::string path_arepuck_m = settings::getParameter<settings::String>(parameters,"#robotPath").value;
     int arepuckHandle = simLoadModel(path_arepuck_m.c_str());
+
+
 
             //sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
     if(arepuckHandle == -1)
@@ -59,8 +59,13 @@ void AREPuckMorphology::setPosition(float x, float y, float z)
     epuckPos[0] = x;
     epuckPos[1] = y;
     epuckPos[2] = z;
-
     simSetObjectPosition(mainHandle,-1,epuckPos);
+
+    //random orientation;
+    float orientation[3];
+    simGetObjectOrientation(mainHandle,mainHandle,orientation);
+    orientation[0] = randomNum->randFloat(0,2*3.14);
+    simSetObjectOrientation(mainHandle,mainHandle,orientation);
 }
 
 void AREPuckMorphology::getObjectHandles()
@@ -82,10 +87,14 @@ void AREPuckMorphology::getObjectHandles()
     for(int i = 0; i < nbrObj ; i++)
         jointHandles.push_back(handles[i]);
 
+
+
     simReleaseBuffer((simChar*)handles);
 }
 
 std::vector<double> AREPuckMorphology::update(){
+
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     std::vector<double> sensorValues;
 
@@ -102,7 +111,13 @@ std::vector<double> AREPuckMorphology::update(){
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
         else if(det == 0) sensorValues.push_back(0);
-        else std::cerr << "No detection on Proximity Sensor" << std::endl;
+        else
+        {
+            sensorValues.push_back(0);
+            if(verbose)
+                std::cerr << "No detection on Proximity Sensor" << std::endl;
+        }
+
     }
     return sensorValues;
 }
