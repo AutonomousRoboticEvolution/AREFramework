@@ -1,47 +1,40 @@
-#include "EPuckMorphology.h"
+#include "AREPuckMorphology.h"
 #include "v_repLib.h"
 
 
 using namespace are;
 
-void EPuckMorphology::create()
+void AREPuckMorphology::create()
 {
-    mainHandle = simGetObjectHandle("ePuck_respondableBody");
     getObjectHandles();
     initSubstrate();
-    std::cout << "Epuck Created" << std::endl;
+    std::cout << "AREpuck Created" << std::endl;
 }
 
-void EPuckMorphology::loadModel(){
+void AREPuckMorphology::loadModel(){
     std::cout << "load model" << std::endl;
 
-    std::string path_epuck_m = settings::getParameter<settings::String>(parameters,"#robotPath").value;
-    int epuckHandle = simLoadModel(path_epuck_m.c_str());
+    std::string path_arepuck_m = settings::getParameter<settings::String>(parameters,"#robotPath").value;
+    int arepuckHandle = simLoadModel(path_arepuck_m.c_str());
 
             //sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
-    if(epuckHandle == -1)
+    if(arepuckHandle == -1)
     {
-        std::cerr << "unable to load epuck model" << std::endl;
+        std::cerr << "unable to load arepuck model" << std::endl;
         simChar* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
         exit(1);
     }
 
-    mainHandle = epuckHandle;
+    mainHandle = arepuckHandle;
 }
 
-void EPuckMorphology::initSubstrate(){
-    substrate.m_input_coords = {//Proximity center
-                                {1,M_PI},{1,5.*M_PI/6.},
-                                {1,2.*M_PI/3.},{1,M_PI/3.},
-                                {1,M_PI/6.},{1,0},
-                                {1,-M_PI/3.},{1,-2.*M_PI/3.}};
-//                                //Front Camera average RGB
-//                                {1,M_PI/2.}, //R
-//                                {1,5.*M_PI/12.}, //G
-//                                {1,7.*M_PI/12.}}; //B
-    substrate.m_output_coords = {{0.8,0},{0.8,M_PI}};
+void AREPuckMorphology::initSubstrate(){
+    substrate.m_input_coords = {{1,M_PI/2.}, {1,M_PI/4.},
+                                {1,3.*M_PI/4.},{1,3.*M_PI/2.}};
+
+    substrate.m_output_coords = {{1,0},{1,M_PI}};
     substrate.m_hidden_coords = {{0,0},
                                  {0.5,0},{0.5,M_PI/6.},
                                  {0.5,M_PI/3.},{0.5,M_PI/2.},
@@ -54,13 +47,13 @@ void EPuckMorphology::initSubstrate(){
     substrate.m_query_weights_only = true;
 }
 
-void EPuckMorphology::createAtPosition(float x, float y, float z)
+void AREPuckMorphology::createAtPosition(float x, float y, float z)
 {
     create();
     setPosition(x,y,z);
 }
 
-void EPuckMorphology::setPosition(float x, float y, float z)
+void AREPuckMorphology::setPosition(float x, float y, float z)
 {
     float epuckPos[3];
     epuckPos[0] = x;
@@ -70,7 +63,7 @@ void EPuckMorphology::setPosition(float x, float y, float z)
     simSetObjectPosition(mainHandle,-1,epuckPos);
 }
 
-void EPuckMorphology::getObjectHandles()
+void AREPuckMorphology::getObjectHandles()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
@@ -92,7 +85,7 @@ void EPuckMorphology::getObjectHandles()
     simReleaseBuffer((simChar*)handles);
 }
 
-std::vector<double> EPuckMorphology::update(){
+std::vector<double> AREPuckMorphology::update(){
 
     std::vector<double> sensorValues;
 

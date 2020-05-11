@@ -34,5 +34,5 @@ void RandNum::setSeed(int seed) {
 
 int RandNum::getSeed()
 {
-	return m_seed;
+        return m_seed;
 }

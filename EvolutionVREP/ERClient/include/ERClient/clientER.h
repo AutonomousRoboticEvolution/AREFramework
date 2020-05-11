@@ -37,7 +37,7 @@ public:
     void initialize();
     void startOfSimulation(int slaveIndex);
     void endOfSimulation(int slaveIndex);
-    void updateSimulation();
+    bool updateSimulation();
     bool execute();
 
     void quitSimulation();

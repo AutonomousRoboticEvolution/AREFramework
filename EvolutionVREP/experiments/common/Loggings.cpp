@@ -10,33 +10,15 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
     if(!openOLogFile(savePopFile))
         return;
 
-    savePopFile << "generation " << generation << ": ,";
+    savePopFile << generation << "," << ea->get_population().size() << ",";
     for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << " ind " << i << ": " << ea->get_population()[i]->getFitness() << ",";
+        savePopFile << ea->get_population()[i]->getObjectives()[0] << ",";
     }
-    float avgFitness = 0;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        avgFitness += ea->get_population()[i]->getFitness();
-    }
-    avgFitness = avgFitness / ea->get_population().size();
-    savePopFile << "avg: ," << avgFitness << ",";
-    int bestInd = 0;
-    float bestFitness = ea->get_population()[0]->getFitness();
-    for (size_t i = 1; i < ea->get_population().size(); i++) {
-        if (bestFitness < ea->get_population()[i]->getFitness()) {
-            bestFitness = ea->get_population()[i]->getFitness();
-            bestInd = i;
-        }
-    }
-    savePopFile << "ind: ," << ea->get_population()[bestInd]->get_individual_id() << ",";
-    savePopFile << "fitness: ," << bestFitness << ",";
-    savePopFile << "individuals: ,";
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << ea->get_population()[i]->get_individual_id() << ",";
-    }
+
     savePopFile << std::endl;
     savePopFile.close();
 }
+
 
 void EvalTimeLog::saveLog(EA::Ptr &ea){
 
@@ -52,3 +34,13 @@ void EvalTimeLog::saveLog(EA::Ptr &ea){
     logFileStream.close();
 }
 
+void NNGenomeLog::saveLog(EA::Ptr &ea)
+{
+    int generation = ea->get_generation();
+    for(size_t i = 0; i < ea->get_population().size(); i++){
+        NEAT::Genome genome = std::dynamic_pointer_cast<NNGenome>(ea->getIndividual(i)->get_ctrl_genome())->get_nn_genome();
+        std::stringstream filepath;
+        filepath << Logging::log_folder << "/genome_" << generation << "_" << i;
+        genome.Save(filepath.str().c_str());
+    }
+}

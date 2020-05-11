@@ -22,7 +22,7 @@ void are::Logging::create_log_folder(const std::string &exp_name){
         << "-" << date->tm_sec
         << "-" << time_milli;
 
-    log_folder = exp_name + stream.str();
+    log_folder = exp_name + "_" + stream.str();
 
     if(!boost::filesystem::exists(log_folder))
         boost::filesystem::create_directory(log_folder);
@@ -54,3 +54,28 @@ bool are::Logging::openILogFile(std::ifstream &logFileStream){
 
     return true;
 }
+
+bool are::Logging::openOLogFile(std::ofstream &logFileStream, const std::string &log_file){
+    logFileStream.open(Logging::log_folder + std::string("/")  + log_file, std::ios::out | std::ios::ate | std::ios::app);
+
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + log_file << std::endl;
+        return false;
+    }
+
+    return true;
+}
+
+bool are::Logging::openILogFile(std::ifstream &logFileStream, const std::string &log_file){
+    logFileStream.open(Logging::log_folder + std::string("/")  + log_file);
+
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + log_file << std::endl;
+        return false;
+    }
+
+    return true;
+}
+

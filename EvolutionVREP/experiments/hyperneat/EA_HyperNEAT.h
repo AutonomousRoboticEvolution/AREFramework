@@ -23,9 +23,10 @@ public:
     void init() override;
     void initPopulation(const NEAT::Parameters&);
     void epoch() override;
+    void init_next_pop();
     bool update(const Environment::Ptr &env) override;
 
-    void setFitness(size_t indIndex, float fitness);
+    void setObjectives(size_t indIndex, const std::vector<double> &objectives);
 
 private:
     std::unique_ptr<NEAT::Population> neat_population;

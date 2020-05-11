@@ -23,12 +23,15 @@ public:
     Individual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
     Individual(const Individual& ind) :
         outputs(ind.outputs),
-        fitness(ind.fitness),
+        objectives(ind.objectives),
         morphGenome(ind.morphGenome),
         ctrlGenome(ind.ctrlGenome),
         morphology(ind.morphology),
-        control(ind.control)
-//        createGenome(ind.createGenome)
+        control(ind.control),
+        parameters(ind.parameters),
+        learner(ind.learner),
+        randNum(ind.randNum)
+
     {}
     virtual ~Individual();
 
@@ -43,13 +46,16 @@ public:
     }
 
     virtual void update(double delta_time) = 0;
-    void mutate()
+    virtual void mutate()
     {
         morphGenome->mutate();
         ctrlGenome->mutate();
     }
+    virtual Individual::Ptr crossover(const Individual::Ptr&){
+        return clone();
+    }
 
-    void set_randNum(const misc::RandNum::Ptr& rn){randNum = rn;}
+    void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
 
     bool isInit(){return (control != nullptr && morphology != nullptr);}
 
@@ -59,8 +65,8 @@ public:
     const Control::Ptr &get_control(){return control;}
     const Genome::Ptr &get_morph_genome(){return morphGenome;}
     const Genome::Ptr &get_ctrl_genome(){return ctrlGenome;}
-    void setFitness(double f){fitness = f;}
-    double getFitness(){return fitness;}
+    void setObjectives(const std::vector<double> &objs){objectives = objs;}
+    const std::vector<double> &getObjectives(){return objectives;}
     int get_individual_id(){return individual_id;}
     void set_individual_id(int i){individual_id = i;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
@@ -78,7 +84,7 @@ public:
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
-        arch & fitness;
+        arch & objectives;
         arch & ctrlGenome;
         arch & morphGenome;
     }
@@ -86,7 +92,7 @@ public:
 
 protected:
     std::vector<double> outputs;
-    double fitness;
+    std::vector<double> objectives;
     Genome::Ptr morphGenome;
     Genome::Ptr ctrlGenome;
     Morphology::Ptr morphology;

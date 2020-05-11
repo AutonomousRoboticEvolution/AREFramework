@@ -19,6 +19,7 @@ public:
                             const settings::ParametersMapPtr &);
 
     Logging() : endOfGen(true){}
+    Logging(bool eog) : endOfGen(eog){}
     Logging(const std::string &file, bool eog) : endOfGen(eog){logFile = file;}
     Logging(const Logging& l) : logFile(l.logFile), endOfGen(l.endOfGen){}
     virtual ~Logging(){}
@@ -28,6 +29,9 @@ public:
 
     bool openOLogFile(std::ofstream&);
     bool openILogFile(std::ifstream&);
+
+    bool openOLogFile(std::ofstream&,const std::string &log_file);
+    bool openILogFile(std::ifstream&,const std::string &log_file);
 
     //SETTERS && GETTERS
     const std::string &get_logFile(){return logFile;}

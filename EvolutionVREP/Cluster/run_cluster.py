@@ -21,7 +21,7 @@ def run_server(rank: int):
     # parameters
     # [1] path to the parameter file
     # [2] server port
-    if(not args.xvbf) :
+    if(not args.xvfb) :
         return subprocess.Popen([#"gdb","--ex=r","--args",
             args.vrep,
             '-h',
@@ -29,7 +29,7 @@ def run_server(rank: int):
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)
     else :
-        print("run with xvbf")
+        print("run with xvfb")
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
             args.vrep,
             '-h',
@@ -110,7 +110,7 @@ if __name__ == "__main__":
     parser.add_argument('n_vrep', metavar='N', type=int,
                         help='Number of VREP instances')
     
-    parser.add_argument('--xvbf',type=int,default=0,help='run with xvfb')
+    parser.add_argument('--xvfb',type=int,default=0,help='run with xvfb')
 
     parser.add_argument('--params', type=str,
                         default=0,
