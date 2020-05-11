@@ -1,22 +1,72 @@
-# Evolutionary Robotics Framework
+# Autonomous Robotic Evolution Framework
 
-This project contains all the files necessary to run experiments for the Autonomous Robotics Evolution project.
+## Introduction
 
-## Required libraries
+The ARE Framework is an evolutionary robotic framework made within the ARE project. It is structured around an evolutionary algorithm structure allowing to evolve morphologies and controllers. Currently, it is designed as a plugin to the V-REP simulator (Coppelia). The following instruction is related to the master branch. 
 
-- MultiNEAT
-- PolyVox
+After, having successfully installed the framework, you can refer to the next tutorial: [How to define an experiment within the ARE Framework](https://bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework/wiki/Defining%20an%20experiment%20within%20the%20ARE%20Framework).
 
-## Installing
+## Required software
 
-In order to install this plu-in please open terminal in the current project and enter the following commands.
+* Preferably use Ubuntu 18.04 as OS
+* V-REP Pro Edu 3.6.2 - [link](https://www.coppeliarobotics.com/files/V-REP_PLAYER_V3_6_2_Ubuntu18_04.tar.xz)
+* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
+* Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
+* libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
+* Boost
+* Eigen 3
 
+## Installation
+
+### Dependencies 
+
+These instructions are specific to Ubuntu (preferably 18.04).
+
+First, install the libraries available via aptitude :
 ```
-mkdir build
-cd build
-cmake -DCMAKE_INSTALL_PREFIX=where/you/want/to/install ..
+sudo apt install libboost-all-dev libeigen3-dev 
+```
+
+Install MutliNEAT :
+```
+git clone https://github.com/ci-group/MultiNEAT.git
+cd MultiNEAT
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/install/path  ..
+make 
+make install # add sudo before the command if the install prefix is /usr/local (default value)
+```
+
+Install Polyvox :
+```
+git clone https://github.com/portaloffreedom/polyvox.git
+cd polyvox
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/install/path  ..
+make 
+make install # add sudo before the command if the install prefix is /usr/local (default value)
+```
+
+Install libdlibxx :
+```
+git clone https://github.com/m-renaud/libdlibxx.git
+cd libdlibxx
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/install/path  ..
+make 
+make install # add sudo before the command if the install prefix is /usr/local (default value)
+```
+
+### The framework
+
+In order to install the framework
+```
+git clone https://legoffl@bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework.git
+cd evolutionary_robotics_framework
+mkdir build && cd build
+cmake -DCMAKE_INSTALL_PREFIX=/install/path -DVREP_FOLDER=/vrep/folder/path ..
 make
-make install # add sudo if the install prefix is /usr/local/
+make install # add sudo if the install prefix is /usr/local/ (default value)
 ```
 If you would like to use CLion IDE with this project please follow the instructions in the [report](https://www.overleaf.com/8988212588bdkjhpfdtckz).
 
@@ -44,22 +94,3 @@ the --xvbf option is to be set at 1 if you launch your experiment through ssh. T
 
 Like in local mode, all the ogs of your experiment are stored in a folder named after the name of your experiment (specified in the parameters file) and the date of its launch. This folder is itself in the repository folder you specified in the parameters file.
 As well, you have log files corresponding to the outputs of the client and all the simulator instances stored where you launched your experiment. This files are named client_<date> for the client output and sim_<nb-instance>_<date>.
-
-
-## Overall structure
-
-* *Ecosystem Manager* contains all the files necessary to the Ecosystem Manager
-* *RobotFab* contains all the files necessary to run the Robot Fabricator
-* *EvolutionVREP* contains all the files necessary to run evolution in simulation with V-REP as simulator
-* *RobotController* contains all the files necessary to compile the controllers to physical robots.
-
-## Authors
-
-* **Matt Hale**
-* **Edgar Buchanan**
-* **Wei Li**
-* **Matteo de Carlo**
-* **Robert Woolley**
-* **Léni K. Le Goff**
-
-See also the list of [contributors](https://www.york.ac.uk/robot-lab/are/) who participated in this project.
