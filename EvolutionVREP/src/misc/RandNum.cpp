@@ -28,8 +28,8 @@ int RandNum::randInt(int lower, int upper) {
 
 void RandNum::setSeed(int seed) {
     gen.seed(seed);
-    m_seed = seed;
-        std::cout << "Seed set to " << seed << std::endl;
+	m_seed = seed;
+	std::cout << "Seed set to " << seed << std::endl;
 }
 
 int RandNum::getSeed()

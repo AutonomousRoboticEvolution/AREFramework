@@ -67,7 +67,6 @@ void saveLog(int num)
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
-
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
