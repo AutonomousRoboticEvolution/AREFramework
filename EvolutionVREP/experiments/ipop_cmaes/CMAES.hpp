@@ -101,6 +101,7 @@ public:
     void set_length_of_stagnation(int los){len_of_stag = los;}
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
     void set_novelty_decr(double nd){novelty_decr = nd;}
+    void set_pop_stag_thres(float pst){pop_stag_thres = pst;}
 
     bool have_reached_ftarget(){return reached_ft;}
 
@@ -112,7 +113,8 @@ private:
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
     std::pair<double,std::vector<double>> best_seen_solution;
-    int len_of_stag = 5;
+    int len_of_stag = 20;
+    float pop_stag_thres = 0.05;
     double novelty_ratio = 0;
     double start_novelty_ratio = 0;
     double novelty_decr = 0.05;

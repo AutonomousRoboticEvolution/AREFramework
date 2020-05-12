@@ -51,11 +51,11 @@ bool customCMAStrategy::pop_desc_stagnation(){
 
    bool stop = true;
    for(int i = 0; i < stddev.rows(); i++)
-       stop = stop && sqrt(stddev(i/static_cast<double>(descriptors.size() - 1))) <= 0.05;
+       stop = stop && sqrt(stddev(i/static_cast<double>(descriptors.size() - 1))) <= pop_stag_thres;
 
    if(stop){
        std::stringstream sstr;
-       sstr << "Stopping : standard deviation of the descriptor population is smaller than 0.05 : " << stddev;
+       sstr << "Stopping : standard deviation of the descriptor population is smaller than " << pop_stag_thres << " : " << stddev;
        log_stopping_criterias.push_back(sstr.str());
        cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
    }
@@ -81,7 +81,7 @@ bool customCMAStrategy::pop_fit_stagnation(){
     stddev = sqrt(stddev/static_cast<double>(fvalues.size()-1));
     cmaes::LOG_IF(cmaes::INFO,!_parameters.quiet()) << "pop standard deviation : " << stddev << std::endl;
 
-    if(stddev <= 0.05){
+    if(stddev <= pop_stag_thres){
         std::stringstream sstr;
         sstr << "Stopping : standard deviation of the population is smaller than 0.05 : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
@@ -193,6 +193,7 @@ void CMAES::init(){
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
+    float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
 
     Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
@@ -237,6 +238,7 @@ void CMAES::init(){
     cmaStrategy->set_length_of_stagnation(lenStag);
     cmaStrategy->set_novelty_ratio(novelty_ratio);
     cmaStrategy->set_novelty_decr(novelty_decr);
+    cmaStrategy->set_pop_stag_thres(pop_stag_thres);
 
     dMat init_samples = cmaStrategy->ask();
 
