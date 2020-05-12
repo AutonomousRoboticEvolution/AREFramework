@@ -7,5 +7,5 @@ The network is either a feed-forward neural network or a continuous-time recurre
 
 **To Do**:
 
-- Replace the NN implenmation of MultiNEAT by nn2
-- put a gaussian and/or polynomial mutation
+- Replace the NN implementation of MultiNEAT by nn2
+- implement a gaussian and/or polynomial mutation
