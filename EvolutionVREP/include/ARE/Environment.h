@@ -39,27 +39,33 @@ public:
         randNum(env.randNum){}
 
     ~Environment(){}
+
     /**
-        @brief Initialize the default environment scene and simulation time step size
-        */
+     * @brief Initialize the default environment scene and simulation time step size
+     */
     virtual void init();
+
     /**
-        @brief Calculate the fitness value of the robot
-        @param morph The pointer of the robot (morphology)
-        */
+     * @brief Compute the objectives
+     * @param an individual
+     * @return a vector of objectives
+     */
     virtual std::vector<double> fitnessFunction(const Individual::Ptr &ind) = 0;
+
     /**
-        @brief update the info of the objects (e.g. robot) in the environments
-        @param morph The pointer of the robot (morphology)
-        */
+     * @brief Update the information of the robot and the simulation
+     * @param simulationTime
+     * @param morphology
+     * @return ?
+     */
     virtual float updateEnv(float simulationTime, const Morphology::Ptr &morph) = 0;
     /**
-        @brief Print debug information
-        */
+     * @brief Print debug information
+     */
     void print();
     /**
-        @brief Load a specific scence
-        */
+     * @brief Load a specific scene
+     */
     void sceneLoader();
 
     //GETTERS & SETTERS
