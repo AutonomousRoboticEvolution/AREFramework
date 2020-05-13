@@ -30,15 +30,7 @@ struct obs_fcts{
     static obs_fct_t pos_traj;
 };
 
-namespace settings {
 
-typedef enum obsType {
-    FINAL_POS = 0,
-    TRAJECTORY = 1,
-    POS_TRAJ = 2
-}obsType;
-
-}
 
 class MFBO : public EA
 {
