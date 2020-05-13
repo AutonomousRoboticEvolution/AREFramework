@@ -4,8 +4,7 @@ add_library(MFBO SHARED
     noEA.cpp
     BOIndividual.cpp
     ../common/NNControl.cpp
-    ../common/EPuckMorphology.cpp
-    ../common/AREPuckMorphology.cpp
+    ../common/FixedMorphology.cpp
     ../common/mazeEnv.cpp
     ../common/testEnv.cpp
     factories.cpp
