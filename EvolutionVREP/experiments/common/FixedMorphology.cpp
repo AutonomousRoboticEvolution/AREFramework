@@ -1,4 +1,4 @@
-#include "AREPuckMorphology.h"
+#include "FixedMorphology.hpp"
 
 using namespace are;
 
@@ -50,7 +50,6 @@ NEAT::Substrate subtrates::epuck([]() -> NEAT::Substrate {
 void FixedMorphology::create()
 {
     getObjectHandles();
-    initSubstrate();
     std::cout << "AREpuck Created" << std::endl;
 }
 
@@ -75,9 +74,6 @@ void FixedMorphology::loadModel(){
     mainHandle = arepuckHandle;
 }
 
-void FixedMorphology::initSubstrate(){
-
-}
 
 void FixedMorphology::createAtPosition(float x, float y, float z)
 {

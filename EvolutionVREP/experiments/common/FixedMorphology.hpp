@@ -1,5 +1,5 @@
-#ifndef AREEPOCHMORPHOLOGY_H
-#define AREEPOCHMORPHOLOGY_H
+#ifndef FIXED_MORPHOLOGY_HPP
+#define FIXED_MORPHOLOGY_HPP
 
 #include "ARE/Morphology.h"
 #if defined(VREP)
@@ -46,4 +46,4 @@ private:
 
 }
 
-#endif //AREPOCHMORPHOLOGY_H
+#endif //FIXED_MORPHOLOGY_HPP

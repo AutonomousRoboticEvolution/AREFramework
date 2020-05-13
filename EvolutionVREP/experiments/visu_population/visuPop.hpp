@@ -9,8 +9,7 @@
 #include "NNParamGenome.hpp"
 #include "NNGenome.hpp"
 #include "NNControl.h"
-#include "EPuckMorphology.h"
-#include "AREPuckMorphology.h"
+#include "FixedMorphology.hpp"
 #include "settings.hpp"
 
 
