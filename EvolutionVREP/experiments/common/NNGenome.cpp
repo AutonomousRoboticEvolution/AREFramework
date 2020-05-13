@@ -27,7 +27,7 @@ void NNGenome::init()
         nn_genome = NEAT::Genome(0,nbr_input+1,nbr_hidden,nbr_output,
                                  false,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,
                                  1,neat_parameters,1);
-    else if(nn_type == settings::CTRNN)
+    else if(nn_type == settings::RNN)
         nn_genome = NEAT::Genome(0,nbr_input+1,nbr_hidden,nbr_output,NEAT::ActivationFunction::SIGNED_SIGMOID,NEAT::ActivationFunction::SIGNED_SIGMOID,neat_parameters);
 
 }
