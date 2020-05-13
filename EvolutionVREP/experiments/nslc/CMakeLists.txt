@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.0)
 add_definitions(-DEIGEN3_ENABLED)
 
 set(INCLUDES
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../common/"
     "../../modules"
     "/usr/include/eigen3/")

@@ -3,8 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 add_library(BO_CMAES SHARED 
     ../common/NNControl.cpp
-    ../common/AREPuckMorphology.cpp
-    ../common/EPuckMorphology.cpp
+    ../common/FixedMorphology.cpp
     ../common/mazeEnv.cpp
     ../common/Loggings.cpp
     ../common/NNGenome.cpp
@@ -25,3 +24,4 @@ target_include_directories(BO_CMAES PUBLIC
     )
 target_link_libraries(BO_CMAES ER_library cmaes)
 install(TARGETS BO_CMAES DESTINATION lib)
+install(DIRECTORY . DESTINATION include/bo_cmaes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

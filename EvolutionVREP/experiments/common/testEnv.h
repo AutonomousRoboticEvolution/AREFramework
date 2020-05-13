@@ -5,6 +5,12 @@
 #include "ARE/Environment.h"
 #include "ARE/Individual.h"
 
+#if defined(VREP)
+#include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
+
 namespace are {
 
 class TestEnv : public Environment

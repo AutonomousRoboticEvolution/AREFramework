@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_library(model_free_bayes_opt_2 SHARED
+add_library(MFBO SHARED
     noEA.cpp
     BOIndividual.cpp
     ../common/NNControl.cpp
@@ -14,12 +14,13 @@ add_library(model_free_bayes_opt_2 SHARED
     BOLoggings.cpp
     ../common/BOLearner.cpp
     )
-target_include_directories(model_free_bayes_opt_2 PUBLIC
+target_include_directories(MFBO PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "${LIMBO_FOLDER}/src/"
     "/usr/include/eigen3"
     "../common/"
     )
-target_link_libraries(model_free_bayes_opt_2 ER_library cmaes rt)
-install(TARGETS model_free_bayes_opt_2 DESTINATION lib)
+target_link_libraries(MFBO ER_library cmaes rt)
+install(TARGETS MFBO DESTINATION lib)
+install(DIRECTORY . DESTINATION include/mfbo FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

@@ -10,7 +10,8 @@ void are::Logging::create_log_folder(const std::string &exp_name){
     std::random_device rd;
 
     typedef std::chrono::duration<double,std::milli> milli_sec;
-    std::chrono::time_point<std::chrono::high_resolution_clock,milli_sec> milli = std::chrono::time_point_cast<milli_sec>(std::chrono::high_resolution_clock::now());
+    std::chrono::time_point<std::chrono::high_resolution_clock,milli_sec> milli =
+            std::chrono::time_point_cast<milli_sec>(std::chrono::high_resolution_clock::now());
     double time_milli = milli.time_since_epoch().count();
     time_milli = time_milli/(10000.f);
     time_milli = time_milli - static_cast<int>(time_milli);

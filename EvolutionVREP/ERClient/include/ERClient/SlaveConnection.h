@@ -6,6 +6,7 @@
 #include <sstream>
 #include <exception>
 
+
 extern "C" {
 #if defined (VREP)
 #include "v_repLib.h"
@@ -42,11 +43,11 @@ private:
     int reconnection_trials = 0;
 
 public:
-	explicit SlaveConnection(const std::string& address, int port);
+    explicit SlaveConnection(const std::string& address, int port);
     SlaveConnection(const SlaveConnection &other);
     SlaveConnection(SlaveConnection &&other);
     virtual ~SlaveConnection();
-	int timeOutReconnectAttempt = 0;
+    int timeOutReconnectAttempt = 0;
 
     bool connect(int connectionTimeoutMs = CONNECTION_TIMEOUT);
     bool connect(const std::string& address, int port, int connectionTimeoutMs = CONNECTION_TIMEOUT);
@@ -71,7 +72,7 @@ public:
 
     bool operator!() const;
 
-    const std::string& address() const { return _address; } 
+    const std::string& address() const { return _address; }
     simxInt port() const { return _port; }
     int individual() const { return _individual; }
     int individualNum() const { return _individualNum; }
@@ -98,7 +99,7 @@ public:
         std::stringstream message("An error occoured when using the VREP remote api.");
         message << std::endl;
 
-        if (returnValue & simx_return_novalue_flag) 
+        if (returnValue & simx_return_novalue_flag)
             message << "There is no command reply in the input buffer. This should not always be considered as an error, depending on the selected operation mode" << std::endl;
         if (returnValue & simx_return_timeout_flag)
             message << "The function timed out (probably the network is down or too slow)" << std::endl;

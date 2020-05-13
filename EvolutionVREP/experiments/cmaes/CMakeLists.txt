@@ -15,9 +15,11 @@ add_library(CMAES SHARED
     CMAESLoggings.cpp
     )
 target_include_directories(CMAES PUBLIC
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../common/"
     "/usr/include/eigen3"
     )
 target_link_libraries(CMAES ER_library cmaes)
 install(TARGETS CMAES DESTINATION lib)
+install(DIRECTORY . DESTINATION include/cmaes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

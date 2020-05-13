@@ -160,6 +160,7 @@ elseif (VREP_FOUND)
     install(TARGETS ${LIB_EXT} DESTINATION ${VREP_FOLDER})
 endif()
 
+
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(ER_library PUBLIC "__WINDOWS__")
 elseif(APPLE)

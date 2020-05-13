@@ -13,7 +13,7 @@
 #include <memory>
 #include "ARE/ER.h"
 #include "ARE/exp_plugin_loader.hpp"
-#include "ERClient/clientER.h"
+#include "ERClient/sim_state.h"
 
 /// an unique pointer to ER_VREP class
 are::ER::Ptr ERVREP;

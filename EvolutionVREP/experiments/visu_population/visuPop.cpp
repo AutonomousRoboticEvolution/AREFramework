@@ -142,6 +142,8 @@ void VisuPop::init(){
 
 
         }
+
+
         VisuIndividual::Ptr ind(new VisuIndividual(morph_gen,genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);

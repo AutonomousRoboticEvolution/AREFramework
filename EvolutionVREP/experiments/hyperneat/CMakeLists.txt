@@ -8,7 +8,8 @@ add_library(hyperneat SHARED
     CPPNIndividual.cpp
     factories.cpp)
 target_include_directories(hyperneat PUBLIC
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../common/"
     )
 target_link_libraries(hyperneat ER_library)

@@ -12,3 +12,5 @@ endif()
 add_subdirectory(lc_nsms)
 add_subdirectory(friction_estimation)
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+
+install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
