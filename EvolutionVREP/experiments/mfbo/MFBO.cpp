@@ -1,20 +1,76 @@
-#include "noEA.h"
+#include "MFBO.hpp"
 
 using namespace are;
 namespace fs = boost::filesystem;
 
-void noEA::init(){
+
+obs_fct_t obs_fcts::final_position = [](const Environment::Ptr env) -> Eigen::VectorXd{
+    Eigen::VectorXd obs(3);
+    std::vector<double> final_pos = std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position();
+    obs << final_pos[0], final_pos[1], final_pos[2];
+};
+
+obs_fct_t obs_fcts::trajectory = [](const Environment::Ptr env) -> Eigen::VectorXd{
+    std::vector<waypoint> traj = std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory();
+    Eigen::VectorXd o(6*traj.size());
+    int i = 0;
+    for(waypoint wp : traj){
+        o(i++) = wp.position[0];
+        o(i++) = wp.position[1];
+        o(i++) = wp.position[2];
+        o(i++) = wp.orientation[0];
+        o(i++) = wp.orientation[1];
+        o(i++) = wp.orientation[2];
+    }
+    return o;
+};
+
+
+obs_fct_t obs_fcts::pos_traj = [](const Environment::Ptr env) -> Eigen::VectorXd{
+    std::vector<waypoint> traj = std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory();
+    Eigen::VectorXd o(3*traj.size());
+    int i = 0;
+    for(waypoint wp : traj){
+        o(i++) = wp.position[0];
+        o(i++) = wp.position[1];
+        o(i++) = wp.position[2];
+    }
+    return o;
+};
+
+
+void MFBO::init(){
+
+    int obs_type = settings::getParameter<settings::Integer>(parameters,"#observationType").value;
+    if(obs_type == settings::obsType::FINAL_POS)
+        _compute_observation = obs_fcts::final_position;
+    else if(obs_type == settings::obsType::TRAJECTORY)
+        _compute_observation = obs_fcts::trajectory;
+    else if(obs_type == settings::obsType::POS_TRAJ)
+        _compute_observation = obs_fcts::pos_traj;
+
     bool start_from_random = settings::getParameter<settings::Boolean>(parameters,"#startFromRandom").value;
     if(start_from_random){
+
         int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
         float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
 
-        NNGenome nn_gen(randomNum,parameters);
-        NEAT::NeuralNetwork nn;
-        nn_gen.init();
-        nn_gen.buildPhenotype(nn);
-        int nbr_weights = nn.m_connections.size();
-        int nbr_biases = nn.m_neurons.size();
+        int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+        const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+        const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+        const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+
+        int nbr_weights, nbr_biases;
+        if(nn_type == settings::nnType::FFNN)
+            NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
+        else if(nn_type == settings::nnType::RNN)
+            NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
+        else if(nn_type == settings::nnType::ELMAN)
+            NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
+        else {
+            std::cerr << "unknown type of neural network" << std::endl;
+            return;
+        }
 
         Eigen::MatrixXd init_samples = limbo::tools::random_lhs(nbr_weights + nbr_biases,init_bo_dataset);
 
@@ -104,7 +160,7 @@ void noEA::init(){
 
 }
 
-void noEA::epoch(){
+void MFBO::epoch(){
 
     if(generation == 0){
         int rnd_i = randomNum->randInt(0,population.size()-1);
@@ -128,7 +184,7 @@ void noEA::epoch(){
     ind.reset();
 }
 
-bool noEA::update(const Environment::Ptr & env)
+bool MFBO::update(const Environment::Ptr & env)
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
@@ -142,14 +198,7 @@ bool noEA::update(const Environment::Ptr & env)
 
     if(instance_type == settings::INSTANCE_REGULAR || !simulator_side){
 
-        //add last fitness and NN weights in the database for the Bayesian optimizer
-        Eigen::VectorXd o(3);
-        std::vector<double> final_pos = std::dynamic_pointer_cast<BOIndividual>(ind)->get_final_position();
-        o(0) = final_pos[0];
-        o(1) = final_pos[1];
-        o(2) = final_pos[2];
-
-        observations.push_back(o);
+        observations.push_back(_compute_observation(env));
 
         std::vector<double> nn_params = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
         Eigen::VectorXd s(nn_params.size());
@@ -166,14 +215,14 @@ bool noEA::update(const Environment::Ptr & env)
     return true;
 }
 
-void noEA::setObjectives(size_t indIndex, const std::vector<double>& obj){
+void MFBO::setObjectives(size_t indIndex, const std::vector<double>& obj){
     currentIndIndex = indIndex;
     population[currentIndIndex]->setObjectives(obj);
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     _is_finish = obj[0] <= ftarget;
 }
 
-bool noEA::is_finish(){
+bool MFBO::is_finish(){
     int init_bo_dataset = settings::getParameter<settings::Integer>(parameters,"#initBODataSet").value;
     int nbr_bo_iter = settings::getParameter<settings::Integer>(parameters,"#numberBOIteration").value;
     return _is_finish || numberEvaluation >= nbr_bo_iter + init_bo_dataset;

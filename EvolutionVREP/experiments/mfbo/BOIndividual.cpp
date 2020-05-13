@@ -1,6 +1,7 @@
 #include "BOIndividual.h"
 
 using namespace are;
+namespace st = settings;
 
 BOIndividual::BOIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
     Individual(morph_gen,ctrl_gen)
@@ -50,31 +51,39 @@ void BOIndividual::createMorphology()
 
 void BOIndividual::createController()
 {
-    control.reset(new NNControl);
-    control->set_parameters(parameters);
-    std::dynamic_pointer_cast<NNControl>(control)->set_randonNum(randNum);
+    int nn_type = st::getParameter<st::Integer>(parameters,"#NNType").value;
+    int nb_input = st::getParameter<st::Integer>(parameters,"#NbrInputNeurones").value;
+    int nb_hidden = st::getParameter<st::Integer>(parameters,"#NbrHiddenNeurones").value;
+    int nb_output = st::getParameter<st::Integer>(parameters,"#NbrOutputNeurones").value;
 
-    if(genType == settings::NEAT){
-        //todo
-    }else if(genType == settings::NN){
-        NEAT::NeuralNetwork &nn = std::dynamic_pointer_cast<NNControl>(control)->nn;
-        std::dynamic_pointer_cast<NNGenome>(ctrlGenome)->buildPhenotype(nn);
-    }else if(genType == settings::NNPARAM){
-        std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
-        std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
+    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
+    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-        NNGenome nn_constructor;
-        nn_constructor.set_parameters(parameters);
-        nn_constructor.init();
-        NEAT::NeuralNetwork &nn = std::dynamic_pointer_cast<NNControl>(control)->nn;
-        nn_constructor.buildPhenotype(nn);
-
-        for(int i = 0; i < weights.size(); i++)
-            nn.m_connections[i].m_weight = weights[i];
-        for(int i = 0; i < bias.size(); i++)
-            nn.m_neurons[i].m_bias = bias[i];
+    if(nn_type == st::nnType::FFNN){
+        control.reset(new NN2Control<ffnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
-}
+    else if(nn_type == st::nnType::ELMAN){
+        control.reset(new NN2Control<elman_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+
+    }
+    else if(nn_type == st::nnType::RNN){
+        control.reset(new NN2Control<rnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+    }
+
+
+ }
 
 void BOIndividual::compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl){
     std::dynamic_pointer_cast<BOLearner>(learner)->set_observation(obs);

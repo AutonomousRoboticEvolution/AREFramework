@@ -18,6 +18,13 @@ enum genomeType {
     NNPARAM = 2
 };
 
+typedef enum obsType {
+    FINAL_POS = 0,
+    TRAJECTORY = 1,
+    POS_TRAJ = 2
+}obsType;
+
+
 }
 
 #endif
