@@ -56,11 +56,11 @@ ARE_hard_maze :
     	- 0.75;-0.75;0.05 #bottom dead end
 
 multi_maze :
-	start : 1.25;1.25;0.05 #centre
+	start : -1.25;1.25;0.05 #centre
 	target (& start) :
 		- -0.75;0.75;0.05 #upper left part
 		- -0.15;-0.875;0.05 #bottom left part
-		- 0.8;-0.55;0.05 #bottom right part
+		- 0.;-0.5;0.05 #bottom right part
 		- 0.5;0.75;0.05  #upper right upper part
 		- 0.75;0.45;0.05 #upper right bottom part 
 
