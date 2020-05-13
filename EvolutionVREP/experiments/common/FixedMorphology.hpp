@@ -10,19 +10,26 @@
 
 namespace are {
 
-class AREPuckMorphology : public Morphology
+struct subtrates{
+    static NEAT::Substrate are_puck;
+    static NEAT::Substrate epuck;
+};
+
+class FixedMorphology : public Morphology
 {
 public:
-    AREPuckMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
+    FixedMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
     Morphology::Ptr clone() const override
-        {return std::make_shared<AREPuckMorphology>(*this);}
+        {return std::make_shared<FixedMorphology>(*this);}
 
     void create() override;
     void createAtPosition(float,float,float) override;
     std::vector<double> update() override;
 
     void loadModel();
-    void initSubstrate();
+    void setSubstrate(NEAT::Substrate sub){
+        substrate = sub;
+    }
 
 
     void setPosition(float,float,float);

@@ -21,20 +21,12 @@ Individual::Ptr BOIndividual::clone()
 
 void BOIndividual::update(double delta_time)
 {
-    std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
-
     std::vector<double> inputs = morphology->update();
     std::vector<double> outputs = control->update(inputs);
-
-
     std::vector<int> jointHandles;
-    if(robot == "EPuck"){
-       jointHandles =
-               std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
-    }else if(robot == "AREPuck"){
-       jointHandles =
-                std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->get_jointHandles();
-    }
+    jointHandles =
+            std::dynamic_pointer_cast<FixedMorphology>(morphology)->get_jointHandles();
+
 
     assert(jointHandles.size() == outputs.size());
 
@@ -45,22 +37,16 @@ void BOIndividual::update(double delta_time)
 
 void BOIndividual::createMorphology()
 {
-    std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
-
-    if(robot == "EPuck"){
-        morphology.reset(new EPuckMorphology(parameters));
-        std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-    }
-    else if(robot == "AREPuck"){
-        morphology.reset(new AREPuckMorphology(parameters));
-        std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->loadModel();
-    }
+    morphology.reset(new FixedMorphology(parameters));
+    std::dynamic_pointer_cast<FixedMorphology>(morphology)->loadModel();
+    morphology->set_randNum(randNum);
 
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    morphology->createAtPosition(init_x,init_y,init_z);}
+    morphology->createAtPosition(init_x,init_y,init_z);
+}
 
 void BOIndividual::createController()
 {
@@ -69,7 +55,7 @@ void BOIndividual::createController()
     std::dynamic_pointer_cast<NNControl>(control)->set_randonNum(randNum);
 
     if(genType == settings::NEAT){
-//todo
+        //todo
     }else if(genType == settings::NN){
         NEAT::NeuralNetwork &nn = std::dynamic_pointer_cast<NNControl>(control)->nn;
         std::dynamic_pointer_cast<NNGenome>(ctrlGenome)->buildPhenotype(nn);

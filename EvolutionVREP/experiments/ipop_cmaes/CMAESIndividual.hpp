@@ -3,8 +3,7 @@
 
 #include <ARE/Individual.h>
 #include <ARE/Genome.h>
-#include "AREPuckMorphology.h"
-#include "EPuckMorphology.h"
+#include "FixedMorphology.hpp"
 #include "NN2Control.hpp"
 #include "NNGenome.hpp"
 #include "NNParamGenome.hpp"

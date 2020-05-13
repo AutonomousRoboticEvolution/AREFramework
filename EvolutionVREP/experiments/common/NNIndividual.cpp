@@ -26,8 +26,6 @@ void NNIndividual::createMorphology(){
 }
 
 void NNIndividual::update(double delta_time){
-    std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
-
     std::vector<double> inputs = morphology->update();
 
     std::vector<double> outputs = control->update(inputs);
