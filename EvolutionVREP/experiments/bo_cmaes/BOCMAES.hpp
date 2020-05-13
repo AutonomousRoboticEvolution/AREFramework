@@ -96,7 +96,7 @@ private:
     double start_novelty_ratio = 0;
     double novelty_decr = 0.05;
 
-    double best_fitness();
+    double best_fitness(std::vector<double> &best_sample);
 
     bool reached_ft = false;
 

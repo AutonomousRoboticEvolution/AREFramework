@@ -107,7 +107,8 @@ void customCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates
 void customCMAStrategy::tell()
 {
     ipop_cmaes_t::tell();
-    best_fitnesses.push_back(best_fitness());
+    std::vector<double> best_sample;
+    best_fitnesses.push_back(best_fitness(best_sample));
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
 }
@@ -136,11 +137,14 @@ void customCMAStrategy::reset_search_state()
     novelty_ratio = start_novelty_ratio;
 }
 
-double customCMAStrategy::best_fitness(){
+double customCMAStrategy::best_fitness(std::vector<double> &best_sample){
     double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf > 1 - ind->getObjectives()[0])
+        if(bf > 1 - ind->getObjectives()[0]){
             bf = 1 - ind->getObjectives()[0];
+            best_sample = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        }
+
     }
     return bf;
 }
