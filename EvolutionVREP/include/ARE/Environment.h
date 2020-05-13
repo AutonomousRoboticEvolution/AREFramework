@@ -12,7 +12,6 @@
 #include "simLib.h"
 #endif
 #include "ARE/Genome.h"
-
 #include "ARE/Individual.h"
 
 
