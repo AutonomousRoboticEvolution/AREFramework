@@ -1,101 +1,143 @@
 /*
- * Author = Matt (based of Rob's original i2c_servo code)
- * Date = May 2020
- * Description; This code controls a Pico microcontroller. It is design to recieve I2C messages and sent a PWM signal to a analogue servo MG996R - Digi Hi Torque.
- */
+* Author = Matt
+* Date = May 2020
+* Description; This code controls the joint organ (based of Rob's original i2c_servo code)
+*/
 
-const int zero_degree_us = 400;
-const int oneeighty_degree_us = 2350;
-
-/// i2c_slave_test.ino
-#include <Wire.h>
-#include <Servo.h>                           // Include servo library
- 
-// standard Arduino library
-Servo PWMservo;  
-
-// ---- NEEDS TO BE CHANGED FOR EACH SERVO ----
-// defines the address for the servo  
+// calibration values for this particular servo:
+#define zero_degree_us 400
+#define size_of_us_range 1950 // the difference between the zero and 180degree positions
 #define SLAVE_ADDRESS 0x07
 
-// 10 byte data buffer
-int receiveBuffer[9];
-// count for debug protocol
-uint8_t keepCounted = 0;
+#include <Wire.h>
+#include <Servo.h>
+Servo PWMservo;
 
-void set_servo(float angle_degrees){
-  int us_value = zero_degree_us +  (oneeighty_degree_us-zero_degree_us)*(angle_degrees/180.0);
-  PWMservo.writeMicroseconds(us_value);
-}
+//Registers implemented:
+#define TARGET_POSTIION_REGISTER 0x10
+#define JOINT_MODE_REGISTER 0X11
+#define MEASURED_POSITION_REGISTER 0x12
 
-/// Read data in to buffer, offset in first element.
-void receiveData(int byteCount){
-  // buffer count to place message in different memory
-  int counter = 0;
-  while(Wire.available()) {
-    // writes the data to the buffer
-    receiveBuffer[counter] = Wire.read();
-    // print some data for debugging to serial
-    Serial.print("Got data: ");
-    Serial.println(receiveBuffer[counter]);
-    counter ++;
-  }
-  // A message to move the servo to a given angle
-  if (receiveBuffer[0] == 0){
-    Serial.println("Move Servo");
-    int servo_degrees = receiveBuffer[1] * 5;
-    set_servo(servo_degrees);
-  }
-}
+//the options for JOINT_MODE_REGISTER
+#define SERVO_OFF 0x00
+#define SERVO_ON 0x01
 
+// define pins
+#define SERVO_POSITION_PIN A0
+#define SERVO_PWM_PIN 4
 
-/// Use the offset value to select a function
-void sendData(){
-  if (receiveBuffer[0] == 99) {
-    writeData(keepCount());
-  } else {
-    Serial.println("No function for this address");
-  }
-}
+// we need a buffer for an 8-bit register, and another 8-bit byte for the actual value of received data:
+uint8_t input_buffer[2];
+uint8_t send_buffer;
+//bool received_data_flag = false;
+//int received_data_byte_count;
+bool measured_joint_position_is_up_to_date = false;
 
-
-/// Write data
-void writeData(char newData) {
-  // Sents a message to the i2c master
-  uint8_t data[] = {receiveBuffer[0], newData};
-  int dataSize = sizeof(data);
-  Wire.write(data, dataSize);
-}
-
-
-/// Counter function for debugging and connection/reset check
-int keepCount() {
-  keepCounted ++;
-  if (keepCounted > 255) {
-    keepCounted = 0;
-    return 0;
-  } else {
-    return keepCounted;
-  }
-}
-
+// global variables
+uint8_t current_target_joint_position; // this is 0-255, representing angles over approx 180degrees
+uint8_t mode; // either SERVO_ON or SERVO_OFF
+uint8_t measured_joint_position;
+bool servo_is_started = false;
 
 void setup(){
+  pinMode(SERVO_POSITION_PIN,INPUT);
+  
   /// Begins serial with pc
-  Serial.begin(9600); // start serial for output
+  Serial.begin(115200); // start serial for output
   Wire.begin(SLAVE_ADDRESS);
   Wire.onReceive(receiveData);
   Wire.onRequest(sendData);
   Serial.println("I2C Ready!");
+
+
+}
+
+void loop(){
+  delay(100);
+}
+
+// triggered on every conversation:
+void receiveData(int received_data_byte_count){
+
+  // the first byte received is the register value, and determines what we should do
+  input_buffer[0] = Wire.read(); // register
+  if (received_data_byte_count>1){
+    input_buffer[1] = Wire.read(); // value
+  }else{
+    input_buffer[1] = 0;
+  }
+
+  Serial.print("Received: 0x");
+  Serial.print(input_buffer[0],HEX);
+  Serial.print(", 0x");
+  Serial.println(input_buffer[1],HEX);
   
-  //Attach servo to D4
-  PWMservo.attach(4);                      // Attach left signal to pin D4
-  // Sets starting position to the middle, i.e. straight joint:
-  set_servo(90);
+  switch (input_buffer[0]) {
+    case TARGET_POSTIION_REGISTER: // set servo value
+      current_target_joint_position = input_buffer[1];
+      set_servo(current_target_joint_position);
+      break;
+  
+    case JOINT_MODE_REGISTER: // turn joint on or off
+      mode = input_buffer[1];
+      //Serial.println(mode,HEX);
+      if (mode&0x01 == SERVO_ON){ 
+        Serial.println("Turn servo on");
+        set_servo(current_target_joint_position); 
+        }
+      else { // SERVO_OFF
+        Serial.println("Turn servo off");
+        if (servo_is_started){
+          PWMservo.detach();
+          servo_is_started = false;}
+      }
+      break;
+  
+    case MEASURED_POSITION_REGISTER:
+      measured_joint_position = analogRead(SERVO_POSITION_PIN)/4;
+      send_buffer = measured_joint_position;
+      measured_joint_position_is_up_to_date = true;
+      Serial.print("Preparing to send measured position of: ");
+      Serial.print(measured_joint_position);
+      Serial.print(" (Hex: ");
+      Serial.print(measured_joint_position,HEX);
+      Serial.println(")");
+      break;
+
+    case 0x99:
+      // test register
+      send_buffer = 0x99;
+      Serial.println("0x99 test");
+      break;
+          
+    default:
+      Serial.print("Attempt to access unkown register: 0x");
+      Serial.println(input_buffer[0], HEX);
+      break;
+  }
 }
 
 
-void loop(){
-  // waits for a i2c message
-  delay(100);
+
+// master wants to read a register:
+void sendData(){
+  Wire.write(send_buffer);
+  measured_joint_position_is_up_to_date = false;
+  Serial.println("Sent");
+}
+
+// send the servo to a certain position. Input: a value from 0-255, corespoinding to the full 180 degree range of the joint.
+void set_servo(uint8_t target_position){
+  if (!servo_is_started){
+    PWMservo.attach(SERVO_PWM_PIN);
+    servo_is_started = true;
+  }
+        
+  unsigned int us_value = zero_degree_us +  size_of_us_range* float(target_position/255.0);
+  PWMservo.writeMicroseconds(us_value);
+  
+  Serial.print("I've been told to set the position to: ");
+  Serial.print(target_position,DEC);
+  Serial.print(", which is a microsecond value of:");
+  Serial.println(us_value,DEC);
 }
