@@ -7,7 +7,8 @@
 #ifndef JOINTORGAN_HPP
 #define JOINTORGAN_HPP
 
-#include <cstdlib> //for abs() function
+
+//#include <cstdlib> //for abs() function
 #include "I2CDevice.hpp"
 
 //Register subaddresses for DRV8830 chip
@@ -15,19 +16,19 @@
 #define JOINT_MODE_REGISTER 0X11
 #define MEASURED_POSITION_REGISTER 0x12
 
-//states for JOINT_MODE_REGISTER
+//the options for JOINT_MODE_REGISTER
 #define SERVO_OFF 0x00
 #define SERVO_ON 0x01
 
 
 /**
-	Controller class for the arduin-pico based servo controller in the joint organ
+
+	Controller class for the arduino-pico based servo controller in the joint organ
 */
 class JointOrgan  : protected I2CDevice {
 	public :
-
 		//Public variables
-		//Vars for motor state and speed
+		//Vars for state and target position
 		uint8_t currentState = SERVO_OFF; ///< Servo state: SERVO_OFF or SERVO_ON
 		uint8_t targetPostion = 128; ///< target angle, as an 8-bit number (0 to 255) representing angles from 0degrees to 180degrees
 
@@ -44,7 +45,7 @@ class JointOrgan  : protected I2CDevice {
 			@brief Target angle setting method. Will automatically active the servo
 			@param target angle is an unsigned 8-bit integer, linearly spaced over the possible range of approximately 180 degrees.
 		*/
-		void setTargetAngle(uint8_t speed);
+		void setTargetAngle(uint8_t newTarget);
 
 		/**
 			@brief Turn the servo off so it should turn freely (and draw no power)
@@ -61,9 +62,12 @@ class JointOrgan  : protected I2CDevice {
 			@brief Read the current angle of the servo.
 			@return
 		*/
-		uint8_t readMeasuredAngle();
+
+        int16_t readMeasuredAngle();
+		uint8_t readTestRegister(); // undocumented test register
 
 
 };
+
 
 #endif
