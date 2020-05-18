@@ -8,7 +8,6 @@ add_library(NSLC SHARED
     ../common/mazeEnv.cpp
     ../common/Loggings.cpp
     ../common/NNGenome.cpp
-    ../common/Novelty.cpp
     ../common/NNIndividual.cpp
     NSLC.cpp
     factories.cpp

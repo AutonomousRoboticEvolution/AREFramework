@@ -2,7 +2,7 @@
 #define CPPNINDIVIDUAL_H
 
 #include "ARE/Individual.h"
-#include "CPPNGenome.h"
+#include "ARE/CPPNGenome.h"
 #include "ARE/Morphology_CPPNMatrix.h"
 #include "v_repLib.h"
 #include "eigen_boost_serialization.hpp"

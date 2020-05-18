@@ -3,12 +3,14 @@
 
 #include "ARE/EA.h"
 #include "ARE/Morphology_CPPNMatrix.h"
-#include "CPPNGenome.h"
+#include "ARE/CPPNGenome.h"
+#include "ARE/Novelty.hpp"
+
 #include "CPPNIndividual.h"
 
 #include "eigen3/Eigen/Core"
 
-#include "Novelty.hpp"
+
 
 namespace are {
 
