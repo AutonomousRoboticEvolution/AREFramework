@@ -36,8 +36,6 @@ public:
     /// Initialize the morph and its control
     virtual void init() = 0;
 
-    virtual Phenotype::Ptr develop() = 0;
-
     virtual void mutate() = 0;
 
     virtual Genome::Ptr crossover(const Genome::Ptr&){

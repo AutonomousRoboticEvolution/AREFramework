@@ -30,7 +30,6 @@ public:
 
     void init() override;
     void init(NEAT::RNG &rng);
-    Phenotype::Ptr develop() override{}
     void mutate(NEAT::RNG &rng);
     void mutate() override{}
     Genome::Ptr crossover(const Genome::Ptr &);
