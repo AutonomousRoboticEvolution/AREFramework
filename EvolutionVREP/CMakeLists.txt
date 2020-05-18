@@ -44,6 +44,7 @@ target_include_directories(ER_library PUBLIC
     "ERClient/include"
     "${VREP_FOLDER}/programming/"
     "${VREP_FOLDER}/programming/include"
+    "/usr/include/eigen3/"
 )
 target_compile_definitions(ER_library PUBLIC
     "NON_MATLAB_PARSING"
