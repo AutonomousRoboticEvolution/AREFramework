@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 
 
 add_library(BO_CMAES SHARED 
-    ../common/NNControl.cpp
+    ../common/NN2Control.cpp
+    ../common/NN2Individual.cpp
     ../common/FixedMorphology.cpp
     ../common/mazeEnv.cpp
     ../common/Loggings.cpp
@@ -10,6 +11,7 @@ add_library(BO_CMAES SHARED
     ../common/genLoggings.cpp
     ../common/Novelty.cpp
     ../common/BOLearner.cpp
+    ../common/NIPES.cpp
     BOCMAES.cpp
     BOCMAESIndividual.cpp
     factories.cpp
