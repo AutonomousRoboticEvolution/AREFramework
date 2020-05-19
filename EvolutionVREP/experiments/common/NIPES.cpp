@@ -117,6 +117,7 @@ bool IPOPCMAStrategy::best_sol_stagnation(){
 
 void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
     // custom eval.
+    _solutions.candidates().clear();
     for (int r=0;r<_pop.size();r++)
     {
         std::vector<double> genome = std::dynamic_pointer_cast<NNParamGenome>(_pop[r]->get_ctrl_genome())->get_full_genome();
@@ -124,11 +125,10 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         for(int i = 0; i < genome.size(); i++)
             x(i) = genome[i];
 
-        _solutions.get_candidate(r).set_x(x);
         double fvalue = (1-novelty_ratio)*(1-_pop[r]->getObjectives()[0])
                 + novelty_ratio*(1-_pop[r]->getObjectives()[1]);
-        _solutions.get_candidate(r).set_fvalue(fvalue);
 
+        _solutions.candidates().push_back(cma::Candidate(fvalue,x));
     }
     update_fevals(candidates.cols());
 }
