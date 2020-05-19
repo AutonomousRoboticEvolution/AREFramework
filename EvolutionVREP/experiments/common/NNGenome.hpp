@@ -2,7 +2,6 @@
 #define NNGENOME_H
 
 #include <ARE/Genome.h>
-#include <ARE/Phenotype.h>
 #include <Genome.h>
 
 namespace are {

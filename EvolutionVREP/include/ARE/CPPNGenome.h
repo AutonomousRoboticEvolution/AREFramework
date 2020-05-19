@@ -7,11 +7,6 @@
 
 namespace are {
 
-struct CPPN : public Phenotype
-{
-    NEAT::NeuralNetwork nn;
-};
-
 class CPPNGenome : public Genome
 {
 public:

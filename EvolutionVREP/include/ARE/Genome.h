@@ -6,7 +6,6 @@
 #include <memory>
 #include "ARE/Settings.h"
 #include "misc/RandNum.h"
-#include "ARE/Phenotype.h"
 
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -71,7 +70,6 @@ class EmptyGenome : public Genome
 public:
     Genome::Ptr clone() const{return nullptr;}
     void init(){}
-    Phenotype::Ptr develop(){return nullptr;}
     void mutate(){}
 
 //    template <class archive>

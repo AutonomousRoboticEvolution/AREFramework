@@ -9,8 +9,6 @@
 //#include "ARE/ER_Module.h"
 #include "misc/RandNum.h"
 #include "ARE/Settings.h"
-#include "ARE/Phenotype.h"
-
 
 namespace are {
 
