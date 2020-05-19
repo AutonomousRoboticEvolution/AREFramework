@@ -1286,7 +1286,7 @@ void Morphology_CPPNMatrix::loadMorphologyGenome(int indNum){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::stringstream filepath;
-    filepath << repository << "/" << loadExperiment << "/genome" <<indNum;
+    filepath << loadExperiment << "/genome" <<indNum;
     nn.Clear();
     nn.Load(filepath.str().c_str());
 }
