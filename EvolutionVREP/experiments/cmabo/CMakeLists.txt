@@ -11,6 +11,7 @@ add_library(CMABO SHARED
     ../common/Novelty.cpp
     ../common/NIPES.cpp
     ../common/BOLearner.cpp
+    ../common/NN2Individual.cpp
     CMABO.cpp
     factories.cpp
     CMABOLoggings.cpp

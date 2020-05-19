@@ -7,9 +7,15 @@ obs_fct_t obs_fcts::final_position = [](const NN2Individual::Ptr &ind) -> Eigen:
     Eigen::VectorXd obs(3);
     std::vector<double> final_pos = ind->get_final_position();
     obs << final_pos[0], final_pos[1], final_pos[2];
+    return obs;
 };
 
 
+void CMABO::init(){
+    NIPES::init();
+    _compute_obs = obs_fcts::final_position;
+    learner.reset(new BOLearner(parameters));
+}
 
 void CMABO::epoch(){
     NIPES::epoch();
@@ -31,9 +37,10 @@ void CMABO::init_next_pop(){
     bo_gen->set_biases(b);
     bo_gen->set_weights(w);
     learner->update(bo_gen);
-    NN2Individual bo_ind;
     EmptyGenome::Ptr morph_gen(new EmptyGenome);
     Individual::Ptr ind(new NN2Individual(morph_gen,bo_gen));
+    ind->set_parameters(parameters);
+    ind->set_randNum(randomNum);
     population.push_back(ind);
 }
 
@@ -59,6 +66,7 @@ bool CMABO::update(const Environment::Ptr &env){
             s(i) = nn_params[i];
 
         samples.push_back(s);
+
 
         if(verbose)
             std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;

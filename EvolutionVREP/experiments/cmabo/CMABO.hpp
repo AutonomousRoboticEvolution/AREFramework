@@ -29,10 +29,13 @@ public:
     CMABO() : NIPES(){}
     CMABO(const settings::ParametersMapPtr& param) : NIPES(param){}
 
+    void init();
     void epoch();
     void init_next_pop();
     bool update(const Environment::Ptr&);
-
+    Eigen::VectorXd getLastObs() const {return observations.back();}
+    Eigen::VectorXd getLastSpl() const {return samples.back();}
+    const BOLearner::Ptr &get_learner() const {return learner;}
 protected:
     obs_fct_t _compute_obs;
     std::vector<Eigen::VectorXd> observations;
