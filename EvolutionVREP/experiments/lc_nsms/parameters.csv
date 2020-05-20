@@ -21,7 +21,7 @@
 #genomeFile,string,genome
 #loadIndividual,int,-1
 #loadExperiment,string,linearCombination_29_3_18-56-18-8978/
-#manufacturabilityMethod,int,0
+#manufacturabilityMethod,int,1
 #kValue,int,15
 #noveltyThreshold,double,0.1
 #noveltyRatio,double,1

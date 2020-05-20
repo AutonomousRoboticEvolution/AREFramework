@@ -344,6 +344,11 @@ private:
     std::vector<std::vector<float>> protoPhenotype;
 
     double manScore;
+
+    // Handles used by the controller
+    std::vector<int> jointHandles;
+    std::vector<int> proxHandles;
+
 };
 
 }

@@ -81,9 +81,13 @@ void Morphology_CPPNMatrix::create()
             // EB: Warning, the more triangles are used the more accurate would me the final representation. However,
             // This make the decomposition process slower and more important the likelihood of the decomposition to
             // crash higher. To prevent this I decided to decrease the maximum concavity as mush as possible.
-            int conDecIntPams[10] = {1, 100, 20, 1, 0, //HACD
+            // EB: IMPORTANT! for the pre-morphogensis stage keep the number of triangles low (100) and high concavity (100).
+            // This will speed-up evolution. However...
+            // For the morphognesis stage keep the number of triangles high (at least 1200) and low concavity (0.5)
+            // This will make a more accurate representation of the skeleton.
+            int conDecIntPams[10] = {1, 1200, 20, 1, 0, //HACD
                                               10000, 20, 4, 4, 64}; //V-HACD
-            float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
+            float conDecFloatPams[10] = {0.5, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             mainHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
@@ -91,7 +95,8 @@ void Morphology_CPPNMatrix::create()
             simSetObjectParent(meshHandle,mainHandle, 1);
             simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
             sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
-            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1);
+            //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); 
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
@@ -186,11 +191,11 @@ void Morphology_CPPNMatrix::create()
         exportMesh(loadInd, vertices,indices);
         exportRobotModel(loadInd);
     }
-
+    getObjectHandles();
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
 
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
@@ -211,14 +216,45 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
 
 void Morphology_CPPNMatrix::getObjectHandles()
 {
-    std::cout << "There's nothing in this method!" << std::endl;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
+    int nbrObj = 0;
+    int* handles = nullptr;
+    handles = simGetObjectsInTree(mainHandle,sim_object_proximitysensor_type,1,&nbrObj);
+
+    proxHandles.clear();
+    jointHandles.clear();
+
+    for(int i = 0; i < nbrObj ; i++)
+        proxHandles.push_back(handles[i]);
+
+    handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);
+    for(int i = 0; i < nbrObj ; i++)
+        jointHandles.push_back(handles[i]);
+
+    simReleaseBuffer((simChar*)handles);
+    simRemoveObjectFromSelection(sim_handle_tree,mainHandle);
 }
 
 std::vector<double> Morphology_CPPNMatrix::update(){
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     std::vector<double> sensorValues;
-    std::cerr << "We shouldn't be here!" << std::endl;
-    std::cerr << "The morphologies for this experiment don't have a controller." << std::endl;
-    abort();
+    std::function<double(float, float, float)> norm_L2 =
+            [](float x, float y, float z) -> double
+            {return std::sqrt(x*x + y*y + z*z);};
+    float pos[4], norm[3];
+    int obj_h;
+    int det;
+    //sim::pauseCommunication(instance_type,1,properties->clientID);
+    for (size_t i = 0; i < proxHandles.size(); i++)
+    {
+        det = simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
+        //det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,properties->clientID);
+        if(det > 0)
+            sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
+        else if(det == 0) sensorValues.push_back(0);
+        else std::cerr << "No detection on Proximity sensor" << std::endl; //<< simGetLastError() << std::endl;
+    }
     return sensorValues;
 }
 
@@ -494,7 +530,7 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     organ.connectorOri.push_back(newConnectorOri[1]);
     organ.connectorOri.push_back(newConnectorOri[2]);
 
-    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keep organ fix in the absolute position. For testing puproses
+    //simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keep organ fix in the absolute position. For testing puproses
 
     usleep(1000);
 }
@@ -547,7 +583,7 @@ void Morphology_CPPNMatrix::createTemporalGripper(Morphology_CPPNMatrix::OrganSp
     gripperOrientation[2] = 1.5708;
     simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
 
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1);
+//    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1); // Keeps gripper fix in the absolute position. For testing purposes
     simSetObjectParent(gripperHandle, mainHandle, 1);
 
     organ.gripperHandle = gripperHandle;
