@@ -6,47 +6,115 @@
 
 #include "I2CBus.hpp"
 #include "JointOrgan.hpp"
+#include "INA219_current_sensor.hpp"
+
+// some stuff for timing the loop:
+//#include "date.h"
+#include <chrono>
+#include <iostream>
+#include <thread>
+
+#define OUTPUT_TO_FILE
+#ifdef OUTPUT_TO_FILE
+#include <fstream>
+#endif
+
 
 #include <math.h>
 #define PI 3.14159265
 
-#define JOINT1_ADDRESS 0x08
-#define JOINT2_ADDRESS 0x07
+#define SHOULDER_ADDRESS 0x08
+#define ELBOW_ADDRESS 0x07
 
 // wiggle parameters:
-#define timestep_us 100000 // 10Hz
-#define period  32// in multiples of timestep_us
+//using namespace std::chrono
+#define timestep 20ms // 100Hz
+#define joint_update_divisor 50
+#define period  4   // in multiples of timestep_us
 #define phase_difference period/4
 uint16_t i_step = 1;
 
 // define the two joints:
-JointOrgan shoulder(JOINT1_ADDRESS);
-JointOrgan elbow(JOINT2_ADDRESS);
+JointOrgan shoulder(SHOULDER_ADDRESS);
+JointOrgan elbow(ELBOW_ADDRESS);
+
+// define the current sensor:
+INA219_current_sensor INA(0x40);
+
+
 
 // some global values
 uint8_t measuredAngle = 0;
 
 int sin_wave(int amplitude, int phase, int offset=0){
-    float fraction = (float(i_step)+phase)/period;
+    float fraction = (float(i_step/joint_update_divisor)+phase)/period;
     return 128 + offset + amplitude * sin ( 2*PI*fraction );
+}
+
+int square_wave(int amplitude, int phase, int offset=0){
+    float fraction = float(((i_step/joint_update_divisor)+phase)%period)/period;
+    if (fraction>=0.5){
+        return 128 + offset + amplitude;
+    }else{
+        return 126 + offset - amplitude;
+    }
 }
 
 void run_wiggle(){
 
+    // setup for loop timing:
+    using namespace std::chrono;
+//    using namespace date;
+    auto next = steady_clock::now();
+    auto prev = next - timestep;
 
-    while(true) {
-        usleep(timestep_us);
+    int elbow_value =128;
+    int shoulder_value=128;
+
+    #ifdef OUTPUT_TO_FILE
+        steady_clock::time_point start_time = steady_clock::now();
+        std::cout<< "t,shoulder demand,shoulder measured,elbow demand,elbow measured,current (mA),voltage (V)\n";
+    #endif
+
+    printf("starting");
+    while (true)
+    {
         i_step++;
+//        printf("%i",i_step);
 
-        int  elbow_value = sin_wave(0,0,0);
-        int shoulder_value = sin_wave(50,phase_difference,50);
+        if (i_step%joint_update_divisor == 0) { // update jiont values
+            elbow_value = square_wave(50, 0, 25);
+            shoulder_value = square_wave(50, phase_difference, 0);
 
-//        printf("%d, %d\n", shoulder_value , elbow_value);
-//        printf("Heartbeats: %X, %X\n", shoulder.readTestRegister(), elbow.readTestRegister());
-        printf("measured: %d, %d\n", shoulder.readMeasuredAngle(), elbow.readMeasuredAngle());
-        shoulder.setTargetAngle(shoulder_value);
-        elbow.setTargetAngle(elbow_value);
+            shoulder.setTargetAngle(shoulder_value);
+            elbow.setTargetAngle(elbow_value);
+//            printf("%i\t%i\n",shoulder_value,elbow_value);
+        }
+
+        // get power data:
+//        float current_A = INA.read_current();
+//        float voltage_V = INA.read_voltage(); // max value of 8000 is 32V
+
+
+        // create output csv file
+        #ifdef OUTPUT_TO_FILE
+            steady_clock::time_point t2 = steady_clock::now();
+            duration<double> time_span = duration_cast<duration<double>>(t2 - start_time);
+            std::cout
+            << time_span.count() << ","
+            << shoulder_value<<"," << shoulder.readMeasuredAngle() <<","
+            << elbow_value<<"," << elbow.readMeasuredAngle() <<","
+            << INA.read_current() <<","<<INA.read_voltage()<<"\n";
+        #endif
+//        printf("===\n");
+        // loop timing stuff:
+        auto now = steady_clock::now();
+        prev = now;
+        next += timestep;
+        std::this_thread::sleep_until(next);
+
     }
+
 }
 
 
@@ -104,18 +172,18 @@ int main(void) {
     I2CBus i2cBus1((char*)"/dev/i2c-1");
     i2cBus1.openBus();
 
+    INA.init();
 
-	run_wiggle();
+#ifdef OUTPUT_TO_FILE
+    // direct any cout calls to file
+    std::ofstream out("out.csv");
+    std::streambuf *coutbuf = std::cout.rdbuf(); //save old buf
+    std::cout.rdbuf(out.rdbuf()); //redirect std::cout to out.txt!
+#endif
+
+    run_wiggle();
 //    command_line_testing();
-//    while(true) {
-//        usleep(1000000);
-//        uint8_t shoulder_reading = shoulder.readMeasuredAngle();
-//        uint8_t elbow_reading = elbow.readMeasuredAngle();
-//
-//        printf("Shoulder: %d, Elbow: %d\n", shoulder_reading, elbow_reading);
-//
 //        printf("Heatbeats: %#X, %#X\n", shoulder.readTestRegister(), elbow.readTestRegister());
 //        printf("Heatbeats: %d, %d\n", shoulder.readTestRegister()==0x99, elbow.readTestRegister()==0x99);
 //        printf("---\n");
-//    }
 }
