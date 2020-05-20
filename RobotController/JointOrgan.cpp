@@ -15,7 +15,6 @@ JointOrgan::JointOrgan(uint8_t address) : I2CDevice(address){
 }
 
 //new Target is an 8-bit number (0 to 255) representing angles from 0degrees to 180degrees
-
 void JointOrgan::setTargetAngle(uint8_t newTarget) {
 	//Send to device (write8To inherited from I2CDevice)
 	write8To(TARGET_POSTIION_REGISTER, newTarget);
@@ -37,15 +36,16 @@ void JointOrgan::setServoOn() {
 
 int16_t JointOrgan::readMeasuredAngle() {
 	//Read and return the current angle, as measured by the potentiometer
-	int number_of_retries=0;
-	while(number_of_retries<NUMBER_OF_RETRIES_BEFORE_GIVING_UP) {
-        if (write8To(MEASURED_POSITION_REGISTER, 0x00) == 0) {
-            return read8();
-        } else {
-            printf("error during readMeasuredAngle (%d retries so far)\n",number_of_retries++);
-        }
-    }
-    return -1; // reached max retries
+	//int number_of_retries=0;
+	//while(number_of_retries<NUMBER_OF_RETRIES_BEFORE_GIVING_UP) {
+        //if (write8To(MEASURED_POSITION_REGISTER, 0x00) == 0) {
+        write8To(MEASURED_POSITION_REGISTER,0x00);
+        return read8();
+        //} else {
+        //    printf("error during readMeasuredAngle (%d retries so far)\n",number_of_retries++);
+        //}
+    //}
+    //return -1; // reached max retries
 }
 
 uint8_t JointOrgan::readTestRegister() {
