@@ -125,7 +125,13 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         for(int i = 0; i < genome.size(); i++)
             x(i) = genome[i];
 
-        double fvalue = (1-novelty_ratio)*(1-_pop[r]->getObjectives()[0])
+        double reward = std::accumulate(_pop[r]->getObjectives().begin(),
+                                        _pop[r]->getObjectives().begin()+_pop[r]->getObjectives().size()-1,0,
+                                        [](double a, double b){
+                                               return a + 1 - b;
+                                         });
+
+        double fvalue = (1-novelty_ratio)*reward
                 + novelty_ratio*(1-_pop[r]->getObjectives()[1]);
 
         _solutions.candidates().push_back(cma::Candidate(fvalue,x));
@@ -177,7 +183,6 @@ double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
             bf = 1 - ind->getObjectives()[0];
             best_sample = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
         }
-
     }
     return bf;
 }
