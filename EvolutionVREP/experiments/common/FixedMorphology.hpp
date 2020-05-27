@@ -1,15 +1,10 @@
 #ifndef FIXED_MORPHOLOGY_HPP
 #define FIXED_MORPHOLOGY_HPP
 
-#include "ARE/Morphology.h"
 #include <cmath>
-#if defined(VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
-#include "simLib.h"
-#endif
-
 #include <boost/algorithm/string.hpp>
+#include "ARE/Morphology.h"
+#include "misc/coppelia_communication.hpp"
 
 namespace are {
 
@@ -51,6 +46,8 @@ public:
      */
     std::vector<double> update() override;
 
+    void command(const std::vector<double>& ctrl_com);
+
     /**
      * @brief load the model of the robot. The path of the model is written in the parameter file as #robotPath
      */
@@ -65,30 +62,21 @@ public:
     }
 
 
-    /**
-     * @brief read the values of the proximity sensors corresponding to the distance to the nearest object detected
-     * @param sensor values (output)
-     */
-    void readProximitySensors(std::vector<double> &sensorValues);
-
-    /**
-     * @brief read the values of the passiv IR sensors corresponding to a binary value (0|1) indicating if an IR beacon is detected.
-     * @param sensor values (output)
-     */
-    void readPassivIRSensors(std::vector<double> &sensorValues);
 
 
     /**
-     * @brief set the position of the morphology.
+     * @brief set the position of the morphology with a random orientation
      */
     void setPosition(float,float,float);
-    std::vector<int> get_jointHandles(){return jointHandles;}
 
-protected:
-    void getObjectHandles() override;
+    //GETTERS
+    std::vector<int> get_jointHandles(){return jointHandles;}
+    std::vector<int> get_wheelHandles(){return wheelHandles;}
+
 
 private:
     std::vector<int> jointHandles;
+    std::vector<int> wheelHandles;
     std::vector<int> proxHandles;
     std::vector<int> IRHandles;
     int cameraHandle;

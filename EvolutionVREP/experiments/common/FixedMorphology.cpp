@@ -1,6 +1,7 @@
 #include "FixedMorphology.hpp"
 
 using namespace are;
+namespace cop = coppelia;
 
 NEAT::Substrate subtrates::are_puck([]() -> NEAT::Substrate {
                                         NEAT::Substrate sub;
@@ -49,7 +50,15 @@ NEAT::Substrate subtrates::epuck([]() -> NEAT::Substrate {
 
 void FixedMorphology::create()
 {
-    getObjectHandles();
+    cop::retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if(verbose){
+        std::cout << "Number of Proximity Sensors : " << proxHandles.size() << std::endl;
+        std::cout << "Number of Passive IR Sensors : " << IRHandles.size() << std::endl;
+        std::cout << "Number of Wheels : " << wheelHandles.size() << std::endl;
+        std::cout << "Number of Joints : " << jointHandles.size() << std::endl;
+    }
+
     std::cout << "Robot Created" << std::endl;
 }
 
@@ -94,123 +103,23 @@ void FixedMorphology::setPosition(float x, float y, float z)
     simSetObjectOrientation(mainHandle,mainHandle,orientation);
 }
 
-void FixedMorphology::getObjectHandles()
-{
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+void FixedMorphology::command(const std::vector<double> &ctrl_com){
+    double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
 
-    int nbrObj = 0;
-    int* handles = nullptr;
-    handles = simGetObjectsInTree(mainHandle,sim_object_proximitysensor_type,1,&nbrObj);
+    std::vector<double> wheel_com;
+    wheel_com.insert(wheel_com.begin(),ctrl_com.begin(),ctrl_com.begin() + wheelHandles.size());
+    cop::sentCommandToWheels(wheelHandles,wheel_com,maxVelocity);
 
-    if(verbose)
-        std::cout << "MORPHOLOGY INIT number of proximity sensor handles : " << nbrObj << std::endl;
-    std::string name;
-    std::vector<std::string> splitted_name;
-    for(int i = 0; i < nbrObj ; i++){
-        name = simGetObjectName(handles[i]);
-        boost::split(splitted_name,name,boost::is_any_of("_"));
-        if(splitted_name[0] == "Proximity")
-            proxHandles.push_back(handles[i]);
-        else if(splitted_name[0] == "passivIR")
-            IRHandles.push_back(handles[i]);
-    }
-
-
-
-
-    handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);
-    if(verbose)
-        std::cout << "MORPHOLOGY INIT number of joint handles : " << nbrObj << std::endl;
-    for(int i = 0; i < nbrObj ; i++)
-        jointHandles.push_back(handles[i]);
-
-    simReleaseBuffer((simChar*)handles);
+    std::vector<double> joint_com;
+    joint_com.insert(joint_com.begin(),ctrl_com.begin() + wheelHandles.size(), ctrl_com.end());
+    cop::sentCommandToJoints(jointHandles,joint_com);
 }
 
 std::vector<double> FixedMorphology::update(){
-
-
     std::vector<double> sensorValues;
 
-    readProximitySensors(sensorValues);
-    readPassivIRSensors(sensorValues);
+    cop::readProximitySensors(proxHandles,sensorValues);
+    cop::readPassivIRSensors(IRHandles,sensorValues);
 
     return sensorValues;
-}
-
-void FixedMorphology::readProximitySensors(std::vector<double> &sensorValues){
-
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
-    std::function<double(float, float, float)> norm_L2 =
-            [](float x, float y, float z) -> double
-    {return std::sqrt(x*x + y*y + z*z);};
-
-    float pos[4], norm[3];
-    int obj_h;
-    int det;
-    for (size_t i = 0; i < proxHandles.size(); i++)
-    {
-        det = simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
-        if(det > 0)
-            sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        else if(det == 0) sensorValues.push_back(0);
-        else
-        {
-            sensorValues.push_back(0);
-            if(verbose)
-                std::cerr << "No detection on Proximity Sensor" << std::endl;
-        }
-
-    }
-}
-
-void FixedMorphology::readPassivIRSensors(std::vector<double> &sensorValues){
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
-
-    std::function<float(float, float, float)> norm_L2 =
-            [](float x, float y, float z) -> float
-    {return std::sqrt(x*x + y*y + z*z);};
-
-    int occlusion_detector;
-
-    float pos[4], norm[3];
-    int obj_h;
-    int det,occl;
-    std::string name;
-    std::vector<std::string> splitted_name;
-    bool occlusion = false;
-    for (int handle : IRHandles) {
-        occlusion_detector = simGetObjectChild(handle,0);
-
-        det = simReadProximitySensor(handle,pos,&obj_h,norm);
-        float dist = norm_L2(pos[0],pos[1],pos[2]);
-        if(det > 0){
-
-            name = simGetObjectName(obj_h);
-            float ref_euler[3];
-            if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
-            float euler[3] = {std::atan2(pos[2],pos[1]) - M_PI/2.f,
-                              std::asin(pos[0]/dist),
-                              0};
-            simSetObjectOrientation(occlusion_detector,handle,euler);
-            occl = simReadProximitySensor(occlusion_detector,pos,&obj_h,norm);
-            if(occl > 0){
-                occlusion = norm_L2(pos[0],pos[1],pos[2]) < dist;
-            }else occlusion = false;
-
-            boost::split(splitted_name,name,boost::is_any_of("_"));
-            if(splitted_name[0] == "IRBeacon" && !occlusion)
-                sensorValues.push_back(1);
-            else sensorValues.push_back(0);
-        }
-
-        if(det <= 0){
-            sensorValues.push_back(0);
-            if(verbose)
-                std::cerr << "No detetion on Passiv IR sensor" << std::endl;
-        }
-
-    }
 }
