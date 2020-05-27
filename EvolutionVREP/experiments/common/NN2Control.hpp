@@ -23,7 +23,6 @@ public:
     }
 
     std::vector<double> update(const std::vector<double> &sensorValues){
-        double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
         bool useInternalBias = settings::getParameter<settings::Boolean>(parameters,"#UseInternalBias").value;
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
         boost::mt19937 rng(randomNum->getSeed());
@@ -45,9 +44,6 @@ public:
                 o = normal(rng);
             }
         }
-
-        for(double &o : output)
-            o = o*maxVelocity;
 
         return output;
     }

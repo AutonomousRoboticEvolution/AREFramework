@@ -56,14 +56,9 @@ void NN2Individual::update(double delta_time){
     std::vector<double> inputs = morphology->update();
 
     std::vector<double> outputs = control->update(inputs);
-    std::vector<int> jointHandles;
-    jointHandles = std::dynamic_pointer_cast<FixedMorphology>(morphology)->get_jointHandles();
 
-    assert(jointHandles.size() == outputs.size());
+    std::dynamic_pointer_cast<FixedMorphology>(morphology)->command(outputs);
 
-    for (size_t i = 0; i < outputs.size(); i++){
-        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
-    }
 }
 
 std::string NN2Individual::to_string()
