@@ -53,9 +53,7 @@ public:
     virtual void crossover(const Individual::Ptr& partner, Individual &child1, Individual &child2);
 
 
-    virtual Individual::Ptr crossover(const Individual::Ptr&){
-        return clone();
-    }
+    virtual void crossover(const Individual::Ptr& partner, Individual &child1, Individual &child2);
 
     void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
 

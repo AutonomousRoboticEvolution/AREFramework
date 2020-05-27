@@ -20,6 +20,11 @@ void Individual::crossover(const Individual::Ptr &partner, Individual &child1, I
     child2 = *this;
 }
 
+void Individual::crossover(const Individual::Ptr &partner, Individual &child1, Individual &child2){
+    child1 = *partner;
+    child2 = *this;
+}
+
 std::string Individual::to_string()
 {
     std::stringstream sstream;
