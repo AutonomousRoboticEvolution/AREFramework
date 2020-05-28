@@ -355,7 +355,6 @@ void NIPES::init_next_pop(){
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }
-    cmaStrategy->inc_iter();
 
 }
 
