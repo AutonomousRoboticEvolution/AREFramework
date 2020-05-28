@@ -54,9 +54,6 @@ public:
 class NSLC : public NSGA2<NSLCIndividual>
 {
 public:
-    typedef std::shared_ptr<NSLC> Ptr;
-    typedef std::shared_ptr<const NSLC> ConstPtr;
-
     NSLC() : NSGA2<NSLCIndividual>(){}
     NSLC(const settings::ParametersMapPtr& param) : NSGA2<NSLCIndividual>(param){}
 

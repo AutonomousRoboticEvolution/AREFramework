@@ -116,7 +116,6 @@ bool NSLC::update(const Environment::Ptr & env){
     std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
                 std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
 
-
     return true;
 }
 
