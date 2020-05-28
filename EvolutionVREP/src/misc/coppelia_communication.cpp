@@ -1,6 +1,5 @@
 #include "misc/coppelia_communication.hpp"
 
-namespace are_set = are::settings;
 
 void coppelia::readProximitySensors(const std::vector<int> handles, std::vector<double> &sensorValues){
 
