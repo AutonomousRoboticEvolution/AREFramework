@@ -81,8 +81,6 @@ void BOIndividual::createController()
     else {
         std::cerr << "unknown type of neural network" << std::endl;
     }
-
-
  }
 
 void BOIndividual::compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl){

@@ -6,6 +6,7 @@
 #include "ARE/EA.h"
 #include "NNGenome.hpp"
 #include "BOIndividual.h"
+#include "NN2Individual.hpp"
 #include "testEnv.h"
 #include "mazeEnv.h"
 
@@ -29,7 +30,6 @@ struct obs_fcts{
      */
     static obs_fct_t pos_traj;
 };
-
 
 
 class MFBO : public EA

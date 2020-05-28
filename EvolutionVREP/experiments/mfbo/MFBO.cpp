@@ -8,6 +8,7 @@ obs_fct_t obs_fcts::final_position = [](const Environment::Ptr env) -> Eigen::Ve
     Eigen::VectorXd obs(3);
     std::vector<double> final_pos = std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position();
     obs << final_pos[0], final_pos[1], final_pos[2];
+    return obs;
 };
 
 obs_fct_t obs_fcts::trajectory = [](const Environment::Ptr env) -> Eigen::VectorXd{
