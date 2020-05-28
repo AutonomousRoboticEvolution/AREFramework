@@ -11,11 +11,7 @@ set(INCLUDE
 add_library(neuroEvolution SHARED
     basicEA.cpp
     factories.cpp)
-target_include_directories(neuroEvolution PUBLIC
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
-    "../common/"
-    )
+target_include_directories(neuroEvolution PUBLIC ${INCLUDE})
 target_link_libraries(neuroEvolution ER_library)
 
 add_executable(neuroEvolution_test neuroEvolution_test.cpp)
