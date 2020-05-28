@@ -77,10 +77,13 @@ public:
             indPtr ind21 = tournament(parents[a2[i]],parents[a2[i+1]]);
             indPtr ind22 = tournament(parents[a2[i+2]],parents[a2[i+3]]);
             //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
-            childrens[i] = std::dynamic_pointer_cast<individual_t>(ind11->crossover(ind12));
-            childrens[i+1] = std::dynamic_pointer_cast<individual_t>(ind12->crossover(ind11));
-            childrens[i+2] = std::dynamic_pointer_cast<individual_t>(ind21->crossover(ind22));
-            childrens[i+3] = std::dynamic_pointer_cast<individual_t>(ind22->crossover(ind21));
+            individual_t child1 ,child2, child3, child4;
+            std::dynamic_pointer_cast<individual_t>(ind11)->crossover(ind12,child1,child2);
+            std::dynamic_pointer_cast<individual_t>(ind21)->crossover(ind22,child3,child4);
+            childrens[i] = std::make_shared<individual_t>(child1);
+            childrens[i+1] = std::make_shared<individual_t>(child2);
+            childrens[i+2] = std::make_shared<individual_t>(child3);
+            childrens[i=3] = std::make_shared<individual_t>(child4);
         }
 
         population.clear();
@@ -137,6 +140,20 @@ public:
     }
 
     //    bool update(const Environment::Ptr&);
+
+    /**
+     * @brief set objective boundaries in the following format : { { obj_1 max, obj_1 min}, {obj_2 max, obj_2 min} ... }
+     * The number of objective is set on the size of the vector.
+     * @param bounds
+     */
+    void set_obj_bounds(std::vector<std::vector<double>> bounds){
+        nb_obj = bounds.size();
+        for(std::vector<double>& b : bounds){
+            max_obj.push_back(b[0]);
+            min_obj.push_back(b[1]);
+        }
+    }
+
 protected:
     NEAT::RNG rng;
     int nb_obj; //number of objectives;
