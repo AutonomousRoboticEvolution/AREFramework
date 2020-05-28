@@ -47,6 +47,8 @@ public:
 	/// This method updates the control of the morphology
     virtual std::vector<double> update() = 0;
 
+    virtual void command(const std::vector<double>& sensorValues){}
+
 
 
 
@@ -61,14 +63,6 @@ public:
     int get_client_id(){return client_id;}
 
 protected:
-
-
-    /**
-     * @brief Use this method to get the handles of the robot's components
-     * @param parentHandle
-     */
-    virtual void getObjectHandles() = 0;
-
     int mainHandle;
 
     int client_id;

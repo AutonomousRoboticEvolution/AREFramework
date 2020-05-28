@@ -2,9 +2,9 @@
 #define CPPNINDIVIDUAL_H
 
 #include "ARE/Individual.h"
+#include "ARE/FixedMorphology.hpp"
 #include "CPPNGenome.h"
 #include "NNControl.h"
-#include "EPuckMorphology.h"
 #include "v_repLib.h"
 
 namespace are {
@@ -26,7 +26,6 @@ public :
     {
         arch & objectives;
         arch & ctrlGenome;
-//        arch & morphGenome;
         arch & final_position;
     }
 

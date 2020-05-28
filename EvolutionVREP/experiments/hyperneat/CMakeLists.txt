@@ -6,7 +6,6 @@ add_library(hyperneat SHARED
     CPPNIndividual.cpp
     ../common/CPPNGenome.cpp
     ../common/NNControl.cpp
-    ../common/EPuckMorphology.cpp
     ../common/testEnv.cpp
     ../common/mazeEnv.cpp
     factories.cpp
@@ -17,4 +16,4 @@ target_include_directories(hyperneat PUBLIC
     "../common/"
     )
 target_link_libraries(hyperneat ER_library)
-install(TARGETS hyperneat DESTINATION lib)
+install(DIRECTORY . DESTINATION include/hyperneat FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

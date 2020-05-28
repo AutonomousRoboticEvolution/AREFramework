@@ -5,7 +5,6 @@
 #include "ARE/EA.h"
 #include "CPPNGenome.h"
 #include "CPPNIndividual.h"
-#include "EPuckMorphology.h"
 #include "mazeEnv.h"
 #include "testEnv.h"
 

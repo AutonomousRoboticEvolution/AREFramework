@@ -3,8 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 
 add_library(neuroEvolution SHARED
     ../common/NNControl.cpp
-    ../common/EPuckMorphology.cpp
-    ../common/AREPuckMorphology.cpp
     ../common/mazeEnv.cpp
     ../common/Loggings.cpp
     ../common/NNGenome.cpp
@@ -17,4 +15,4 @@ target_include_directories(neuroEvolution PUBLIC
     "../common/"
     )
 target_link_libraries(neuroEvolution ER_library)
-install(TARGETS neuroEvolution DESTINATION lib)
+install(DIRECTORY . DESTINATION include/neuroEvolution FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

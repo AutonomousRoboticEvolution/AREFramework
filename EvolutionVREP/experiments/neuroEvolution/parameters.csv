@@ -9,7 +9,6 @@
 #populationSize,int,20
 #maxEvalTime,float,60
 #numberOfGeneration,int,10
-#variationRatio,float,0.2
 #repository,string,/home/leni/are-logs
 #fitnessFile,string,fitnesses_hn.csv
 #evalTimeFile,string,eval_durations.csv
