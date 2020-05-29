@@ -2,7 +2,24 @@
 
 using namespace are;
 
-
+settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<settings::ParametersMap>(
+            []() -> settings::ParametersMap{
+                settings::ParametersMap parameters;
+                parameters.emplace("#experimentName",new settings::String("neuroEvolution"));
+                parameters.emplace("#expPluginName",new settings::String("/usr/local/lib/libneuroEvolution.so"));
+                parameters.emplace("#scenePath",new settings::String("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt"));
+                parameters.emplace("#robotPath",new settings::String("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck.ttm"));
+                parameters.emplace("#repository",new settings::String("~/are_logs"));
+                parameters.emplace("#populationSize",new settings::Integer(50));
+                parameters.emplace("#maxEvalTime",new settings::Float(60));
+                parameters.emplace("#numberOfGeneration",new settings::Float(1000));
+                parameters.emplace("#maxEvalTime",new settings::Float(60));
+                parameters.emplace("#timeStep",new settings::Float(0.05));
+                parameters.emplace("#verbose",new settings::Boolean(0));
+                parameters.emplace("#instanceType",new settings::Integer(0));
+                parameters.emplace("#seed",new settings::Integer(-1));
+                return parameters;
+            }());
 
 settings::ParametersMap settings::loadParameters(const std::string& file)
 {
