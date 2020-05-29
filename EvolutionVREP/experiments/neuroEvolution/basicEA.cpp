@@ -3,14 +3,36 @@
 using namespace are;
 
 void BasicEA::init(){
+
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    double max_weight = settings::getParameter<settings::Double>(parameters,"#maxWeight").value;
+
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+
+    int nbr_weights, nbr_bias;
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+
+
     rng.Seed(randomNum->getSeed());
 
     for(int i = 0; i < pop_size; i++){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNGenome::Ptr ctrl_gen(new NNGenome(randomNum,parameters));
-        ctrl_gen->init(rng);
-        Individual::Ptr ind(new NNIndividual(morph_gen,ctrl_gen));
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters));
+        ctrl_gen->set_weights(randomNum->randVectd(-max_weight,max_weight,nbr_weights));
+        ctrl_gen->set_biases(randomNum->randVectd(-max_weight,max_weight,nbr_bias));
+        Individual::Ptr ind(new NN2Individual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -83,7 +105,7 @@ void BasicEA::crossover()
 void BasicEA::mutation()
 {
     for(Individual::Ptr &ind : population)
-        std::dynamic_pointer_cast<NNGenome>(ind->get_ctrl_genome())->mutate(rng);
+        ind->mutate();
 }
 
 void BasicEA::setObjectives(size_t indIdx, const std::vector<double> &objectives){
@@ -97,7 +119,7 @@ bool BasicEA::update(const Environment::Ptr & env){
 
     Individual::Ptr ind = population[currentIndIndex];
 
-    std::dynamic_pointer_cast<NNIndividual>(ind)->set_final_position(
+    std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
 
 
