@@ -61,6 +61,8 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
+    void set_randomNum(){}
+    void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
 
 protected:
     int mainHandle;
