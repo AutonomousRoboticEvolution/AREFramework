@@ -7,15 +7,28 @@
 
 namespace are {
 
+struct waypoint{
+    float position[3];
+    float orientation[3];
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & position;
+        arch & orientation;
+    }
+
+};
+
 class MazeEnv : public Environment
 {
 public:
-    MazeEnv() : Environment(), randNum(0)
-    {
-        target_position.resize(3);
-        final_position.resize(3);
-        name = "mazeEnv";
-    }
+
+    typedef std::shared_ptr<MazeEnv> Ptr;
+    typedef std::shared_ptr<const MazeEnv> ConstPtr;
+
+    MazeEnv();
+
     ~MazeEnv(){}
     void init() override;
 
@@ -25,15 +38,15 @@ public:
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 
-    void init_randNum(int seed){randNum.setSeed(seed);}
-
     const std::vector<double> &get_final_position(){return final_position;}
     const std::vector<double> &get_target_position(){return target_position;}
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
 private:
     std::vector<double> target_position;
     std::vector<double> final_position;
-    misc::RandNum randNum;
+    std::vector<waypoint> trajectory;
+    int move_counter = 0;
 };
 
 } //are
