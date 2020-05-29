@@ -16,6 +16,12 @@ RandNum::~RandNum()
 {
 }
 
+double RandNum::randDouble(double lower, double upper) {
+    boost::random::uniform_real_distribution<> dist(lower,upper);
+    return dist(gen);
+}
+
+
 float RandNum::randFloat(float lower, float upper) {
     boost::random::uniform_real_distribution<> dist(lower,upper);
     return dist(gen);
@@ -25,6 +31,19 @@ int RandNum::randInt(int lower, int upper) {
     boost::random::uniform_int_distribution<> dist(lower,upper);
     return dist(gen);
 }
+
+std::vector<double> RandNum::randVectd(double lower, double upper, int size){
+    std::vector<double> res;
+    for(int i = 0; i < size; i++)
+        res.push_back(randDouble(lower,upper));
+    return res;
+}
+
+double RandNum::normalDist(double mu, double sigma){
+    boost::random::normal_distribution<> nd(mu,sigma);
+    return nd(gen);
+}
+
 
 void RandNum::setSeed(int seed) {
     gen.seed(seed);
