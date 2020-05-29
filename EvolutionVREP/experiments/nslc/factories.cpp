@@ -1,4 +1,4 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "NSLC.hpp"
 #include "Loggings.h"
 #include "NSLCLoggings.hpp"
@@ -47,7 +47,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(arclog);
 
 
-    are::NNGenomeLog::Ptr nnglog(new are::NNGenomeLog);
+    are::NNParamGenomeLog::Ptr nnglog(new are::NNParamGenomeLog);
     logs.push_back(nnglog);
 }
 

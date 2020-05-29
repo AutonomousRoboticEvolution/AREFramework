@@ -3,22 +3,24 @@
 
 #include "NSGA2.hpp"
 #include "Novelty.hpp"
-#include "NNIndividual.hpp"
-#include "mazeEnv.h"
+#include "ARE/nn2/NN2Individual.hpp"
+#include "ARE/nn2/NN2Settings.hpp"
+#include "ARE/NNParamGenome.hpp"
+#include "ARE/mazeEnv.h"
 
 namespace are {
 
-class NSLCIndividual : public NSGAIndividual, public NNIndividual
+class NSLCIndividual : public NSGAIndividual, public NN2Individual
 {
 public:
     typedef std::shared_ptr<NSLCIndividual> Ptr;
     typedef std::shared_ptr<const NSLCIndividual> ConstPtr;
 
-    NSLCIndividual() : NNIndividual(), NSGAIndividual(){}
-    NSLCIndividual(const EmptyGenome::Ptr& morph_gen,const NNGenome::Ptr& ctrl_gen) :
-        NNIndividual(morph_gen, ctrl_gen){}
+    NSLCIndividual() : NN2Individual(), NSGAIndividual(){}
+    NSLCIndividual(const EmptyGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
+        NN2Individual(morph_gen, ctrl_gen){}
     NSLCIndividual(const NSLCIndividual& ind) :
-        NNIndividual(ind),
+        NN2Individual(ind),
         NSGAIndividual(ind){}
 
 
@@ -26,8 +28,9 @@ public:
         return std::make_shared<NSLCIndividual>(*this);
     }
 
-    Individual::Ptr crossover(const Individual::Ptr &){
-        return clone();
+    void crossover(const Individual::Ptr& partner, Individual &child1, Individual &child2){
+        child1 = *partner;
+        child2 = *this;
     }
 
     //specific to the current ARE arenas
@@ -66,7 +69,7 @@ public:
 
     void mutation(){
         for(Individual::Ptr &ind : population)
-            std::dynamic_pointer_cast<NNGenome>(ind->get_ctrl_genome())->mutate(rng);
+            ind->mutate();
     }
 
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
