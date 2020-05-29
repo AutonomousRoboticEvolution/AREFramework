@@ -1,3 +1,6 @@
 add_subdirectory(hyperneat)
+if(WITH_NN2)
 add_subdirectory(neuroEvolution)
 add_subdirectory(nslc)
+endif()
+install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
