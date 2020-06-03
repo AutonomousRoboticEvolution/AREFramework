@@ -2,8 +2,7 @@
 #expPluginName,string,/usr/local/lib/libneuroEvolution.so
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-tricycle.ttm
-#robot,string,AREPuck
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/custom_epuck.ttm
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,20
 #maxEvalTime,float,60
@@ -26,7 +25,7 @@
 #init_z,float,0.05
 #maxWeight,double,1.0
 #NNType,int,0
-#NbrInputNeurones,int,2
+#NbrInputNeurones,int,8
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,2
 #tournamentSize,int,2

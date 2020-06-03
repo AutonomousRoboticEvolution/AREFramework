@@ -15,4 +15,5 @@ target_include_directories(hyperneat PUBLIC
     "../common/"
     )
 target_link_libraries(hyperneat ER_library)
+install(TARGETS  hyperneat DESTINATION lib)
 install(DIRECTORY . DESTINATION include/hyperneat FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

@@ -23,6 +23,7 @@ void CPPNIndividual::update(double delta_time)
 void CPPNIndividual::createMorphology()
 {
     morphology.reset(new FixedMorphology(parameters));
+    morphology->set_randNum(randNum);
     std::dynamic_pointer_cast<FixedMorphology>(morphology)->loadModel();
     std::dynamic_pointer_cast<FixedMorphology>(morphology)->setSubstrate(subtrates::are_puck);
 
