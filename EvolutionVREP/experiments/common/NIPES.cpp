@@ -125,11 +125,9 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         for(int i = 0; i < genome.size(); i++)
             x(i) = genome[i];
 
-        double reward = std::accumulate(_pop[r]->getObjectives().begin(),
-                                        _pop[r]->getObjectives().begin()+_pop[r]->getObjectives().size()-1,0,
-                                        [](double a, double b){
-                                               return a + 1 - b;
-                                         });
+        double reward = 0;
+        for(int i = 0; i < _pop[r]->getObjectives().size(); i++)
+            reward += 1 - _pop[r]->getObjectives()[i];
 
         double fvalue = (1-novelty_ratio)*reward
                 + novelty_ratio*(1-_pop[r]->getObjectives()[1]);
