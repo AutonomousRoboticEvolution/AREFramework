@@ -3,7 +3,6 @@ project(ER)
 
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
 
-
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 if (NOT VREP_FOLDER)
@@ -117,6 +116,4 @@ elseif(UNIX)
 endif()
 
 add_subdirectory(ERClient)
-add_subdirectory(VREP_Files)
-
 add_subdirectory(experiments)
