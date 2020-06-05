@@ -52,7 +52,7 @@ float INA219_current_sensor::read_current(){
 
 float INA219_current_sensor::read_voltage(){
     uint16_t raw_value = read16From(REGISTER_BUSVOLTAGE);
-    raw_value = (raw_value & 0xFF00) >> 8 | (raw_value & 0x00FF) << 8; // switch over the two bits
+    raw_value = (raw_value & 0xFF00) >> 8 | (raw_value & 0x00FF) << 8; // switch over the two bytes
 
 //    std::cout<<"raw:\t";display_binary(raw_value);
     if ((raw_value & 0x0001) == 1){ // last bit is the math overflow warning
@@ -66,9 +66,7 @@ float INA219_current_sensor::read_voltage(){
 //    std::cout << "raw value:" << std::bitset<16>(raw_value)  << std::endl;
 //    int16_t voltage_value = reverse_bits((raw_value&0xFFF8)>>3)>>3; // thirteen first bits, but in reverse order
     bool is_negative = (raw_value >> 15) & 0x01; // 1st bit is the sign value
-    uint16_t voltage_value = (raw_value&0x7FE0)>>3;
-//    std::cout<<"vtg:\t";
-//    display_binary(voltage_value);
+    uint16_t voltage_value = (raw_value&0x7FE0)>>3; // the first 13 bits correspond to the actual value
 
     int16_t signed_voltage_value;
     if (is_negative) {//is negative
@@ -85,11 +83,12 @@ float INA219_current_sensor::read_voltage(){
 
 
 //    std::cout << std::bitset<16>(signed_voltage_value)  << std::endl;
-    return float(signed_voltage_value)/8000.0*32 ; // the first 13 bits correspond to the actual value
+    return float(signed_voltage_value)/8000.0*32 ;
     // magic numbers here! max value (32V) is represented by a value of 8000 (0x1F40), see section 8.6.3.2 http://www.ti.com/lit/ds/symlink/ina219.pdf?&ts=1589900192086
 }
 
 void INA219_current_sensor::setCalibration_32V_2A() {
-    uint16_t ina219_calValue = 4096; // copied from https://github.com/adafruit/Adafruit_INA219/blob/master/Adafruit_INA219.cpp
-    write16To(REGISTER_CALIBRATION,ina219_calValue);
+    uint16_t cal_value = 4096; // copied from https://github.com/adafruit/Adafruit_INA219/blob/master/Adafruit_INA219.cpp
+    cal_value = (cal_value & 0xFF00) >> 8 | (cal_value & 0x00FF) << 8; // switch over the two bytes, because INA219 expects them in the other order from C++
+    write16To(REGISTER_CALIBRATION,cal_value);
 }
