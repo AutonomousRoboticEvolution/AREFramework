@@ -92,22 +92,3 @@ void RawMatrixLog::saveLog(EA::Ptr &ea)
         rawMatrixFile.close();
     }
 }
-
-void ProtoPhenotypeLog::saveLog(EA::Ptr &ea)
-{
-    int generation = ea->get_generation();
-    for(size_t i = 0; i < ea->get_population().size(); i++){
-        std::ofstream protoPhenotypeFile;
-        std::string filepath;
-        filepath = Logging::log_folder + "/protophenotype" + std::to_string(generation * ea->get_population().size() + i) + ".csv";
-        protoPhenotypeFile.open(filepath);
-        std::vector<std::vector<float>> protoPhenotype = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getProtoPhenotype();
-        for(int j = 0; j < protoPhenotype.size(); j++){
-            for(int k = 0; k < protoPhenotype[j].size(); k++){
-                protoPhenotypeFile << protoPhenotype[j][k] << ",";
-            }
-            protoPhenotypeFile << std::endl;
-        }
-        protoPhenotypeFile.close();
-    }
-}

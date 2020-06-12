@@ -9,7 +9,7 @@
 #numberOfGeneration,int,1200
 #repository,string,/home/ebb505/ARE_Project/are-logs/
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
@@ -27,3 +27,7 @@
 #noveltyRatio,double,1
 #seed,int,1
 #linearCombAlpha,double,1
+#isWheel,bool,1
+#isSensor,bool,1
+#isJoint,bool,1
+#isCaster,bool,1

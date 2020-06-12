@@ -32,7 +32,6 @@ void CPPNIndividual::createMorphology()
     setMorphDesc();
     setManRes();
     setRawMat();
-    setProtoPhenotype();
     setManScore();
 }
 
@@ -59,11 +58,6 @@ void CPPNIndividual::setManRes()
 void CPPNIndividual::setRawMat()
 {
     rawMat = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRawMatrix();
-}
-
-void CPPNIndividual::setProtoPhenotype()
-{
-    protoPhenotype = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getProtoPhenotype();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){

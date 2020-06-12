@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated>
+      <config projectName="ER" targetName="hyperneat" />
+      <config projectName="ER" targetName="neuroEvolution" />
+      <config projectName="ER" targetName="v_repExtER" />
+      <config projectName="ER" targetName="ERClient" />
+      <config projectName="ER" targetName="ER_library" />
+      <config projectName="ER" targetName="lc_nsms" />
+      <config projectName="ER" targetName="NSLC" />
+    </generated>
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" GENERATION_OPTIONS="-DVREP_FOLDER=/home/ebb505/ARE_Project/vrep -DCMAKE_INSTALL_PREFIX=/home/ebb505/ARE_Project/vrep" />
+    </configurations>
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="05e115ff-7d6f-44ed-b76c-5c33e053e5d7" name="Default Changelist" comment="" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="CMakeBuildProfile:Debug" />
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="1cqeoLpPGDaBMnZ8IaRGsiHgGhG" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/CMakeLists.txt" />
+    <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
+    <property name="nodejs_npm_path_reset_for_default_project" value="true" />
+    <property name="settings.editor.selected.configurable" value="CMakeSettings" />
+  </component>
+  <component name="RunManager" selected="CMake Application.ERClient">
+    <configuration name="ERClient" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="-g/home/ebb505/ARE_Project/evolutionary_robotics_framework/EvolutionVREP/experiments/lc_nsms/parameters.csv" REDIRECT_INPUT="false" WORKING_DIR="file://$PROJECT_DIR$/../../vrep" PASS_PARENT_ENVS_2="true" CONFIG_NAME="Debug" RUN_PATH="$PROJECT_DIR$/../../vrep/vrep" EXPLICIT_BUILD_TARGET_NAME="all">
+      <envs>
+        <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../../vrep:$PROJECT_DIR$/../../vrep/lib" />
+      </envs>
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+        <option name="CMake.Install" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ER_library" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="ER_library" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="NSLC" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="NSLC" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="hyperneat" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="hyperneat" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="lc_nsms" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="lc_nsms" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="neuroEvolution" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="neuroEvolution" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="v_repExtER" type="CMakeRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true" PROJECT_NAME="ER" TARGET_NAME="v_repExtER" CONFIG_NAME="Debug">
+      <method v="2">
+        <option name="com.jetbrains.cidr.execution.CidrBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="CMake Application.ER_library" />
+      <item itemvalue="CMake Application.v_repExtER" />
+      <item itemvalue="CMake Application.ERClient" />
+      <item itemvalue="CMake Application.hyperneat" />
+      <item itemvalue="CMake Application.lc_nsms" />
+      <item itemvalue="CMake Application.neuroEvolution" />
+      <item itemvalue="CMake Application.NSLC" />
+    </list>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="05e115ff-7d6f-44ed-b76c-5c33e053e5d7" name="Default Changelist" comment="" />
+      <created>1591260724553</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1591260724553</updated>
+      <workItem from="1591260725815" duration="8689000" />
+      <workItem from="1591350665064" duration="17207000" />
+      <workItem from="1591691133669" duration="1221000" />
+      <workItem from="1591958255932" duration="2078000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="2" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="2338" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1591959459458">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2338" y="197" key="#com.intellij.execution.impl.EditConfigurationsDialog/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959459458" />
+    <state width="465" height="506" key="DebuggerActiveHint" timestamp="1591366368275">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="465" height="506" key="DebuggerActiveHint/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591366368275" />
+    <state x="2663" y="297" width="424" height="484" key="FileChooserDialogImpl" timestamp="1591959038532">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2663" y="297" width="424" height="484" key="FileChooserDialogImpl/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959038532" />
+    <state width="1874" height="181" key="GridCell.Tab.0.bottom" timestamp="1591959464721">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="181" key="GridCell.Tab.0.bottom/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959464721" />
+    <state width="881" height="176" key="GridCell.Tab.0.bottom/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="1874" height="181" key="GridCell.Tab.0.center" timestamp="1591959464721">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="181" key="GridCell.Tab.0.center/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959464721" />
+    <state width="881" height="176" key="GridCell.Tab.0.center/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="1874" height="181" key="GridCell.Tab.0.left" timestamp="1591959464720">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="181" key="GridCell.Tab.0.left/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959464720" />
+    <state width="881" height="176" key="GridCell.Tab.0.left/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="1874" height="181" key="GridCell.Tab.0.right" timestamp="1591959464721">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state width="1874" height="181" key="GridCell.Tab.0.right/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591959464721" />
+    <state width="881" height="176" key="GridCell.Tab.0.right/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="881" height="176" key="GridCell.Tab.1.bottom" timestamp="1591717211961">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1874" height="176" key="GridCell.Tab.1.bottom/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591632729262" />
+    <state width="881" height="176" key="GridCell.Tab.1.bottom/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="881" height="176" key="GridCell.Tab.1.center" timestamp="1591717211961">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1874" height="176" key="GridCell.Tab.1.center/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591632729262" />
+    <state width="881" height="176" key="GridCell.Tab.1.center/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="881" height="176" key="GridCell.Tab.1.left" timestamp="1591717211961">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1874" height="176" key="GridCell.Tab.1.left/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591632729262" />
+    <state width="881" height="176" key="GridCell.Tab.1.left/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state width="881" height="176" key="GridCell.Tab.1.right" timestamp="1591717211961">
+      <screen x="67" y="27" width="1853" height="1053" />
+    </state>
+    <state width="1874" height="176" key="GridCell.Tab.1.right/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591632729262" />
+    <state width="881" height="176" key="GridCell.Tab.1.right/67.27.1853.1053/1920.0.1920.1080@67.27.1853.1053" timestamp="1591717211961" />
+    <state x="2369" y="174" width="1173" height="730" key="SettingsEditor" timestamp="1591261165451">
+      <screen x="1920" y="0" width="1920" height="1080" />
+    </state>
+    <state x="2369" y="174" width="1173" height="730" key="SettingsEditor/67.27.1853.1053/1920.0.1920.1080@1920.0.1920.1080" timestamp="1591261165451" />
+  </component>
+</project>

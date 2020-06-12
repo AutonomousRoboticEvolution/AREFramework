@@ -1,7 +1,7 @@
 #ifndef MORPHOLOGY_CPPNMATRIX_H
 #define MORPHOLOGY_CPPNMATRIX_H
 
-#include "Morphology.h"
+#include "ARE/Morphology.h"
 
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
@@ -61,6 +61,7 @@ public:
         int wheelNumber;
         int sensorNumber;
         int casterNumber;
+        int jointNumber;
         // Constructor
         MorphDesc(){
             robotWidth = 0;
@@ -70,6 +71,7 @@ public:
             wheelNumber = 0;
             sensorNumber = 0;
             casterNumber = 0;
+            jointNumber = 0;
         }
     };
     MorphDesc morphDesc;
@@ -94,6 +96,24 @@ public:
         }
     };
     RobotManRes robotManRes;
+
+    class GraphDesc{
+    public:
+        std::vector<std::vector<std::vector<int>>> graphMatrix;
+        // Constructor
+        GraphDesc(){
+            graphMatrix.resize(13); /// \todo EB: these constants should be defined elsewhere!
+            for(int i = 0; i < 13; i++){
+                graphMatrix[i].resize(13);
+                for(int j = 0; j < 13; j++){
+                    graphMatrix[i][j].resize(13);
+                    for(int k = 0; k < 13; k++){
+                        graphMatrix[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+    };
 
     Morphology::Ptr clone() const override
         {return std::make_shared<Morphology_CPPNMatrix>(*this);}
@@ -289,9 +309,10 @@ public:
     NEAT::NeuralNetwork getGenome(){return nn;};
     void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
     std::vector<std::vector<float>> getRawMatrix(){return rawMatrix;};
-    std::vector<std::vector<float>> getProtoPhenotype(){return protoPhenotype;};
     double getManScore(){return manScore;};
     void setManScore(double ms){ manScore = ms;};
+
+    std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphDesc.graphMatrix;};
 
 protected:
     void getObjectHandles() override;
@@ -306,7 +327,7 @@ private:
     // WAS 4 -> 3.6mm
     // 6 -> 5.4mm
     // 11 -> 9.9mm (EB: with this value there is no stack overflow!)
-    const int VOXEL_MULTIPLIER = 11;
+    const int VOXEL_MULTIPLIER = 22;
     const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
     const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
     const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
@@ -319,13 +340,13 @@ private:
     const int FILLEDVOXEL = 255;
 
     // Skeleton dimmesions in voxels
-    const int xHeadUpperLimit = 4;
-    const int xHeadLowerLimit = -4;
-    const int yHeadUpperLimit = 4;
-    const int yHeadLowerLimit = -4;
+    const int xHeadUpperLimit = 2;
+    const int xHeadLowerLimit = -2;
+    const int yHeadUpperLimit = 2;
+    const int yHeadLowerLimit = -2;
     // Parameters for skeleton base
-    const int skeletonBaseThickness = 2;
-    const int skeletonBaseHeight = 3;
+    const int skeletonBaseThickness = 1;
+    const int skeletonBaseHeight = 2;
 
     unsigned int id;
     // Variables used to contain handles.
@@ -341,7 +362,6 @@ private:
     std::vector<std::vector<std::vector<int>>> casterRegionCoord;
 
     std::vector<std::vector<float>> rawMatrix;
-    std::vector<std::vector<float>> protoPhenotype;
 
     double manScore;
 
@@ -349,6 +369,7 @@ private:
     std::vector<int> jointHandles;
     std::vector<int> proxHandles;
 
+    GraphDesc graphDesc;
 };
 
 }

@@ -39,10 +39,14 @@ void Morphology_CPPNMatrix::create()
     bool indVerResult;
     indVerResult = getIndicesVertices(decodedMesh,vertices,indices);
 
-    organRegionCounter(areMatrix, VoxelType::WHEEL);
-    organRegionCounter(areMatrix, VoxelType::SENSOR);
-    //organRegionCounter(areMatrix, VoxelType::JOINT);
-    organRegionCounter(areMatrix, VoxelType::CASTER);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value)
+        organRegionCounter(areMatrix, VoxelType::WHEEL);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value)
+        organRegionCounter(areMatrix, VoxelType::SENSOR);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value)
+        organRegionCounter(areMatrix, VoxelType::JOINT);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value)
+        organRegionCounter(areMatrix, VoxelType::CASTER);
     /// \todo EB: Skeleton could be integrated to organRegionCounter
     findSkeletonSurface(skeletonMatrix);
     generateOrgans(nn);
@@ -85,9 +89,9 @@ void Morphology_CPPNMatrix::create()
             // This will speed-up evolution. However...
             // For the morphognesis stage keep the number of triangles high (at least 1200) and low concavity (0.5)
             // This will make a more accurate representation of the skeleton.
-            int conDecIntPams[10] = {1, 1200, 20, 1, 0, //HACD
+            int conDecIntPams[10] = {1, 100, 20, 1, 0, //HACD
                                               10000, 20, 4, 4, 64}; //V-HACD
-            float conDecFloatPams[10] = {0.5, 30, 0.25, 0.0, 0.0,//HACD
+            float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             mainHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
@@ -95,8 +99,8 @@ void Morphology_CPPNMatrix::create()
             simSetObjectParent(meshHandle,mainHandle, 1);
             simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
             sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
-            //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
-            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); 
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+            //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0);
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
@@ -140,23 +144,24 @@ void Morphology_CPPNMatrix::create()
 
             testRobot(skeletonMatrix);
             manufacturabilityScore();
-            // For logging purposes
-            /// \todo EB: We might not need this here.
-            for(auto & i : _organSpec){
-                std::vector<float> organProperties;
-                organProperties.push_back(i.organType);
-                organProperties.push_back(i.organPos[0]);
-                organProperties.push_back(i.organPos[1]);
-                organProperties.push_back(i.organPos[2]);
-                organProperties.push_back(i.organOri[0]);
-                organProperties.push_back(i.organOri[1]);
-                organProperties.push_back(i.organOri[2]);
-                organProperties.push_back(i.organColliding);
-                organProperties.push_back(i.organInsideSkeleton);
-                organProperties.push_back(i.organGoodOrientation);
-                protoPhenotype.push_back(organProperties);
-            }
 
+            // For the graph descriptor
+            for(auto & i : _organSpec) {
+                int posX = (int) (i.organPos[0] / VOXEL_REAL_SIZE);
+                int posY = (int) (i.organPos[1] / VOXEL_REAL_SIZE);
+                int posZ = (int) (i.organPos[2] / VOXEL_REAL_SIZE);
+                posX += MATRIX_HALF_SIZE;
+                posY += MATRIX_HALF_SIZE;
+
+                if (i.organType == 1) // Wheels
+                    graphDesc.graphMatrix[posX][posY][posZ] = 2;
+                else if (i.organType == 2) // Sensors
+                    graphDesc.graphMatrix[posX][posY][posZ] = 3;
+                else if (i.organType == 3) // Joints
+                    graphDesc.graphMatrix[posX][posY][posZ] = 4;
+                else if (i.organType == 4) // Caster
+                    graphDesc.graphMatrix[posX][posY][posZ] = 5;
+            }
             // Update ns descriptors
             std::vector<float > dist = getSkeletonDimmensions(skeletonMatrix);
             morphDesc.robotWidth = dist[0];
@@ -165,6 +170,7 @@ void Morphology_CPPNMatrix::create()
             morphDesc.voxelNumber = numSkeletonVoxels;
             morphDesc.wheelNumber = countOrgans(1);
             morphDesc.sensorNumber = countOrgans(2);
+            morphDesc.jointNumber = countOrgans(3);
             morphDesc.casterNumber = countOrgans(4);
         }
         else{
@@ -195,7 +201,7 @@ void Morphology_CPPNMatrix::create()
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
 
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
@@ -290,8 +296,8 @@ void Morphology_CPPNMatrix::genomeDecoder(PolyVox::RawVolume<AREVoxel>& areMatri
                     areVoxel.sensor = FILLEDVOXEL;
                 if(cppn.Output()[4] > 0) /// \todo EB WARNING! Verify the order
                     areVoxel.caster = FILLEDVOXEL;
-//                if(cppn.Output()[5] > 0) /// \todo EB WARNING! Verify the order
-//                    areVoxel.joint = FILLEDVOXEL;
+                if(cppn.Output()[5] > 0) /// \todo EB WARNING! Verify the order
+                    areVoxel.joint = FILLEDVOXEL;
 
                 areMatrix.setVoxel(x, y, z, areVoxel);
                 // For logging purposes
@@ -315,7 +321,7 @@ void Morphology_CPPNMatrix::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMa
     auto region = skeletonMatrix.getEnclosingRegion();
     bool isSkeletonConnected = false;
 
-    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + skeletonBaseThickness; z += 1) {
+    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + skeletonBaseHeight; z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 if(x <= xHeadUpperLimit + skeletonBaseThickness && x >= xHeadLowerLimit - skeletonBaseThickness &&
@@ -455,7 +461,7 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     // Create connector and offset by some distance
     /// \todo EB: This offset shouldn't be here.
     float connectorPos[3];
-    connectorPos[0] = organPos[0]; connectorPos[1] = organPos[1];
+    connectorPos[0] = organPos[0]; connectorPos[1] = organPos[1]; connectorPos[2] = organPos[2];
     if(organ.organType == 0) // Brain
         connectorPos[2] = organPos[2] + 0.02;
     else if(organ.organType == 1) // Wheels
@@ -464,9 +470,10 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
         connectorPos[2] = organPos[2] + 0.02;
     else if(organ.organType == 3) // Joints
         connectorPos[2] = organPos[2] + 0.06;
-    else if(organ.organType == 4) // Caster
+    else if(organ.organType == 4) { // Caster
+        connectorPos[0] = organPos[0] - 0.01;
         connectorPos[2] = organPos[2] + 0.02;
-    else{
+    } else{
         std::cerr << "Organ does not exist." << __func__ << std::endl;
         abort();
     }
@@ -494,19 +501,21 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     simSetObjectParent(forceSensor,mainHandle,1);
     simSetObjectParent(organHandle, forceSensor, 1);
 
+    /// \todo EB: There might be a bug! Why this values? IMPORTANT!
     // This moves the organ slightly away from the surface.
     /// \todo: EB: We might not need this in the future
     if(organ.organType == 0) // Brain
         organPos[2] = 0.0;
     else if(organ.organType == 1) // Wheels
-        organPos[2] = -0.02;
+        organPos[2] = 0.005; //organPos[2] = -0.02;
     else if(organ.organType == 2) // Sensors
-        organPos[2] = -0.02;
+        organPos[2] = 0.005;
     else if(organ.organType == 3) // Joints
-        organPos[2] = -0.06;
-    else if(organ.organType == 4) // Caster
         organPos[2] = -0.02;
-    else{
+    else if(organ.organType == 4) { // Caster
+        organPos[0] = 0.01;
+        organPos[2] = 0.005;
+    } else{
         std::cerr << "Organ does not exist." << __func__ << std::endl;
         abort();
     }
@@ -530,7 +539,7 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     organ.connectorOri.push_back(newConnectorOri[1]);
     organ.connectorOri.push_back(newConnectorOri[2]);
 
-    //simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keep organ fix in the absolute position. For testing puproses
+    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keep organ fix in the absolute position. For testing puproses
 
     usleep(1000);
 }
@@ -583,7 +592,7 @@ void Morphology_CPPNMatrix::createTemporalGripper(Morphology_CPPNMatrix::OrganSp
     gripperOrientation[2] = 1.5708;
     simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
 
-//    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1); // Keeps gripper fix in the absolute position. For testing purposes
+    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1);
     simSetObjectParent(gripperHandle, mainHandle, 1);
 
     organ.gripperHandle = gripperHandle;
@@ -690,7 +699,7 @@ void Morphology_CPPNMatrix::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skele
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 if(x <= xHeadUpperLimit && x >= xHeadLowerLimit && y <= yHeadUpperLimit && y >= yHeadLowerLimit){
-                    if(skeletonMatrix.getVoxel(x,y,z) > 0){
+                    if(skeletonMatrix.getVoxel(x,y,z) == FILLEDVOXEL){
                         skeletonMatrix.setVoxel(x, y, z, EMPTYVOXEL);
                         numSkeletonVoxels--;
                     }
@@ -1154,13 +1163,10 @@ void Morphology_CPPNMatrix::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &s
                     skeletonRegionCoord[regionCounter-1].push_back(newCoord);
                     exploreSkeletonRegion(skeletonMatrix, visitedVoxels, x, y, z, regionCounter);
                 }
-
-                // For logging purposes
-                std::vector<float> voxelProperties;
-                voxelProperties.push_back(0); // Type (Bone = 0)
-                voxelProperties.push_back(x); voxelProperties.push_back(y); voxelProperties.push_back(z);
-                voxelProperties.push_back(voxel);
-                protoPhenotype.push_back(voxelProperties);
+                // For the graph descriptor
+                if(voxel == FILLEDVOXEL){
+                    graphDesc.graphMatrix[x+region.getUpperZ()-1][y+region.getUpperZ()-1][z+region.getUpperZ()-1] = 1;
+                }
             }
         }
     }
@@ -1330,14 +1336,15 @@ void Morphology_CPPNMatrix::loadMorphologyGenome(int indNum){
 Eigen::VectorXd Morphology_CPPNMatrix::getMorphDesc()
 {
     int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
-    Eigen::VectorXd morphDescVec(7);
+    Eigen::VectorXd morphDescVec(8);
     morphDescVec(0) = morphDesc.robotWidth/MATRIX_SIZE_M;
     morphDescVec(1) = morphDesc.robotDepth/MATRIX_SIZE_M;
     morphDescVec(2) = morphDesc.robotHeight/MATRIX_SIZE_M;
     morphDescVec(3) = (double) morphDesc.voxelNumber/VOXELS_NUMBER;
     morphDescVec(4) = (double) morphDesc.wheelNumber/MAX_NUM_ORGANS;
     morphDescVec(5) = (double) morphDesc.sensorNumber/MAX_NUM_ORGANS;
-    morphDescVec(6) = (double) morphDesc.casterNumber/MAX_NUM_ORGANS;
+    morphDescVec(6) = (double) morphDesc.jointNumber/MAX_NUM_ORGANS;
+    morphDescVec(7) = (double) morphDesc.casterNumber/MAX_NUM_ORGANS;
     return morphDescVec;
 }
 
@@ -1446,7 +1453,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
 
     std::stringstream filepath;
-    filepath << repository << "/" << loadExperiment << "/model" << indNum << ".ttm";
+    filepath << loadExperiment << "/model" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;

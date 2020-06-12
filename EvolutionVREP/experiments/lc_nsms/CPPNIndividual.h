@@ -38,13 +38,11 @@ public :
     Eigen::VectorXd getMorphDesc(){return morphDesc;};
     std::vector<bool> getManRes(){return testRes;};
     std::vector<std::vector<float>> getRawMat(){return rawMat;};
-    std::vector<std::vector<float>> getProtoPhenotype(){return protoPhenotype;};
     double getManScore(){ return manScore;};
     void setGenome();
     void setMorphDesc();
     void setManRes();
     void setRawMat();
-    void setProtoPhenotype();
     void setManScore();
 
     Eigen::VectorXd descriptor();
@@ -58,7 +56,6 @@ protected:
     std::vector<bool> testRes;
     double manScore;
     std::vector<std::vector<float>> rawMat;
-    std::vector<std::vector<float>> protoPhenotype;
 
 };
 

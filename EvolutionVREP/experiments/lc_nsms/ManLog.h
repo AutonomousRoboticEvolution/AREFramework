@@ -53,15 +53,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class ProtoPhenotypeLog : public Logging
-{
-public:
-    ProtoPhenotypeLog(const std::string &file) : Logging(file, true){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
-
 }//are
 
 #endif //ER_MANLOG_H
