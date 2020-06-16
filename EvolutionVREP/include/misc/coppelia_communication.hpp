@@ -84,6 +84,13 @@ void sentCommandToJointsOscillatory(const std::vector<int> &handles, const std::
 void getJointsPosition(const std::vector<int>& handles, std::vector<double>& positions);
 
 /**
+ * @brief get joints' positions
+ * @param list of the handles of the joints
+ * @param (output) list of positions of the joints
+ */
+void getJointsPosition(const std::vector<int>& handles, std::vector<double>& positions);
+
+/**
  * @brief sent command to the wheels
  * @param handles of the wheel
  * @param commands in (-1,1)

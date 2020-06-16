@@ -105,13 +105,20 @@ void FixedMorphology::setPosition(float x, float y, float z)
 
 void FixedMorphology::command(const std::vector<double> &ctrl_com){
     double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
+    energy_cost = 0;
 
     std::vector<double> wheel_com;
     wheel_com.insert(wheel_com.begin(),ctrl_com.begin(),ctrl_com.begin() + wheelHandles.size());
+    for(const double& val: wheel_com)
+        energy_cost+=fabs(val);
     cop::sentCommandToWheels(wheelHandles,wheel_com,maxVelocity);
 
     std::vector<double> joint_com;
     joint_com.insert(joint_com.begin(),ctrl_com.begin() + wheelHandles.size(), ctrl_com.end());
+    std::vector<double> positions;
+    cop::getJointsPosition(jointHandles,positions);
+    for(size_t i = 0; i < positions.size();i++)
+        energy_cost += fabs(positions[i]/M_PI*2.f - joint_com[i]);
     cop::sentCommandToJoints(jointHandles,joint_com);
 }
 

@@ -32,7 +32,9 @@ public:
         Individual(morph_gen,ctrl_gen){}
     NN2Individual(const NN2Individual& ind) :
         Individual(ind),
-        final_position(ind.final_position){}
+        final_position(ind.final_position),
+        energy_cost(ind.energy_cost)
+    {}
 
     Individual::Ptr clone() override {
         return std::make_shared<NN2Individual>(*this);
@@ -59,16 +61,20 @@ public:
         arch & objectives;
         arch & ctrlGenome;
         arch & final_position;
+        arch & energy_cost;
     }
 
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
     const std::vector<double>& get_final_position(){return final_position;}
+
+    double get_energy_cost(){return energy_cost;}
 
 protected:
     void createMorphology() override;
     void createController() override;
 
     std::vector<double> final_position;
+    double energy_cost=0;
 };
 
 }

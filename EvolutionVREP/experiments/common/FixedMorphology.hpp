@@ -72,7 +72,7 @@ public:
     //GETTERS
     std::vector<int> get_jointHandles(){return jointHandles;}
     std::vector<int> get_wheelHandles(){return wheelHandles;}
-
+    double get_energy_cost(){return energy_cost;}
 
 private:
     std::vector<int> jointHandles;
@@ -80,6 +80,7 @@ private:
     std::vector<int> proxHandles;
     std::vector<int> IRHandles;
     int cameraHandle;
+    double energy_cost = 0;
 };
 
 }

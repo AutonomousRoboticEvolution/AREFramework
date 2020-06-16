@@ -126,11 +126,12 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
             x(i) = genome[i];
 
         double reward = 0;
-        for(int i = 0; i < _pop[r]->getObjectives().size(); i++)
+        int i = 0;
+        for(; i < _pop[r]->getObjectives().size() - 1; i++)
             reward += 1 - _pop[r]->getObjectives()[i];
 
         double fvalue = (1-novelty_ratio)*reward
-                + novelty_ratio*(1-_pop[r]->getObjectives()[1]);
+                + novelty_ratio*(1-_pop[r]->getObjectives()[i]);
 
         _solutions.candidates().push_back(cma::Candidate(fvalue,x));
     }
@@ -273,6 +274,14 @@ void NIPES::epoch(){
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
+    double energy_budget = settings::getParameter<settings::Double>(parameters,"#energyBudget").value;
+
+    /**Energy Cost**/
+    for(const auto &ind : population){
+        double ec = std::dynamic_pointer_cast<NN2Individual>(ind)->get_energy_cost();
+        if(ec > energy_budget) ec = energy_budget;
+        std::dynamic_pointer_cast<NN2Individual>(ind)->addObjective(ec/energy_budget);
+    }
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -353,7 +362,6 @@ void NIPES::init_next_pop(){
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }
-
 }
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
