@@ -280,7 +280,7 @@ void NIPES::epoch(){
     for(const auto &ind : population){
         double ec = std::dynamic_pointer_cast<NN2Individual>(ind)->get_energy_cost();
         if(ec > energy_budget) ec = energy_budget;
-        std::dynamic_pointer_cast<NN2Individual>(ind)->addObjective(ec/energy_budget);
+        std::dynamic_pointer_cast<NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
     }
 
     /** NOVELTY **/
