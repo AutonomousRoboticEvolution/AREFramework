@@ -2,7 +2,6 @@
 #define NNGENOME_H
 
 #include <ARE/Genome.h>
-#include <ARE/Phenotype.h>
 #include <Genome.h>
 
 namespace are {
@@ -30,7 +29,6 @@ public:
 
     void init() override;
     void init(NEAT::RNG &rng);
-    Phenotype::Ptr develop() override{}
     void mutate(NEAT::RNG &rng);
     void mutate() override{}
     Genome::Ptr crossover(const Genome::Ptr &);

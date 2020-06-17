@@ -7,11 +7,6 @@
 
 namespace are {
 
-struct CPPN : public Phenotype
-{
-    NEAT::NeuralNetwork nn;
-};
-
 class CPPNGenome : public Genome
 {
 public:
@@ -27,9 +22,7 @@ public:
         return std::make_shared<CPPNGenome>(*this);
     }
 
-
     void init() override {}
-    Phenotype::Ptr develop() override;
     void mutate() override {}
 
     const NEAT::Genome &get_neat_genome(){return neat_genome;}

@@ -2,7 +2,7 @@
 #define NSLC_HPP
 
 #include "NSGA2.hpp"
-#include "Novelty.hpp"
+#include "ARE/Novelty.hpp"
 #include "NNIndividual.hpp"
 #include "mazeEnv.h"
 

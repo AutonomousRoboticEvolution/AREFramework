@@ -2,7 +2,7 @@
 #define CPPNINDIVIDUAL_H
 
 #include "ARE/Individual.h"
-#include "CPPNGenome.h"
+#include "ARE/CPPNGenome.h"
 #include "NNControl.h"
 #include "EPuckMorphology.h"
 #include "v_repLib.h"

@@ -6,7 +6,6 @@
 #include <memory>
 #include "ARE/Settings.h"
 #include "misc/RandNum.h"
-#include "ARE/Phenotype.h"
 
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/shared_ptr.hpp>
@@ -35,8 +34,6 @@ public:
 
     /// Initialize the morph and its control
     virtual void init() = 0;
-
-    virtual Phenotype::Ptr develop() = 0;
 
     virtual void mutate() = 0;
 
@@ -73,7 +70,6 @@ class EmptyGenome : public Genome
 public:
     Genome::Ptr clone() const{return nullptr;}
     void init(){}
-    Phenotype::Ptr develop(){return nullptr;}
     void mutate(){}
 
 //    template <class archive>
