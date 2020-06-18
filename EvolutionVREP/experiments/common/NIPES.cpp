@@ -130,6 +130,8 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         for(; i < _pop[r]->getObjectives().size() - 1; i++)
             reward += 1 - _pop[r]->getObjectives()[i];
 
+        reward = reward/static_cast<double>(_pop[r]->getObjectives().size() - 1);
+
         double fvalue = (1-novelty_ratio)*reward
                 + novelty_ratio*(1-_pop[r]->getObjectives()[i]);
 
@@ -378,6 +380,9 @@ bool NIPES::update(const Environment::Ptr & env){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
+
     }
 
 

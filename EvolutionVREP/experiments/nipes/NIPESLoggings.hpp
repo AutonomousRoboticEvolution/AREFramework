@@ -18,6 +18,14 @@ public:
 
 
 
+class TrajectoryLog : public Logging
+{
+public:
+    TrajectoryLog() : Logging(true){}
+    void saveLog(EA::Ptr& ea);
+    void loadLog(const std::string &file){}
+};
+
 }//are
 
 #endif //CMAES_LOGGINGS_H

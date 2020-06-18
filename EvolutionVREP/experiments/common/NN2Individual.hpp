@@ -3,6 +3,7 @@
 
 #include <ARE/Individual.h>
 #include <ARE/Genome.h>
+#include "mazeEnv.h"
 #include "FixedMorphology.hpp"
 #include "NN2Control.hpp"
 #include "NNGenome.hpp"
@@ -67,6 +68,11 @@ public:
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
     const std::vector<double>& get_final_position(){return final_position;}
 
+    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+
+
+
     double get_energy_cost(){return energy_cost;}
 
 protected:
@@ -74,6 +80,7 @@ protected:
     void createController() override;
 
     std::vector<double> final_position;
+    std::vector<waypoint> trajectory;
     double energy_cost=0;
 };
 
