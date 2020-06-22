@@ -141,6 +141,8 @@ struct random{
     static ParametersMapPtr parameters;
 };
 
+
+
 template<typename T>
 T getParameter(const ParametersMapPtr &params,const std::string& name)
 {

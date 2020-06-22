@@ -21,6 +21,47 @@ settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<set
                 return parameters;
             }());
 
+settings::ParametersMapPtr settings::random::parameters(new settings::ParametersMap());
+
+settings::Type::Ptr settings::buildType(const std::string &name)
+{
+    if(name == "bool")
+        return std::make_shared<settings::Boolean>(Boolean());
+    else if(name == "int")
+        return std::make_shared<settings::Integer>(Integer());
+    else if(name == "float")
+        return std::make_shared<settings::Float>(Float());
+    else if(name == "double")
+        return std::make_shared<settings::Double>(Double());
+    else if(name == "string")
+        return std::make_shared<settings::String>(String());
+    else
+    {
+        std::cerr << "unknown parameter type : " << name << std::endl;
+        return nullptr;
+    }
+}
+
+std::string settings::toString(const std::string &name, const settings::Type::ConstPtr& elt){
+    std::stringstream sstr;
+    if(elt->name == "bool"){
+        sstr << name << ",bool," << settings::cast<settings::Boolean>(elt)->value << std::endl;
+    }
+    else if(elt->name == "int"){
+        sstr << name << ",int," << settings::cast<settings::Integer>(elt)->value << std::endl;
+    }
+    else if(elt->name == "float"){
+        sstr << name << ",float," << settings::cast<settings::Float>(elt)->value << std::endl;
+    }
+    else if(elt->name == "double"){
+        sstr << name << ",double," << settings::cast<settings::Double>(elt)->value << std::endl;
+    }
+    else if(elt->name == "string"){
+        sstr << name << ",string," << settings::cast<settings::String>(elt)->value << std::endl;
+    }
+    return sstr.str();
+}
+
 settings::ParametersMap settings::loadParameters(const std::string& file)
 {
     settings::ParametersMap parameters;
@@ -50,23 +91,14 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
 
 settings::ParametersMapPtr settings::random::parameters(new settings::ParametersMap());
 
-settings::Type::Ptr settings::buildType(const std::string &name)
-{
-    if(name == "bool")
-        return std::make_shared<settings::Boolean>(Boolean());
-    else if(name == "int")
-        return std::make_shared<settings::Integer>(Integer());
-    else if(name == "float")
-        return std::make_shared<settings::Float>(Float());
-    else if(name == "double")
-        return std::make_shared<settings::Double>(Double());
-    else if(name == "string")
-        return std::make_shared<settings::String>(String());
-    else
-    {
-        std::cerr << "unknown parameter type : " << name << std::endl;
-        return nullptr;
-    }
+    for(const auto &elt : *params)
+        if(random::parameters->find(elt.first) == random::parameters->end())
+            ofs << toString(elt.first,elt.second);
+
+    for(const auto &elt : *random::parameters)
+        ofs << toString(elt.first,elt.second);
+
+    ofs.close();
 }
 
 std::string settings::toString(const std::string &name, const settings::Type::ConstPtr& elt){
