@@ -8,6 +8,8 @@ add_library(visu_pop SHARED
     ../common/Loggings.cpp
     ../common/genLoggings.cpp
     ../common/NNGenome.cpp
+    ../common/NNParamGenome.cpp
+    ../common/NN2Individual.cpp
     visuPop.cpp
     factories.cpp
     )
