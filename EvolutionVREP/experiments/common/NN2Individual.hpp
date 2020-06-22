@@ -63,6 +63,7 @@ public:
         arch & ctrlGenome;
         arch & final_position;
         arch & energy_cost;
+        arch & trajectory;
     }
 
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
