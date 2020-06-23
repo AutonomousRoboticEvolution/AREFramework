@@ -18,6 +18,7 @@ void RobustnessTest::init(){
     std::string folder = repository + "/" + folder_to_load;
 
     std::vector<std::string> gen_files;
+    std::vector<int> gen_index;
     if(ind >= 0){
         std::stringstream sstr;
         sstr << folder << "/genome_" << generation << "_" << ind;
@@ -32,7 +33,9 @@ void RobustnessTest::init(){
             boost::split(split_str,split_str.back(),boost::is_any_of("_"));
             if(split_str[0] == "genome" &&
                     std::stoi(split_str[1]) == generation){
+
                 gen_files.push_back(filename);
+                gen_index.push_back(std::stoi(split_str[2]));
             }
         }
     }
@@ -54,14 +57,15 @@ void RobustnessTest::init(){
         return;
     }
 
-    for(const std::string& file : gen_files){
+    population.resize(gen_files.size());
+    for(size_t i = 0; i < gen_files.size(); i++){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr genome;
 
         genome.reset(new NNParamGenome(randomNum,parameters));
         NNParamGenome::Ptr nngenome = std::dynamic_pointer_cast<NNParamGenome>(genome);
         std::ifstream logFileStream;
-        logFileStream.open(file);
+        logFileStream.open(gen_files[i]);
         std::string line;
         std::getline(logFileStream,line);
         int nbr_weights = std::stoi(line);
@@ -86,7 +90,27 @@ void RobustnessTest::init(){
         Individual::Ptr ind(new NN2Individual(morph_gen,genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        population.push_back(ind);
+        population[gen_index[i]] = ind;
     }
+}
+
+void RobustnessTest::setObjectives(size_t indIdx, const std::vector<double> &objectives){
+    currentIndIndex = indIdx;
+    population[indIdx]->setObjectives(objectives);
+}
+
+bool RobustnessTest::update(const Environment::Ptr & env){
+    endEvalTime = hr_clock::now();
+    numberEvaluation++;
+
+    if(simulator_side){
+        Individual::Ptr ind = population[currentIndIndex];
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
+    }
+
+    return true;
 }
 

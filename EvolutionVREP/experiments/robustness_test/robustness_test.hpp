@@ -25,6 +25,11 @@ public:
     }
 
     void init();
+    bool update(const Environment::Ptr &) override;
+    void setObjectives(size_t indIdx, const std::vector<double> &objectives);
+
+private:
+    int currentIndIndex;
 };
 
 }

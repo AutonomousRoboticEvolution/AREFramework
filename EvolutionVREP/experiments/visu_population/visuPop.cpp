@@ -78,6 +78,7 @@ void VisuPop::init(){
     std::string folder = repository + "/" + folder_to_load;
 
     std::vector<std::string> gen_files;
+    std::vector<int> gen_index;
     if(ind >= 0){
         std::stringstream sstr;
         sstr << folder << "/genome_" << generation << "_" << ind;
@@ -93,6 +94,7 @@ void VisuPop::init(){
             if(split_str[0] == "genome" &&
                     std::stoi(split_str[1]) == generation){
                 gen_files.push_back(filename);
+                gen_index.push_back(std::stoi(split_str[2]));
             }
         }
     }
@@ -114,14 +116,16 @@ void VisuPop::init(){
         return;
     }
 
-    for(const std::string& file : gen_files){
+
+    population.resize(gen_files.size());
+    for(size_t i = 0; i < gen_files.size(); i++){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr genome;
 
         genome.reset(new NNParamGenome(randomNum,parameters));
         NNParamGenome::Ptr nngenome = std::dynamic_pointer_cast<NNParamGenome>(genome);
         std::ifstream logFileStream;
-        logFileStream.open(file);
+        logFileStream.open(gen_files[i]);
         std::string line;
         std::getline(logFileStream,line);
         int nbr_weights = std::stoi(line);
@@ -146,7 +150,7 @@ void VisuPop::init(){
         Individual::Ptr ind(new NN2Individual(morph_gen,genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        population.push_back(ind);
+        population[gen_index[i]] = ind;
     }
 }
 
