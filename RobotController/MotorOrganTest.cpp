@@ -46,7 +46,7 @@ int main(void) {
 				printf("FAULTREG: %02X\n", motor1.readFaultReg());
 				break;
 		}
-		printf("FAULTREG: %02X\n", motor1.readFaultReg());
+		//printf("FAULTREG: %02X\n", motor1.readFaultReg());
 	} while (c != 'x');
 
 	return 1;
