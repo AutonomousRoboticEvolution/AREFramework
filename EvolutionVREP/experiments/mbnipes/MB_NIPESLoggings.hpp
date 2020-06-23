@@ -10,14 +10,6 @@
 
 namespace are {
 
-class BehavDescLog : public Logging
-{
-public:
-    BehavDescLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
 class StopCritLog : public Logging
 {
 public:

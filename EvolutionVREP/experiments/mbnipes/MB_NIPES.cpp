@@ -48,6 +48,9 @@ void MB_NIPES::init_next_pop(){
     double uncertainty_threshold = settings::getParameter<settings::Double>(parameters,"#uncertaintyThreshold").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
+    if(verbose)
+        std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
+
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     dMat new_samples = cmaStrategy->ask();
@@ -74,6 +77,7 @@ void MB_NIPES::init_next_pop(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         double sigma =  learner->get_sigma(ctrl_gen->get_full_genome());
+        std::cout << "sigma : " << sigma << std::endl;
         if(sigma < uncertainty_threshold)
             virtual_pop.push_back(ind);
         else
@@ -107,9 +111,6 @@ bool MB_NIPES::update(const Environment::Ptr &env){
 
         samples.push_back(s);
 
-
-//        if(verbose)
-//            std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
 
         ind.reset();
     }
