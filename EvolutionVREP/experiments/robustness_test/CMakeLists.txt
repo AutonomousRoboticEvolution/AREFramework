@@ -18,7 +18,8 @@ target_include_directories(robustnessTest PUBLIC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../common/"
     "/usr/include/eigen3"
+    "../../modules/"
     )
-target_link_libraries(robustnessTest ER_library cmaes)
+target_link_libraries(robustnessTest ER_library)
 install(TARGETS robustnessTest DESTINATION lib)
 install(DIRECTORY . DESTINATION include/robustnessTest  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

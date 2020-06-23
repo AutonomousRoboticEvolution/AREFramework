@@ -18,6 +18,7 @@ target_include_directories(visu_pop PUBLIC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../common/"
     "/usr/include/eigen3"
+    "../../modules"
     )
 target_link_libraries(visu_pop ER_library cmaes)
 install(TARGETS visu_pop DESTINATION lib)
