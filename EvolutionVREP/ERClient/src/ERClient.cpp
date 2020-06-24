@@ -22,6 +22,7 @@
 #include "ERClient/clientER.h"
 #include <ctime>
 #include <boost/filesystem.hpp>
+#include <random>
 
 using namespace are;
 
@@ -68,8 +69,11 @@ int main(int argc, char* argv[])
 
     //todo take the seed
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
-    if(seed < 0)
-        seed = rand();
+    if(seed < 0){
+        std::random_device rd;
+        seed = rd();
+    }
+
     misc::RandNum rn(seed);
     client->set_randNum(std::make_shared<misc::RandNum>(rn));
 
