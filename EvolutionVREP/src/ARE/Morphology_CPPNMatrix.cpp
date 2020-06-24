@@ -2,6 +2,9 @@
 #include "v_repLib.h"
 #include <stdio.h>
 
+#define HANDMADEROBOT 0
+#define ISCLUSTER 0
+
 using namespace are;
 
 void Morphology_CPPNMatrix::create()
@@ -21,14 +24,25 @@ void Morphology_CPPNMatrix::create()
         loadMorphologyGenome(loadInd);
     }
     // Decoding CPPN
+#ifndef HANDMADEROBOT
+    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
     genomeDecoder(areMatrix, nn);
-
+#endif
     generateSkeleton(areMatrix, skeletonMatrix, VoxelType::BONE); // Generate skeleton without modifications
     createSkeletonBase(skeletonMatrix);
     emptySpaceForHead(skeletonMatrix);
     skeletonRegionCounter(skeletonMatrix);
     removeSkeletonRegions(skeletonMatrix);
-
+#ifndef HANDMADEROBOT
+    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 1
+    createAREPuck(skeletonMatrix);
+#elif HANDMADEROBOT == 2
+    createAREPotato(skeletonMatrix);
+#elif HANDMADEROBOT == 3
+    createARETricyle(skeletonMatrix);
+#endif
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
@@ -94,8 +108,19 @@ void Morphology_CPPNMatrix::create()
             float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
-            mainHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-
+            int convexHandle;
+            convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
+            mainHandle = convexHandle;
+//            // Create brain primitive
+//            float brainSize[3] = {0.084,0.084,0.11};
+//            int brainHandle;
+//            brainHandle = simCreatePureShape(0,0,brainSize,0.250,NULL);
+//            float brainPos[3] = {0.0,0.0,0.06};
+//            simSetObjectPosition(brainHandle,-1,brainPos);
+//            // Group primitives
+//            int groupHandles[2] = {convexHandle, brainHandle};
+//            mainHandle = simGroupShapes(groupHandles, 2);
+            // Set parenthood
             simSetObjectParent(meshHandle,mainHandle, 1);
             simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
             sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
@@ -120,7 +145,11 @@ void Morphology_CPPNMatrix::create()
 
             // Create organs
             for(auto & i : _organSpec){
+#ifndef HANDMADEROBOT
+                std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
                 setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
+#endif
                 createOrgan(i);
                 // If organ is not brain
                 if(i.organType != 0)
@@ -147,31 +176,46 @@ void Morphology_CPPNMatrix::create()
 
             // For the graph descriptor
             for(auto & i : _organSpec) {
-                int posX = (int) (i.organPos[0] / VOXEL_REAL_SIZE);
-                int posY = (int) (i.organPos[1] / VOXEL_REAL_SIZE);
-                int posZ = (int) (i.organPos[2] / VOXEL_REAL_SIZE);
+                int posX = (int) (i.connectorPos[0] / VOXEL_REAL_SIZE);
+                int posY = (int) (i.connectorPos[1] / VOXEL_REAL_SIZE);
+                int posZ = (int) (i.connectorPos[2] / VOXEL_REAL_SIZE);
                 posX += MATRIX_HALF_SIZE;
                 posY += MATRIX_HALF_SIZE;
 
-                if (i.organType == 1) // Wheels
-                    graphDesc.graphMatrix[posX][posY][posZ] = 2;
-                else if (i.organType == 2) // Sensors
-                    graphDesc.graphMatrix[posX][posY][posZ] = 3;
-                else if (i.organType == 3) // Joints
-                    graphDesc.graphMatrix[posX][posY][posZ] = 4;
-                else if (i.organType == 4) // Caster
-                    graphDesc.graphMatrix[posX][posY][posZ] = 5;
+                if(posX > MATRIX_SIZE)
+                    posX = MATRIX_SIZE-1;
+                if(posX < 0)
+                    posX = 0;
+                if(posY > MATRIX_SIZE)
+                    posY = MATRIX_SIZE-1;
+                if(posY < 0)
+                    posY = 0;
+                if(posZ > MATRIX_SIZE)
+                    posZ = MATRIX_SIZE-1;
+                if(posZ < 0)
+                    posZ = 0;
+
+                if(i.organType == 1) // Wheels
+                    indDesc.matDesc.graphMatrix[posX][posY][posZ] = 2;
+                else if(i.organType == 2) // Sensors
+                    indDesc.matDesc.graphMatrix[posX][posY][posZ] = 3;
+                else if(i.organType == 3) // Joints
+                    indDesc.matDesc.graphMatrix[posX][posY][posZ] = 4;
+                else if(i.organType == 4) // Caster
+                    indDesc.matDesc.graphMatrix[posX][posY][posZ] = 5;
             }
+
             // Update ns descriptors
             std::vector<float > dist = getSkeletonDimmensions(skeletonMatrix);
-            morphDesc.robotWidth = dist[0];
-            morphDesc.robotDepth = dist[1];
-            morphDesc.robotHeight = dist[2];
-            morphDesc.voxelNumber = numSkeletonVoxels;
-            morphDesc.wheelNumber = countOrgans(1);
-            morphDesc.sensorNumber = countOrgans(2);
-            morphDesc.jointNumber = countOrgans(3);
-            morphDesc.casterNumber = countOrgans(4);
+            indDesc.cartDesc.robotWidth = dist[0];
+            indDesc.cartDesc.robotDepth = dist[1];
+            indDesc.cartDesc.robotHeight = dist[2];
+            indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
+            indDesc.cartDesc.wheelNumber = countOrgans(1);
+            indDesc.cartDesc.sensorNumber = countOrgans(2);
+            indDesc.cartDesc.jointNumber = countOrgans(3);
+            indDesc.cartDesc.casterNumber = countOrgans(4);
+            indDesc.cartDesc.setCartDesc();
         }
         else{
             // Stop generating ns if convex decomposition fails
@@ -197,6 +241,7 @@ void Morphology_CPPNMatrix::create()
         exportMesh(loadInd, vertices,indices);
         exportRobotModel(loadInd);
     }
+    //exportRobotModel(loadInd);
     getObjectHandles();
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -288,16 +333,26 @@ void Morphology_CPPNMatrix::genomeDecoder(PolyVox::RawVolume<AREVoxel>& areMatri
                 areVoxel.joint = EMPTYVOXEL;
                 areVoxel.caster = EMPTYVOXEL;
 
-                if(cppn.Output()[1] > 0)
+                if(cppn.Output()[1] > 0) {
                     areVoxel.bone = FILLEDVOXEL;
-                if(cppn.Output()[2] > 0)
+                    indDesc.cppnBinDesc.skeletonMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = true;
+                }
+                if(cppn.Output()[2] > 0){
                     areVoxel.wheel = FILLEDVOXEL;
-                if(cppn.Output()[3] > 0)
+                    indDesc.cppnBinDesc.wheelMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = true;
+                }
+                if(cppn.Output()[3] > 0) {
                     areVoxel.sensor = FILLEDVOXEL;
-                if(cppn.Output()[4] > 0) /// \todo EB WARNING! Verify the order
+                    indDesc.cppnBinDesc.sensorMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = true;
+                }
+                if(cppn.Output()[4] > 0) { /// \todo EB WARNING! Verify the order
                     areVoxel.caster = FILLEDVOXEL;
-                if(cppn.Output()[5] > 0) /// \todo EB WARNING! Verify the order
+                    indDesc.cppnBinDesc.casterMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = true;
+                }
+                if(cppn.Output()[5] > 0) { /// \todo EB WARNING! Verify the order
                     areVoxel.joint = FILLEDVOXEL;
+                    indDesc.cppnBinDesc.jointMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = true;
+                }
 
                 areMatrix.setVoxel(x, y, z, areVoxel);
                 // For logging purposes
@@ -445,6 +500,24 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     organHandle = simLoadModel(modelsPath.c_str());
     organ.handle = organHandle;
 
+    /// \todo: EB: Maybe we should move this to a method
+    // Get object handles for collision detection
+    simAddObjectToSelection(sim_handle_tree, organ.handle);
+    int selectionSize = simGetObjectSelectionSize();
+    // store all these objects (max 10 shapes)
+    int shapesStorage[10]; // stores up to 10 shapes
+    simGetObjectSelection(shapesStorage);
+    for (int i = 0; i < selectionSize; i++) {
+        char* componentName;
+        componentName = simGetObjectName(shapesStorage[i]);
+        if('P' == componentName[0]){
+            organ.objectHandles.push_back(shapesStorage[i]);
+        }
+        simReleaseBuffer(componentName);
+    }
+    simRemoveObjectFromSelection(sim_handle_all, organ.handle);
+
+
     // For force sensor
     int fsParams[5];
     fsParams[0] = 0; fsParams[1] = 1; fsParams[2] = 1; fsParams[3] = 0; fsParams[4] = 0;
@@ -466,9 +539,10 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
         connectorPos[2] = organPos[2] + 0.02;
     else if(organ.organType == 1) // Wheels
         connectorPos[2] = organPos[2] + 0.02;
-    else if(organ.organType == 2) // Sensors
+    else if(organ.organType == 2) { // Sensors
+        connectorPos[0] = organPos[0] + 0.01;
         connectorPos[2] = organPos[2] + 0.02;
-    else if(organ.organType == 3) // Joints
+    }else if(organ.organType == 3) // Joints
         connectorPos[2] = organPos[2] + 0.06;
     else if(organ.organType == 4) { // Caster
         connectorPos[0] = organPos[0] - 0.01;
@@ -500,27 +574,66 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     // Set parents
     simSetObjectParent(forceSensor,mainHandle,1);
     simSetObjectParent(organHandle, forceSensor, 1);
-
-    /// \todo EB: There might be a bug! Why this values? IMPORTANT!
-    // This moves the organ slightly away from the surface.
+    /// \todo There might be a bug somewhere! The lines commented work well for ARE-Puck and ARE-Potato. The uncommented lines work well with evolved morphologies...
+    // This moves the organ slightly away from the surface. This parameters were calibrated through visual inspection
     /// \todo: EB: We might not need this in the future
+    organPos[0] = 0.0; organPos[1] = 0.0; organPos[2] = 0.0;
+#ifndef HANDMADEROBOT
+    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
+//    if(organ.organType == 0) // Brain
+//        organPos[2] = 0.0;
+//    else if(organ.organType == 1) // Wheels
+//        organPos[2] = 0.03;
+//    else if(organ.organType == 2) { // Sensors
+//        organPos[0] = 0.01;
+//        organPos[2] = 0.03;
+//    }else if(organ.organType == 3) // Joints
+//        organPos[2] = -0.02;
+//    else if(organ.organType == 4) { // Caster
+//        organPos[0] = -0.01;
+//        organPos[1] = -0.005;
+//        organPos[2] = 0.03;
+//    } else{
+//        std::cerr << "Organ does not exist." << __func__ << std::endl;
+//        abort();
+//    }
     if(organ.organType == 0) // Brain
         organPos[2] = 0.0;
     else if(organ.organType == 1) // Wheels
-        organPos[2] = 0.005; //organPos[2] = -0.02;
-    else if(organ.organType == 2) // Sensors
-        organPos[2] = 0.005;
-    else if(organ.organType == 3) // Joints
-        organPos[2] = -0.02;
+        organPos[2] = -0.03;
+    else if(organ.organType == 2) { // Sensors
+        organPos[0] = -0.01;
+        organPos[2] = -0.03;
+    }else if(organ.organType == 3) // Joints
+        organPos[2] = -0.07;
     else if(organ.organType == 4) { // Caster
         organPos[0] = 0.01;
-        organPos[2] = 0.005;
+        //organPos[1] = 0.005;
+        organPos[2] = -0.03;
     } else{
         std::cerr << "Organ does not exist." << __func__ << std::endl;
         abort();
     }
-    organPos[0] = 0.0;
-    organPos[1] = 0.0;
+#elif HANDMADEROBOT == 1 || HANDMADEROBOT == 2 || HANDMADEROBOT == 3
+    if(organ.organType == 0) // Brain
+        organPos[2] = 0.0;
+    else if(organ.organType == 1) // Wheels
+        organPos[2] = -0.03;
+    else if(organ.organType == 2) { // Sensors
+        organPos[0] = -0.01;
+        organPos[2] = -0.03;
+    }else if(organ.organType == 3) // Joints
+        organPos[2] = -0.07;
+    else if(organ.organType == 4) { // Caster
+        organPos[0] = 0.01;
+        //organPos[1] = 0.005;
+        organPos[2] = -0.03;
+    } else{
+        std::cerr << "Organ does not exist." << __func__ << std::endl;
+        abort();
+    }
+#endif
     simSetObjectPosition(forceSensor, forceSensor, organPos);
     simGetObjectPosition(organHandle, -1, organPos);
     organ.organPos[0] = organPos[0];
@@ -618,41 +731,23 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Morph
 bool Morphology_CPPNMatrix::IsOrganColliding(Morphology_CPPNMatrix::OrganSpec &organ)
 {
     int8_t collisionResult;
-    std::vector<int> handles;
-    handles.push_back(organ.handle);
-    if(organ.organType == 1) // If wheel
-    {
-        // select all objects in tree
-        simAddObjectToSelection(sim_handle_tree, organ.handle);
-        int selectionSize = simGetObjectSelectionSize();
-        // store all these objects (max 10 shapes)
-        int shapesStorage[10]; // stores up to 10 shapes
-        simGetObjectSelection(shapesStorage);
-        for (int i = 0; i < selectionSize; i++) {
-            char* componentName;
-            componentName = simGetObjectName(shapesStorage[i]);
-            if('W' == componentName[0]){
-                handles.push_back(shapesStorage[i]);
-            }
-            simReleaseBuffer(componentName);
-        }
-        simRemoveObjectFromSelection(sim_handle_all, organ.handle);
-    }
-
     // Check collision with skeleton
-    for(int handle : handles){
+    for(int handle : organ.objectHandles){
         collisionResult = simCheckCollision(handle,mainHandle);
         if(collisionResult == 1) // Collision detected!
             return true;
     }
     /// \todo EB: Wheels are ignored in the following loop.
     // Check collision with other organs
-    for(auto & i : _organSpec){
-        collisionResult = simCheckCollision(organ.handle,i.handle);
-        if(collisionResult == 1) // Collision detected!
-            return true;
+    for(int handle : organ.objectHandles) {
+        for (auto &organComp : _organSpec) {
+            for (auto &i : organComp.objectHandles) {
+                collisionResult = simCheckCollision(handle, i);
+                if (collisionResult == 1) // Collision detected!
+                    return true;
+            }
+        }
     }
-
     return false;
 }
 
@@ -667,22 +762,15 @@ bool Morphology_CPPNMatrix::IsOrganInsideSkeleton(PolyVox::RawVolume<uint8_t> &s
     int zPos = (int) (position[2]/VOXEL_REAL_SIZE);
     zPos -= MATRIX_HALF_SIZE;
     uint8_t voxelValue;
-    // Explore neighbourhood.
-    // EB: This step is important because there is a high likelyhood that the voxel selected as centre point is empty
-    // but all the surrounding voxels are filled which causes an overlap leading to weird behaviours.
-    const int VOXELSNUMBER = 3;
-    for(int i = zPos - VOXELSNUMBER; i <= zPos + VOXELSNUMBER; i++){
-        for(int j = yPos - VOXELSNUMBER; j <= yPos + VOXELSNUMBER; j++){
-            for(int k = xPos - VOXELSNUMBER; k <= xPos + VOXELSNUMBER; k++){
-                voxelValue = skeletonMatrix.getVoxel(k,j,i);
-                if(voxelValue == FILLEDVOXEL) // Organ centre point inside of skeleton
-                    return true;
-                else if(voxelValue != EMPTYVOXEL)
-                    std::cerr << "We shouldn't be here! " << __func__ <<std::endl;
-            }
-        }
+    voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
+    if(voxelValue == FILLEDVOXEL) // Organ centre point inside of skeleton
+        return true;
+    else if(voxelValue == EMPTYVOXEL)
+        return false;
+    else {
+        std::cerr << "We shouldn't be here! " << __func__ << std::endl;
+        abort();
     }
-    return false;
 }
 
 bool Morphology_CPPNMatrix::isOrganGoodOrientation(Morphology_CPPNMatrix::OrganSpec &organ)
@@ -733,13 +821,13 @@ void Morphology_CPPNMatrix::removeRobot()
     // If the robot fails a single test its novelty is pensalised
     if(!robotManRes.noCollisions || !robotManRes.noBadOrientations || !robotManRes.isGripperAccess){
         /// \todo EB: is this a good way to remove robot?
-        morphDesc.robotWidth = 0.0;
-        morphDesc.robotDepth = 0.0;
-        morphDesc.robotHeight = 0.0;
-        morphDesc.voxelNumber = 0.0;
-        morphDesc.wheelNumber = 0.0;
-        morphDesc.sensorNumber = 0.0;
-        morphDesc.casterNumber = 0.0;
+        indDesc.cartDesc.robotWidth = 0.0;
+        indDesc.cartDesc.robotDepth = 0.0;
+        indDesc.cartDesc.robotHeight = 0.0;
+        indDesc.cartDesc.voxelNumber = 0.0;
+        indDesc.cartDesc.wheelNumber = 0.0;
+        indDesc.cartDesc.sensorNumber = 0.0;
+        indDesc.cartDesc.casterNumber = 0.0;
     }
 }
 
@@ -818,9 +906,16 @@ void Morphology_CPPNMatrix::manufacturabilityScore()
 
 void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices)
 {
+#ifndef ISCLUSTER
+    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif ISCLUSTER == 0
     const auto **verticesMesh = new const simFloat *[2];
-    auto *verticesSizesMesh = new simInt[2];
     const auto **indicesMesh = new const simInt *[2];
+#elif ISCLUSTER == 1
+    auto **verticesMesh = new simFloat *[2];
+    auto **indicesMesh = new simInt *[2];
+#endif
+    auto *verticesSizesMesh = new simInt[2];
     auto *indicesSizesMesh = new simInt[2];
     verticesMesh[0] = vertices.data();
     verticesSizesMesh[0] = vertices.size();
@@ -896,22 +991,57 @@ void Morphology_CPPNMatrix::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeleto
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     uint8_t voxel;
     // Explore neighbourhood.
-    for (int dz = -2; dz <= 2; dz+=2) {
-        for (int dy = -2; dy <= 2; dy+=2) {
-            for (int dx = -2; dx <= 2; dx+=2) {
-                if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
-                    posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
-                    posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
-                    voxel = skeletonMatrix.getVoxel(posX + dx, posY + dy, posZ + dz);
-                    if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel > 120) {
-                        exploreSkeleton(skeletonMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, surfaceCounter);
-                    }
-                    else if(!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel < 120) {
-                        std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz, dx, dy, dz};
-                        //skeletonSurfaceCoord.push_back(newCoord);
-                        skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
-                    }
-                }
+//    for (int dz = -1; dz <= 1; dz+=1) {
+//        for (int dy = -1; dy <= 1; dy+=1) {
+//            for (int dx = -1; dx <= 1; dx+=1) {
+//                if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
+//                    posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
+//                    posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
+//                    voxel = skeletonMatrix.getVoxel(posX + dx, posY + dy, posZ + dz);
+//                    if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel == FILLEDVOXEL) {
+//                        exploreSkeleton(skeletonMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, surfaceCounter);
+//                    }
+//                    else if(!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel == EMPTYVOXEL) {
+//                        std::vector<int> newCoord{posX, posY, posZ, dx, dy, dz};
+//                        skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
+//                    }
+//                }
+//            }
+//        }
+//    }
+    for (int dz = -1; dz <= 1; dz+=1) {
+        if (posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
+            voxel = skeletonMatrix.getVoxel(posX, posY, posZ + dz);
+            if (!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == FILLEDVOXEL) {
+                exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY, posZ + dz, surfaceCounter);
+            }
+            else if(!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == EMPTYVOXEL) {
+                std::vector<int> newCoord{posX, posY, posZ, 0, 0, dz};
+                skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
+            }
+        }
+    }
+    for (int dy = -1; dy <= 1; dy+=1) {
+        if (posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE) {
+            voxel = skeletonMatrix.getVoxel(posX, posY + dy, posZ);
+            if (!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == FILLEDVOXEL) {
+                exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY + dy, posZ, surfaceCounter);
+            }
+            else if(!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == EMPTYVOXEL) {
+                std::vector<int> newCoord{posX, posY, posZ, 0, dy, 0};
+                skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
+            }
+        }
+    }
+    for (int dx = -1; dx <= 1; dx+=1) {
+        if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE) {
+            voxel = skeletonMatrix.getVoxel(posX + dx, posY, posZ);
+            if (!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == FILLEDVOXEL) {
+                exploreSkeleton(skeletonMatrix, visitedVoxels, posX + dx, posY, posZ, surfaceCounter);
+            }
+            else if(!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == EMPTYVOXEL) {
+                std::vector<int> newCoord{posX, posY, posZ, dx, 0, 0};
+                skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
             }
         }
     }
@@ -975,6 +1105,19 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn)
                                                       skeletonSurfaceCoord[m][n][2], skeletonSurfaceCoord[m][n][3], skeletonSurfaceCoord[m][n][4],
                                                       skeletonSurfaceCoord[m][n][5]};
                             coordList[i].push_back(newCoord);
+                            // This stuff is for the descriptor
+                            if(organType == VoxelType::WHEEL)
+                                indDesc.interDesc.wheelInter[copyList[i][j][0]+5][copyList[i][j][1]+5][copyList[i][j][2]+5] = true; ///\todo EB: Hard-coded number. Replace it with region.upperZ!
+                            else if(organType == VoxelType::SENSOR)
+                                indDesc.interDesc.sensorInter[copyList[i][j][0]+5][copyList[i][j][1]+5][copyList[i][j][2]+5] = true; ///\todo EB: Hard-coded number. Replace it with region.upperZ!
+                            else if(organType == VoxelType::JOINT)
+                                indDesc.interDesc.jointInter[copyList[i][j][0]+5][copyList[i][j][1]+5][copyList[i][j][2]+5] = true; ///\todo EB: Hard-coded number. Replace it with region.upperZ!
+                            else if(organType == VoxelType::CASTER)
+                                indDesc.interDesc.casterInter[copyList[i][j][0]+5][copyList[i][j][1]+5][copyList[i][j][2]+5] = true; ///\todo EB: Hard-coded number. Replace it with region.upperZ!
+                            else {
+                                std::cout << "We shouldn't be here! " << __func__ << std::endl;
+                                abort();
+                            }
                         }
                     }
                 }
@@ -1165,7 +1308,7 @@ void Morphology_CPPNMatrix::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &s
                 }
                 // For the graph descriptor
                 if(voxel == FILLEDVOXEL){
-                    graphDesc.graphMatrix[x+region.getUpperZ()-1][y+region.getUpperZ()-1][z+region.getUpperZ()-1] = 1;
+                    indDesc.matDesc.graphMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = 1;
                 }
             }
         }
@@ -1282,33 +1425,33 @@ Morphology_CPPNMatrix::exploreOrganRegion(PolyVox::RawVolume<AREVoxel> &areMatri
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     AREVoxel voxel;
     // Explore neighbourhood.
-    for (int dz = -2; dz <= 2; dz+=1) {
-        for (int dy = -2; dy <= 2; dy+=1) {
-            for (int dx = -2; dx <= 2; dx+=1) {
+    for (int dz = -1; dz <= 1; dz+=1) {
+        for (int dy = -1; dy <= 1; dy+=1) {
+            for (int dx = -1; dx <= 1; dx+=1) {
                 if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
                     posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
                     posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
                     voxel = areMatrix.getVoxel(posX + dx, posY + dy, posZ + dz);
                     if(voxelType == VoxelType::WHEEL){
-                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.wheel > 120) {
+                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.wheel == FILLEDVOXEL) {
                             std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz};
                             wheelRegionCoord[regionCounter-1].push_back(newCoord);
                             exploreOrganRegion(areMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, regionCounter, voxelType);
                         }
                     } else if(voxelType == VoxelType::SENSOR){
-                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.sensor > 120) {
+                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.sensor == FILLEDVOXEL) {
                             std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz};
                             sensorRegionCoord[regionCounter-1].push_back(newCoord);
                             exploreOrganRegion(areMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, regionCounter, voxelType);
                         }
                     } else if(voxelType == VoxelType::JOINT){
-                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.joint > 120) {
+                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.joint == FILLEDVOXEL) {
                             std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz};
                             jointRegionCoord[regionCounter-1].push_back(newCoord);
                             exploreOrganRegion(areMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, regionCounter, voxelType);
                         }
                     } else if(voxelType == VoxelType::CASTER){
-                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.caster > 120) {
+                        if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel.caster == FILLEDVOXEL) {
                             std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz};
                             casterRegionCoord[regionCounter-1].push_back(newCoord);
                             exploreOrganRegion(areMatrix, visitedVoxels, posX + dx, posY + dy, posZ + dz, regionCounter, voxelType);
@@ -1331,21 +1474,6 @@ void Morphology_CPPNMatrix::loadMorphologyGenome(int indNum){
     filepath << loadExperiment << "/genome" <<indNum;
     nn.Clear();
     nn.Load(filepath.str().c_str());
-}
-
-Eigen::VectorXd Morphology_CPPNMatrix::getMorphDesc()
-{
-    int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
-    Eigen::VectorXd morphDescVec(8);
-    morphDescVec(0) = morphDesc.robotWidth/MATRIX_SIZE_M;
-    morphDescVec(1) = morphDesc.robotDepth/MATRIX_SIZE_M;
-    morphDescVec(2) = morphDesc.robotHeight/MATRIX_SIZE_M;
-    morphDescVec(3) = (double) morphDesc.voxelNumber/VOXELS_NUMBER;
-    morphDescVec(4) = (double) morphDesc.wheelNumber/MAX_NUM_ORGANS;
-    morphDescVec(5) = (double) morphDesc.sensorNumber/MAX_NUM_ORGANS;
-    morphDescVec(6) = (double) morphDesc.jointNumber/MAX_NUM_ORGANS;
-    morphDescVec(7) = (double) morphDesc.casterNumber/MAX_NUM_ORGANS;
-    return morphDescVec;
 }
 
 std::vector<float> Morphology_CPPNMatrix::getSkeletonDimmensions(PolyVox::RawVolume<uint8_t>& skeletonMatrix)
@@ -1378,9 +1506,9 @@ std::vector<float> Morphology_CPPNMatrix::getSkeletonDimmensions(PolyVox::RawVol
 
     // Get dimmensions
     std::vector<float> dimmensions;
-    float xDiff = abs(maxX - minX);
-    float yDiff = abs(maxY - minY);
-    float zDiff = abs(maxZ - minZ);
+    float xDiff = abs(maxX - minX) + 1;
+    float yDiff = abs(maxY - minY) + 1;
+    float zDiff = abs(maxZ - minZ) + 1;
     dimmensions.push_back(xDiff * VOXEL_REAL_SIZE);
     dimmensions.push_back(yDiff * VOXEL_REAL_SIZE);
     dimmensions.push_back(zDiff * VOXEL_REAL_SIZE);
@@ -1390,17 +1518,19 @@ std::vector<float> Morphology_CPPNMatrix::getSkeletonDimmensions(PolyVox::RawVol
 bool Morphology_CPPNMatrix::isGripperColliding(int gripperHandle)
 {
     int8_t collisionResult;
-
     // Check collision with skeleton
     collisionResult = simCheckCollision(gripperHandle,mainHandle);
     if(collisionResult == 1) // Collision detected!
         return true;
 
+    /// \todo EB: Wheels are ignored in the following loop.
     // Check collision with other organs
-    for(auto & i : _organSpec){
-        collisionResult = simCheckCollision(gripperHandle,i.handle);
-        if(collisionResult == 1) // Collision detected!
-            return true;
+    for (auto &organComp : _organSpec) {
+        for (auto &i : organComp.objectHandles) {
+            collisionResult = simCheckCollision(gripperHandle, i);
+            if (collisionResult == 1) // Collision detected!
+                return true;
+        }
     }
     return false;
 }
@@ -1523,4 +1653,171 @@ int Morphology_CPPNMatrix::countOrgans(int organType)
 void Morphology_CPPNMatrix::removeGripper(int gripperHandle)
 {
     simRemoveModel(gripperHandle);
+}
+
+void Morphology_CPPNMatrix::createAREPuck(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+{
+    int listVoxels[11][3] = {
+            {0,4,-5}, {0,-4,-5}, {0,5,-5}, {0,-5,-5}, // Wheels skeleton
+            {3,0,-4}, {3,0,-3},  // Back sensor skeleton
+            {-4,0,-5}, {-4,2,-5}, {-4,-2,-5}, {-4,1,-5}, {-4,-1,-5},  // Front sensors skeleton
+            };
+    int listOrgans[7][3] = {
+            {0,5,-5}, {0,-5,-5}, // Wheels positions
+            {3,0,-3},  // Back sensor position
+            {-4,0,-5}, {-4,2,-5}, {-4,-2,-5},   // Front sensors skeleton
+            {3,0,-5},  // Back caster position
+    };
+    for(int i=0; i < 11; i++){
+        skeletonMatrix.setVoxel(listVoxels[i][0], listVoxels[i][1], listVoxels[i][2], FILLEDVOXEL);
+    }
+    float tempPos[3];
+    for(int i = 0; i < 7; i++){
+        OrganSpec _organ;
+        int oriX = 0; int oriY = 0; int oriZ = 0;
+        if(i==0){
+            _organ.organType = 1;
+            oriX = -1;
+        } else if(i==1){
+            _organ.organType = 1;
+            oriX = -1;
+        }else if(i==2){
+            _organ.organType = 2;
+            oriX = 1;
+        }else if(i==3){
+            oriX = -1;
+            _organ.organType = 2;
+        } else if(i==4){
+            oriX = -1;
+            oriY = 1;
+            _organ.organType = 2;
+        }else if(i==5){
+            oriX = -1;
+            oriY = -1;
+            _organ.organType = 2;
+        } else if(i==6){
+            oriX = 1;
+            _organ.organType = 4;
+        }
+        tempPos[0] = (float) listOrgans[i][0] * VOXEL_REAL_SIZE;
+        tempPos[1] = (float) listOrgans[i][1] * VOXEL_REAL_SIZE;
+        tempPos[2] = (float) listOrgans[i][2] * VOXEL_REAL_SIZE;
+        tempPos[2] += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
+
+        _organ.organPos.push_back(tempPos[0]);
+        _organ.organPos.push_back(tempPos[1]);
+        _organ.organPos.push_back(tempPos[2]);
+        generateOrientations(oriX, oriY, oriZ, _organ);
+        if(i==1){
+            _organ.organOri.push_back(3.15149);
+        }
+        _organSpec.push_back(_organ);
+    }
+}
+
+void Morphology_CPPNMatrix::createAREPotato(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+{
+    int listVoxels[7][3] = {
+            {-4,0,-5}, // Wheel
+            {-4,-2,-5}, {-4,-1,-5},   // Skeleton
+            {-4,-2,-4}, // Sensor
+            {4,2,-5}, // Caster
+            {1,-4,-5}, // Skeleton
+            {1,-5,-5}, // Wheel
+    };
+    int listOrgans[4][3] = {
+            {-4,0,-5}, // Wheel
+            {1,-5,-5}, // Wheel
+            {-4,-2,-4}, // Sensor
+            {4,2,-5}, // Caster
+    };
+    for(int i=0; i < 7; i++){
+        skeletonMatrix.setVoxel(listVoxels[i][0], listVoxels[i][1], listVoxels[i][2], FILLEDVOXEL);
+    }
+    float tempPos[3];
+    for(int i = 0; i < 4; i++){
+        OrganSpec _organ;
+        int oriX = 0; int oriY = 0; int oriZ = 0;
+        if(i==0){
+            _organ.organType = 1;
+            oriX = -1;
+        } else if(i==1){
+            _organ.organType = 1;
+            oriX = 1;
+        }else if(i==2){
+            _organ.organType = 2;
+            oriX = -1;
+            oriY = -1;
+        }else if(i==3){
+            oriX = 1;
+            _organ.organType = 4;
+        }
+        tempPos[0] = (float) listOrgans[i][0] * VOXEL_REAL_SIZE;
+        tempPos[1] = (float) listOrgans[i][1] * VOXEL_REAL_SIZE;
+        tempPos[2] = (float) listOrgans[i][2] * VOXEL_REAL_SIZE;
+        tempPos[2] += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
+
+        _organ.organPos.push_back(tempPos[0]);
+        _organ.organPos.push_back(tempPos[1]);
+        _organ.organPos.push_back(tempPos[2]);
+        generateOrientations(oriX, oriY, oriZ, _organ);
+
+        _organSpec.push_back(_organ);
+    }
+}
+
+void Morphology_CPPNMatrix::createARETricyle(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+{
+    int listVoxels[6][3] = {
+            {-4,3,-5}, // Sensor 1
+            {-4,-3,-5}, // Sensor 2
+            {-3,4,-5}, // Caster 1
+            {-3,-4,-5}, // Caster 2
+            {4,0,-4}, // Joint 1
+            {4,0,-5}, // Joint 1
+    };
+    int listOrgans[5][3] = {
+            {-4,3,-5}, // Sensor 1
+            {-4,-3,-5}, // Sensor 2
+            {-3,4,-5}, // Caster 1
+            {-3,-4,-5}, // Caster 2
+            {4,0,-4}, // Joint 1
+    };
+    for(int i=0; i < 6; i++){
+        skeletonMatrix.setVoxel(listVoxels[i][0], listVoxels[i][1], listVoxels[i][2], FILLEDVOXEL);
+    }
+    float tempPos[3];
+    for(int i = 0; i < 5; i++){
+        OrganSpec _organ;
+        int oriX = 0; int oriY = 0; int oriZ = 0;
+        if(i==0){
+            _organ.organType = 2;
+            oriX = -1;
+            oriY = 1;
+        } else if(i==1){
+            _organ.organType = 2;
+            oriX = -1;
+            oriY = -1;
+        }else if(i==2){
+            _organ.organType = 4;
+            oriY = 1;
+        }else if(i==3){
+            oriY = -1;
+            _organ.organType = 4;
+        }else if(i==4) {
+            oriX = 1;
+            _organ.organType = 3;
+        }
+        tempPos[0] = (float) listOrgans[i][0] * VOXEL_REAL_SIZE;
+        tempPos[1] = (float) listOrgans[i][1] * VOXEL_REAL_SIZE;
+        tempPos[2] = (float) listOrgans[i][2] * VOXEL_REAL_SIZE;
+        tempPos[2] += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
+
+        _organ.organPos.push_back(tempPos[0]);
+        _organ.organPos.push_back(tempPos[1]);
+        _organ.organPos.push_back(tempPos[2]);
+        generateOrientations(oriX, oriY, oriZ, _organ);
+
+        _organSpec.push_back(_organ);
+    }
 }

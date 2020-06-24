@@ -31,10 +31,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::GenomeLog::Ptr genlog(new are::GenomeLog(genome_log_file));
     logs.push_back(genlog);
 
-    std::string morph_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#morphDescFile").value;
-    are::MorphDesLog::Ptr morphdesclog(new are::MorphDesLog(morph_desc_log_file));
-    logs.push_back(morphdesclog);
-
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));
     logs.push_back(testslog);
@@ -43,7 +39,24 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 //    are::RawMatrixLog::Ptr  rawlog(new are::RawMatrixLog(raw_matrix_file));
 //    logs.push_back(rawlog);
 //
-//    std::string protophenotype_file = are::settings::getParameter<are::settings::String>(param, "#protoPhenotypeFile").value;
-//    are::ProtoPhenotypeLog::Ptr  protophenotypelog(new are::ProtoPhenotypeLog(protophenotype_file));
-//    logs.push_back(protophenotypelog);
+
+//    std::string graphmatrix_file = are::settings::getParameter<are::settings::String>(param, "#graphMatrixFile").value;
+//    are::GraphMatrixLog::Ptr  graphmatrixlog(new are::GraphMatrixLog(graphmatrix_file));
+//    logs.push_back(graphmatrixlog);
+
+    std::string md_cart_wd_log_file = are::settings::getParameter<are::settings::String>(param,"#mdCartWdhFile").value;
+    are::morphDescCartWHDLog::Ptr mdcartwdlog(new are::morphDescCartWHDLog(md_cart_wd_log_file));
+    logs.push_back(mdcartwdlog);
+
+//    std::string md_matrix_proto_log_file = are::settings::getParameter<are::settings::String>(param,"#mdMatrixProtoFile").value;
+//    are::ProtoMatrixLog::Ptr mdmatrixprotolog(new are::ProtoMatrixLog(md_matrix_proto_log_file));
+//    logs.push_back(mdmatrixprotolog);
+
+//    std::string md_matrix_bincppn_log_file = are::settings::getParameter<are::settings::String>(param,"#mdMatrixBinCPPNFile").value;
+//    are::BinCPPNMatrixLog::Ptr mdmatrixbincppnlog(new are::BinCPPNMatrixLog(md_matrix_bincppn_log_file));
+//    logs.push_back(mdmatrixbincppnlog);
+//
+//    std::string md_matrix_inter_log_file = are::settings::getParameter<are::settings::String>(param,"#mdMatrixInterFile").value;
+//    are::InterMatrixLog::Ptr mdmatrixinterlog(new are::InterMatrixLog(md_matrix_inter_log_file));
+//    logs.push_back(mdmatrixinterlog);
 }

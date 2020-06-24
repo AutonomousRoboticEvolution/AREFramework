@@ -20,15 +20,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-
-class MorphDesLog : public Logging
-{
-public:
-    MorphDesLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
 class GenomeLog : public Logging
 {
 public:
@@ -49,6 +40,38 @@ class RawMatrixLog : public Logging
 {
 public:
     RawMatrixLog(const std::string &file) : Logging(file, true){}
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
+class morphDescCartWHDLog : public Logging
+{
+public:
+    morphDescCartWHDLog(const std::string &file) : Logging(file, true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
+class ProtoMatrixLog : public Logging
+{
+public:
+    ProtoMatrixLog(const std::string &file) : Logging(file, true){}
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
+class BinCPPNMatrixLog : public Logging
+{
+public:
+    BinCPPNMatrixLog(const std::string &file) : Logging(file, true){}
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
+class InterMatrixLog : public Logging
+{
+public:
+    InterMatrixLog(const std::string &file) : Logging(file, true){}
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };

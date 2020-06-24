@@ -17,7 +17,28 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="05e115ff-7d6f-44ed-b76c-5c33e053e5d7" name="Default Changelist" comment="" />
+    <list default="true" id="05e115ff-7d6f-44ed-b76c-5c33e053e5d7" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/CPPNIndividual.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/CPPNIndividual.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/CPPNIndividual.h" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/CPPNIndividual.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/LC_NSMS.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/LC_NSMS.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/LC_NSMS.h" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/LC_NSMS.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/ManLog.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/ManLog.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/ManLog.h" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/ManLog.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/lc_nsms/factories.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/lc_nsms/factories.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_BrainC.ttm" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Caster.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Caster.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Gripper.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Gripper.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_HeadV2.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_HeadV2.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Joint.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Joint.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Joint2.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Joint2.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Sensor.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Sensor.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/experiments/sim/C_Wheel.ttm" beforeDir="false" afterPath="$PROJECT_DIR$/experiments/sim/C_Wheel.ttm" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include/ARE/Morphology_CPPNMatrix.h" beforeDir="false" afterPath="$PROJECT_DIR$/include/ARE/Morphology_CPPNMatrix.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ARE/Morphology_CPPNMatrix.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/src/ARE/Morphology_CPPNMatrix.cpp" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -39,6 +60,7 @@
   <component name="PropertiesComponent">
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="cf.first.check.clang-format" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$/CMakeLists.txt" />
@@ -110,6 +132,7 @@
       <workItem from="1591350665064" duration="17207000" />
       <workItem from="1591691133669" duration="1221000" />
       <workItem from="1591958255932" duration="2078000" />
+      <workItem from="1593007202546" duration="401000" />
     </task>
     <servers />
   </component>
