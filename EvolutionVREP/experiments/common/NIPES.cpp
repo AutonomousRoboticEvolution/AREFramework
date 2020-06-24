@@ -375,6 +375,7 @@ void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
 bool NIPES::update(const Environment::Ptr & env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;
+    reevaluated++;
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
@@ -382,10 +383,13 @@ bool NIPES::update(const Environment::Ptr & env){
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
         std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
-
     }
 
+//    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
+//    if(reevaluated < nbReEval)
+//        return false;
 
+//    reevaluated = 0;
     return true;
 }
 bool NIPES::is_finish(){

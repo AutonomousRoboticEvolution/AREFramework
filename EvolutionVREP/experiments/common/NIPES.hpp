@@ -138,6 +138,7 @@ protected:
     cma::CMASolutions best_run;
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
+    int reevaluated = 0;
 };
 
 
