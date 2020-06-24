@@ -61,9 +61,6 @@ public:
         substrate = sub;
     }
 
-
-
-
     /**
      * @brief set the position of the morphology with a random orientation
      */
