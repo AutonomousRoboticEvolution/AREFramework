@@ -1322,9 +1322,9 @@ void Morphology_CPPNMatrix::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &s
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     uint8_t voxel;
     // Explore neighbourhood.
-    for (int dz = -2; dz <= 2; dz+=1) {
-        for (int dy = -2; dy <= 2; dy+=1) {
-            for (int dx = -2; dx <= 2; dx+=1) {
+    for (int dz = -1; dz <= 1; dz+=1) {
+        for (int dy = -1; dy <= 1; dy+=1) {
+            for (int dx = -1; dx <= 1; dx+=1) {
                 if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
                     posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
                     posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
