@@ -4,6 +4,7 @@
 
 #define HANDMADEROBOT 0
 #define ISCLUSTER 0
+#define ISROBOTSTATIC 1
 
 using namespace are;
 
@@ -111,21 +112,26 @@ void Morphology_CPPNMatrix::create()
             int convexHandle;
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
             mainHandle = convexHandle;
-//            // Create brain primitive
-//            float brainSize[3] = {0.084,0.084,0.11};
-//            int brainHandle;
-//            brainHandle = simCreatePureShape(0,0,brainSize,0.250,NULL);
-//            float brainPos[3] = {0.0,0.0,0.06};
-//            simSetObjectPosition(brainHandle,-1,brainPos);
-//            // Group primitives
-//            int groupHandles[2] = {convexHandle, brainHandle};
-//            mainHandle = simGroupShapes(groupHandles, 2);
+            // Create brain primitive
+            float brainSize[3] = {0.084,0.084,0.11};
+            int brainHandle;
+            brainHandle = simCreatePureShape(0,0,brainSize,0.250,NULL);
+            float brainPos[3] = {0.0,0.0,0.06};
+            simSetObjectPosition(brainHandle,-1,brainPos);
+            // Group primitives
+            int groupHandles[2] = {convexHandle, brainHandle};
+            mainHandle = simGroupShapes(groupHandles, 2);
             // Set parenthood
             simSetObjectParent(meshHandle,mainHandle, 1);
             simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
             sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
+#ifndef ISROBOTSTATIC
+            std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif ISROBOTSTATIC == 0
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+#elif ISROBOTSTATIC == 1
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
-            //simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0);
+#endif
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
@@ -652,7 +658,13 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     organ.connectorOri.push_back(newConnectorOri[1]);
     organ.connectorOri.push_back(newConnectorOri[2]);
 
-    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keep organ fix in the absolute position. For testing puproses
+#ifndef ISROBOTSTATIC
+            std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif ISROBOTSTATIC == 0
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+#elif ISROBOTSTATIC == 1
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+#endif
 
     usleep(1000);
 }
@@ -705,7 +717,13 @@ void Morphology_CPPNMatrix::createTemporalGripper(Morphology_CPPNMatrix::OrganSp
     gripperOrientation[2] = 1.5708;
     simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
 
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1);
+#ifndef ISROBOTSTATIC
+            std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif ISROBOTSTATIC == 0
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+#elif ISROBOTSTATIC == 1
+            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+#endif
     simSetObjectParent(gripperHandle, mainHandle, 1);
 
     organ.gripperHandle = gripperHandle;
@@ -1350,7 +1368,7 @@ void Morphology_CPPNMatrix::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &s
                 skeletonRegionCoord[i][j][0] >= xHeadLowerLimit - skeletonBaseThickness &&
                 skeletonRegionCoord[i][j][1] <= yHeadUpperLimit + skeletonBaseThickness &&
                 skeletonRegionCoord[i][j][1] >= yHeadLowerLimit - skeletonBaseThickness &&
-                skeletonRegionCoord[i][j][2] <= -11 + skeletonBaseThickness){ /// \todo :EB make this a constant!
+                skeletonRegionCoord[i][j][2] <= -6 + skeletonBaseHeight){ /// \todo :EB make this a constant!
                     regionConnected = i;
                     break;
                 }
