@@ -95,6 +95,7 @@ public:
     }
 
     //GETTERS & SETTERS
+    void setCurrentIndIndex(int index){currentIndIndex = index;}
     Individual::Ptr getIndividual(size_t index) const;
     size_t getPopSize() const {return population.size();}
 
