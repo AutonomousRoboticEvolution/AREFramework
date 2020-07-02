@@ -277,12 +277,15 @@ void NIPES::epoch(){
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double energy_budget = settings::getParameter<settings::Double>(parameters,"#energyBudget").value;
+    bool energy_reduction = settings::getParameter<settings::Boolean>(parameters,"#energyReduction").value;
 
     /**Energy Cost**/
-    for(const auto &ind : population){
-        double ec = std::dynamic_pointer_cast<NN2Individual>(ind)->get_energy_cost();
-        if(ec > energy_budget) ec = energy_budget;
-        std::dynamic_pointer_cast<NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
+    if(energy_reduction){
+        for(const auto &ind : population){
+            double ec = std::dynamic_pointer_cast<NN2Individual>(ind)->get_energy_cost();
+            if(ec > energy_budget) ec = energy_budget;
+            std::dynamic_pointer_cast<NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
+        }
     }
 
     /** NOVELTY **/
@@ -367,7 +370,6 @@ void NIPES::init_next_pop(){
 }
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
-    currentIndIndex = indIdx;
     population[indIdx]->setObjectives(objectives);
 }
 
@@ -392,8 +394,33 @@ bool NIPES::update(const Environment::Ptr & env){
 //    reevaluated = 0;
     return true;
 }
+
 bool NIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
     return _is_finish || numberEvaluation >= maxNbrEval;
+}
+
+bool NIPES::finish_eval(){
+
+    float tPos[3];
+    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
+    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
+    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+
+    auto distance = [](float* a,float* b) -> double
+    {
+        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                         (a[1] - b[1])*(a[1] - b[1]) +
+                         (a[2] - b[2])*(a[2] - b[2]));
+    };
+
+    int handle = population[currentIndIndex]->get_morphology()->getMainHandle();
+    float pos[3];
+    simGetObjectPosition(handle,-1,pos);
+    double dist = 1 - distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+
+    return  dist < fTarget;
 }

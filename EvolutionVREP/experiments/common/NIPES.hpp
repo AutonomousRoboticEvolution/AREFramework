@@ -115,14 +115,15 @@ public:
         cmaStrategy.reset();
     }
 
-    void init();
-    void epoch();
-    void init_next_pop();
-    bool update(const Environment::Ptr&);
+    void init() override;
+    void epoch() override;
+    void init_next_pop() override;
+    bool update(const Environment::Ptr&) override;
 
-    void setObjectives(size_t indIdx, const std::vector<double> &objectives);
+    void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
 
-    bool is_finish();
+    bool is_finish() override;
+    bool finish_eval() override;
 
     bool restarted(){return !cmaStrategy->log_stopping_criterias.empty();}
     std::string pop_stopping_criterias(){
@@ -134,7 +135,6 @@ public:
 
 protected:
     IPOPCMAStrategy::Ptr cmaStrategy;
-    size_t currentIndIndex;
     cma::CMASolutions best_run;
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
