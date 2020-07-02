@@ -1,4 +1,4 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "EA_HyperNEAT.h"
 #include "Loggings.h"
 #include "HNLoggings.h"

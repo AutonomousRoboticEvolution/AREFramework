@@ -5,8 +5,7 @@
 #include "ARE/EA.h"
 #include "ARE/CPPNGenome.h"
 #include "CPPNIndividual.h"
-#include "EPuckMorphology.h"
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "testEnv.h"
 
 typedef std::chrono::high_resolution_clock hr_clock;
