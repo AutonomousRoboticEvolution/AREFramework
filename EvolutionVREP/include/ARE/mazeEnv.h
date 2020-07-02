@@ -56,6 +56,8 @@ private:
     std::vector<double> final_position;
     std::vector<waypoint> trajectory;
     int move_counter = 0;
+
+    void build_tiled_floor(std::vector<int> &tiles_handles);
 };
 
 } //are

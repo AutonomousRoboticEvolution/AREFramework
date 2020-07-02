@@ -48,6 +48,11 @@ void MazeEnv::init(){
         simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
     }
 
+    if(!flatFloor){
+        std::vector<int> th;
+        build_tiled_floor(th);
+    }
+
     trajectory.clear();
 
     if(!flatFloor){
