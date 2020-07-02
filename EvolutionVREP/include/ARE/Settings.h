@@ -31,6 +31,7 @@ class Boolean : public Type
 {
 public:
     Boolean(){name = "bool";}
+    Boolean(bool b) : value(b){name = "int";}
     bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
     template<class archive>
@@ -45,6 +46,7 @@ class Integer : public Type
 {
 public:
     Integer(){name = "int";}
+    Integer(int i) : value(i) {name = "int";}
     int value = 0;
     void fromString(const std::string& str){value = std::stoi(str);}
     template<class archive>
@@ -59,6 +61,7 @@ class Float : public Type
 {
 public:
     Float(){name = "float";}
+    Float(float f) : value(f) {name = "float";}
     float value = 0.0;
     void fromString(const std::string& str){value = std::stof(str);}
     template<class archive>
@@ -74,6 +77,7 @@ class Double : public Type
 {
 public:
     Double(){name = "double";}
+    Double(double d) : value(d) {name = "double";}
     double value = 0.0;
     void fromString(const std::string& str){value = std::stod(str);}
     template<class archive>
@@ -88,6 +92,7 @@ class String : public Type
 {
 public:
     String(){name = "string";}
+    String(std::string s) : value(s) {name = "string";}
     std::string value = "";
     void fromString(const std::string& str){value = str;}
     template<class archive>
@@ -120,13 +125,26 @@ enum InstanceType {
 typedef std::map<const std::string,const Type::ConstPtr> ParametersMap;
 typedef std::shared_ptr<ParametersMap> ParametersMapPtr;
 
+/**
+ * @brief Default parameters.
+ */
+struct defaults{
+    static ParametersMapPtr parameters;
+};
+
 template<typename T>
 T getParameter(const ParametersMapPtr &params,const std::string& name)
 {
     if(params->find(name) == params->end()){
-        std::cerr << "unable to find parameters " << name << std::endl
-                  << "you should define it in the parameters file." << std::endl;
-        return T();
+        std::cerr << "Unable to find parameters " << name << std::endl
+                  << "You should define it in the parameters file." << std::endl;
+        if(settings::defaults::parameters->find(name) == settings::defaults::parameters->end()){
+            std::cerr << "No default value found" << std::endl;
+            return T();
+        }
+        T res = *(cast<T>(defaults::parameters->at(name)));
+        std::cerr << "Returning default value : " << res.value << std::endl;
+        return res;
     }
     return *(cast<T>(params->at(name)));
 }
@@ -135,16 +153,34 @@ template<typename T>
 T getParameter(const ParametersMap &params,const std::string& name)
 {
     if(params.find(name) == params.end()){
-        std::cerr << "unable to find parameters " << name << std::endl
-                  << "you should define it in the parameters file." << std::endl;
-        return T();
+        std::cerr << "Unable to find parameters " << name << std::endl
+                  << "You should define it in the parameters file." << std::endl;
+        if(settings::defaults::parameters->find(name) == settings::defaults::parameters->end()){
+            std::cerr << "No default value found" << std::endl;
+            return T();
+        }
+        T res = *(cast<T>(defaults::parameters->at(name)));
+        std::cerr << "Returning default value : " << res.value << std::endl;
+        return res;
     }
     return *(cast<T>(params.at(name)));
 }
 
+/**
+ * @brief Load the parameters from a file. No need to call it explicitly. It is called at the start of the plugin, either in v_repExtER or in ERClient.
+ * @param parameter file in csv format
+ * @return the parameters map
+ */
 ParametersMap loadParameters(const std::string& file);
+
+/**
+ * @brief TODO : fix seed issue
+ * @param file
+ * @param param
+ */
 void saveParameters(const std::string& file,const ParametersMapPtr &param); //todo
 
+//To re-evaluate, likely to be removed
 struct Property
 {
     typedef std::shared_ptr<Property> Ptr;

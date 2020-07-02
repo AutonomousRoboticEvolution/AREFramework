@@ -16,33 +16,16 @@ Individual::Ptr CPPNIndividual::clone()
 void CPPNIndividual::update(double delta_time)
 {
     std::vector<double> inputs = morphology->update();
-
-//    std::cout << "Inputs : ";
-//    for(const double& prox : inputs)
-//        std::cout << prox << " ; ";
-//    std::cout << std::endl;
-
     std::vector<double> outputs = control->update(inputs);
-
-//    std::cout << "Outputs : ";
-//    for(const double& o : outputs)
-//        std::cout << o << " ; ";
-//    std::cout << std::endl;
-
-    std::vector<int> jointHandles =
-            std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
-
-    assert(jointHandles.size() == outputs.size());
-
-    for (size_t i = 0; i < outputs.size(); i++){
-        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
-    }
+    morphology->command(outputs);
 }
 
 void CPPNIndividual::createMorphology()
 {
-    morphology.reset(new EPuckMorphology(parameters));
-    std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
+    morphology.reset(new FixedMorphology(parameters));
+    morphology->set_randNum(randNum);
+    std::dynamic_pointer_cast<FixedMorphology>(morphology)->loadModel();
+    std::dynamic_pointer_cast<FixedMorphology>(morphology)->setSubstrate(subtrates::are_puck);
 
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
@@ -69,7 +52,6 @@ std::string CPPNIndividual::to_string()
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
     oarch.register_type<CPPNGenome>();
-//    oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
 }
@@ -80,6 +62,5 @@ void CPPNIndividual::from_string(const std::string &str){
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
     iarch.register_type<CPPNGenome>();
-//    iarch.register_type<EmptyGenome>();
     iarch >> *this;
 }

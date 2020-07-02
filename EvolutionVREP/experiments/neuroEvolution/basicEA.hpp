@@ -3,8 +3,10 @@
 
 #include "ARE/EA.h"
 #include <memory>
-#include "NNIndividual.hpp"
-#include "mazeEnv.h"
+#include "ARE/nn2/NN2Individual.hpp"
+#include "ARE/nn2/NN2Settings.hpp"
+#include "ARE/NNParamGenome.hpp"
+#include "ARE/mazeEnv.h"
 
 namespace are {
 

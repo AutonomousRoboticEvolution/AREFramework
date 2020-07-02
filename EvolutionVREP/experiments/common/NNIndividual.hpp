@@ -3,8 +3,7 @@
 
 #include "ARE/Individual.h"
 #include "NNGenome.hpp"
-#include "EPuckMorphology.h"
-#include "AREPuckMorphology.h"
+#include "ARE/FixedMorphology.hpp"
 #include "NNControl.h"
 
 namespace are {

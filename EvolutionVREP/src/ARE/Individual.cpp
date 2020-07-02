@@ -15,6 +15,11 @@ Individual::~Individual(){
     control.reset();
 }
 
+void Individual::crossover(const Individual::Ptr &partner, Individual &child1, Individual &child2){
+    child1 = *partner;
+    child2 = *this;
+}
+
 std::string Individual::to_string()
 {
     std::stringstream sstream;

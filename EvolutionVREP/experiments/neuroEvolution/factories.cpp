@@ -1,4 +1,4 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "basicEA.hpp"
 #include "Loggings.h"
 #include "NELoggings.hpp"
@@ -38,6 +38,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::BehavDescLog::Ptr bdlog(new are::BehavDescLog(behav_desc_log_file));
     logs.push_back(bdlog);
 
-    are::NNGenomeLog::Ptr nnglog(new are::NNGenomeLog);
+    are::NNParamGenomeLog::Ptr nnglog(new are::NNParamGenomeLog);
     logs.push_back(nnglog);
 }

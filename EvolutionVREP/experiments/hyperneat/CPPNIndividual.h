@@ -3,8 +3,8 @@
 
 #include "ARE/Individual.h"
 #include "ARE/CPPNGenome.h"
+#include "ARE/FixedMorphology.hpp"
 #include "NNControl.h"
-#include "EPuckMorphology.h"
 #include "v_repLib.h"
 
 namespace are {
@@ -26,7 +26,6 @@ public :
     {
         arch & objectives;
         arch & ctrlGenome;
-//        arch & morphGenome;
         arch & final_position;
     }
 

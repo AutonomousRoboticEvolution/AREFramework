@@ -1,22 +1,27 @@
 cmake_minimum_required(VERSION 3.0)
 
+add_definitions(-DEIGEN3_ENABLED)
+
+set(INCLUDES
+    "${VREP_FOLDER}/programming/include"
+    "../common/"
+    "../../modules"
+    "/usr/include/eigen3/")
 
 add_library(NSLC SHARED
-    ../common/NNControl.cpp
-    ../common/EPuckMorphology.cpp
-    ../common/AREPuckMorphology.cpp
-    ../common/mazeEnv.cpp
     ../common/Loggings.cpp
-    ../common/NNGenome.cpp
-    ../common/NNIndividual.cpp
+    ../common/Novelty.cpp
     NSLC.cpp
     factories.cpp
     NSLCLoggings.cpp
     )
-target_include_directories(NSLC PUBLIC
-    "${VREP_FOLDER}/programming/include"
-    "../common/"
-    "/usr/include/eigen3/"
-    )
+target_include_directories(NSLC PUBLIC ${INCLUDES})
 target_link_libraries(NSLC ER_library)
-install(TARGETS NSLC DESTINATION lib)
+
+
+add_executable(nslc_test nslc_test.cpp)
+target_include_directories(nslc_test PUBLIC ${INCLUDES})
+target_link_libraries(nslc_test NSLC ER_library)
+
+install(TARGETS  NSLC DESTINATION lib)
+install(DIRECTORY . DESTINATION include/nslc FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

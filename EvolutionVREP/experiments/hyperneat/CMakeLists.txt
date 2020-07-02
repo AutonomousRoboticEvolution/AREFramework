@@ -2,18 +2,17 @@ cmake_minimum_required(VERSION 3.0)
 
 
 add_library(hyperneat SHARED
+    ../common/NNControl.cpp
+    ../common/testEnv.cpp
+    ../common/Loggings.cpp
     EA_HyperNEAT.cpp
     CPPNIndividual.cpp
-    ../common/NNControl.cpp
-    ../common/EPuckMorphology.cpp
-    ../common/testEnv.cpp
-    ../common/mazeEnv.cpp
     factories.cpp
-    ../common/Loggings.cpp
     HNLoggings.cpp)
 target_include_directories(hyperneat PUBLIC
     "${VREP_FOLDER}/programming/include"
     "../common/"
     )
 target_link_libraries(hyperneat ER_library)
-install(TARGETS hyperneat DESTINATION lib)
+install(TARGETS  hyperneat DESTINATION lib)
+install(DIRECTORY . DESTINATION include/hyperneat FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
