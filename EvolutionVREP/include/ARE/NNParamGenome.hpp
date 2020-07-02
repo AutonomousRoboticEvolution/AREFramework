@@ -92,7 +92,6 @@ public:
     void init() override{
 
     }
-    Phenotype::Ptr develop() override{}
     void mutate() override;
 
 

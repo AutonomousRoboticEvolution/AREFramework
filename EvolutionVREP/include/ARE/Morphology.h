@@ -48,8 +48,6 @@ public:
     virtual void command(const std::vector<double>& sensorValues){}
 
 
-
-
     //GETTERS & SETTERS
     virtual int getMainHandle(){return mainHandle;}
     const NEAT::Substrate &get_substrate(){return substrate;}

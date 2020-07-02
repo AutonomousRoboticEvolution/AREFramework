@@ -10,7 +10,6 @@ set(INCLUDES
 
 add_library(NSLC SHARED
     ../common/Loggings.cpp
-    ../common/Novelty.cpp
     NSLC.cpp
     factories.cpp
     NSLCLoggings.cpp

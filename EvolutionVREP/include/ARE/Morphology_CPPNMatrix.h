@@ -315,7 +315,7 @@ public:
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphDesc.graphMatrix;};
 
 protected:
-    void getObjectHandles() override;
+    void getObjectHandles();
 
 private:
     NEAT::NeuralNetwork nn;
