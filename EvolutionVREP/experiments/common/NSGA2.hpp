@@ -2,6 +2,7 @@
 #define NSGA2_HPP
 
 #include "ARE/EA.h"
+#include <tbb/tbb.h>
 
 namespace are {
 
@@ -71,21 +72,23 @@ public:
         std::vector<size_t> a1 = shuffle();
         std::vector<size_t> a2 = shuffle();
 
-        for(size_t i = 0; i < population.size() - 3; i+=4){
-            indPtr ind11 = tournament(parents[a1[i]],parents[a1[i+1]]);
-            indPtr ind12 = tournament(parents[a1[i+2]],parents[a1[i+3]]);
-            indPtr ind21 = tournament(parents[a2[i]],parents[a2[i+1]]);
-            indPtr ind22 = tournament(parents[a2[i+2]],parents[a2[i+3]]);
-            //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
-            individual_t child1 ,child2, child3, child4;
-            std::dynamic_pointer_cast<individual_t>(ind11)->crossover(ind12,child1,child2);
-            std::dynamic_pointer_cast<individual_t>(ind21)->crossover(ind22,child3,child4);
-            childrens[i] = std::make_shared<individual_t>(child1);
-            childrens[i+1] = std::make_shared<individual_t>(child2);
-            childrens[i+2] = std::make_shared<individual_t>(child3);
-            childrens[i=3] = std::make_shared<individual_t>(child4);
-        }
-
+        tbb::parallel_for(tbb::blocked_range<size_t>(0,population.size(), 4),
+                          [&](tbb::blocked_range<size_t> r){
+            for(size_t i = r.begin(); i < r.end(); i+=4){
+                indPtr ind11 = tournament(parents[a1[i]],parents[a1[i+1]]);
+                indPtr ind12 = tournament(parents[a1[i+2]],parents[a1[i+3]]);
+                indPtr ind21 = tournament(parents[a2[i]],parents[a2[i+1]]);
+                indPtr ind22 = tournament(parents[a2[i+2]],parents[a2[i+3]]);
+                //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
+                indPtr child1(new individual_t) ,child2(new individual_t), child3(new individual_t), child4(new individual_t);
+                std::dynamic_pointer_cast<individual_t>(ind11)->crossover(ind12,*child1,*child2);
+                std::dynamic_pointer_cast<individual_t>(ind21)->crossover(ind22,*child3,*child4);
+                childrens[i] = child1;
+                childrens[i+1] = child2;
+                childrens[i+2] = child3;
+                childrens[i+3] = child4;
+            }
+        });
         population.clear();
         for(const auto &ind : childrens)
             population.push_back(ind);
