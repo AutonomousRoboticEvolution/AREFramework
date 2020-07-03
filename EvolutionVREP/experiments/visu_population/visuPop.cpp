@@ -83,6 +83,7 @@ void VisuPop::init(){
         std::stringstream sstr;
         sstr << folder << "/genome_" << generation << "_" << ind;
         gen_files.push_back(sstr.str());
+        gen_index.push_back(0);
     }
     else{
         std::string filename;
