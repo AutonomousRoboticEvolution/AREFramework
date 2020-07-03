@@ -126,14 +126,24 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
             x(i) = genome[i];
 
         double reward = 0;
-        int i = 0;
-        for(; i < _pop[r]->getObjectives().size() - 1; i++)
-            reward += 1 - _pop[r]->getObjectives()[i];
+        double fvalue = 0;
+        if(start_novelty_ratio > 0){
+            int i = 0;
+            for(; i < _pop[r]->getObjectives().size() - 1; i++)
+                reward += 1 - _pop[r]->getObjectives()[i];
 
-        reward = reward/static_cast<double>(_pop[r]->getObjectives().size() - 1);
+            reward = reward/static_cast<double>(_pop[r]->getObjectives().size() - 1);
 
-        double fvalue = (1-novelty_ratio)*reward
-                + novelty_ratio*(1-_pop[r]->getObjectives()[i]);
+            fvalue = (1-novelty_ratio)*reward
+                    + novelty_ratio*(1-_pop[r]->getObjectives()[i]);
+        }
+        else{
+            for(const double& obj :  _pop[r]->getObjectives())
+                reward += 1 - obj;
+
+            fvalue = reward/_pop[r]->getObjectives().size();
+
+        }
 
         _solutions.candidates().push_back(cma::Candidate(fvalue,x));
     }
@@ -164,7 +174,7 @@ bool IPOPCMAStrategy::stop()
     if(ipop_stop){
         log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
     }
-    return  reached_ft || pop_stag || best_sol_stag  || ipop_stop;
+    return  pop_stag || best_sol_stag  || ipop_stop;
 }
 
 void IPOPCMAStrategy::reset_search_state()
@@ -317,10 +327,10 @@ void NIPES::epoch(){
     cmaStrategy->eval();
     cmaStrategy->tell();
     bool stop = cmaStrategy->stop();
-    if(cmaStrategy->have_reached_ftarget()){
-        _is_finish = true;
-        return;
-    }
+//    if(cmaStrategy->have_reached_ftarget()){
+//        _is_finish = true;
+////        return;
+//    }
 
     if(withRestart && stop){
         if(verbose)
@@ -421,6 +431,10 @@ bool NIPES::finish_eval(){
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
     double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+
+    if(dist < fTarget){
+        std::cout << "STOP !" << std::endl;
+    }
 
     return  dist < fTarget;
 }
