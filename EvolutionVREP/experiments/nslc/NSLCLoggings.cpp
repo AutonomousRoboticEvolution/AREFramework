@@ -2,7 +2,7 @@
 
 using namespace are;
 
-void BehavDescLog::saveLog(EA::Ptr &ea)
+void NSLCBehavDescLog::saveLog(EA::Ptr &ea)
 {
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream))
