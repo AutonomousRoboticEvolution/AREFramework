@@ -64,6 +64,7 @@ public:
         arch & final_position;
         arch & energy_cost;
         arch & trajectory;
+        arch & sim_time;
     }
 
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
@@ -72,9 +73,10 @@ public:
     void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
 
-
+    void crossover(const Individual::Ptr &partner, Individual& child1, Individual& child2) override;
 
     double get_energy_cost(){return energy_cost;}
+    double get_sim_time(){return sim_time;}
 
 protected:
     void createMorphology() override;
@@ -83,6 +85,7 @@ protected:
     std::vector<double> final_position;
     std::vector<waypoint> trajectory;
     double energy_cost=0;
+    double sim_time=0;
 };
 
 }

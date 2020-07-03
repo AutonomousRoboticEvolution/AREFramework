@@ -52,7 +52,6 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
-
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {

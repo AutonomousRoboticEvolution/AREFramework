@@ -49,8 +49,10 @@ struct mutators{
 
 
 
-using crossover_t = std::function<void(const std::vector<double> &p1, const std::vector<double> &p2,
-                                   std::vector<double> &c1,std::vector<double>& c2)>;
+using crossover_t = std::function<
+                    void(const std::vector<double> &p1, const std::vector<double> &p2,
+                    std::vector<double> &c1,std::vector<double>& c2,
+            double* param, const misc::RandNum::Ptr &rn)>;
 
 struct crossovers{
     enum type {
@@ -94,6 +96,7 @@ public:
     }
     Phenotype::Ptr develop() override{}
     void mutate() override;
+    void crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
 
 
     void set_weights(const std::vector<double>& w){weights = w;}

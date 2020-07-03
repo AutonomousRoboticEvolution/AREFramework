@@ -21,8 +21,8 @@ void Individual::crossover(const Individual::Ptr &partner, Individual &child1, I
 }
 
 void Individual::crossover(const Individual::Ptr &partner, Individual &child1, Individual &child2){
-    child1 = *partner;
-    child2 = *this;
+    child1 = *(partner->clone());
+    child2 = *(clone());
 }
 
 std::string Individual::to_string()
