@@ -420,7 +420,7 @@ bool NIPES::finish_eval(){
     int handle = population[currentIndIndex]->get_morphology()->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = 1 - distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
 
     return  dist < fTarget;
 }
