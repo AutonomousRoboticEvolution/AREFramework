@@ -398,7 +398,7 @@ bool NIPES::update(const Environment::Ptr & env){
 bool NIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-    return _is_finish || numberEvaluation >= maxNbrEval;
+    return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 
 bool NIPES::finish_eval(){
