@@ -1,5 +1,5 @@
-#ifndef MORPHOLOGY_CPPNMATRIX_H
-#define MORPHOLOGY_CPPNMATRIX_H
+#ifndef Morphology_CPPNMatrix_H
+#define Morphology_CPPNMatrix_H
 
 #include "ARE/Morphology.h"
 
@@ -86,8 +86,6 @@ public:
 
     class CartDesc
     {
-    private:
-
     public:
         float robotWidth; // X
         float robotDepth; // Y
@@ -109,6 +107,7 @@ public:
             sensorNumber = 0;
             casterNumber = 0;
             jointNumber = 0;
+            setCartDesc();
         }
         void setCartDesc(){
             cartDesc(0) = robotWidth / MATRIX_SIZE_M;
@@ -140,74 +139,29 @@ public:
         }
     };
 
-    class CPPNBinaryDesc{
+    class SymDesc{
     public:
-        std::vector<std::vector<std::vector<bool>>> skeletonMatrix;
-        std::vector<std::vector<std::vector<bool>>> wheelMatrix;
-        std::vector<std::vector<std::vector<bool>>> sensorMatrix;
-        std::vector<std::vector<std::vector<bool>>> jointMatrix;
-        std::vector<std::vector<std::vector<bool>>> casterMatrix;
-        // Constructor
-        CPPNBinaryDesc(){
-            skeletonMatrix.resize(MATRIX_SIZE + 1);
-            wheelMatrix.resize(MATRIX_SIZE + 1);
-            sensorMatrix.resize(MATRIX_SIZE + 1);
-            jointMatrix.resize(MATRIX_SIZE + 1);
-            casterMatrix.resize(MATRIX_SIZE + 1);
-            for(int i = 0; i < 13; i++){
-                skeletonMatrix[i].resize(MATRIX_SIZE + 1);
-                wheelMatrix[i].resize(MATRIX_SIZE + 1);
-                sensorMatrix[i].resize(MATRIX_SIZE + 1);
-                jointMatrix[i].resize(MATRIX_SIZE + 1);
-                casterMatrix[i].resize(MATRIX_SIZE + 1);
-                for(int j = 0; j < MATRIX_SIZE + 1; j++){
-                    skeletonMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    wheelMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    sensorMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    jointMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    casterMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    for(int k = 0; k < MATRIX_SIZE + 1; k++){
-                        skeletonMatrix[i][j][k] = false;
-                        wheelMatrix[i][j][k] = false;
-                        sensorMatrix[i][j][k] = false;
-                        jointMatrix[i][j][k] = false;
-                        casterMatrix[i][j][k] = false;
-                    }
-                }
-            }
+        unsigned short int voxelQ1, voxelQ2, voxelQ3, voxelQ4;
+        unsigned short int wheelQ1, wheelQ2, wheelQ3, wheelQ4;
+        unsigned short int sensorQ1, sensorQ2, sensorQ3, sensorQ4;
+        unsigned short int jointQ1, jointQ2, jointQ3, jointQ4;
+        unsigned short int casterQ1, casterQ2, casterQ3, casterQ4;
+        Eigen::VectorXd symDesc;
+        SymDesc(){
+            symDesc.resize(20);
+            voxelQ1 = 0; voxelQ2 = 0; voxelQ3 = 0; voxelQ4 = 0;
+            wheelQ1 = 0; wheelQ2 = 0; wheelQ3 = 0; wheelQ4 = 0;
+            sensorQ1 = 0; sensorQ2 = 0; sensorQ3 = 0; sensorQ4 = 0;
+            jointQ1 = 0; jointQ2 = 0; jointQ3 = 0; jointQ4 = 0;
+            casterQ1 = 0; casterQ2 = 0; casterQ3 = 0; casterQ4 = 0;
+            setSymDesc();
         }
-    };
-
-    class IntersectionDesc{
-    public:
-        std::vector<std::vector<std::vector<bool>>> wheelInter;
-        std::vector<std::vector<std::vector<bool>>> sensorInter;
-        std::vector<std::vector<std::vector<bool>>> jointInter;
-        std::vector<std::vector<std::vector<bool>>> casterInter;
-        // Constructor
-        IntersectionDesc(){
-            wheelInter.resize(MATRIX_SIZE + 1);
-            sensorInter.resize(MATRIX_SIZE + 1);
-            jointInter.resize(MATRIX_SIZE + 1);
-            casterInter.resize(MATRIX_SIZE + 1);
-            for(int i = 0; i < MATRIX_SIZE + 1; i++){
-                wheelInter[i].resize(MATRIX_SIZE + 1);
-                sensorInter[i].resize(MATRIX_SIZE + 1);
-                jointInter[i].resize(MATRIX_SIZE + 1);
-                casterInter[i].resize(MATRIX_SIZE + 1);
-                for(int j = 0; j < MATRIX_SIZE + 1; j++){
-                    wheelInter[i][j].resize(MATRIX_SIZE + 1);
-                    sensorInter[i][j].resize(MATRIX_SIZE + 1);
-                    jointInter[i][j].resize(MATRIX_SIZE + 1);
-                    casterInter[i][j].resize(MATRIX_SIZE + 1);
-                    for(int k = 0; k < MATRIX_SIZE + 1; k++){
-                        wheelInter[i][j][k] = false;
-                        sensorInter[i][j][k] = false;
-                        jointInter[i][j][k] = false;
-                        casterInter[i][j][k] = false;
-                    }
-                }
-            }
+        void setSymDesc(){
+            symDesc(0) = voxelQ1; symDesc(1) = voxelQ2; symDesc(2) = voxelQ3; symDesc(3) = voxelQ4;
+            symDesc(4) = wheelQ1; symDesc(5) = wheelQ2; symDesc(6) = wheelQ3; symDesc(7) = wheelQ4;
+            symDesc(8) = sensorQ1; symDesc(9) = sensorQ2; symDesc(10) = sensorQ3; symDesc(11) = sensorQ4;
+            symDesc(12) = jointQ1; symDesc(13) = jointQ2; symDesc(14) = jointQ3; symDesc(15) = jointQ4;
+            symDesc(16) = casterQ1; symDesc(17) = casterQ2; symDesc(18) = casterQ3; symDesc(19) = casterQ4;
         }
     };
 
@@ -215,8 +169,7 @@ public:
     public:
         CartDesc cartDesc;
         MatDesc matDesc;
-        CPPNBinaryDesc cppnBinDesc;
-        IntersectionDesc interDesc;
+        SymDesc symDesc;
     };
 
     /////////////////////////////
@@ -400,13 +353,15 @@ public:
     void createAREPotato(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
     void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
 
+    void getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void setVoxelQuadrant(short signed int x, short signed int y, short unsigned int componentType);
+
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
     std::vector<bool> getRobotManRes(){return robotManRes.getResVector();};
     NEAT::NeuralNetwork getGenome(){return nn;};
     void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
-    std::vector<std::vector<float>> getRawMatrix(){return rawMatrix;};
     double getManScore(){return manScore;};
     void setManScore(double ms){ manScore = ms;};
 
@@ -414,15 +369,7 @@ public:
     /// \todo EB: There must be a better way to retrieve descriptor. Perhaps as the descritor as a whole?
     Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return indDesc.matDesc.graphMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getCPPNBoolSkeletonMatrix(){return indDesc.cppnBinDesc.skeletonMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getCPPNBoolWheelMatrix(){return indDesc.cppnBinDesc.wheelMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getCPPNBoolSensorMatrix(){return indDesc.cppnBinDesc.sensorMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getCPPNBoolJointMatrix(){return indDesc.cppnBinDesc.jointMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getCPPNBoolCasterMatrix(){return indDesc.cppnBinDesc.casterMatrix;};
-    std::vector<std::vector<std::vector<bool>>> getInterWheelMatrix(){return indDesc.interDesc.wheelInter;};
-    std::vector<std::vector<std::vector<bool>>> getInterSensorMatrix(){return indDesc.interDesc.sensorInter;};
-    std::vector<std::vector<std::vector<bool>>> getInterJointMatrix(){return indDesc.interDesc.jointInter;};
-    std::vector<std::vector<std::vector<bool>>> getInterCasterMatrix(){return indDesc.interDesc.casterInter;};
+    Eigen::VectorXd getSymDesc(){return indDesc.symDesc.symDesc;};
 
 protected:
     void getObjectHandles() override;
@@ -471,8 +418,6 @@ private:
     std::vector<std::vector<std::vector<int>>> jointRegionCoord;
     std::vector<std::vector<std::vector<int>>> casterRegionCoord;
 
-    std::vector<std::vector<float>> rawMatrix;
-
     double manScore;
 
     // Handles used by the controller
@@ -484,4 +429,4 @@ private:
 
 }
 
-#endif //MORPHOLOGY_CPPNMATRIX_H
+#endif //Morphology_CPPNMatrix_H

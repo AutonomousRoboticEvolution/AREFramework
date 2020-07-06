@@ -31,18 +31,8 @@ void CPPNIndividual::createMorphology()
     setGenome();
     setMorphDesc();
     setManRes();
-//    setRawMat();
     setManScore();
     setGraphMatrix();
-//    setCPPNBoolSkeletonMatrix();
-//    setCPPNBoolWheelMatrix();
-//    setCPPNBoolSensorMatrix();
-//    setCPPNBoolJointMatrix();
-//    setCPPNBoolCasterMatrix();
-//    setInterWheelMatrix();
-//    setInterSensorMatrix();
-//    setInterJointMatrix();
-//    setInterCasterMatrix();
 }
 
 void CPPNIndividual::createController()
@@ -63,11 +53,6 @@ void CPPNIndividual::setMorphDesc()
 void CPPNIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-}
-
-void CPPNIndividual::setRawMat()
-{
-    rawMat = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRawMatrix();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
@@ -103,41 +88,4 @@ void CPPNIndividual::setManScore()
 void CPPNIndividual::setGraphMatrix()
 {
     graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
-}
-
-void CPPNIndividual::setCPPNBoolSkeletonMatrix()
-{
-    skeletonMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getCPPNBoolSkeletonMatrix();
-}
-void CPPNIndividual::setCPPNBoolWheelMatrix()
-{
-    wheelMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getCPPNBoolWheelMatrix();
-}
-void CPPNIndividual::setCPPNBoolSensorMatrix()
-{
-    sensorMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getCPPNBoolSensorMatrix();
-}
-void CPPNIndividual::setCPPNBoolJointMatrix()
-{
-    jointMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getCPPNBoolJointMatrix();
-}
-void CPPNIndividual::setCPPNBoolCasterMatrix()
-{
-    casterMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getCPPNBoolCasterMatrix();
-}
-void CPPNIndividual::setInterWheelMatrix()
-{
-    wheelInter =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getInterWheelMatrix();
-}
-void CPPNIndividual::setInterSensorMatrix()
-{
-    sensorInter =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getInterSensorMatrix();
-}
-void CPPNIndividual::setInterJointMatrix()
-{
-    jointInter =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getInterJointMatrix();
-}
-void CPPNIndividual::setInterCasterMatrix()
-{
-    casterInter =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getInterCasterMatrix();
 }

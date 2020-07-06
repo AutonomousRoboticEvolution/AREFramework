@@ -36,14 +36,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class RawMatrixLog : public Logging
-{
-public:
-    RawMatrixLog(const std::string &file) : Logging(file, true){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
 class morphDescCartWHDLog : public Logging
 {
 public:
@@ -56,22 +48,6 @@ class ProtoMatrixLog : public Logging
 {
 public:
     ProtoMatrixLog(const std::string &file) : Logging(file, true){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
-class BinCPPNMatrixLog : public Logging
-{
-public:
-    BinCPPNMatrixLog(const std::string &file) : Logging(file, true){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
-class InterMatrixLog : public Logging
-{
-public:
-    InterMatrixLog(const std::string &file) : Logging(file, true){}
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };
