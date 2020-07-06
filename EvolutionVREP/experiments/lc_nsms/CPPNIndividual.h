@@ -35,15 +35,22 @@ public :
 
     // Setters and getters
     NEAT::NeuralNetwork getGenome(){return nn;};
-    Eigen::VectorXd getMorphDesc(){return morphDesc;};
+
     std::vector<bool> getManRes(){return testRes;};
     std::vector<std::vector<float>> getRawMat(){return rawMat;};
     double getManScore(){ return manScore;};
     void setGenome();
-    void setMorphDesc();
+
     void setManRes();
     void setRawMat();
     void setManScore();
+
+    /// Setters for descritors
+    void setMorphDesc();
+    void setGraphMatrix();
+    /// Getters for descritors
+    Eigen::VectorXd getMorphDesc(){return morphDesc;};
+    std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphMatrix;};
 
     Eigen::VectorXd descriptor();
 
@@ -52,11 +59,13 @@ protected:
     void createMorphology() override;
 
     NEAT::NeuralNetwork nn;
-    Eigen::VectorXd morphDesc;
     std::vector<bool> testRes;
     double manScore;
     std::vector<std::vector<float>> rawMat;
 
+    /// Descritors
+    std::vector<std::vector<std::vector<int>>> graphMatrix;
+    Eigen::VectorXd morphDesc;
 };
 
 }//are

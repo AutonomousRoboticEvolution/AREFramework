@@ -31,8 +31,8 @@ void CPPNIndividual::createMorphology()
     setGenome();
     setMorphDesc();
     setManRes();
-    setRawMat();
     setManScore();
+    setGraphMatrix();
 }
 
 void CPPNIndividual::createController()
@@ -53,11 +53,6 @@ void CPPNIndividual::setMorphDesc()
 void CPPNIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-}
-
-void CPPNIndividual::setRawMat()
-{
-    rawMat = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRawMatrix();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
@@ -88,4 +83,9 @@ void CPPNIndividual::from_string(const std::string &str){
 void CPPNIndividual::setManScore()
 {
     manScore = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getManScore();
+}
+
+void CPPNIndividual::setGraphMatrix()
+{
+    graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
 }
