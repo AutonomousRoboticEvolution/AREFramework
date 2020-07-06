@@ -118,4 +118,7 @@ bool NSGC::is_finish(){
     double max_eval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
     return best_fitness > ftarget || numberEvaluation > max_eval;
 }
+<<<<<<< HEAD
 
+=======
+>>>>>>> add new experiment Novelty search with global competition

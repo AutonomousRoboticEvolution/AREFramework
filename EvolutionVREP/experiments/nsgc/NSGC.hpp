@@ -1,6 +1,7 @@
 #ifndef NSGC_HPP
 #define NSGC_HPP
 
+<<<<<<< HEAD
 #include "ARE/learning/NSGA2.hpp"
 #include "ARE/learning/Novelty.hpp"
 #include "ARE/nn2/NN2Individual.hpp"
@@ -10,6 +11,17 @@
 namespace are {
 
 class NSGCIndividual : public NSGAIndividual<NSGCIndividual>, public NN2Individual
+=======
+#include "NSGA2.hpp"
+#include "Novelty.hpp"
+#include "NN2Individual.hpp"
+#include "NNParamGenome.hpp"
+#include "mazeEnv.h"
+
+namespace are {
+
+class NSGCIndividual : public NSGAIndividual, public NN2Individual
+>>>>>>> add new experiment Novelty search with global competition
 {
 public:
     typedef std::shared_ptr<NSGCIndividual> Ptr;
@@ -60,6 +72,14 @@ public:
 
     bool update(const Environment::Ptr&) override;
 
+<<<<<<< HEAD
+=======
+    void mutation(){
+        for(Individual::Ptr &ind : population)
+            ind->mutate();
+    }
+
+>>>>>>> add new experiment Novelty search with global competition
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
 
     bool is_finish() override;
@@ -77,4 +97,7 @@ private:
 
 
 #endif //NSGC_HPP
+<<<<<<< HEAD
 
+=======
+>>>>>>> add new experiment Novelty search with global competition
