@@ -72,24 +72,32 @@ public:
         std::vector<size_t> a1 = shuffle();
         std::vector<size_t> a2 = shuffle();
 
-        //tbb::parallel_for(tbb::blocked_range<size_t>(0,population.size() - 3, 4),
-          //                [&](tbb::blocked_range<size_t> r){
-            //for(size_t i = r.begin(); i < r.end(); i+=4){
-        for(size_t i = 0; i < population.size() - 3; i+=4){
-        indPtr ind11 = tournament(parents[a1[i]],parents[a1[i+1]]);
-                indPtr ind12 = tournament(parents[a1[i+2]],parents[a1[i+3]]);
-                indPtr ind21 = tournament(parents[a2[i]],parents[a2[i+1]]);
-                indPtr ind22 = tournament(parents[a2[i+2]],parents[a2[i+3]]);
+        //Fill indexes 4 vy 4
+        std::vector<size_t> indexes(
+                [&]() -> std::vector<size_t> {
+                    std::vector<size_t> v;
+                    for(size_t i = 0; i<population.size();i+=4) v.push_back(i);
+                    return v;
+                }());
+
+        tbb::parallel_for(tbb::blocked_range<size_t>(0,indexes.size()),
+                          [&](tbb::blocked_range<size_t> r){
+            for(size_t i = r.begin(); i < r.end(); i+=4){
+                size_t idx = indexes[i];
+                indPtr ind11 = tournament(parents[a1[idx]],parents[a1[i+1]]);
+                indPtr ind12 = tournament(parents[a1[idx+2]],parents[a1[i+3]]);
+                indPtr ind21 = tournament(parents[a2[idx]],parents[a2[i+1]]);
+                indPtr ind22 = tournament(parents[a2[idx+2]],parents[a2[i+3]]);
                 //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
                 indPtr child1(new individual_t) ,child2(new individual_t), child3(new individual_t), child4(new individual_t);
                 std::dynamic_pointer_cast<individual_t>(ind11)->crossover(ind12,*child1,*child2);
                 std::dynamic_pointer_cast<individual_t>(ind21)->crossover(ind22,*child3,*child4);
-                childrens[i] = child1;
-                childrens[i+1] = child2;
-                childrens[i+2] = child3;
-                childrens[i+3] = child4;
+                childrens[idx] = child1;
+                childrens[idx+1] = child2;
+                childrens[idx+2] = child3;
+                childrens[idx+3] = child4;
             }
-        //});
+        });
         population.clear();
         for(const auto&ind : childrens)
             population.push_back(ind);
