@@ -72,10 +72,11 @@ public:
         std::vector<size_t> a1 = shuffle();
         std::vector<size_t> a2 = shuffle();
 
-        tbb::parallel_for(tbb::blocked_range<size_t>(0,population.size(), 4),
-                          [&](tbb::blocked_range<size_t> r){
-            for(size_t i = r.begin(); i < r.end(); i+=4){
-                indPtr ind11 = tournament(parents[a1[i]],parents[a1[i+1]]);
+        //tbb::parallel_for(tbb::blocked_range<size_t>(0,population.size() - 3, 4),
+          //                [&](tbb::blocked_range<size_t> r){
+            //for(size_t i = r.begin(); i < r.end(); i+=4){
+        for(size_t i = 0; i < population.size() - 3; i+=4){
+        indPtr ind11 = tournament(parents[a1[i]],parents[a1[i+1]]);
                 indPtr ind12 = tournament(parents[a1[i+2]],parents[a1[i+3]]);
                 indPtr ind21 = tournament(parents[a2[i]],parents[a2[i+1]]);
                 indPtr ind22 = tournament(parents[a2[i+2]],parents[a2[i+3]]);
@@ -88,9 +89,9 @@ public:
                 childrens[i+2] = child3;
                 childrens[i+3] = child4;
             }
-        });
+        //});
         population.clear();
-        for(const auto &ind : childrens)
+        for(const auto&ind : childrens)
             population.push_back(ind);
     }
 
@@ -151,6 +152,8 @@ public:
      */
     void set_obj_bounds(std::vector<std::vector<double>> bounds){
         nb_obj = bounds.size();
+        max_obj.clear();
+        min_obj.clear();
         for(std::vector<double>& b : bounds){
             max_obj.push_back(b[0]);
             min_obj.push_back(b[1]);
