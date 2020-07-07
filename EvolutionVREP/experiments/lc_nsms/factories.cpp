@@ -31,19 +31,12 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::GenomeLog::Ptr genlog(new are::GenomeLog(genome_log_file));
     logs.push_back(genlog);
 
-    std::string morph_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#morphDescFile").value;
-    are::MorphDesLog::Ptr morphdesclog(new are::MorphDesLog(morph_desc_log_file));
-    logs.push_back(morphdesclog);
-
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));
     logs.push_back(testslog);
 
-//    std::string raw_matrix_file = are::settings::getParameter<are::settings::String>(param, "#rawMatrixFile").value;
-//    are::RawMatrixLog::Ptr  rawlog(new are::RawMatrixLog(raw_matrix_file));
-//    logs.push_back(rawlog);
-//
-//    std::string protophenotype_file = are::settings::getParameter<are::settings::String>(param, "#protoPhenotypeFile").value;
-//    are::ProtoPhenotypeLog::Ptr  protophenotypelog(new are::ProtoPhenotypeLog(protophenotype_file));
-//    logs.push_back(protophenotypelog);
+    std::string md_cart_wd_log_file = are::settings::getParameter<are::settings::String>(param,"#mdCartWdhFile").value;
+    are::morphDescCartWHDLog::Ptr mdcartwdlog(new are::morphDescCartWHDLog(md_cart_wd_log_file));
+    logs.push_back(mdcartwdlog);
+
 }

@@ -55,6 +55,8 @@ void LC_NSMS::init()
 
     initPopulation();
 
+    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
+    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
 }
 
 void LC_NSMS::initPopulation()
@@ -62,7 +64,7 @@ void LC_NSMS::initPopulation()
     rng.Seed(randomNum->getSeed());
 
     // Morphology
-    NEAT::Genome morph_genome(0, 5, 10, 5, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
+    NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
 
     int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
@@ -115,7 +117,7 @@ void LC_NSMS::epoch(){
             double manScore = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getManScore();
 
             //set the objetives
-            std::vector<double> objectives = {linearCombAlpha * (ind_nov / 2.64)  + (1-linearCombAlpha) * manScore}; /// \todo EB: define 2.64 as constant
+            std::vector<double> objectives = {linearCombAlpha * (ind_nov / 2.64)  + (1-linearCombAlpha) * manScore}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
             ind->setObjectives(objectives);
         }
 

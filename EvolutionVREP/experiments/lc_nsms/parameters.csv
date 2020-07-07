@@ -9,7 +9,7 @@
 #numberOfGeneration,int,1200
 #repository,string,/home/ebb505/ARE_Project/are-logs/
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0

@@ -1,5 +1,5 @@
-#ifndef MORPHOLOGY_CPPNMATRIX_H
-#define MORPHOLOGY_CPPNMATRIX_H
+#ifndef Morphology_CPPNMatrix_H
+#define Morphology_CPPNMatrix_H
 
 #include "ARE/Morphology.h"
 
@@ -48,33 +48,8 @@ public:
         bool organColliding;
         bool organGoodOrientation;
         bool organGripperAccess;
+        std::vector<int> objectHandles; // For collision detection purpose
     };
-
-
-    class MorphDesc
-    {
-    public:
-        float robotWidth; // X
-        float robotDepth; // Y
-        float robotHeight; // Z
-        int voxelNumber;
-        int wheelNumber;
-        int sensorNumber;
-        int casterNumber;
-        int jointNumber;
-        // Constructor
-        MorphDesc(){
-            robotWidth = 0;
-            robotDepth = 0;
-            robotHeight = 0;
-            voxelNumber = 0;
-            wheelNumber = 0;
-            sensorNumber = 0;
-            casterNumber = 0;
-            jointNumber = 0;
-        }
-    };
-    MorphDesc morphDesc;
 
     class RobotManRes{
     public:
@@ -97,17 +72,66 @@ public:
     };
     RobotManRes robotManRes;
 
-    class GraphDesc{
+    Morphology::Ptr clone() const override
+        {return std::make_shared<Morphology_CPPNMatrix>(*this);}
+
+    void create() override;
+    void createAtPosition(float,float,float) override;
+    std::vector<double> update() override;
+    void setPosition(float,float,float);
+
+    ///////////////////////
+    ///// Descriptors /////
+    ///////////////////////
+
+    class CartDesc
+    {
+    public:
+        float robotWidth; // X
+        float robotDepth; // Y
+        float robotHeight; // Z
+        int voxelNumber;
+        int wheelNumber;
+        int sensorNumber;
+        int casterNumber;
+        int jointNumber;
+        Eigen::VectorXd cartDesc;
+        // Constructor
+        CartDesc(){
+            cartDesc.resize(8);
+            robotWidth = 0;
+            robotDepth = 0;
+            robotHeight = 0;
+            voxelNumber = 0;
+            wheelNumber = 0;
+            sensorNumber = 0;
+            casterNumber = 0;
+            jointNumber = 0;
+            setCartDesc();
+        }
+        void setCartDesc(){
+            cartDesc(0) = robotWidth / MATRIX_SIZE_M;
+            cartDesc(1) = robotDepth / MATRIX_SIZE_M;
+            cartDesc(2) = robotHeight / MATRIX_SIZE_M;
+            cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
+            cartDesc(4) = (double) wheelNumber / MAX_NUM_ORGANS;
+            cartDesc(5) = (double) sensorNumber / MAX_NUM_ORGANS;
+            cartDesc(6) = (double) jointNumber / MAX_NUM_ORGANS;
+            cartDesc(7) = (double) casterNumber / MAX_NUM_ORGANS;
+        }
+    };
+
+    class MatDesc{
     public:
         std::vector<std::vector<std::vector<int>>> graphMatrix;
         // Constructor
-        GraphDesc(){
-            graphMatrix.resize(13); /// \todo EB: these constants should be defined elsewhere!
-            for(int i = 0; i < 13; i++){
-                graphMatrix[i].resize(13);
-                for(int j = 0; j < 13; j++){
-                    graphMatrix[i][j].resize(13);
-                    for(int k = 0; k < 13; k++){
+        MatDesc(){
+            graphMatrix.resize(MATRIX_SIZE + 1);
+            for(int i = 0; i < MATRIX_SIZE + 1; i++){
+                graphMatrix[i].resize(MATRIX_SIZE + 1);
+                for(int j = 0; j < MATRIX_SIZE + 1; j++){
+                    graphMatrix[i][j].resize(MATRIX_SIZE + 1);
+                    for(int k = 0; k < MATRIX_SIZE + 1; k++){
                         graphMatrix[i][j][k] = 0;
                     }
                 }
@@ -115,17 +139,41 @@ public:
         }
     };
 
-    Morphology::Ptr clone() const override
-        {return std::make_shared<Morphology_CPPNMatrix>(*this);}
+    class SymDesc{
+    public:
+        unsigned short int voxelQ1, voxelQ2, voxelQ3, voxelQ4;
+        unsigned short int wheelQ1, wheelQ2, wheelQ3, wheelQ4;
+        unsigned short int sensorQ1, sensorQ2, sensorQ3, sensorQ4;
+        unsigned short int jointQ1, jointQ2, jointQ3, jointQ4;
+        unsigned short int casterQ1, casterQ2, casterQ3, casterQ4;
+        Eigen::VectorXd symDesc;
+        SymDesc(){
+            symDesc.resize(20);
+            voxelQ1 = 0; voxelQ2 = 0; voxelQ3 = 0; voxelQ4 = 0;
+            wheelQ1 = 0; wheelQ2 = 0; wheelQ3 = 0; wheelQ4 = 0;
+            sensorQ1 = 0; sensorQ2 = 0; sensorQ3 = 0; sensorQ4 = 0;
+            jointQ1 = 0; jointQ2 = 0; jointQ3 = 0; jointQ4 = 0;
+            casterQ1 = 0; casterQ2 = 0; casterQ3 = 0; casterQ4 = 0;
+            setSymDesc();
+        }
+        void setSymDesc(){
+            symDesc(0) = voxelQ1; symDesc(1) = voxelQ2; symDesc(2) = voxelQ3; symDesc(3) = voxelQ4;
+            symDesc(4) = wheelQ1; symDesc(5) = wheelQ2; symDesc(6) = wheelQ3; symDesc(7) = wheelQ4;
+            symDesc(8) = sensorQ1; symDesc(9) = sensorQ2; symDesc(10) = sensorQ3; symDesc(11) = sensorQ4;
+            symDesc(12) = jointQ1; symDesc(13) = jointQ2; symDesc(14) = jointQ3; symDesc(15) = jointQ4;
+            symDesc(16) = casterQ1; symDesc(17) = casterQ2; symDesc(18) = casterQ3; symDesc(19) = casterQ4;
+        }
+    };
 
-    void create() override;
-    void createAtPosition(float,float,float) override;
-    std::vector<double> update() override;
-
-    void setPosition(float,float,float);
+    class Descriptors{
+    public:
+        CartDesc cartDesc;
+        MatDesc matDesc;
+        SymDesc symDesc;
+    };
 
     /////////////////////////////
-    ///// Create ns /////
+    ///// Create morphology /////
     /////////////////////////////
     /**
      * @brief Decodes the genome (CPPN --> Matrix)
@@ -301,18 +349,27 @@ public:
 
     static void removeGripper(int gripperHandle);
 
+    void createAREPuck(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void createAREPotato(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+
+    void getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void setVoxelQuadrant(short signed int x, short signed int y, short unsigned int componentType);
+
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
-    Eigen::VectorXd getMorphDesc();
     std::vector<bool> getRobotManRes(){return robotManRes.getResVector();};
     NEAT::NeuralNetwork getGenome(){return nn;};
     void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
-    std::vector<std::vector<float>> getRawMatrix(){return rawMatrix;};
     double getManScore(){return manScore;};
     void setManScore(double ms){ manScore = ms;};
 
-    std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphDesc.graphMatrix;};
+    /// Getters for descriptors.
+    /// \todo EB: There must be a better way to retrieve descriptor. Perhaps as the descritor as a whole?
+    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
+    std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return indDesc.matDesc.graphMatrix;};
+    Eigen::VectorXd getSymDesc(){return indDesc.symDesc.symDesc;};
 
 protected:
     void getObjectHandles();
@@ -323,18 +380,18 @@ private:
     /////////////////////
     ///// Constants /////
     /////////////////////
-    const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
+    constexpr static const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
     // WAS 4 -> 3.6mm
     // 6 -> 5.4mm
     // 11 -> 9.9mm (EB: with this value there is no stack overflow!)
-    const int VOXEL_MULTIPLIER = 22;
-    const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
-    const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
+    static const int VOXEL_MULTIPLIER = 22;
+    constexpr static const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
+    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
     const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
     const float SHAPE_SCALE_VALUE = VOXEL_REAL_SIZE; // results into 23.76x23.76x23.76 cm³ - in reality is 28x28x25 cm³
-    const int VOXELS_NUMBER = MATRIX_SIZE * MATRIX_SIZE *MATRIX_SIZE;
-    const int MAX_NUM_ORGANS = 10;
-    const float MATRIX_SIZE_M = MATRIX_SIZE * VOXEL_REAL_SIZE;
+    static const int VOXELS_NUMBER = MATRIX_SIZE * MATRIX_SIZE *MATRIX_SIZE;
+    static const int MAX_NUM_ORGANS = 10;
+    constexpr static const float MATRIX_SIZE_M = MATRIX_SIZE * VOXEL_REAL_SIZE;
 
     const int EMPTYVOXEL = 0;
     const int FILLEDVOXEL = 255;
@@ -361,17 +418,15 @@ private:
     std::vector<std::vector<std::vector<int>>> jointRegionCoord;
     std::vector<std::vector<std::vector<int>>> casterRegionCoord;
 
-    std::vector<std::vector<float>> rawMatrix;
-
     double manScore;
 
     // Handles used by the controller
     std::vector<int> jointHandles;
     std::vector<int> proxHandles;
 
-    GraphDesc graphDesc;
+    Descriptors indDesc;
 };
 
 }
 
-#endif //MORPHOLOGY_CPPNMATRIX_H
+#endif //Morphology_CPPNMatrix_H
