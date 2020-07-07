@@ -15,39 +15,22 @@ void FitnessLog::saveLog(are::EA::Ptr &ea)
         return;
 
     savePopFile << generation << ",";
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << ea->get_population()[i]->getObjectives()[0] << ",";
+    for (size_t ind = 0; ind < ea->get_population().size(); ind++) {
+        savePopFile << ea->get_population()[ind]->getObjectives()[0] << ",";
     }
 
     savePopFile << std::endl;
     savePopFile.close();
 }
 
-void MorphDesLog::saveLog(EA::Ptr &ea)
-{
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-    int generation = ea->get_generation();
-    for(size_t i = 0; i < ea->get_population().size(); i++){
-        logFileStream << generation * ea->get_population().size() + i << ",";
-        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getMorphDesc();
-        for(int j = 0; j < morphDesc.size(); j++){
-            logFileStream << morphDesc(j) << ",";
-        }
-        logFileStream << std::endl;
-    }
-    logFileStream.close();
-}
-
 void GenomeLog::saveLog(EA::Ptr &ea)
 {
     int generation = ea->get_generation();
-    for(size_t i = 0; i < ea->get_population().size(); i++){
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
         NEAT::NeuralNetwork nn;
-        nn = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getGenome();
+        nn = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getGenome();
         std::stringstream filepath;
-        filepath << Logging::log_folder << "/genome" << generation * ea->get_population().size() + i;
+        filepath << Logging::log_folder << "/genome" << generation * ea->get_population().size() + ind;
         FILE *file = fopen(filepath.str().c_str(), "w");
         nn.Save(file);
         fclose(file);
@@ -61,34 +44,56 @@ void TestsLog::saveLog(EA::Ptr &ea)
     if(!openOLogFile(logFileStream))
         return;
     int generation = ea->get_generation();
-    for(size_t i = 0; i < ea->get_population().size(); i++){
-        logFileStream << generation * ea->get_population().size() + i << ",";
-        std::vector<bool> manRes = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getManRes();
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        logFileStream << generation * ea->get_population().size() + ind << ",";
+        std::vector<bool> manRes = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getManRes();
         for(int j = 0; j < manRes.size(); j++){
             logFileStream << manRes[j] << ",";
         }
-        //logFileStream << ea->get_population()[i]->getObjectives()[0] << ",";
-        logFileStream << std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getManScore() << ",";
+        //logFileStream << ea->get_population()[ind]->getObjectives()[0] << ",";
+        logFileStream << std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getManScore() << ",";
         logFileStream << std::endl;
     }
     logFileStream.close();
 }
 
-void RawMatrixLog::saveLog(EA::Ptr &ea)
+void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
 {
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
     int generation = ea->get_generation();
-    for(size_t i = 0; i < ea->get_population().size(); i++){
-        std::ofstream rawMatrixFile;
-        std::string filepath;
-        filepath = Logging::log_folder + "/rawMatrix" + std::to_string(generation * ea->get_population().size() + i) + ".csv";
-        rawMatrixFile.open(filepath);
-        std::vector<std::vector<float>> rawMatrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getRawMat();
-        for(int j = 0; j < rawMatrix.size(); j++){
-            for(int k = 0; k < rawMatrix[j].size(); k++){
-                rawMatrixFile << rawMatrix[j][k] << ",";
-            }
-            rawMatrixFile << std::endl;
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        logFileStream << generation * ea->get_population().size() + ind << ",";
+        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getMorphDesc();
+        for(int j = 0; j < morphDesc.size(); j++){
+            logFileStream << morphDesc(j) << ",";
         }
-        rawMatrixFile.close();
+        logFileStream << std::endl;
     }
+    logFileStream.close();
+}
+
+
+void ProtoMatrixLog::saveLog(EA::Ptr &ea)
+{
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
+    int generation = ea->get_generation();
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        std::vector<std::vector<std::vector<int>>> graphMatrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getGraphMatrix();
+        for(int x = 0; x < graphMatrix.size(); x++){
+            logFileStream << generation * ea->get_population().size() + ind << ",";
+            for(int y = 0; y < graphMatrix[x].size(); y++){
+                for(int z = 0; z < graphMatrix[x][y].size(); z++){
+                    // EB: Ignore voxels in the middle. They are always empty!
+                    if(z <= 5 || z >= 7) /// \todo EB: These should be constansts else where!
+                        logFileStream << graphMatrix[x][y][z] << ",";
+                }
+            };
+            logFileStream << std::endl;
+        }
+    }
+    logFileStream.close();
 }

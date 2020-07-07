@@ -2,15 +2,13 @@
 #define LC_NSMS_H
 
 #include "ARE/EA.h"
-#include "ARE/Morphology_CPPNMatrix.h"
 #include "ARE/CPPNGenome.h"
-#include "ARE/Novelty.hpp"
-
+#include "ARE/Morphology_CPPNMatrix.h"
 #include "CPPNIndividual.h"
 
 #include "eigen3/Eigen/Core"
 
-
+#include "ARE/Novelty.hpp"
 
 namespace are {
 
