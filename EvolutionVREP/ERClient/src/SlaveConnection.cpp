@@ -168,7 +168,7 @@ void SlaveConnection::setFloatSignal(const std::string& signalName, simxFloat st
 void SlaveConnection::getStringSignal(const std::string& signalName, std::string &message) const
 {
     simxUChar *states;
-    simInt length;
+    simxInt length;
     checkReturnValue(
                 simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)
                 );
