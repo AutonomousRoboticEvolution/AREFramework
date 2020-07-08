@@ -75,6 +75,10 @@ public:
         return generation >= maxGen;
     }
 
+    virtual bool finish_eval(){
+        return false;
+    }
+
     //GETTERS & SETTERS
     Individual::Ptr getIndividual(size_t index) const;
     size_t getPopSize() const {return population.size();}
@@ -85,6 +89,7 @@ public:
     void set_generation(int gen){generation = gen;}
     int get_generation() const {return generation;}
     void incr_generation(){generation++;}
+    void setCurrentIndIndex(int index){currentIndIndex = index;}
 
     int get_numberEvaluation() const {return numberEvaluation;}
 
@@ -94,7 +99,7 @@ public:
     }
     void set_startEvalTime(const hr_clock::time_point& t){startEvalTime = t;}
     void set_endEvalTime(const hr_clock::time_point& t){endEvalTime = t;}
-
+    void set_simulator_side(bool ss){simulator_side = ss;}
 
 protected:
     /// This method initilizes a population of genomes
@@ -114,6 +119,8 @@ protected:
 
     int generation = 0;
     int numberEvaluation = 0;
+    bool simulator_side = true;
+    int currentIndIndex = 0;
 
     hr_clock::time_point startEvalTime;
     hr_clock::time_point endEvalTime;
