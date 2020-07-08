@@ -2,7 +2,7 @@
 #define NOVELTY_HPP
 
 #include <ARE/Individual.h>
-
+#include <tbb/tbb.h>
 #include <Eigen/Core>
 
 namespace are {
