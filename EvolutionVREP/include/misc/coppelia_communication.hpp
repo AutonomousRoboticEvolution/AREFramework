@@ -49,13 +49,19 @@ void retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, std::ve
 void sentCommandToJoints(const std::vector<int>& handles,const std::vector<double>& commands);
 
 /**
+ * @brief get joints' positions
+ * @param list of the handles of the joints
+ * @param (output) list of positions of the joints
+ */
+void getJointsPosition(const std::vector<int>& handles, std::vector<double>& positions);
+
+/**
  * @brief sent command to the wheels
  * @param handles of the wheel
  * @param commands in (-1,1)
  * @param absolute maximum velocity
  */
 void sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity);
-
 
 }//coppelia
 
