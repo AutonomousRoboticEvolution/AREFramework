@@ -60,6 +60,9 @@ int main(int argc, char* argv[])
     int port = atoi(argv[2]);
     int nbInst = atoi(argv[3]);
 
+    settings::defaults::parameters->emplace("#killWhenNotConnected",new settings::Boolean(false));
+    settings::defaults::parameters->emplace("#shouldReopenConnections",new settings::Boolean(false));
+
     //Load the parameters
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
                 settings::loadParameters(parameters_file));
@@ -72,6 +75,7 @@ int main(int argc, char* argv[])
     if(seed < 0){
         std::random_device rd;
         seed = rd();
+        settings::random::parameters->emplace("#seed",new settings::Integer(seed));
     }
 
     misc::RandNum rn(seed);
@@ -94,29 +98,10 @@ int main(int argc, char* argv[])
     }
 
     //Write parameters in the log folder.
-    std::ofstream ofs(are::Logging::log_folder + std::string("/parameters.csv"));
-    for(const auto &elt : *parameters)
-    {
-        if(elt.first != "#seed"){
-            if(elt.second->name == "bool"){
-                ofs << elt.first << ",bool," << settings::cast<settings::Boolean>(elt.second)->value << std::endl;
-            }
-            else if(elt.second->name == "int"){
-                ofs << elt.first << ",int," << settings::cast<settings::Integer>(elt.second)->value << std::endl;
-            }
-            else if(elt.second->name == "float"){
-                ofs << elt.first << ",float," << settings::cast<settings::Float>(elt.second)->value << std::endl;
-            }
-            else if(elt.second->name == "double"){
-                ofs << elt.first << ",double," << settings::cast<settings::Double>(elt.second)->value << std::endl;
-            }
-            else if(elt.second->name == "string"){
-                ofs << elt.first << ",string," << settings::cast<settings::String>(elt.second)->value << std::endl;
-            }
-        }
-        else ofs << "#seed" << ",int," << seed << std::endl;
-    }
-    ofs.close();
+    settings::saveParameters(are::Logging::log_folder + std::string("/parameters.csv"),parameters);
+
+    // load or initialize EA
+    client->get_properties()->indCounter = 0;
  
     if (verbose) {
         std::cout << "initialized EA " << std::endl;

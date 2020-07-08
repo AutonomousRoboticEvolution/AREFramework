@@ -152,8 +152,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if(seed < 0){
         std::random_device rd;
         seed = rd();
+        are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));
     }
-
     misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
@@ -162,29 +162,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
         //Write parameters in the log folder.
-        std::ofstream ofs(are::Logging::log_folder + std::string("/parameters.csv"));
-        for(const auto &elt : *parameters)
-        {
-            if(elt.first != "#seed"){
-                if(elt.second->name == "bool"){
-                    ofs << elt.first << ",bool," << are_sett::cast<are_sett::Boolean>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "int"){
-                    ofs << elt.first << ",int," << are_sett::cast<are_sett::Integer>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "float"){
-                    ofs << elt.first << ",float," << are_sett::cast<are_sett::Float>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "double"){
-                    ofs << elt.first << ",double," << are_sett::cast<are_sett::Double>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "string"){
-                    ofs << elt.first << ",string," << are_sett::cast<are_sett::String>(elt.second)->value << std::endl;
-                }
-            }
-            else ofs << "#seed" << ",int," << seed << std::endl;
-        }
-        ofs.close();
+        are_sett::saveParameters(are::Logging::log_folder + std::string("/parameters.csv"),parameters);
     }
 
     if(instance_type == are_sett::INSTANCE_SERVER)
@@ -272,11 +250,13 @@ void localMessageHandler(int message){
     }
 
     // START NEW SIMULATION
-    if (simulationState == FREE)
+    if (simulationState == FREE && ERVREP->get_ea()->get_population().size() > 0)
     {
         simulationState = STARTING;
         counter = 0;
         simStartSimulation();
+    }else if(simulationState == FREE && ERVREP->get_ea()->get_population().size() == 0){
+        ERVREP->endOfSimulation();
     }
 }
 
@@ -374,10 +354,6 @@ void clientMessageHandler(int message){
             std::cout << "SIMULATION ENDED" << std::endl;
         }
     }
-
-
-
-
 
     if (clientState[0] == are_c::IDLE)
     {

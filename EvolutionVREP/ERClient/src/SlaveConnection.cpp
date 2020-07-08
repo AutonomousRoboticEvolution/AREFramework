@@ -1,12 +1,6 @@
 #include "ERClient/SlaveConnection.h"
 #include <iostream>
 
-extern "C" {
-    #include "v_repLib.h"
-    #include "v_repConst.h"
-    #include "remoteApi/extApi.h"
-}
-
 using namespace are::client;
 
 void checkReturnValue(simxInt returnValue)
