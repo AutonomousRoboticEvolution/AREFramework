@@ -7,7 +7,6 @@ using namespace are;
 
 MazeEnv::MazeEnv()
 {
-
     target_position.resize(3);
     final_position.resize(3);
     name = "mazeEnv";
