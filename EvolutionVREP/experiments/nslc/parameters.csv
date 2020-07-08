@@ -47,4 +47,6 @@
 #mutationRate,double,0.4
 #mutationParam,double,0.5
 #mutationType,int,2
+#crossoverType,int,1
+#crossoverParameter,double,0.1
 #nbrWaypoints,int,2

@@ -1,8 +1,8 @@
 #ifndef NSLC_HPP
 #define NSLC_HPP
 
-#include "NSGA2.hpp"
-#include "ARE/Novelty.hpp"
+#include "ARE/learning/NSGA2.hpp"
+#include "ARE/learning/Novelty.hpp"
 #include "ARE/nn2/NN2Individual.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/NNParamGenome.hpp"
@@ -10,7 +10,7 @@
 
 namespace are {
 
-class NSLCIndividual : public NSGAIndividual, public NN2Individual
+class NSLCIndividual : public NSGAIndividual<NSLCIndividual>, public NN2Individual
 {
 public:
     typedef std::shared_ptr<NSLCIndividual> Ptr;
@@ -24,13 +24,12 @@ public:
         NSGAIndividual(ind){}
 
 
-    Individual::Ptr clone(){
+    Individual::Ptr clone() override{
         return std::make_shared<NSLCIndividual>(*this);
     }
 
-    void crossover(const Individual::Ptr& partner, Individual &child1, Individual &child2){
-        child1 = *partner;
-        child2 = *this;
+    void crossover(const Individual::Ptr& partner, Individual& child1, Individual& child2){
+        NN2Individual::crossover(partner,child1,child2);
     }
 
     //specific to the current ARE arenas
@@ -66,11 +65,6 @@ public:
     void epoch() override;
 
     bool update(const Environment::Ptr&) override;
-
-    void mutation(){
-        for(Individual::Ptr &ind : population)
-            ind->mutate();
-    }
 
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
 
