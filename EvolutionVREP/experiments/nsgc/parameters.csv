@@ -18,6 +18,8 @@
 #stopCritFile,string,stop_crit.csv
 #noveltyFile,string,novelty.csv
 #archiveFile,string,archive.csv
+#energyCost,string,energy_cost.csv
+#simTime,string,sim_time.csv
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
