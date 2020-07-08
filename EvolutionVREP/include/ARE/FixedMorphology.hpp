@@ -20,6 +20,14 @@ class FixedMorphology : public Morphology
 {
 public:
     FixedMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
+    FixedMorphology(const FixedMorphology& fm) : Morphology(fm),
+        jointHandles(fm.jointHandles),
+        wheelHandles(fm.wheelHandles),
+        proxHandles(fm.proxHandles),
+        IRHandles(fm.IRHandles),
+        cameraHandle(fm.cameraHandle),
+        energy_cost(fm.energy_cost){}
+
     Morphology::Ptr clone() const override
         {return std::make_shared<FixedMorphology>(*this);}
 
@@ -69,6 +77,7 @@ public:
     //GETTERS
     std::vector<int> get_jointHandles(){return jointHandles;}
     std::vector<int> get_wheelHandles(){return wheelHandles;}
+    double get_energy_cost(){return energy_cost;}
 
 
 private:
@@ -77,6 +86,8 @@ private:
     std::vector<int> proxHandles;
     std::vector<int> IRHandles;
     int cameraHandle;
+    double energy_cost = 0;
+
 };
 
 }
