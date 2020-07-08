@@ -7,9 +7,10 @@
 #include <map>
 #include <string>
 #include <fstream> // ifstream
+#include <sstream>
 #include <list>
 #include <vector>
-#include <misc/utilities.h>
+#include "misc/utilities.h"
 
 namespace are {
 
@@ -105,6 +106,7 @@ public:
 
 Type::Ptr buildType(const std::string &name);
 
+std::string toString(const std::string &name, const Type::ConstPtr &element);
 
 template<typename T>
 std::shared_ptr<const T> cast(const Type::ConstPtr val)
@@ -129,6 +131,13 @@ typedef std::shared_ptr<ParametersMap> ParametersMapPtr;
  * @brief Default parameters.
  */
 struct defaults{
+    static ParametersMapPtr parameters;
+};
+
+/**
+ * @brief Randomly generated parameters.
+ */
+struct random{
     static ParametersMapPtr parameters;
 };
 

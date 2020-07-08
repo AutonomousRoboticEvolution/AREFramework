@@ -2,10 +2,13 @@
 
 #include <chrono>
 #include <boost/filesystem.hpp>
+#include <random>
 
 std::string are::Logging::log_folder = "";
 
 void are::Logging::create_log_folder(const std::string &exp_name){
+    std::random_device rd;
+
     typedef std::chrono::duration<double,std::milli> milli_sec;
     std::chrono::time_point<std::chrono::high_resolution_clock,milli_sec> milli = std::chrono::time_point_cast<milli_sec>(std::chrono::high_resolution_clock::now());
     double time_milli = milli.time_since_epoch().count();
@@ -20,7 +23,8 @@ void are::Logging::create_log_folder(const std::string &exp_name){
         << "_" << date->tm_hour
         << "-" << date->tm_min
         << "-" << date->tm_sec
-        << "-" << time_milli;
+        << "-" << time_milli
+        << "-" << rd();
 
     log_folder = exp_name + "_" + stream.str();
 
