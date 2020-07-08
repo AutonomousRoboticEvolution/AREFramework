@@ -42,7 +42,7 @@ public:
         child2 = clone();
     }
 
-    virtual std::string to_string() = 0;
+    virtual std::string to_string() const = 0;
     virtual void from_string(const std::string&) = 0;
 
     //Getters & Setters

@@ -49,8 +49,11 @@ struct mutators{
 
 
 
-using crossover_t = std::function<void(const std::vector<double> &p1, const std::vector<double> &p2,
-                                   std::vector<double> &c1,std::vector<double>& c2)>;
+
+using crossover_t = std::function<
+                    void(const std::vector<double> &p1, const std::vector<double> &p2,
+                    std::vector<double> &c1,std::vector<double>& c2,
+            double* param, const misc::RandNum::Ptr &rn)>;
 
 struct crossovers{
     enum type {
@@ -93,6 +96,7 @@ public:
 
     }
     void mutate() override;
+    void crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
 
 
     void set_weights(const std::vector<double>& w){weights = w;}
@@ -123,7 +127,7 @@ public:
      *          ...
      * @return
      */
-    std::string to_string() const {
+    std::string to_string() const override{
         std::stringstream sstr;
         sstr << weights.size() << std::endl;
         sstr << biases.size() << std::endl;
@@ -134,6 +138,9 @@ public:
         return sstr.str();
     }
 
+    void from_string(const std::string &) override{
+//Todo
+    }
 
     friend class boost::serialization::access;
     template <class archive>
