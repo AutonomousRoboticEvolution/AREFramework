@@ -6,40 +6,13 @@ int Novelty::k_value = 15;
 double Novelty::novelty_thr = 0.9;
 double Novelty::archive_adding_prob = 0.4;
 
-//parallel_reduce(
-//        blocked_range<float*>( array, array+n ),
-//        0.f,
-//        [](const blocked_range<float*>& r, float init)->float {
-//            for( float* a=r.begin(); a!=r.end(); ++a )
-//                init += *a;
-//            return init;
-//        },
-//        []( float x, float y )->float {
-//            return x+y;
-//        }
-//    );
 
 double Novelty::sparseness(const std::vector<double> &dist){
 
     double sum = 0;
     if(dist.size() >  k_value + 1){
-
-//        tbb::parallel_reduce(tbb::blocked_range<size_t>(0,dist.size()),0,
-//                             [&](const tbb::blocked_range<size_t>& r, double init) -> double {
-//            for(size_t i = r.begin(); i != r.end(); i++){
-//                init+=dist[i];
-//                if(i>=k_value) return init;
-//            }
-//            return init;
-//        },
-//        [&](double x, double y) -> double {
-
-//        }
-//                             )
-
         for(int i = 0; i < k_value; i++)
             sum += dist[i];
-
     }
     if(isnan(sum/static_cast<double>(k_value))){
         std::cerr << "NaN found" << std::endl;

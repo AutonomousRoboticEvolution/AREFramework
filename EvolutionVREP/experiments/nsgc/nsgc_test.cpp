@@ -23,11 +23,7 @@ int main()
 {
 
     are_set::ParametersMap parameters;
-<<<<<<< HEAD
-    parameters.emplace("#populationSize",new are_set::Integer(40));
-=======
-    parameters.emplace("#populationSize",new are_set::Integer(100));
->>>>>>> add new experiment Novelty search with global competition
+    parameters.emplace("#populationSize",new are_set::Integer(1000));
     parameters.emplace("#mutationType",new are_set::Integer(are::mutators::type::GAUSSIAN));
     parameters.emplace("#mutationRate",new are_set::Double(0.4));
     parameters.emplace("#mutationParam",new are_set::Double(1.));
@@ -36,11 +32,7 @@ int main()
     parameters.emplace("#maxWeight",new are_set::Double(5.));
     parameters.emplace("#verbose",new are_set::Boolean(true));
     parameters.emplace("#kValue",new are_set::Integer(15));
-<<<<<<< HEAD
     parameters.emplace("#withNovelty",new are_set::Boolean(false));
-=======
-    parameters.emplace("#withNovelty",new are_set::Boolean(true));
->>>>>>> add new experiment Novelty search with global competition
     parameters.emplace("#noveltyThreshold", new are_set::Double(0.9));
     parameters.emplace("#archiveAddingProb", new are_set::Double(0.4));
     parameters.emplace("#NNType",new are_set::Integer(are_set::nnType::FFNN));
@@ -57,11 +49,7 @@ int main()
     are::NSGC nsgc(std::make_shared<are_set::ParametersMap>(parameters));
     nsgc.set_randomNum(rngen);
     nsgc.init();
-<<<<<<< HEAD
-//    nsgc.set_obj_bounds({{1,0},{1,0}});
-=======
     nsgc.set_obj_bounds({{1,0},{1,0}});
->>>>>>> add new experiment Novelty search with global competition
     std::vector<double> best_gen;
     std::vector<are::Individual::Ptr> pop;
     double best_fit = 1e14;
@@ -76,15 +64,9 @@ int main()
             genome = std::dynamic_pointer_cast<are::NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
 
             fit = rastrigin(10,genome);
-<<<<<<< HEAD
             if(fit > 200) fit = 200;
             avg_fit += fit;
             norm_fit = 1. - fit/200.;
-=======
-            if(fit > 50) fit =  50;
-            avg_fit += fit;
-            norm_fit = 1. - fit/50.;
->>>>>>> add new experiment Novelty search with global competition
             std::dynamic_pointer_cast<are::NN2Individual>(ind)->set_final_position(genome); //fake position because mandatory for novelty in this experiment
             ind->setObjectives({norm_fit});
             if(fit < best_fit){

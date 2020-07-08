@@ -6,14 +6,16 @@
 
 namespace are {
 
+template <class individual_t>
 struct NSGAInfo
 {
-    std::vector<Individual::Ptr> dominated; //List of dominated individual by this
+    std::vector<std::shared_ptr<individual_t>> dominated; //List of dominated individual by this
     int domination_counter; //number of individuals who dominates this
     float crowd_dist;
     int rank;
 };
 
+template <class individual_t>
 class NSGAIndividual
 {
 public:
@@ -22,11 +24,11 @@ public:
         nsga_info(ind.nsga_info){}
 
 
-    const NSGAInfo& get_nsga_info(){return nsga_info;}
-    NSGAInfo& access_nsga_info(){return nsga_info;}
+    const NSGAInfo<individual_t>& get_nsga_info(){return nsga_info;}
+    NSGAInfo<individual_t>& access_nsga_info(){return nsga_info;}
 
 protected:
-    NSGAInfo nsga_info;
+    NSGAInfo<individual_t> nsga_info;
 };
 
 template<class individual_t>
@@ -200,21 +202,62 @@ private:
             return -1; //2 "dominates" 1
         else return 0; //non domination case
     }
+
+    //Class to do a parallel reduce
+    class NonDominatedSort {
+    public:
+        NonDominatedSort(NSGA2* nsga2, std::vector<indPtr> pop, indPtr curr_ind) :
+           _nsga2(nsga2), _dom_counter(0), _pop(pop), _curr_ind(curr_ind)
+        {}
+
+        void operator()( const tbb::blocked_range<size_t>& r ) {
+            for(size_t i = r.begin(); i != r.end(); i++){
+                int dom_comp = _nsga2->check_dominance(_curr_ind->getObjectives(),_pop[i]->getObjectives());
+                if(dom_comp == 1)
+                    _dominated.push_back(_pop[i]);
+                else if(dom_comp == -1)
+                    _dom_counter++;
+            }
+        }
+
+        NonDominatedSort( NonDominatedSort& x, tbb::split ) :
+            _nsga2(x._nsga2), _dom_counter(0), _pop(x._pop), _curr_ind(x._curr_ind) {}
+
+        void join( const NonDominatedSort& y ) {
+            _dominated.insert(_dominated.end(),y._dominated.begin(),y._dominated.end());
+            _dom_counter+=y._dom_counter;
+        }
+
+        std::vector<indPtr> get_dominated(){return _dominated;}
+        int get_dom_counter(){return _dom_counter;}
+    private:
+        int _dom_counter = 0;
+        std::vector<indPtr> _dominated;
+        std::vector<indPtr> _pop;
+        indPtr _curr_ind;
+        NSGA2* _nsga2;
+    };
+
     void non_dominated_sort(const std::vector<indPtr> &pop){
         //filling for the pareto front
         front.clear();
         front.resize(1);
-        for(const indPtr& ind1 : pop){
-            ind1->access_nsga_info().dominated.clear();
-            ind1->access_nsga_info().domination_counter = 0;
 
-            for(const indPtr& ind2 : pop){
-                int dom_comp = check_dominance(ind1->getObjectives(),ind2->getObjectives());
-                if(dom_comp == 1)
-                    ind1->access_nsga_info().dominated.push_back(ind2);
-                else if(dom_comp == -1)
-                    ind1->access_nsga_info().domination_counter++;
-            }
+        for(const indPtr& ind1 : pop){
+//            ind1->access_nsga_info().dominated.clear();
+//            ind1->access_nsga_info().domination_counter = 0;
+            NonDominatedSort nds(this,pop,ind1);
+            tbb::parallel_reduce(tbb::blocked_range<size_t>(0,pop.size()),nds);
+            ind1->access_nsga_info().dominated = nds.get_dominated();
+            ind1->access_nsga_info().domination_counter = nds.get_dom_counter();
+//            for(const indPtr& ind2 : pop){
+//                int dom_comp = check_dominance(ind1->getObjectives(),ind2->getObjectives());
+//                if(dom_comp == 1)
+//                    ind1->access_nsga_info().dominated.push_back(ind2);
+//                else if(dom_comp == -1)
+//                    ind1->access_nsga_info().domination_counter++;
+//            }
+
 
             if(ind1->get_nsga_info().domination_counter == 0){
                 ind1->access_nsga_info().rank = 1;
@@ -222,6 +265,7 @@ private:
             }
         }
 
+        //TODO parallelisation
         //splitting the pareto front into several fronts according to the dominance
         int fi = 1;
         std::vector<indPtr> subfront; //front of next rank
@@ -265,6 +309,7 @@ private:
                         (max_obj[i] - min_obj[i]);
         }
     }
+
     indPtr tournament(const indPtr & ind1,const indPtr &ind2){
         bool diversity_prev = settings::getParameter<settings::Boolean>(parameters,"#useNSGA2Diversity").value;
 
@@ -282,6 +327,10 @@ private:
         else
             return ind2;
     }
+
+
+
+
 };
 
 
