@@ -78,6 +78,8 @@ public:
     Genome::Ptr clone() const{return nullptr;}
     void init(){}
     void mutate(){}
+    std::string to_string() const override{return "";}
+    void from_string(const std::string &) override{}
 
 //    template <class archive>
 //    void serialize(archive &arch, const unsigned int v)
