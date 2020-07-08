@@ -37,15 +37,22 @@ public:
 
     virtual void mutate() = 0;
 
-    virtual Genome::Ptr crossover(const Genome::Ptr&){
-        return clone();
+    virtual void crossover(const Genome::Ptr& partner,Genome::Ptr child1,Genome::Ptr child2){
+        child1 = partner->clone();
+        child2 = clone();
     }
+
+    virtual std::string to_string() = 0;
+    virtual void from_string(const std::string&) = 0;
 
     //Getters & Setters
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+    void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+
+
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
