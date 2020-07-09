@@ -15,9 +15,10 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
     settings::defaults::parameters->emplace("#target_y",new settings::Double(0.));
     settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
-    settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(false));
+    settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
+    settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
 }
 
@@ -30,6 +31,8 @@ void MazeEnv::init(){
                        settings::getParameter<settings::Double>(parameters,"#target_z").value};
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
+    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
+
     if(withBeacon){
         float bSize[3] = {0.1f,0.1f,0.1f};
         int beacon_handle = simCreatePureShape(1,0,bSize,0.05f,nullptr); //create a sphere as beacon;
@@ -43,6 +46,11 @@ void MazeEnv::init(){
     }
 
     trajectory.clear();
+
+    if(!flatFloor){
+        std::vector<int> th;
+        build_tiled_floor(th);
+    }
 
 }
 
@@ -86,4 +94,22 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
         trajectory.push_back(wp);
 
     return 0;
+}
+
+void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
+    float tile_size[3] = {0.25f,0.25f,0.01f};
+    float starting_pos[3] = {-0.875f,-0.875f,0.005f};
+    for(int i = 0; i < 8; i++){
+        for(int j = 0; j < 8; j++){
+            tiles_handles.push_back(simCreatePureShape(0,8,tile_size,0.05f,nullptr));
+            std::stringstream name;
+            name << "tile_" << i << j;
+            simSetObjectName(tiles_handles.back(),name.str().c_str());
+            float pos[3] = {starting_pos[0] + i*tile_size[0],starting_pos[1] + j*tile_size[1],randNum->randFloat(-0.005,-0.001)};
+            simSetObjectPosition(tiles_handles.back(),-1,pos);
+            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,randNum->randFloat(0,1));
+            simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
+            simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
+        }
+    }
 }
