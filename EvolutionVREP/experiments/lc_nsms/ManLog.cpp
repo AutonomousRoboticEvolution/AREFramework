@@ -6,22 +6,6 @@
 
 using namespace are;
 
-void FitnessLog::saveLog(are::EA::Ptr &ea)
-{
-    int generation = ea->get_generation();
-
-    std::ofstream savePopFile;
-    if(!openOLogFile(savePopFile))
-        return;
-
-    savePopFile << generation << ",";
-    for (size_t ind = 0; ind < ea->get_population().size(); ind++) {
-        savePopFile << ea->get_population()[ind]->getObjectives()[0] << ",";
-    }
-
-    savePopFile << std::endl;
-    savePopFile.close();
-}
 
 void GenomeLog::saveLog(EA::Ptr &ea)
 {

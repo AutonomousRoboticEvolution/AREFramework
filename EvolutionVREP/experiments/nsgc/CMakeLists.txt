@@ -1,17 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 
 set(SRC
-    ../common/FixedMorphology.cpp
-    ../common/mazeEnv.cpp
-    ../common/Loggings.cpp
-    ../common/NNParamGenome.cpp
-    ../common/genLoggings.cpp
-    ../common/NNGenome.cpp
-    ../common/Novelty.cpp
-    ../common/NN2Individual.cpp
     NSGC.cpp
-    factories.cpp
-    NSGCLoggings.cpp)
+    factories.cpp)
 
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

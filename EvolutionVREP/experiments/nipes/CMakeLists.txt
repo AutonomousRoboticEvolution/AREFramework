@@ -10,16 +10,7 @@ set(INCLUDES
     "../../modules/")
 
 add_library(NIPES SHARED 
-    ../common/FixedMorphology.cpp
-    ../common/mazeEnv.cpp
-    ../common/Loggings.cpp
-    ../common/NNParamGenome.cpp
-    ../common/NN2Individual.cpp
-    ../common/NNGenome.cpp
-    ../common/genLoggings.cpp
-    ../common/Novelty.cpp
-    ../common/NIPES.cpp
-    factories.cpp
+   factories.cpp
     NIPESLoggings.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})

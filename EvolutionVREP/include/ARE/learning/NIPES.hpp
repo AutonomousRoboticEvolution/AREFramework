@@ -2,12 +2,12 @@
 #define NIPES_HPP
 
 #include <ARE/EA.h>
-#include "Novelty.hpp"
+#include "ARE/learning/Novelty.hpp"
 #include <libcmaes/cmaes.h>
-#include "NNParamGenome.hpp"
-#include "NN2Control.hpp"
-#include "NN2Individual.hpp"
-#include "mazeEnv.h"
+#include "ARE/NNParamGenome.hpp"
+#include "ARE/nn2/NN2Control.hpp"
+#include "ARE/nn2/NN2Individual.hpp"
+#include "ARE/mazeEnv.h"
 
 namespace cma = libcmaes;
 using geno_pheno_t = cma::GenoPheno<cma::pwqBoundStrategy>;

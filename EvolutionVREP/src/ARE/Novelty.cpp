@@ -1,4 +1,4 @@
-#include "ARE/Novelty.hpp"
+#include "ARE/learning/Novelty.hpp"
 
 using namespace are;
 

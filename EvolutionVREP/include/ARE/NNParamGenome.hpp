@@ -2,6 +2,7 @@
 #define NN_PARAM_GENOME_HPP
 
 #include <ARE/Genome.h>
+#include <ARE/Logging.h>
 #include <boost/random.hpp>
 
 namespace are{
@@ -155,6 +156,15 @@ private:
     std::vector<double> weights;
     std::vector<double> biases;
 };
+
+class NNParamGenomeLog : public Logging
+{
+public:
+    NNParamGenomeLog() : Logging(true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
+
 }
 
 #endif //NN_PARAM_GENOME_HPP
