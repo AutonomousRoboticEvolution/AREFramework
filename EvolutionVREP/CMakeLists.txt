@@ -39,8 +39,10 @@ set(CORE_SRC
     "${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c"
     "${VREP_FOLDER}/programming/common/shared_memory.c")
 
-if(WITH_NN2)
+if(WITH_NN2 AND LIMBO_FOLDER)
     FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
+elseif(WITH_NN2)
+    FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/NIPES.cpp")
 else()
     FILE(GLOB SOURCES ${CORE_SRC})
 endif()
@@ -54,7 +56,9 @@ target_include_directories(ER_library PUBLIC
     "ERClient/include"
     "${VREP_FOLDER}/programming/"
     "${VREP_FOLDER}/programming/include"
-    "/usr/include/eigen3"    "modules"
+    "/usr/include/eigen3"
+    "modules"
+    "${LIMBO_FOLDER}/src/"
 )
 
 
@@ -86,6 +90,7 @@ target_link_libraries(ER_library
 target_include_directories(ER_library
     PRIVATE
     ${PolyVox_INCLUDE_DIRS}
+    "modules/"
 )
 
 install(TARGETS ER_library DESTINATION lib)

@@ -209,6 +209,20 @@ struct Property
 };
 
 
+enum genomeType {
+    NEAT = 0,
+    NN = 1,
+    NNPARAM = 2
+};
+
+typedef enum obsType {
+    FINAL_POS = 0,
+    TRAJECTORY = 1,
+    POS_TRAJ = 2
+}obsType;
+
+
+
 } //settings
 
 }//are
