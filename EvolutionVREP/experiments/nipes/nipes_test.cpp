@@ -1,4 +1,4 @@
-#include "NIPES.hpp"
+#include "ARE/learning/NIPES.hpp"
 #include <random>
 
 namespace are_set = are::settings;
@@ -23,7 +23,7 @@ int main()
 {
 
     are_set::ParametersMap parameters;
-    parameters.emplace("#populationSize",new are_set::Integer(100));
+    parameters.emplace("#populationSize",new are_set::Integer(10));
     parameters.emplace("#MaxWeight",new are_set::Float(5.));
     parameters.emplace("#verbose",new are_set::Boolean(true));
     parameters.emplace("#kValue",new are_set::Integer(15));

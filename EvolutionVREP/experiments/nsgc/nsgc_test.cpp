@@ -23,7 +23,7 @@ int main()
 {
 
     are_set::ParametersMap parameters;
-    parameters.emplace("#populationSize",new are_set::Integer(1000));
+    parameters.emplace("#populationSize",new are_set::Integer(40));
     parameters.emplace("#mutationType",new are_set::Integer(are::mutators::type::GAUSSIAN));
     parameters.emplace("#mutationRate",new are_set::Double(0.4));
     parameters.emplace("#mutationParam",new are_set::Double(1.));
@@ -94,10 +94,6 @@ int main()
 
     std::vector<double> zeros(0,gen_size);
 
-
     std::cout << "Solution found : "  << best_fit << " for target value : "  << rastrigin(10,zeros) << " in " << eval << " evaluations" << std::endl;
-
-
-
 }
 

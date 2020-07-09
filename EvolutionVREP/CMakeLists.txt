@@ -40,7 +40,7 @@ set(CORE_SRC
     "${VREP_FOLDER}/programming/common/shared_memory.c")
 
 if(WITH_NN2)
-    FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*")
+    FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
 else()
     FILE(GLOB SOURCES ${CORE_SRC})
 endif()
@@ -79,7 +79,7 @@ add_library(v_repExtER SHARED
 
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
-    dlibxx dl rt
+    dlibxx dl rt tbb cmaes
     ${Boost_LIBRARIES}
 )
 
