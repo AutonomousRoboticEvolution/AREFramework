@@ -93,6 +93,10 @@ void settings::saveParameters(const std::string& file,const ParametersMapPtr &pa
     //Write parameters in the log folder.
     std::ofstream ofs(file);
 
+    for(const auto &elt : *defaults::parameters)
+        if(params->find(elt.first) == params->end())
+            ofs << toString(elt.first,elt.second);
+
     for(const auto &elt : *params)
         if(random::parameters->find(elt.first) == random::parameters->end())
             ofs << toString(elt.first,elt.second);
