@@ -32,7 +32,7 @@ class Boolean : public Type
 {
 public:
     Boolean(){name = "bool";}
-    Boolean(bool b) : value(b){name = "int";}
+    Boolean(bool b) : value(b){name = "bool";}
     bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
     template<class archive>
