@@ -22,7 +22,6 @@ public:
     // base functions of EA
     void init();
     void selection();
-    void replacement();
     void mutation();
     void crossover();
 

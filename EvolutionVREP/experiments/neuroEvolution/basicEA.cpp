@@ -89,18 +89,36 @@ void BasicEA::selection()
     }
 }
 
-void BasicEA::replacement()
-{
-    population.clear();
-    population = childrens;
-    population.resize(childrens.size());
-    population.shrink_to_fit();
-}
+    void BasicEA::crossover()
+    {
+        auto shuffle = [&]() -> std::vector<size_t>{
+                std::vector<size_t> res;
+                std::vector<size_t> idxes;
+                for(size_t i = 0; i < childrens.size(); i++)
+                idxes.push_back(i);
 
-void BasicEA::crossover()
-{
-    //No crossover
-}
+        for(size_t i = 0; i < childrens.size(); i++){
+            int n = randomNum->randInt(0,idxes.size()-1);
+            res.push_back(idxes[n]);
+            idxes.erase(idxes.begin() + n);
+            idxes.shrink_to_fit();
+        }
+        return res;
+    };
+
+    std::vector<size_t> c1 = shuffle();
+    std::vector<size_t> c2 = shuffle();
+
+    population.clear();
+
+    for(int i = 0; i < c1.size()/2; i++){
+        Individual::Ptr child1(new NN2Individual), child2(new NN2Individual);
+        childrens[c1[i]]->crossover(childrens[c2[i]],*child1,*child2);
+        population.push_back(child1);
+        population.push_back(child2);
+    }
+
+    }
 
 void BasicEA::mutation()
 {

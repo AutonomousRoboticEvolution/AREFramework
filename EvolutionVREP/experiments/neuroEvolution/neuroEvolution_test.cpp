@@ -25,7 +25,10 @@ int main()
     parameters.emplace("#populationSize",new are_set::Integer(100));
     parameters.emplace("#mutationType",new are_set::Integer(are::mutators::type::GAUSSIAN));
     parameters.emplace("#mutationRate",new are_set::Double(0.4));
-    parameters.emplace("#mutationParam",new are_set::Double(0.05));
+    parameters.emplace("#mutationParam",new are_set::Double(1.));
+    parameters.emplace("#crossoverType",new are_set::Integer(are::crossovers::type::SBX));
+    parameters.emplace("#crossoverParameter",new are_set::Double(0.1));
+
     parameters.emplace("#maxWeight",new are_set::Double(5.));
     parameters.emplace("#verbose",new are_set::Boolean(true));
     parameters.emplace("#tournamentSize",new are_set::Integer(20));
@@ -51,22 +54,30 @@ int main()
         pop = ea.get_population();
         std::vector<double> genome;
         double fit,norm_fit;
+        double instant_best_fit = 1e14;
+        double avg_fit = 0;
         for(are::Individual::Ptr& ind : pop){
             genome = std::dynamic_pointer_cast<are::NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
 
-            fit = sphere(genome);
+            fit = rastrigin(10,genome);
+            avg_fit += fit;
             if(fit > 200) fit =  200;
             norm_fit = 1 - fit/200.;
             std::dynamic_pointer_cast<are::NN2Individual>(ind)->set_final_position({norm_fit,0,0}); //fake position because mandatory for novelty in this experiment
             ind->setObjectives({norm_fit});
-            std::cout << "Fitness : " << fit << std::endl;
+//            std::cout << "Fitness : " << fit << std::endl;
             if(fit < best_fit){
                 best_fit = fit;
                 best_gen = genome;
             }
+            if(fit < instant_best_fit){
+                instant_best_fit = fit;
+                best_gen = genome;
+            }
+
             eval++;
         }
-        std::cout << "best fitness : " << best_fit << std::endl;
+        std::cout << "best fitness : " << instant_best_fit << " avg fitness : " << avg_fit/pop.size() << std::endl;
         std::cout << "best genome : ";
         for(const double& g : best_gen)
                 std::cout << g << " ; ";
@@ -74,5 +85,6 @@ int main()
         ea.epoch();
         ea.init_next_pop();
     }
-    std::cout << "Solution found : "  << best_fit << " for target value : "  << sphere(zeros) << " in " << eval << " evaluations" << std::endl;
+    std::cout << "Solution found : "  << best_fit << " for target value : "  << rastrigin(10,zeros) << " in " << eval << " evaluations" << std::endl;
+
 }
