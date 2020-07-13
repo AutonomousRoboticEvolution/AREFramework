@@ -3,7 +3,7 @@
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/escape_room.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-tricycle-pIR.ttm
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARETricycle.ttm
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,2
 #maxEvalTime,float,120
