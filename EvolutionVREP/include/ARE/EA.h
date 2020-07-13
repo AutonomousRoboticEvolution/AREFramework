@@ -64,17 +64,31 @@ public:
     void incr_nbr_eval(){numberEvaluation++;}
 
     /**
+     * @brief Initialisation of the algorithm. Called only one time on starting up
+     */
+    virtual void init() = 0;
+    /**
      * @brief Epoch method is called at the end of each generation
      */
     virtual void epoch();
-    virtual void init() = 0;    // initializes EA
+    /**
+     * @brief Initialisation of the population for next generation. Called at the end of each generation after the epoch function.
+     */
     virtual void init_next_pop();
 
+    /**
+     * @brief ending condition of the algorithm
+     * @return true if ending condition is meet
+     */
     virtual bool is_finish(){
         int maxGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
         return generation >= maxGen;
     }
 
+    /**
+     * @brief ending condition of the evaluation. This condition is added with OR to the default condition the time limit.
+     * @return
+     */
     virtual bool finish_eval(){
         return false;
     }
@@ -107,7 +121,7 @@ protected:
     virtual void selection(){}  	// selection operator
     virtual void replacement(){}		// replacement operator
     virtual void mutation(){}		// mutation operator
-    virtual void crossover(){}
+    virtual void crossover(){}      //crossover
     virtual void end(){}				// last call to the EA, when simulation stops
 
 
