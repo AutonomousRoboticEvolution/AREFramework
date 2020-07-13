@@ -77,7 +77,6 @@ public:
 
     void create() override;
     void createAtPosition(float,float,float) override;
-    std::vector<double> update() override;
     void setPosition(float,float,float);
 
     ///////////////////////
@@ -371,8 +370,6 @@ public:
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return indDesc.matDesc.graphMatrix;};
     Eigen::VectorXd getSymDesc(){return indDesc.symDesc.symDesc;};
 
-protected:
-    void getObjectHandles();
 
 private:
     NEAT::NeuralNetwork nn;
@@ -420,9 +417,6 @@ private:
 
     double manScore;
 
-    // Handles used by the controller
-    std::vector<int> jointHandles;
-    std::vector<int> proxHandles;
 
     Descriptors indDesc;
 };

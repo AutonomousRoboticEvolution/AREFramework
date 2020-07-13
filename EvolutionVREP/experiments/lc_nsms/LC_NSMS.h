@@ -8,7 +8,7 @@
 
 #include "eigen3/Eigen/Core"
 
-#include "ARE/Novelty.hpp"
+#include "ARE/learning/Novelty.hpp"
 
 namespace are {
 

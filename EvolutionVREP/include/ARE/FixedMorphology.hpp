@@ -21,12 +21,8 @@ class FixedMorphology : public Morphology
 public:
     FixedMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
     FixedMorphology(const FixedMorphology& fm) : Morphology(fm),
-        jointHandles(fm.jointHandles),
-        wheelHandles(fm.wheelHandles),
-        proxHandles(fm.proxHandles),
-        IRHandles(fm.IRHandles),
-        cameraHandle(fm.cameraHandle),
-        energy_cost(fm.energy_cost){}
+        substrate(fm.substrate)
+        {}
 
     Morphology::Ptr clone() const override
         {return std::make_shared<FixedMorphology>(*this);}
@@ -46,15 +42,8 @@ public:
      */
     void createAtPosition(float x,float y,float z) override;
 
-    /**
-     * @brief method which read all the sensors of the morphology and return in the following order :
-     *              - the proximity sensors values : distance to the nearest object detected
-     *              - the passivIR sensors values : 0|1 value indicatings if an IR beacon is detected
-     * @return sensor values
-     */
-    std::vector<double> update() override;
 
-    void command(const std::vector<double>& ctrl_com);
+
 
     /**
      * @brief load the model of the robot. The path of the model is written in the parameter file as #robotPath
@@ -78,15 +67,11 @@ public:
     std::vector<int> get_jointHandles(){return jointHandles;}
     std::vector<int> get_wheelHandles(){return wheelHandles;}
     double get_energy_cost(){return energy_cost;}
+    const NEAT::Substrate &get_substrate(){return substrate;}
 
 
 private:
-    std::vector<int> jointHandles;
-    std::vector<int> wheelHandles;
-    std::vector<int> proxHandles;
-    std::vector<int> IRHandles;
-    int cameraHandle;
-    double energy_cost = 0;
+    NEAT::Substrate substrate;
 
 };
 
