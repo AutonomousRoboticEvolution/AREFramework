@@ -89,11 +89,7 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
     return parameters;
 }
 
-settings::ParametersMapPtr settings::random::parameters(new settings::ParametersMap());
 
-    for(const auto &elt : *params)
-        if(random::parameters->find(elt.first) == random::parameters->end())
-            ofs << toString(elt.first,elt.second);
 
     for(const auto &elt : *random::parameters)
         ofs << toString(elt.first,elt.second);

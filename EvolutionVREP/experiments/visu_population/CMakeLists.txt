@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.0)
 
 
 add_library(visu_pop SHARED 
-    ../common/NNControl.cpp
-    ../common/FixedMorphology.cpp
-    ../common/mazeEnv.cpp
-    ../common/Loggings.cpp
-    ../common/genLoggings.cpp
-    ../common/NNGenome.cpp
-    ../common/NNParamGenome.cpp
-    ../common/NN2Individual.cpp
     visuPop.cpp
     factories.cpp
     )

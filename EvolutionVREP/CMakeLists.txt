@@ -74,9 +74,9 @@ SET(VREP_SRC
     )
 
 if(WITH_NN2 AND LIMBO_FOLDER)
-    FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
+    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
 elseif(WITH_NN2)
-    FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/NIPES.cpp")
+    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/NIPES.cpp")
 else()
     FILE(GLOB SOURCES ${CORE_SRC})
 endif()

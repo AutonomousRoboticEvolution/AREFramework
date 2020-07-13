@@ -106,7 +106,6 @@ public:
     void set_generation(int gen){generation = gen;}
     int get_generation() const {return generation;}
     void incr_generation(){generation++;}
-    void setCurrentIndIndex(int index){currentIndIndex = index;}
 
     int get_numberEvaluation() const {return numberEvaluation;}
 

@@ -1,6 +1,5 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "visuPop.hpp"
-#include "Loggings.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
