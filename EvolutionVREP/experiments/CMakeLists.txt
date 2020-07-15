@@ -9,8 +9,10 @@ add_subdirectory(random_search)
 add_subdirectory(reevaluate_fixedmorphology)
 add_subdirectory(pop_morph_nipes)
 endif()
+
 add_subdirectory(lc_nsms)
 add_subdirectory(friction_estimation)
+
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
