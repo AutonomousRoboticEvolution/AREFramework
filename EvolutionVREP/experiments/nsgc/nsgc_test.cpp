@@ -34,12 +34,12 @@ int main()
     parameters.emplace("#kValue",new are_set::Integer(15));
     parameters.emplace("#withNovelty",new are_set::Boolean(false));
     parameters.emplace("#noveltyThreshold", new are_set::Double(0.9));
-    parameters.emplace("#archiveAddingProb", new are_set::Double(0.4));
+    parameters.emplace("#archiveAddingProb", new are_set::Double(0.2));
     parameters.emplace("#NNType",new are_set::Integer(are_set::nnType::FFNN));
     parameters.emplace("#NbrInputNeurones",new are_set::Integer(1));
     parameters.emplace("#NbrHiddenNeurones",new are_set::Integer(0));
     parameters.emplace("#NbrOutputNeurones",new are_set::Integer(1));
-    parameters.emplace("#useNSGA2Diversity",new are_set::Boolean(false));
+    parameters.emplace("#useNSGA2Diversity",new are_set::Boolean(true));
 
 
     std::random_device rd;
