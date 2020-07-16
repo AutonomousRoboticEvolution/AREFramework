@@ -22,11 +22,7 @@ void CubeMorphology::loadModel(){
     //sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
     if(modelHandle == -1)
     {
-<<<<<<< HEAD
         std::cerr << "unable to load robot model" << std::endl;
-=======
-        std::cerr << "unable to load arepuck model" << std::endl;
->>>>>>> new experiment to estimate friction coefficient
         simChar* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
@@ -107,8 +103,12 @@ bool FricEA::is_finish(){
     return population[0]->getObjectives()[0] > 1e-2;
 =======
     int base_handle = population[0]->get_morphology()->getMainHandle();
-    int nbrObj;
+    int nbrObj = 0;
     int* handles = simGetObjectsInTree(base_handle,sim_handle_all,1,&nbrObj);
+    if(nbrObj == 0){
+        std::cerr << "no object found" << std::endl;
+        return;
+    }
     std::vector<std::string> split_str;
     for(int i = 0; i < nbrObj; i++){
         std::string name(simGetObjectName(handles[i]));
@@ -117,6 +117,7 @@ bool FricEA::is_finish(){
                 continue;
         simSetEngineFloatParameter(sim_bullet_body_friction,handles[i],nullptr,friction_coeff);
     }
+    simReleaseBuffer((simChar*)(handles));
 }
 
 bool FricEA::is_finish(){
@@ -162,10 +163,7 @@ std::vector<double> FrictionSetUp::fitnessFunction(const Individual::Ptr &ind){
 float FrictionSetUp::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     int handle = morph->getMainHandle();
     simGetObjectPosition(handle,-1,robot_pos);
-<<<<<<< HEAD
 
-=======
->>>>>>> new experiment to estimate friction coefficient
 }
 
 void FricCoeffLog::saveLog(EA::Ptr &ea){
@@ -175,10 +173,6 @@ void FricCoeffLog::saveLog(EA::Ptr &ea){
     if(!openOLogFile(savePopFile))
         return;
 
-<<<<<<< HEAD
     savePopFile << generation << "," << static_cast<FricEA*>(ea.get())->get_friction_coeff() << std::endl;
-=======
-    savePopFile << generation << "," << static_cast<FricEA*>(ea.get())->get_friction_coeff();
->>>>>>> new experiment to estimate friction coefficient
     savePopFile.close();
 }

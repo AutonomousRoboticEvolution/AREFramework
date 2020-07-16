@@ -32,22 +32,15 @@ public:
 
     }
 
-<<<<<<< HEAD
 
-=======
-    void init() override{}
->>>>>>> new experiment to estimate friction coefficient
     Individual::Ptr clone() override{}
     void createController() override{}
     void createMorphology() override;
     void update(double delta_time) override{}
-<<<<<<< HEAD
-
     void set_fric_coeff(double fc){fric_coeff = fc;}
 private:
     double fric_coeff;
-=======
->>>>>>> new experiment to estimate friction coefficient
+
 };
 
 class FricEA : public EA
@@ -78,11 +71,7 @@ public:
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 private:
-<<<<<<< HEAD
     float robot_pos[3];
-=======
-    float* robot_pos;
->>>>>>> new experiment to estimate friction coefficient
     float initial_pos[3];
 
 };
