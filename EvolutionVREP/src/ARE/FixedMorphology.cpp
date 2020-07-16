@@ -59,6 +59,21 @@ void FixedMorphology::create()
         std::cout << "Number of Joints : " << jointHandles.size() << std::endl;
     }
 
+    //random orientation;
+    bool randOrient = settings::getParameter<settings::Boolean>(parameters,"#randomOrientation").value;
+    float robotOrient;
+    if(randOrient){
+        robotOrient = randomNum->randFloat(0,2*3.14);
+    }
+    else{
+        robotOrient = settings::getParameter<settings::Float>(parameters,"#robotOrientation").value;
+    }
+
+    float orientation[3];
+    simGetObjectOrientation(mainHandle,mainHandle,orientation);
+    orientation[0] = robotOrient;
+    simSetObjectOrientation(mainHandle,mainHandle,orientation);
+
     std::cout << "Robot Created" << std::endl;
 }
 
@@ -95,20 +110,5 @@ void FixedMorphology::setPosition(float x, float y, float z)
     robotPos[1] = y;
     robotPos[2] = z;
     simSetObjectPosition(mainHandle,-1,robotPos);
-
-    //random orientation;
-    bool randOrient = settings::getParameter<settings::Boolean>(parameters,"#randomOrientation").value;
-    float robotOrient;
-    if(randOrient){
-        robotOrient = randomNum->randFloat(0,2*3.14);
-    }
-    else{
-        robotOrient = settings::getParameter<settings::Float>(parameters,"#robotOrientation").value;
-    }
-
-    float orientation[3];
-    simGetObjectOrientation(mainHandle,mainHandle,orientation);
-    orientation[0] = robotOrient;
-    simSetObjectOrientation(mainHandle,mainHandle,orientation);
 }
 
