@@ -1,6 +1,7 @@
 #experimentName,string,friction_estimation
 #expPluginName,string,/usr/local/lib/libfric_est.so
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+<<<<<<< HEAD
 #robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/Cube2Castor2Wheels.ttm
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/friction_setup.ttt
 #startFricCoeff,float,0.69
@@ -10,3 +11,11 @@
 #timeStep,float,0.05
 #repository,string,/home/leni/are-logs
 #fricLogFile,string,fricCoeffs.log
+=======
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/cube4Castor.ttm
+#fricCoeffDecr,float,0.01
+#maxEvalTime,float,1
+#timeStep,float,0.05
+#repository,string,/home/leni/are-logs
+#fricLogFile,string,fricCoeffs.log
+>>>>>>> new experiment to estimate friction coefficient
