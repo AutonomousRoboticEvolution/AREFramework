@@ -31,7 +31,8 @@ public:
         initialPos(env.initialPos),
         maxTime(env.maxTime),
         type(env.type),
-        name(env.name){}
+        name(env.name),
+        randNum(env.randNum){}
 
     ~Environment(){}
     /**
@@ -65,6 +66,7 @@ public:
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const std::string &get_name(){return name;}
+    void set_randNum(misc::RandNum::Ptr &rn){randNum = rn;}
 
 protected:
     ///setting of the environment
@@ -78,6 +80,8 @@ protected:
     float maxTime = 0.0;
     int type = 0;
     std::string name;
+    misc::RandNum::Ptr randNum;
+
 };
 
 }//are

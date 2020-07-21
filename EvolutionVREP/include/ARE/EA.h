@@ -64,15 +64,33 @@ public:
     void incr_nbr_eval(){numberEvaluation++;}
 
     /**
+     * @brief Initialisation of the algorithm. Called only one time on starting up
+     */
+    virtual void init() = 0;
+    /**
      * @brief Epoch method is called at the end of each generation
      */
     virtual void epoch();
-    virtual void init() = 0;    // initializes EA
+    /**
+     * @brief Initialisation of the population for next generation. Called at the end of each generation after the epoch function.
+     */
     virtual void init_next_pop();
 
+    /**
+     * @brief ending condition of the algorithm
+     * @return true if ending condition is meet
+     */
     virtual bool is_finish(){
         int maxGen = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
         return generation >= maxGen;
+    }
+
+    /**
+     * @brief ending condition of the evaluation. This condition is added with OR to the default condition the time limit.
+     * @return
+     */
+    virtual bool finish_eval(){
+        return false;
     }
 
     //GETTERS & SETTERS
@@ -85,6 +103,7 @@ public:
     void set_generation(int gen){generation = gen;}
     int get_generation() const {return generation;}
     void incr_generation(){generation++;}
+    void setCurrentIndIndex(int index){currentIndIndex = index;}
 
     int get_numberEvaluation() const {return numberEvaluation;}
 
@@ -94,7 +113,7 @@ public:
     }
     void set_startEvalTime(const hr_clock::time_point& t){startEvalTime = t;}
     void set_endEvalTime(const hr_clock::time_point& t){endEvalTime = t;}
-
+    void set_simulator_side(bool ss){simulator_side = ss;}
 
 protected:
     /// This method initilizes a population of genomes
@@ -102,7 +121,7 @@ protected:
     virtual void selection(){}  	// selection operator
     virtual void replacement(){}		// replacement operator
     virtual void mutation(){}		// mutation operator
-    virtual void crossover(){}
+    virtual void crossover(){}      //crossover
     virtual void end(){}				// last call to the EA, when simulation stops
 
 
@@ -114,6 +133,8 @@ protected:
 
     int generation = 0;
     int numberEvaluation = 0;
+    bool simulator_side = true;
+    int currentIndIndex = 0;
 
     hr_clock::time_point startEvalTime;
     hr_clock::time_point endEvalTime;

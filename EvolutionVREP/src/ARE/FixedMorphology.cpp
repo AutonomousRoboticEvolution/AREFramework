@@ -90,36 +90,25 @@ void FixedMorphology::createAtPosition(float x, float y, float z)
 
 void FixedMorphology::setPosition(float x, float y, float z)
 {
-    float epuckPos[3];
-    epuckPos[0] = x;
-    epuckPos[1] = y;
-    epuckPos[2] = z;
-    simSetObjectPosition(mainHandle,-1,epuckPos);
+    float robotPos[3];
+    robotPos[0] = x;
+    robotPos[1] = y;
+    robotPos[2] = z;
+    simSetObjectPosition(mainHandle,-1,robotPos);
 
     //random orientation;
+    bool randOrient = settings::getParameter<settings::Boolean>(parameters,"#randomOrientation").value;
+    float robotOrient;
+    if(randOrient){
+        robotOrient = randomNum->randFloat(0,2*3.14);
+    }
+    else{
+        robotOrient = settings::getParameter<settings::Float>(parameters,"#robotOrientation").value;
+    }
+
     float orientation[3];
     simGetObjectOrientation(mainHandle,mainHandle,orientation);
-    orientation[0] = randomNum->randFloat(0,2*3.14);
+    orientation[0] = robotOrient;
     simSetObjectOrientation(mainHandle,mainHandle,orientation);
 }
 
-void FixedMorphology::command(const std::vector<double> &ctrl_com){
-    double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
-
-    std::vector<double> wheel_com;
-    wheel_com.insert(wheel_com.begin(),ctrl_com.begin(),ctrl_com.begin() + wheelHandles.size());
-    cop::sentCommandToWheels(wheelHandles,wheel_com,maxVelocity);
-
-    std::vector<double> joint_com;
-    joint_com.insert(joint_com.begin(),ctrl_com.begin() + wheelHandles.size(), ctrl_com.end());
-    cop::sentCommandToJoints(jointHandles,joint_com);
-}
-
-std::vector<double> FixedMorphology::update(){
-    std::vector<double> sensorValues;
-
-    cop::readProximitySensors(proxHandles,sensorValues);
-    cop::readPassivIRSensors(IRHandles,sensorValues);
-
-    return sensorValues;
-}

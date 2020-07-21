@@ -9,6 +9,7 @@
 //#include "ARE/ER_Module.h"
 #include "misc/RandNum.h"
 #include "ARE/Settings.h"
+#include "misc/coppelia_communication.hpp"
 
 namespace are {
 
@@ -26,8 +27,14 @@ public:
     Morphology(){}
     Morphology(const settings::ParametersMapPtr &param) : parameters(param){}
     Morphology(const Morphology& morph) :
+        mainHandle(morph.mainHandle),
+        jointHandles(morph.jointHandles),
+        wheelHandles(morph.wheelHandles),
+        proxHandles(morph.proxHandles),
+        IRHandles(morph.IRHandles),
+        cameraHandle(morph.cameraHandle),
         randomNum(morph.randomNum),
-        substrate(morph.substrate)
+        energy_cost(morph.energy_cost)
     {}
     virtual ~Morphology()
     {
@@ -42,34 +49,46 @@ public:
 	virtual void create() = 0;
 	virtual void createAtPosition(float x, float y, float z) = 0;
 
-	/// This method updates the control of the morphology
-    virtual std::vector<double> update() = 0;
+    /**
+     * @brief method which read all the sensors of the morphology and return in the following order :
+     *              - the proximity sensors values : distance to the nearest object detected
+     *              - the passivIR sensors values : 0|1 value indicatings if an IR beacon is detected
+     * @return sensor values
+     */
+    virtual std::vector<double> update();
 
-    virtual void command(const std::vector<double>& sensorValues){}
+    /**
+     * @brief Sends command to the actuators of the robot with the following order : wheel commands and joints commands.
+     */
+    virtual void command(const std::vector<double>&);
 
 
     //GETTERS & SETTERS
     virtual int getMainHandle(){return mainHandle;}
-    const NEAT::Substrate &get_substrate(){return substrate;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
-    void set_randomNum(){}
     void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
 
 protected:
     int mainHandle;
+
+    // Handles used by the controller
+    std::vector<int> jointHandles;
+    std::vector<int> proxHandles;
+    std::vector<int> IRHandles;
+    std::vector<int> wheelHandles;
+    int cameraHandle;
 
     int client_id;
 
     misc::RandNum::Ptr randomNum;
     settings::ParametersMapPtr parameters;
     settings::Property::Ptr properties;
-
-    NEAT::Substrate substrate;
+    double energy_cost = 0;
 };
 
 }//are

@@ -7,9 +7,10 @@
 #include <map>
 #include <string>
 #include <fstream> // ifstream
+#include <sstream>
 #include <list>
 #include <vector>
-#include <misc/utilities.h>
+#include "misc/utilities.h"
 
 namespace are {
 
@@ -31,7 +32,7 @@ class Boolean : public Type
 {
 public:
     Boolean(){name = "bool";}
-    Boolean(bool b) : value(b){name = "int";}
+    Boolean(bool b) : value(b){name = "bool";}
     bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
     template<class archive>
@@ -105,6 +106,7 @@ public:
 
 Type::Ptr buildType(const std::string &name);
 
+std::string toString(const std::string &name, const Type::ConstPtr &element);
 
 template<typename T>
 std::shared_ptr<const T> cast(const Type::ConstPtr val)
@@ -129,6 +131,13 @@ typedef std::shared_ptr<ParametersMap> ParametersMapPtr;
  * @brief Default parameters.
  */
 struct defaults{
+    static ParametersMapPtr parameters;
+};
+
+/**
+ * @brief Randomly generated parameters.
+ */
+struct random{
     static ParametersMapPtr parameters;
 };
 
@@ -198,6 +207,20 @@ struct Property
     int indCounter = 0;
     int clientID;
 };
+
+
+enum genomeType {
+    NEAT = 0,
+    NN = 1,
+    NNPARAM = 2
+};
+
+typedef enum obsType {
+    FINAL_POS = 0,
+    TRAJECTORY = 1,
+    POS_TRAJ = 2
+}obsType;
+
 
 
 } //settings

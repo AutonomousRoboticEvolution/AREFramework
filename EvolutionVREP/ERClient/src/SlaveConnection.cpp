@@ -1,12 +1,6 @@
 #include "ERClient/SlaveConnection.h"
 #include <iostream>
 
-extern "C" {
-    #include "v_repLib.h"
-    #include "v_repConst.h"
-    #include "remoteApi/extApi.h"
-}
-
 using namespace are::client;
 
 void checkReturnValue(simxInt returnValue)
@@ -174,7 +168,7 @@ void SlaveConnection::setFloatSignal(const std::string& signalName, simxFloat st
 void SlaveConnection::getStringSignal(const std::string& signalName, std::string &message) const
 {
     simxUChar *states;
-    simInt length;
+    simxInt length;
     checkReturnValue(
                 simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)
                 );

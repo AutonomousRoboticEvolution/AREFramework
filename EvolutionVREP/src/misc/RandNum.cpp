@@ -17,18 +17,18 @@ RandNum::~RandNum()
 }
 
 double RandNum::randDouble(double lower, double upper) {
-    boost::random::uniform_real_distribution<> dist(lower,upper);
+    std::uniform_real_distribution<> dist(lower,upper);
     return dist(gen);
 }
 
 
 float RandNum::randFloat(float lower, float upper) {
-    boost::random::uniform_real_distribution<> dist(lower,upper);
+    std::uniform_real_distribution<> dist(lower,upper);
     return dist(gen);
 }
 
 int RandNum::randInt(int lower, int upper) {
-    boost::random::uniform_int_distribution<> dist(lower,upper);
+    std::uniform_int_distribution<> dist(lower,upper);
     return dist(gen);
 }
 
@@ -40,7 +40,7 @@ std::vector<double> RandNum::randVectd(double lower, double upper, int size){
 }
 
 double RandNum::normalDist(double mu, double sigma){
-    boost::random::normal_distribution<> nd(mu,sigma);
+    std::normal_distribution<> nd(mu,sigma);
     return nd(gen);
 }
 

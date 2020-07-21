@@ -3,7 +3,7 @@
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puckChangeProperties.ttm
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/AREPuck.ttm
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,12
 #maxEvalTime,float,60
@@ -33,7 +33,7 @@
 #init_z,float,0.05
 #maxWeight,double,1.0
 #NNType,int,0
-#NbrInputNeurones,int,4
+#NbrInputNeurones,int,8
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,4
 #UseInternalBias,bool,1
@@ -47,4 +47,9 @@
 #mutationRate,double,0.4
 #mutationParam,double,0.5
 #mutationType,int,2
+#crossoverType,int,2
+#crossoverParameter,double,0.1
 #nbrWaypoints,int,2
+#withBeacon,bool,1
+#randomOrientation,bool,1
+

@@ -9,9 +9,7 @@ set(INCLUDE
     "/usr/include/eigen3/")
 
 add_library(neuroEvolution SHARED
-    ../common/Loggings.cpp
     basicEA.cpp
-    NELoggings.cpp
     factories.cpp)
 target_include_directories(neuroEvolution PUBLIC ${INCLUDE})
 target_link_libraries(neuroEvolution ER_library)

@@ -38,7 +38,7 @@ void CPPNIndividual::createController()
 {
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(ctrlGenome)->get_neat_genome();
-    NEAT::Substrate subs = morphology->get_substrate();
+    NEAT::Substrate subs = std::dynamic_pointer_cast<FixedMorphology>(morphology)->get_substrate();
     control.reset(new NNControl);
     control->set_parameters(parameters);
     NEAT::NeuralNetwork nn;

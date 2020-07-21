@@ -3,7 +3,7 @@
 #define RANDNUM_H
 
 #include <memory>
-#include <boost/random.hpp>
+#include <random>
 
 namespace misc {
 
@@ -60,7 +60,7 @@ public:
     void setSeed(int seed); // sets the seed of the random number generator
 	int m_seed = 0;
 	int getSeed();
-    boost::random::mt19937 gen;
+    std::mt19937 gen;
 };
 
 }//misc

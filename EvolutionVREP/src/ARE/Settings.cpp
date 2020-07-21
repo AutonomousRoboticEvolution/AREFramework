@@ -48,6 +48,7 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
     return parameters;
 }
 
+settings::ParametersMapPtr settings::random::parameters(new settings::ParametersMap());
 
 settings::Type::Ptr settings::buildType(const std::string &name)
 {
@@ -66,4 +67,42 @@ settings::Type::Ptr settings::buildType(const std::string &name)
         std::cerr << "unknown parameter type : " << name << std::endl;
         return nullptr;
     }
+}
+
+std::string settings::toString(const std::string &name, const settings::Type::ConstPtr& elt){
+    std::stringstream sstr;
+    if(elt->name == "bool"){
+        sstr << name << ",bool," << settings::cast<settings::Boolean>(elt)->value << std::endl;
+    }
+    else if(elt->name == "int"){
+        sstr << name << ",int," << settings::cast<settings::Integer>(elt)->value << std::endl;
+    }
+    else if(elt->name == "float"){
+        sstr << name << ",float," << settings::cast<settings::Float>(elt)->value << std::endl;
+    }
+    else if(elt->name == "double"){
+        sstr << name << ",double," << settings::cast<settings::Double>(elt)->value << std::endl;
+    }
+    else if(elt->name == "string"){
+        sstr << name << ",string," << settings::cast<settings::String>(elt)->value << std::endl;
+    }
+    return sstr.str();
+}
+
+void settings::saveParameters(const std::string& file,const ParametersMapPtr &params){
+    //Write parameters in the log folder.
+    std::ofstream ofs(file);
+
+    for(const auto &elt : *defaults::parameters)
+        if(params->find(elt.first) == params->end())
+            ofs << toString(elt.first,elt.second);
+
+    for(const auto &elt : *params)
+        if(random::parameters->find(elt.first) == random::parameters->end())
+            ofs << toString(elt.first,elt.second);
+
+    for(const auto &elt : *random::parameters)
+        ofs << toString(elt.first,elt.second);
+
+    ofs.close();
 }

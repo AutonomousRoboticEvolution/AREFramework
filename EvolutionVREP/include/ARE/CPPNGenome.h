@@ -24,6 +24,8 @@ public:
 
     void init() override {}
     void mutate() override {}
+    void from_string(const std::string &) override{/*TODO*/}
+    std::string to_string() const override{/*TODO*/}
 
     const NEAT::Genome &get_neat_genome(){return neat_genome;}
 

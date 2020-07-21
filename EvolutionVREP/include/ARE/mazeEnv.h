@@ -11,6 +11,13 @@ struct waypoint{
     float position[3];
     float orientation[3];
 
+    std::string to_string() const{
+        std::stringstream sstr;
+        sstr << position[0] << "," << position[1] << "," << position[2] << ";"
+             << orientation[0] << "," << orientation[1] << "," << orientation[2];
+        return sstr.str();
+    }
+
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -41,6 +48,8 @@ public:
     const std::vector<double> &get_final_position(){return final_position;}
     const std::vector<double> &get_target_position(){return target_position;}
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
+
+    void build_tiled_floor(std::vector<int> &tiles_handles);
 
 private:
     std::vector<double> target_position;

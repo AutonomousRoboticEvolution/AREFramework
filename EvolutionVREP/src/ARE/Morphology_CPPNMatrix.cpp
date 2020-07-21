@@ -1,12 +1,14 @@
 #include "ARE/Morphology_CPPNMatrix.h"
 #include "v_repLib.h"
 #include <stdio.h>
+#include "misc/coppelia_communication.hpp"
 
 #define HANDMADEROBOT 0
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
 
 using namespace are;
+namespace cop = coppelia;
 
 void Morphology_CPPNMatrix::create()
 {
@@ -261,7 +263,8 @@ void Morphology_CPPNMatrix::create()
         exportRobotModel(loadInd);
     }
     //exportRobotModel(loadInd);
-    getObjectHandles();
+//    getObjectHandles();
+    cop::retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
@@ -284,49 +287,6 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
     simSetObjectPosition(mainHandle, -1, robotPos);
 }
 
-void Morphology_CPPNMatrix::getObjectHandles()
-{
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
-    int nbrObj = 0;
-    int* handles = nullptr;
-    handles = simGetObjectsInTree(mainHandle,sim_object_proximitysensor_type,1,&nbrObj);
-
-    proxHandles.clear();
-    jointHandles.clear();
-
-    for(int i = 0; i < nbrObj ; i++)
-        proxHandles.push_back(handles[i]);
-
-    handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);
-    for(int i = 0; i < nbrObj ; i++)
-        jointHandles.push_back(handles[i]);
-
-    simReleaseBuffer((simChar*)handles);
-    simRemoveObjectFromSelection(sim_handle_tree,mainHandle);
-}
-
-std::vector<double> Morphology_CPPNMatrix::update(){
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    std::vector<double> sensorValues;
-    std::function<double(float, float, float)> norm_L2 =
-            [](float x, float y, float z) -> double
-            {return std::sqrt(x*x + y*y + z*z);};
-    float pos[4], norm[3];
-    int obj_h;
-    int det;
-    //sim::pauseCommunication(instance_type,1,properties->clientID);
-    for (size_t i = 0; i < proxHandles.size(); i++)
-    {
-        det = simReadProximitySensor(proxHandles[i],pos,&obj_h,norm);
-        //det = sim::readProximitySensor(instance_type,proxHandles[i],pos,&obj_h,norm,properties->clientID);
-        if(det > 0)
-            sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        else if(det == 0) sensorValues.push_back(0);
-        else std::cerr << "No detection on Proximity sensor" << std::endl; //<< simGetLastError() << std::endl;
-    }
-    return sensorValues;
-}
 
 void Morphology_CPPNMatrix::genomeDecoder(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::NeuralNetwork &cppn)
 {

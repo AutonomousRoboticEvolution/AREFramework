@@ -33,6 +33,8 @@
 #mutationType,int,2
 #mutationRate,double,0.4
 #mutationParam,double,0.5
+#crossoverType,int,1
+#crossoverParameter,double,0.1
 #nbrWaypoints,int,2
 #noiseLevel,double,0.
 #maxVelocity,double,10.

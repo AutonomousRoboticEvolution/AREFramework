@@ -1,6 +1,5 @@
 #include "misc/coppelia_communication.hpp"
 
-
 void coppelia::readProximitySensors(const std::vector<int> handles, std::vector<double> &sensorValues){
 
     std::function<double(float, float, float)> norm_L2 =
@@ -95,6 +94,14 @@ void coppelia::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandle
 void coppelia::sentCommandToJoints(const std::vector<int>& handles,const std::vector<double>& commands){
     for (size_t i = 0; i < handles.size(); i++)
         simSetJointTargetPosition(handles[i],static_cast<float>(commands[i]*M_PI/2.));
+}
+
+void coppelia::getJointsPosition(const std::vector<int>& handles,std::vector<double>& positions){
+    float pos;
+    for(const int& handle : handles){
+        simGetJointPosition(handle,&pos);
+        positions.push_back(static_cast<double>(pos));
+    }
 }
 
 void coppelia::sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity){

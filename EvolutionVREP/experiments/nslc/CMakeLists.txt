@@ -9,13 +9,10 @@ set(INCLUDES
     "/usr/include/eigen3/")
 
 add_library(NSLC SHARED
-    ../common/Loggings.cpp
     NSLC.cpp
-    factories.cpp
-    NSLCLoggings.cpp
-    )
+    factories.cpp)
 target_include_directories(NSLC PUBLIC ${INCLUDES})
-target_link_libraries(NSLC ER_library)
+target_link_libraries(NSLC ER_library tbb)
 
 
 add_executable(nslc_test nslc_test.cpp)
