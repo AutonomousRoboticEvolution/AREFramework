@@ -38,7 +38,6 @@ void CubeMorphology::createAtPosition(float x, float y, float z){
 }
 
 void FricInd::createMorphology(){
-<<<<<<< HEAD
     float tiltAngle = settings::getParameter<settings::Float>(parameters,"#planeTiltAngle").value;
 
 
@@ -73,21 +72,11 @@ void FricEA::init(){
 
     friction_coeff = settings::getParameter<settings::Float>(parameters,"#startFricCoeff").value;
 
-=======
-    morphology.reset(new CubeMorphology(parameters));
-    morphology->createAtPosition(-0.05,0.05,0.24);
-}
-
-void FricEA::init(){
->>>>>>> new experiment to estimate friction coefficient
     EmptyGenome::Ptr gen(new EmptyGenome);
     FricInd::Ptr ind(new FricInd(gen,gen));
     ind->set_parameters(parameters);
     ind->set_randNum(randomNum);
-<<<<<<< HEAD
     std::dynamic_pointer_cast<FricInd>(ind)->set_fric_coeff(friction_coeff);
-=======
->>>>>>> new experiment to estimate friction coefficient
     population.push_back(ind);
 }
 
@@ -95,34 +84,11 @@ void FricEA::init_next_pop(){
 
     float fric_coeff_decr = settings::getParameter<settings::Float>(parameters,"#fricCoeffDecr").value;
     friction_coeff-=fric_coeff_decr;
-<<<<<<< HEAD
     std::dynamic_pointer_cast<FricInd>(population[0])->set_fric_coeff(friction_coeff);
 }
 
 bool FricEA::is_finish(){
-    return population[0]->getObjectives()[0] > 1e-2;
-=======
-    int base_handle = population[0]->get_morphology()->getMainHandle();
-    int nbrObj = 0;
-    int* handles = simGetObjectsInTree(base_handle,sim_handle_all,1,&nbrObj);
-    if(nbrObj == 0){
-        std::cerr << "no object found" << std::endl;
-        return;
-    }
-    std::vector<std::string> split_str;
-    for(int i = 0; i < nbrObj; i++){
-        std::string name(simGetObjectName(handles[i]));
-        boost::split(split_str,name,boost::is_any_of("_"));
-        if(split_str[0] != "P")
-                continue;
-        simSetEngineFloatParameter(sim_bullet_body_friction,handles[i],nullptr,friction_coeff);
-    }
-    simReleaseBuffer((simChar*)(handles));
-}
-
-bool FricEA::is_finish(){
     return population[0]->getObjectives()[0] > 1e-4;
->>>>>>> new experiment to estimate friction coefficient
 }
 
 void FrictionSetUp::init(){
@@ -132,7 +98,6 @@ void FrictionSetUp::init(){
     initial_pos[2] = 0.24;
 
     Environment::init();
-<<<<<<< HEAD
 
     float tiltAngle = settings::getParameter<settings::Float>(parameters,"#planeTiltAngle").value;
 
@@ -141,20 +106,13 @@ void FrictionSetUp::init(){
     simGetObjectOrientation(planeHandle,-1,orient);
     orient[0] = tiltAngle;
     simSetObjectOrientation(planeHandle,-1,orient);
-=======
->>>>>>> new experiment to estimate friction coefficient
 }
 
 std::vector<double> FrictionSetUp::fitnessFunction(const Individual::Ptr &ind){
     std::vector<double> obj(1);
     obj[0] = fabs(robot_pos[0] - initial_pos[0])
-<<<<<<< HEAD
             + fabs(robot_pos[1] - initial_pos[1]);
-            //+ fabs(robot_pos[2] - initial_pos[2]);
-=======
-            + fabs(robot_pos[1] - initial_pos[1])
             + fabs(robot_pos[2] - initial_pos[2]);
->>>>>>> new experiment to estimate friction coefficient
 
     return obj;
 }
