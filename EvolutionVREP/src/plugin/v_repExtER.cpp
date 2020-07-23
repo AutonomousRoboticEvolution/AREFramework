@@ -19,7 +19,13 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <random>
@@ -49,7 +55,7 @@ extern "C" {
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
-LIBRARY vrepLib;
+LIBRARY simLib;
 
 ///save time log
 void saveLog(int num)
@@ -99,18 +105,36 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 
 
-    vrepLib = loadVrepLibrary(temp.c_str());
-    if (vrepLib == NULL)
+
+#if defined (VREP)
+    simLib = loadVrepLibrary(temp.c_str());
+#elif defined (COPPELIASIM)
+    simLib = loadSimLibrary(temp.c_str());
+#endif
+    if (simLib == NULL)
     {
         std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
         return(0); // Means error, V-REP will unload this plugin
     }
-    if (getVrepProcAddresses(vrepLib) == 0)
+#if defined (VREP)
+    if (getVrepProcAddresses(simLib) == 0)
     {
         std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
-        unloadVrepLibrary(vrepLib);
+
+        unloadVrepLibrary(simLib); // release the library
+
         return(0); // Means error, V-REP will unload this plugin
     }
+#elif defined(COPPELIASIM)
+    if (getSimProcAddresses(simLib) == 0)
+    {
+        std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
+
+        unloadSimLibrary(simLib); // release the library
+
+        return(0); // Means error, V-REP will unload this plugin
+    }
+#endif
 
     // Check the V-REP version:
     int vrepVer;
@@ -118,7 +142,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
     {
         std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
-        unloadVrepLibrary(vrepLib);
+#if defined (VREP)
+        unloadVrepLibrary(simLib); // release the library
+#elif defined(COPPELIASIM)
+        unloadSimLibrary(simLib);
+#endif
         return(0); // Means error, V-REP will unload this plugin
     }
 
@@ -183,7 +211,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-    unloadVrepLibrary(vrepLib); // release the library
+#if defined (VREP)
+    unloadVrepLibrary(simLib); // release the library
+#elif defined(COPPELIASIM)
+    unloadSimLibrary(simLib);
+#endif
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)

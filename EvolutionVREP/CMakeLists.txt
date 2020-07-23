@@ -5,9 +5,33 @@ add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
-if (NOT VREP_FOLDER)
-    message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
-else()
+if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
+    message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
+elseif(COPPELIASIM_FOLDER)
+    message("COPPELIA FOUND!")
+    SET(COPPELIASIM_FOUND ON)
+    SET(VREP_FOUND OFF)
+    add_definitions(-DCOPPELIASIM)
+    if (WIN32)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.exe")
+    elseif(APPLE)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/coppeliaSim")
+    else()
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+elseif(VREP_FOLDER)
+    message("VREP FOUND!")
+    SET(VREP_FOUND ON)
+    SET(COPPELIASIM_FOUND OFF)
+    add_definitions(-DVREP)
+
     if (WIN32)
         set(VREP_LIB_FOLDER "${VREP_FOLDER}")
         set(VREP_EXE "${VREP_FOLDER}/vrep.exe")
@@ -22,6 +46,8 @@ else()
     if(NOT EXISTS ${VREP_EXE})
         message(FATAL_ERROR "VREP_FOLDER not configure properly: \"${VREP_EXE}\"not found")
     endif()
+else()
+    message(FATAL_ERROR "VREP_FOLDER variable not set, please set the variable to the vrep location. Example: -DVREP_FOLDER=/usr/share/vrep/")
 endif()
 
 add_subdirectory(modules)
@@ -34,10 +60,18 @@ find_package(PolyVox REQUIRED)
 set(CORE_SRC
     "src/ARE/*"
     "src/misc/*"
-    "${VREP_FOLDER}/programming/common/v_repLib.cpp"
-    "${VREP_FOLDER}/programming/remoteApi/extApi.c"
-    "${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c"
-    "${VREP_FOLDER}/programming/common/shared_memory.c")
+)
+
+SET(VREP_SRC
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+    )
 
 if(WITH_NN2 AND LIMBO_FOLDER)
     FILE(GLOB SOURCES ${CORE_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
@@ -49,13 +83,13 @@ endif()
 
 message("SOURCES : ${SOURCES}")
 
-add_library(ER_library SHARED ${SOURCES})
+add_library(ER_library SHARED ${VREP_SRC} ${SOURCES})
 
 target_include_directories(ER_library PUBLIC
     "include"
     "ERClient/include"
-    "${VREP_FOLDER}/programming/"
-    "${VREP_FOLDER}/programming/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "/usr/include/eigen3"
     "modules"
     "${LIMBO_FOLDER}/src/"
@@ -77,9 +111,16 @@ set_target_properties(ER_library PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
 
-add_library(v_repExtER SHARED 
+if(VREP_FOUND)
+    SET(LIB_EXT v_repExtER)
+elseif(COPPELIASIM_FOUND)
+    SET(LIB_EXT simExtER)
+endif()
+
+add_library(${LIB_EXT} SHARED
     src/plugin/v_repExtER.cpp
 )
+
 
 target_link_libraries(ER_library
     MultiNEAT::MultiNEAT
@@ -96,21 +137,26 @@ target_include_directories(ER_library
 install(TARGETS ER_library DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
-target_link_libraries(v_repExtER ER_library dlibxx dl ${Boost_LIBRARIES})
-
-target_include_directories(v_repExtER PUBLIC
+target_include_directories(${LIB_EXT} PUBLIC
     "include"
     "ERClient/include"
-    "${VREP_FOLDER}/programming/include"
-)
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+  )
 
-set_target_properties(v_repExtER PROPERTIES 
+
+set_target_properties(${LIB_EXT} PROPERTIES
     CXX_STANDARD 14
     # COMPILE_FLAGS "-w"
     POSITION_INDEPENDENT_CODE ON
 )
 
-install(TARGETS v_repExtER DESTINATION ${VREP_LIB_FOLDER})
+if (COPPELIASIM_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${COPPELIASIM_FOLDER})
+elseif (VREP_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${VREP_FOLDER})
+endif()
 
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(ER_library PUBLIC "__WINDOWS__")
