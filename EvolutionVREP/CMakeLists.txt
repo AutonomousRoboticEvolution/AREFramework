@@ -137,6 +137,8 @@ target_include_directories(ER_library
 install(TARGETS ER_library DESTINATION lib)
 install(DIRECTORY include/ DESTINATION include)
 
+target_link_libraries(${LIB_EXT} ER_library dlibxx dl ${Boost_LIBRARIES})
+
 target_include_directories(${LIB_EXT} PUBLIC
     "include"
     "ERClient/include"
