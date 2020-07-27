@@ -1,7 +1,7 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
+#include "ARE/Logging.h"
+#include "ARE/learning/Novelty.hpp"
 #include "MB_NIPES.hpp"
-#include "genLoggings.hpp"
-#include "Loggings.h"
 #include "MB_NIPESLoggings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory(const are::settings::ParametersMapPtr& param)
@@ -37,18 +37,14 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(etlog);
 
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;
-    are::BehavDescLog::Ptr bdlog(new are::BehavDescLog(behav_desc_log_file));
+    are::BehavDescLog<are::NN2Individual>::Ptr bdlog(new are::BehavDescLog<are::NN2Individual>(behav_desc_log_file));
     logs.push_back(bdlog);
 
     are::NNParamGenomeLog::Ptr nnpglog(new are::NNParamGenomeLog);
     logs.push_back(nnpglog);
 
-    std::string novelty_log_file = are::settings::getParameter<are::settings::String>(param,"#noveltyFile").value;
-    are::NoveltyLog::Ptr nvlog(new are::NoveltyLog(novelty_log_file));
-    logs.push_back(nvlog);
-
     std::string archive_log_file = are::settings::getParameter<are::settings::String>(param,"#archiveFile").value;
-    are::ArchiveLog::Ptr arclog(new are::ArchiveLog(archive_log_file));
+    are::ArchiveLog<are::MB_NIPES>::Ptr arclog(new are::ArchiveLog<are::MB_NIPES>(archive_log_file));
     logs.push_back(arclog);
 
 //    std::string bo_log_file = are::settings::getParameter<are::settings::String>(param,"#BOSamplesFile").value;

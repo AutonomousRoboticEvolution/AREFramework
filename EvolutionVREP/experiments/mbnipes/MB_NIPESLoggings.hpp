@@ -18,22 +18,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class NoveltyLog : public Logging
-{
-public:
-    NoveltyLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
-class ArchiveLog : public Logging
-{
-public:
-    ArchiveLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
 class BOLog : public Logging
 {
 public:

@@ -19,45 +19,6 @@ void StopCritLog::saveLog(EA::Ptr &ea)
     logFileStream.close();
 }
 
-void NoveltyLog::saveLog(are::EA::Ptr &ea)
-{
-    int generation = ea->get_generation();
-
-    std::ofstream savePopFile;
-    if(!openOLogFile(savePopFile))
-        return;
-
-    savePopFile << generation << "," << ea->get_population().size() << ",";
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << ea->get_population()[i]->getObjectives()[1] << ",";
-    }
-
-    savePopFile << std::endl;
-    savePopFile.close();
-}
-
-void ArchiveLog::saveLog(are::EA::Ptr &ea)
-{
-    int generation = ea->get_generation();
-
-    std::ofstream savePopFile;
-    if(!openOLogFile(savePopFile))
-        return;
-
-    Eigen::VectorXd desc;
-
-    savePopFile << generation << ";" << static_cast<NIPES*>(ea.get())->get_archive().size() << ";";
-    for (size_t i = 0; i < static_cast<NIPES*>(ea.get())->get_archive().size(); i++) {
-        desc = static_cast<NIPES*>(ea.get())->get_archive()[i];
-        for(size_t j = 0; j < desc.rows() - 1 ; j++)
-            savePopFile << desc(j) << ",";
-        savePopFile << desc(desc.rows()-1) << ";";
-    }
-
-    savePopFile << std::endl;
-    savePopFile.close();
-}
-
 
 void BOLog::saveLog(EA::Ptr &ea)
 {

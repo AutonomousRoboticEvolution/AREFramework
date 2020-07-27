@@ -1,9 +1,9 @@
-#ifndef CMABO_HPP
-#define CMABO_HPP
+#ifndef MB_NIPES_HPP
+#define MB_NIPES_HPP
 
-#include "NIPES.hpp"
-#include "NN2Individual.hpp"
-#include "BOLearner.h"
+#include "ARE/learning/NIPES.hpp"
+#include "ARE/nn2/NN2Individual.hpp"
+#include "ARE/learning/BayesianOpt.hpp"
 
 namespace are
 {
@@ -48,4 +48,4 @@ protected:
 }
 
 
-#endif //CMABO_HPP
+#endif //MB_NIPES_HPP

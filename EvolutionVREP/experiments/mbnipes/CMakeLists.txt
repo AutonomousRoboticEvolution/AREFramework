@@ -12,17 +12,6 @@ set(INCLUDES
 
 
 add_library(MB_NIPES SHARED 
-    ../common/FixedMorphology.cpp
-    ../common/mazeEnv.cpp
-    ../common/Loggings.cpp
-    ../common/NNGenome.cpp
-    ../common/genLoggings.cpp
-    ../common/Novelty.cpp
-    ../common/NIPES.cpp
-    ../common/BOLearner.cpp
-    ../common/NN2Individual.cpp
-    ../common/NN2Control.cpp
-    ../common/NNParamGenome.cpp
     MB_NIPES.cpp
     factories.cpp
     MB_NIPESLoggings.cpp
