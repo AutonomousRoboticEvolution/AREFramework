@@ -3,7 +3,7 @@
 #include "ManLog.h"
 
 extern "C" are::Environment::Ptr environmentFactory
-    (const are::settings::ParametersMapPtr& param)
+        (const are::settings::ParametersMapPtr& param)
 {
     are::Environment::Ptr env(new are::TestEnv);
     env->set_parameters(param);
@@ -39,4 +39,11 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::morphDescCartWHDLog::Ptr mdcartwdlog(new are::morphDescCartWHDLog(md_cart_wd_log_file));
     logs.push_back(mdcartwdlog);
 
+    std::string md_sym_log_file = are::settings::getParameter<are::settings::String>(param,"#mdSymFile").value;
+    are::morphDescSymLog::Ptr mdsymlog(new are::morphDescSymLog(md_sym_log_file));
+    logs.push_back(mdsymlog);
+
+    std::string md_matrix_proto_log_file = are::settings::getParameter<are::settings::String>(param,"#mdMatrixProtoFile").value;
+    are::ProtoMatrixLog::Ptr mdmatrixprotolog(new are::ProtoMatrixLog(md_matrix_proto_log_file));
+    logs.push_back(mdmatrixprotolog);
 }

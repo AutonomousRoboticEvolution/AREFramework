@@ -12,7 +12,6 @@
 
 namespace are {
 
-
 class GenomeLog : public Logging
 {
 public:
@@ -33,6 +32,14 @@ class morphDescCartWHDLog : public Logging
 {
 public:
     morphDescCartWHDLog(const std::string &file) : Logging(file, true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
+class morphDescSymLog : public Logging
+{
+public:
+    morphDescSymLog(const std::string &file) : Logging(file, true){} //Logging at the end of the generation
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };
