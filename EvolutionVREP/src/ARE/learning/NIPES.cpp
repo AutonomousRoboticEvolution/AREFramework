@@ -379,9 +379,6 @@ void NIPES::init_next_pop(){
     }
 }
 
-void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
-    population[indIdx]->setObjectives(objectives);
-}
 
 
 bool NIPES::update(const Environment::Ptr & env){

@@ -120,8 +120,6 @@ public:
     void init_next_pop() override;
     bool update(const Environment::Ptr&) override;
 
-    void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
-
     bool is_finish() override;
     bool finish_eval() override;
 
