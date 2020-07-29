@@ -55,7 +55,6 @@ public:
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
-        arch & parameters;
 //        arch & initialized;
     }
 
