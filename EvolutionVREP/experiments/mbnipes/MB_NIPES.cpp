@@ -98,7 +98,10 @@ bool MB_NIPES::update(const Environment::Ptr &env){
     if(simulator_side){
         std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
     }
+
 
     if(instance_type == settings::INSTANCE_REGULAR || !simulator_side){
 

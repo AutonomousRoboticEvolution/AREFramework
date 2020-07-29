@@ -106,9 +106,14 @@ bool NSGC::update(const Environment::Ptr & env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;
 
-    Individual::Ptr ind = population[currentIndIndex];
-    std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
+    if(simulator_side){
+        Individual::Ptr ind = population[currentIndIndex];
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
                     std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
+                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
+    }
+
 
     return true;
 }
