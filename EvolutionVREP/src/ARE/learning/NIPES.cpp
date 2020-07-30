@@ -327,10 +327,10 @@ void NIPES::epoch(){
     cmaStrategy->eval();
     cmaStrategy->tell();
     bool stop = cmaStrategy->stop();
-//    if(cmaStrategy->have_reached_ftarget()){
-//        _is_finish = true;
-////        return;
-//    }
+    if(cmaStrategy->have_reached_ftarget()){
+        _is_finish = true;
+//        return;
+    }
 
     if(withRestart && stop){
         if(verbose)

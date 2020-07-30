@@ -73,6 +73,8 @@ public:
     int get_client_id(){return client_id;}
     void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
 
+    double get_energy_cost(){return energy_cost;}
+
 protected:
     int mainHandle;
 

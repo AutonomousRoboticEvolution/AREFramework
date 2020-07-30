@@ -76,6 +76,7 @@ void morph_log::NNParamGenomeLog::saveLog(EA::Ptr &ea)
         logFileStream.close();
     }
 }
+<<<<<<< HEAD
 
 void morph_log::ControllerArchiveLog::saveLog(EA::Ptr &ea){
     int generation = ea->get_generation();
@@ -98,3 +99,5 @@ void morph_log::ControllerArchiveLog::saveLog(EA::Ptr &ea){
     }
     logFileStream.close();
 }
+=======
+>>>>>>> add new experiment : pop_morph_nipes

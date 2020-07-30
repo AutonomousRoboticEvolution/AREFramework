@@ -1,6 +1,7 @@
 #experimentName,string,pop_morph_nipes
 #expPluginName,string,/usr/local/lib/libPM_NIPES.so
 #extSettingsClass,bool,0
+<<<<<<< HEAD
 #vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/middle_wall.ttt
 #organsPath,string,/home/le_goff/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
@@ -13,6 +14,18 @@
 #maxEvalTime,float,120
 #maxNbrEval,int,10000
 #repository,string,/home/le_goff/are-logs
+=======
+#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
+#loadExperiment,string,/home/leni/git/genomes/20200720/lc_nsms_20_6_14-19-2-2722-642861003/
+#morphDescFile,string,MD_Cart_WDH.csv
+#bootstrapFile,string,CLSRrobotList.csv
+#populationSize,int,2
+#maxEvalTime,float,120
+#maxNbrEval,int,2
+#repository,string,/home/leni/are-logs
+>>>>>>> add new experiment : pop_morph_nipes
 #numberOfGeneration,int,2
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -22,8 +35,11 @@
 #stopCritFile,string,stop_crit.csv
 #noveltyFile,string,novelty.csv
 #archiveFile,string,archive.csv
+<<<<<<< HEAD
 #energyCostFile,string,energy_cost.csv/
 #simTimeFile,string,sim_time.csv
+=======
+>>>>>>> add new experiment : pop_morph_nipes
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -31,12 +47,21 @@
 #shouldReopenConnections,bool,0
 #seed,int,-1
 #arenaSize,double,2.
+<<<<<<< HEAD
 #target_x,double,0.
 #target_y,double,0.5
 #target_z,double,0.05
 #init_x,float,0.
 #init_y,float,-0.5
 #init_z,float,0.12
+=======
+#target_x,double,0.75
+#target_y,double,0.75
+#target_z,double,0.05
+#init_x,float,0.
+#init_y,float,0.
+#init_z,float,0.05
+>>>>>>> add new experiment : pop_morph_nipes
 #MaxWeight,float,1.0
 #NNType,int,2
 #NbrInputNeurones,int,4
@@ -63,9 +88,13 @@
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
+<<<<<<< HEAD
 #manufacturabilityMethod,int,1
 #flatFloor,bool,1
 #energyReduction,bool,0
 #jointControllerType,int,2
 #reloadController,bool,0
 #isExportModel,bool,1
+=======
+#manufacturabilityMethod,int,1
+>>>>>>> add new experiment : pop_morph_nipes

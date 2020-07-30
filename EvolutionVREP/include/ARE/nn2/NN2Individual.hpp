@@ -29,7 +29,7 @@ public:
     typedef std::shared_ptr<const NN2Individual> ConstPtr;
 
     NN2Individual() : Individual(){}
-    NN2Individual(const EmptyGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
+    NN2Individual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
         Individual(morph_gen,ctrl_gen){}
     NN2Individual(const NN2Individual& ind) :
         Individual(ind),
