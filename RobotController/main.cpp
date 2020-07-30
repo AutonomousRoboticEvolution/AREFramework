@@ -11,7 +11,8 @@
 
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
-#include "../Cplusplus_Evolution/ERFiles/control/FixedStructreANN.h"
+#include "BrainOrgan.hpp"
+//#include "../Cplusplus_Evolution/ERFiles/control/FixedStructreANN.h"
 
 #define SENSOR1 0x72
 #define SENSOR2 0x73
@@ -21,25 +22,27 @@
 #define SCALE_MOTOR1 6.0
 #define SCALE_MOTOR2 6.0
 
+#define LED_DRIVER_ADDR 0x6A
 
-void split_line(std::string& line, char delim, std::vector<std::string>& values)
-{
-    size_t pos = 0;
-    while ((pos = line.find(delim, (pos + 0))) != string::npos) {
-        string p = line.substr(0, pos);
-        values.push_back(p);
-        line = line.substr(pos + 1);
-    }
-    while ((pos = line.find(delim, (pos + 1))) != string::npos) {
-        string p = line.substr(0, pos);
-        values.push_back(p);
-        line = line.substr(pos + 1);
-    }
 
-    if (!line.empty()) {
-        values.push_back(line);
-    }
-}
+// void split_line(std::string& line, char delim, std::vector<std::string>& values)
+// {
+//     size_t pos = 0;
+//     while ((pos = line.find(delim, (pos + 0))) != string::npos) {
+//         string p = line.substr(0, pos);
+//         values.push_back(p);
+//         line = line.substr(pos + 1);
+//     }
+//     while ((pos = line.find(delim, (pos + 1))) != string::npos) {
+//         string p = line.substr(0, pos);
+//         values.push_back(p);
+//         line = line.substr(pos + 1);
+//     }
+
+//     if (!line.empty()) {
+//         values.push_back(line);
+//     }
+// }
 
 bool running = true;
 
@@ -62,81 +65,107 @@ void setup_sigint_catch()
 
 }
 
-std::vector<std::string> load_params_list(const std::string &filename)
-{
-    std::vector<std::string> brain_params;
-    //load brain params from file
-    std::ifstream genome_file(filename);
-    if (!genome_file) {
-        std::cerr << "Could not load " << filename << std::endl;
-        std::exit(1);
-    }
+// std::vector<std::string> load_params_list(const std::string &filename)
+// {
+//     std::vector<std::string> brain_params;
+//     //load brain params from file
+//     std::ifstream genome_file(filename);
+//     if (!genome_file) {
+//         std::cerr << "Could not load " << filename << std::endl;
+//         std::exit(1);
+//     }
 
-    {
-        std::string value;
-        while (std::getline(genome_file, value, ',')) {
-            if (value.find('\n') != string::npos) {
-                split_line(value, '\n', brain_params);
-            } else {
-                brain_params.push_back(value);
-            }
-        }
-    }
+//     {
+//         std::string value;
+//         while (std::getline(genome_file, value, ',')) {
+//             if (value.find('\n') != string::npos) {
+//                 split_line(value, '\n', brain_params);
+//             } else {
+//                 brain_params.push_back(value);
+//             }
+//         }
+//     }
 
-    return brain_params;
-}
+//     return brain_params;
+// }
 
 int main()
 {
     setup_sigint_catch();
-    Settings settings;
 
-    FixedStructureANN controller;
-    controller.settings = std::make_shared<Settings>();
-    controller.randomNum = std::make_shared<RandNum>(0);
-    controller.init(2, 0, 2);
-    std::vector<std::string> brain_params = load_params_list("genome.csv");
-    controller.setControlParams(brain_params);
+    //Create led driver
+    LedDriver ledDriver(LED_DRIVER_ADDR);
+    ledDriver.test();
+    
 
-	// Variables
-	int8_t speed1 = 0;
-	int8_t speed2 = 0;
-	float reading1 = 0;
-	float reading2 = 0;
-	//Create a sensor and motor  organs
-	SensorOrgan sensor1(SENSOR1);
-	SensorOrgan sensor2(SENSOR2);
-	MotorOrgan motor1(MOTOR1);
-	MotorOrgan motor2(MOTOR2);
-	// Initialize motors
-	motor1.brake();
-	motor2.brake();
-	sleep(1); // Give chance to stop motor at start of code
-	// Initialize ADC sensor
-	//sensor1.ADCinit();
-	//sensor2.ADCinit();
-	sensor1.initProximity();
-	sensor2.initProximity();
-	// Infinite loop
-	do {
-		// Take readings from sensors
-		reading1 = sensor1.calibratedProximityReading();
-		reading2 = sensor2.calibratedProximityReading();
+    // ledDriver.testWrite(0x00, 0x01);	//Mode1 bit [4] clear to enable osc
+    // ledDriver.testWrite(0x01, 0x28);	//Mode2 bit [3] set output change on ack; [5] global blink
+    // ledDriver.testWrite(0x14, 0xFF);	//LEDOUT0 to 11111111 pwmable and blinkable
+    // ledDriver.testWrite(0x15, 0xFF);	//LEDOUT1 to 11111111 pwmable and blinkable
+    // ledDriver.testWrite(0x16, 0xFF);	//LEDOUT2 to 11111111 pwmable and blinkable
+    // ledDriver.testWrite(0x17, 0xFF);	//LEDOUT3 to 11111111 pwmable and blinkable
+    // ledDriver.testWrite(0x02, 0x00);	//Half beans to first led (green)
+    // ledDriver.testWrite(0x03, 0x8F);	//3/4 beans to 2nd led (red)
+    // ledDriver.testWrite(0x04, 0x0F);	//Half beans to 3rd led (blue)
+    // ledDriver.testWrite(0x13, 0x0A);	//GRPFREQ to ~0.5s(C)
+    // ledDriver.testWrite(0x12, 0x5F);	//GRPPWM duty cycle to 0.5
 
-		std::vector<float> inputs = { reading1, reading2 };
-		std::vector<float> output = controller.update(inputs);
+    // printf("Mode1: %0X\n", ledDriver.testRead(0x00));
+    // printf("Mode2: %0X\n", ledDriver.testRead(0x01));
+    // printf("LEDOUT0: %0X\n", ledDriver.testRead(0x14));
+    // printf("PWM0: %0X\n", ledDriver.testRead(0x2));
+    // printf("PWM1: %0X\n", ledDriver.testRead(0x3));
+    // printf("PWM2: %0X\n", ledDriver.testRead(0x4));
+    // printf("PWM3: %0X\n", ledDriver.testRead(0x5));
 
-		speed1 = output[0] * 63.0 * SCALE_MOTOR1;
-		speed2 = output[1] * 63.0 * SCALE_MOTOR2;
+    // Settings settings;
 
-		motor1.setSpeed(speed1);
-		motor2.setSpeed(speed2);
+ //    FixedStructureANN controller;
+ //    controller.settings = std::make_shared<Settings>();
+ //    controller.randomNum = std::make_shared<RandNum>(0);
+ //    controller.init(2, 0, 2);
+ //    std::vector<std::string> brain_params = load_params_list("genome.csv");
+ //    controller.setControlParams(brain_params);
 
-		//Loop timer
-		usleep(50*1000); // 50ms -> 20Hz
-	} while (running);
+	// // Variables
+	// int8_t speed1 = 0;
+	// int8_t speed2 = 0;
+	// float reading1 = 0;
+	// float reading2 = 0;
+	// //Create a sensor and motor  organs
+	// SensorOrgan sensor1(SENSOR1);
+	// SensorOrgan sensor2(SENSOR2);
+	// MotorOrgan motor1(MOTOR1);
+	// MotorOrgan motor2(MOTOR2);
+	// // Initialize motors
+	// motor1.brake();
+	// motor2.brake();
+	// sleep(1); // Give chance to stop motor at start of code
+	// // Initialize ADC sensor
+	// //sensor1.ADCinit();
+	// //sensor2.ADCinit();
+	// sensor1.initProximity();
+	// sensor2.initProximity();
+	// // Infinite loop
+	// do {
+	// 	// Take readings from sensors
+	// 	reading1 = sensor1.calibratedProximityReading();
+	// 	reading2 = sensor2.calibratedProximityReading();
 
-	motor1.brake();
-	motor2.brake();
-	return 0;
+	// 	std::vector<float> inputs = { reading1, reading2 };
+	// 	std::vector<float> output = controller.update(inputs);
+
+	// 	speed1 = output[0] * 63.0 * SCALE_MOTOR1;
+	// 	speed2 = output[1] * 63.0 * SCALE_MOTOR2;
+
+	// 	motor1.setSpeed(speed1);
+	// 	motor2.setSpeed(speed2);
+
+	// 	//Loop timer
+	// 	usleep(50*1000); // 50ms -> 20Hz
+	// } while (running);
+
+	// motor1.brake();
+	// motor2.brake();
+	// return 0;
 }

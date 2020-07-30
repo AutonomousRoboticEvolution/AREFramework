@@ -115,6 +115,11 @@ uint16_t ColorSensor :: readcolor(uint8_t ch)
 }
 
 //*****************TOF sensor***************************//
+//TODO: This copy-and-paste job is an abomination, and does not belong here
+//Such a quantity of copied code should be packaged in its own file and simply referenced from this one
+//The duplication of functionality which is elsewhere provided by i2cDevice is also probably best avoided if possible
+//note that everything else uses WiringPi to access the i2c bus and this code uses ioctl. If strange behaviour happens, maybe check this?
+
 #define calcMacroPeriod(vcsel_period_pclks) ((((uint32_t)2304 * (vcsel_period_pclks) * 1655) + 500) / 1000)
 // Encode VCSEL pulse period register value from period in PCLKs
 // based on VL53L0X_encode_vcsel_period()
