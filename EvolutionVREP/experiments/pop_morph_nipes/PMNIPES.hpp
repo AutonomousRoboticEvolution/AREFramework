@@ -10,7 +10,6 @@
 
 namespace are{
 
-<<<<<<< HEAD
 typedef
 /**
  * @brief Archive of controller ordered in a 3D vector with the following dimension : number of wheels, number of joints, number of sensors
@@ -41,8 +40,6 @@ struct ControllerArchive{
 
 } ControllerArchive;
 
-=======
->>>>>>> add new experiment : pop_morph_nipes
 class PMNIPESIndividual : public NN2Individual
 {
 public:
@@ -65,31 +62,19 @@ public:
     void setGenome();
 
     void setManRes();
-<<<<<<< HEAD
 
     /// Setters for descritors
     void setMorphDesc();
-
-=======
-    void setManScore();
-
-    /// Setters for descritors
-    void setMorphDesc();
-    void setGraphMatrix();
-    void setSymDesc();
->>>>>>> add new experiment : pop_morph_nipes
 
     void set_nn_inputs(int nni){nn_inputs = nni;}
     void set_nn_outputs(int nno){nn_outputs = nno;}
 
-<<<<<<< HEAD
 
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
         arch & objectives;
         arch & ctrlGenome;
-        arch & morphGenome;
         arch & final_position;
         arch & energy_cost;
         arch & trajectory;
@@ -101,8 +86,6 @@ public:
     std::string to_string() override;
     void from_string(const std::string &) override;
 
-=======
->>>>>>> add new experiment : pop_morph_nipes
 private:
     void createMorphology() override;
     void createController() override;
@@ -114,10 +97,6 @@ private:
     Eigen::VectorXd morphDesc;
     Eigen::VectorXd symDesc;
 
-<<<<<<< HEAD
-
-=======
->>>>>>> add new experiment : pop_morph_nipes
     int nn_inputs;
     int nn_outputs;
 
@@ -137,7 +116,6 @@ public:
     void init_cmaes(int dim);
     void init_first_pop(int nbr_weights, int nbr_bias);
     void init_next_pop() override;
-<<<<<<< HEAD
     bool update(const Environment::Ptr &) override;
     bool is_finish() override;
 
@@ -146,12 +124,6 @@ public:
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
     const ControllerArchive::controller_archive_t& get_controller_archive(){return controller_archive.archive;}
-=======
-    bool is_finish() override;
-
-    //GETTERS
-    const std::string& subFolder(){return sub_folder;}
->>>>>>> add new experiment : pop_morph_nipes
 
 private:
     typedef struct morph_desc_t{
@@ -161,28 +133,20 @@ private:
     }morph_desc_t;
 
     void loadNEATGenome(short int genomeID, NEAT::Genome& gen);
-<<<<<<< HEAD
     void listMorphGenomeID(std::vector<short int>& list, const std::vector<short> &past_list = std::vector<short>());
     void loadNbrSenAct(std::vector<short> &list, std::map<short int, morph_desc_t>& desc_map);
-=======
-    void listMorphGenomeID(std::vector<short int>& list);
-    void loadNbrSenAct(const std::vector<short int>& list, std::map<short int, morph_desc_t>& desc_map);
->>>>>>> add new experiment : pop_morph_nipes
+
 
     std::vector<short int> morphIDList;
     std::map<short,morph_desc_t> morphDescMap;
     int morphCounter = 0;
     std::string sub_folder;
-<<<<<<< HEAD
     NEAT::Genome current_morph_gen;
     float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
     ControllerArchive controller_archive;
-=======
 
-
->>>>>>> add new experiment : pop_morph_nipes
 };
 
 }

@@ -2,7 +2,6 @@
 
 using namespace are;
 
-<<<<<<< HEAD
 void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
 {
     archive.resize(max_wheels+1);
@@ -46,22 +45,6 @@ void PMNIPESIndividual::createMorphology(){
     setGenome();
     setMorphDesc();
     setManRes();
-=======
-void PMNIPESIndividual::createMorphology(){
-    NEAT::Genome gen =
-            std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
-    morphology.reset(new Morphology_CPPNMatrix(parameters));
-    NEAT::NeuralNetwork nn;
-    gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-    morphology->createAtPosition(0,0,0.12);
-    setGenome();
-    setMorphDesc();
-    setManRes();
-    setManScore();
-    setGraphMatrix();
-    setSymDesc();
->>>>>>> add new experiment : pop_morph_nipes
 }
 
 void PMNIPESIndividual::createController(){
@@ -98,20 +81,12 @@ void PMNIPESIndividual::createController(){
 
 void PMNIPESIndividual::update(double delta_time){
     std::vector<double> inputs = morphology->update();
-<<<<<<< HEAD
     std::vector<double> outputs = control->update(inputs);
 
     std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
 //    energy_cost += morphology->get_energy_cost();
 //    if(std::isnan(energy_cost))
 //        energy_cost = 0;
-=======
-
-    std::vector<double> outputs = control->update(inputs);
-
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
-    energy_cost += morphology->get_energy_cost();
->>>>>>> add new experiment : pop_morph_nipes
     sim_time = delta_time;
 }
 
@@ -130,7 +105,6 @@ void PMNIPESIndividual::setManRes()
     testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
 }
 
-<<<<<<< HEAD
 std::string PMNIPESIndividual::to_string()
 {
     
@@ -163,22 +137,8 @@ void PMNIPESIndividual::from_string(const std::string &str){
     morphGenome->set_randNum(randNum);
 }
 
-=======
-void PMNIPESIndividual::setManScore()
-{
-    manScore = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getManScore();
-}
 
-void PMNIPESIndividual::setGraphMatrix()
-{
-    graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
-}
 
-void PMNIPESIndividual::setSymDesc()
-{
-    symDesc =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getSymDesc();
-}
->>>>>>> add new experiment : pop_morph_nipes
 
 void PMNIPES::init(){
 
@@ -187,7 +147,6 @@ void PMNIPES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-<<<<<<< HEAD
 
     int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
 
@@ -209,9 +168,7 @@ void PMNIPES::init(){
 
     controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
 
-=======
-    listMorphGenomeID(morphIDList);
->>>>>>> add new experiment : pop_morph_nipes
+
     loadNbrSenAct(morphIDList,morphDescMap);
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
@@ -234,7 +191,6 @@ void PMNIPES::init(){
     init_cmaes(nbr_weights+nbr_bias);
 
     init_first_pop(nbr_weights,nbr_bias);
-<<<<<<< HEAD
 
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
@@ -244,13 +200,6 @@ void PMNIPES::init(){
         if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
             boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
     }
-=======
-    std::stringstream sstr;
-    sstr << "morph_" << morphIDList[morphCounter];
-    sub_folder = sstr.str();
-    if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
-        boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
->>>>>>> add new experiment : pop_morph_nipes
 
 }
 
@@ -281,10 +230,6 @@ void PMNIPES::init_cmaes(int dim){
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
-<<<<<<< HEAD
-=======
-
->>>>>>> add new experiment : pop_morph_nipes
     cmaStrategy.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
     cmaStrategy->set_elitist_restart(elitist_restart);
     cmaStrategy->set_length_of_stagnation(lenStag);
@@ -303,25 +248,16 @@ void PMNIPES::init_first_pop(int nbr_weights, int nbr_bias){
     std::vector<double> weights(nbr_weights);
     std::vector<double> biases(nbr_bias);
 
-<<<<<<< HEAD
     loadNEATGenome(morphIDList[morphCounter],current_morph_gen);
 
-=======
->>>>>>> add new experiment : pop_morph_nipes
     for(int u = 0; u < pop_size; u++){
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
             biases[w-nbr_weights] = init_samples(w,u);
 
-<<<<<<< HEAD
         CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
-=======
 
-        NEAT::Genome neat_gen;
-        loadNEATGenome(morphIDList[morphCounter],neat_gen);
-        CPPNGenome::Ptr morph_gen(new CPPNGenome(neat_gen));
->>>>>>> add new experiment : pop_morph_nipes
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
@@ -337,7 +273,6 @@ void PMNIPES::init_first_pop(int nbr_weights, int nbr_bias){
     }
 }
 
-<<<<<<< HEAD
 bool PMNIPES::update(const Environment::Ptr & env){
 
     NIPES::update(env);
@@ -356,22 +291,14 @@ void PMNIPES::init_next_pop(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
     if(numberEvaluation >= maxNbrEval || _is_finish || nbr_dropped_eval >= 50)
-=======
-void PMNIPES::init_next_pop(){
-    int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-
-    if(numberEvaluation >= maxNbrEval || _is_finish)
->>>>>>> add new experiment : pop_morph_nipes
     {
         population.clear();
         cmaStrategy->reset_search_state();
         morphCounter++;
         numberEvaluation=0;
-<<<<<<< HEAD
         _is_finish=false;
     	generation=0;
-=======
->>>>>>> add new experiment : pop_morph_nipes
+
         std::stringstream sstr;
         sstr << "morph_" << morphIDList[morphCounter];
         sub_folder = sstr.str();
@@ -399,17 +326,9 @@ void PMNIPES::init_next_pop(){
 
         init_first_pop(nbr_weights,nbr_bias);
 
-<<<<<<< HEAD
         return;
     }
 
-
-
-=======
-
-        return;
-    }
->>>>>>> add new experiment : pop_morph_nipes
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     dMat new_samples = cmaStrategy->ask();
@@ -428,13 +347,8 @@ void PMNIPES::init_next_pop(){
         for(int j = nbr_weights; j < nbr_weights+nbr_bias; j++)
             biases[j-nbr_weights] = new_samples(j,i);
 
-<<<<<<< HEAD
         CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
-=======
-        NEAT::Genome neat_gen;
-        loadNEATGenome(morphIDList[morphCounter],neat_gen);
-        CPPNGenome::Ptr morph_gen(new CPPNGenome(neat_gen));
->>>>>>> add new experiment : pop_morph_nipes
+
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
@@ -452,11 +366,7 @@ void PMNIPES::init_next_pop(){
 bool PMNIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-<<<<<<< HEAD
     return (numberEvaluation >= maxNbrEval || _is_finish || nbr_dropped_eval >= 50) && morphCounter >= morphIDList.size();
-=======
-    return (numberEvaluation >= maxNbrEval || _is_finish) && morphCounter >= morphIDList.size();
->>>>>>> add new experiment : pop_morph_nipes
 }
 
 void PMNIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
@@ -467,11 +377,7 @@ void PMNIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
     gen = NEAT::Genome(filepath.str().c_str());
 }
 
-<<<<<<< HEAD
 void PMNIPES::listMorphGenomeID(std::vector<short int>& list,const std::vector<short>& past_list){
-=======
-void PMNIPES::listMorphGenomeID(std::vector<short int>& list){
->>>>>>> add new experiment : pop_morph_nipes
     // This code snippet was taken from: https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::string bootstrapFile = settings::getParameter<settings::String>(parameters,"#bootstrapFile").value;
@@ -487,7 +393,6 @@ void PMNIPES::listMorphGenomeID(std::vector<short int>& list){
         // Keep track of the current column index
         int colIdx = 0;
         // Extract each integer
-<<<<<<< HEAD
         bool add_val=true;
         while(ss >> val) {
             // Add the current integer to the 'colIdx' column's values vector
@@ -496,11 +401,6 @@ void PMNIPES::listMorphGenomeID(std::vector<short int>& list){
                     add_val = add_val && id != val;
             if(add_val)
                 list.push_back(val);
-=======
-        while(ss >> val) {
-            // Add the current integer to the 'colIdx' column's values vector
-            list.push_back(val);
->>>>>>> add new experiment : pop_morph_nipes
             // If the next token is a comma, ignore it and move on
             if(ss.peek() == ',') ss.ignore();
             // Increment the column index
@@ -511,18 +411,11 @@ void PMNIPES::listMorphGenomeID(std::vector<short int>& list){
     myFile.close();
 }
 
-<<<<<<< HEAD
 void PMNIPES::loadNbrSenAct(std::vector<short> &list, std::map<short, morph_desc_t> &desc_map){
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::string morph_desc_file = settings::getParameter<settings::String>(parameters,"#morphDescFile").value;
     int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
-=======
-void PMNIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morph_desc_t> &desc_map){
-
-    std::string exp_folder = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
-    std::string morph_desc_file = settings::getParameter<settings::String>(parameters,"#morphDescFile").value;
->>>>>>> add new experiment : pop_morph_nipes
 
     std::ifstream ifs(exp_folder + std::string("/") + morph_desc_file);
     if(!ifs){
@@ -535,22 +428,15 @@ void PMNIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
         boost::split(split_line,line,boost::is_any_of(","));
         int id = std::stoi(split_line[0]);
         morph_desc_t md;
-<<<<<<< HEAD
         md.wheels = static_cast<int>(std::stod(split_line[5])*maxNbrOrgans);
         md.joints = static_cast<int>(std::stod(split_line[7])*maxNbrOrgans);
         md.sensors = static_cast<int>(std::stod(split_line[6])*maxNbrOrgans);
-=======
-        md.wheels = static_cast<int>(std::stod(split_line[5])*10);
-        md.joints = static_cast<int>(std::stod(split_line[7])*10);
-        md.sensors = static_cast<int>(std::stod(split_line[6])*10);
->>>>>>> add new experiment : pop_morph_nipes
+
         full_desc_map.emplace(id,md);
     }
 
     for(const int &id : list)
         desc_map.emplace(id,full_desc_map[id]);
-<<<<<<< HEAD
-
 }
 
 bool PMNIPES::finish_eval(){
@@ -602,6 +488,3 @@ bool PMNIPES::finish_eval(){
     return  stop;
 }
 
-=======
-}
->>>>>>> add new experiment : pop_morph_nipes
