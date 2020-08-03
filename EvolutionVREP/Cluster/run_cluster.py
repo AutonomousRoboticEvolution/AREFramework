@@ -4,14 +4,14 @@ import subprocess
 import datetime
 import sys
 
-def run_servers(n: int):
+def run_servers(args,n: int):
     processes = []
     for rank in range(n):
-        processes.append(run_server(rank))
+        processes.append(run_server(args,rank))
     return processes
 
 
-def run_server(rank: int):
+def run_server(args,rank: int):
     server_port = args.port_start + rank
     print(f'Starting server rank {rank} listening on port {server_port}')
     time = datetime.datetime.today()
@@ -38,13 +38,13 @@ def run_server(rank: int):
         ],stdout=logfile)
 
 
-def run_client():
+def run_client(args):
     print('Starting client')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = "./client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen([
+    return subprocess.Popen([#"gdb","--ex=r","--args",
         args.client,
         str(args.params),
         str(args.port_start),
@@ -84,9 +84,8 @@ def main():
     client = None
     try:
         import time
-        servers = run_servers(args.n_vrep)
-        client = run_client()
-
+        servers = run_servers(args,args.n_vrep)
+        client = run_client(args)
         
         time.sleep(1)
 

@@ -7,9 +7,14 @@
 #include <exception>
 
 extern "C" {
-    // #include "v_repLib.h"
-    #include "v_repConst.h"
-    #include "remoteApi/extApi.h"
+#if defined (VREP)
+#include "v_repLib.h"
+#include "v_repConst.h"
+#elif defined (COPPELIASIM)
+#include "simConst.h"
+#include "simLib.h"
+#endif
+#include "remoteApi/extApi.h"
 }
 
 #define CONNECTION_TIMEOUT 5000

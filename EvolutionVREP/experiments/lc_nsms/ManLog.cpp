@@ -11,14 +11,11 @@ void GenomeLog::saveLog(EA::Ptr &ea)
 {
     int generation = ea->get_generation();
     for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        NEAT::NeuralNetwork nn;
-        nn = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getGenome();
         std::stringstream filepath;
-        filepath << Logging::log_folder << "/genome" << generation * ea->get_population().size() + ind;
-        FILE *file = fopen(filepath.str().c_str(), "w");
-        nn.Save(file);
-        fclose(file);
-        nn.Clear();
+        filepath << Logging::log_folder << "/morphGenome" << generation * ea->get_population().size() + ind;
+        const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->get_morph_genome();
+        NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
+        genome.Save(filepath.str().c_str());
     }
 }
 
@@ -58,6 +55,22 @@ void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
     logFileStream.close();
 }
 
+void morphDescSymLog::saveLog(EA::Ptr &ea)
+{
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
+    int generation = ea->get_generation();
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        logFileStream << generation * ea->get_population().size() + ind << ",";
+        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getSymDesc();
+        for(int j = 0; j < morphDesc.size(); j++){
+            logFileStream << morphDesc(j) << ",";
+        }
+        logFileStream << std::endl;
+    }
+    logFileStream.close();
+}
 
 void ProtoMatrixLog::saveLog(EA::Ptr &ea)
 {

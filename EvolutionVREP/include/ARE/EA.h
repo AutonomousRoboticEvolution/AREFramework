@@ -48,6 +48,7 @@ public:
     /// This method sets the fitness value of an individual
     virtual void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
+        currentIndIndex = indIndex;
         population[indIndex]->setObjectives(objectives);
     }
 

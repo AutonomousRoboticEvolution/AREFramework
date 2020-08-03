@@ -26,6 +26,9 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     void init_next_pop() override;
 
+    NEAT::Genome loadInd(short int genomeID);
+    std::vector<int> listInds();
+
 private:
     std::unique_ptr<NEAT::Population> morph_population;
 

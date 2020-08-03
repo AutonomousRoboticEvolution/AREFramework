@@ -10,7 +10,11 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 
 extern "C" {
+#if defined (VREP)
 #include "v_repConst.h"
+#elif defined (COPPELIASIM)
+#include "simConst.h"
+#endif
 #include "remoteApi/extApiPlatform.h"
 #include "remoteApi/extApi.h"
 }

@@ -70,7 +70,6 @@ int main(int argc, char* argv[])
     client->set_parameters(parameters);
     //-
 
-    //todo take the seed
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
     if(seed < 0){
         std::random_device rd;
