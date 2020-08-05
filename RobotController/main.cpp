@@ -12,8 +12,8 @@
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
-#include <wiringPiSPI.h>
-#include "MPU6000.hpp"
+// #include <wiringPiSPI.h>
+#include "IMU.hpp"
 //#include "../Cplusplus_Evolution/ERFiles/control/FixedStructreANN.h"
 
 #define SENSOR1 0x72
@@ -99,7 +99,9 @@ int main()
     // LedDriver ledDriver(LED_DRIVER_ADDR);
     // ledDriver.test();
     
-    //SPI test code for MPU6000
+    //SPI test code for mpu6000
+    IMU imu;
+
     int err = 0;
    	err = wiringPiSPISetup(0,100000);
    	uint8_t spi[64] = {0};
@@ -123,9 +125,10 @@ int main()
    	printf("After reset Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
    	//Wake up and set to use gyroz clock
-   	spi[0] = MPUREG_PWR_MGMT_1;
-   	spi[1] = MPU_CLK_SEL_PLLGYROZ;
-   	wiringPiSPIDataRW(0, spi, 2);
+   	// spi[0] = MPUREG_PWR_MGMT_1;
+   	// spi[1] = MPU_CLK_SEL_PLLGYROZ;
+   	// wiringPiSPIDataRW(0, spi, 2);
+   	imu.write8To(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
    	usleep(150000);
    	printf("After gyroz clock set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
@@ -140,6 +143,9 @@ int main()
    	spi[1] = 0x00;	//nowt, just clock out the contents of whoami
 	wiringPiSPIDataRW(0, spi, 2);
    	printf("After whoami Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+
+   	uint8_t whoamival = imu.read8From(MPUREG_WHOAMI);
+   	printf("Whoami returned %0X\n", whoamival);
 
    	//Set sample rate
    	spi[0] = MPUREG_SMPLRT_DIV;
@@ -170,15 +176,15 @@ int main()
    	}
 
    	//Read axis
-   	spi[0] = MPUREG_ACCEL_XOUT_H;
-   	spi[1] = 0x00;
-   	spi[2] = 0x00;
-   	wiringPiSPIDataRW(0, spi, 3);
-   	uint16_t data = *(uint16_t*)&spi[1];
-	printf("X data Spi: [0]:%0X , [1]:%0X, [2]:%0X, err: %d\n", spi[0], spi[1], spi[2], err);
-	printf("Data: %d %0X\n", data, data);
+   	// spi[0] = MPUREG_ACCEL_XOUT_H | READ_FLAG;
+   	// spi[1] = 0x00;
+   	// spi[2] = 0x00;
+   	// wiringPiSPIDataRW(0, spi, 3);
+   	uint16_t data = imu.read16From(MPUREG_ACCEL_XOUT_H);
+	// printf("X data Spi: [0]:%0X , [1]:%0X, [2]:%0X, err: %d\n", spi[0], spi[1], spi[2], err);
+	printf("Data: %d %f %0X\n", data, (float)data, data);
 
-
+	/***************************************************************************/
 
 
     // ledDriver.testWrite(0x00, 0x01);	//Mode1 bit [4] clear to enable osc

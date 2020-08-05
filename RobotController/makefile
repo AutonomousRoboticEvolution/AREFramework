@@ -2,7 +2,7 @@ PROG=main
 CC=g++
 CPPFLAGS=-Wall -I/usr/local/include
 LDFLAGS=-L/usr/local/lib -lwiringPi
-OBJS=main.o I2CDevice.o MotorOrgan.o SensorOrgan.o Sensors.o BrainOrgan.o
+OBJS=main.o I2CDevice.o MotorOrgan.o SensorOrgan.o Sensors.o BrainOrgan.o IMU.o
 
 $(PROG) : $(OBJS)
 	$(CC) $(CPPFLAGS) -o $(PROG) $(OBJS) $(LDFLAGS)
@@ -19,4 +19,6 @@ Sensors.o : Sensors.hpp Sensors.cpp
 	$(CC) $(CPPFLAGS) -c Sensors.cpp
 BrainOrgan.o : BrainOrgan.hpp BrainOrgan.cpp
 	$(CC) $(CPPFLAGS) -c BrainOrgan.cpp
+IMU.o : IMU.hpp IMU.cpp
+	$(CC) $(CPPFLAGS) -c IMU.cpp
 clean: rm -f core $(PROG) $(OBJS)
