@@ -101,88 +101,102 @@ int main()
     
     //SPI test code for mpu6000
     IMU imu;
+    imu.init();
 
-    int err = 0;
-   	err = wiringPiSPISetup(0,100000);
-   	uint8_t spi[64] = {0};
+ //    int err = 0;
+ //   	err = wiringPiSPISetup(0,100000);
+ //   	uint8_t spi[64] = {0};
 
-   	//Disable I2C
-   	spi[0] = MPUREG_USER_CTRL;
-   	spi[1] = BIT_I2C_IF_DIS;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After i2c disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ //   	//Disable I2C
+ //   	spi[0] = MPUREG_USER_CTRL;
+ //   	spi[1] = BIT_I2C_IF_DIS;
+ //   	wiringPiSPIDataRW(0, spi, 2);
+ //   	printf("After i2c disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Reset
-   	spi[0] = MPUREG_PWR_MGMT_1;
-   	spi[1] = BIT_H_RESET;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	usleep(100000);
-   	spi[0] = MPUREG_SIGNAL_PATH_RESET;
-   	spi[1] = 0x7;	//00000111, gyro, accel and temp reset
-   	wiringPiSPIDataRW(0, spi, 2);
-   	usleep(100000);
+ //   	//Reset
+ //   	spi[0] = MPUREG_PWR_MGMT_1;
+ //   	spi[1] = BIT_H_RESET;
+ //   	wiringPiSPIDataRW(0, spi, 2);
+ //   	usleep(100000);
+ //   	spi[0] = MPUREG_SIGNAL_PATH_RESET;
+ //   	spi[1] = 0x7;	//00000111, gyro, accel and temp reset
+ //   	wiringPiSPIDataRW(0, spi, 2);
+ //   	usleep(100000);
    	
-   	printf("After reset Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ //   	printf("After reset Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Wake up and set to use gyroz clock
-   	// spi[0] = MPUREG_PWR_MGMT_1;
-   	// spi[1] = MPU_CLK_SEL_PLLGYROZ;
-   	// wiringPiSPIDataRW(0, spi, 2);
-   	imu.write8To(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
-   	usleep(150000);
-   	printf("After gyroz clock set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-	//Disable I2C (again!?)
-   	spi[0] = MPUREG_USER_CTRL;
-   	spi[1] = BIT_I2C_IF_DIS;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After 2nd i2c disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ //   	//Wake up and set to use gyroz clock
+ //   	spi[0] = MPUREG_PWR_MGMT_1;
+ //   	spi[1] = MPU_CLK_SEL_PLLGYROZ;
+ //   	wiringPiSPIDataRW(0, spi, 2);
+ //   	imu.write8To(MPUREG_PWR_MGMT_1, MPU_CLK_SEL_PLLGYROZ);
+ //   	usleep(150000);
+ //   	printf("After gyroz clock set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Check whoami
-   	spi[0] = MPUREG_WHOAMI | READ_FLAG;	//Whoami register
-   	spi[1] = 0x00;	//nowt, just clock out the contents of whoami
-	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After whoami Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+	// //Disable I2C (again!?)
+ // 	spi[0] = MPUREG_USER_CTRL;
+ // 	spi[1] = BIT_I2C_IF_DIS;
+ // 	wiringPiSPIDataRW(0, spi, 2);
+ // 	printf("After 2nd i2c disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	uint8_t whoamival = imu.read8From(MPUREG_WHOAMI);
-   	printf("Whoami returned %0X\n", whoamival);
+ 	
 
-   	//Set sample rate
-   	spi[0] = MPUREG_SMPLRT_DIV;
-   	spi[1] = 1;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After smplrt set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ // 	//Set sample rate
+ // 	spi[0] = MPUREG_SMPLRT_DIV;
+ // 	spi[1] = 1;
+ // 	wiringPiSPIDataRW(0, spi, 2);
+ // 	printf("After smplrt set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Set filtering
-   	spi[0] = MPUREG_CONFIG;
-   	spi[1] = BITS_DLPF_CFG_5HZ;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After config set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ // 	//Set filtering
+ // 	spi[0] = MPUREG_CONFIG;
+ // 	spi[1] = BITS_DLPF_CFG_5HZ;
+ // 	wiringPiSPIDataRW(0, spi, 2);
+ // 	printf("After config set Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Disable interrupts
-   	spi[0] = MPUREG_INT_ENABLE;
-   	spi[1] = 0x00;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	printf("After interrupt disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
+ // 	// //Disable interrupts
+ // 	spi[0] = MPUREG_INT_ENABLE;
+ // 	spi[1] = 0x00;
+ // 	wiringPiSPIDataRW(0, spi, 2);
+ // 	printf("After interrupt disable Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Try reading loads of registers
-   	//Don't forget the read flag!
-   	//---doesn't look like read flag gets applied to subsequent registers if reading a block of many?
-   	//Output is shifted by one [0]->[1]
-   	spi[0] = MPUREG_PWR_MGMT_1 | READ_FLAG;
-   	wiringPiSPIDataRW(0, spi, 2);
-   	for (int i=0; i<3; ++i) {
-   		printf("Spi[%0X] : %0X\n",i+MPUREG_PWR_MGMT_1-1,spi[i]);
-   	}
+ //  //Check whoami
+ //  spi[0] = MPUREG_WHOAMI | READ_FLAG; //Whoami register
+ //  spi[1] = 0x00;  //nowt, just clock out the contents of whoami
+ //  wiringPiSPIDataRW(0, spi, 2);
+ //  printf("After whoami Spi: [0]:%0X , [1]:%0X, err: %d\n", spi[0], spi[1], err);
 
-   	//Read axis
-   	// spi[0] = MPUREG_ACCEL_XOUT_H | READ_FLAG;
-   	// spi[1] = 0x00;
-   	// spi[2] = 0x00;
-   	// wiringPiSPIDataRW(0, spi, 3);
-   	uint16_t data = imu.read16From(MPUREG_ACCEL_XOUT_H);
-	// printf("X data Spi: [0]:%0X , [1]:%0X, [2]:%0X, err: %d\n", spi[0], spi[1], spi[2], err);
-	printf("Data: %d %f %0X\n", data, (float)data, data);
+ //  uint8_t whoamival = imu.read8From(MPUREG_WHOAMI);
+ //  printf("Whoami returned %0X\n", whoamival);
+
+ // 	//Try reading loads of registers
+ // 	//Don't forget the read flag!
+ // 	//---doesn't look like read flag gets applied to subsequent registers if reading a block of many?
+ // 	//Output is shifted by one [0]->[1]
+ // 	spi[0] = MPUREG_PWR_MGMT_1 | READ_FLAG;
+ // 	wiringPiSPIDataRW(0, spi, 2);
+ // 	for (int i=0; i<3; ++i) {
+ // 		printf("Spi[%0X] : %0X\n",i+MPUREG_PWR_MGMT_1-1,spi[i]);
+ // 	}
+
+  for(int i=0; i<200; ++i) {
+    int16_t data = imu.read16From(MPUREG_ACCEL_XOUT_H);
+    printf("Data: %d %0.1f %0X\n", data, (float)data/16384, data);
+    usleep(10000);
+  }
+
+  int16_t temp = imu.read16From(MPUREG_TEMP_OUT_H);
+  printf("Temperature: %.1f C (%0X hex)\n", (float)temp/340 + 36.53, temp);
+
+  // //8bit version
+  // for(int i=0; i<200; ++i) {
+  //   uint8_t datah = imu.read8From(MPUREG_ACCEL_XOUT_H);
+  //   uint8_t datal = imu.read8From(MPUREG_ACCEL_XOUT_L);
+  //   int16_t data = datah << 8 | datal;
+  //   printf("Data: %0.1f %0X (%0X %0X)\n", (float)data, data, datah, datal);
+  //   usleep(10000);
+  // }
+ 	
 
 	/***************************************************************************/
 

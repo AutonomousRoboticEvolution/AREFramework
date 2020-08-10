@@ -11,9 +11,10 @@
 
 //Includes
 #include <wiringPiSPI.h>
-#include <cstdint>
-#include <cerrno>
-#include <cstdio>
+#include <cstdint>	//for int types
+#include <cerrno>	//for errno used by wiringpi
+#include <cstdio>	//for printf
+#include <unistd.h>	//for usleep
 
 //Default settings
 #define SPI_FREQ_HZ 100000
@@ -120,6 +121,8 @@ class IMU {
 			We are using pin 24 for chip select, so IMU_CS_NUM will be 0.
 		*/
 		IMU();
+
+		void init();
 
 	//private:
 		void write8To(uint8_t address, uint8_t data);
