@@ -1,7 +1,7 @@
 /**
 	@file IMU.hpp
 	@brief Header and documentation for IMU.cpp, for the MPU6000 accelerometer/gyro chip
-	Some elements loosely based on MPU6000_spi library for Mbed by Bruno Alfano
+	Some elements based on MPU6000_spi library for Mbed by Bruno Alfano
 	https://os.mbed.com/users/brunoalfano/code/MPU6000_spi/
 	@author Mike Angus
 */
@@ -10,17 +10,18 @@
 #define IMU_HPP
 
 //Includes
-#include <wiringPiSPI.h>
+#include <wiringPiSPI.h>	//for SPI bus control
 #include <cstdint>	//for int types
 #include <cerrno>	//for errno used by wiringpi
 #include <cstdio>	//for printf
 #include <unistd.h>	//for usleep
+#include <iostream>	//for prompts during test
 
 //Default settings
 #define SPI_FREQ_HZ 100000
 #define IMU_CS_NUM 0
 
-// MPU6000 registers
+// MPU6000 registers (Bruno Alfano)
 #define MPUREG_XG_OFFS_TC 0x00
 #define MPUREG_YG_OFFS_TC 0x01
 #define MPUREG_ZG_OFFS_TC 0x02
@@ -78,7 +79,7 @@
 #define MPUREG_FIFO_R_W 0x74
 #define MPUREG_WHOAMI 0x75
  
-// Configuration bits MPU6000
+// Configuration bits MPU6000 (Bruno Alfano)
 #define BIT_SLEEP 0x40
 #define BIT_H_RESET 0x80
 #define BITS_CLKSEL 0x07
@@ -94,7 +95,7 @@
 #define BITS_FS_8G                  0x10
 #define BITS_FS_16G                 0x18
 #define BITS_FS_MASK                0x18
-#define BITS_DLPF_CFG_256HZ_NOLPF2  0x00
+#define BITS_DLPF_CFG_256HZ			0x00
 #define BITS_DLPF_CFG_188HZ         0x01
 #define BITS_DLPF_CFG_98HZ          0x02
 #define BITS_DLPF_CFG_42HZ          0x03
@@ -110,7 +111,10 @@
 #define READ_FLAG   0x80
 
 
-//TODO: classcomment
+/**
+	IMU class provides methods for operating the MPU6000 inertial measurement unit.
+	Datasheet and register map available at: https://invensense.tdk.com/products/motion-tracking/6-axis/mpu-6050/
+*/
 class IMU {
 
 	public:
@@ -122,11 +126,106 @@ class IMU {
 		*/
 		IMU();
 
+		/**
+			@brief Chip initialisation routine.
+			Performs a software reset of the chip and then sets up ready to use.
+			Sample rate and accel/gyro/filtering settings are initialised to chosen defaults here
+			Note that there is 200ms of sleep time in this function.
+		*/
 		void init();
 
-	//private:
+		/**
+			@brief Set the measurement scale of the accelerometer.
+			Higher values trade reduced numerical precision for increased range.
+			@param option One of four predefined sets of bits:
+			BITS_FS_2G = max g-force value +/- 2g
+			BITS_FS_4G = max g-force value +/- 4g
+			BITS_FS_8G = max g-force value +/- 8g
+			BITS_FS_16G = max g-force value +/- 16g
+		*/
+		void setAccelerometerScale(uint8_t option);
+
+		/**
+			@brief Set the measurement scale of the gyroscope.
+			Higher values trade reduced numerical precision for increased range.
+			@param option One of four predefined sets of bits:
+			BITS_FS_250DPS = max rotation rate value +/- 250 degrees/second
+			BITS_FS_500DPS = max rotation rate value +/- 500 degrees/second
+			BITS_FS_1000DPS = max rotation rate value +/- 1000 degrees/second
+			BITS_FS_2000DPS = max rotation rate value +/- 2000 degrees/second
+		*/
+		void setGyroScale(uint8_t option);
+
+		/**
+			@brief Set the level of digital low-pass filtering (DLPF) applied to all measurements
+			Defined by bandwidth in Hz, which corresponds to a particular delay in the time domain.
+			Lower bandwidths mean better noise filtering, but higher delays.
+			Choose the lowest bandwidth that is sufficient to capture the desired dynamics.
+			Details of exact bandwidths and delays are on p13 of MPU6000 register map.
+			@param option One of seven predefined sets of bits:
+			BITS_DLPF_CFG_256HZ = filter bandwidth of 256Hz
+			BITS_DLPF_CFG_188HZ = filter bandwidth of 188Hz
+			BITS_DLPF_CFG_98HZ = filter bandwidth of 98Hz
+			BITS_DLPF_CFG_42HZ = filter bandwidth of 42Hz
+			BITS_DLPF_CFG_20HZ = filter bandwidth of 20Hz
+			BITS_DLPF_CFG_10HZ = filter bandwidth of 10Hz
+			BITS_DLPF_CFG_5HZ = filter bandwidth of 5Hz
+		*/
+		void setFilterBandwidth(uint8_t option);
+
+		/**
+			@brief Read the accelerometer in all three axes.
+			Output is three float values in g (g-force, not grams)
+			@param resultArray 3-element array to store the output.
+			Order in the array is X, Y, Z in locations [0], [1], [2]
+		*/
+		void readAccel(float* resultArray);
+		/**
+			@brief Read the gyroscope in all three axes.
+			Output is three float values in degrees per second
+			@param resultArray 3-element array to store the output.
+			Order in the array is X, Y, Z in locations [0], [1], [2]
+		*/
+		void readGyro(float* resultArray);
+		/**
+			@brief Read the temperature measured by the onboard sensor.
+			Chip itself does not appear to heat up significantly, so this can be a proxy for board temperature.
+			Confirmed with thermal camera that readings are about right.
+			@return The temperature in degrees Celsius
+		*/
+		float readTemperature();
+
+		/**
+			@brief Perform self test routine
+			@param testLength The number of samples to test the accel and gyro for
+			@param samplePeriodUs The time between samples in microseconds
+		*/
+		void test(int testLength, int samplePeriodUs);
+
+	private:
+		//These factors are used to divide the values in the measurement registers
+		//based on the chosen measurement range, to produce the actual readings.
+		int accelerometerScaleFactor;
+		float gyroScaleFactor;
+
+		/**
+			@brief Write a single byte to the target register over the SPI bus
+			@param address Target register address
+			@param data The data to be written to the register
+		*/
 		void write8To(uint8_t address, uint8_t data);
+		/**
+			@brief Read a single byte from the target register over the SPI bus
+			@param address Target register address
+			@return The contents of the register
+		*/
 		uint8_t read8From(uint8_t address);
+		/**
+			@brief Read two bytes from the target register over the SPI bus
+			@param address Target register address
+			This is taken to be the address of the high byte, with the low byte at the subsequent address
+			@return The concatenated 16-bit value derived from the two bytes read
+		*/
 		uint16_t read16From(uint8_t address);
 
 };
