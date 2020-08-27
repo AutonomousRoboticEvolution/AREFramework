@@ -56,17 +56,29 @@ public:
         bool noCollisions;
         bool noBadOrientations;
         bool isGripperAccess;
+        short int wheelsRepressed;
+        short int sensorsRepressed;
+        short int jointsRepressed;
+        short int casterRepressed;
         // Constructor
         RobotManRes(){
             noCollisions = true;
             noBadOrientations = true;
             isGripperAccess = true;
+            wheelsRepressed = 0;
+            sensorsRepressed = 0;
+            jointsRepressed = 0;
+            casterRepressed = 0;
         }
         std::vector<bool> getResVector(){
             std::vector<bool> resVector;
             resVector.push_back(noCollisions);
             resVector.push_back(noBadOrientations);
             resVector.push_back(isGripperAccess);
+            resVector.push_back(wheelsRepressed);
+            resVector.push_back(sensorsRepressed);
+            resVector.push_back(jointsRepressed);
+            resVector.push_back(casterRepressed);
             return resVector;
         }
     };
@@ -78,98 +90,6 @@ public:
     void create() override;
     void createAtPosition(float,float,float) override;
     void setPosition(float,float,float);
-
-    ///////////////////////
-    ///// Descriptors /////
-    ///////////////////////
-
-    class CartDesc
-    {
-    public:
-        float robotWidth; // X
-        float robotDepth; // Y
-        float robotHeight; // Z
-        int voxelNumber;
-        int wheelNumber;
-        int sensorNumber;
-        int casterNumber;
-        int jointNumber;
-        Eigen::VectorXd cartDesc;
-        // Constructor
-        CartDesc(){
-            cartDesc.resize(8);
-            robotWidth = 0;
-            robotDepth = 0;
-            robotHeight = 0;
-            voxelNumber = 0;
-            wheelNumber = 0;
-            sensorNumber = 0;
-            casterNumber = 0;
-            jointNumber = 0;
-            setCartDesc();
-        }
-        void setCartDesc(){
-            cartDesc(0) = robotWidth / MATRIX_SIZE_M;
-            cartDesc(1) = robotDepth / MATRIX_SIZE_M;
-            cartDesc(2) = robotHeight / MATRIX_SIZE_M;
-            cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
-            cartDesc(4) = (double) wheelNumber / MAX_NUM_ORGANS;
-            cartDesc(5) = (double) sensorNumber / MAX_NUM_ORGANS;
-            cartDesc(6) = (double) jointNumber / MAX_NUM_ORGANS;
-            cartDesc(7) = (double) casterNumber / MAX_NUM_ORGANS;
-        }
-    };
-
-    class MatDesc{
-    public:
-        std::vector<std::vector<std::vector<int>>> graphMatrix;
-        // Constructor
-        MatDesc(){
-            graphMatrix.resize(MATRIX_SIZE + 1);
-            for(int i = 0; i < MATRIX_SIZE + 1; i++){
-                graphMatrix[i].resize(MATRIX_SIZE + 1);
-                for(int j = 0; j < MATRIX_SIZE + 1; j++){
-                    graphMatrix[i][j].resize(MATRIX_SIZE + 1);
-                    for(int k = 0; k < MATRIX_SIZE + 1; k++){
-                        graphMatrix[i][j][k] = 0;
-                    }
-                }
-            }
-        }
-    };
-
-    class SymDesc{
-    public:
-        unsigned short int voxelQ1, voxelQ2, voxelQ3, voxelQ4;
-        unsigned short int wheelQ1, wheelQ2, wheelQ3, wheelQ4;
-        unsigned short int sensorQ1, sensorQ2, sensorQ3, sensorQ4;
-        unsigned short int jointQ1, jointQ2, jointQ3, jointQ4;
-        unsigned short int casterQ1, casterQ2, casterQ3, casterQ4;
-        Eigen::VectorXd symDesc;
-        SymDesc(){
-            symDesc.resize(20);
-            voxelQ1 = 0; voxelQ2 = 0; voxelQ3 = 0; voxelQ4 = 0;
-            wheelQ1 = 0; wheelQ2 = 0; wheelQ3 = 0; wheelQ4 = 0;
-            sensorQ1 = 0; sensorQ2 = 0; sensorQ3 = 0; sensorQ4 = 0;
-            jointQ1 = 0; jointQ2 = 0; jointQ3 = 0; jointQ4 = 0;
-            casterQ1 = 0; casterQ2 = 0; casterQ3 = 0; casterQ4 = 0;
-            setSymDesc();
-        }
-        void setSymDesc(){
-            symDesc(0) = voxelQ1; symDesc(1) = voxelQ2; symDesc(2) = voxelQ3; symDesc(3) = voxelQ4;
-            symDesc(4) = wheelQ1; symDesc(5) = wheelQ2; symDesc(6) = wheelQ3; symDesc(7) = wheelQ4;
-            symDesc(8) = sensorQ1; symDesc(9) = sensorQ2; symDesc(10) = sensorQ3; symDesc(11) = sensorQ4;
-            symDesc(12) = jointQ1; symDesc(13) = jointQ2; symDesc(14) = jointQ3; symDesc(15) = jointQ4;
-            symDesc(16) = casterQ1; symDesc(17) = casterQ2; symDesc(18) = casterQ3; symDesc(19) = casterQ4;
-        }
-    };
-
-    class Descriptors{
-    public:
-        CartDesc cartDesc;
-        MatDesc matDesc;
-        SymDesc symDesc;
-    };
 
     /////////////////////////////
     ///// Create morphology /////
@@ -210,9 +130,33 @@ public:
      */
     void createMaleConnector(OrganSpec& organ);
 
-    ////////////////////////////////////
-    /////  Manufacturability tests /////
-    ////////////////////////////////////
+    /**
+     * @brief Removes the gripper created with createTemporalGripper
+     */
+    static void removeGripper(int gripperHandle);
+
+    ////////////////////////////////////////////
+    /////  Manufacturability testing stuff /////
+    ////////////////////////////////////////////
+    /// \todo EB: Might be good idea to move this testing to a class
+    /**
+     * @brief This method tests that robot as a whole.
+     */
+    void testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief Tests each component (organ) in the robot.
+     */
+    void testComponents(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief If a component fails any manufacturability test that component is removed from the final ns.
+     */
+    void geneRepression();
+
+    /// Not used...
+    void removeRobot();
+    /// Measure manufacturability score
+    void manufacturabilityScore();
+
     /**
      * @brief This method check if a specific organ (organHandle) is colliding with other components.ding
      */
@@ -237,60 +181,13 @@ public:
     ///// Fixing phenotype techniques //////
     ////////////////////////////////////////
     /**
-     * @brief This methods makes space for the Head Organ by removing voxels.
-     * @param skeletonMatrix Skeleton Matrix
-     * \todo Define skeleton matrix
+     * @brief This method makes space for the Head Organ by removing voxels.
      */
     void emptySpaceForHead(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-
+    /**
+     * @brief This method creates a predifines skeleton.
+     */
     void createSkeletonBase(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-
-    //////////////////////////////////////
-    ///// Manufacturability methods //////
-    /////////////////////////////////////
-
-    /**
-     * @brief This method tests that robot as a whole.
-     */
-    void testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    /**
-     * @brief Tests each component (organ) in the robot.
-     */
-    void testComponents(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    /**
-     * @brief If a compoenent fails any manufacturability test that component is removed from the final ns.
-     */
-    void geneRepression();
-
-    /// These following two methods are not being used for the PPSN experiments...
-    void removeRobot();
-
-    void manufacturabilityScore();
-
-    //////////////////////////////////
-    ///// Miscellanous functions /////
-    //////////////////////////////////
-    /**
-     * @brief Export mesh file (stl) from a list of vertices and indices.
-     * \todo EB: We might not want this method here and this should be in logging instead.
-     */
-    void exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices);
-    /**
-     * @brief Export the robot as ttm model
-     */
-    void exportRobotModel(int indNum);
-    /**
-     * @brief Load specific genome
-     */
-    void loadMorphologyGenome(int indNum);
-    /**
-     * @brief This method renders the matrix of a specific organ. Useful for debugging.
-     */
-    void tempVisualizeMatrix(NEAT::NeuralNetwork &neuralNetwork, VoxelType _voxelType, float posX, float posY, float posZ);
-    /**
-     * @brief Returns the number of organs for a specific organ type.
-     */
-    int countOrgans(int organType);
 
     ///////////////////////////
     ///// Surface methods /////
@@ -341,19 +238,37 @@ public:
      */
     void exploreOrganRegion(PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<bool>& visitedVoxels, int32_t posX, int32_t posY, int32_t posZ, int regionCounter, VoxelType voxelType);
 
-    /**
-     * @brief Get the width, depth and  height of the skeleton
-     */
-    std::vector<float> getSkeletonDimmensions(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-
-    static void removeGripper(int gripperHandle);
-
-    void createAREPuck(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    void createAREPotato(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-
     void getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    void setVoxelQuadrant(short signed int x, short signed int y, short unsigned int componentType);
+
+    //////////////////////////////////
+    ///// Miscellanous functions /////
+    //////////////////////////////////
+    /**
+     * @brief Export mesh file (stl) from a list of vertices and indices.
+     * \todo EB: We might not want this method here and this should be in logging instead.
+     */
+    void exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices);
+    /**
+     * @brief Export the robot as ttm model
+     * \todo EB: We might not want this method here and this should be in logging instead.
+     */
+    void exportRobotModel(int indNum);
+    /**
+     * @brief This method renders the matrix of a specific organ. Useful for debugging.
+     */
+    void tempVisualizeMatrix(NEAT::NeuralNetwork &neuralNetwork, VoxelType _voxelType, float posX, float posY, float posZ);
+    /**
+     * @brief This method create the AREPuck robot with the matrix body plan.
+     */
+    void createAREPuck(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief This method create the AREPotato robot with the matrix body plan.
+     */
+    void createAREPotato(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief This method create the ARETricycle robot with the matrix body plan.
+     */
+    void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
 
     ///////////////////////////////
     ///// Setters and getters /////
@@ -365,11 +280,248 @@ public:
     void setManScore(double ms){ manScore = ms;};
 
     /// Getters for descriptors.
-    /// \todo EB: There must be a better way to retrieve descriptor. Perhaps as the descritor as a whole?
+    /// \todo EB: There must be a better way to retrieve descriptor. Perhaps as the descriptor as a whole?
     Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return indDesc.matDesc.graphMatrix;};
     Eigen::VectorXd getSymDesc(){return indDesc.symDesc.symDesc;};
 
+
+private:
+    ///////////////////////
+    ///// Descriptors /////
+    ///////////////////////
+
+    class CartDesc
+    {
+    public:
+        const int ORGANTRAITLIMIT = 5;
+        float robotWidth; // X
+        float robotDepth; // Y
+        float robotHeight; // Z
+        int voxelNumber;
+        int wheelNumber;
+        int sensorNumber;
+        int casterNumber;
+        int jointNumber;
+        Eigen::VectorXd cartDesc;
+        // Constructor
+        CartDesc(){
+            cartDesc.resize(8);
+            robotWidth = 0;
+            robotDepth = 0;
+            robotHeight = 0;
+            voxelNumber = 0;
+            wheelNumber = 0;
+            sensorNumber = 0;
+            casterNumber = 0;
+            jointNumber = 0;
+            setCartDesc();
+        }
+        void setCartDesc(){
+            cartDesc(0) = robotWidth / MATRIX_SIZE_M;
+            cartDesc(1) = robotDepth / MATRIX_SIZE_M;
+            cartDesc(2) = robotHeight / MATRIX_SIZE_M;
+            cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
+            cartDesc(4) = (double) wheelNumber / ORGANTRAITLIMIT;
+            cartDesc(5) = (double) sensorNumber / ORGANTRAITLIMIT;
+            cartDesc(6) = (double) jointNumber / ORGANTRAITLIMIT;
+            cartDesc(7) = (double) casterNumber / ORGANTRAITLIMIT;
+        }
+        void countOrgans( std::vector<OrganSpec> _organSpec){
+            for(std::vector<OrganSpec>::iterator it = _organSpec.begin(); it != _organSpec.end(); it++){
+                if(it->organType == 1)
+                    wheelNumber++;
+                if(it->organType == 2)
+                    sensorNumber++;
+                if(it->organType == 3)
+                    jointNumber++;
+                if(it->organType == 4)
+                    casterNumber++;
+            }
+        }
+        void getSkeletonDimmensions(PolyVox::RawVolume<uint8_t>& skeletonMatrix){
+            uint8_t uVoxelValue = 0;
+            std::vector<float> voxCoordX;
+            std::vector<float> voxCoordY;
+            std::vector<float> voxCoordZ;
+            auto region = skeletonMatrix.getEnclosingRegion();
+            // Create list of coordinates
+            for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+                for (int32_t y = region.getLowerY() + 1; y < region.getUpperY(); y += 1) {
+                    for (int32_t x = region.getLowerX() + 1; x < region.getUpperX(); x += 1) {
+                        uVoxelValue = skeletonMatrix.getVoxel(x,y,z);
+                        if(uVoxelValue > 0){
+                            voxCoordX.push_back(x);
+                            voxCoordY.push_back(y);
+                            voxCoordZ.push_back(z);
+                        }
+                    }
+                }
+            }
+            // Get max and min elements
+            auto maxX = *max_element(std::begin(voxCoordX),std::end(voxCoordX));
+            auto maxY = *max_element(std::begin(voxCoordY),std::end(voxCoordY));
+            auto maxZ = *max_element(std::begin(voxCoordZ),std::end(voxCoordZ));
+            auto minX = *min_element(std::begin(voxCoordX),std::end(voxCoordX));
+            auto minY = *min_element(std::begin(voxCoordY),std::end(voxCoordY));
+            auto minZ = *min_element(std::begin(voxCoordZ),std::end(voxCoordZ));
+
+            // Get dimmensions
+            float xDiff = abs(maxX - minX) + 1;
+            float yDiff = abs(maxY - minY) + 1;
+            float zDiff = abs(maxZ - minZ) + 1;
+            robotWidth = xDiff * VOXEL_REAL_SIZE;
+            robotDepth = yDiff * VOXEL_REAL_SIZE;
+            robotHeight = zDiff * VOXEL_REAL_SIZE;
+        }
+    };
+
+    class MatDesc{
+    public:
+        std::vector<std::vector<std::vector<int>>> graphMatrix;
+        // Constructor
+        MatDesc(){
+            graphMatrix.resize(MATRIX_SIZE + 1);
+            for(int i = 0; i < MATRIX_SIZE + 1; i++){
+                graphMatrix[i].resize(MATRIX_SIZE + 1);
+                for(int j = 0; j < MATRIX_SIZE + 1; j++){
+                    graphMatrix[i][j].resize(MATRIX_SIZE + 1);
+                    for(int k = 0; k < MATRIX_SIZE + 1; k++){
+                        graphMatrix[i][j][k] = 0;
+                    }
+                }
+            }
+        }
+    };
+
+    class SymDesc{
+    public:
+        int voxel[8], wheel[8], sensor[8], joint[8], caster[8];
+        Eigen::VectorXd symDesc;
+        SymDesc(){
+            for(int i = 0; i < 8; i++){
+                voxel[i] = 0; wheel[i] = 0; sensor[i] = 0; joint[i] = 0; caster[i] = 0;
+            }
+            symDesc.resize(40);
+            setSymDesc();
+        }
+        void setSymDesc(){
+            short counter = 0;
+            for(int i = 0; i < 8; i++){
+                symDesc(counter) = (double) voxel[i] / 274; counter++; /// \todo EB: We need to define this constants elsewhere.
+                symDesc(counter) = (double) wheel[i] / 3.2; counter++;
+                symDesc(counter) = (double) sensor[i] / 3.2; counter++;
+                symDesc(counter) = (double) joint[i] / 3.2; counter++;
+                symDesc(counter) = (double) caster[i] / 3.2; counter++;
+            }
+        }
+        void setVoxelQuadrant(short signed int x, short signed int y, short signed int z, short unsigned int componentType){
+            if(x >= 0 && y >= 0 && z >= 0){
+                if(componentType == 0)
+                    voxel[0]++;
+                else if(componentType == 1)
+                    wheel[0]++;
+                else if(componentType == 2)
+                    sensor[0]++;
+                else if(componentType == 3)
+                    joint[0]++;
+                else if(componentType == 4)
+                    caster[0]++;
+
+            } else if(x < 0 && y >= 0 && z >= 0){
+                if(componentType == 0)
+                    voxel[1]++;
+                else if(componentType == 1)
+                    wheel[1]++;
+                else if(componentType == 2)
+                    sensor[1]++;
+                else if(componentType == 3)
+                    joint[1]++;
+                else if(componentType == 4)
+                    caster[1]++;
+
+            } else if(x < 0 && y < 0 && z >= 0){
+                if(componentType == 0)
+                    voxel[2]++;
+                else if(componentType == 1)
+                    wheel[2]++;
+                else if(componentType == 2)
+                    sensor[2]++;
+                else if(componentType == 3)
+                    joint[2]++;
+                else if(componentType == 4)
+                    caster[2]++;
+
+            } else if(x >= 0 && y < 0 && z >= 0){
+                if(componentType == 0)
+                    voxel[3]++;
+                else if(componentType == 1)
+                    wheel[3]++;
+                else if(componentType == 2)
+                    sensor[3]++;
+                else if(componentType == 3)
+                    joint[3]++;
+                else if(componentType == 4)
+                    caster[3]++;
+
+            } else if(x >= 0 && y >= 0 && z < 0){
+                if(componentType == 0)
+                    voxel[4]++;
+                else if(componentType == 1)
+                    wheel[4]++;
+                else if(componentType == 2)
+                    sensor[4]++;
+                else if(componentType == 3)
+                    joint[4]++;
+                else if(componentType == 4)
+                    caster[4]++;
+
+            } else if(x < 0 && y >= 0 && z < 0){
+                if(componentType == 0)
+                    voxel[5]++;
+                else if(componentType == 1)
+                    wheel[5]++;
+                else if(componentType == 2)
+                    sensor[5]++;
+                else if(componentType == 3)
+                    joint[5]++;
+                else if(componentType == 4)
+                    caster[5]++;
+
+            } else if(x < 0 && y < 0 && z < 0){
+                if(componentType == 0)
+                    voxel[6]++;
+                else if(componentType == 1)
+                    wheel[6]++;
+                else if(componentType == 2)
+                    sensor[6]++;
+                else if(componentType == 3)
+                    joint[6]++;
+                else if(componentType == 4)
+                    caster[6]++;
+
+            } else if(x >= 0 && y < 0 && z < 0){
+                if(componentType == 0)
+                    voxel[7]++;
+                else if(componentType == 1)
+                    wheel[7]++;
+                else if(componentType == 2)
+                    sensor[7]++;
+                else if(componentType == 3)
+                    joint[7]++;
+                else if(componentType == 4)
+                    caster[7]++;
+
+            }
+        }
+    };
+
+    class Descriptors{
+    public:
+        CartDesc cartDesc;
+        MatDesc matDesc;
+        SymDesc symDesc;
+    };
 
 private:
     NEAT::NeuralNetwork nn;
