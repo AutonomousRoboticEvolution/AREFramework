@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 
+add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
+
+
 set(SRC
     NSGC.cpp
     factories.cpp)

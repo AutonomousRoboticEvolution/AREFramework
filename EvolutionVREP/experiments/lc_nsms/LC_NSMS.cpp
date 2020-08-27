@@ -69,10 +69,20 @@ void LC_NSMS::initPopulation()
 
     int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
 
+    bool isBootstrapPopulation = settings::getParameter<settings::Boolean>(parameters,"#isBootstrapEvolution").value;
+    std::vector<int> robotList;
+    if(isBootstrapPopulation){
+        robotList = listInds();
+    }
+
     for (size_t i = 0; i < params.PopulationSize ; i++)
     {
-        EmptyGenome::Ptr no_gen(new EmptyGenome);
-
+        if(isBootstrapPopulation) {
+            NEAT::Genome indGenome;
+            indGenome = loadInd(robotList[i]);
+            morph_population->AccessGenomeByIndex(i) = indGenome;
+        }
+        // Generate random topologies
         /// \todo EB: This if statement might not be necessay here.
         if(manufacturabilityMethod < 0){ // Generate random robots
             NEAT::RNG rng;
@@ -80,8 +90,9 @@ void LC_NSMS::initPopulation()
             rng.Seed(rn->randInt(1,100000));
             morph_population->AccessGenomeByIndex(i).Randomize_LinkWeights(params.MaxWeight,rng);
             morph_population->AccessGenomeByIndex(i).Mutate_NeuronBiases(params,rng);
-        }
 
+        }
+        EmptyGenome::Ptr no_gen(new EmptyGenome);
         CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,no_gen));
 
@@ -93,6 +104,7 @@ void LC_NSMS::initPopulation()
 
 void LC_NSMS::epoch(){
     double linearCombAlpha = settings::getParameter<settings::Double>(parameters,"#linearCombAlpha").value;
+    bool isSymDesc = settings::getParameter<settings::Boolean>(parameters,"#isSymDesc").value;
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
         if(Novelty::k_value >= population.size())
@@ -100,12 +112,19 @@ void LC_NSMS::epoch(){
         else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
         std::vector<Eigen::VectorXd> pop_desc;
-        for(const auto& ind : population)
-            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->descriptor());
-
+        for(const auto& ind : population) {
+            if(isSymDesc)
+                pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc());
+            else
+                pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc());
+        }
         //compute novelty score
         for(const auto& ind : population){
-            Eigen::VectorXd ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->descriptor();
+            Eigen::VectorXd ind_desc;
+            if(isSymDesc)
+                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc();
+            else
+                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
             //Compute distances to find the k nearest neighbors of ind
             std::vector<size_t> pop_indexes;
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -123,7 +142,12 @@ void LC_NSMS::epoch(){
 
         //update archive for novelty score
         for(const auto& ind : population){
-            Eigen::VectorXd ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->descriptor();
+            Eigen::VectorXd ind_desc;
+            if(isSymDesc)
+                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc();
+            else
+                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
+
             double ind_nov = ind->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
@@ -172,4 +196,46 @@ bool LC_NSMS::is_finish()
 {
     unsigned int maxGenerations = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
     return get_generation() > maxGenerations;
+}
+
+NEAT::Genome LC_NSMS::loadInd(short genomeID)
+{
+    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
+    std::cout << "Loading genome: " << genomeID << "!" << std::endl;
+    std::stringstream filepath;
+    filepath << loadExperiment << "/morphGenome" << genomeID;
+    NEAT::Genome indGenome(filepath.str().c_str());
+    return indGenome;
+}
+
+std::vector<int> LC_NSMS::listInds()
+{
+    std::vector<int> robotList;
+    // This code snippet was taken from: https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
+    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
+    std::string bootstrapFile = settings::getParameter<settings::String>(parameters,"#bootstrapFile").value;
+    // Create an input filestream
+    std::ifstream myFile(loadExperiment+bootstrapFile);
+    if(!myFile.is_open()) throw std::runtime_error("Could not open file");
+    std::string line;
+    int val;
+
+    while(std::getline(myFile, line)){
+        // Create a stringstream of the current line
+        std::stringstream ss(line);
+        // Keep track of the current column index
+        int colIdx = 0;
+        // Extract each integer
+        while(ss >> val) {
+            // Add the current integer to the 'colIdx' column's values vector
+            robotList.push_back(val);
+            // If the next token is a comma, ignore it and move on
+            if(ss.peek() == ',') ss.ignore();
+            // Increment the column index
+            colIdx++;
+        }
+    }
+    // Close file
+    myFile.close();
+    return robotList;
 }

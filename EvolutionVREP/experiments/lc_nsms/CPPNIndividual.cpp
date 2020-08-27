@@ -3,7 +3,7 @@
 using namespace are;
 
 CPPNIndividual::CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
-    Individual(morph_gen,ctrl_gen)
+        Individual(morph_gen,ctrl_gen)
 {
 //    createMorphology();
 //    createController();
@@ -33,6 +33,7 @@ void CPPNIndividual::createMorphology()
     setManRes();
     setManScore();
     setGraphMatrix();
+    setSymDesc();
 }
 
 void CPPNIndividual::createController()
@@ -53,10 +54,6 @@ void CPPNIndividual::setMorphDesc()
 void CPPNIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-}
-
-Eigen::VectorXd CPPNIndividual::descriptor(){
-    return morphDesc;
 }
 
 std::string CPPNIndividual::to_string()
@@ -88,4 +85,9 @@ void CPPNIndividual::setManScore()
 void CPPNIndividual::setGraphMatrix()
 {
     graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
+}
+
+void CPPNIndividual::setSymDesc()
+{
+    symDesc =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getSymDesc();
 }

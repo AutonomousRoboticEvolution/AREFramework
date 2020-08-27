@@ -37,22 +37,20 @@ public :
     NEAT::NeuralNetwork getGenome(){return nn;};
 
     std::vector<bool> getManRes(){return testRes;};
-    std::vector<std::vector<float>> getRawMat(){return rawMat;};
     double getManScore(){ return manScore;};
     void setGenome();
 
     void setManRes();
-    void setRawMat();
     void setManScore();
 
     /// Setters for descritors
     void setMorphDesc();
     void setGraphMatrix();
+    void setSymDesc();
     /// Getters for descritors
     Eigen::VectorXd getMorphDesc(){return morphDesc;};
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphMatrix;};
-
-    Eigen::VectorXd descriptor();
+    Eigen::VectorXd getSymDesc(){return symDesc;};
 
 protected:
     void createController() override;
@@ -61,11 +59,11 @@ protected:
     NEAT::NeuralNetwork nn;
     std::vector<bool> testRes;
     double manScore;
-    std::vector<std::vector<float>> rawMat;
 
     /// Descritors
     std::vector<std::vector<std::vector<int>>> graphMatrix;
     Eigen::VectorXd morphDesc;
+    Eigen::VectorXd symDesc;
 };
 
 }//are
