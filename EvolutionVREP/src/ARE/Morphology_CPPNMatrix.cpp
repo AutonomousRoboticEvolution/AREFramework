@@ -437,8 +437,19 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     int organHandle = 0;
     if(organ.organType == 0) // Brain
         modelsPath += "C_HeadV3.ttm";
-    else if(organ.organType == 1) // Wheels
+    else if(organ.organType == 1) { // Wheels
+#ifndef HANDMADEROBOT
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
+        modelsPath += "C_WheelV2.ttm";
+#elif HANDMADEROBOT == 1
         modelsPath += "C_Wheel.ttm";
+#elif HANDMADEROBOT == 2
+        modelsPath += "C_Wheel.ttm";
+#elif HANDMADEROBOT == 3
+        modelsPath += "C_Wheel.ttm";
+#endif
+    }
     else if(organ.organType == 2) // Sensors
         modelsPath += "C_Sensor.ttm";
     else if(organ.organType == 3) // Joints
@@ -489,8 +500,20 @@ void Morphology_CPPNMatrix::createOrgan(Morphology_CPPNMatrix::OrganSpec &organ)
     connectorPos[0] = organPos[0]; connectorPos[1] = organPos[1]; connectorPos[2] = organPos[2];
     if(organ.organType == 0) // Brain
         connectorPos[2] = organPos[2] + 0.02;
-    else if(organ.organType == 1) // Wheels
+    else if(organ.organType == 1){ // Wheels
+#ifndef HANDMADEROBOT
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
+        connectorPos[1] = organPos[1] - 0.015;
+        connectorPos[2] = organPos[2] + 0.00;
+#elif HANDMADEROBOT == 1
         connectorPos[2] = organPos[2] + 0.02;
+#elif HANDMADEROBOT == 2
+        connectorPos[2] = organPos[2] + 0.02;
+#elif HANDMADEROBOT == 3
+        connectorPos[2] = organPos[2] + 0.02;
+#endif
+    }
     else if(organ.organType == 2) { // Sensors
         connectorPos[0] = organPos[0] + 0.01;
         connectorPos[2] = organPos[2] + 0.02;
@@ -598,8 +621,19 @@ void Morphology_CPPNMatrix::createTemporalGripper(Morphology_CPPNMatrix::OrganSp
     gripperPosition[0] = 0.0;
     gripperPosition[1] = 0.0;
     /// \todo EB: This offset should be somewhere else or constant.
-    if(organ.organType == 1) // Wheels
+    if(organ.organType == 1) { // Wheels
+#ifndef HANDMADEROBOT
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
+        gripperPosition[2] = -0.11;
+#elif HANDMADEROBOT == 1
         gripperPosition[2] = -0.1;
+#elif HANDMADEROBOT == 2
+        gripperPosition[2] = -0.1;
+#elif HANDMADEROBOT == 3
+        gripperPosition[2] = -0.1;
+#endif
+    }
     else if(organ.organType == 2) // Sensors
         gripperPosition[2] = -0.1;
     else if(organ.organType == 3) // Joints
@@ -681,8 +715,14 @@ bool Morphology_CPPNMatrix::IsOrganInsideSkeleton(PolyVox::RawVolume<uint8_t> &s
     voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
     if(voxelValue == FILLEDVOXEL) // Organ centre point inside of skeleton
         return true;
-    else if(voxelValue == EMPTYVOXEL)
-        return false;
+    else if(voxelValue == EMPTYVOXEL) {
+        /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
+        if(xPos <= xHeadUpperLimit && xPos >= xHeadLowerLimit &&
+                yPos <= yHeadUpperLimit && yPos >= xHeadLowerLimit)
+            return true;
+        else
+            return false;
+    }
     else
         assert(false);
 }
@@ -750,6 +790,17 @@ void Morphology_CPPNMatrix::geneRepression()
     for(std::vector<OrganSpec>::iterator it = _organSpec.begin(); it != _organSpec.end();){
         if(it->organType != 0){
             if(it->organInsideSkeleton){
+                if(it->organType == 1)
+                    robotManRes.wheelsRepressed++;
+                else if(it->organType == 2)
+                    robotManRes.sensorsRepressed++;
+                else if(it->organType == 3)
+                    robotManRes.jointsRepressed++;
+                else if(it->organType == 4)
+                    robotManRes.casterRepressed++;
+                else
+                    assert(false);
+
                 simRemoveObject(simGetObjectParent(it->handle)); // Remove force sensor.
                 simRemoveModel(it->handle); // Remove model.
                 simRemoveModel(it->gripperHandle);
@@ -757,6 +808,17 @@ void Morphology_CPPNMatrix::geneRepression()
             }
             else{
                 if(it->organColliding){
+                    if(it->organType == 1)
+                        robotManRes.wheelsRepressed++;
+                    else if(it->organType == 2)
+                        robotManRes.sensorsRepressed++;
+                    else if(it->organType == 3)
+                        robotManRes.jointsRepressed++;
+                    else if(it->organType == 4)
+                        robotManRes.casterRepressed++;
+                    else
+                        assert(false);
+
                     simRemoveObject(simGetObjectParent(it->handle)); // Remove force sensor.
                     simRemoveModel(it->handle); // Remove model.
                     simRemoveModel(it->gripperHandle);
@@ -764,6 +826,17 @@ void Morphology_CPPNMatrix::geneRepression()
                 }
                 else{
                     if(!it->organGoodOrientation){
+                        if(it->organType == 1)
+                            robotManRes.wheelsRepressed++;
+                        else if(it->organType == 2)
+                            robotManRes.sensorsRepressed++;
+                        else if(it->organType == 3)
+                            robotManRes.jointsRepressed++;
+                        else if(it->organType == 4)
+                            robotManRes.casterRepressed++;
+                        else
+                            assert(false);
+
                         simRemoveObject(simGetObjectParent(it->handle)); // Remove force sensor.
                         simRemoveModel(it->handle); // Remove model.
                         simRemoveModel(it->gripperHandle);
@@ -771,6 +844,17 @@ void Morphology_CPPNMatrix::geneRepression()
                     }
                     else{
                         if(!it->organGripperAccess){
+                            if(it->organType == 1)
+                                robotManRes.wheelsRepressed++;
+                            else if(it->organType == 2)
+                                robotManRes.sensorsRepressed++;
+                            else if(it->organType == 3)
+                                robotManRes.jointsRepressed++;
+                            else if(it->organType == 4)
+                                robotManRes.casterRepressed++;
+                            else
+                                assert(false);
+
                             simRemoveObject(simGetObjectParent(it->handle)); // Remove force sensor.
                             simRemoveModel(it->handle); // Remove model.
                             simRemoveModel(it->gripperHandle);
@@ -836,11 +920,10 @@ void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices,
     indicesMesh[0] = indices.data();
     indicesSizesMesh[0] = indices.size();
 
-    std::string repository = settings::getParameter<settings::String>(parameters, "#repository").value;
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
 
     std::stringstream filepath;
-    filepath << repository << "/" << loadExperiment << "/mesh" << loadInd << ".stl";
+    filepath << loadExperiment << "mesh" << loadInd << ".stl";
 
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
