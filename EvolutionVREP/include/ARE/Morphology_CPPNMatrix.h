@@ -243,21 +243,13 @@ public:
     //////////////////////////////////
     ///// Miscellanous functions /////
     //////////////////////////////////
-<<<<<<< HEAD
+
     /**
      * @brief Export mesh file (stl) from a list of vertices and indices.
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
     void exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices);
     /**
-=======
-    /**
-     * @brief Export mesh file (stl) from a list of vertices and indices.
-     * \todo EB: We might not want this method here and this should be in logging instead.
-     */
-    void exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices);
-    /**
->>>>>>> origin/patch_morphology_3
      * @brief Export the robot as ttm model
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
@@ -303,10 +295,8 @@ private:
     class CartDesc
     {
     public:
-<<<<<<< HEAD
-=======
+
         const int ORGANTRAITLIMIT = 5;
->>>>>>> origin/patch_morphology_3
         float robotWidth; // X
         float robotDepth; // Y
         float robotHeight; // Z
