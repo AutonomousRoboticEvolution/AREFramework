@@ -221,7 +221,11 @@ typedef enum obsType {
     POS_TRAJ = 2
 }obsType;
 
-
+typedef enum jointCtrlType {
+    DIRECT = 0,
+    PROPORTIONAL = 1,
+    OSCILLATORY = 2
+}jointCtrlType;
 
 } //settings
 

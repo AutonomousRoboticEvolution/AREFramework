@@ -42,11 +42,36 @@ void retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, std::ve
 
 
 /**
- * @brief sent command to the joint
+ * @brief sent command to the joint. The commands is passed directly as position to the joint.
  * @param handles of the joint
  * @param commands in (-1,1)
  */
-void sentCommandToJoints(const std::vector<int>& handles,const std::vector<double>& commands);
+void sentCommandToJointsDirect(const std::vector<int>& handles,const std::vector<double>& commands);
+
+/**
+ * @brief Proportional controller.
+ * @param handles of the joints
+ * @param commands in (-1,1)
+ * @param Proportional Gain
+ */
+void sentCommandToJointsProportional(const std::vector<int>& handles, const std::vector<double>& commands, double P);
+
+/**
+ * @brief TODO : PID controller
+ * @param handles
+ * @param commands
+ * @param Proportional gain
+ * @param Integral gain
+ * @param Derivative gain
+ */
+//void sentCommandToJointsPID(const std::vector<int>& handles, const std::vector<double>& commands, double P, double I, double D);
+
+/**
+ * @brief Oscillatory controller based on a sinusoïdal function
+ * @param handles of the joints
+ * @param commands in (-1,1)
+ */
+void sentCommandToJointsOscillatory(const std::vector<int> &handles, const std::vector<double> &commands);
 
 /**
  * @brief get joints' positions
