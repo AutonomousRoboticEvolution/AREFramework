@@ -72,7 +72,11 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
                          (a[2] - b[2])*(a[2] - b[2]));
     };
     std::vector<double> d(1);
-    d[0] = 1 - distance(final_position,target_position)/2.83f;
+    d[0] = 1 - distance(final_position,target_position)/max_dist;
+
+    for(double& f : d)
+        if(std::isnan(f) || std::isinf(f))
+            f = max_dist;
 
     return d;
 }
