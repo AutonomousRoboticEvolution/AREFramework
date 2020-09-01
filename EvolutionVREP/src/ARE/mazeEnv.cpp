@@ -76,7 +76,7 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
 
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f))
-            f = max_dist;
+            f = 0;
 
     return d;
 }
