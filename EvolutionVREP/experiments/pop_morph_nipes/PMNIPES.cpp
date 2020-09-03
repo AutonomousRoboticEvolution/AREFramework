@@ -258,6 +258,8 @@ void PMNIPES::init_first_pop(int nbr_weights, int nbr_bias){
 
         CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
 
+
+        CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
@@ -297,8 +299,7 @@ void PMNIPES::init_next_pop(){
         morphCounter++;
         numberEvaluation=0;
         _is_finish=false;
-    	generation=0;
-
+        generation=0;
         std::stringstream sstr;
         sstr << "morph_" << morphIDList[morphCounter];
         sub_folder = sstr.str();
@@ -348,7 +349,6 @@ void PMNIPES::init_next_pop(){
             biases[j-nbr_weights] = new_samples(j,i);
 
         CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
-
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
