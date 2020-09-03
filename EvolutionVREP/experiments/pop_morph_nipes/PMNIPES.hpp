@@ -75,6 +75,7 @@ public:
     {
         arch & objectives;
         arch & ctrlGenome;
+        arch & morphGenome;
         arch & final_position;
         arch & energy_cost;
         arch & trajectory;
