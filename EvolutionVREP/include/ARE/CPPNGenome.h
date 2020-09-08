@@ -24,8 +24,22 @@ public:
 
     void init() override {}
     void mutate() override {}
-    void from_string(const std::string &) override{/*TODO*/}
-    std::string to_string() const override{/*TODO*/}
+    void from_string(const std::string &) override
+    {
+        std::stringstream sstream;
+        sstream << str;
+        boost::archive::text_iarchive iarch(sstream);
+        iarch.register_type<CPPNGenome>();
+        iarch >> *this;
+    }
+    std::string to_string() const override
+    {
+        std::stringstream sstream;
+        boost::archive::text_oarchive oarch(sstream);
+        oarch.register_type<CPPNGenome>();
+        oarch << *this;
+        return sstream.str();
+    }
 
     const NEAT::Genome &get_neat_genome(){return neat_genome;}
 

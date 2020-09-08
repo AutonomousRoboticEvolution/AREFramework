@@ -102,7 +102,7 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     final_position[2] = static_cast<double>(wp.position[2]);
 
     float interval = evalTime/static_cast<float>(nbr_wp);
-    if(simulationTime >= interval*trajectory.size())
+    if(simulationTime >= interval*trajectory.size() && !wp.is_nan())
         trajectory.push_back(wp);
 
     return 0;

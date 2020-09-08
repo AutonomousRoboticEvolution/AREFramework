@@ -18,6 +18,13 @@ struct waypoint{
         return sstr.str();
     }
 
+    bool is_nan(){
+        bool isNan = false;
+        for(int i = 0; i < 3; i++)
+            isNan = isNan || std::isnan(position[0]) || std::isnan(orientation[0]);
+        return  isNan;
+    }
+
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
