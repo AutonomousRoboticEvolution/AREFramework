@@ -92,6 +92,9 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
 
+    if(wp.is_nan())
+        return 1;
+
     if(fabs(final_position[0] - wp.position[0]) > 1e-1 ||
             fabs(final_position[1] - wp.position[1]) > 1e-1 ||
             fabs(final_position[2] - wp.position[2]) > 1e-1)
@@ -102,7 +105,7 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     final_position[2] = static_cast<double>(wp.position[2]);
 
     float interval = evalTime/static_cast<float>(nbr_wp);
-    if(simulationTime >= interval*trajectory.size() && !wp.is_nan())
+    if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
 
     return 0;

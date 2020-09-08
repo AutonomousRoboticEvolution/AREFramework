@@ -250,6 +250,9 @@ void PMNIPES::init_first_pop(int nbr_weights, int nbr_bias){
 
     loadNEATGenome(morphIDList[morphCounter],current_morph_gen);
 
+
+
+
     for(int u = 0; u < pop_size; u++){
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
