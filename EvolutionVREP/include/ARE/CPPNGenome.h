@@ -24,7 +24,7 @@ public:
 
     void init() override {}
     void mutate() override {}
-    void from_string(const std::string &) override
+    void from_string(const std::string & str) override
     {
         std::stringstream sstream;
         sstream << str;
