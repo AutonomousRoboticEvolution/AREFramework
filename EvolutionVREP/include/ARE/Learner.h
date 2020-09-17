@@ -24,6 +24,12 @@ public:
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
 
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+    }
+
 protected:
     settings::ParametersMapPtr parameters;
 

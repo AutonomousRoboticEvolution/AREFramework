@@ -36,8 +36,12 @@ bool IPOPCMAStrategy::reach_ftarget(){
 
 bool IPOPCMAStrategy::pop_desc_stagnation(){
    std::vector<Eigen::VectorXd> descriptors;
-   for (const auto& ind: _pop)
-       descriptors.push_back(std::dynamic_pointer_cast<NN2Individual>(ind)->descriptor());
+   for (const auto& ind: _pop){
+       Eigen::VectorXd desc(ind.descriptor.size());
+       for(int i = 0; i < ind.descriptor.size(); i++)
+           desc(i) = ind.descriptor[i];
+       descriptors.push_back(desc);
+   }
 
    Eigen::VectorXd mean = Eigen::VectorXd::Zero(3);
    for(Eigen::VectorXd desc : descriptors){
@@ -65,7 +69,7 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
 bool IPOPCMAStrategy::pop_fit_stagnation(){
     std::vector<double> fvalues;
     for(const auto& ind : _pop)
-       fvalues.push_back(ind->getObjectives()[0]);
+       fvalues.push_back(ind.objectives[0]);
 
 
 
@@ -120,7 +124,7 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
     _solutions.candidates().clear();
     for (int r=0;r<_pop.size();r++)
     {
-        std::vector<double> genome = std::dynamic_pointer_cast<NNParamGenome>(_pop[r]->get_ctrl_genome())->get_full_genome();
+        std::vector<double> genome = _pop[r].genome;
         dVec x(genome.size());
         for(int i = 0; i < genome.size(); i++)
             x(i) = genome[i];
@@ -129,19 +133,19 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         double fvalue = 0;
         if(start_novelty_ratio > 0){
             int i = 0;
-            for(; i < _pop[r]->getObjectives().size() - 1; i++)
-                reward += 1 - _pop[r]->getObjectives()[i];
+            for(; i < _pop[r].objectives.size() - 1; i++)
+                reward += 1 - _pop[r].objectives[i];
 
-            reward = reward/static_cast<double>(_pop[r]->getObjectives().size() - 1);
+            reward = reward/static_cast<double>(_pop[r].objectives.size() - 1);
 
             fvalue = (1-novelty_ratio)*reward
-                    + novelty_ratio*(1-_pop[r]->getObjectives()[i]);
+                    + novelty_ratio*(1-_pop[r].objectives[i]);
         }
         else{
-            for(const double& obj :  _pop[r]->getObjectives())
+            for(const double& obj :  _pop[r].objectives)
                 reward += 1 - obj;
 
-            fvalue = reward/_pop[r]->getObjectives().size();
+            fvalue = reward/_pop[r].objectives.size();
 
         }
 
@@ -190,12 +194,25 @@ void IPOPCMAStrategy::reset_search_state()
 double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
     double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf > 1 - ind->getObjectives()[0]){
-            bf = 1 - ind->getObjectives()[0];
-            best_sample = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        if(bf > 1 - ind.objectives[0]){
+            bf = 1 - ind.objectives[0];
+            best_sample = ind.genome;
         }
     }
     return bf;
+}
+
+void IPOPCMAStrategy::set_population(const std::vector<Individual::Ptr> &pop){
+    _pop.clear();
+    for(const Individual::Ptr& ind : pop){
+        individual_t i;
+        i.genome = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        i.objectives = ind->getObjectives();
+        i.descriptor.resize(std::dynamic_pointer_cast<NN2Individual>(ind)->descriptor().rows());
+        for(int j = 0; j < i.descriptor.size(); j++)
+            i.descriptor[j] = std::dynamic_pointer_cast<NN2Individual>(ind)->descriptor()(j);
+        _pop.push_back(i);
+    }
 }
 
 void NIPES::init(){

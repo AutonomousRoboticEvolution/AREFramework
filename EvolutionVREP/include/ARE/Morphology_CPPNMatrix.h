@@ -122,7 +122,6 @@ public:
     /// Getters for descriptors.
     Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
 
-private:
     ///////////////////////
     ///// Descriptors /////
     ///////////////////////
@@ -210,6 +209,7 @@ private:
     public:
         CartDesc cartDesc;
     };
+    const Descriptors& getIndDesc(){return indDesc;}
 
 private:
     NEAT::NeuralNetwork nn;

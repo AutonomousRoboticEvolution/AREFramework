@@ -25,6 +25,22 @@ private:
 
 public:
 
+    typedef struct individual_t{
+        std::vector<double> genome;
+        std::vector<double> objectives;
+        std::vector<double> descriptor;
+
+        template<class archive>
+        void serialize(archive &arch, const unsigned int v)
+        {
+            arch & genome;
+            arch & objectives;
+            arch & descriptor;
+        }
+
+
+    }individual_t;
+
     static std::map<int,std::string> scriterias;
 
     typedef std::shared_ptr<IPOPCMAStrategy> Ptr;
@@ -57,6 +73,7 @@ public:
 
     dMat ask()
     {
+        _pop.clear();
         return ipop_cmaes_t::ask();
     }
 
@@ -77,7 +94,10 @@ public:
         ipop_cmaes_t::lambda_inc();
     }
 
-    void set_population(const std::vector<Individual::Ptr>& pop){_pop = pop;}
+    void add_individual(const individual_t &ind){_pop.push_back(ind);}
+    void set_population(const std::vector<Individual::Ptr>& pop);
+    void set_population(const std::vector<individual_t>& pop){_pop = pop;}
+    const std::vector<individual_t> &get_population(){return _pop;}
     void set_elitist_restart(bool er){elitist_restart = er;}
     void set_length_of_stagnation(int los){len_of_stag = los;}
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
@@ -90,7 +110,7 @@ public:
 
 
 private:
-    std::vector<Individual::Ptr> _pop;
+    std::vector<individual_t> _pop;
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
     std::pair<double,std::vector<double>> best_seen_solution;

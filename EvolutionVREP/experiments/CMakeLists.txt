@@ -8,6 +8,8 @@ add_subdirectory(bayesopt)
 add_subdirectory(random_search)
 add_subdirectory(reevaluate_fixedmorphology)
 add_subdirectory(pop_morph_nipes)
+add_subdirectory(mnipes)
+add_subdirectory(robustness_test)
 endif()
 
 add_subdirectory(lc_nsms)

@@ -1,0 +1,157 @@
+#ifndef M_NIPES_HPP
+#define M_NIPES_HPP
+
+#include <boost/filesystem.hpp>
+
+#include "ARE/CPPNGenome.h"
+#include "ARE/learning/NIPES.hpp"
+#include "ARE/Morphology_CPPNMatrix.h"
+#include "cmaes_learner.hpp"
+
+
+namespace are{
+
+using CPPNMorph = Morphology_CPPNMatrix;
+
+class M_NIPESIndividual : public Individual
+{
+public:
+    M_NIPESIndividual() :  Individual(){}
+    M_NIPESIndividual(const CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen,const CMAESLearner::Ptr& cma_learner)
+        : Individual(morph_gen,ctrl_gen)
+    {
+
+        learner = cma_learner;
+    }
+    M_NIPESIndividual(const M_NIPESIndividual& ind) :
+        Individual(ind),
+        nn(ind.nn),
+        testRes(ind.testRes),
+        graphMatrix(ind.graphMatrix),
+        morphDesc(ind.morphDesc),
+        symDesc(ind.symDesc),
+        nn_inputs(ind.nn_inputs),
+        nn_outputs(ind.nn_outputs),
+        final_position(ind.final_position),
+        trajectory(ind.trajectory),
+        energy_cost(ind.energy_cost),
+        sim_time(ind.sim_time)
+
+    {}
+
+    Individual::Ptr clone() override {
+        return std::make_shared<M_NIPESIndividual>(*this);
+    }
+
+    void update(double delta_time) override;
+
+    //specific to the current ARE arenas
+    Eigen::VectorXd descriptor();
+    void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
+    const std::vector<double>& get_final_position(){return final_position;}
+    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+    double get_energy_cost(){return energy_cost;}
+    double get_sim_time(){return sim_time;}
+
+    void setGenome();
+
+    void setManRes();
+    void setManScore();
+
+    /// Setters for descritors
+    void setMorphDesc();
+    void setGraphMatrix();
+    void setSymDesc();
+
+    void set_nn_inputs(int nni){nn_inputs = nni;}
+    void set_nn_outputs(int nno){nn_outputs = nno;}
+
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & learner;
+        arch & morphGenome;
+        arch & final_position;
+        arch & energy_cost;
+        arch & trajectory;
+        arch & sim_time;
+        arch & nn_inputs;
+        arch & nn_outputs;
+    }
+
+    std::string to_string() override;
+    void from_string(const std::string &) override;
+    void update_ctrl();
+
+
+
+private:
+    void createMorphology() override;
+    void createController() override;
+
+    NEAT::NeuralNetwork nn;
+    std::vector<bool> testRes;
+    double manScore;
+    std::vector<std::vector<std::vector<int>>> graphMatrix;
+    Eigen::VectorXd morphDesc;
+    Eigen::VectorXd symDesc;
+
+    double energy_cost;
+    std::vector<waypoint> trajectory;
+    double sim_time;
+    std::vector<double> final_position;
+
+    int nn_inputs;
+    int nn_outputs;
+
+};
+
+class M_NIPES : public EA
+{
+public:
+
+    typedef std::unique_ptr<M_NIPES> Ptr;
+    typedef std::unique_ptr<const M_NIPES> ConstPtr;
+
+    M_NIPES() : EA(){}
+    M_NIPES(const settings::ParametersMapPtr& param) : EA(param){}
+
+    void init() override;
+    void init_morph_pop();
+    void init_next_pop() override;
+    void epoch() override;
+    bool update(const Environment::Ptr &) override;
+//    bool is_finish() override;
+
+    //GETTERS
+    const std::string& subFolder(){return sub_folder;}
+
+private:
+    typedef struct morph_desc_t{
+        int wheels;
+        int joints;
+        int sensors;
+    }morph_desc_t;
+
+    void loadNEATGenome(short int genomeID, NEAT::Genome& gen);
+    void listMorphGenomeID(std::vector<short int>& list);
+    void loadNbrSenAct(const std::vector<short int>& list, std::map<short int, morph_desc_t>& desc_map);
+
+    std::vector<short int> morphIDList;
+    std::map<short,morph_desc_t> morphDescMap;
+    int morphCounter = 0;
+    std::string sub_folder;
+    NEAT::Genome current_morph_gen;
+    NEAT::Parameters neat_params;
+    std::unique_ptr<NEAT::Population> morph_population;
+
+};
+
+}
+
+
+
+#endif //PMNIPES_HPP
