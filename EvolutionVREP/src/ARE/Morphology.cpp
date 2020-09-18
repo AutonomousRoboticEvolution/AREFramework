@@ -29,8 +29,17 @@ void Morphology::command(const std::vector<double> &ctrl_com){
     joint_com.insert(joint_com.begin(),ctrl_com.begin() + wheelHandles.size(), ctrl_com.end());
     std::vector<double> positions;
     cop::getJointsPosition(jointHandles,positions);
-    //compute energy cost of this command
+    //compute energy cost of this command //TODO : different energy computation according to the type of joint controller
     for(size_t i = 0; i < positions.size();i++)
         energy_cost += fabs(positions[i]/M_PI*2.f - joint_com[i]);
-    cop::sentCommandToJoints(jointHandles,joint_com);
+
+    int ctrlType = settings::getParameter<settings::Integer>(parameters,"#jointControllerType").value;
+    if(ctrlType == settings::jointCtrlType::DIRECT)
+        cop::sentCommandToJointsDirect(jointHandles,joint_com);
+    else if(ctrlType == settings::jointCtrlType::PROPORTIONAL){
+        float propGain = settings::getParameter<settings::Float>(parameters,"#proportionalGain").value;
+        cop::sentCommandToJointsProportional(jointHandles,joint_com,propGain);
+    }else if(ctrlType == settings::jointCtrlType::OSCILLATORY){
+        cop::sentCommandToJointsOscillatory(jointHandles,joint_com);
+    }
 }

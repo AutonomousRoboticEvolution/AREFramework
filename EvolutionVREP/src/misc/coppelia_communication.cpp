@@ -91,9 +91,28 @@ void coppelia::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandle
     simReleaseBuffer((simChar*)handles);
 }
 
-void coppelia::sentCommandToJoints(const std::vector<int>& handles,const std::vector<double>& commands){
+void coppelia::sentCommandToJointsDirect(const std::vector<int>& handles,const std::vector<double>& commands){
     for (size_t i = 0; i < handles.size(); i++)
         simSetJointTargetPosition(handles[i],static_cast<float>(commands[i]*M_PI/2.));
+}
+
+void coppelia::sentCommandToJointsProportional(const std::vector<int>& handles, const std::vector<double>& commands, double P){
+
+    for (size_t i = 0; i < handles.size(); i++){
+        float currentPos;
+        simGetJointPosition(handles[i],&currentPos);
+        float e = P*(commands[i]*M_PI/2. - currentPos);
+        simSetJointTargetPosition(handles[i],static_cast<float>((e+currentPos)));
+    }
+}
+
+void coppelia::sentCommandToJointsOscillatory(const std::vector<int> &handles, const std::vector<double> &commands)
+{
+    double simulationTime = simGetSimulationTime();
+    for (size_t i = 0; i < handles.size(); i++){
+        double angle = sin(simulationTime*commands[i]);
+        simSetJointTargetPosition(handles[i],static_cast<float>(angle*M_PI/2.));
+    }
 }
 
 void coppelia::getJointsPosition(const std::vector<int>& handles,std::vector<double>& positions){
