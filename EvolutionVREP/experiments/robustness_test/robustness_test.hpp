@@ -3,15 +3,13 @@
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
-#include <ARE/EA.h>
-#include <ARE/Logging.h>
-#include <ARE/Individual.h>
-#include "NNParamGenome.hpp"
-#include "NNGenome.hpp"
-#include "NNControl.h"
-#include "NN2Individual.hpp"
-#include "FixedMorphology.hpp"
-#include "settings.hpp"
+#include "ARE/EA.h"
+#include "ARE/Logging.h"
+#include "ARE/Individual.h"
+#include "ARE/NNParamGenome.hpp"
+#include "ARE/nn2/NN2Individual.hpp"
+#include "ARE/FixedMorphology.hpp"
+
 
 
 namespace are {

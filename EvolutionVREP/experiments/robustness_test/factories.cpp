@@ -1,6 +1,6 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "robustness_test.hpp"
-#include "Loggings.h"
+#include "ARE/Logging.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
@@ -30,10 +30,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(fitlog);
 
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;
-    are::BehavDescLog::Ptr bdlog(new are::BehavDescLog(behav_desc_log_file));
+    are::BehavDescLog<are::NN2Individual>::Ptr bdlog(new are::BehavDescLog<are::NN2Individual>(behav_desc_log_file));
     logs.push_back(bdlog);
 
-    are::TrajectoryLog::Ptr trajlog(new are::TrajectoryLog);
+    are::TrajectoryLog<are::NN2Individual>::Ptr trajlog(new are::TrajectoryLog<are::NN2Individual>);
     logs.push_back(trajlog);
 
 }

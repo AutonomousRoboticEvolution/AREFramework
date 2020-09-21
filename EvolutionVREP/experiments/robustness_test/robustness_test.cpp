@@ -19,6 +19,12 @@ void RobustnessTest::init(){
 
     std::vector<std::string> gen_files;
     std::vector<int> gen_index;
+
+    //Load the last generation
+    if(generation < 0){
+
+    }
+
     if(ind >= 0){
         std::stringstream sstr;
         sstr << folder << "/genome_" << generation << "_" << ind;
