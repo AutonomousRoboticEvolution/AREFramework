@@ -135,21 +135,33 @@ void M_NIPESIndividual::update_ctrl(){
 
 void M_NIPES::init(){
 
+
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     //Novelty parameters
     Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
     //Initialized the population of morphologies
-    init_morph_pop();
-
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
-        std::stringstream sstr;
-        sstr << "morph_" << morphIDList[morphCounter];
-        sub_folder = sstr.str();
-        if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
-            boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
+        init_morph_pop();
+//        std::stringstream sstr;
+//        sstr << "morph_" << morphIDList[morphCounter];
+//        sub_folder = sstr.str();
+//        if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
+//            boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
+    }
+    if(instance_type == settings::INSTANCE_SERVER && simulator_side){
+        NEAT::Genome mgen(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, neat_params, 10);
+        CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
+        morph_gen->set_parameters(parameters);
+        morph_gen->set_randNum(randomNum);
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        CMAESLearner::Ptr cma_learner(new CMAESLearner);
+        Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
     }
 
 }
