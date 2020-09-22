@@ -56,24 +56,36 @@ public:
         bool noCollisions;
         bool noBadOrientations;
         bool isGripperAccess;
+        short int wheelsRepressed;
+        short int sensorsRepressed;
+        short int jointsRepressed;
+        short int casterRepressed;
         // Constructor
         RobotManRes(){
             noCollisions = true;
             noBadOrientations = true;
             isGripperAccess = true;
+            wheelsRepressed = 0;
+            sensorsRepressed = 0;
+            jointsRepressed = 0;
+            casterRepressed = 0;
         }
         std::vector<bool> getResVector(){
             std::vector<bool> resVector;
             resVector.push_back(noCollisions);
             resVector.push_back(noBadOrientations);
             resVector.push_back(isGripperAccess);
+            resVector.push_back(wheelsRepressed);
+            resVector.push_back(sensorsRepressed);
+            resVector.push_back(jointsRepressed);
+            resVector.push_back(casterRepressed);
             return resVector;
         }
     };
     RobotManRes robotManRes;
 
     Morphology::Ptr clone() const override
-    {return std::make_shared<Morphology_CPPNMatrix>(*this);}
+        {return std::make_shared<Morphology_CPPNMatrix>(*this);}
 
     void create() override;
     void createAtPosition(float,float,float) override;
@@ -282,6 +294,7 @@ private:
     class CartDesc
     {
     public:
+        const int ORGANTRAITLIMIT = 5;
         float robotWidth; // X
         float robotDepth; // Y
         float robotHeight; // Z
@@ -309,10 +322,10 @@ private:
             cartDesc(1) = robotDepth / MATRIX_SIZE_M;
             cartDesc(2) = robotHeight / MATRIX_SIZE_M;
             cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
-            cartDesc(4) = (double) wheelNumber / MAX_NUM_ORGANS;
-            cartDesc(5) = (double) sensorNumber / MAX_NUM_ORGANS;
-            cartDesc(6) = (double) jointNumber / MAX_NUM_ORGANS;
-            cartDesc(7) = (double) casterNumber / MAX_NUM_ORGANS;
+            cartDesc(4) = (double) wheelNumber / ORGANTRAITLIMIT;
+            cartDesc(5) = (double) sensorNumber / ORGANTRAITLIMIT;
+            cartDesc(6) = (double) jointNumber / ORGANTRAITLIMIT;
+            cartDesc(7) = (double) casterNumber / ORGANTRAITLIMIT;
         }
         void countOrgans( std::vector<OrganSpec> _organSpec){
             for(std::vector<OrganSpec>::iterator it = _organSpec.begin(); it != _organSpec.end(); it++){
