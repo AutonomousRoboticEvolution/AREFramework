@@ -281,7 +281,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
                     );
         //LEARNING WITH NIP-ES
         if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step()){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->update_ctrl();
+          //  std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->update_ctrl();
             return false;
         }else return true;
     }else return true;

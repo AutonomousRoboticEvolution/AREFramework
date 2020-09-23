@@ -321,8 +321,7 @@ void clientMessageHandler(int message){
         }
         //        simStartSimulation();
         ERVREP->initEnv();
-        if(ERVREP->get_nbr_eval() == 0)
-            ERVREP->initIndividual();//startOfSimulation();
+        ERVREP->initIndividual();//startOfSimulation();
         // Initializes population
         simSetIntegerSignal("simulationState",are_c::BUSY);
         simSetFloatSignal("simulationTime",0);

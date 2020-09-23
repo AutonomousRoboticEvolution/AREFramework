@@ -77,7 +77,7 @@ void ER::initIndividual(){
     mess.resize(length);
     currentInd = ea->getIndividual(0);
     if(nbrEval == 0)
-          currentInd->from_string(mess);
+        currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
 }
