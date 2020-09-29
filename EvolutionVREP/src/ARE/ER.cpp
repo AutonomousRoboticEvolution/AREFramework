@@ -1,7 +1,6 @@
 #include "ARE/ER.h"
 
 using namespace are;
-namespace interproc = boost::interprocess;
 
 
 /// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a
@@ -104,7 +103,7 @@ void ER::handleSimulation()
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,currentInd->get_morphology());
 
-    if (simGetSimulationTime() >
+    if (simulationTime >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value || ea->finish_eval()) {
         simStopSimulation();
     }

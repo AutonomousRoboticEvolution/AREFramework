@@ -133,7 +133,7 @@ bool ER::updateSimulation()
             {
                 //            float simTime = slave->getFloatSignal("simulationTime");
                 //            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
-                std::cout << "Simulator " << currentIndexVec[slaveIdx] << " is busy" << std::endl;
+//                std::cout << "Simulator " << currentIndexVec[slaveIdx] << " is busy" << std::endl;
 
             }
             else if(state == RESTART){
