@@ -86,7 +86,7 @@ public:
     void from_string(const std::string &) override;
     void update_ctrl();
 
-
+    Eigen::VectorXd getMorphDesc(){return  morphDesc;}
 
 private:
     void createMorphology() override;

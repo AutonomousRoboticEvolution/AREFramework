@@ -11,6 +11,8 @@ void M_NIPESIndividual::createMorphology(){
     gen.BuildPhenotype(nn);
     std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
     morphology->createAtPosition(0,0,0.12);
+    float pos[3];
+    simGetObjectPosition(morphology->getMainHandle(),-1,pos);
     setGenome();
     setMorphDesc();
     setManRes();
@@ -279,6 +281,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
                         ind->getObjectives(),
                         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
                     );
+
         //LEARNING WITH NIP-ES
         if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step()){
           //  std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->update_ctrl();

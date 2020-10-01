@@ -98,6 +98,7 @@ public:
     void set_population(const std::vector<Individual::Ptr>& pop);
     void set_population(const std::vector<individual_t>& pop){_pop = pop;}
     const std::vector<individual_t> &get_population(){return _pop;}
+    std::vector<individual_t> &access_population(){return _pop;}
     void set_elitist_restart(bool er){elitist_restart = er;}
     void set_length_of_stagnation(int los){len_of_stag = los;}
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}

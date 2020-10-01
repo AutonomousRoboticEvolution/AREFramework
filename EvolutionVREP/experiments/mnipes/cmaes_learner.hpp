@@ -43,6 +43,7 @@ public:
         arch & _archive;
     }
 
+    std::string archive_to_string();
 
 protected:
     int _dimension;
@@ -58,6 +59,7 @@ protected:
     int _generation = 0;
     bool _is_finish = false;
     archive_t _archive;
+    std::vector<Eigen::VectorXd> _novelty_archive;
 };
 
 }//are

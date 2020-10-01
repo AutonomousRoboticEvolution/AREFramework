@@ -13,6 +13,7 @@ add_library(M_NIPES SHARED
    factories.cpp
    M_NIPES.cpp 
    cmaes_learner.cpp
+   MNIPESLoggings.cpp
     )
 target_include_directories(M_NIPES PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES ER_library cmaes tbb)

@@ -38,7 +38,8 @@ public:
 
     virtual void init()
     {
-        createMorphology();
+        if(morphology == nullptr)
+            createMorphology();
         int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
         if(control == nullptr || instance_type == settings::INSTANCE_SERVER)
             createController();

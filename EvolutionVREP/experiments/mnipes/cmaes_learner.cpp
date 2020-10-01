@@ -49,7 +49,39 @@ void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::
 }
 
 void CMAESLearner::iterate(){
+    /** NOVELTY **/
+    if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
+        if(Novelty::k_value >= _population.size())
+            Novelty::k_value = _population.size()/2;
+        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
+        std::vector<Eigen::VectorXd> pop_desc;
+        for(const auto& ind : _cma_strat->get_population()){
+            Eigen::VectorXd desc(ind.descriptor.size());
+            for(int i = 0; i < ind.descriptor.size(); i++)
+                desc(i) = ind.descriptor[i];
+            pop_desc.push_back(desc);
+        }
+        //compute novelty
+        for(auto& ind : _cma_strat->access_population()){
+            Eigen::VectorXd ind_desc(ind.descriptor.size());
+            for(int i = 0; i < ind.descriptor.size(); i++)
+                ind_desc(i) = ind.descriptor[i];
+
+            double ind_nov = Novelty::sparseness(Novelty::distances(ind_desc,_novelty_archive,pop_desc));
+            ind.objectives.push_back(ind_nov);
+        }
+
+        //update archive
+        for(const auto& ind : _cma_strat->get_population()){
+            Eigen::VectorXd ind_desc(ind.descriptor.size());
+            for(int i = 0; i < ind.descriptor.size(); i++)
+                ind_desc(i) = ind.descriptor[i];
+            double ind_nov = ind.objectives.back();
+            Novelty::update_archive(ind_desc,ind_nov,_novelty_archive,_rand_num);
+        }
+    }
+    /**/
 
     _cma_strat->eval();
     _cma_strat->tell();
@@ -134,4 +166,23 @@ void CMAESLearner::update(Control::Ptr &control){
     _counter++;
     _nbr_eval++;
 
+}
+
+std::string CMAESLearner::archive_to_string(){
+    std::stringstream sstr;
+    for(const auto& elt : _archive){
+        sstr << elt.first << "\n";
+        for(const auto& ind: elt.second){
+            for(const double& obj : ind.objectives)
+                sstr << obj << ",";
+            sstr << "\n";
+            for(const double& desc : ind.descriptor)
+                sstr << desc << ",";
+            sstr << "\n";
+            for(const double& gen : ind.genome)
+                sstr << gen << ",";
+            sstr << "\n";
+        }
+    }
+    return sstr.str();
 }

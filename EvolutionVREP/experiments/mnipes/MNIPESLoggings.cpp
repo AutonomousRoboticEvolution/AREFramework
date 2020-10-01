@@ -1,0 +1,65 @@
+#include "MNIPESLoggings.hpp"
+
+using namespace are;
+
+
+void StopCritLog::saveLog(EA::Ptr &ea)
+{
+    if(!static_cast<NIPES*>(ea.get())->restarted())
+        return;
+
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
+
+    int generation = ea->get_generation();
+
+    logFileStream << generation << "," << static_cast<NIPES*>(ea.get())->pop_stopping_criterias() << std::endl;
+
+    logFileStream.close();
+}
+
+void MorphGenomeLog::saveLog(EA::Ptr &ea)
+{
+    int generation = ea->get_generation();
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        std::stringstream filepath;
+        filepath << Logging::log_folder << "/morphGenome" << generation * ea->get_population().size() + ind;
+        const Genome::Ptr morphGenome = std::dynamic_pointer_cast<M_NIPESIndividual>(ea->getIndividual(ind))->get_morph_genome();
+        NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
+        genome.Save(filepath.str().c_str());
+    }
+}
+
+void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
+{
+    std::ofstream logFileStream;
+    if(!openOLogFile(logFileStream))
+        return;
+    int generation = ea->get_generation();
+    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+        logFileStream << generation * ea->get_population().size() + ind << ",";
+        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<M_NIPESIndividual>(ea->getIndividual(ind))->getMorphDesc();
+        for(int j = 0; j < morphDesc.size(); j++){
+            logFileStream << morphDesc(j) << ",";
+        }
+        logFileStream << std::endl;
+    }
+    logFileStream.close();
+}
+
+void ControllersLog::saveLog(EA::Ptr &ea){
+    int generation = ea->get_generation();
+
+    std::ofstream logFileStream;
+    for(size_t i = 0; i < ea->get_population().size(); i++){
+        std::stringstream filename;
+        filename << "controllers_" << generation << "_" << i;
+        if(!openOLogFile(logFileStream, filename.str()))
+            return;
+        logFileStream << std::dynamic_pointer_cast<CMAESLearner>(
+                             ea->get_population()[i]->get_learner()
+                             )->archive_to_string();
+        logFileStream.close();
+    }
+}
