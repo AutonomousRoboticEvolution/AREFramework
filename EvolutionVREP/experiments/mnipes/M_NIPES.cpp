@@ -358,3 +358,51 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
     for(const int &id : list)
         desc_map.emplace(id,full_desc_map[id]);
 }
+
+
+bool M_NIPES::finish_eval(){
+
+
+    float tPos[3];
+    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
+    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
+    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+
+    auto distance = [](float* a,float* b) -> double
+    {
+        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                         (a[1] - b[1])*(a[1] - b[1]) +
+                         (a[2] - b[2])*(a[2] - b[2]));
+    };
+
+    int handle = population[currentIndIndex]->get_morphology()->getMainHandle();
+    float pos[3];
+    simGetObjectPosition(handle,-1,pos);
+    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+
+    if(simGetSimulationTime() < 0.1){
+        current_ind_past_pos[0] = pos[0];
+        current_ind_past_pos[1] = pos[1];
+        current_ind_past_pos[2] = pos[2];
+    }else{
+        if(fabs(current_ind_past_pos[0] - pos[0]) > 1e-2 &&
+                fabs(current_ind_past_pos[1] - pos[1]) > 1e-2 &&
+                fabs(current_ind_past_pos[2] - pos[2]) > 1e-2)
+            move_counter++;
+
+        current_ind_past_pos[0] = pos[0];
+        current_ind_past_pos[1] = pos[1];
+        current_ind_past_pos[2] = pos[2];
+
+    }
+
+    bool stop = dist < fTarget || (simGetSimulationTime() > 10.0 && move_counter <= 10);
+
+    if(stop){
+        std::cout << "STOP !" << std::endl;
+    }
+
+    return  stop;
+}

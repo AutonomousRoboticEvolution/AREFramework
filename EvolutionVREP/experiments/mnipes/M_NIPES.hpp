@@ -125,6 +125,7 @@ public:
     void epoch() override;
     bool update(const Environment::Ptr &) override;
 //    bool is_finish() override;
+    bool finish_eval() override;
 
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
@@ -148,6 +149,8 @@ private:
     NEAT::Parameters neat_params;
     std::unique_ptr<NEAT::Population> morph_population;
 
+    float current_ind_past_pos[3];
+    int move_counter = 0;
 };
 
 }

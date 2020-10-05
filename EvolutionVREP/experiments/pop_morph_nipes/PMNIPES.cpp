@@ -440,6 +440,7 @@ void PMNIPES::loadNbrSenAct(std::vector<short> &list, std::map<short, morph_desc
 
     for(const int &id : list)
         desc_map.emplace(id,full_desc_map[id]);
+
 }
 
 bool PMNIPES::finish_eval(){
