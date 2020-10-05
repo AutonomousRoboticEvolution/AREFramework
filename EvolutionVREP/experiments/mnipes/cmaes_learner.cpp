@@ -119,7 +119,7 @@ bool CMAESLearner::step(){
 
 
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
-    if(_nbr_eval >= max_nbr_eval || _is_finish)
+    if(_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50)
         return true;
 
     iterate();

@@ -293,7 +293,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
 //bool M_NIPES::is_finish(){
 //    int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-//    return (numberEvaluation >= maxNbrEval || _is_finish);
+//    return (numberEvaluation >= maxNbrEval || _is_finish || );
 //}
 
 void M_NIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
@@ -386,6 +386,7 @@ bool M_NIPES::finish_eval(){
         current_ind_past_pos[0] = pos[0];
         current_ind_past_pos[1] = pos[1];
         current_ind_past_pos[2] = pos[2];
+        move_counter = 0;
     }else{
         if(fabs(current_ind_past_pos[0] - pos[0]) > 1e-2 &&
                 fabs(current_ind_past_pos[1] - pos[1]) > 1e-2 &&
@@ -398,7 +399,9 @@ bool M_NIPES::finish_eval(){
 
     }
 
-    bool stop = dist < fTarget || (simGetSimulationTime() > 10.0 && move_counter <= 10);
+    bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
+    if(drop_eval) nbr_dropped_eval++;
+    bool stop = dist < fTarget || drop_eval;
 
     if(stop){
         std::cout << "STOP !" << std::endl;

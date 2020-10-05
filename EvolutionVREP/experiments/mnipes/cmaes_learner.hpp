@@ -44,6 +44,7 @@ public:
     }
 
     std::string archive_to_string();
+    void set_nbr_dropped_eval(const int& nde){nbr_dropped_eval = nde;}
 
 protected:
     int _dimension;
@@ -60,6 +61,7 @@ protected:
     bool _is_finish = false;
     archive_t _archive;
     std::vector<Eigen::VectorXd> _novelty_archive;
+    int nbr_dropped_eval = 0;
 };
 
 }//are
