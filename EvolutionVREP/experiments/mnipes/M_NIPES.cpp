@@ -388,9 +388,9 @@ bool M_NIPES::finish_eval(){
         current_ind_past_pos[2] = pos[2];
         move_counter = 0;
     }else{
-        if(fabs(current_ind_past_pos[0] - pos[0]) > 1e-2 &&
-                fabs(current_ind_past_pos[1] - pos[1]) > 1e-2 &&
-                fabs(current_ind_past_pos[2] - pos[2]) > 1e-2)
+        if(fabs(current_ind_past_pos[0] - pos[0]) > 1e-3 ||
+                fabs(current_ind_past_pos[1] - pos[1]) > 1e-3 ||
+                fabs(current_ind_past_pos[2] - pos[2]) > 1e-3)
             move_counter++;
 
         current_ind_past_pos[0] = pos[0];
