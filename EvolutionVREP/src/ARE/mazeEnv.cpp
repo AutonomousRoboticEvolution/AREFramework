@@ -91,6 +91,7 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     waypoint wp;
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
+//    std::cout << wp.to_string() << std::endl;
 
     if(wp.is_nan())
         return 1;
