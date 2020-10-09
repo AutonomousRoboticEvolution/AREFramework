@@ -22,6 +22,7 @@
 
 #include "v_repLib.h"
 
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <random>
@@ -117,16 +118,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
         return(0); // Means error, V-REP will unload this plugin
     }
-#elif defined(COPPELIASIM)
-    if (getSimProcAddresses(simLib) == 0)
-    {
-        std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
 
-        unloadSimLibrary(simLib); // release the library
-
-        return(0); // Means error, V-REP will unload this plugin
-    }
-#endif
 
     // Check the V-REP version:
     int vrepVer;

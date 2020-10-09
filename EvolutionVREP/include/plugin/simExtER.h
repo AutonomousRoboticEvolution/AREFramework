@@ -59,4 +59,3 @@ void localMessageHandler(int message);
 void clientMessageHandler(int message);
 
 #endif //SIMEXTER_H
-
