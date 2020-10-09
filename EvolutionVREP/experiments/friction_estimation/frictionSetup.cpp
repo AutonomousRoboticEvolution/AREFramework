@@ -1,14 +1,10 @@
 #include "frictionSetup.hpp"
-<<<<<<< HEAD
+
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
-=======
-#include "v_repLib.h"
-
->>>>>>> new experiment to estimate friction coefficient
 #include <boost/algorithm/string.hpp>
 
 using namespace are;
