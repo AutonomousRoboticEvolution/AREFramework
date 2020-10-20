@@ -78,6 +78,8 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
         if(std::isnan(f) || std::isinf(f))
             f = 0;
 
+    assert(d[0] <= 1 && d[0] >= 0);
+
     return d;
 }
 
