@@ -38,10 +38,10 @@ public:
 
     virtual void init()
     {
-        if(morphology == nullptr)
-            createMorphology();
+        createMorphology();
         int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-        if(control == nullptr || instance_type == settings::INSTANCE_SERVER)
+        bool reload_ctrl = settings::getParameter<settings::Boolean>(parameters,"#reloadController").value;
+        if(control == nullptr || instance_type == settings::INSTANCE_SERVER || reload_ctrl)
             createController();
     }
 

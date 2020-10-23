@@ -29,7 +29,21 @@ void MazeEnv::init(){
 
     Environment::init();
 
-       target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    std::string scenePath = settings::getParameter<settings::String>(parameters,"#scenePath").value;
+    if(verbose){
+        int i = 0;
+        int handle = 0;
+        std::cout << "Loaded scene : " << scenePath << std::endl;
+        std::cout << "Objects in the scene : " << std::endl;
+        while((handle = simGetObjects(i,sim_handle_all)) >= 0){
+            std::cout << simGetObjectName(handle) << std::endl;
+            i++;
+        }
+    }
+
+
+    target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                        settings::getParameter<settings::Double>(parameters,"#target_y").value,
                        settings::getParameter<settings::Double>(parameters,"#target_z").value};
 

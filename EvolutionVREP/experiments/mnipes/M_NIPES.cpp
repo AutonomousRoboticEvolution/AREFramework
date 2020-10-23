@@ -10,7 +10,11 @@ void M_NIPESIndividual::createMorphology(){
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
     std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-    morphology->createAtPosition(0,0,0.12);
+    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
+    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    morphology->createAtPosition(init_x,init_y,init_z);
     float pos[3];
     simGetObjectPosition(morphology->getMainHandle(),-1,pos);
     setGenome();
