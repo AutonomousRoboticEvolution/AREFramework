@@ -1,6 +1,9 @@
 #include "ARE/mazeEnv.h"
+#if defined (VREP)
 #include "v_repLib.h"
-
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 #include <boost/algorithm/string.hpp>
 
 using namespace are;

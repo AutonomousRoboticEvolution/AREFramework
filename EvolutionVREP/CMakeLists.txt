@@ -113,13 +113,13 @@ set_target_properties(ER_library PROPERTIES
 
 if(VREP_FOUND)
     SET(LIB_EXT v_repExtER)
+    SET(PLUGIN_SRC src/plugin/v_repExtER.cpp)
 elseif(COPPELIASIM_FOUND)
     SET(LIB_EXT simExtER)
+    SET(PLUGIN_SRC src/plugin/simExtER.cpp)
 endif()
 
-add_library(${LIB_EXT} SHARED
-    src/plugin/v_repExtER.cpp
-)
+add_library(${LIB_EXT} SHARED ${PLUGIN_SRC})
 
 
 target_link_libraries(ER_library

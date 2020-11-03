@@ -1,5 +1,9 @@
 #include "ARE/Morphology_CPPNMatrix.h"
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 #include <stdio.h>
 #include "misc/coppelia_communication.hpp"
 

@@ -19,14 +19,11 @@ extern "C" {
 #include "remoteApi/extApi.h"
 }
 
+#include "ERClient/sim_state.h"
 
 namespace are {
 
 namespace client {
-
-typedef enum simulation_state{
-    IDLE = 0, READY = 1, BUSY = 2, FINISH = 3, ERROR = 9
-} SimState;
 
 class ER : public are::ER
 {
