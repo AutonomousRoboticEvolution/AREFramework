@@ -99,6 +99,7 @@ void ER::endOfSimulation(int slaveIndex){
     ea->update(environment);
     //        if(evalIsFinish)
     //            currentIndIndex++;
+
     saveLogs(false);
 }
 
