@@ -85,7 +85,7 @@ public:
     RobotManRes robotManRes;
 
     Morphology::Ptr clone() const override
-    {return std::make_shared<Morphology_CPPNMatrix>(*this);}
+        {return std::make_shared<Morphology_CPPNMatrix>(*this);}
 
     void create() override;
     void createAtPosition(float,float,float) override;
