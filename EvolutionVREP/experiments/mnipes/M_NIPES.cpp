@@ -66,7 +66,7 @@ void M_NIPESIndividual::update(double delta_time){
     std::vector<double> inputs = morphology->update();
     std::vector<double> outputs = control->update(inputs);
 
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
+    morphology->command(outputs);
     energy_cost += morphology->get_energy_cost();
     if(std::isnan(energy_cost))
         energy_cost = 0;
