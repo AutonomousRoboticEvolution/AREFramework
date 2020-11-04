@@ -331,34 +331,30 @@ void clientMessageHandler(int message){
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
        
+        std::cout << ERVREP->get_evalIsFinish() << std::endl;
         if(ERVREP->get_evalIsFinish()){
 
             std::string indString = ERVREP->get_currentInd()->to_string();
             simSetStringSignal("currentInd",indString.c_str(),indString.size());
             simSetIntegerSignal("simulationState",are_c::FINISH);
 
-            loadingPossible = true;  // start another simulation
+            //loadingPossible = true;  // start another simulation
             if (verbose) {
                 std::cout << "EVALUATION ENDED" << std::endl;
             }
         }
         else{
-            simSetIntegerSignal("simulationState",are_c::BUSY);
-            simStartSimulation();
-
+            // Initializes population
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-        }
-
-        std::string indString = ERVREP->get_currentInd()->to_string();
-        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-        simSetIntegerSignal("simulationState",are_c::FINISH);
-
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
-            std::cout << "SIMULATION ENDED" << std::endl;
-        }
+            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simulationState = RESTART;
+            std::string indString = ERVREP->get_currentInd()->to_string();
+            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            loadingPossible = true;  // start another simulation
+            return;
+       }
     }
 
     if (clientState[0] == are_c::IDLE)
@@ -366,7 +362,7 @@ void clientMessageHandler(int message){
         timerOn = false;
         simulationState = STARTING;
         simSetIntegerSignal("simulationState",are_c::READY);
-    }else if(clientState[0] == are_c::READY && simulationState == STARTING){
+    }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
         simStartSimulation();
     }
     else if(clientState[0] == 99){
