@@ -716,9 +716,9 @@ bool Morphology_CPPNMatrix::IsOrganInsideSkeleton(PolyVox::RawVolume<uint8_t> &s
     simGetObjectPosition(organHandle,-1,position);
 
     // Transform organPos from m to voxels
-    int xPos = (int) (position[0]/VOXEL_REAL_SIZE);
-    int yPos = (int) (position[1]/VOXEL_REAL_SIZE);
-    int zPos = (int) (position[2]/VOXEL_REAL_SIZE);
+    int xPos = static_cast<int>(std::round(position[0]/VOXEL_REAL_SIZE));
+    int yPos = static_cast<int>(std::round(position[1]/VOXEL_REAL_SIZE));
+    int zPos = static_cast<int>(std::round(position[2]/VOXEL_REAL_SIZE));
     zPos -= MATRIX_HALF_SIZE;
     uint8_t voxelValue;
     voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
