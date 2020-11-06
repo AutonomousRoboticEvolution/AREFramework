@@ -51,7 +51,9 @@ else()
 endif()
 
 add_subdirectory(modules)
+add_subdirectory(image_processing)
 
+find_package(OpenCV REQUIRED)
 find_package(Boost REQUIRED random)
 find_package(MultiNEAT REQUIRED)
 message("MultiNEAT Folder : ${MultiNEAT_DIR}")
@@ -88,6 +90,8 @@ add_library(ER_library SHARED ${VREP_SRC} ${SOURCES})
 target_include_directories(ER_library PUBLIC
     "include"
     "ERClient/include"
+    "image_processing/include"
+    ${OpenCV_INCLUDE_DIRS}
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "/usr/include/eigen3"
