@@ -2,7 +2,7 @@
 
 using namespace are;
 
-void Environment::sceneLoader() {
+void VirtualEnvironment::sceneLoader() {
     std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
     if(simLoadScene(scene_path.c_str()) < 0){
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
@@ -10,7 +10,7 @@ void Environment::sceneLoader() {
     }
 }
 
-void Environment::init() {
+void VirtualEnvironment::init() {
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value){
         std::cout << "Initialize Environment" << std::endl;
     }
@@ -19,10 +19,6 @@ void Environment::init() {
     float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 	// Sets time step
     simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
-}
-
-void Environment::print() {
-    std::cout << "Environment is here" << std::endl;
 }
 
 

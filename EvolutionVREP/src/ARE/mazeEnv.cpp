@@ -27,7 +27,7 @@ MazeEnv::MazeEnv()
 
 void MazeEnv::init(){
 
-    Environment::init();
+    VirtualEnvironment::init();
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string scenePath = settings::getParameter<settings::String>(parameters,"#scenePath").value;

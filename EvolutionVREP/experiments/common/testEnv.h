@@ -13,10 +13,10 @@
 
 namespace are {
 
-class TestEnv : public Environment
+class TestEnv : public VirtualEnvironment
 {
 public:
-    TestEnv() : Environment()
+    TestEnv() : VirtualEnvironment()
     {
         initial_position.resize(3);
         final_position.resize(3);

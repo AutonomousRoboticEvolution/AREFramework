@@ -8,7 +8,7 @@
 namespace are {
 
 
-class MazeEnv : public Environment
+class MazeEnv : public VirtualEnvironment
 {
 public:
 
@@ -21,7 +21,7 @@ public:
     void init() override;
 
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
-    float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
+    float update(float simulationTime, const Morphology::Ptr &morph) override;
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;
