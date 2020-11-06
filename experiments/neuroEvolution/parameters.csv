@@ -12,7 +12,7 @@
 #evalTimeFile,string,eval_durations.csv
 #behavDescFile,string,final_pos.csv
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #timeStep,float,1.
 #shouldReopenConnections,bool,0

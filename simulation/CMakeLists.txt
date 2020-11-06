@@ -46,7 +46,11 @@ else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
 
+add_subdirectory(modules)
+add_subdirectory(image_processing)
 
+find_package(OpenCV REQUIRED)
+find_package(Boost REQUIRED random)
 find_package(MultiNEAT REQUIRED)
 message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 find_package(PolyVox REQUIRED)
@@ -97,6 +101,9 @@ add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
 
 target_include_directories(${LIB_EXT} PUBLIC
     "include"
+    "ERClient/include"
+    "image_processing/include"
+    ${OpenCV_INCLUDE_DIRS}
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
 )
