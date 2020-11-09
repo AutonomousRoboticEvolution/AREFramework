@@ -243,6 +243,7 @@ public:
     //////////////////////////////////
     ///// Miscellanous functions /////
     //////////////////////////////////
+
     /**
      * @brief Export mesh file (stl) from a list of vertices and indices.
      * \todo EB: We might not want this method here and this should be in logging instead.
@@ -294,6 +295,7 @@ private:
     class CartDesc
     {
     public:
+
         const int ORGANTRAITLIMIT = 5;
         float robotWidth; // X
         float robotDepth; // Y

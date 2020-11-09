@@ -14,13 +14,12 @@
     - The third argumt defines where the repository is
 */
 
-#include "plugin/v_repExtER.h"
+#include "plugin/simExtER.h"
 //#include "luaFunctionData.h"
 #include <iostream>
 #include <fstream>
 #include <memory>
-
-#include "v_repLib.h"
+#include "simLib.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -67,7 +66,7 @@ void saveLog(int num)
     logFile.close();
 }
 
-VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
+SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
 {
     std::cout << "---------------------------" << std::endl
               << "STARTING WITH ARE FRAMEWORK" << std::endl
@@ -92,42 +91,47 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     std::string temp(currentDirAndPath);
 
 #ifdef _WIN32
-    temp += "\\v_rep.dll";
+    temp += "\\coppeliaSim.dll";
 #elif defined (__linux)
-    temp += "/libv_rep.so";
+    temp += "/libcoppeliaSim.so";
 #elif defined (__APPLE__)
-    temp += "/libv_rep.dylib";
+    temp += "/libcoppeliaSim.dylib";
 #endif /* __linux || __APPLE__ */
 
 
 
 
-    simLib = loadVrepLibrary(temp.c_str());
+    simLib = loadSimLibrary(temp.c_str());
     if (simLib == NULL)
     {
         std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
         return(0); // Means error, V-REP will unload this plugin
     }
 
-    if (getVrepProcAddresses(simLib) == 0)
+
+    if (getSimProcAddresses(simLib) == 0)
     {
         std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
 
-        unloadVrepLibrary(simLib); // release the library
+        unloadSimLibrary(simLib); // release the library
 
         return(0); // Means error, V-REP will unload this plugin
     }
 
-    // Check the V-REP version:
-    int vrepVer;
-    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
-    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
-    {
-        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
-        unloadVrepLibrary(simLib); // release the library
-        return(0); // Means error, V-REP will unload this plugin
-    }
 
+//    // Check the V-REP version:
+//    int vrepVer;
+//    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
+//    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
+//    {
+//        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
+
+
+//        unloadSimLibrary(simLib);
+
+
+//        return(0); // Means error, V-REP will unload this plugin
+//    }
 
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
                 are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
@@ -178,21 +182,24 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     }
     //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
-    return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
-    // version 1 was for V-REP versions before V-REP 2.5.12
-    // version 2 was for V-REP versions before V-REP 2.6.0
-    // version 5 was for V-REP versions before V-REP 3.1.0
-    // version 6 is for V-REP versions after V-REP 3.1.3
-    // version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
+    return(9); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
+    // version 1 was for CoppeliaSim versions before CoppeliaSim 2.5.12
+    // version 2 was for CoppeliaSim versions before CoppeliaSim 2.6.0
+    // version 5 was for CoppeliaSim versions before CoppeliaSim 3.1.0
+    // version 6 is for CoppeliaSim versions after CoppeliaSim 3.1.3
+    // version 7 is for CoppeliaSim versions after CoppeliaSim 3.2.0 (completely rewritten)
+    // version 8 is for CoppeliaSim versions after CoppeliaSim 3.3.0 (using stacks for data exchange with scripts)
+    // version 9 is for CoppeliaSim versions after CoppeliaSim 3.4.0 (new API notation)
 }
 
 // Release the v-rep lib
-VREP_DLLEXPORT void v_repEnd()
+SIM_DLLEXPORT void simEnd()
 { // This is called just once, at the end of V-REP
-    unloadVrepLibrary(simLib); // release the library
+    unloadSimLibrary(simLib);
+
 }
 
-VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
+SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
     are_sett::ParametersMapPtr param = ERVREP->get_parameters();
     //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
@@ -330,35 +337,38 @@ void clientMessageHandler(int message){
     {
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
-       
+        std::cout << ERVREP->get_evalIsFinish() << std::endl;
         if(ERVREP->get_evalIsFinish()){
 
             std::string indString = ERVREP->get_currentInd()->to_string();
             simSetStringSignal("currentInd",indString.c_str(),indString.size());
             simSetIntegerSignal("simulationState",are_c::FINISH);
 
-            loadingPossible = true;  // start another simulation
+            //loadingPossible = true;  // start another simulation
             if (verbose) {
                 std::cout << "EVALUATION ENDED" << std::endl;
             }
         }
         else{
-            simSetIntegerSignal("simulationState",are_c::BUSY);
-            simStartSimulation();
-
+            // Initializes population
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-        }
+            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simulationState = RESTART;
+            std::string indString = ERVREP->get_currentInd()->to_string();
+            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            loadingPossible = true;  // start another simulation
+            return;
+       }
 
-        std::string indString = ERVREP->get_currentInd()->to_string();
-        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-        simSetIntegerSignal("simulationState",are_c::FINISH);
+//        std::string indString = ERVREP->get_currentInd()->to_string();
+//        simSetStringSignal("currentInd",indString.c_str(),indString.size());
+//        simSetIntegerSignal("simulationState",are_c::FINISH);
 
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
-            std::cout << "SIMULATION ENDED" << std::endl;
-        }
+//        if (verbose) {
+//            std::cout << "SIMULATION ENDED" << std::endl;
+//        }
     }
 
     if (clientState[0] == are_c::IDLE)
@@ -366,7 +376,7 @@ void clientMessageHandler(int message){
         timerOn = false;
         simulationState = STARTING;
         simSetIntegerSignal("simulationState",are_c::READY);
-    }else if(clientState[0] == are_c::READY && simulationState == STARTING){
+    }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
         simStartSimulation();
     }
     else if(clientState[0] == 99){
@@ -375,3 +385,4 @@ void clientMessageHandler(int message){
     }
 
 }
+

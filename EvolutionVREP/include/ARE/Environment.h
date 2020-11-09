@@ -6,7 +6,11 @@
 #include <vector>
 #include <iostream>
 #include <memory>
+#if defined(VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 #include "ARE/Genome.h"
 
 #include "ARE/Individual.h"

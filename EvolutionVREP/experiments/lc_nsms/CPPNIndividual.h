@@ -4,7 +4,11 @@
 #include "ARE/Individual.h"
 #include "ARE/CPPNGenome.h"
 #include "ARE/Morphology_CPPNMatrix.h"
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 #include "eigen_boost_serialization.hpp"
 
 namespace are {

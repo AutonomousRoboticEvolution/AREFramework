@@ -5,7 +5,11 @@
 #include "ARE/CPPNGenome.h"
 #include "ARE/FixedMorphology.hpp"
 #include "NNControl.h"
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 
 namespace are {
 
