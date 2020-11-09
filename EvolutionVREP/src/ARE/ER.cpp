@@ -100,7 +100,8 @@ void ER::initIndividual(){
     }
     mess.resize(length);
     currentInd = ea->getIndividual(0);
-    currentInd->from_string(mess);
+    if(nbrEval == 0)
+          currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
 }
@@ -142,6 +143,8 @@ void ER::endOfSimulation()
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
 
+    nbrEval++;
+
     if(instanceType == settings::INSTANCE_REGULAR){
         if(currentIndIndex < ea->get_population().size())
         {
@@ -152,9 +155,10 @@ void ER::endOfSimulation()
                     std::cout << fitness << std::endl;
             }
             ea->setObjectives(currentIndIndex,objectives);
-
-            if(ea->update(environment))
-              currentIndIndex++;
+            if(ea->update(environment)){
+                currentIndIndex++;
+                nbrEval = 0;
+            }
             ea->set_endEvalTime(hr_clock::now());
             saveLogs(false);
         }
@@ -191,6 +195,9 @@ void ER::endOfSimulation()
         ea->setObjectives(currentIndIndex,objectives);
 
         evalIsFinish = ea->update(environment);
+        if(evalIsFinish)
+            nbrEval = 0;
+
         ea->set_endEvalTime(hr_clock::now());
         simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }

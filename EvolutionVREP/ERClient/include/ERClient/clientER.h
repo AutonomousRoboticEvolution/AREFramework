@@ -3,6 +3,7 @@
 
 #include "ARE/ER.h"
 #include "ERClient/SlaveConnection.h"
+#include "ERClient/sim_state.h"
 
 #include <boost/archive/text_oarchive.hpp>
 
@@ -18,8 +19,6 @@ extern "C" {
 #include "remoteApi/extApiPlatform.h"
 #include "remoteApi/extApi.h"
 }
-
-#include "ERClient/sim_state.h"
 
 namespace are {
 
@@ -46,12 +45,15 @@ public:
     void openConnections();
     void reopenConnections();
     bool confirmConnections();
+    std::vector<std::unique_ptr<SlaveConnection>> updateSimulatorList();
+
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
-    int loadingTrials = 1000;
+    int loadingTrials = 3;
     bool sim_init = false;
     std::vector<Individual::Ptr> currentIndVec;
     std::vector<int> currentIndexVec;
+    std::vector<int> indToEval;
 
 };
 
