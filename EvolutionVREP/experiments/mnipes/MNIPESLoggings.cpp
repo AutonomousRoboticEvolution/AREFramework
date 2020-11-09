@@ -24,21 +24,21 @@ void MorphGenomeLog::saveLog(EA::Ptr &ea)
     int generation = ea->get_generation();
     for(size_t ind = 0; ind < ea->get_population().size(); ind++){
         std::stringstream filepath;
-        filepath << Logging::log_folder << "/morphGenome" << generation * ea->get_population().size() + ind;
+        filepath << Logging::log_folder << "/morphGenome" << generation << "_" <<  ind;
         const Genome::Ptr morphGenome = std::dynamic_pointer_cast<M_NIPESIndividual>(ea->getIndividual(ind))->get_morph_genome();
         NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
         genome.Save(filepath.str().c_str());
     }
 }
 
-void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
+void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
 {
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream))
         return;
     int generation = ea->get_generation();
     for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        logFileStream << generation * ea->get_population().size() + ind << ",";
+        logFileStream << generation << "," << ind << ",";
         Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<M_NIPESIndividual>(ea->getIndividual(ind))->getMorphDesc();
         for(int j = 0; j < morphDesc.size(); j++){
             logFileStream << morphDesc(j) << ",";

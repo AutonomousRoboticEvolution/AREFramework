@@ -24,12 +24,10 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-
-
-class morphDescCartWHDLog : public Logging
+class MorphDescCartWHDLog : public Logging
 {
 public:
-    morphDescCartWHDLog() : Logging(true){} //Logging at the end of the generation
+    MorphDescCartWHDLog(const std::string &file) : Logging(true){} //Logging at the end of the generation
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };

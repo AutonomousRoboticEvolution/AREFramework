@@ -32,6 +32,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::MorphGenomeLog::Ptr mglog(new are::MorphGenomeLog());
     logs.push_back(mglog);
 
+    std::string md_log_file = are::settings::getParameter<are::settings::String>(param,"#morphDescFile").value;
+    are::MorphDescCartWHDLog::Ptr mdlog(new are::MorphDescCartWHDLog(md_log_file));
+    logs.push_back(mdlog);
+
     are::ControllersLog::Ptr ctrllog(new are::ControllersLog());
     logs.push_back(ctrllog);
 }
