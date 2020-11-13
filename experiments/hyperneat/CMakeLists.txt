@@ -10,11 +10,8 @@ add_library(hyperneat SHARED
 target_include_directories(hyperneat PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
-<<<<<<< HEAD:EvolutionVREP/experiments/hyperneat/CMakeLists.txt
-=======
     "../../simulation/include"
     "../../EAFramework/include"
->>>>>>> real_experiment:experiments/hyperneat/CMakeLists.txt
     "../common/"
     )
 target_link_libraries(hyperneat ARE simulatedER)

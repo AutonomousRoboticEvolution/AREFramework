@@ -5,11 +5,8 @@ add_definitions(-DEIGEN3_ENABLED)
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
-<<<<<<< HEAD:EvolutionVREP/experiments/nslc/CMakeLists.txt
-=======
     "../../simulation/include"
     "../../EAFramework/include"
->>>>>>> real_experiment:experiments/nslc/CMakeLists.txt
     "../common/"
     "../../modules"
     "/usr/include/eigen3/")

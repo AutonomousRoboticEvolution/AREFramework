@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
-project(ER)
+project(ARE)
+
+add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+
 if (RASPBERRY)
     add_subdirectory(EAFramework)
     add_subdirectory(PhysicalER)
