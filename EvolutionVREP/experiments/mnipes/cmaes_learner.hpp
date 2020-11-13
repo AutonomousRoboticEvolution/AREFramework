@@ -24,12 +24,13 @@ public:
         _nn_outputs = nbr_outputs;
     }
 
-    void init();
+    void init(std::vector<double> initial_point = std::vector<double>());
     void next_pop();
     void iterate();
     bool step();
 
-    void update(Control::Ptr&) override;
+    void update(Control::Ptr &) override{}
+    std::pair<std::vector<double>,std::vector<double>> update_ctrl(Control::Ptr&);
 
     void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
 

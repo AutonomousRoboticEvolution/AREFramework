@@ -13,14 +13,46 @@ namespace are{
 
 using CPPNMorph = Morphology_CPPNMatrix;
 
+typedef
+/**
+ * @brief Archive of controller ordered in a 3D vector with the following dimension : number of wheels, number of joints, number of sensors
+ *      The archive store pairs of controller genome and associated fitness.
+ */
+struct ControllerArchive{
+    typedef std::vector<std::vector<std::vector<std::pair<NNParamGenome::Ptr,double>>>> controller_archive_t;
+    controller_archive_t archive;
+
+    void init(int max_wheels,int max_joints, int max_sensors);
+
+    /**
+     * @brief update the archive. If the fitness of the candidate controller is greater than the stored one.
+     * @param candidate new genome
+     * @param associate fitness
+     * @param number of wheels
+     * @param number of joints
+     * @param number of sensors
+     */
+    void update(const NNParamGenome::Ptr& genome, double fitness, int wheels, int joints, int sensors);
+
+    template<class archive_t>
+    void serialize(archive_t &arch, const unsigned int v)
+    {
+        arch & archive;
+    }
+
+
+} ControllerArchive;
+
+/**
+ * @brief The M_NIPESIndividual class
+ */
 class M_NIPESIndividual : public Individual
 {
 public:
     M_NIPESIndividual() :  Individual(){}
-    M_NIPESIndividual(const CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen,const CMAESLearner::Ptr& cma_learner)
+    M_NIPESIndividual(const CPPNGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen,const CMAESLearner::Ptr& cma_learner)
         : Individual(morph_gen,ctrl_gen)
     {
-
         learner = cma_learner;
     }
     M_NIPESIndividual(const M_NIPESIndividual& ind) :
@@ -35,8 +67,8 @@ public:
         final_position(ind.final_position),
         trajectory(ind.trajectory),
         energy_cost(ind.energy_cost),
-        sim_time(ind.sim_time)
-
+        sim_time(ind.sim_time),
+        controller_archive(ind.controller_archive)
     {}
 
     Individual::Ptr clone() override {
@@ -74,19 +106,23 @@ public:
         arch & objectives;
         arch & learner;
         arch & morphGenome;
+        arch & ctrlGenome;
         arch & final_position;
         arch & energy_cost;
         arch & trajectory;
         arch & sim_time;
         arch & nn_inputs;
         arch & nn_outputs;
+        arch & controller_archive;
     }
 
     std::string to_string() override;
     void from_string(const std::string &) override;
-    void update_ctrl();
+
 
     Eigen::VectorXd getMorphDesc(){return  morphDesc;}
+
+    void set_ctrl_archive(const ControllerArchive& ctrl_arc){controller_archive = ctrl_arc;}
 
 private:
     void createMorphology() override;
@@ -107,6 +143,7 @@ private:
     int nn_inputs;
     int nn_outputs;
 
+    ControllerArchive controller_archive;
 };
 
 class M_NIPES : public EA
@@ -148,6 +185,8 @@ private:
     NEAT::Genome current_morph_gen;
     NEAT::Parameters neat_params;
     std::unique_ptr<NEAT::Population> morph_population;
+
+    ControllerArchive controller_archive;
 
     float current_ind_past_pos[3];
     int move_counter = 0;

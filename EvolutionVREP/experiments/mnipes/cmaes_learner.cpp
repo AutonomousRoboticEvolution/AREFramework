@@ -2,7 +2,7 @@
 
 using namespace are;
 
-void CMAESLearner::init(){
+void CMAESLearner::init(std::vector<double> initial_point){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesPopSize").value;
@@ -15,7 +15,8 @@ void CMAESLearner::init(){
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
 
-    std::vector<double> initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
+    if(initial_point.empty())
+        initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
 
     double lb[_dimension], ub[_dimension];
     for(int i = 0; i < _dimension; i++){
@@ -128,10 +129,11 @@ bool CMAESLearner::step(){
     return false;
 }
 
-void CMAESLearner::update(Control::Ptr &control){
+std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Control::Ptr &control){
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+
 
     std::vector<double> weights;
     std::vector<double> bias;
@@ -161,10 +163,11 @@ void CMAESLearner::update(Control::Ptr &control){
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
-        return;
     }
     _counter++;
     _nbr_eval++;
+
+    return std::make_pair(weights,bias);
 
 }
 

@@ -2,6 +2,31 @@
 
 using namespace are;
 
+void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
+{
+    archive.resize(max_wheels+1);
+    for(auto& a_w : archive){
+        a_w.resize(max_joints+1);
+        for(auto& a_j: a_w){
+            a_j.resize(max_sensors+1);
+        }
+    }
+
+    for(auto& w : archive){
+        for(auto& j : w){
+            for(auto& s : j){
+                s.first = std::make_shared<NNParamGenome>(NNParamGenome());
+                s.second = 0;
+            }
+        }
+    }
+}
+
+void ControllerArchive::update(const NNParamGenome::Ptr &genome, double fitness, int wheels, int joints, int sensors){
+    if(archive[wheels][joints][sensors].second < fitness)
+        archive[wheels][joints][sensors] = std::make_pair(genome,fitness);
+}
+
 void M_NIPESIndividual::createMorphology(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
@@ -54,12 +79,22 @@ void M_NIPESIndividual::createController(){
         learner.reset(new CMAESLearner(nbr_weights, nbr_bias,nn_inputs,nn_outputs));
         learner->set_parameters(parameters);
         std::dynamic_pointer_cast<CMAESLearner>(learner)->set_randNum(randNum);
-        std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
+
+        auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
+
+        if(starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
+            std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
+        else{
+            std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
+            std::dynamic_pointer_cast<CMAESLearner>(learner)->init(init_pt);
+        }
         std::dynamic_pointer_cast<CMAESLearner>(learner)->next_pop();
 
     }
 
-    std::dynamic_pointer_cast<CMAESLearner>(learner)->update(control);
+    auto nn_params = std::dynamic_pointer_cast<CMAESLearner>(learner)->update_ctrl(control);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_weights(nn_params.first);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_biases(nn_params.second);
 }
 
 void M_NIPESIndividual::update(double delta_time){
@@ -135,21 +170,23 @@ void M_NIPESIndividual::from_string(const std::string &str){
     morphGenome->set_randNum(randNum);
 }
 
-void M_NIPESIndividual::update_ctrl(){
-    learner->update(control);
-}
 
 void M_NIPES::init(){
-
-
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     //Novelty parameters
     Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
+
+
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
+
+        int max_wheels = settings::getParameter<settings::Integer>(parameters,"maxNbrWheels").value;
+        int max_joints = settings::getParameter<settings::Integer>(parameters,"maxNbrJoints").value;
+        int max_sensors = settings::getParameter<settings::Integer>(parameters,"maxNbrSensors").value;
+        controller_archive.init(max_wheels,max_joints,max_sensors);
         init_morph_pop();
 //        std::stringstream sstr;
 //        sstr << "morph_" << morphIDList[morphCounter];
@@ -162,7 +199,7 @@ void M_NIPES::init(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
-        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
         ind->set_parameters(parameters);
@@ -237,16 +274,26 @@ void M_NIPES::init_morph_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
-        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         population.push_back(ind);
     }
 }
 
 void M_NIPES::epoch(){
+
+    //update controller archive
+    for(const auto& ind: population){
+        auto& cart_desc = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(ind->get_morphology())->getIndDesc().cartDesc;
+        auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
+        controller_archive.update(ctrl_gen,ind->getObjectives()[0],cart_desc.wheelNumber,cart_desc.jointNumber,cart_desc.sensorNumber);
+    }
+
+    //Epoch the morphogenesis
     for(unsigned i = 0; i < population.size(); i++)
         morph_population->AccessGenomeByIndex(i).SetFitness(population[i]->getObjectives()[0]);
     morph_population->Epoch();
@@ -261,11 +308,12 @@ void M_NIPES::init_next_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
-        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         population.push_back(ind);
     }
 }
@@ -365,8 +413,6 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
 
 
 bool M_NIPES::finish_eval(){
-
-
     float tPos[3];
     tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
     tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
