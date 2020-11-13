@@ -1,0 +1,4 @@
+#NNType,int,2
+#NbrInputNeurones,int,2
+#NbrHiddenNeurones,int,8
+#NbrOutputNeurones,int,3

@@ -1,0 +1,206 @@
+cmake_minimum_required(VERSION 3.0)
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
+    message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
+elseif(COPPELIASIM_FOLDER)
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+    SET(COPPELIASIM_FOUND ON)
+    SET(VREP_FOUND OFF)
+=======
+    message("COPPELIA FOUND!")
+    SET(COPPELIASIM_FOUND ON CACHE BOOL "" FORCE) #CACHE BOOL "" FORCE option allows this variable to be accessed in other CMakeLists of the project
+    SET(VREP_FOUND OFF CACHE BOOL "" FORCE)
+>>>>>>> real_experiment:simulation/CMakeLists.txt
+    add_definitions(-DCOPPELIASIM)
+    if (WIN32)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.exe")
+    elseif(APPLE)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/coppeliaSim")
+    else()
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+elseif(VREP_FOLDER)
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+    SET(VREP_FOUND ON)
+    SET(COPPELIASIM_FOUND OFF)
+=======
+    message("VREP FOUND!")
+    SET(VREP_FOUND ON CACHE BOOL "" FORCE)
+    SET(COPPELIASIM_FOUND OFF CACHE BOOL "" FORCE)
+>>>>>>> real_experiment:simulation/CMakeLists.txt
+    add_definitions(-DVREP)
+    if (WIN32)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.exe")
+    elseif(APPLE)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}/vrep.app/Contents/MacOS/")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.app/Contents/MacOS/vrep")
+    else()
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "VREP_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+else()
+    message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
+endif()
+
+find_package(MultiNEAT REQUIRED)
+message("MultiNEAT Folder : ${MultiNEAT_DIR}")
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+find_package(PolyVox REQUIRED)
+
+
+=======
+>>>>>>> real_experiment:simulation/CMakeLists.txt
+
+SET(VREP_SRC
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+    )
+
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+set(CORE_SRC "src/ARE/*")
+set(MISC_SRC "src/misc/*")
+
+
+if(WITH_NN2 AND LIMBO_FOLDER)
+    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
+elseif(WITH_NN2)
+    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/NIPES.cpp")
+else()
+    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC})
+endif()
+
+add_library(ER_library SHARED ${VREP_SRC} ${SOURCES})
+=======
+if(WITH_NN2)
+    FILE(GLOB SRC src/* src/nn2/*)
+else()
+    FILE(GLOB SRC src/*)
+endif()
+
+add_library(simulatedER SHARED  ${VREP_SRC} ${SRC})
+target_include_directories(simulatedER PUBLIC
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+    "include"
+    "../EAFramework/include")
+target_link_libraries(simulatedER
+    MultiNEAT::MultiNEAT
+    dlibxx dl rt tbb cmaes
+    ${Boost_LIBRARIES}
+    ARE)
+
+if(VREP_FOUND)
+    SET(LIB_EXT v_repExtER)
+    SET(PLUGIN_SRC src/plugin/v_repExtER.cpp)
+elseif(COPPELIASIM_FOUND)
+    SET(LIB_EXT simExtER)
+    SET(PLUGIN_SRC src/plugin/simExtER.cpp)
+endif()
+
+
+>>>>>>> real_experiment:simulation/CMakeLists.txt
+
+add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
+
+target_include_directories(${LIB_EXT} PUBLIC
+    "include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+)
+
+
+target_compile_definitions(${LIB_EXT} PUBLIC
+    "NON_MATLAB_PARSING"
+    "MAX_EXT_API_CONNECTIONS=255"
+)
+
+
+# tool to help remove the warnings when using GCC
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+
+set_target_properties(${LIB_EXT} PROPERTIES 
+    CXX_STANDARD 14
+#    COMPILE_FLAGS "-w"
+    POSITION_INDEPENDENT_CODE ON
+)
+
+target_link_libraries(${LIB_EXT}
+    MultiNEAT::MultiNEAT
+    dlibxx dl rt tbb cmaes
+    ${Boost_LIBRARIES}
+    ARE
+    simulatedER
+)
+
+target_include_directories(${LIB_EXT}
+    PRIVATE
+    ${PolyVox_INCLUDE_DIRS}
+    "modules/"
+)
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+
+install(TARGETS ER_library DESTINATION lib)
+install(DIRECTORY include/ DESTINATION include)
+
+target_link_libraries(${LIB_EXT} ER_library dlibxx dl ${Boost_LIBRARIES})
+
+
+target_include_directories(${LIB_EXT} PUBLIC
+    "include"
+    "ERClient/include"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+  )
+
+
+set_target_properties(${LIB_EXT} PROPERTIES
+    CXX_STANDARD 14
+    # COMPILE_FLAGS "-w"
+    POSITION_INDEPENDENT_CODE ON
+)
+=======
+install(TARGETS  simulatedER DESTINATION lib)
+install(DIRECTORY . DESTINATION include/simulatedER FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+>>>>>>> real_experiment:simulation/CMakeLists.txt
+
+if (COPPELIASIM_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${COPPELIASIM_FOLDER})
+elseif (VREP_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${VREP_FOLDER})
+endif()
+
+
+if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
+    target_compile_definitions(${LIB_EXT} PUBLIC "__WINDOWS__")
+elseif(APPLE)
+    target_compile_definitions(${LIB_EXT} PUBLIC "__APPLE__")
+elseif(UNIX)
+    target_compile_definitions(${LIB_EXT} PUBLIC "__linux")
+endif()
+
+add_subdirectory(ERClient)
+<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
+add_subdirectory(modules)
+add_subdirectory(experiments)
+=======
+>>>>>>> real_experiment:simulation/CMakeLists.txt

@@ -1,0 +1,145 @@
+#include "BOLearner.h"
+
+using namespace are;
+namespace lb = limbo;
+
+BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, max_fun_evals);
+BO_DECLARE_DYN_PARAM(double, Params::opt_cmaes, fun_tolerance);
+BO_DECLARE_DYN_PARAM(double, Params::opt_cmaes, lbound);
+BO_DECLARE_DYN_PARAM(double, Params::opt_cmaes, ubound);
+BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, restarts);
+BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, elitism);
+BO_DECLARE_DYN_PARAM(int, Params::opt_cmaes, lambda);
+BO_DECLARE_DYN_PARAM(bool, Params::opt_cmaes, handle_uncertainty);
+
+
+
+
+BOLearner::BOLearner()
+{
+    Params::opt_cmaes::set_lbound(-1.);
+    Params::opt_cmaes::set_ubound(1.);
+
+    Params::opt_cmaes::set_max_fun_evals(-1);
+    Params::opt_cmaes::set_fun_tolerance(1);
+    Params::opt_cmaes::set_restarts(1);
+    Params::opt_cmaes::set_elitism(1);
+    Params::opt_cmaes::set_lambda(-1);
+    Params::opt_cmaes::set_handle_uncertainty(true);
+    _current_iteration = 0;
+}
+
+void BOLearner::init_model(int input_size)
+{
+    _model = model_t(input_size,1);
+}
+
+
+//void BOLearner::optimize()
+//{
+//    // initial step-size, i.e. estimated initial parameter error.
+//    double sigma = 0.5;
+//    std::vector<double> x0(init.data(), init.data() + init.size());
+
+//    libcmaes::CMAParameters<> cmaparams(x0, sigma, Params::opt_cmaes::lambda());
+//    _set_common_params(cmaparams, dim);
+
+//    auto pfunc = CMAStrategy<CovarianceUpdate, GenoPheno<NoBoundStrategy>>::_defaultPFunc;
+
+//    // the optimization itself
+//    libcmaes::CMASolutions cmasols = cmaes<>(f_cmaes, cmaparams, pfunc);
+//    if (Params::opt_cmaes::stochastic() || Params::opt_cmaes::handle_uncertainty())
+//        return cmasols.xmean();
+
+//    return cmasols.get_best_seen_candidate().get_x_dvec();
+//}
+
+void BOLearner::compute_model(){
+    _model.compute(_samples,_observations);
+}
+
+void BOLearner::update(Control::Ptr & ctrl)
+{
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    using acqui_optimizer_t =
+    typename boost::parameter::binding<args, lb::tag::acquiopt, lb::opt::Cmaes<Params>>::type;
+
+    int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
+    Eigen::VectorXd starting_point = _samples.back();
+
+//    lb::FirstElem aggr;
+    if(_current_iteration == 0){
+        _best_sample = _samples.back();
+        _best_observ = _observations.back();
+        _best_fitness = _observations.back()(0); //here fitness == observation
+    }
+    if(_best_fitness < _observations.back()(0)){
+        _best_sample = _samples.back();
+        _best_observ = _observations.back();
+        _best_fitness = _observations.back()(0); //here fitness == observation
+    }
+
+
+    const auto aggr = [=](const Eigen::VectorXd& x) -> double
+    {
+        double avg = 0;
+        for(const auto &o : _observations)
+            avg += o(0);
+        return avg/static_cast<double>(_observations.size());
+    };
+
+    _model.compute(_samples,_observations);
+
+    acqui_optimizer_t acqui_optimizer;
+
+    acquisition_function_t acqui(_model, _current_iteration);
+
+    auto acqui_optimization =
+            [&](const Eigen::VectorXd& x, bool g) { return acqui(x, aggr, g); };
+
+    Eigen::VectorXd new_sample = acqui_optimizer(acqui_optimization, starting_point, false);
+
+
+    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    int i = 0;
+    for(; i < nbr_weights; i++)
+        nn.m_connections[i].m_weight = new_sample(i);
+    int j = 0;
+    for(; i < nbr_weights+nbr_bias; i++){
+        nn.m_neurons[j].m_bias = new_sample(i);
+        j++;
+    }
+
+    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
+
+    if(verbose)
+        std::cout << "Delta between previous and current weights : " << (starting_point - new_sample).norm() << std::endl;
+
+    _current_iteration++;
+    //        _update_stats(*this, aggr);
+
+}
+
+void BOLearner::update_model()
+{
+    _model.add_sample(_samples.back(), _observations.back());
+    _model.optimize_hyperparams();
+}
+
+void BOLearner::best_ctrl(Control::Ptr &ctrl){
+
+    int nbr_weights = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_connections.size();
+    int nbr_bias = std::dynamic_pointer_cast<NNControl>(ctrl)->nn.m_neurons.size();
+    NEAT::NeuralNetwork nn = std::dynamic_pointer_cast<NNControl>(ctrl)->nn;
+    int i = 0;
+    for(; i < nbr_weights; i++)
+        nn.m_connections[i].m_weight = _best_sample(i);
+    int j = 0;
+    for(; i < nbr_weights+nbr_bias; i++){
+        nn.m_neurons[j].m_bias = _best_sample(i);
+        j++;
+    }
+
+    std::dynamic_pointer_cast<NNControl>(ctrl)->nn = nn;
+}
