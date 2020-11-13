@@ -38,5 +38,9 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     are::ControllersLog::Ptr ctrllog(new are::ControllersLog());
     logs.push_back(ctrllog);
+
+    are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());
+    logs.push_back(calog);
 }
+
 

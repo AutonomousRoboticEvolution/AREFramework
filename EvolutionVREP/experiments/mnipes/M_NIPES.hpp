@@ -167,6 +167,10 @@ public:
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
 
+    const ControllerArchive::controller_archive_t& get_controller_archive(){
+        return controller_archive.archive;
+    }
+
 private:
     typedef struct morph_desc_t{
         int wheels;

@@ -40,6 +40,13 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class ControllerArchiveLog : public Logging
+{
+public:
+    ControllerArchiveLog() : Logging(true){}
+    void saveLog(EA::Ptr &ea) override;
+    void loadLog(const std::string &file = std::string()) override{}
+};
 
 }//are
 
