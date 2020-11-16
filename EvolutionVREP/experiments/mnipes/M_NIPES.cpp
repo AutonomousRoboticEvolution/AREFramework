@@ -150,6 +150,7 @@ std::string M_NIPESIndividual::to_string()
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<M_NIPESIndividual>();
+    oarch.register_type<NNParamGenome>();
     oarch.register_type<CPPNGenome>();
     oarch.register_type<CMAESLearner>();
     oarch << *this;
@@ -161,6 +162,7 @@ void M_NIPESIndividual::from_string(const std::string &str){
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<M_NIPESIndividual>();
+    iarch.register_type<NNParamGenome>();
     iarch.register_type<CPPNGenome>();
     iarch.register_type<CMAESLearner>();
     iarch >> *this;
@@ -183,9 +185,9 @@ void M_NIPES::init(){
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
 
-        int max_wheels = settings::getParameter<settings::Integer>(parameters,"maxNbrWheels").value;
-        int max_joints = settings::getParameter<settings::Integer>(parameters,"maxNbrJoints").value;
-        int max_sensors = settings::getParameter<settings::Integer>(parameters,"maxNbrSensors").value;
+        int max_wheels = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
+        int max_joints = settings::getParameter<settings::Integer>(parameters,"#maxNbrJoints").value;
+        int max_sensors = settings::getParameter<settings::Integer>(parameters,"#maxNbrSensors").value;
         controller_archive.init(max_wheels,max_joints,max_sensors);
         init_morph_pop();
 //        std::stringstream sstr;
