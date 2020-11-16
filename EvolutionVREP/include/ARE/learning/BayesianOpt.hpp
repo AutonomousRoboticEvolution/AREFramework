@@ -85,6 +85,8 @@ struct ObsClosestSample : lb::mean::BaseMean<Params> {
             D(i) = (gp.samples()[i] - x).norm();
         int i;
         D.minCoeff(&i);
+	//std::cout << "Distances : "  << D << std::endl;
+	std::cout << i << " " << gp.observations()[i] << std::endl;
         return gp.observations()[i];
     }
 };

@@ -8,7 +8,7 @@
 #populationSize,int,2
 #maxEvalTime,float,120
 #maxNbrEval,int,1000
-#repository,string,/home/leni/are-logs
+#repository,string,/home/le_goff/are-logs
 #numberOfGeneration,int,2
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -54,3 +54,7 @@
 #energyBudget,double,100
 #randomOrientation,bool,1
 #numberOfReEvaluation,int,3
+#jointControllerType,int,0
+#proportionalGain,float,0.1
+#flatFloor,bool,1
+#reloadController,bool,1

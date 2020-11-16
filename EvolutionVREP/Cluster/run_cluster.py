@@ -31,6 +31,7 @@ def run_server(args,rank: int):
     else :
         print("run with xvfb")
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
+         # "gdb","--ex=r","--args",
             args.vrep,
             '-h',
             f'-g{args.params}',

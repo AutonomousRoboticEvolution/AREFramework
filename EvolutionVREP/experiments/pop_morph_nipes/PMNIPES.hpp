@@ -75,10 +75,10 @@ public:
     {
         arch & objectives;
         arch & ctrlGenome;
-        arch & morphGenome;
+	arch & morphGenome;
         arch & final_position;
         arch & energy_cost;
-        arch & trajectory;
+	arch & trajectory;
         arch & sim_time;
         arch & nn_inputs;
         arch & nn_outputs;

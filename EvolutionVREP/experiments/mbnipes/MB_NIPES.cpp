@@ -38,9 +38,9 @@ void MB_NIPES::epoch(){
     NIPES::epoch();
     learner->set_observation(observations);
     learner->set_samples(samples);
-    if(generation == 0)
+ if(generation == 0)
         learner->compute_model();
-    else learner->update_model();
+   else learner->update_model();
 }
 
 void MB_NIPES::init_next_pop(){
@@ -51,9 +51,18 @@ void MB_NIPES::init_next_pop(){
     if(verbose)
         std::cout << "Size of dataset for BO : " <<  observations.size() << std::endl;
 
+//    std::cout << "observations :" << std::endl;
+/*    for(const auto& o : observations)
+	    std::cout << o << std::endl;
+    std::cout << "learner observations :" << std::endl;
+    for(const auto& o : learner->observations())
+	    std::cout << o << std::endl;
+*/
+   
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     dMat new_samples = cmaStrategy->ask();
+    
 
     int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(population[0]->get_ctrl_genome())->get_weights().size();
     int nbr_bias = std::dynamic_pointer_cast<NNParamGenome>(population[0]->get_ctrl_genome())->get_biases().size();

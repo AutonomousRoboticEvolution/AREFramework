@@ -302,7 +302,7 @@ void PMNIPES::init_next_pop(){
         morphCounter++;
         numberEvaluation=0;
         _is_finish=false;
-        generation=0;
+    	generation=0;
         std::stringstream sstr;
         sstr << "morph_" << morphIDList[morphCounter];
         sub_folder = sstr.str();
