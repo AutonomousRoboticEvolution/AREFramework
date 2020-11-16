@@ -9,7 +9,7 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
-#include "eigen_boost_serialization.hpp"
+#include "misc/eigen_boost_serialization.hpp"
 
 namespace are {
 

@@ -7,7 +7,7 @@
 #include "ARE/learning/NIPES.hpp"
 #include "ARE/Morphology_CPPNMatrix.h"
 #include "cmaes_learner.hpp"
-
+#include "misc/eigen_boost_serialization.hpp"
 
 namespace are{
 
@@ -114,6 +114,7 @@ public:
         arch & nn_inputs;
         arch & nn_outputs;
         arch & controller_archive;
+        arch & morphDesc;
     }
 
     std::string to_string() override;
