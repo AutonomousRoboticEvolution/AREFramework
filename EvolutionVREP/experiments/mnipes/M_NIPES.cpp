@@ -15,7 +15,7 @@ void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
     for(auto& w : archive){
         for(auto& j : w){
             for(auto& s : j){
-                s.first = std::make_shared<NNParamGenome>(NNParamGenome());
+                s.first.reset(new NNParamGenome());
                 s.second = 0;
             }
         }
@@ -180,8 +180,6 @@ void M_NIPES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-
-
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
 
@@ -288,11 +286,14 @@ void M_NIPES::init_morph_pop(){
 
 void M_NIPES::epoch(){
 
+    int max_wheel = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
+    int max_joint = settings::getParameter<settings::Integer>(parameters,"#maxNbrJoints").value;
+    int max_sensor = settings::getParameter<settings::Integer>(parameters,"#maxNbrSensors").value;
     //update controller archive
     for(const auto& ind: population){
-        auto& cart_desc = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(ind->get_morphology())->getIndDesc().cartDesc;
+        const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
         auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
-        controller_archive.update(ctrl_gen,ind->getObjectives()[0],cart_desc.wheelNumber,cart_desc.jointNumber,cart_desc.sensorNumber);
+        controller_archive.update(ctrl_gen,ind->getObjectives()[0],morph_desc[4]*max_wheel,morph_desc[6]*max_joint,morph_desc[5]*max_sensor);
     }
 
     //Epoch the morphogenesis

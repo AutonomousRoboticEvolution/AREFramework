@@ -132,7 +132,7 @@ private:
     std::vector<bool> testRes;
     double manScore;
     std::vector<std::vector<std::vector<int>>> graphMatrix;
-    Eigen::VectorXd morphDesc;
+    Eigen::VectorXd morphDesc; // <width,depth,height,voxels,wheels,sensor,joint,caster>
     Eigen::VectorXd symDesc;
 
     double energy_cost;
@@ -183,7 +183,6 @@ private:
     void loadNbrSenAct(const std::vector<short int>& list, std::map<short int, morph_desc_t>& desc_map);
 
     std::vector<short int> morphIDList;
-    std::map<short,morph_desc_t> morphDescMap;
     int morphCounter = 0;
     std::string sub_folder;
     NEAT::Genome current_morph_gen;
