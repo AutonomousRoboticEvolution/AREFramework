@@ -148,7 +148,7 @@ Eigen::VectorXd M_NIPESIndividual::descriptor(){
 std::string M_NIPESIndividual::to_string()
 {
     std::stringstream sstream;
-    boost::archive::text_oarchive oarch(sstream);
+    boost::archive::text_oarchive oarch(sstream); 
     oarch.register_type<M_NIPESIndividual>();
     oarch.register_type<NNParamGenome>();
     oarch.register_type<CPPNGenome>();

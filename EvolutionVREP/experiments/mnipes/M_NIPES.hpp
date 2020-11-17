@@ -107,14 +107,14 @@ public:
         arch & learner;
         arch & morphGenome;
         arch & ctrlGenome;
-        arch & final_position;
+	arch & final_position;
         arch & energy_cost;
         arch & trajectory;
         arch & sim_time;
         arch & nn_inputs;
         arch & nn_outputs;
         arch & controller_archive;
-        arch & morphDesc;
+	arch & morphDesc;
     }
 
     std::string to_string() override;
