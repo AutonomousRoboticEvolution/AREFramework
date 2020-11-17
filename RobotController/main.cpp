@@ -12,9 +12,11 @@
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
+#include "LedDriver.hpp"
 // #include <wiringPiSPI.h>
 #include "IMU.hpp"
 //#include "../Cplusplus_Evolution/ERFiles/control/FixedStructreANN.h"
+#include "BatteryMonitor.hpp"
 
 #define SENSOR1 0x72
 #define SENSOR2 0x73
@@ -91,18 +93,74 @@ void setup_sigint_catch()
 //     return brain_params;
 // }
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <dirent.h>
+#include <string.h>
+// #include <time.h>
+
+
 int main()
 {
     setup_sigint_catch();
 
+	/***************** SANDBOX *******************/
+	BatteryMonitor battMon;
+	// battMon.direct1WireTest();
+
+	int fd = serialOpen("/dev/ttyAMA0", 4800);
+	serialPutchar(fd, 0x00);	//Trigger master reset cycle
+
+	//Send reset command to calibrate DS2480B
+	fd = serialOpen("/dev/ttyAMA0", 9600);
+	serialPutchar(fd, 0xE3); //switch to command mode
+	serialPutchar(fd, 0xC1);
+
+	char response;
+	usleep(100000);	//100ms wait
+	while (serialDataAvail(fd) > 0) {
+		response = serialGetchar(fd);
+		printf("Response: %0X or %c", response, response);
+	}
+
+ 	serialPrintf(fd, "HONTO BAJUDA\n");
+
+	/************ LED DRIVER and IMU ********************************************/
     //Create and test led driver
     // LedDriver ledDriver(LED_DRIVER_ADDR);
     // ledDriver.test();
-    
-    //SPI test code for mpu6000
-    IMU imu;
-    imu.test(50, 100000);
 
+    // ledDriver.init();
+    // ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
+
+    // for (int i=0; i<4; ++i) {
+    // 	ledDriver.setMode(leds[i], PWM, ALL);
+    // 	ledDriver.setBrightness(leds[i], 150);
+    // }
+    
+    // //SPI test code for mpu6000
+    // IMU imu;
+    // imu.init();
+    // // imu.test(50, 100000);
+
+    // //LED colour displaying IMU output
+    // int duration = 500;
+    // float accels[3];
+    // float rgbs[3];
+    // for (int i=0; i<duration; ++i) {
+    // 	imu.readAccel(accels);
+    // 	for (int j=0; j<3; ++j) {
+    // 		rgbs[j] = accels[j] < 0 ? -accels[j] : accels[j];	//to make all positive
+    // 		printf("ACCELS: X:%.1f Y:%.1f Z:%.1f\n", accels[0], accels[1], accels[2]);
+    // 		printf("RGBS: X:%.1f Y:%.1f Z:%.1f\n", rgbs[0], rgbs[1], rgbs[2]);
+    // 	}
+    // 	ledDriver.setColourRgb(RGB0, rgbs[0], rgbs[1], rgbs[2]);
+    // 	usleep(50000);
+    // }
+/******************************ANCIENT CODE *************************************/
     // Settings settings;
 
  //    FixedStructureANN controller;
