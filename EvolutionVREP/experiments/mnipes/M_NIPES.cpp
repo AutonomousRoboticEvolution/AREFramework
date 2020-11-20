@@ -53,6 +53,7 @@ void M_NIPESIndividual::createMorphology(){
 void M_NIPESIndividual::createController(){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     //If first evaluation on this morphology : init the learner (CMAES)
     if(std::dynamic_pointer_cast<CMAESLearner>(learner)->get_nbr_eval() == 0)
@@ -82,7 +83,7 @@ void M_NIPESIndividual::createController(){
 
         auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
 
-        if(starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
+        if(!use_ctrl_arch || starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
             std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
         else{
             std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
@@ -289,13 +290,18 @@ void M_NIPES::epoch(){
     int max_wheel = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
     int max_joint = settings::getParameter<settings::Integer>(parameters,"#maxNbrJoints").value;
     int max_sensor = settings::getParameter<settings::Integer>(parameters,"#maxNbrSensors").value;
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+
+
+    
     //update controller archive
+    if(use_ctrl_arch){
     for(const auto& ind: population){
         const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
         auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
         controller_archive.update(ctrl_gen,ind->getObjectives()[0],morph_desc[4]*max_wheel,morph_desc[6]*max_joint,morph_desc[5]*max_sensor);
     }
-
+    }
     //Epoch the morphogenesis
     for(unsigned i = 0; i < population.size(); i++)
         morph_population->AccessGenomeByIndex(i).SetFitness(population[i]->getObjectives()[0]);
