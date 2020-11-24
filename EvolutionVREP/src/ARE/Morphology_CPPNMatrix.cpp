@@ -5,7 +5,7 @@
 
 #define HANDMADEROBOT 0
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 1
+#define ISROBOTSTATIC 0
 
 using namespace are;
 namespace cop = coppelia;
