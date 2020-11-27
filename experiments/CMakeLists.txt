@@ -1,3 +1,4 @@
+
 if(VREP_FOUND)
     add_definitions(-DVREP)
 elseif(COPPELIASIM_FOUND)
@@ -17,5 +18,5 @@ endif()
 add_subdirectory(lc_nsms)
 add_subdirectory(friction_estimation)
 add_subdirectory(real_dummy)
-#add_subdirectory(test_blob_tracking)
+add_subdirectory(test_blob_tracking)
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
