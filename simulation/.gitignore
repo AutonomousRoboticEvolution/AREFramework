@@ -1,0 +1,19 @@
+# IDE files
+/.vscode/
+
+#cmakeModules build directory
+/build/
+/Doc/
+/common
+
+#compiled and intermediatory files
+/obj/
+*.o
+*.so
+*.dll
+*.dylib
+
+#shit files
+desktop.ini
+.DS_Store
+.directory
