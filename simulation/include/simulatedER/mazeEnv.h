@@ -11,6 +11,7 @@
 
 #include "simulatedER/VirtualEnvironment.hpp"
 #include "ARE/Individual.h"
+#include "simulatedER/Morphology.h"
 
 namespace are {
 

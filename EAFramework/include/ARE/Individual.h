@@ -64,7 +64,7 @@ public:
 
     //Getters & Setters
     const std::vector<double> &get_outputs(){return outputs;}
-    const sim::Morphology::Ptr &get_morphology(){return morphology;}
+    const Morphology::Ptr &get_morphology(){return morphology;}
     const Control::Ptr &get_control(){return control;}
     const Genome::Ptr &get_morph_genome(){return morphGenome;}
     const Genome::Ptr &get_ctrl_genome(){return ctrlGenome;}
