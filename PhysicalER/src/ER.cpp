@@ -78,6 +78,7 @@ void ER::generate(){
 
 bool ER::execute(){
 
+
     if(robot_state == READY){
         std::cout << "Press Enter when the robot is ready" << std::endl;
         std::cin.ignore();
@@ -134,6 +135,7 @@ bool ER::update_evaluation(){
 
     //currentInd->update(eval_duration.count());
     environment->update_info();
+    return  eval_time <= eval_duration.count() || currentInd->isEvaluated();
 
     std::string message;
     wait_for_message(message,subscriber);

@@ -76,9 +76,11 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
     )
 
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
-set(CORE_SRC "src/ARE/*")
-set(MISC_SRC "src/misc/*")
+if(WITH_NN2)
+    FILE(GLOB SRC src/* src/nn2/*)
+else()
+    FILE(GLOB SRC src/*)
+endif()
 
 
 if(WITH_NN2 AND LIMBO_FOLDER)
@@ -157,31 +159,8 @@ target_include_directories(${LIB_EXT}
     ${PolyVox_INCLUDE_DIRS}
     "modules/"
 )
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
-
-install(TARGETS ER_library DESTINATION lib)
-install(DIRECTORY include/ DESTINATION include)
-
-target_link_libraries(${LIB_EXT} ER_library dlibxx dl ${Boost_LIBRARIES})
-
-
-target_include_directories(${LIB_EXT} PUBLIC
-    "include"
-    "ERClient/include"
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
-  )
-
-
-set_target_properties(${LIB_EXT} PROPERTIES
-    CXX_STANDARD 14
-    # COMPILE_FLAGS "-w"
-    POSITION_INDEPENDENT_CODE ON
-)
-=======
 install(TARGETS  simulatedER DESTINATION lib)
 install(DIRECTORY . DESTINATION include/simulatedER FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
->>>>>>> real_experiment:simulation/CMakeLists.txt
 
 if (COPPELIASIM_FOUND)
     install(TARGETS ${LIB_EXT} DESTINATION ${COPPELIASIM_FOLDER})
