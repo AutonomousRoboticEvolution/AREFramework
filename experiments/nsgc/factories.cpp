@@ -48,7 +48,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::SimTimeLog<are::NSGCIndividual>::Ptr stlog(new are::SimTimeLog<are::NSGCIndividual>(st_log_file));
     logs.push_back(stlog);
 
-    are::TrajectoryLog<are::NSGCIndividual>::Ptr trajlog(new are::TrajectoryLog<are::NSGCIndividual>);
+    are::sim::TrajectoryLog<are::NSGCIndividual>::Ptr trajlog(new are::sim::TrajectoryLog<are::NSGCIndividual>);
     logs.push_back(trajlog);
 
     are::NNParamGenomeLog::Ptr nnglog(new are::NNParamGenomeLog);
