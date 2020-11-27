@@ -434,7 +434,6 @@ void PMNIPES::loadNbrSenAct(std::vector<short> &list, std::map<short, morph_desc
         md.wheels = static_cast<int>(std::stod(split_line[5])*maxNbrOrgans);
         md.joints = static_cast<int>(std::stod(split_line[7])*maxNbrOrgans);
         md.sensors = static_cast<int>(std::stod(split_line[6])*maxNbrOrgans);
-
         full_desc_map.emplace(id,md);
     }
 
