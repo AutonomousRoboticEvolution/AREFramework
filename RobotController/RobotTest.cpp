@@ -5,13 +5,21 @@
 */
 
 // choose what sort of test we are running:
-#define LEG_TEST
+//#define LEG_TEST
 //#define TRICYCLE
+#define MOTOR_ORGAN_TEST
 
 #define OUTPUT_TO_FILE
 #ifdef OUTPUT_TO_FILE
 #include <fstream>
 #endif
+
+#ifdef MOTOR_ORGAN_TEST
+#include "I2CBus.hpp"
+#include "MotorOrgan.hpp"
+#define MOTOR_ADDRESS 0x20
+#endif
+
 
 #include "I2CBus.hpp"
 #include "JointOrgan.hpp"
@@ -177,6 +185,51 @@ void run_tricycle(){
 }
 #endif
 
+#ifdef MOTOR_ORGAN_TEST
+int motor_organ_tester(void) {
+
+    //Initialise the bus
+    I2CBus i2cBus1((char*)"/dev/i2c-1");
+    i2cBus1.openBus();
+
+    //Create a motor organ
+    MotorOrgan motor1(MOTOR_ADDRESS);
+
+    //TEST Set motor speed from console
+    int8_t spd = 0;
+    char c;
+    printf("MOTOR TEST\np increases\no decreases\nk brakes\nc clears fault reg\nx exits\n");
+    do {
+        printf("Speed: %d\n", spd);
+        c = getchar();
+        switch (c) {
+            case 'p' :
+                spd+=20;
+                motor1.setSpeed(spd);
+                break;
+
+            case 'o' :
+                spd-=20;
+                motor1.setSpeed(spd);
+                break;
+
+            case 'k' :
+                spd = 0;
+                motor1.brake();
+                //motor1.setSpeed(spd);
+                break;
+            case 'c' :
+                motor1.clearFaultReg();
+                printf("FAULTREG: %02X\n", motor1.readFaultReg());
+                break;
+        }
+        //printf("FAULTREG: %02X\n", motor1.readFaultReg());
+    } while (c != 'x');
+
+    return 1;
+}
+#endif
+
 
 int main(void) {
     //Initialise the bus
@@ -198,6 +251,10 @@ int main(void) {
 
 #ifdef TRICYCLE
     run_tricycle();
+#endif
+
+#ifdef MOTOR_ORGAN_TEST
+    motor_organ_tester();
 #endif
 
 }
