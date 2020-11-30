@@ -160,7 +160,8 @@ class TOF : protected I2CDevice {
 		// sets the device continous capture mode
 		//
 		int init(int iChan, int bLongRange);
-			
+		
+	//TODO: All this copy-paste from an external library should be abstracted into its own file
 	private:
 		uint8_t iAddr;
 	    int file_i2c;

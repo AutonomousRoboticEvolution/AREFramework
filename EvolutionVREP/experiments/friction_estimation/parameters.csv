@@ -1,0 +1,12 @@
+#experimentName,string,friction_estimation
+#expPluginName,string,/usr/local/lib/libfric_est.so
+#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/Cube2Castor2Wheels.ttm
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/friction_setup.ttt
+#startFricCoeff,float,0.69
+#fricCoeffDecr,float,0.001
+#planeTiltAngle,float,0.3305
+#maxEvalTime,float,10
+#timeStep,float,0.05
+#repository,string,/home/leni/are-logs
+#fricLogFile,string,fricCoeffs.log

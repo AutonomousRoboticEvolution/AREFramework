@@ -2,10 +2,14 @@
 #define CPPNINDIVIDUAL_H
 
 #include "ARE/Individual.h"
-#include "CPPNGenome.h"
+#include "ARE/CPPNGenome.h"
+#include "ARE/FixedMorphology.hpp"
 #include "NNControl.h"
-#include "EPuckMorphology.h"
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 
 namespace are {
 
@@ -26,7 +30,6 @@ public :
     {
         arch & objectives;
         arch & ctrlGenome;
-//        arch & morphGenome;
         arch & final_position;
     }
 

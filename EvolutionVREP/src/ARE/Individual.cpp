@@ -15,6 +15,11 @@ Individual::~Individual(){
     control.reset();
 }
 
+void Individual::crossover(const Individual::Ptr &partner, Individual &child1, Individual &child2){
+    child1 = *partner;
+    child2 = *this;
+}
+
 std::string Individual::to_string()
 {
     std::stringstream sstream;
@@ -29,4 +34,10 @@ void Individual::from_string(const std::string &str){
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch >> *this;
+
+    //set the parameters and randNum of the genome because their are not included in the serialisation
+    ctrlGenome->set_parameters(parameters);
+    ctrlGenome->set_randNum(randNum);
+    morphGenome->set_parameters(parameters);
+    morphGenome->set_randNum(randNum);
 }

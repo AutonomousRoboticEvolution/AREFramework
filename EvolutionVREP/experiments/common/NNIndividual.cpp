@@ -14,15 +14,9 @@ void NNIndividual::createController(){
 
 void NNIndividual::createMorphology(){
     std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
+    morphology.reset(new FixedMorphology(parameters));
+    std::dynamic_pointer_cast<FixedMorphology>(morphology)->loadModel();
 
-    if(robot == "EPuck"){
-        morphology.reset(new EPuckMorphology(parameters));
-        std::dynamic_pointer_cast<EPuckMorphology>(morphology)->loadModel();
-    }
-    else if(robot == "AREPuck"){
-        morphology.reset(new AREPuckMorphology(parameters));
-        std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->loadModel();
-    }
 
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
@@ -37,19 +31,8 @@ void NNIndividual::update(double delta_time){
     std::vector<double> inputs = morphology->update();
 
     std::vector<double> outputs = control->update(inputs);
-    std::vector<int> jointHandles;
-    if(robot == "EPuck"){
-       jointHandles =
-               std::dynamic_pointer_cast<EPuckMorphology>(morphology)->get_jointHandles();
-    }else if(robot == "AREPuck"){
-        jointHandles =
-                std::dynamic_pointer_cast<AREPuckMorphology>(morphology)->get_jointHandles();
-    }
-    assert(jointHandles.size() == outputs.size());
 
-    for (size_t i = 0; i < outputs.size(); i++){
-        simSetJointTargetVelocity(jointHandles[i],static_cast<float>(outputs[i]));
-    }
+    morphology->command(outputs);  
 }
 
 std::string NNIndividual::to_string()

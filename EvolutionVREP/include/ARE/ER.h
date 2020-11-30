@@ -92,6 +92,7 @@ public:
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
     bool get_evalIsFinish(){return evalIsFinish;}
+    int get_nbr_eval(){return nbrEval;}
 
 protected:
     ///pointer to settting of EA
@@ -124,6 +125,7 @@ protected:
     size_t currentIndIndex = 0;
     /// generation counter
     int generation = 0;
+    int nbrEval = 0;
     /// Indicates whether to start the simulation in server mode (received genome)
     bool startRun = true;
     float simulationTime = 0;

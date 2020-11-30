@@ -3,6 +3,7 @@
 
 #include "ARE/ER.h"
 #include "ERClient/SlaveConnection.h"
+#include "ERClient/sim_state.h"
 
 #include <boost/archive/text_oarchive.hpp>
 
@@ -10,19 +11,18 @@
 #include <boost/interprocess/managed_shared_memory.hpp>
 
 extern "C" {
+#if defined (VREP)
 #include "v_repConst.h"
+#elif defined (COPPELIASIM)
+#include "simConst.h"
+#endif
 #include "remoteApi/extApiPlatform.h"
 #include "remoteApi/extApi.h"
 }
 
-
 namespace are {
 
 namespace client {
-
-typedef enum simulation_state{
-    IDLE = 0, READY = 1, BUSY = 2, FINISH = 3, ERROR = 9
-} SimState;
 
 class ER : public are::ER
 {
@@ -45,12 +45,15 @@ public:
     void openConnections();
     void reopenConnections();
     bool confirmConnections();
+    std::vector<std::unique_ptr<SlaveConnection>> updateSimulatorList();
+
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
-    int loadingTrials = 1000;
+    int loadingTrials = 3;
     bool sim_init = false;
     std::vector<Individual::Ptr> currentIndVec;
     std::vector<int> currentIndexVec;
+    std::vector<int> indToEval;
 
 };
 

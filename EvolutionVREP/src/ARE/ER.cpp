@@ -55,6 +55,7 @@ void ER::initialize()
         exit(1);
 
     environment = environmentFactory(parameters);
+    environment->set_randNum(randNum);
     if(!load_fct_exp_plugin<Logging::Factory>
             (loggingFactory,exp_plugin_name,"loggingFactory"))
         exit(1);
@@ -79,13 +80,13 @@ void ER::startOfSimulation()
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    simulationTime = 0;
-
     environment->init();
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->set_properties(properties);
     currentInd->init();
+    ea->setCurrentIndIndex(currentIndIndex);
+
 }
 
 void ER::initIndividual(){
@@ -99,7 +100,8 @@ void ER::initIndividual(){
     }
     mess.resize(length);
     currentInd = ea->getIndividual(0);
-    currentInd->from_string(mess);
+    if(nbrEval == 0)
+          currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
 }
@@ -119,7 +121,7 @@ void ER::handleSimulation()
         return;
     }
 
-    simulationTime += simGetSimulationTimeStep();
+    simulationTime = simGetSimulationTime();
     //    if(instance_type == settings::INSTANCE_SERVER)
     //        simSetFloatSignal("simulationTime",simulationTime);
 
@@ -127,7 +129,7 @@ void ER::handleSimulation()
     environment->updateEnv(simulationTime,currentInd->get_morphology());
 
     if (simGetSimulationTime() >
-            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value) {
+            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value || ea->finish_eval()) {
         simStopSimulation();
     }
 }
@@ -141,6 +143,8 @@ void ER::endOfSimulation()
     if(verbose)
         std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
 
+    nbrEval++;
+
     if(instanceType == settings::INSTANCE_REGULAR){
         if(currentIndIndex < ea->get_population().size())
         {
@@ -151,9 +155,10 @@ void ER::endOfSimulation()
                     std::cout << fitness << std::endl;
             }
             ea->setObjectives(currentIndIndex,objectives);
-
-            if(ea->update(environment))
-              currentIndIndex++;
+            if(ea->update(environment)){
+                currentIndIndex++;
+                nbrEval = 0;
+            }
             ea->set_endEvalTime(hr_clock::now());
             saveLogs(false);
         }
@@ -190,6 +195,9 @@ void ER::endOfSimulation()
         ea->setObjectives(currentIndIndex,objectives);
 
         evalIsFinish = ea->update(environment);
+        if(evalIsFinish)
+            nbrEval = 0;
+
         ea->set_endEvalTime(hr_clock::now());
         simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
@@ -203,93 +211,3 @@ void ER::saveLogs(bool endOfGen)
         }
     }
 }
-
-
-//bool ER::loadIndividual(int individualNum)
-//{
-//    bool verbose = settings::cast<settings::Boolean>(parameters->at("#verbose"))->value;
-//    if(verbose)
-//        std::cout << "loading individual " << individualNum << std::endl;
-//    currentInd = ea->getIndividual(individualNum);
-
-//    //     currentGenome = genomeFactory(0, randNum, settings);
-//    // try to load from signal
-//    simInt signalLength = -1;
-//    simInt signalLengthVerify = -1;
-//    simChar* signal = simGetStringSignal("individualGenome", &signalLength);
-//    simInt retValue = simGetIntegerSignal("individualGenomeLenght", &signalLengthVerify);
-
-//    if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//        if (signal != nullptr && signalLength != signalLengthVerify) {
-//            std::cout << "genome received by signal, but length got corrupted, using file." << std::endl;
-//            std::cout << signalLength << " != " << signalLengthVerify << std::endl;
-//        }
-//        std::cout << "loading genome " << individualNum << " from ";
-//    }
-
-//    bool load = false;
-//    if (signal != nullptr && signalLength == signalLengthVerify)
-//    {
-//        // load from signal
-//        if () {
-//            std::cout << " signal." << std::endl;
-//        }
-
-//        const std::string individual((char*)signal, signalLength);
-//        std::istringstream individualStream(individual);
-//        load = currentGenome->loadGenome(individualGenomeStream, individualNum);
-//    }
-//    else
-//    {
-//        // load from file
-//        if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//            std::cout << " file." << std::endl;
-//        }
-//    }
-
-//    if (signal != nullptr) {
-//        simReleaseBuffer(signal);
-//    }
-
-//    //        currentGenome->set_individualNumber(individualNum);
-//    std::cout << "loaded" << std::endl;
-//    return load;
-//}
-
-
-
-
-
-//void ER::saveSettings()
-//{
-//    if (settings::cast<settings::Integer>(parameters->at("#verbose"))->value) {
-//        std::cout << "Saving settings" << std::endl;
-//	}
-//	settings->generation = generation;
-//	// TODO : remove redundancy
-//	settings->individualCounter = settings->indCounter;
-//    std::vector<int> indNums;
-//    for (size_t i = 0; i < ea->get_population().size(); i++) {
-//        indNums.push_back(ea->get_population()[i]->get_individual_id()); // must be set when saving
-//	}
-//	settings->indNumbers = indNums;
-
-//	int bestInd = 0;
-//	int bestIndividual = 0;
-//	float bestFitness = 0;
-//    for (size_t i = 0; i < ea->get_population().size(); i++) {
-//        if (bestFitness < ea->get_population()[i]->getFitness()) {
-//            bestFitness = ea->get_population()[i]->getFitness();
-//			bestInd = i;
-//            bestIndividual = ea->get_population()[bestInd]->get_individual_id();
-//			if (settings->verbose) {
-//                std::cout << "Best individual has number " << ea->get_population()[bestInd]->get_individual_id() << std::endl;
-//			}
-//		}
-//	}
-//	settings->bestIndividual = bestIndividual;
-//	settings->saveSettings();
-//	if (settings->verbose) {
-//        std::cout << "Settings saved" << std::endl;
-//	}
-//}

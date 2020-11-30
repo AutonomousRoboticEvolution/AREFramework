@@ -7,9 +7,14 @@
 #include <exception>
 
 extern "C" {
-    // #include "v_repLib.h"
-    #include "v_repConst.h"
-    #include "remoteApi/extApi.h"
+#if defined (VREP)
+#include "v_repLib.h"
+#include "v_repConst.h"
+#elif defined (COPPELIASIM)
+#include "simConst.h"
+#include "simLib.h"
+#endif
+#include "remoteApi/extApi.h"
 }
 
 #define CONNECTION_TIMEOUT 5000
@@ -34,6 +39,7 @@ private:
     int _individual;
     int _individualNum;
     State _state;
+    int reconnection_trials = 0;
 
 public:
 	explicit SlaveConnection(const std::string& address, int port);
@@ -76,6 +82,8 @@ public:
     void setState(State state) { _state = state; }
 
     int get_clientID(){return _clientID;}
+    void incr_reconnection_trials(){reconnection_trials++;}
+    int get_reconnection_trials(){return reconnection_trials;}
 };
 
 class VrepRemoteException: public std::exception

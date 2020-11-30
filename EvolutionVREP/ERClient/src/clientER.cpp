@@ -44,7 +44,11 @@ void ER::initialize(){
         exit(1);
 
     ea = EAFactory(randNum, parameters);
+    ea->set_simulator_side(false);
     ea->init();
+    ea->set_startEvalTime(hr_clock::now());
+    for(int i = 0; i < ea->get_population().size(); i++)
+        indToEval.push_back(i);
 }
 
 bool ER::execute()
@@ -59,9 +63,11 @@ bool ER::execute()
         reopenConnections();
     }
 
-    if (!confirmConnections()) {
+    confirmConnections();
+    serverInstances = updateSimulatorList();
+    if(serverInstances.empty())
         return false;
-    }
+
 
     return updateSimulation();
 }
@@ -70,8 +76,10 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    currentIndVec[slaveIndex] = ea->getIndividual(currentIndIndex);
-    currentIndexVec[slaveIndex] = currentIndIndex;
+    currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
+    currentIndexVec[slaveIndex] = indToEval.back();
+    if(!indToEval.empty())
+        indToEval.pop_back();
     currentIndVec[slaveIndex]->set_properties(properties);
 }
 
@@ -88,8 +96,7 @@ void ER::endOfSimulation(int slaveIndex){
         std::cout << std::endl;
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
-
-
+    ea->update(environment);
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
@@ -100,74 +107,81 @@ void ER::endOfSimulation(int slaveIndex){
 bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
     bool all_instances_finish = true;
 
-    for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
-    {
-        int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
-        all_instances_finish = all_instances_finish
-                && (state == READY)
-                && (currentIndIndex >= ea->get_population().size());
+    if(ea->get_population().size() > 0){
 
-        //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
+        for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
+        {
+            int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
+            all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
-        if(state == IDLE)
-        {
-            serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
-        }
-        else if(state == READY && currentIndIndex < ea->get_population().size())
-        {
-            ///@todo start in slave to handle errors
-            //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
-            ea->set_startEvalTime(hr_clock::now());
-            startOfSimulation(slaveIdx);
-            currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
-            serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
-            serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
-            currentIndIndex++;
-        }
-        else if(state == BUSY)
-        {
-            //            float simTime = slave->getFloatSignal("simulationTime");
-            //serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
+            //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
 
+            if(state == IDLE)
+            {
+                serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+            }
+            else if(state == READY && !indToEval.empty())
+            {
+                ///@todo start in slave to handle errors
+                //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
+                startOfSimulation(slaveIdx);
+                currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
+                serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
+                serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
+            }
+            else if(state == BUSY)
+            {
+                //            float simTime = slave->getFloatSignal("simulationTime");
+                //            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
+            }
+            else if(state == RESTART){
+                currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
+                serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
+                serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
+                std::cout << "Restart simulator " << slaveIdx << std::endl;
+            }
+            else if(state == FINISH)
+            {
+                std::string message;
+                serverInstances[slaveIdx]->getStringSignal("currentInd",message);
+                currentIndVec[slaveIdx]->from_string(message);
+                evalIsFinish = serverInstances[slaveIdx]->getIntegerSignal("evalIsFinish");
+                endOfSimulation(slaveIdx);
+                serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+
+            }
+            else if(state == ERROR)
+            {
+                std::cerr << "An error happened on the server side" << std::endl;
+            }
+            else if(state == READY && indToEval.empty()){
+                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+            }
+            else{
+                std::cerr << "state value unknown : " << state << std::endl
+                          << "Possible states are : " << std::endl
+                          << "\t IDLE : 0" << std::endl
+                          << "\t READY : 1" << std::endl
+                          << "\t BUSY : 2" << std::endl
+                          << "\t FINISH : 3" << std::endl
+                          << "\t ERROR : 9" << std::endl;
+                all_instances_finish = false;
+            }
         }
-        else if(state == FINISH)
-        {
-            std::string message;
-            serverInstances[slaveIdx]->getStringSignal("currentInd",message);
-            currentIndVec[slaveIdx]->from_string(message);
-            evalIsFinish = serverInstances[slaveIdx]->getIntegerSignal("evalIsFinish");
-            endOfSimulation(slaveIdx);
-            serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
-            ea->incr_nbr_eval();
-        }
-        else if(state == ERROR)
-        {
-            std::cerr << "An error happened on the server side" << std::endl;
-        }
-        else if(state == READY && currentIndIndex >= ea->get_population().size()){
-            std::cout << "SlaveIdx : " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
-        }
-        else
-            std::cerr << "state value unknown : " << state << std::endl
-                      << "Possible states are : " << std::endl
-                      << "\t IDLE : 0" << std::endl
-                      << "\t READY : 1" << std::endl
-                      << "\t BUSY : 2" << std::endl
-                      << "\t FINISH : 3" << std::endl
-                      << "\t ERROR : 9" << std::endl;
     }
-    if(currentIndIndex >= ea->get_population().size() && all_instances_finish)
+    if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
         ea->epoch();
         saveLogs();
+        ea->set_startEvalTime(hr_clock::now());
         ea->init_next_pop();
+        for(int i = 0; i < ea->get_population().size(); i++)
+            indToEval.push_back(i);
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();
-        currentIndIndex = 0;
 
         if(ea->is_finish()){
             if(verbose)
@@ -180,6 +194,7 @@ bool ER::updateSimulation()
         }
     }
     return true;
+
 }
 
 void ER::quitSimulation()
@@ -222,18 +237,38 @@ bool ER::confirmConnections()
     for (auto &slave: serverInstances) {
         if (!slave->status()) {
             std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
-            tries++;
+            slave->incr_reconnection_trials();
             extApi_sleepMs(20);
         }
         else {
             continue;
         }
-        if (tries > loadingTrials) {
-            std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than 1000 times." << std::endl;
-            return false;
-        }
     }
 
     //    std::cout << "Connections confirmed" << std::endl;
     return true;
+}
+
+std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
+
+
+    std::vector<std::unique_ptr<SlaveConnection>> newServInst;
+    std::vector<Individual::Ptr> newCurrentIndVec;
+    std::vector<int> newCurrentIndexVec;
+    for(size_t idx = 0; idx < serverInstances.size();idx++){
+        if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
+            std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
+            serverInstances[idx].reset();
+            indToEval.push_back(currentIndexVec[idx]);
+        }else {
+            newServInst.push_back(std::move(serverInstances[idx]));
+            newCurrentIndVec.push_back(currentIndVec[idx]);
+            newCurrentIndexVec.push_back(currentIndexVec[idx]);
+        }
+     }
+
+    currentIndVec = newCurrentIndVec;
+    currentIndexVec = newCurrentIndexVec;
+
+    return newServInst;
 }

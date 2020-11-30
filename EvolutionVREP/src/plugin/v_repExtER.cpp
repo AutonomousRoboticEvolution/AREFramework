@@ -19,7 +19,9 @@
 #include <iostream>
 #include <fstream>
 #include <memory>
+
 #include "v_repLib.h"
+
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <random>
@@ -49,7 +51,7 @@ extern "C" {
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
-LIBRARY vrepLib;
+LIBRARY simLib;
 
 ///save time log
 void saveLog(int num)
@@ -99,16 +101,20 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 
 
-    vrepLib = loadVrepLibrary(temp.c_str());
-    if (vrepLib == NULL)
+
+    simLib = loadVrepLibrary(temp.c_str());
+    if (simLib == NULL)
     {
         std::cout << "Error, could not find or correctly load v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
         return(0); // Means error, V-REP will unload this plugin
     }
-    if (getVrepProcAddresses(vrepLib) == 0)
+
+    if (getVrepProcAddresses(simLib) == 0)
     {
         std::cout << "Error, could not find all required functions in v_rep.dll. Cannot start 'BubbleRob' plugin.\n";
-        unloadVrepLibrary(vrepLib);
+
+        unloadVrepLibrary(simLib); // release the library
+
         return(0); // Means error, V-REP will unload this plugin
     }
 
@@ -118,7 +124,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
     {
         std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
-        unloadVrepLibrary(vrepLib);
+        unloadVrepLibrary(simLib); // release the library
         return(0); // Means error, V-REP will unload this plugin
     }
 
@@ -152,8 +158,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     if(seed < 0){
         std::random_device rd;
         seed = rd();
+        are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));
     }
-
     misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<misc::RandNum>(rn));
     ERVREP->initialize();
@@ -162,29 +168,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
         //Write parameters in the log folder.
-        std::ofstream ofs(are::Logging::log_folder + std::string("/parameters.csv"));
-        for(const auto &elt : *parameters)
-        {
-            if(elt.first != "#seed"){
-                if(elt.second->name == "bool"){
-                    ofs << elt.first << ",bool," << are_sett::cast<are_sett::Boolean>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "int"){
-                    ofs << elt.first << ",int," << are_sett::cast<are_sett::Integer>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "float"){
-                    ofs << elt.first << ",float," << are_sett::cast<are_sett::Float>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "double"){
-                    ofs << elt.first << ",double," << are_sett::cast<are_sett::Double>(elt.second)->value << std::endl;
-                }
-                else if(elt.second->name == "string"){
-                    ofs << elt.first << ",string," << are_sett::cast<are_sett::String>(elt.second)->value << std::endl;
-                }
-            }
-            else ofs << "#seed" << ",int," << seed << std::endl;
-        }
-        ofs.close();
+        are_sett::saveParameters(are::Logging::log_folder + std::string("/parameters.csv"),parameters);
     }
 
     if(instance_type == are_sett::INSTANCE_SERVER)
@@ -205,7 +189,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-    unloadVrepLibrary(vrepLib); // release the library
+    unloadVrepLibrary(simLib); // release the library
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
@@ -272,11 +256,13 @@ void localMessageHandler(int message){
     }
 
     // START NEW SIMULATION
-    if (simulationState == FREE)
+    if (simulationState == FREE && ERVREP->get_ea()->get_population().size() > 0)
     {
         simulationState = STARTING;
         counter = 0;
         simStartSimulation();
+    }else if(simulationState == FREE && ERVREP->get_ea()->get_population().size() == 0){
+        ERVREP->endOfSimulation();
     }
 }
 
@@ -345,46 +331,38 @@ void clientMessageHandler(int message){
         simulationState = CLEANUP;
         ERVREP->endOfSimulation();
        
+        std::cout << ERVREP->get_evalIsFinish() << std::endl;
         if(ERVREP->get_evalIsFinish()){
 
             std::string indString = ERVREP->get_currentInd()->to_string();
             simSetStringSignal("currentInd",indString.c_str(),indString.size());
             simSetIntegerSignal("simulationState",are_c::FINISH);
 
-            loadingPossible = true;  // start another simulation
+            //loadingPossible = true;  // start another simulation
             if (verbose) {
                 std::cout << "EVALUATION ENDED" << std::endl;
             }
         }
         else{
-            simSetIntegerSignal("simulationState",are_c::BUSY);
-            simStartSimulation();
-
+            // Initializes population
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-        }
-
-        std::string indString = ERVREP->get_currentInd()->to_string();
-        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-        simSetIntegerSignal("simulationState",are_c::FINISH);
-
-        loadingPossible = true;  // start another simulation
-        if (verbose) {
-            std::cout << "SIMULATION ENDED" << std::endl;
-        }
+            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simulationState = RESTART;
+            std::string indString = ERVREP->get_currentInd()->to_string();
+            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            loadingPossible = true;  // start another simulation
+            return;
+       }
     }
-
-
-
-
 
     if (clientState[0] == are_c::IDLE)
     {
         timerOn = false;
         simulationState = STARTING;
         simSetIntegerSignal("simulationState",are_c::READY);
-    }else if(clientState[0] == are_c::READY && simulationState == STARTING){
+    }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
         simStartSimulation();
     }
     else if(clientState[0] == 99){

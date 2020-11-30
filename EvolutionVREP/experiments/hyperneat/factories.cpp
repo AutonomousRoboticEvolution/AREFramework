@@ -1,7 +1,6 @@
-#include "mazeEnv.h"
+#include "ARE/mazeEnv.h"
 #include "EA_HyperNEAT.h"
-#include "Loggings.h"
-#include "HNLoggings.h"
+#include "ARE/Logging.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
@@ -35,6 +34,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(etlog);
 
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;
-    are::BehavDescLog::Ptr bdlog(new are::BehavDescLog(behav_desc_log_file));
+    are::BehavDescLog<are::CPPNIndividual>::Ptr bdlog(new are::BehavDescLog<are::CPPNIndividual>(behav_desc_log_file));
     logs.push_back(bdlog);
 }

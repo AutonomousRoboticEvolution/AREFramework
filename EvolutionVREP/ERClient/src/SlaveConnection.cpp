@@ -1,12 +1,6 @@
 #include "ERClient/SlaveConnection.h"
 #include <iostream>
 
-extern "C" {
-    #include "v_repLib.h"
-    #include "v_repConst.h"
-    #include "remoteApi/extApi.h"
-}
-
 using namespace are::client;
 
 void checkReturnValue(simxInt returnValue)
@@ -110,9 +104,7 @@ bool SlaveConnection::reconnect()
 simxInt SlaveConnection::getIntegerSignal(const std::string& signalName) const
 {
     simxInt states[1];
-    checkReturnValue(
-		simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking)
-	);
+    simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking);
     return states[0];
 }
 
@@ -120,14 +112,13 @@ simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName
 {
     simxInt states[1];
     try {
-        checkReturnValue(
-            simxGetIntegerSignal(
-                this->_clientID,
-                (simxChar*) signalName.c_str(),
-                states,
-                simx_opmode_streaming + msInterval
-        )
-		);
+
+        simxGetIntegerSignal(
+                    this->_clientID,
+                    (simxChar*) signalName.c_str(),
+                    states,
+                    simx_opmode_streaming + msInterval
+                    );
     } catch (const VrepRemoteException &e) {
         if (e.returnValue & simx_return_novalue_flag) {
             // this is to be expected for streaming mode
@@ -142,51 +133,39 @@ simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName
 simxInt SlaveConnection::getIntegerSignalBuffer(const std::string& signalName) const
 {
     simxInt states[1];
-	checkReturnValue(
-        simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_buffer)
-    );
+    simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_buffer);
 	return states[0];
 }
 
 void SlaveConnection::setIntegerSignal(const std::string& signalName, simxInt state)
 {
-    checkReturnValue(
-        simxSetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking)
-    );
+    simxSetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking);
 }
 
 simxFloat SlaveConnection::getFloatSignal(const std::string& signalName) const
 {
     simxFloat states[1];
-    checkReturnValue(
-        simxGetFloatSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking)
-    );
+    simxGetFloatSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking);
     return states[0];
 }
 
 void SlaveConnection::setFloatSignal(const std::string& signalName, simxFloat state)
 {
-    checkReturnValue(
-        simxSetFloatSignal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking)
-    );
+    simxSetFloatSignal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking);
 }
 
 void SlaveConnection::getStringSignal(const std::string& signalName, std::string &message) const
 {
     simxUChar *states;
-    simInt length;
-    checkReturnValue(
-                simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)
-                );
+    simxInt length;
+    simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking);
     message = (char*)states;
     message.resize(length);
 }
 
 void SlaveConnection::setStringSignal(const std::string& signalName, const std::string& state)
 {
-    checkReturnValue(
-        simxSetStringSignal(this->_clientID, (simxChar*) signalName.c_str(), (simxUChar*) state.c_str(), state.size(), simx_opmode_blocking)
-    );
+    simxSetStringSignal(this->_clientID, (simxChar*) signalName.c_str(), (simxUChar*) state.c_str(), state.size(), simx_opmode_blocking);
 }
 
 bool SlaveConnection::operator!() const
