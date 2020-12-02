@@ -398,6 +398,7 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::string morph_desc_file = settings::getParameter<settings::String>(parameters,"#morphDescFile").value;
+    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
 
     std::ifstream ifs(exp_folder + std::string("/") + morph_desc_file);
     if(!ifs){
@@ -410,9 +411,9 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
         boost::split(split_line,line,boost::is_any_of(","));
         int id = std::stoi(split_line[0]);
         morph_desc_t md;
-        md.wheels = static_cast<int>(std::stod(split_line[5])*10);
-        md.joints = static_cast<int>(std::stod(split_line[7])*10);
-        md.sensors = static_cast<int>(std::stod(split_line[6])*10);
+        md.wheels = static_cast<int>(std::stod(split_line[5])*maxNbrOrgans);
+        md.joints = static_cast<int>(std::stod(split_line[7])*maxNbrOrgans);
+        md.sensors = static_cast<int>(std::stod(split_line[6])*maxNbrOrgans);
         full_desc_map.emplace(id,md);
     }
 
