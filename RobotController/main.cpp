@@ -99,6 +99,7 @@ void setup_sigint_catch()
 #include <string.h>
 // #include <time.h>
 
+#include <bitset> // for displaying binary values
 
 int main()
 {
@@ -107,10 +108,18 @@ int main()
     /************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
     batteryMonitor.init();
-    batteryMonitor.measureVoltage();
+
+    std::cout << "Temperature measured as: " << batteryMonitor.measureTemperature() << " degreesC" << std::endl;
+
+    uint16_t busVoltage = batteryMonitor.measure5VBusVoltage();
+    std::cout <<"bus voltage measured as:  "<< std::bitset<16>( busVoltage ) << " = " << (float)busVoltage/100 << "V" << std::endl;
+
+    uint16_t batteryVoltage = batteryMonitor.measureBatteryVoltage();
+    std::cout <<"battery measured as:  "<< std::bitset<16>( batteryVoltage ) << " = " << (float)batteryVoltage/100 << "V" << std::endl;
+
 //    batteryMonitor.printAllPages();
-//    int message [1] = {0b11000010/};
-//    batteryMonitor.computeCRC(message , 1 , 0x0F);
+
+
 /************ LED DRIVER and IMU ********************************************/
 //    // Create and test led driver
 //    LedDriver ledDriver(LED_DRIVER_ADDR);
