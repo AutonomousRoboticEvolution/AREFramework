@@ -40,6 +40,8 @@ void Morphology_CPPNMatrix::create()
     createAREPotato(skeletonMatrix);
 #elif HANDMADEROBOT == 3
     createARETricyle(skeletonMatrix);
+#elif HANDMADEROBOT == 4
+    createARESpider(skeletonMatrix);
 #endif
 
     // Create mesh for skeleton
@@ -56,10 +58,12 @@ void Morphology_CPPNMatrix::create()
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
-        
+#ifndef HANDMADEROBOT
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
         findSkeletonSurface(skeletonMatrix);
         generateOrgans(nn);
-
+#endif
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, listVertices.at(0).data(), listVertices.at(0).size(), listIndices.at(0).data(),
                                         listIndices.at(0).size(), nullptr);
         if (meshHandle == -1) {
@@ -183,11 +187,6 @@ void Morphology_CPPNMatrix::create()
         robotManRes.noBadOrientations = false;
         robotManRes.noCollisions = false;
     }
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportMesh(loadInd, listVertices.at(0),listIndices.at(0));
-        exportRobotModel(loadInd);
-    }
     // Segmented robots
     if((indVerResult || convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
         // Since the list of organ is going to increase, it's better to cap it to prevent accessing elements out of range.
@@ -247,10 +246,20 @@ void Morphology_CPPNMatrix::create()
                 _organSpec.at(i).objectHandles[1] = simGroupShapes(handles,2);
                 simSetObjectParent(childSkeletonVisualHandle,_organSpec.at(i).objectHandles[1],1);
 
+                simGetObjectOrientation(_organSpec.at(i).objectHandles[1],_organSpec.at(i).handle,orientation);
+
                 // Generate organs
                 const auto CHILDORGANNUMBER = 4;
                 int organCoord[CHILDORGANNUMBER][3] {{0,0,2},{0,-1,0},{-1,0,0},{2,0,0}};
+
+                // SimGroupShapes changes the orientation of the shape this verifies that the organ generation is consistent.
+                if(abs(orientation[0]) < 0.01)
+                    organCoord[0][2] = -1;
+
                 std::vector<int> organTypeList(CHILDORGANNUMBER,-1);
+#ifndef HANDMADEROBOT
+                std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
                 // Check each side of the child skeleton
                 for(int j = 0; j < CHILDORGANNUMBER; j++){
                     if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).wheel == FILLEDVOXEL){
@@ -267,6 +276,10 @@ void Morphology_CPPNMatrix::create()
                         continue;
                     }
                 }
+#elif HANDMADEROBOT == 4
+                organTypeList.at(0) = 3;
+#endif
+
                 for(int j = 0; j < CHILDORGANNUMBER; j++){
                     if(organTypeList.at(j) != -1){
                         OrganSpec _organ;
@@ -278,7 +291,15 @@ void Morphology_CPPNMatrix::create()
                         _organ.organPos.push_back(tempPosition[1]);
                         _organ.organPos.push_back(tempPosition[2]);
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], _organ);
+
+#ifndef HANDMADEROBOT
+                        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif HANDMADEROBOT == 0
                         setOrganOrientation(nn, _organ); // Along z-axis relative to the organ itself
+#elif HANDMADEROBOT == 4
+                        _organ.organOri.push_back(0.0);
+#endif
+
 
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
@@ -302,6 +323,12 @@ void Morphology_CPPNMatrix::create()
                 }
             }
         }
+    }
+    // Export model
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
+        exportMesh(loadInd, listVertices.at(0),listIndices.at(0));
+        exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
     if(indVerResult || convexDecompositionSuccess){
@@ -1558,13 +1585,28 @@ void Morphology_CPPNMatrix::removeGripper(int gripperHandle)
     simRemoveModel(gripperHandle);
 }
 
+void Morphology_CPPNMatrix::getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix)
+{
+    auto region = skeletonMatrix.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                if(skeletonMatrix.getVoxel(x,y,z) == FILLEDVOXEL){
+                    indDesc.matDesc.graphMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = 1;
+                    indDesc.symDesc.setVoxelQuadrant(x, y, z, 0);
+                }
+            }
+        }
+    }
+}
+
 void Morphology_CPPNMatrix::createAREPuck(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     int listVoxels[11][3] = {
             {0,4,-5}, {0,-4,-5}, {0,5,-5}, {0,-5,-5}, // Wheels skeleton
             {3,0,-4}, {3,0,-3},  // Back sensor skeleton
             {-4,0,-5}, {-4,2,-5}, {-4,-2,-5}, {-4,1,-5}, {-4,-1,-5},  // Front sensors skeleton
-            };
+    };
     int listOrgans[7][3] = {
             {0,5,-5}, {0,-5,-5}, // Wheels positions
             {3,0,-3},  // Back sensor position
@@ -1725,17 +1767,85 @@ void Morphology_CPPNMatrix::createARETricyle(PolyVox::RawVolume<uint8_t> &skelet
     }
 }
 
-void Morphology_CPPNMatrix::getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix)
+void Morphology_CPPNMatrix::createARESpider(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
-    auto region = skeletonMatrix.getEnclosingRegion();
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                if(skeletonMatrix.getVoxel(x,y,z) == FILLEDVOXEL){
-                    indDesc.matDesc.graphMatrix[x + region.getUpperX() - 1][y + region.getUpperY() - 1][z + region.getUpperZ() - 1] = 1;
-                    indDesc.symDesc.setVoxelQuadrant(x, y, z, 0);
-                }
-            }
+    const int NUMVOXELS = 8;
+    const int NUMORGANS = 8;
+    int listVoxels[NUMVOXELS][3] = {
+            {-4,2,-5}, // Sensor 1
+            {-4,-2,-5}, // Sensor 2
+
+            {4,4,-5}, // Joint 1
+            {0,4,-5}, // Joint 2
+            {-4,4,-5}, // Joint 3
+
+            {4,-4,-5}, // Joint 4
+            {0,-4,-5}, // Joint 5
+            {-4,-4,-5}, // Joint 6
+
+    };
+    int listOrgans[NUMORGANS][3] = {
+            {-4,2,-5}, // Sensor 1
+            {-4,-2,-5}, // Sensor 2
+
+            {4,4,-5}, // Joint 1
+            {0,4,-5}, // Joint 2
+            {-4,4,-5}, // Joint 3
+
+            {4,-4,-5}, // Joint 4
+            {0,-4,-5}, // Joint 5
+            {-4,-4,-5}, // Joint 6
+    };
+    for(int i=0; i < NUMVOXELS; i++){
+        skeletonMatrix.setVoxel(listVoxels[i][0], listVoxels[i][1], listVoxels[i][2], FILLEDVOXEL);
+    }
+    float tempPos[3];
+    for(int i = 0; i < NUMORGANS; i++){
+        OrganSpec _organ;
+        int oriX = 0; int oriY = 0; int oriZ = 0;
+        if(i==0){
+            _organ.organType = 2;
+            oriX = -1;
+            oriY = 1;
+        } else if(i==1){
+            _organ.organType = 2;
+            oriX = -1;
+            oriY = -1;
         }
+        else if(i==2){
+            _organ.organType = 3;
+            oriY = 1;
+        }
+        else if(i==3){
+            _organ.organType = 3;
+            oriY = 1;
+        }
+        else if(i==4){
+            _organ.organType = 3;
+            oriY = 1;
+        }
+        else if(i==5){
+            _organ.organType = 3;
+            oriY = -1;
+        }
+        else if(i==6){
+            _organ.organType = 3;
+            oriY = -1;
+        }
+        else if(i==7){
+            _organ.organType = 3;
+            oriY = -1;
+        }
+        tempPos[0] = (float) listOrgans[i][0] * VOXEL_REAL_SIZE;
+        tempPos[1] = (float) listOrgans[i][1] * VOXEL_REAL_SIZE;
+        tempPos[2] = (float) listOrgans[i][2] * VOXEL_REAL_SIZE;
+        tempPos[2] += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
+
+        _organ.organPos.push_back(tempPos[0]);
+        _organ.organPos.push_back(tempPos[1]);
+        _organ.organPos.push_back(tempPos[2]);
+        generateOrientations(oriX, oriY, oriZ, _organ);
+
+        _organSpec.push_back(_organ);
     }
 }

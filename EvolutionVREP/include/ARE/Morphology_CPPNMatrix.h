@@ -264,6 +264,10 @@ public:
      * @brief This method create the ARETricycle robot with the matrix body plan.
      */
     void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief This method create the ARESpider robot with the matrix body plan.
+     */
+    void createARESpider(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
 
     ///////////////////////////////
     ///// Setters and getters /////
