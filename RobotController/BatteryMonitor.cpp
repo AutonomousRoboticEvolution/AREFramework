@@ -18,27 +18,24 @@ BatteryMonitor::BatteryMonitor() : I2CDevice(BATTERY_MONITOR_I2C_ADDRESS) {
 
 void BatteryMonitor::init() {
 
-//    crcInit();
-
-    std::cout << "resetting\n" ;
+//    std::cout << "resetting\n" ;
     write8(COMMAND_DEVICE_RESET);
     write8(COMMAND_1_WIRE_RESET);
     waitFor1WireToFinish();
 
-    setReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
-    std::cout << "device config read: " << std::bitset<8>(read8()) << std::endl;
+    setI2CReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
+//    std::cout << "device config reads: " << std::bitset<8>(read8()) << std::endl;
 
-    setReadPointer(POINTER_CODE_STATUS );
-    std::cout << "status: " << std::bitset<8>(read8()) << std::endl;
+    setI2CReadPointer(POINTER_CODE_STATUS );
+//    std::cout << "status: " << std::bitset<8>(read8()) << std::endl;
 
-    std::cout << "setting config to: " << std::bitset<8>(DS2484_DEFAULT_CONFIGURATION_DATA) << std::endl;
+//    std::cout << "setting config to: " << std::bitset<8>(DS2484_DEFAULT_CONFIGURATION_DATA) << std::endl;
     waitFor1WireToFinish();
     write8To(COMMAND_WRITE_DEVICE_CONFIGURATION , DS2484_DEFAULT_CONFIGURATION_DATA);
 
-    setReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
-    std::cout << "device config read: " << std::bitset<8>(read8()) << std::endl;
-
-    std::cout << "END OF INIT" << std::endl<< std::endl;
+    setI2CReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
+//    std::cout << "device config reads: " << std::bitset<8>(read8()) << std::endl;
+//    std::cout << "END OF INIT" << std::endl<< std::endl;
 
 }
 
@@ -58,47 +55,121 @@ void BatteryMonitor::write1WireByte(int data) {
     write8To(COMMAND_1_WIRE_WRITE_BYTE,data);
 }
 
-void BatteryMonitor::setReadPointer(int pointerCode){
+void BatteryMonitor::setI2CReadPointer(int pointerCode){
     write8To( COMMAND_SET_READ_POINTER, pointerCode );
 }
 
 int BatteryMonitor::read1WireByte() {
     write8(COMMAND_1_WIRE_READ_BYTE);
     waitFor1WireToFinish();
-    setReadPointer( POINTER_CODE_READ_DATA );
+    setI2CReadPointer( POINTER_CODE_READ_DATA );
     return read8();
 }
 
 void BatteryMonitor::waitFor1WireToFinish() {
-    setReadPointer(POINTER_CODE_STATUS);
+    setI2CReadPointer(POINTER_CODE_STATUS);
     while(read8() & 0x01){}
 }
 
 
-int BatteryMonitor::measureTemperature() {
-    std::cout << "Measure temperature" << std::endl;
+float BatteryMonitor::measureTemperature() {
+
     reset1Wire();
     skipROM();
-    write1WireByte({0x44}); //convert T
+    write1WireByte({BATTERY_MONITOR_CONVERT_TEMPERATURE}); //convert T
     waitForDS2438ToStopBeingBusy();
-    return 0;
+
+    // note the waitForDS2438ToStopBeingBusy() will leave the last page retrieved as page0, so we don't need to update it again
+    int16_t temperatureData = pageDataFromDS2438[2]<<8 | pageDataFromDS2438[1];
+    bool signBit = temperatureData & 0x8000 >> 15; // zero if positive, one if negative (2's compliment)
+    if (signBit)  {// value is negative (wow it's cold in here!) - do two's compliment by flipping bits and adding one
+        temperatureData ^= 0xFFFF; // XOR with all ones to flip every bit
+        temperatureData += 1 ; // add one
+        return -1 * (float)temperatureData/256;
+    } else{ // value is positive
+        return (float) temperatureData/256;
+    }
 }
 
-int BatteryMonitor::measureVoltage() {
-    std::cout << "Measuring battery voltage" << std::endl;
+void BatteryMonitor::uploadNewConfig(uint8_t statusConfigByte){
+    bool uploadSuccessful = false;
+    int retries =0;
+    while (!uploadSuccessful) {
+        // upload the new status byte to the scratchpad
+        reset1Wire();
+        skipROM();
+        write1WireByte(BATTERY_MONITOR_WRITE_SCRATCHPAD); //write scratchpad
+        write1WireByte(0x00); //page 0
+        write1WireByte(statusConfigByte);
+        reset1Wire();
+
+        // check the scratchpad value is correct
+        updateReadPageDataFromScratchpad(0x00); // read page0 which contains the status/config byte
+        if (pageDataFromDS2438[0] == statusConfigByte){ // 0th byte is the status/config byte
+            // the upload happened correctly
+            uploadSuccessful=true;
+        }else{
+            // this is bad
+            retries++;
+            if (retries>BATTERY_MONITOR_UPLOAD_MAX_RETRIES){
+                // this is very bad
+                throw std::runtime_error("Uploading new config to the battery monitor has failed. Check for problems with the 1Wire bus, or bugs in this code!");
+            }
+        }
+    }
+    // upload successful to scratchpad, so now need to copy from scratchpad into the actual memory
     reset1Wire();
     skipROM();
-    write1WireByte({0xB4}); //convert V
+    write1WireByte(BATTERY_MONITOR_COPY_SCRATCHPAD_TO_MEMORY); //copy scratchpad to memory
+    write1WireByte(0x00); //select page 0
+    write1WireByte(statusConfigByte); // issue bytes in order, starting with 0th, which is the only one we need to send
+    reset1Wire();
+}
+
+uint16_t BatteryMonitor::measure5VBusVoltage() {
+    //check if the battery monitor is currently in bus voltage mode
+    updateReadPageData(0x00); // read page0 which contains the status/config byte
+    uint8_t statusConfigByte = pageDataFromDS2438[0]; // the 0th byte is the status/config byte
+
+    if ((statusConfigByte & BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD) != 0){ // if not already in bus voltage mode, we need to change it
+        // modify status byte to include battery voltage mode = 0 (for 5V bus measurement)
+        statusConfigByte = statusConfigByte & (BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD^0xF); // keep all bit the same, except the VOLTAGE_AD which becomes 0
+        uploadNewConfig(statusConfigByte);
+    }
+    // now in bus voltage measurement mode :)
+
+    // do the voltage measurement
+    reset1Wire();
+    skipROM();
+    write1WireByte({BATTERY_MONITOR_CONVERT_VOLTAGE}); //convert V
     waitForDS2438ToStopBeingBusy();
 
-    // pageDataFromDS2438 will already have been updated in waitForDS2438ToStopBeingBusy(), so it already has page0 stored:
-    std::cout << "--- page 0"<<" ---"<<std::endl;
-    for(int i=0;i<8;i++){
-        std::cout << i<<" ";
-        std::cout << std::bitset<8>( pageDataFromDS2438[i] ) << std::endl;
-    }
+    // note the waitForDS2438ToStopBeingBusy() will leave the last page retrieved as page0, so we don't need to update it again
+    int16_t voltageData = pageDataFromDS2438[4]<<8 | pageDataFromDS2438[3];
+    return voltageData;
+}
 
-    return 0;
+uint16_t BatteryMonitor::measureBatteryVoltage() {
+    //check if the battery monitor is currently in battery mode
+    updateReadPageData(0x00); // read page0 which contains the status/config byte
+    uint8_t statusConfigByte = pageDataFromDS2438[0]; // the 0th byte is the status/config byte
+
+    if ((statusConfigByte & BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD) == 0){ // if not already in battery mode, we need to change it
+        // modify status byte to include battery voltage mode = 1
+        statusConfigByte = statusConfigByte | BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD; // keep all bit the same, except the VOLTAGE_AD which becomes 1
+        uploadNewConfig(statusConfigByte);
+    }
+    // now in battery measurement mode :)
+
+    // do the voltage measurement
+    reset1Wire();
+    skipROM();
+    write1WireByte({BATTERY_MONITOR_CONVERT_VOLTAGE}); //convert V
+    waitForDS2438ToStopBeingBusy();
+
+    // note the waitForDS2438ToStopBeingBusy() will leave the last page retrieved as page0, so we don't need to update it again
+    int16_t voltageData = pageDataFromDS2438[4]<<8 | pageDataFromDS2438[3];
+    return voltageData;
 }
 
 void BatteryMonitor::printAllPages() {
@@ -118,28 +189,20 @@ void BatteryMonitor::waitForDS2438ToStopBeingBusy() {
     while(waiting) {
         updateReadPageData(0x00); // read page0, which contains status flags
         int statusByte = pageDataFromDS2438[0]; // extract the status byte (byte 0)
-        bool temperatureBusyFlag = (statusByte & 0b00010000) >> 4;
-        bool ADConverterBusyFlag = (statusByte & 0b01000000) >> 6;
+        bool temperatureBusyFlag = (statusByte & BATTERY_MONITOR_BITMASK_CONFIG_TEMPERATURE_BUSY) >> 4;
+        bool ADConverterBusyFlag = (statusByte & BATTERY_MONITOR_BITMASK_CONFIG_AD_BUSY) >> 6;
         if (!temperatureBusyFlag and !ADConverterBusyFlag){waiting=false;}
     }
 }
 
-void BatteryMonitor::updateReadPageData(int pageNumber){
-
+void BatteryMonitor::updateReadPageDataFromScratchpad(int pageNumber){
     int CRCcheck = 1; // this will become zero once the CRC test is passed, so initialse to something non-zero
     int CRCRetriesCounter = 0;
     while (CRCcheck != 0 ) {
-
-        // first, tell DS2438 to copy data from memory onto "scratchpad"
+        // command the reading of the scratchpad
         reset1Wire();
         skipROM();
-        write1WireByte(0xB8); //recall memory
-        write1WireByte(pageNumber); // page number to access
-
-        // then command the reading of the scratchpad
-        reset1Wire();
-        skipROM();
-        write1WireByte(0xBE); // Issue Read SP 00h command
+        write1WireByte(BATTERY_MONITOR_READ_SCRATCHPAD); // Issue Read SP 00h command
         write1WireByte(pageNumber); // page number to access
 
         // read expected 8 byte return:
@@ -164,8 +227,19 @@ void BatteryMonitor::updateReadPageData(int pageNumber){
     } // CRC check now passed
 }
 
-//#define WIDTH    9
-#define TOPBIT   (0x01 << 8)
+void BatteryMonitor::updateReadPageData(int pageNumber){
+
+    // first, tell DS2438 to copy data from memory onto "scratchpad"
+    reset1Wire();
+    skipROM();
+    write1WireByte(BATTERY_MONITOR_COPY_MEMORY_TO_SCRATCHPAD); //recall memory
+    write1WireByte(pageNumber); // page number to access
+
+    updateReadPageDataFromScratchpad(pageNumber);
+
+}
+
+#define TOPBIT   (0x01 << 8) // bitmask for extracting the leftmost bit
 int BatteryMonitor::doCRCCheck(int message[], int nBytes, int receivedCRC)
 {
     int remainder = 0x00;
@@ -187,5 +261,4 @@ int BatteryMonitor::doCRCCheck(int message[], int nBytes, int receivedCRC)
         }
     }
     return remainder;
-
 }
