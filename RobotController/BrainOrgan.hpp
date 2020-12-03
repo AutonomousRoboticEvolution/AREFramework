@@ -9,5 +9,6 @@
 
 #include "LedDriver.hpp"
 #include "IMU.hpp"
+#include "BatteryMonitor.hpp"
 
 #endif

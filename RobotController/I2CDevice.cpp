@@ -18,6 +18,14 @@ void I2CDevice::write8(uint8_t data) {
 	}
 }
 
+//16-bit write, for when register not specified by subaddress
+void I2CDevice::write16(uint16_t data) {
+	//Attempt to write to the device, report if error
+	if(wiringPiI2CWrite(devHandle, data) < 0) {
+		printf("[I2CDevice %02X] 8-bit write failed: %s\n", devAddress, strerror(errno));
+	}
+}
+
 //8-bit write to specific register
 void I2CDevice::write8To(uint8_t subAddress, uint8_t data) {
 	//Attempt to write to the device, report if error
