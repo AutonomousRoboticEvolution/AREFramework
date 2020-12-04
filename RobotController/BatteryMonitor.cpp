@@ -6,15 +6,44 @@
 #include "BatteryMonitor.hpp"
 
 #include <iostream>
-#include <bitset>
+#include <bitset> // to display values in binary, e.g. std::cout << std::bitset<8>(myNumber) << std::endl
 #include <unistd.h> // for usleep
-
 
 
 BatteryMonitor::BatteryMonitor() : I2CDevice(BATTERY_MONITOR_I2C_ADDRESS) {
     //Calls the I2CDevice constructor
+    init();
 }
 
+void BatteryMonitor::testingDisplayBatteryLevels(){
+
+
+    uint16_t batteryVoltage = measureBatteryVoltage();
+    uint16_t busVoltage = measure5VBusVoltage();
+    int currentMilliAmps = measureCurrent();
+    int batteryChargeRemaining = measureBatteryChargeRemaining();
+    float temperature = measureTemperature();
+
+    std::cout << "temperature: "<< temperature <<" degreesC"<<std::endl;
+    std::cout << "batteryVoltage:         " << std::bitset<8>(batteryVoltage) << " = "<<batteryVoltage/100.0<<"V"<< std::endl;
+    std::cout << "busVoltage:             " << std::bitset<8>(busVoltage) << " = "<<busVoltage/100.0<<"V"<< std::endl;
+    std::cout << "current:                " << std::bitset<8>(currentMilliAmps) << " = " << currentMilliAmps <<"mA"<< std::endl;
+    std::cout << "batteryChargeRemaining: " << std::bitset<8>(batteryChargeRemaining) << " = " << batteryChargeRemaining <<"mAh" <<std::endl;
+
+    std::cout << std::endl<< "====== starting  ======" << std::endl<< std::endl;
+
+    std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;
+    int i=0;
+    while (i<99){
+        usleep(1000000);
+        i++;
+        if (i%10==0){std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;}
+        batteryVoltage = measureBatteryVoltage();
+        currentMilliAmps = measureCurrent();
+        batteryChargeRemaining = measureBatteryChargeRemaining();
+        std::cout << (float)batteryVoltage/100 << "V\t|\t" << currentMilliAmps << "mA\t|\t" << batteryChargeRemaining << "mAh" << std::endl;
+    }
+}
 
 void BatteryMonitor::init() {
 
@@ -32,10 +61,6 @@ void BatteryMonitor::init() {
 //    std::cout << "setting config to: " << std::bitset<8>(DS2484_DEFAULT_CONFIGURATION_DATA) << std::endl;
     waitFor1WireToFinish();
     write8To(COMMAND_WRITE_DEVICE_CONFIGURATION , DS2484_DEFAULT_CONFIGURATION_DATA);
-
-    setI2CReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
-//    std::cout << "device config reads: " << std::bitset<8>(read8()) << std::endl;
-//    std::cout << "END OF INIT" << std::endl<< std::endl;
 
 }
 
@@ -71,6 +96,25 @@ void BatteryMonitor::waitFor1WireToFinish() {
     while(read8() & 0x01){}
 }
 
+int BatteryMonitor::measureCurrent() {
+    // get raw current data from bytes 5 and 6 of page0 (see datasheet page 16):
+    updateReadPageData(0x00);
+    int16_t currentDataRaw = pageDataFromDS2438[6]<<8 | pageDataFromDS2438[5];
+//    std::cout <<"raw current data:  "<< std::bitset<16>( currentDataRaw ) << std::endl;
+
+    // return converted to milliAmps for easier to use:
+    return int(currentDataRaw) * BATTERY_MONITOR_CURRENT_CONVERSION_FACTOR;
+}
+
+int BatteryMonitor::measureBatteryChargeRemaining() {
+    // get raw ICA data from byte 4 of page1 (see datasheet page 16):
+    updateReadPageData(0x01);
+    uint8_t currentAccumulatorDataRaw = pageDataFromDS2438[4];
+//    std::cout <<"raw ICA data:  "<< std::bitset<16>( currentAccumulatorDataRaw ) << std::endl;
+
+    // return converted to milliAmps for easier to use:
+    return int(currentAccumulatorDataRaw) * BATTERY_MONITOR_CURRENT_ACCUMULATOR_CONVERSION_FACTOR;
+}
 
 float BatteryMonitor::measureTemperature() {
 
@@ -91,38 +135,81 @@ float BatteryMonitor::measureTemperature() {
     }
 }
 
-void BatteryMonitor::uploadNewConfig(uint8_t statusConfigByte){
+void BatteryMonitor::setBatteryChargeRemaining(int chargeValueMilliAmpHours){
+    // first we must compute the value for the ICA register:
+    int temp = int(chargeValueMilliAmpHours / float(BATTERY_MONITOR_CURRENT_ACCUMULATOR_CONVERSION_FACTOR));
+    if (temp>0xFF or temp<0){ // not able to store in the 8-bit ICA register, throw error
+        throw std::runtime_error("Attempted to set a battery charge remaining value that will not fit in the register.");
+    }
+    uint8_t newAccumulatorDataRaw = temp & 0xFF; // only 8-bits available
+
+    std::cout <<"new value in mAh:  "<<chargeValueMilliAmpHours<<" = "<< std::bitset<16>( chargeValueMilliAmpHours ) << std::endl;
+    std::cout <<"new ICA register:  "<<int(newAccumulatorDataRaw)<<" = "<< std::bitset<8>( newAccumulatorDataRaw ) << std::endl;
+
+    uploadNewByteToDS2438(1,4, newAccumulatorDataRaw);
+
+    int batteryChargeRemaining = measureBatteryChargeRemaining();
+    std::cout << "batteryChargeRemaining: " << std::bitset<8>(batteryChargeRemaining) << " = " << batteryChargeRemaining <<"mAh" <<std::endl;
+
+}
+
+
+void BatteryMonitor::uploadNewDS2438Config(uint8_t statusConfigByte) {
+    uploadNewByteToDS2438(0,0,statusConfigByte);
+}
+
+void BatteryMonitor::uploadNewByteToDS2438(int pageNumber, int byteNumber, uint8_t newByteValue){
+
+    // make a copy of the current values, so we can re-upload all the bytes we're not changing
+    int newPageData [8];
+    updateReadPageData(pageNumber); // updates pageDataFromDS2438
+    std::copy(std::begin(pageDataFromDS2438), std::end(pageDataFromDS2438), std::begin(newPageData));
+    newPageData[byteNumber] = newByteValue; // overwrite the byte to be changed
+    std::cout<<"data: "<< std::bitset<8>(newPageData[byteNumber])<<std::endl;
+
     bool uploadSuccessful = false;
     int retries =0;
     while (!uploadSuccessful) {
         // upload the new status byte to the scratchpad
         reset1Wire();
         skipROM();
-        write1WireByte(BATTERY_MONITOR_WRITE_SCRATCHPAD); //write scratchpad
-        write1WireByte(0x00); //page 0
-        write1WireByte(statusConfigByte);
+        write1WireByte(BATTERY_MONITOR_WRITE_SCRATCHPAD); //write to scratchpad
+        write1WireByte(pageNumber); // set the page we want to write to
+        int i;
+        for(i=0; i<8; i++) { // loop through each byte and write it
+            write1WireByte( newPageData[i] );
+//            std::cout<<"uploading byte "<<i<<" as "<<std::bitset<8>(newPageData[i])<<std::endl;
+        }
         reset1Wire();
 
-        // check the scratchpad value is correct
-        updateReadPageDataFromScratchpad(0x00); // read page0 which contains the status/config byte
-        if (pageDataFromDS2438[0] == statusConfigByte){ // 0th byte is the status/config byte
-            // the upload happened correctly
-            uploadSuccessful=true;
-        }else{
-            // this is bad
-            retries++;
-            if (retries>BATTERY_MONITOR_UPLOAD_MAX_RETRIES){
-                // this is very bad
-                throw std::runtime_error("Uploading new config to the battery monitor has failed. Check for problems with the 1Wire bus, or bugs in this code!");
+        // check the scratchpad values are correct
+        updateReadPageDataFromScratchpad(pageNumber);
+        uploadSuccessful=true;
+        for(i=0; i<8; i++) { // loop through each byte to check it
+            if (pageDataFromDS2438[i] != newPageData[i]) {
+                // found an error
+                uploadSuccessful = false;
+                break;
             }
         }
-    }
+
+        if (!uploadSuccessful) { // this is bad, try again?
+            retries++;
+            if (retries > BATTERY_MONITOR_UPLOAD_MAX_RETRIES) { // this is very bad, give up
+                std::cout << "debugging information, trying to write: "<<std::endl<<"pageNumber: "<<pageNumber<<std::endl<<", byteNumber: "<<byteNumber<<", value: "<<std::bitset<8>( newByteValue )<<std::endl;
+                std::cout << "error on byte number "<<i<<", returned a value of:"<<std::endl<<std::bitset<8>( pageDataFromDS2438[i] )<<std::endl<<"should have been:" <<std::endl << std::bitset<8>( newPageData[i] ) <<std::endl;
+                throw std::runtime_error(
+                        "Uploading new data to the battery monitor has failed. Check for problems with the 1Wire bus, or bugs in this code!");
+            }
+        }
+    } // end of while (!uploadSuccessful)
+
     // upload successful to scratchpad, so now need to copy from scratchpad into the actual memory
     reset1Wire();
     skipROM();
     write1WireByte(BATTERY_MONITOR_COPY_SCRATCHPAD_TO_MEMORY); //copy scratchpad to memory
-    write1WireByte(0x00); //select page 0
-    write1WireByte(statusConfigByte); // issue bytes in order, starting with 0th, which is the only one we need to send
+    write1WireByte(pageNumber); //select page 0
+    waitFor1WireToFinish();
     reset1Wire();
 }
 
@@ -134,7 +221,7 @@ uint16_t BatteryMonitor::measure5VBusVoltage() {
     if ((statusConfigByte & BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD) != 0){ // if not already in bus voltage mode, we need to change it
         // modify status byte to include battery voltage mode = 0 (for 5V bus measurement)
         statusConfigByte = statusConfigByte & (BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD^0xF); // keep all bit the same, except the VOLTAGE_AD which becomes 0
-        uploadNewConfig(statusConfigByte);
+        uploadNewDS2438Config(statusConfigByte);
     }
     // now in bus voltage measurement mode :)
 
@@ -157,7 +244,7 @@ uint16_t BatteryMonitor::measureBatteryVoltage() {
     if ((statusConfigByte & BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD) == 0){ // if not already in battery mode, we need to change it
         // modify status byte to include battery voltage mode = 1
         statusConfigByte = statusConfigByte | BATTERY_MONITOR_BITMASK_CONFIG_VOLTAGE_AD; // keep all bit the same, except the VOLTAGE_AD which becomes 1
-        uploadNewConfig(statusConfigByte);
+        uploadNewDS2438Config(statusConfigByte);
     }
     // now in battery measurement mode :)
 
@@ -174,7 +261,7 @@ uint16_t BatteryMonitor::measureBatteryVoltage() {
 
 void BatteryMonitor::printAllPages() {
 
-    for (int i_page=0; i_page<3; i_page++){
+    for (int i_page=0; i_page<8; i_page++){
         std::cout << "--- page "<<i_page<<" ---"<<std::endl;
         updateReadPageData(i_page);
         for(int i=0;i<8;i++){
