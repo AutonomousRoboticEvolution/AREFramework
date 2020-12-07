@@ -48,13 +48,6 @@ class I2CDevice {
 		*/
 		void write8(uint8_t data);
 
-    /**
-        @brief Write 16-bit value directly to device (no subaddress), for cases when the
-        internal register doesn't have it's own address.
-        @param data The byte to be written
-    */
-    void write16(uint16_t data);
-
 		/**
 			@brief Write 8-bit value to specified register of device.
 			@param subAddress The address of the target internal register (not device address)
