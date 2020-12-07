@@ -108,10 +108,10 @@ int main()
 
     /************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
-//    batteryMonitor.testingDisplayBatteryLevels();
+//    batteryMonitor.setBatteryChargeRemaining(2000);
+    batteryMonitor.testingDisplayBatteryLevels();
 //    batteryMonitor.printAllPages();
-    batteryMonitor.setBatteryChargeRemaining(2000);
-    batteryMonitor.printAllPages();
+//    batteryMonitor.printAllPages();
 
 /************ LED DRIVER and IMU ********************************************/
 //    // Create and test led driver

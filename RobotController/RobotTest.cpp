@@ -1,6 +1,6 @@
 /**
 	@file JointOrganTest.cpp
-	@brief Test code for the JointOrgan class (based on Mike's MotorOrgan)
+	@brief temporary test code for running some joints and/or wheels
 	@author Matt
 */
 

@@ -1,6 +1,7 @@
-//
-// Created by matt on 18/05/2020.
-//
+/**
+ * @author Matt
+ * @brief Temporary code for using my "benchtop" Head organ, this communicates with the INA219 current sensor
+ */
 
 #ifndef ROBOTCONTROLLER_INA219_CURRENT_SENSOR_H
 #define ROBOTCONTROLLER_INA219_CURRENT_SENSOR_H

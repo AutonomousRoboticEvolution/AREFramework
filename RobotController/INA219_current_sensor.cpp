@@ -1,6 +1,7 @@
-//
-// Created by matt on 18/05/2020.
-//
+/**
+ * @author Matt
+ * @brief Temporary code for using my "benchtop" Head organ, this communicates with the INA219 current sensor
+ */
 
 #include "INA219_current_sensor.hpp"
 #include <iostream>
