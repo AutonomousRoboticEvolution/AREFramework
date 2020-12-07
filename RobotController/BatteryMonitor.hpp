@@ -19,14 +19,17 @@
  */
 #define BATTER_MONITOR_R_SENSE 0.05
 #define BATTERY_MONITOR_CURRENT_CONVERSION_FACTOR 1000/(4096*BATTER_MONITOR_R_SENSE)
+
 /**
- * The equivilent for the remaining battery capacity measurement ("ICA" in datasheet) is:
+ * The equivalent for the remaining battery capacity measurement ("ICA" in datasheet) is:
  * Remaining Capacity = ICA / (2048 * R_SENSE_IN_OHMS )
  * So for a result in mAh, we can calculate another factor as follows
  */
 #define BATTERY_MONITOR_CURRENT_ACCUMULATOR_CONVERSION_FACTOR 1000/(2096*BATTER_MONITOR_R_SENSE)
 
-
+/**
+ * this is actually the address of the i2c to 1wire converter
+ */
 #define BATTERY_MONITOR_I2C_ADDRESS 0x18
 
 /**
@@ -50,6 +53,7 @@
 #define BATTERY_MONITOR_COPY_SCRATCHPAD_TO_MEMORY 0x48
 #define BATTERY_MONITOR_READ_SCRATCHPAD 0xBE
 #define BATTERY_MONITOR_WRITE_SCRATCHPAD 0x4E
+#define BATTERY_MONITOR_SkIP_ROM 0xCC
 
 #define BATTERY_MONITOR_BITMASK_CONFIG_CURRENT_AD 0x01
 #define BATTERY_MONITOR_BITMASK_CONFIG_CURRENT_ACCUMULATOR 0x02
@@ -86,7 +90,9 @@
  */
 #define DS2484_DEFAULT_CONFIGURATION_DATA 0xE1
 
-
+/**
+ * Provides methods for running the DS2438Z+ battery monitor chip, via DS2848 I2C converter
+ */
 class BatteryMonitor : protected I2CDevice {
 
 	public :
@@ -109,7 +115,7 @@ class BatteryMonitor : protected I2CDevice {
         float measureTemperature();
 
         /**
-         * @brief read the current current value from the battery monitor
+         * @brief read the instantaneous current value from the battery monitor
          * @return the current in milliAmps. Note negative values indicate current is being drawn from the battery, positive values indicate the battery is being charged.
          */
         int measureCurrent();
@@ -128,7 +134,7 @@ class BatteryMonitor : protected I2CDevice {
         void setBatteryChargeRemaining(int chargeValueMilliAmpHours);
 
         /**
-         * @brief measure the voltage of the 5V bus. LSB represents 10mV. Note the maximum voltage the chip can read is 10V
+         * @brief measure the voltage of the 5V bus. LSB represents 10mV. Note the maximum voltage the chip can read is stated as 10V in the datasheet
          * @return the data as returned by the DS2438, which is an integer voltage measured in multiples of 10mV. e.g. 0x010E = 270 is 2.7V, or 0x01F4 = 500 is 5V.
          */
 		uint16_t measure5VBusVoltage();
@@ -140,7 +146,7 @@ class BatteryMonitor : protected I2CDevice {
 		uint16_t measureBatteryVoltage();
 
 		/**
-		 * for debugging, print all the pages of the battery monitor memory in binary
+		 * for debugging, print all the pages of the battery monitor memory in binary format
 		 */
         void printAllPages();
 
@@ -186,7 +192,7 @@ class BatteryMonitor : protected I2CDevice {
         void updateReadPageDataFromScratchpad(int pageNumber); // copy the scratchpad values into pageDataFromDS2438
 
         /**
-         * @brief check if the battery monitor (DS2438) is busy doing a temperature or voltage conversion, and wait until it is not.
+         * @brief check if the battery monitor chip (DS2438) is busy doing a temperature or voltage conversion, and wait until it is not.
          */
         void waitForDS2438ToStopBeingBusy();
 
@@ -200,16 +206,17 @@ class BatteryMonitor : protected I2CDevice {
         int doCRCCheck(int message[], int nBytes, int receivedCRC);
 
         /**
-         * @brief Upload a new status/config byte to the DS2438, format is defined on p15 of the datasheet.
-         * @param statusConfigByte the new value to be uplaoded.
+         * @brief Upload a new status/config byte to the battery monitor chip (DS2438), format is defined on p15 of the datasheet.
+         * @param statusConfigByte the new value to be uploaded.
          */
         void uploadNewDS2438Config(uint8_t statusConfigByte);
 
         /**
-        * @brief write new data to the battery monitor
+        * @brief write new data to the battery monitor chip (DS2438) internal memory
          * Will re-download from the scratchpad and check for errors (caused by the 1Wire interface) before commanding it be copied into the actual memory.
+         * See page 16 of the datasheet for the memory map
         * @param page which page the new byte needs to go into
-        * @param byteNumber which byte within that page is being written
+        * @param byteNumber which byte within that page to change
          * @param newByteValue the value to put there
         */
         void uploadNewByteToDS2438(int pageNumber, int byteNumber, uint8_t newByteValue);

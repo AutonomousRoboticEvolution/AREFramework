@@ -1,7 +1,7 @@
 /**
 	@file BatteryMonitor.cpp
-	@brief Implementation of BatteryMonitor methods
-	@author Mike Angus
+	@brief handles the DS2438Z+ battery monitor chip, via I2C converter
+	@author Matt Hale
 */
 #include "BatteryMonitor.hpp"
 
@@ -47,13 +47,13 @@ void BatteryMonitor::testingDisplayBatteryLevels(){
 
 void BatteryMonitor::init() {
 
-//    std::cout << "resetting\n" ;
+//    std::cout << "resetting i2c to 1Wire converter\n" ;
     write8(COMMAND_DEVICE_RESET);
     write8(COMMAND_1_WIRE_RESET);
     waitFor1WireToFinish();
 
     setI2CReadPointer(POINTER_CODE_DEVICE_CONFIGURATION);
-//    std::cout << "device config reads: " << std::bitset<8>(read8()) << std::endl;
+//    std::cout << "old config reads: " << std::bitset<8>(read8()) << std::endl;
 
     setI2CReadPointer(POINTER_CODE_STATUS );
 //    std::cout << "status: " << std::bitset<8>(read8()) << std::endl;
@@ -71,7 +71,7 @@ void BatteryMonitor::reset1Wire(){
 }
 void BatteryMonitor::skipROM(){
 //    std::cout << "Skip ROM" << std::endl;
-    write1WireByte(0xCC); //skipROM
+    write1WireByte(BATTERY_MONITOR_SkIP_ROM); //skipROM
 }
 
 void BatteryMonitor::write1WireByte(int data) {
@@ -93,14 +93,14 @@ int BatteryMonitor::read1WireByte() {
 
 void BatteryMonitor::waitFor1WireToFinish() {
     setI2CReadPointer(POINTER_CODE_STATUS);
-    while(read8() & 0x01){}
+    while(read8() & 0x01){} // LSB is the 1Wire status bit, zero once 1Wire conversation is finished
 }
 
 int BatteryMonitor::measureCurrent() {
-    // get raw current data from bytes 5 and 6 of page0 (see datasheet page 16):
+    //get raw current data from bytes 5 and 6 of page0 (see datasheet page 16):
     updateReadPageData(0x00);
     int16_t currentDataRaw = pageDataFromDS2438[6]<<8 | pageDataFromDS2438[5];
-//    std::cout <<"raw current data:  "<< std::bitset<16>( currentDataRaw ) << std::endl;
+    //std::cout <<"raw current data:  "<< std::bitset<16>( currentDataRaw ) << std::endl;
 
     // return converted to milliAmps for easier to use:
     return int(currentDataRaw) * BATTERY_MONITOR_CURRENT_CONVERSION_FACTOR;

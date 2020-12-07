@@ -1,8 +1,7 @@
 /**
-	@file MotorOrganTest.cpp
-	@brief Test code for the MotorOrgan class.
-	Allows control of motor and shows how the bus should be set up.
-	@author Mike Angus
+	@file main.cpp
+	@brief Test code for various on-robot
+	@author Mike Angus, Matt Hale
 */
 #include <csignal>
 #include <fstream>
