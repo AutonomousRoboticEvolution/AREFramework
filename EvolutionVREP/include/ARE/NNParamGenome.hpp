@@ -128,20 +128,8 @@ public:
      *          ...
      * @return
      */
-    std::string to_string() const override{
-        std::stringstream sstr;
-        sstr << weights.size() << std::endl;
-        sstr << biases.size() << std::endl;
-        for(double w : weights)
-            sstr << w << std::endl;
-        for(double b : biases)
-            sstr << b << std::endl;
-        return sstr.str();
-    }
-
-    void from_string(const std::string &) override{
-//Todo
-    }
+    std::string to_string() const override;
+    void from_string(const std::string & str) override;
 
     friend class boost::serialization::access;
     template <class archive>

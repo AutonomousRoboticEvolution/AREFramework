@@ -35,7 +35,6 @@ void ER::initialize()
             (loggingFactory,exp_plugin_name,"loggingFactory"))
         exit(1);
 
-    loggingFactory(logs,parameters);
 
 
     if(!load_fct_exp_plugin<EA::Factory>
@@ -43,6 +42,9 @@ void ER::initialize()
         exit(1);
     ea = EAFactory(randNum, parameters);
     ea->init();
+
+    loggingFactory(logs,parameters);
+
 }
 
 

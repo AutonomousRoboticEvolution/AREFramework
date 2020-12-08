@@ -1,7 +1,7 @@
 #ifndef M_NIPES_HPP
 #define M_NIPES_HPP
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 #include "ARE/CPPNGenome.h"
 #include "ARE/learning/NIPES.hpp"
@@ -172,6 +172,10 @@ public:
         return controller_archive.archive;
     }
 
+    void set_controller_archive(const ControllerArchive::controller_archive_t archive){
+        controller_archive.archive = archive;
+    }
+
 private:
     typedef struct morph_desc_t{
         int wheels;
@@ -182,6 +186,8 @@ private:
     void loadNEATGenome(short int genomeID, NEAT::Genome& gen);
     void listMorphGenomeID(std::vector<short int>& list);
     void loadNbrSenAct(const std::vector<short int>& list, std::map<short int, morph_desc_t>& desc_map);
+    void loadControllerArchive(const std::string &file);
+    int findLastGen(const std::string &exp_folder);
 
     std::vector<short int> morphIDList;
     int morphCounter = 0;

@@ -180,14 +180,23 @@ void M_NIPES::init(){
     Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+    bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
+
 
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
 
-        int max_wheels = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
-        int max_joints = settings::getParameter<settings::Integer>(parameters,"#maxNbrJoints").value;
-        int max_sensors = settings::getParameter<settings::Integer>(parameters,"#maxNbrSensors").value;
-        controller_archive.init(max_wheels,max_joints,max_sensors);
+
+        if(start_from_exp){//Load controller archive from previous experiment
+            std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
+            generation = findLastGen(exp_folder);
+            std::stringstream sstr;
+            sstr << generation;
+            loadControllerArchive(exp_folder + std::string("/") + "controller_archive"+ sstr.str());
+        }else{
+            int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+            controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+        }
         init_morph_pop();
 //        std::stringstream sstr;
 //        sstr << "morph_" << morphIDList[morphCounter];
@@ -211,9 +220,16 @@ void M_NIPES::init(){
 }
 
 void M_NIPES::init_morph_pop(){
-    //Load the bootstrap population
-    listMorphGenomeID(morphIDList);
-    unsigned int pop_size = morphIDList.size();
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
+    unsigned int pop_size = 0;
+    if(start_from_exp)
+        pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    else{
+        //Load the bootstrap population
+        listMorphGenomeID(morphIDList);
+        pop_size = morphIDList.size();
+    }
 
     /// Set parameters for NEAT
     neat_params.PopulationSize = pop_size;
@@ -264,10 +280,22 @@ void M_NIPES::init_morph_pop(){
     neat_params.ActivationFunction_UnsignedSine_Prob = 0.0;
     neat_params.ActivationFunction_Linear_Prob = 1.0;
 
+
+
     NEAT::Genome morph_gen(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, neat_params, 10);
     morph_population.reset(new NEAT::Population(morph_gen,neat_params,true,1.0,randomNum->getSeed()));
+
+    std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
+
     for(unsigned i = 0; i < pop_size; i++){
-        loadNEATGenome(morphIDList[i],morph_gen);
+        if(start_from_exp){
+            std::stringstream sstr;
+            sstr << generation << "_" << i;
+            if(verbose)
+                std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
+            morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
+        }else
+            loadNEATGenome(morphIDList[i],morph_gen);
         morph_population->AccessGenomeByIndex(i) = morph_gen;
     }
     for(int i = 0; i < pop_size ; i++){
@@ -365,6 +393,7 @@ void M_NIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
     gen = NEAT::Genome(filepath.str().c_str());
 }
 
+
 void M_NIPES::listMorphGenomeID(std::vector<short int>& list){
     // This code snippet was taken from: https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
@@ -398,7 +427,7 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::string morph_desc_file = settings::getParameter<settings::String>(parameters,"#morphDescFile").value;
-    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
 
     std::ifstream ifs(exp_folder + std::string("/") + morph_desc_file);
     if(!ifs){
@@ -421,6 +450,81 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
         desc_map.emplace(id,full_desc_map[id]);
 }
 
+void M_NIPES::loadControllerArchive(const std::string &file){
+    std::ifstream stream;
+    stream.open(file, std::ios::out | std::ios::ate | std::ios::app);
+
+    if(!stream)
+    {
+        std::cerr << "unable to open : " << file << std::endl;
+        return;
+    }
+
+    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+
+    ControllerArchive archive;
+    archive.init(maxNbrOrgans,maxNbrOrgans,maxNbrOrgans);
+
+    std::string elt;
+    std::string wheel_str,joint_str,sensor_str;
+    int w,j,s;
+    int nbr_weights,nbr_biases;
+    int state = 0;
+    double fitness;
+    are::NNParamGenome::Ptr gen(new are::NNParamGenome);
+    while(std::getline(stream,elt)){
+        if(state == 0){
+            std::stringstream sstr(elt);
+            std::getline(sstr,wheel_str,',');
+            w = std::stoi(wheel_str);
+            std::getline(sstr,joint_str,',');
+            j = std::stoi(joint_str);
+            std::getline(sstr,sensor_str,',');
+            s = std::stoi(sensor_str);
+            state = 1;
+        }else if(state == 1){
+            std::stringstream sstr;
+            sstr << elt << std::endl;
+            nbr_weights = std::stoi(elt);
+            std::getline(stream,elt);
+            sstr << elt << std::endl;
+            nbr_biases = std::stoi(elt);
+            for(int i = 0; i < nbr_weights; i++){
+                std::getline(stream,elt);
+                sstr << elt << std::endl;
+            }
+            for(int i = 0; i < nbr_biases; i++){
+                std::getline(stream,elt);
+                sstr << elt << std::endl;
+            }
+            gen->from_string(sstr.str());
+            state = 2;
+        }else if (state == 2){
+            fitness = std::stod(elt);
+            archive.archive[w][j][s] = std::make_pair(gen,fitness);
+        }
+    }
+
+    controller_archive.archive = archive.archive;
+}
+
+int M_NIPES::findLastGen(const std::string &exp_folder){
+    std::string fitness_file = settings::getParameter<settings::String>(parameters,"#fitnessFile").value;
+    std::ifstream ifs(exp_folder + std::string("/") + fitness_file);
+    if(!ifs){
+        std::cerr << "unable to open " << exp_folder + std::string("/") + fitness_file << std::endl;
+        return 0;
+    }
+
+    std::string line;
+    std::vector<std::string> lines;
+    while(std::getline(ifs,line))
+        lines.push_back(line);
+    std::stringstream sstr(lines.back());
+    std::string gen_str;
+    std::getline(sstr,gen_str,',');
+    return std::stoi(gen_str);
+}
 
 bool M_NIPES::finish_eval(){
     float tPos[3];

@@ -152,6 +152,37 @@ void NNParamGenome::crossover(const Genome::Ptr &partner, Genome::Ptr child1, Ge
 
 }
 
+std::string NNParamGenome::to_string() const{
+    std::stringstream sstr;
+    sstr << weights.size() << std::endl;
+    sstr << biases.size() << std::endl;
+    for(double w : weights)
+        sstr << w << std::endl;
+    for(double b : biases)
+        sstr << b << std::endl;
+    return sstr.str();
+}
+
+void NNParamGenome::from_string(const std::string &str){
+    weights.clear();
+    biases.clear();
+    std::stringstream sstr(str);
+    std::string elt;
+    getline(sstr,elt);
+    int nbr_weights = std::stoi(elt);
+    getline(sstr,elt);
+    int nbr_biases = std::stoi(elt);
+    for(int i = 0; i<nbr_weights; i++){
+        getline(sstr,elt);
+        weights.push_back(std::stod(elt));
+    }
+
+    for(int i = 0; i<nbr_biases; i++){
+        getline(sstr,elt);
+        biases.push_back(std::stod(elt));
+    }
+}
+
 void NNParamGenomeLog::saveLog(EA::Ptr &ea)
 {
     int generation = ea->get_generation();
