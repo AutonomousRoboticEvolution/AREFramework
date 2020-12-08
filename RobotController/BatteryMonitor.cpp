@@ -17,7 +17,6 @@ BatteryMonitor::BatteryMonitor() : I2CDevice(BATTERY_MONITOR_I2C_ADDRESS) {
 
 void BatteryMonitor::testingDisplayBatteryLevels(){
 
-
     uint16_t batteryVoltage = measureBatteryVoltage();
     uint16_t busVoltage = measure5VBusVoltage();
     int currentMilliAmps = measureCurrent();
@@ -30,19 +29,19 @@ void BatteryMonitor::testingDisplayBatteryLevels(){
     std::cout << "current:                " << std::bitset<8>(currentMilliAmps) << " = " << currentMilliAmps <<"mA"<< std::endl;
     std::cout << "batteryChargeRemaining: " << std::bitset<8>(batteryChargeRemaining) << " = " << batteryChargeRemaining <<"mAh" <<std::endl;
 
-    std::cout << std::endl<< "====== starting  ======" << std::endl<< std::endl;
-
-    std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;
-    int i=0;
-    while (i<99){
-        usleep(1000000);
-        i++;
-        if (i%10==0){std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;}
-        batteryVoltage = measureBatteryVoltage();
-        currentMilliAmps = measureCurrent();
-        batteryChargeRemaining = measureBatteryChargeRemaining();
-        std::cout << (float)batteryVoltage/100 << "V\t|\t" << currentMilliAmps << "mA\t|\t" << batteryChargeRemaining << "mAh" << std::endl;
-    }
+//    std::cout << std::endl<< "====== starting  ======" << std::endl<< std::endl;
+//
+//    std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;
+//    int i=0;
+//    while (i<99){
+//        usleep(1000000);
+//        i++;
+//        if (i%10==0){std::cout <<"Voltage\t|\tCurrent\t|\tICA"<<std::endl;}
+//        batteryVoltage = measureBatteryVoltage();
+//        currentMilliAmps = measureCurrent();
+//        batteryChargeRemaining = measureBatteryChargeRemaining();
+//        std::cout << (float)batteryVoltage/100 << "V\t|\t" << currentMilliAmps << "mA\t|\t" << batteryChargeRemaining << "mAh" << std::endl;
+//    }
 }
 
 void BatteryMonitor::init() {
@@ -165,7 +164,7 @@ void BatteryMonitor::uploadNewByteToDS2438(int pageNumber, int byteNumber, uint8
     updateReadPageData(pageNumber); // updates pageDataFromDS2438
     std::copy(std::begin(pageDataFromDS2438), std::end(pageDataFromDS2438), std::begin(newPageData));
     newPageData[byteNumber] = newByteValue; // overwrite the byte to be changed
-    std::cout<<"data: "<< std::bitset<8>(newPageData[byteNumber])<<std::endl;
+//    std::cout<<"data: "<< std::bitset<8>(newPageData[byteNumber])<<std::endl;
 
     bool uploadSuccessful = false;
     int retries =0;
