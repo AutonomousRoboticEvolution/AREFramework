@@ -40,6 +40,7 @@ public:
         int organType;
         int connectorHandle;
         int gripperHandle;
+        int graphicConnectorHandle;
         std::vector<float> organPos;
         std::vector<float> connectorPos;
         std::vector<float> organOri;
@@ -48,6 +49,8 @@ public:
         bool organColliding;
         bool organGoodOrientation;
         bool organGripperAccess;
+        bool organRemoved;
+        bool organChecked;
         std::vector<int> objectHandles; // For collision detection purpose
     };
 
@@ -115,7 +118,7 @@ public:
     /**
      * @brief This method loads model, creates force sensor sets position and orientation and assigns parent.
      */
-    void createOrgan(OrganSpec& organ);
+    void createOrgan(OrganSpec& organ, int skeletonHandle);
     /**
      * @brief Creates a temporal gripper. The isOrganColliding method checks this gripper is not colliding.
      */
@@ -128,7 +131,7 @@ public:
     /**
      * @brief Creates a model to only visualize the vale connector
      */
-    void createMaleConnector(OrganSpec& organ);
+    void createMaleConnector(OrganSpec& organ, int skeletonHandle);
 
     /**
      * @brief Removes the gripper created with createTemporalGripper
@@ -146,11 +149,11 @@ public:
     /**
      * @brief Tests each component (organ) in the robot.
      */
-    void testComponents(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void testComponents(PolyVox::RawVolume<uint8_t>& skeletonMatrix,Morphology_CPPNMatrix::OrganSpec &organ);
     /**
      * @brief If a component fails any manufacturability test that component is removed from the final ns.
      */
-    void geneRepression();
+    void geneRepression(Morphology_CPPNMatrix::OrganSpec &organ);
 
     /// Not used...
     void removeRobot();
@@ -187,7 +190,7 @@ public:
     /**
      * @brief This method creates a predifines skeleton.
      */
-    void createSkeletonBase(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    void createSkeletonBase(PolyVox::RawVolume<uint8_t>& skeletonMatrix, bool isMainSkeleton);
 
     ///////////////////////////
     ///// Surface methods /////
@@ -229,21 +232,12 @@ public:
      * @brief If there is more than one region in the skeleton delete the smaller regions.
      */
     void removeSkeletonRegions(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
-    /**
-     * @brief This method explore the organs matrix
-     */
-    void organRegionCounter(PolyVox::RawVolume<AREVoxel>& areMatrix, VoxelType voxelType);
-    /**
-     * @brief This method explore the skeleton matrix
-     */
-    void exploreOrganRegion(PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<bool>& visitedVoxels, int32_t posX, int32_t posY, int32_t posZ, int regionCounter, VoxelType voxelType);
 
     void getFinalSkeletonVoxels(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
 
     //////////////////////////////////
     ///// Miscellanous functions /////
     //////////////////////////////////
-
     /**
      * @brief Export mesh file (stl) from a list of vertices and indices.
      * \todo EB: We might not want this method here and this should be in logging instead.
@@ -270,6 +264,10 @@ public:
      * @brief This method create the ARETricycle robot with the matrix body plan.
      */
     void createARETricyle(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
+    /**
+     * @brief This method create the ARESpider robot with the matrix body plan.
+     */
+    void createARESpider(PolyVox::RawVolume<uint8_t>& skeletonMatrix);
 
     ///////////////////////////////
     ///// Setters and getters /////
@@ -295,8 +293,10 @@ private:
     class CartDesc
     {
     public:
-
-        const int ORGANTRAITLIMIT = 5;
+        //const int ORGANTRAITLIMIT = 5;
+        const int ORGANTRAITLIMIT = 16;
+        //const float DIMENSIONLIMIT = 0.23;
+        const float DIMENSIONLIMIT = 0.55; // Skeleton - > 0.23m; Joint - > 0.08; 1 Skeleton + 4 Joints
         float robotWidth; // X
         float robotDepth; // Y
         float robotHeight; // Z
@@ -320,25 +320,28 @@ private:
             setCartDesc();
         }
         void setCartDesc(){
-            cartDesc(0) = robotWidth / MATRIX_SIZE_M;
-            cartDesc(1) = robotDepth / MATRIX_SIZE_M;
-            cartDesc(2) = robotHeight / MATRIX_SIZE_M;
+            cartDesc(0) = robotWidth / DIMENSIONLIMIT;
+            cartDesc(1) = robotDepth / DIMENSIONLIMIT;
+            cartDesc(2) = robotHeight / DIMENSIONLIMIT;
             cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
             cartDesc(4) = (double) wheelNumber / ORGANTRAITLIMIT;
             cartDesc(5) = (double) sensorNumber / ORGANTRAITLIMIT;
             cartDesc(6) = (double) jointNumber / ORGANTRAITLIMIT;
             cartDesc(7) = (double) casterNumber / ORGANTRAITLIMIT;
         }
-        void countOrgans( std::vector<OrganSpec> _organSpec){
+        void countOrgans(std::vector<OrganSpec> _organSpec){
             for(std::vector<OrganSpec>::iterator it = _organSpec.begin(); it != _organSpec.end(); it++){
-                if(it->organType == 1)
-                    wheelNumber++;
-                if(it->organType == 2)
-                    sensorNumber++;
-                if(it->organType == 3)
-                    jointNumber++;
-                if(it->organType == 4)
-                    casterNumber++;
+                if(!it->organRemoved && it->organChecked) {
+                    if (it->organType == 1)
+                        wheelNumber++;
+                    if (it->organType == 2)
+                        sensorNumber++;
+                    if (it->organType == 3)
+                        jointNumber++;
+                    if (it->organType == 4)
+                        casterNumber++;
+                }
+
             }
         }
         void getSkeletonDimmensions(PolyVox::RawVolume<uint8_t>& skeletonMatrix){
@@ -375,6 +378,29 @@ private:
             robotWidth = xDiff * VOXEL_REAL_SIZE;
             robotDepth = yDiff * VOXEL_REAL_SIZE;
             robotHeight = zDiff * VOXEL_REAL_SIZE;
+        }
+        void getRobotDimmensions(std::vector<OrganSpec> _organSpec){
+            float minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
+            for(auto & i : _organSpec) {
+                if (!i.organRemoved && i.organChecked) {
+                    if(i.connectorPos.at(0) > maxX)
+                        maxX = i.connectorPos.at(0);
+                    if(i.connectorPos.at(1) > maxY)
+                        maxY = i.connectorPos.at(1);
+                    if(i.connectorPos.at(2) > maxZ)
+                        maxZ = i.connectorPos.at(2);
+                    if(i.connectorPos.at(0) < minX)
+                        minX = i.connectorPos.at(0);
+                    if(i.connectorPos.at(1) < minY)
+                        minY = i.connectorPos.at(1);
+                    if(i.connectorPos.at(2) < minZ)
+                        minZ = i.connectorPos.at(2);
+                }
+            }
+            // Get dimmensions
+            robotWidth = abs(maxX - minX);
+            robotDepth = abs(maxY - minY);
+            robotHeight = abs(maxZ - minZ);
         }
     };
 
@@ -529,7 +555,6 @@ private:
     NEAT::NeuralNetwork nn;
 
     /////////////////////
-    ///// Constants /////
     /////////////////////
     constexpr static const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
     // WAS 4 -> 3.6mm
@@ -564,15 +589,11 @@ private:
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
     std::vector<std::vector<std::vector<int>>> skeletonRegionCoord;
 
-    std::vector<std::vector<std::vector<int>>> wheelRegionCoord;
-    std::vector<std::vector<std::vector<int>>> sensorRegionCoord;
-    std::vector<std::vector<std::vector<int>>> jointRegionCoord;
-    std::vector<std::vector<std::vector<int>>> casterRegionCoord;
-
     double manScore;
 
-
     Descriptors indDesc;
+
+    std::vector<int> skeletonHandles;
 };
 
 }
