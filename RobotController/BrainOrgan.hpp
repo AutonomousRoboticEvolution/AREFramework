@@ -10,5 +10,7 @@
 #include "LedDriver.hpp"
 #include "IMU.hpp"
 #include "BatteryMonitor.hpp"
+#include "Fan.hpp"
+#include "DaughterBoards.hpp"
 
 #endif

@@ -106,12 +106,17 @@ int main()
 {
 //    setup_sigint_catch();
 
-    /************ Battery monitor testing ********************************************/
+/************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
 //    batteryMonitor.setBatteryChargeRemaining(2000);
     batteryMonitor.testingDisplayBatteryLevels();
 //    batteryMonitor.printAllPages();
-//    batteryMonitor.printAllPages();
+
+/************ Fan and daughter boards enable testing *********************************/
+    Fan fan;
+    DaughterBoards daughterBoards;
+    fan.test();
+    daughterBoards.test();
 
 /************ LED DRIVER and IMU ********************************************/
 //    // Create and test led driver
