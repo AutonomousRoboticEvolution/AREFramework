@@ -1,8 +1,6 @@
 #ifndef M_NIPES_HPP
 #define M_NIPES_HPP
 
-#include <filesystem>
-
 #include "ARE/CPPNGenome.h"
 #include "ARE/learning/NIPES.hpp"
 #include "ARE/Morphology_CPPNMatrix.h"

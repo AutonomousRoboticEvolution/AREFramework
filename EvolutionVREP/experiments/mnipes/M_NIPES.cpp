@@ -81,14 +81,18 @@ void M_NIPESIndividual::createController(){
         learner->set_parameters(parameters);
         std::dynamic_pointer_cast<CMAESLearner>(learner)->set_randNum(randNum);
 
-        auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
+        if(use_ctrl_arch){
+            auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
 
-        if(!use_ctrl_arch || starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
-            std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
-        else{
-            std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
-            std::dynamic_pointer_cast<CMAESLearner>(learner)->init(init_pt);
-        }
+            if(!use_ctrl_arch || (starting_gen->get_weights().empty() && starting_gen->get_biases().empty()))
+                std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
+            else{
+                std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
+                std::dynamic_pointer_cast<CMAESLearner>(learner)->init(init_pt);
+            }
+        }else std::dynamic_pointer_cast<CMAESLearner>(learner)->init();
+
+
         std::dynamic_pointer_cast<CMAESLearner>(learner)->next_pop();
 
     }
@@ -181,6 +185,7 @@ void M_NIPES::init(){
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
 
     //Initialized the population of morphologies
@@ -190,12 +195,16 @@ void M_NIPES::init(){
         if(start_from_exp){//Load controller archive from previous experiment
             std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
             generation = findLastGen(exp_folder);
-            std::stringstream sstr;
-            sstr << generation;
-            loadControllerArchive(exp_folder + std::string("/") + "controller_archive"+ sstr.str());
+            if(use_ctrl_arch){
+                std::stringstream sstr;
+                sstr << generation;
+                loadControllerArchive(exp_folder + std::string("/") + "controller_archive"+ sstr.str());
+            }
         }else{
-            int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
-            controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+            if(use_ctrl_arch){
+                int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+                controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+            }
         }
         init_morph_pop();
 //        std::stringstream sstr;
@@ -315,20 +324,16 @@ void M_NIPES::init_morph_pop(){
 
 void M_NIPES::epoch(){
 
-    int max_wheel = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
-    int max_joint = settings::getParameter<settings::Integer>(parameters,"#maxNbrJoints").value;
-    int max_sensor = settings::getParameter<settings::Integer>(parameters,"#maxNbrSensors").value;
+    int max_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-
-
     
     //update controller archive
     if(use_ctrl_arch){
-    for(const auto& ind: population){
-        const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
-        auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
-        controller_archive.update(ctrl_gen,ind->getObjectives()[0],morph_desc[4]*max_wheel,morph_desc[6]*max_joint,morph_desc[5]*max_sensor);
-    }
+        for(const auto& ind: population){
+            const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
+            auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
+            controller_archive.update(ctrl_gen,ind->getObjectives()[0],morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);
+        }
     }
     //Epoch the morphogenesis
     for(unsigned i = 0; i < population.size(); i++)
@@ -427,7 +432,7 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::string morph_desc_file = settings::getParameter<settings::String>(parameters,"#morphDescFile").value;
-    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrWheels").value;
+    int maxNbrOrgans = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
 
     std::ifstream ifs(exp_folder + std::string("/") + morph_desc_file);
     if(!ifs){
