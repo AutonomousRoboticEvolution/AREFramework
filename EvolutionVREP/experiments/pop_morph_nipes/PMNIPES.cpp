@@ -168,7 +168,6 @@ void PMNIPES::init(){
 
     controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
 
-
     loadNbrSenAct(morphIDList,morphDescMap);
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
@@ -250,17 +249,11 @@ void PMNIPES::init_first_pop(int nbr_weights, int nbr_bias){
 
     loadNEATGenome(morphIDList[morphCounter],current_morph_gen);
 
-
-
-
     for(int u = 0; u < pop_size; u++){
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
             biases[w-nbr_weights] = init_samples(w,u);
-
-        CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
-
 
         CPPNGenome::Ptr morph_gen(new CPPNGenome(current_morph_gen));
         morph_gen->set_parameters(parameters);

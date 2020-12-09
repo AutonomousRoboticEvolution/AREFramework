@@ -189,7 +189,6 @@ public:
 private:
     std::string log_file;
 };
-<<<<<<< HEAD
 
 class ControllerArchiveLog : public Logging
 {
@@ -199,8 +198,6 @@ public:
     void loadLog(const std::string &file = std::string()) override{}
 };
 
-=======
->>>>>>> add new experiment : pop_morph_nipes
 }//morph_log
 }//are
 

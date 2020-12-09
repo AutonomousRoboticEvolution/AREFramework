@@ -60,10 +60,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::morph_log::SimTimeLog<are::PMNIPESIndividual>::Ptr stlog(new are::morph_log::SimTimeLog<are::PMNIPESIndividual>(st_log_file));
     logs.push_back(stlog);
 
-<<<<<<< HEAD
     are::morph_log::ControllerArchiveLog::Ptr calog(new are::morph_log::ControllerArchiveLog());
     logs.push_back(calog);
-=======
->>>>>>> add new experiment : pop_morph_nipes
 }
 
