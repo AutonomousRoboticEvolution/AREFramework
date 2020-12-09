@@ -1,9 +1,10 @@
-#ifndef NIPES_HPP
-#define NIPES_HPP
+#ifndef SA_NIPES_HPP
+#define SA_NIPES_HPP
 
 #include <ARE/EA.h>
 #include "ARE/learning/Novelty.hpp"
 #include <libcmaes/cmaes.h>
+#include <libcmaes/surrogatestrategy.h>
 #include "ARE/NNParamGenome.hpp"
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/nn2/NN2Individual.hpp"
@@ -12,17 +13,13 @@
 namespace cma = libcmaes;
 using geno_pheno_t = cma::GenoPheno<cma::pwqBoundStrategy>;
 using cov_update_t = cma::CovarianceUpdate;
-using ipop_cmaes_t = cma::IPOPCMAStrategy<cov_update_t,geno_pheno_t>;
+using sa_cmaes_t = cma::ACMSurrogateStrategy<cma::IPOPCMAStrategy,cov_update_t,geno_pheno_t>;
 using eostrat_t = cma::ESOStrategy<cma::CMAParameters<geno_pheno_t>,cma::CMASolutions,cma::CMAStopCriteria<geno_pheno_t>>;
 
 namespace are{
 
-class IPOPCMAStrategy : public ipop_cmaes_t
+class SACMAStrategy : public sa_cmaes_t
 {
-private:
-//    cma::FitFunc emptyObj = [](const double*,const int&) -> double{};
-
-
 public:
 
     typedef struct individual_t{
@@ -37,33 +34,20 @@ public:
             arch & objectives;
             arch & descriptor;
         }
-
-
     }individual_t;
 
     static std::map<int,std::string> scriterias;
 
-    typedef std::shared_ptr<IPOPCMAStrategy> Ptr;
-    typedef std::shared_ptr<const IPOPCMAStrategy> ConstPtr;
+    typedef std::shared_ptr<SACMAStrategy> Ptr;
+    typedef std::shared_ptr<const SACMAStrategy> ConstPtr;
 
-    IPOPCMAStrategy(cma::FitFunc func,cma::CMAParameters<geno_pheno_t> &parameters)
-        :ipop_cmaes_t(func,parameters)
+    SACMAStrategy(cma::FitFunc func,cma::CMAParameters<geno_pheno_t> &parameters)
+        :sa_cmaes_t(func,parameters)
     {
-        _stopcriteria.set_criteria_active(cma::AUTOMAXITER,false); //The automatically set maximal number of iterations per run has been reached
-        _stopcriteria.set_criteria_active(cma::TOLHISTFUN,false);  //[Success] The optimization has converged
-        _stopcriteria.set_criteria_active(cma::EQUALFUNVALS,false); //[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function
-        _stopcriteria.set_criteria_active(cma::TOLX,false);//[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)
-        _stopcriteria.set_criteria_active(cma::TOLUPSIGMA,false);//[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization.
-        _stopcriteria.set_criteria_active(cma::STAGNATION,false);//[Partial Success] Median of newest values is not smaller than the median of older values
-        _stopcriteria.set_criteria_active(cma::CONDITIONCOV,false);//[Error] The covariance matrix's condition number exceeds 1e14. Check out the formulation of your problem
-        _stopcriteria.set_criteria_active(cma::NOEFFECTAXIS,false);//[Partial Success] Mean remains constant along search axes
-        _stopcriteria.set_criteria_active(cma::NOEFFECTCOOR,false);//[Partial Success] Mean remains constant in coordinates
-        _stopcriteria.set_criteria_active(cma::MAXFEVALS,false);//The maximum number of function evaluations allowed for optimization has been reached
-        _stopcriteria.set_criteria_active(cma::MAXITER,false);//The maximum number of iterations specified for optimization has been reached
-        _stopcriteria.set_criteria_active(cma::FTARGET,false);//[Success] The objective function target value has been reached
+
     }
 
-    ~IPOPCMAStrategy() {}
+    ~SACMAStrategy() {}
 
     //custom stop criteria
     bool pop_desc_stagnation();
@@ -84,14 +68,14 @@ public:
     bool stop();
 
     void capture_best_solution(cma::CMASolutions& best_run){
-        ipop_cmaes_t::capture_best_solution(best_run);
+        sa_cmaes_t::capture_best_solution(best_run);
     }
 
     void reset_search_state();
 
 
     void lambda_inc(){
-        ipop_cmaes_t::lambda_inc();
+        sa_cmaes_t::lambda_inc();
     }
 
     void add_individual(const individual_t &ind){_pop.push_back(ind);}
@@ -162,5 +146,5 @@ protected:
 
 }
 
-#endif //NIPES_HPP
+#endif //SA_NIPES_HPP
 
