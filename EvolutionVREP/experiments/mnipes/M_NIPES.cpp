@@ -204,6 +204,11 @@ void M_NIPES::init(){
             if(use_ctrl_arch){
                 int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
                 controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+                std::string load_archive = settings::getParameter<settings::String>(parameters,"#loadPreviousArchive").value;
+                bool bootst_ca = settings::getParameter<settings::Boolean>(parameters,"#bootstrapControllerArchive").value;
+                if(bootst_ca){
+                    loadControllerArchive(load_archive);
+                }
             }
         }
         init_morph_pop();
