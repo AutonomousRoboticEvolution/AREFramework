@@ -22,6 +22,16 @@ void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
     }
 }
 
+void ControllerArchive::reset_fitnesses(){
+    for(auto& w : archive){
+        for(auto& j : w){
+            for(auto& s : j){
+                s.second = 0;
+            }
+        }
+    }
+}
+
 void ControllerArchive::update(const NNParamGenome::Ptr &genome, double fitness, int wheels, int joints, int sensors){
     if(archive[wheels][joints][sensors].second < fitness)
         archive[wheels][joints][sensors] = std::make_pair(genome,fitness);
@@ -208,6 +218,7 @@ void M_NIPES::init(){
                 bool bootst_ca = settings::getParameter<settings::Boolean>(parameters,"#bootstrapControllerArchive").value;
                 if(bootst_ca){
                     loadControllerArchive(load_archive);
+                    controller_archive.reset_fitnesses();
                 }
             }
         }

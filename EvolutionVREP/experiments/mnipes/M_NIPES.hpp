@@ -32,6 +32,11 @@ struct ControllerArchive{
      */
     void update(const NNParamGenome::Ptr& genome, double fitness, int wheels, int joints, int sensors);
 
+    /**
+     * @brief reset all fitnesses at 0 while keeping the controllers genomes
+     */
+    void reset_fitnesses();
+
     template<class archive_t>
     void serialize(archive_t &arch, const unsigned int v)
     {
