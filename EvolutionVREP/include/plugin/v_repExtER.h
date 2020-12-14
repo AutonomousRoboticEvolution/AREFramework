@@ -31,6 +31,7 @@ enum SimulationState {
     STARTING,
     BUSY,
     CLEANUP,
+    RESTART
 };
 
 SimulationState simulationState = FREE;
