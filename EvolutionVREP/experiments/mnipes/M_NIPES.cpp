@@ -343,7 +343,6 @@ void M_NIPES::epoch(){
 
 
 void M_NIPES::init_next_pop(){
-
     population.clear();
     for(int i = 0; i < morph_population->NumGenomes() ; i++){
         NEAT::Genome mgen = morph_population->AccessGenomeByIndex(i);
@@ -456,9 +455,7 @@ void M_NIPES::loadNbrSenAct(const std::vector<short> &list, std::map<short, morp
 }
 
 void M_NIPES::loadControllerArchive(const std::string &file){
-    std::ifstream stream;
-    stream.open(file, std::ios::out | std::ios::ate | std::ios::app);
-
+    std::ifstream stream(file);
     if(!stream)
     {
         std::cerr << "unable to open : " << file << std::endl;
@@ -476,7 +473,7 @@ void M_NIPES::loadControllerArchive(const std::string &file){
     int nbr_weights,nbr_biases;
     int state = 0;
     double fitness;
-    are::NNParamGenome::Ptr gen(new are::NNParamGenome);
+    are::NNParamGenome gen;
     while(std::getline(stream,elt)){
         if(state == 0){
             std::stringstream sstr(elt);
@@ -502,11 +499,12 @@ void M_NIPES::loadControllerArchive(const std::string &file){
                 std::getline(stream,elt);
                 sstr << elt << std::endl;
             }
-            gen->from_string(sstr.str());
+            gen.from_string(sstr.str());
             state = 2;
         }else if (state == 2){
             fitness = std::stod(elt);
-            archive.archive[w][j][s] = std::make_pair(gen,fitness);
+            archive.archive[w][j][s] = std::make_pair(std::make_shared<are::NNParamGenome>(gen),fitness);
+            state = 0;
         }
     }
 
