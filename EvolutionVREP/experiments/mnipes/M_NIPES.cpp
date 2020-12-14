@@ -200,8 +200,6 @@ void M_NIPES::init(){
 
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
-
-
         if(start_from_exp){//Load controller archive from previous experiment
             std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
             generation = findLastGen(exp_folder);
@@ -392,10 +390,15 @@ bool M_NIPES::update(const Environment::Ptr& env){
                     );
 
         //LEARNING WITH NIP-ES
-        if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step()){
-          //  std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->update_ctrl();
+        if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step())
             return false;
-        }else return true;
+        else{
+            //set best fitness of the learner as fitness of the individual (instead of the last fitness obtain by the learner)
+            auto obj = ind->getObjectives();
+            obj[0] = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->get_best_solution().first;
+            ind->setObjectives(obj);
+            return true;
+        }
     }else return true;
 }
 

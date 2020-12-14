@@ -118,12 +118,12 @@ bool CMAESLearner::step(){
     if(_counter < _population.size())
         return false;
 
+    iterate();
 
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
     if(_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50)
         return true;
 
-    iterate();
     next_pop();
 
     return false;

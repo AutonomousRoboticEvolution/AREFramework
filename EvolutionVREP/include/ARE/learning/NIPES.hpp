@@ -104,6 +104,7 @@ public:
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
     void set_novelty_decr(double nd){novelty_decr = nd;}
     void set_pop_stag_thres(float pst){pop_stag_thres = pst;}
+    const std::pair<double,std::vector<double>> &get_best_seen_solution(){return best_seen_solution;}
 
     bool have_reached_ftarget(){return reached_ft;}
 

@@ -46,6 +46,7 @@ public:
 
     std::string archive_to_string();
     void set_nbr_dropped_eval(const int& nde){nbr_dropped_eval = nde;}
+    const std::pair<double,std::vector<double>>& get_best_solution(){return _cma_strat->get_best_seen_solution();}
 
 protected:
     int _dimension;
