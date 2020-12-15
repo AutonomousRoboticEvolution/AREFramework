@@ -17,6 +17,11 @@ using eostrat_t = cma::ESOStrategy<cma::CMAParameters<geno_pheno_t>,cma::CMASolu
 
 namespace are{
 
+/**
+ * @brief IPOP-CMAES : Increasing POPulation Covariance Matrix Evolutionary Strategy with custom restart mechanism and possibility to add novelty as special objective
+ * WARNING : This learner minimize fitnesses between 0 and 1.
+ *
+ */
 class IPOPCMAStrategy : public ipop_cmaes_t
 {
 private:
@@ -27,7 +32,7 @@ public:
 
     typedef struct individual_t{
         std::vector<double> genome;
-        std::vector<double> objectives;
+        std::vector<double> objectives; //this objectives are the oposite of the reward and novelty use here (reward = 1 - obj0) Those are the same objective values than the one obtain in the EA class.
         std::vector<double> descriptor;
 
         template<class archive>
@@ -94,6 +99,8 @@ public:
         ipop_cmaes_t::lambda_inc();
     }
 
+    double learning_progress();
+
     void add_individual(const individual_t &ind){_pop.push_back(ind);}
     void set_population(const std::vector<Individual::Ptr>& pop);
     void set_population(const std::vector<individual_t>& pop){_pop = pop;}
@@ -111,6 +118,7 @@ public:
     std::vector<std::string> log_stopping_criterias;
 
 
+
 private:
     std::vector<individual_t> _pop;
     bool elitist_restart = false;
@@ -121,8 +129,12 @@ private:
     double novelty_ratio = 0;
     double start_novelty_ratio = 0;
     double novelty_decr = 0.05;
+    double starting_fitness = 0;
+    int number_of_eval = 0;
 
     double best_fitness(std::vector<double> &);
+
+    void _set_starting_fitness();
 
     bool reached_ft = false;
 

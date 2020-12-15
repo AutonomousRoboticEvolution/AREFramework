@@ -119,6 +119,15 @@ bool IPOPCMAStrategy::best_sol_stagnation(){
     }else return false;
 }
 
+void IPOPCMAStrategy::_set_starting_fitness(){
+    starting_fitness = 1 - _pop[0].objectives[0];
+    for(const auto& ind : _pop){
+        if(1 - ind.objectives[0] < starting_fitness){
+            starting_fitness = 1 - ind.objectives[0];
+        }
+    }
+}
+
 void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
     // custom eval.
     _solutions.candidates().clear();
@@ -150,6 +159,12 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
         }
 
         _solutions.candidates().push_back(cma::Candidate(fvalue,x));
+
+        if(number_of_eval == 0)
+            _set_starting_fitness();
+
+        number_of_eval++;
+
     }
     update_fevals(candidates.cols());
 }
@@ -191,6 +206,10 @@ void IPOPCMAStrategy::reset_search_state()
     best_fitnesses.clear();
 }
 
+double IPOPCMAStrategy::learning_progress(){
+    return (starting_fitness - best_seen_solution.first)/number_of_eval;
+}
+
 double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
     double bf = 1.;
     for(const auto& ind : _pop){
@@ -201,6 +220,8 @@ double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
     }
     return bf;
 }
+
+
 
 void IPOPCMAStrategy::set_population(const std::vector<Individual::Ptr> &pop){
     _pop.clear();

@@ -46,6 +46,21 @@ struct ControllerArchive{
 
 } ControllerArchive;
 
+typedef std::function<double(const CMAESLearner::Ptr&)> fitness_fct_t;
+
+typedef struct FitnessFunctions{
+    static fitness_fct_t best_fitness;
+    static fitness_fct_t average_fitness;
+    static fitness_fct_t learning_progress;
+}FitnessFunctions;
+
+typedef enum FitnessType{
+    BEST_FIT = 0,
+    AVG_FIT = 1,
+    LEARNING_PROG = 2,
+    DIVERSITY = 3
+}FitnessType;
+
 /**
  * @brief The M_NIPESIndividual class
  */
@@ -200,6 +215,8 @@ private:
     std::unique_ptr<NEAT::Population> morph_population;
 
     ControllerArchive controller_archive;
+
+    fitness_fct_t fitness_fct;
 
     float current_ind_past_pos[3];
     int move_counter = 0;

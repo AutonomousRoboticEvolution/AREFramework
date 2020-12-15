@@ -37,6 +37,36 @@ void ControllerArchive::update(const NNParamGenome::Ptr &genome, double fitness,
         archive[wheels][joints][sensors] = std::make_pair(genome,fitness);
 }
 
+
+fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner::Ptr& learner) -> double
+{
+    return 1 - learner->get_best_solution().first;
+};
+
+fitness_fct_t FitnessFunctions::average_fitness = [](const CMAESLearner::Ptr& learner) -> double
+{
+    auto pop = learner->get_population();
+    std::vector<double> fitnesses;
+    for(const auto &ind : pop)
+        fitnesses.push_back(ind.objectives[0]);
+
+    if(fitnesses.size() > 10){
+        std::sort(fitnesses.begin(),fitnesses.end(),std::greater<double>());
+    }
+
+    double avg = 0;
+    for(int i =0; i< 10; i++){
+        avg+=fitnesses[i];
+    }
+    return avg/10.f;
+
+};
+
+fitness_fct_t FitnessFunctions::learning_progress = [](const CMAESLearner::Ptr& learner) -> double
+{
+    return learner->learning_progress();
+};
+
 void M_NIPESIndividual::createMorphology(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
@@ -196,7 +226,15 @@ void M_NIPES::init(){
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    int fitness_type = settings::getParameter<settings::Integer>(parameters,"#fitnessType").value;
 
+    if(fitness_type == BEST_FIT)
+        fitness_fct = FitnessFunctions::best_fitness;
+    else if(fitness_type == AVG_FIT)
+        fitness_fct = FitnessFunctions::average_fitness;
+    else if(fitness_type == LEARNING_PROG)
+        fitness_fct = FitnessFunctions::learning_progress;
+    else fitness_fct = FitnessFunctions::best_fitness;
 
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
@@ -395,7 +433,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
         else{
             //set best fitness of the learner as fitness of the individual (instead of the last fitness obtain by the learner)
             auto obj = ind->getObjectives();
-            obj[0] = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->get_best_solution().first;
+            obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
             ind->setObjectives(obj);
             return true;
         }
