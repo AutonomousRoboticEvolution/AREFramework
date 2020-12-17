@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 project(ARE)
 
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
+#set(CMAKE_CXX_STANDARD 17)
+#set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if (RASPBERRY)
     add_subdirectory(EAFramework)

@@ -32,6 +32,7 @@ if (RASPBERRY)
 
     target_link_libraries(piARE ${Boost_LIBRARIES})
 else()
+find_package(PolyVox REQUIRED)
 
     find_package(MultiNEAT REQUIRED)
     message("MultiNEAT Folder : ${MultiNEAT_DIR}")
