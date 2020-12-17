@@ -381,10 +381,23 @@ void M_NIPES::epoch(){
     
     //update controller archive
     if(use_ctrl_arch){
+        std::vector<double> weights;
+        std::vector<double> biases;
+        int nbr_weights;
+        NNParamGenome best_gen;
         for(const auto& ind: population){
+            //Pick up the best controller found by the learner
+            auto &best_controller = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->get_best_solution();
+            nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
+            weights.clear();
+            biases.clear();
+            weights.insert(weights.begin(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+            biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+            best_gen.set_weights(weights);
+            best_gen.set_biases(biases);
+            //update the archive
             const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
-            auto ctrl_gen = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome());
-            controller_archive.update(ctrl_gen,ind->getObjectives()[0],morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);
+            controller_archive.update(std::make_shared<NNParamGenome>(best_gen),best_controller.first,morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);
         }
     }
     //Epoch the morphogenesis
