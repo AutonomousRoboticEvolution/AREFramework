@@ -1,8 +1,6 @@
 #ifndef NN2CONTROL_H
 #define NN2CONTROL_H
 
-#include <pybind11/pybind11.h>
-
 #include "ARE/Control.h"
 #include <eigen3/Eigen/Core>
 
@@ -12,8 +10,6 @@
 #include "nn2/mlp.hpp"
 #include "nn2/elman.hpp"
 #include "nn2/rnn.hpp"
-
-namespace py = pybind11;
 
 namespace are {
 
@@ -82,13 +78,6 @@ public:
 };
 
 
-}
-
-declare_python_NN2Control<ffnn_t>(m,"FFNN");
-declare_python_NN2Control<elman_t>(m,"Elman");
-declare_python_NN2Control<rnn_t>(m,"RNN");
-
-}
 }
 
 #endif //NN2CONTROL_H
