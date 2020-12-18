@@ -152,7 +152,6 @@ void NNParamGenome::crossover(const Genome::Ptr &partner, Genome::Ptr child1, Ge
 
 }
 
-<<<<<<< HEAD:EvolutionVREP/src/ARE/NNParamGenome.cpp
 std::string NNParamGenome::to_string() const{
     std::stringstream sstr;
     sstr << weights.size() << std::endl;
@@ -163,8 +162,6 @@ std::string NNParamGenome::to_string() const{
         sstr << b << std::endl;
     return sstr.str();
 }
-=======
->>>>>>> real_experiment:EAFramework/src/NNParamGenome.cpp
 
 void NNParamGenome::from_string(const std::string &gen_str){
     std::vector<std::string> split_str;
@@ -200,7 +197,6 @@ void NNParamGenome::from_file(const std::string &filename){
     for(int i = 0; i < nbr_bias; i++){
         std::getline(logFileStream,line);
         biases.push_back(std::stod(line));
-<<<<<<< HEAD:EvolutionVREP/src/ARE/NNParamGenome.cpp
     }
 }
 
@@ -218,7 +214,5 @@ void NNParamGenomeLog::saveLog(EA::Ptr &ea)
                              ea->get_population()[i]->get_ctrl_genome()
                              )->to_string();
         logFileStream.close();
-=======
->>>>>>> real_experiment:EAFramework/src/NNParamGenome.cpp
     }
 }
