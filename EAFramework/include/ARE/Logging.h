@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "ARE/EA.h"
+#include "NNParamGenome.hpp"
 
 namespace are {
 
