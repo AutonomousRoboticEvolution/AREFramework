@@ -116,7 +116,7 @@ void are::EvalTimeLog::saveLog(EA::Ptr &ea){
     logFileStream.close();
 }
 
-void NNParamGenomeLog::saveLog(EA::Ptr &ea)
+void are::NNParamGenomeLog::saveLog(EA::Ptr &ea)
 {
     int generation = ea->get_generation();
 
