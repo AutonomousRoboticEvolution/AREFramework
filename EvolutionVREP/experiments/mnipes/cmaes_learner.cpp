@@ -86,6 +86,7 @@ void CMAESLearner::iterate(){
 
     _cma_strat->eval();
     _cma_strat->tell();
+    _best_solution = _cma_strat->get_best_seen_solution();
     bool stop = _cma_strat->stop();
     _is_finish = _cma_strat->have_reached_ftarget();
     if(stop){

@@ -42,17 +42,19 @@ public:
     {
         arch & boost::serialization::base_object<Learner>(*this);
         arch & _archive;
+        arch & _best_solution;
     }
 
     std::string archive_to_string();
     void set_nbr_dropped_eval(const int& nde){nbr_dropped_eval = nde;}
-    const std::pair<double,std::vector<double>>& get_best_solution(){return _cma_strat->get_best_seen_solution();}
+    const std::pair<double,std::vector<double>>& get_best_solution(){return _best_solution;}
     const std::vector<IPOPCMAStrategy::individual_t>& get_population(){return _cma_strat->get_population();}
     double learning_progress(){return _cma_strat->learning_progress();}
 
 protected:
     int _dimension;
     IPOPCMAStrategy::Ptr _cma_strat;
+    std::pair<double,std::vector<double>> _best_solution;
     misc::RandNum::Ptr _rand_num;
     std::vector<Eigen::VectorXd> _population;
     int _counter = 0;
