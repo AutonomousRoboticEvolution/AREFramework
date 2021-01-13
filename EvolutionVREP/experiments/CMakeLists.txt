@@ -11,6 +11,7 @@ add_subdirectory(pop_morph_nipes)
 add_subdirectory(mnipes)
 add_subdirectory(robustness_test)
 #add_subdirectory(sa_nipes)
+add_subdirectory(visualization)
 endif()
 
 add_subdirectory(lc_nsms)
