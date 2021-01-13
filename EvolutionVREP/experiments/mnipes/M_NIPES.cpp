@@ -397,7 +397,7 @@ void M_NIPES::epoch(){
             best_gen.set_biases(biases);
             //update the archive
             const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
-            controller_archive.update(std::make_shared<NNParamGenome>(best_gen),best_controller.first,morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);
+            controller_archive.update(std::make_shared<NNParamGenome>(best_gen),1-best_controller.first,morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);
         }
     }
     //Epoch the morphogenesis
@@ -444,7 +444,6 @@ bool M_NIPES::update(const Environment::Ptr& env){
         if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step())
             return false;
         else{
-            //set best fitness of the learner as fitness of the individual (instead of the last fitness obtain by the learner)
             auto obj = ind->getObjectives();
             obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
             ind->setObjectives(obj);
