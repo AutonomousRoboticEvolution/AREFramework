@@ -1,4 +1,5 @@
 
+
 if(VREP_FOUND)
     add_definitions(-DVREP)
 elseif(COPPELIASIM_FOUND)
@@ -14,6 +15,7 @@ add_subdirectory(nipes)
 add_subdirectory(bayesopt)
 add_subdirectory(random_search)
 add_subdirectory(reevaluate_fixedmorphology)
+add_subdirectory(test_pimio)
 endif()
 add_subdirectory(lc_nsms)
 add_subdirectory(friction_estimation)
