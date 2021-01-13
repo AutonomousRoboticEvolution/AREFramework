@@ -30,7 +30,7 @@ int main(int argc, char** argv) {
     
     misc::RandNum::Ptr randomNumber(new misc::RandNum(0));
 
-    zmq::message_t message;
+    zmq::message_t message("");
 
     EmptyGenome::Ptr empy_gen(new EmptyGenome);
     NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
