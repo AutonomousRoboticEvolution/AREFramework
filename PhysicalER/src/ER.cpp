@@ -122,6 +122,7 @@ void ER::start_evaluation(){
     std::string reply;
     send_ctrl_genome(reply,ctrl_gen,request);
 
+
     ea->setCurrentIndIndex(currentIndIndex);
 }
 
@@ -135,7 +136,6 @@ bool ER::update_evaluation(){
 
     //currentInd->update(eval_duration.count());
     environment->update_info();
-    return  eval_time <= eval_duration.count() || currentInd->isEvaluated();
 
     std::string message;
     wait_for_message(message,subscriber);
