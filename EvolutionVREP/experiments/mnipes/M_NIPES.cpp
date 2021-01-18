@@ -72,6 +72,7 @@ void M_NIPESIndividual::createMorphology(){
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
 
     morphology.reset(new Morphology_CPPNMatrix(parameters));
+    morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
     std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);

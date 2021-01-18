@@ -328,6 +328,22 @@ void Morphology_CPPNMatrix::create()
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 {
     create();
+
+    //random orientation;
+    bool randOrient = settings::getParameter<settings::Boolean>(parameters,"#randomOrientation").value;
+    float robotOrient;
+    if(randOrient){
+        robotOrient = randomNum->randFloat(0,2*3.14);
+    }
+    else{
+        robotOrient = settings::getParameter<settings::Float>(parameters,"#robotOrientation").value;
+    }
+
+    float orientation[3];
+    simGetObjectOrientation(mainHandle,mainHandle,orientation);
+    orientation[0] = robotOrient;
+    simSetObjectOrientation(mainHandle,mainHandle,orientation);
+
     setPosition(x,y,z);
 }
 
