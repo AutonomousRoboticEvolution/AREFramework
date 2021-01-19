@@ -284,8 +284,9 @@ void M_NIPES::init(){
 void M_NIPES::init_morph_pop(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
+    bool start_from_rand = settings::getParameter<settings::Boolean>(parameters,"#startFromRandom").value;
     unsigned int pop_size = 0;
-    if(start_from_exp)
+    if(start_from_exp || start_from_rand)
         pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     else{
         //Load the bootstrap population
@@ -342,15 +343,20 @@ void M_NIPES::init_morph_pop(){
     neat_params.ActivationFunction_UnsignedSine_Prob = 0.0;
     neat_params.ActivationFunction_Linear_Prob = 1.0;
 
-
-
     NEAT::Genome morph_gen(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, neat_params, 10);
     morph_population.reset(new NEAT::Population(morph_gen,neat_params,true,1.0,randomNum->getSeed()));
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
 
     for(unsigned i = 0; i < pop_size; i++){
-        if(start_from_exp){
+        if(start_from_rand){
+            NEAT::RNG rng;
+            const misc::RandNum::Ptr rn = get_randomNum();
+            rng.Seed(rn->randInt(1,100000));
+            morph_population->AccessGenomeByIndex(i).Randomize_LinkWeights(neat_params.MaxWeight,rng);
+            morph_population->AccessGenomeByIndex(i).Mutate_NeuronBiases(neat_params,rng);
+        }
+        else if(start_from_exp){
             std::stringstream sstr;
             sstr << generation << "_" << i;
             if(verbose)
@@ -360,7 +366,7 @@ void M_NIPES::init_morph_pop(){
             loadNEATGenome(morphIDList[i],morph_gen);
         morph_population->AccessGenomeByIndex(i) = morph_gen;
     }
-    for(int i = 0; i < pop_size ; i++){
+    for(unsigned i = 0; i < pop_size ; i++){
         NEAT::Genome mgen = morph_population->AccessGenomeByIndex(i);
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
