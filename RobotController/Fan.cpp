@@ -55,7 +55,7 @@ void Fan::turnOn(){
 };
 
 void Fan::turnOff(){
-    setPWMValue(FAN_PWM_MIN);
+    digitalWrite (FAN_GPIO_PIN, LOW);
 };
 
 void Fan::setPWMValue(int value){
