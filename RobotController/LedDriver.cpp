@@ -9,7 +9,6 @@
 //LEDDriver Constructor
 LedDriver::LedDriver(uint8_t address) : I2CDevice(address) {
 	//Calls the I2CDevice constructor
-
 }
 
 //LED driver initialisation function. Sets up the chip and the local member variables.
