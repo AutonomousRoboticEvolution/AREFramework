@@ -23,6 +23,8 @@ public:
 private:
     Aseba::DBusInterface* interface;
     NN2Individual controller;
+    float _max_eval_time = 30000;
+    float _time_step = 100;
 };
 
 }//pi
