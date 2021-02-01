@@ -33,15 +33,15 @@ int PimioControl::exec(int argc, char** argv){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
     double time = 0;
-    while(1){
+    while(time <= _max_eval_time){
 
         retrieveSensorValues(sensor_values);
         controller.set_inputs(sensor_values);
         controller.update(time);
         nn_outputs = controller.get_ouputs();
         sendMotorCommand(nn_outputs[0]*50,nn_outputs[1]*50);
-
-        QTest::qSleep(5000);
+        time+=_time_step;
+        QTest::qSleep(_time_step);
     }
 
     return qapp.exec();
