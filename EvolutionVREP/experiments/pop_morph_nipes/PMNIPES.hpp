@@ -77,7 +77,7 @@ public:
         arch & ctrlGenome;
         arch & morphGenome;
         arch & final_position;
-        arch & energy_cost;
+//        arch & energy_cost;
         arch & trajectory;
         arch & sim_time;
         arch & nn_inputs;
