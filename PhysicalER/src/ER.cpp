@@ -122,7 +122,6 @@ void ER::start_evaluation(){
     std::string reply;
     send_ctrl_genome(reply,ctrl_gen,request);
 
-
     ea->setCurrentIndIndex(currentIndIndex);
 }
 
