@@ -18,7 +18,7 @@ public:
     void sendMotorCommand(double left, double right);
     void retrieveSensorValues(std::vector<double> &sensor_vals);
 
-    int exec(int argc, char** argv);
+    int exec(int argc, char** argv, zmq::socket_t& socket);
 
 private:
     Aseba::DBusInterface* interface;

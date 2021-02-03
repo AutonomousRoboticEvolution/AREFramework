@@ -27,7 +27,7 @@ void PimioControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         sensor_vals.push_back(v);
 }
 
-int PimioControl::exec(int argc, char** argv){
+int PimioControl::exec(int argc, char** argv, zmq::socket_t& socket){
     QCoreApplication qapp(argc,argv);
 
     std::vector<double> sensor_values;
@@ -41,9 +41,15 @@ int PimioControl::exec(int argc, char** argv){
         nn_outputs = controller.get_ouputs();
         sendMotorCommand(nn_outputs[0]*50,nn_outputs[1]*50);
         time+=_time_step;
+
+        
         QTest::qSleep(_time_step);
     }
 
-    return qapp.exec();
+    zmq::message_t message;
+    socket.recv(message);
+    strcpy(static_cast<char*>(message),"finish")
+    socket.send(message);
 
+    return qapp.exec();
 }
