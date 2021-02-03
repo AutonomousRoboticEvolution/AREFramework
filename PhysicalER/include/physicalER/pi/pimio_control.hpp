@@ -5,6 +5,7 @@
 #include <vector>
 #include "physicalER/pi/dbusinterface.h"
 #include "physicalER/pi/pi_individual.hpp"
+#include <zmq.hpp>
 #include <QTest>
 
 namespace are {
