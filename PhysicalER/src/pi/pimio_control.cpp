@@ -42,13 +42,17 @@ int PimioControl::exec(int argc, char** argv, zmq::socket_t& socket){
         sendMotorCommand(nn_outputs[0]*50,nn_outputs[1]*50);
         time+=_time_step;
 
+        zmq::message_t message;
+        socket.recv(message);
+        strcpy(static_cast<char*>(message.data()),"busy");
+        socket.send(message);
         
         QTest::qSleep(_time_step);
     }
 
     zmq::message_t message;
     socket.recv(message);
-    strcpy(static_cast<char*>(message),"finish")
+    strcpy(static_cast<char*>(message.data()),"finish");
     socket.send(message);
 
     return qapp.exec();
