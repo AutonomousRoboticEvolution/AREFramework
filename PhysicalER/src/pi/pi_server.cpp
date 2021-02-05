@@ -67,7 +67,6 @@ int main(int argc, char** argv) {
     pi::PimioControl pimio(ind);
     pimio.exec(argc,argv,publisher);
 
-
     return 0;
 }
 

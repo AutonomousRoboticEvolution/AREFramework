@@ -78,7 +78,6 @@ void ER::generate(){
 
 bool ER::execute(){
 
-
     if(robot_state == READY){
         std::cout << "Press Enter when the robot is ready" << std::endl;
         std::cin.ignore();
