@@ -59,6 +59,15 @@ int main(int argc, char** argv) {
 
     }
 
+    std::string str_ctrl(static_cast<char*>(message.data()));
+    str_ctrl.erase(0,str_ctrl.find(' ')+1);
+    std::cout << str_ctrl << std::endl;
+    ctrl_gen->from_string(str_ctrl);
+    pi::NN2Individual ind(empy_gen,ctrl_gen);
+    pi::PimioControl pimio(ind);
+    pimio.exec(argc,argv,publisher);
+
+
     return 0;
 }
 
