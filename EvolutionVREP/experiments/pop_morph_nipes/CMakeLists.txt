@@ -10,13 +10,9 @@ set(INCLUDES
     "../../modules/")
 
 add_library(PM_NIPES SHARED 
-<<<<<<< HEAD
+    ../common/straightLineEnv.cpp
     factories.cpp
     PMNIPES.cpp
-=======
-   factories.cpp
-   PMNIPES.cpp 
->>>>>>> add new experiment : pop_morph_nipes
     NIPESLoggings.cpp
     )
 target_include_directories(PM_NIPES PUBLIC ${INCLUDES})

@@ -17,6 +17,33 @@
 
 namespace are {
 
+struct waypoint{
+    float position[3];
+    float orientation[3];
+
+    std::string to_string() const{
+        std::stringstream sstr;
+        sstr << position[0] << "," << position[1] << "," << position[2] << ";"
+             << orientation[0] << "," << orientation[1] << "," << orientation[2];
+        return sstr.str();
+    }
+
+    bool is_nan(){
+        bool isNan = false;
+        for(int i = 0; i < 3; i++)
+            isNan = isNan || std::isnan(position[0]) || std::isnan(orientation[0]);
+        return isNan;
+    }
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & position;
+        arch & orientation;
+    }
+
+};
+
 class Environment
 {
 public:
@@ -76,6 +103,8 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     const std::string &get_name(){return name;}
     void set_randNum(misc::RandNum::Ptr &rn){randNum = rn;}
+    const std::vector<double> &get_final_position(){return final_position;}
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
 protected:
     ///setting of the environment
@@ -90,7 +119,8 @@ protected:
     int type = 0;
     std::string name;
     misc::RandNum::Ptr randNum;
-
+    std::vector<double> final_position;
+    std::vector<waypoint> trajectory;
 };
 
 }//are
