@@ -27,15 +27,11 @@ public:
     float timeCheck = 0.0;
 
     const std::vector<double> &get_final_position(){return final_position;}
-    const std::vector<double> &get_target_position(){return target_position;}
-    const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
     void build_tiled_floor(std::vector<int> &tiles_handles);
 
 private:
     std::vector<double> target_position;
-    std::vector<double> final_position;
-    std::vector<waypoint> trajectory;
     int move_counter = 0;
 
     void build_tiled_floor(std::vector<int> &tiles_handles);

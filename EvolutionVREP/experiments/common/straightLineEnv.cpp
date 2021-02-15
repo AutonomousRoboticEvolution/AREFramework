@@ -34,36 +34,18 @@ void StraightLine::init(){
     /// EB: This shouldn't be here!
     move_counter = 0;
 
-
+    error = 0;
+    timeStepCounter = 0;
 }
 
 std::vector<double> StraightLine::fitnessFunction(const Individual::Ptr &ind){
 
     std::vector<double> d(1);
-    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
+
     //////////////////////////////////////////////////////////////////////////////
     /// Straight line fitness
-    double angle = atan2(final_position[1], final_position[0]);
-    int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
-    std::vector<double> lineTarget;
-    double speedConstant = 1.0 / nbr_wp;
-    double localError = 0;
-    for(int i = 0; i < trajectory.size(); i++){
-        lineTarget.push_back(cos(angle) * i * speedConstant);
-        lineTarget.push_back(sin(angle) * i * speedConstant);
-        lineTarget.push_back(final_position[2]); // This is the height of the robot
-        std::vector<double> tempTarget{trajectory.at(i).position[0], trajectory.at(i).position[1], trajectory.at(i).position[2]};
-//        std::cout << "Error: " << localError << std::endl;
-        localError += distance(tempTarget, lineTarget);
-        lineTarget.clear();
-    }
-     d[0] = 1 - localError/300.0;
-     //////////////////////////////////////////////////////////////////////////////
+    d[0] = 1 - (error/300);
+    //////////////////////////////////////////////////////////////////////////////
 
     return d;
 }
@@ -90,7 +72,24 @@ float StraightLine::updateEnv(float simulationTime, const Morphology::Ptr &morph
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \todo EB: This is temporal code for the experiment in the journal October
+    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
+    {
+        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                         (a[1] - b[1])*(a[1] - b[1]) +
+                         (a[2] - b[2])*(a[2] - b[2]));
+    };
 
+
+    //////////////////////////////////////////////////////////////////////////////
+    /// Straight line fitness
+    const double DISTANCECONSTANT = 1.0/300;
+    std::vector<double> lineTarget{0.0, DISTANCECONSTANT*timeStepCounter-0.5,final_position[2]};
+    error += distance(final_position,lineTarget);
+    //std::cout << "Time: " << timeStepCounter << " Distance: " << DISTANCECONSTANT*timeStepCounter << " Error: " << error << std::endl;
+    timeStepCounter++;
+    //////////////////////////////////////////////////////////////////////////////
     return 0;
 }
 
