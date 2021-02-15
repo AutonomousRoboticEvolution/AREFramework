@@ -1,12 +1,22 @@
 #include "ARE/mazeEnv.h"
+#include "straightLineEnv.hpp"
 #include "PMNIPES.hpp"
 #include "NIPESLoggings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::MazeEnv);
-    env->set_parameters(param);
+    int envType = are::settings::getParameter<are::settings::Integer>(param,"#environment").value;
+    are::Environment::Ptr env;
+    if(envType == 0){
+        env.reset(new are::MazeEnv);
+        env->set_parameters(param);
+    }else if(envType == 1){
+        env.reset(new are::StraightLine);
+        env->set_parameters(param);
+    }else{
+        std::cerr << "unknown environment : 0 for Maze or 1 for Straight Line" << std::endl;
+    }
     return env;
 }
 

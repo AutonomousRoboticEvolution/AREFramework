@@ -1,5 +1,5 @@
-#ifndef MAZEENV_H
-#define MAZEENV_H
+#ifndef STRAIGHT_LINE_ENV_HPP
+#define STRAIGHT_LINE_ENV_HPP
 
 #include <cmath>
 #include "ARE/Environment.h"
@@ -7,17 +7,16 @@
 
 namespace are {
 
-
-class MazeEnv : public Environment
+class StraightLine : public Environment
 {
 public:
 
-    typedef std::shared_ptr<MazeEnv> Ptr;
-    typedef std::shared_ptr<const MazeEnv> ConstPtr;
+    typedef std::shared_ptr<StraightLine> Ptr;
+    typedef std::shared_ptr<const StraightLine> ConstPtr;
 
-    MazeEnv();
+    StraightLine();
 
-    ~MazeEnv(){}
+    ~StraightLine(){}
     void init() override;
 
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
@@ -26,15 +25,15 @@ public:
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 
-    const std::vector<double> &get_final_position(){return final_position;}
-
     void build_tiled_floor(std::vector<int> &tiles_handles);
 
 private:
-    std::vector<double> target_position;
     int move_counter = 0;
+    /// Straight line variables
+    double error = 0.00001;
+    int timeStepCounter = 0;
 };
 
 } //are
 
-#endif //MAZEENV_H
+#endif //STRAIGHT_LINE_ENV_HPP
