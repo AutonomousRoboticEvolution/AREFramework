@@ -29,9 +29,8 @@ public:
 
 private:
     int move_counter = 0;
-    /// Straight line variables
-    double error = 0.00001;
-    int timeStepCounter = 0;
+
+
 };
 
 } //are
