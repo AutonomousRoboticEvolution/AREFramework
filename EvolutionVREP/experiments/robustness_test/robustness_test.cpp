@@ -66,32 +66,8 @@ void RobustnessTest::init(){
     population.resize(gen_files.size());
     for(size_t i = 0; i < gen_files.size(); i++){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr genome;
-
-        genome.reset(new NNParamGenome(randomNum,parameters));
-        NNParamGenome::Ptr nngenome = std::dynamic_pointer_cast<NNParamGenome>(genome);
-        std::ifstream logFileStream;
-        logFileStream.open(gen_files[i]);
-        std::string line;
-        std::getline(logFileStream,line);
-        int nbr_weights = std::stoi(line);
-        std::getline(logFileStream,line);
-        int nbr_bias = std::stoi(line);
-
-        std::vector<double> weights;
-        for(int i = 0; i < nbr_weights; i++){
-            std::getline(logFileStream,line);
-            weights.push_back(std::stod(line));
-        }
-        nngenome->set_weights(weights);
-
-        std::vector<double> biases;
-        for(int i = 0; i < nbr_bias; i++){
-            std::getline(logFileStream,line);
-            biases.push_back(std::stod(line));
-        }
-        nngenome->set_biases(biases);
-
+        NNParamGenome::Ptr genome(new NNParamGenome(randomNum,parameters));
+        genome->from_file(gen_files[i]);
 
         Individual::Ptr ind(new NN2Individual(morph_gen,genome));
         ind->set_parameters(parameters);
@@ -111,10 +87,8 @@ bool RobustnessTest::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
-                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
-        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(
-                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(env->get_trajectory());
     }
 
     return true;

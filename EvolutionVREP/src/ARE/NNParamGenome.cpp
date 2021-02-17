@@ -163,23 +163,40 @@ std::string NNParamGenome::to_string() const{
     return sstr.str();
 }
 
-void NNParamGenome::from_string(const std::string &str){
+void NNParamGenome::from_string(const std::string &gen_str){
+    std::vector<std::string> split_str;
+    boost::split(split_str,gen_str,boost::is_any_of("\n"));
+    int nbr_weights = std::stoi(split_str[0]);
+    int nbr_bias = std::stoi(split_str[1]);
+
     weights.clear();
+    for(int i = 2; i < nbr_weights+2; i++)
+        weights.push_back(std::stod(split_str[i]));
+
     biases.clear();
-    std::stringstream sstr(str);
-    std::string elt;
-    getline(sstr,elt);
-    int nbr_weights = std::stoi(elt);
-    getline(sstr,elt);
-    int nbr_biases = std::stoi(elt);
-    for(int i = 0; i<nbr_weights; i++){
-        getline(sstr,elt);
-        weights.push_back(std::stod(elt));
+    for(int i = nbr_weights; i < nbr_weights + nbr_bias; i++)
+        biases.push_back(std::stod(split_str[i]));
+}
+
+void NNParamGenome::from_file(const std::string &filename){
+    std::ifstream logFileStream;
+    logFileStream.open(filename);
+    std::string line;
+    std::getline(logFileStream,line);
+    int nbr_weights = std::stoi(line);
+    std::getline(logFileStream,line);
+    int nbr_bias = std::stoi(line);
+
+    weights.clear();
+    for(int i = 0; i < nbr_weights; i++){
+        std::getline(logFileStream,line);
+        weights.push_back(std::stod(line));
     }
 
-    for(int i = 0; i<nbr_biases; i++){
-        getline(sstr,elt);
-        biases.push_back(std::stod(elt));
+    biases.clear();
+    for(int i = 0; i < nbr_bias; i++){
+        std::getline(logFileStream,line);
+        biases.push_back(std::stod(line));
     }
 }
 
