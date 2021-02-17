@@ -1,5 +1,8 @@
 #include "ARE/mazeEnv.h"
+<<<<<<< HEAD
 #include "straightLineEnv.hpp"
+=======
+>>>>>>> cfad5f6ea4243a58ac61ad027f95ad1a08cb8dc1
 #include "PMNIPES.hpp"
 #include "NIPESLoggings.hpp"
 
