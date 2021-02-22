@@ -103,33 +103,8 @@ void Visu::init(){
 
 
     population.resize(1);
-    NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-
-    //load ctrl genome
-    std::ifstream logFileStream;
-    logFileStream.open(ctrl_gen_file);
-    std::string line;
-    std::getline(logFileStream,line);
-    int nbr_weights = std::stoi(line);
-    std::getline(logFileStream,line);
-    int nbr_bias = std::stoi(line);
-
-    std::vector<double> weights;
-    for(int i = 0; i < nbr_weights; i++){
-        std::getline(logFileStream,line);
-        weights.push_back(std::stod(line));
-    }
-    ctrl_gen->set_weights(weights);
-
-    std::vector<double> biases;
-    for(int i = 0; i < nbr_bias; i++){
-        std::getline(logFileStream,line);
-        biases.push_back(std::stod(line));
-    }
-    ctrl_gen->set_biases(biases);
-
-    ctrl_gen->set_randNum(randomNum);
-    ctrl_gen->set_parameters(parameters);
+    NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters));
+    ctrl_gen->from_file(ctrl_gen_file);
 
     //load morphology genome
     std::stringstream filepath;
