@@ -3,48 +3,93 @@
 
 using namespace are;
 namespace  fs = boost::filesystem;
+namespace st = settings;
 
+void RobustInd::createMorphology(){
+    NEAT::Genome gen =
+            std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
+
+    morphology.reset(new Morphology_CPPNMatrix(parameters));
+    morphology->set_randNum(randNum);
+    NEAT::NeuralNetwork nn;
+    gen.BuildPhenotype(nn);
+    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
+    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    morphology->createAtPosition(init_x,init_y,init_z);
+    float pos[3];
+    simGetObjectPosition(morphology->getMainHandle(),-1,pos);
+}
+
+void RobustInd::createController(){
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+
+    int wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.wheelNumber;
+    int joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.jointNumber;
+    int sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.sensorNumber;
+
+    int nb_inputs = sensor_nbr*2;
+    int nb_outputs = wheel_nbr + joint_nbr;
+
+    int nbr_weights, nbr_bias;
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+
+    std::cout << "number of weights : " << nbr_weights << " and number of biases : " << nbr_bias << std::endl;
+
+    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
+    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
+
+    if(nn_type == st::nnType::FFNN){
+        control.reset(new NN2Control<ffnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
+    }
+    else if(nn_type == st::nnType::ELMAN){
+        control.reset(new NN2Control<elman_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
+
+    }
+    else if(nn_type == st::nnType::RNN){
+        control.reset(new NN2Control<rnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+
+}
+
+void RobustInd::update(double delta_time){
+    std::vector<double> inputs = morphology->update();
+
+    std::vector<double> outputs = control->update(inputs);
+
+    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
+}
 
 void RobustnessTest::init(){
-
-
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
-    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
-    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
-    int ind = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
 
-
-
-    std::string folder = repository + "/" + folder_to_load;
-
-    std::vector<std::string> gen_files;
-    std::vector<int> gen_index;
-
-    //Load the last generation
-    if(generation < 0){
-
-    }
-
-    if(ind >= 0){
-        std::stringstream sstr;
-        sstr << folder << "/genome_" << generation << "_" << ind;
-        gen_files.push_back(sstr.str());
-    }
-    else{
-        std::string filename;
-        std::vector<std::string> split_str;
-        for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
-            filename = dirit.path().string();
-            boost::split(split_str,filename,boost::is_any_of("/"));
-            boost::split(split_str,split_str.back(),boost::is_any_of("_"));
-            if(split_str[0] == "genome" &&
-                    std::stoi(split_str[1]) == generation){
-
-                gen_files.push_back(filename);
-                gen_index.push_back(std::stoi(split_str[2]));
-            }
-        }
-    }
+    list_files_pair_t list_gen_files;
+    load_gen_files(list_gen_files,folder_to_load);
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
@@ -63,16 +108,19 @@ void RobustnessTest::init(){
         return;
     }
 
-    population.resize(gen_files.size());
-    for(size_t i = 0; i < gen_files.size(); i++){
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
+    population.resize(list_gen_files.size());
+    for(size_t i = 0; i < list_gen_files.size(); i++){
+        NEAT::Genome neat_genome(list_gen_files[i].first.c_str());
+        CPPNGenome::Ptr morph_gen(new CPPNGenome(neat_genome));
+        morph_gen->set_randNum(randomNum);
+        morph_gen->set_parameters(parameters);
         NNParamGenome::Ptr genome(new NNParamGenome(randomNum,parameters));
-        genome->from_file(gen_files[i]);
+        genome->from_file(list_gen_files[i].second);
 
-        Individual::Ptr ind(new NN2Individual(morph_gen,genome));
+        Individual::Ptr ind(new RobustInd(morph_gen,genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        population[gen_index[i]] = ind;
+        population[i] = ind;
     }
 }
 
@@ -87,10 +135,31 @@ bool RobustnessTest::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<NN2Individual>(ind)->set_trajectory(env->get_trajectory());
+        std::dynamic_pointer_cast<RobustInd>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<RobustInd>(ind)->set_trajectory(env->get_trajectory());
     }
 
     return true;
 }
 
+void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std::string &folder){
+    std::map<int,std::string> morph_files, ctrl_files;
+    std::string filename;
+    std::vector<std::string> split_str;
+    for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
+        filename = dirit.path().string();
+        boost::split(split_str,filename,boost::is_any_of("/"));
+        boost::split(split_str,split_str.back(),boost::is_any_of("_"));
+
+        if(split_str[0] == "morphGenome")
+            morph_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+        else if(split_str[0] == "ctrlGenome")
+            ctrl_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+    }
+    for(const auto& elt: morph_files){
+        std::pair<std::string,std::string> file_pair;
+        file_pair.first = elt.second;
+        file_pair.second = ctrl_files[elt.first];
+        list_gen_files.push_back(file_pair);
+    }
+}
