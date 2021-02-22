@@ -39,6 +39,9 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::ControllersLog::Ptr ctrllog(new are::ControllersLog());
     logs.push_back(ctrllog);
 
+    are::NNParamGenomeLog::Ptr ctrlGenLog(new are::NNParamGenomeLog);
+    logs.push_back(ctrlGenLog);
+
     bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
     if(use_ctrl_arch){
     are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());

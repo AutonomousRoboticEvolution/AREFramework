@@ -402,6 +402,7 @@ void M_NIPES::epoch(){
             biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
             best_gen.set_weights(weights);
             best_gen.set_biases(biases);
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_genome(std::make_shared<NNParamGenome>(best_gen)); //put best genome back in the ind for log
             //update the archive
             const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
             controller_archive.update(std::make_shared<NNParamGenome>(best_gen),1-best_controller.first,morph_desc[4]*max_organs,morph_desc[6]*max_organs,morph_desc[5]*max_organs);

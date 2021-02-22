@@ -207,7 +207,7 @@ void NNParamGenomeLog::saveLog(EA::Ptr &ea)
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;
-        filename << "genome_" << generation << "_" << i;
+        filename << "ctrlGenome_" << generation << "_" << i;
         if(!openOLogFile(logFileStream, filename.str()))
             return;
         logFileStream << std::dynamic_pointer_cast<NNParamGenome>(

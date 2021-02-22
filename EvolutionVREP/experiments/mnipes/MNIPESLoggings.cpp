@@ -24,7 +24,7 @@ void MorphGenomeLog::saveLog(EA::Ptr &ea)
     int generation = ea->get_generation();
     for(size_t ind = 0; ind < ea->get_population().size(); ind++){
         std::stringstream filepath;
-        filepath << Logging::log_folder << "/morphGenome" << generation << "_" <<  ind;
+        filepath << Logging::log_folder << "/morphGenome_" << generation << "_" <<  ind;
         const Genome::Ptr morphGenome = std::dynamic_pointer_cast<M_NIPESIndividual>(ea->getIndividual(ind))->get_morph_genome();
         NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
         genome.Save(filepath.str().c_str());
