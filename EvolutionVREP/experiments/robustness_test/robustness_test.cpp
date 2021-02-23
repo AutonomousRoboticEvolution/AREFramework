@@ -85,6 +85,33 @@ void RobustInd::update(double delta_time){
     std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
 }
 
+
+std::string RobustInd::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<RobustInd>();
+    oarch.register_type<NNParamGenome>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void RobustInd::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<RobustInd>();
+    iarch.register_type<NNParamGenome>();
+    iarch >> *this;
+
+    //set the parameters and randNum of the genome because their are not included in the serialisation
+    ctrlGenome->set_parameters(parameters);
+    ctrlGenome->set_randNum(randNum);
+    morphGenome->set_parameters(parameters);
+    morphGenome->set_randNum(randNum);
+}
+
+
 void RobustnessTest::init(){
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
 

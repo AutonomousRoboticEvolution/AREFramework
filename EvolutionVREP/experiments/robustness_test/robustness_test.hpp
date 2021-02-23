@@ -19,6 +19,8 @@ using CPPNMorph = Morphology_CPPNMatrix;
 class RobustInd : public Individual
 {
 public:
+
+    RobustInd() : Individual(){}
     RobustInd(const CPPNGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
         : Individual(morph_gen,ctrl_gen)
     {
@@ -34,6 +36,18 @@ public:
     const std::vector<double>& get_final_position(){return final_position;}
     void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
+
+    std::string to_string() override;
+    void from_string(const std::string &str) override;
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & ctrlGenome;
+        arch & final_position;
+        arch & trajectory;
+    }
 
 private:
     void createMorphology() override;
