@@ -47,6 +47,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());
     logs.push_back(calog);
     }
+
+    are::TrajectoryLog<are::M_NIPESIndividual>::Ptr trajLog(new are::TrajectoryLog<are::M_NIPESIndividual>);
+    logs.push_back(trajLog);
+
 }
 
 
