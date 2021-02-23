@@ -16,7 +16,17 @@ namespace are {
 class Morphology_CPPNMatrix : public Morphology
 {
 public:
-    Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){}
+    Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){
+            settings::defaults::parameters->emplace("#randomOrientation",new settings::Boolean(1));
+            settings::defaults::parameters->emplace("#robotOrientation",new settings::Float(0));
+            settings::defaults::parameters->emplace("#randomPositionRange",new settings::Float(0));
+            settings::defaults::parameters->emplace("#isSegmentedRobot",new settings::Boolean(1));
+            settings::defaults::parameters->emplace("#isWheel",new settings::Boolean(1));
+            settings::defaults::parameters->emplace("#isJoint",new settings::Boolean(1));
+            settings::defaults::parameters->emplace("#isSensor",new settings::Boolean(1));
+            settings::defaults::parameters->emplace("#isCaster",new settings::Boolean(1));
+
+    }
 
     class RobotManRes{
     public:
