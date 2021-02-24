@@ -30,6 +30,7 @@
 #NNType,int,2
 #NbrHiddenNeurones,int,8
 #UseInternalBias,bool,1
+#jointControllerType,int,2
 
 #maxVelocity,double,10.
 #nbrWaypoints,int,10

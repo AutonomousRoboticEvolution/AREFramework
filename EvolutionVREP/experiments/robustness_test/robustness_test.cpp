@@ -118,23 +118,6 @@ void RobustnessTest::init(){
     list_files_pair_t list_gen_files;
     load_gen_files(list_gen_files,folder_to_load);
 
-    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
-    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-
-    int nbr_weights, nbr_bias;
-    if(nn_type == settings::nnType::FFNN)
-        NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::RNN)
-        NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN)
-        NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else {
-        std::cerr << "unknown type of neural network" << std::endl;
-        return;
-    }
-
     population.resize(list_gen_files.size());
     for(size_t i = 0; i < list_gen_files.size(); i++){
         NEAT::Genome neat_genome(list_gen_files[i].first.c_str());

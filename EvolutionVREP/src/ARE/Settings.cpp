@@ -37,7 +37,7 @@ settings::Type::Ptr settings::buildType(const std::string &name)
         return std::make_shared<settings::String>(String());
     else
     {
-        std::cerr << "unknown parameter type : " << name << std::endl;
+        std::cerr << "[ARE error] unknown parameter type : " << name << std::endl;
         return nullptr;
     }
 }
@@ -68,7 +68,7 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
     std::ifstream ifs(file);
     if(!ifs || !ifs.good())
     {
-        std::cerr << "Unable to open parameters file : " << file << std::endl;
+        std::cerr << "[ARE error] unable to open parameters file : " << file << std::endl;
         return settings::ParametersMap();
     }
     std::string line;
