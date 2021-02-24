@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
 
     //*/ Load Parameter file. Change to be retrieve through communication
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
-                settings::loadParameters(simGetStringParameter(argv[1])));
+                settings::loadParameters(argv[1]));
     /**/
     
     misc::RandNum::Ptr randomNumber(new misc::RandNum(0));
