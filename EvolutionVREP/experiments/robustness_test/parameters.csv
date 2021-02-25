@@ -6,7 +6,7 @@
 
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/Two_rooms_2.ttt
 #repository,string,/home/leni/are-logs
-#folderToLoad,string,/home/leni/are-logs/robustness/rooms/wa/150/1/
+#folderToLoad,string,/home/leni/git/genomes/robustness/rooms/wa/150/1/
 
 #populationSize,int,200
 #maxEvalTime,float,120
@@ -31,6 +31,7 @@
 #NbrHiddenNeurones,int,8
 #UseInternalBias,bool,1
 #jointControllerType,int,2
+#reloadController,bool,1
 
 #maxVelocity,double,10.
 #nbrWaypoints,int,10
