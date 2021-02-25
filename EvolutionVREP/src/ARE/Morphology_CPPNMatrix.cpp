@@ -276,6 +276,7 @@ void Morphology_CPPNMatrix::create()
             }
         }
     }
+
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!

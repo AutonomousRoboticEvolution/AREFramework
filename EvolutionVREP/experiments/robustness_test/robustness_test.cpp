@@ -91,6 +91,7 @@ std::string RobustInd::to_string()
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<RobustInd>();
+    oarch.register_type<CPPNGenome>();
     oarch.register_type<NNParamGenome>();
     oarch << *this;
     return sstream.str();
@@ -101,6 +102,7 @@ void RobustInd::from_string(const std::string &str){
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<RobustInd>();
+    iarch.register_type<CPPNGenome>();
     iarch.register_type<NNParamGenome>();
     iarch >> *this;
 

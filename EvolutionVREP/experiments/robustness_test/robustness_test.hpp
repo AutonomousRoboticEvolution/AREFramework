@@ -45,6 +45,7 @@ public:
     {
         arch & objectives;
         arch & ctrlGenome;
+        arch & morphGenome;
         arch & final_position;
         arch & trajectory;
     }
