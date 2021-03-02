@@ -89,10 +89,10 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
     d[0] = 1 - distance(final_position,target_position)/max_dist;
 
     for(double& f : d)
-        if(std::isnan(f) || std::isinf(f))
+        if(std::isnan(f) || std::isinf(f) || f < 0)
             f = 0;
+        else if(f > 1) f = 1;
 
-    assert(d[0] <= 1 && d[0] >= 0);
 
     return d;
 }

@@ -4,8 +4,10 @@ using namespace are;
 
 void Environment::sceneLoader() {
     std::string scene_path = settings::getParameter<settings::String>(parameters,"#scenePath").value;
-    if(simLoadScene(scene_path.c_str()) < 0)
+    if(simLoadScene(scene_path.c_str()) < 0){
         std::cerr << "unable to load the scene : " << scene_path << std::endl;
+        exit(1);
+    }
 }
 
 void Environment::init() {
