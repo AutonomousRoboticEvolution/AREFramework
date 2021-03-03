@@ -116,9 +116,10 @@ void RobustInd::from_string(const std::string &str){
 
 void RobustnessTest::init(){
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    int gen_to_load = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
 
     list_files_pair_t list_gen_files;
-    load_gen_files(list_gen_files,folder_to_load);
+    load_gen_files(list_gen_files,folder_to_load,gen_to_load);
 
     population.resize(list_gen_files.size());
     for(size_t i = 0; i < list_gen_files.size(); i++){
@@ -154,7 +155,7 @@ bool RobustnessTest::update(const Environment::Ptr & env){
     return true;
 }
 
-void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std::string &folder){
+void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std::string &folder, int gen_to_load){
     std::map<int,std::string> morph_files, ctrl_files;
     std::string filename;
     std::vector<std::string> split_str;
@@ -163,10 +164,12 @@ void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std
         boost::split(split_str,filename,boost::is_any_of("/"));
         boost::split(split_str,split_str.back(),boost::is_any_of("_"));
 
-        if(split_str[0] == "morphGenome")
-            morph_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
-        else if(split_str[0] == "ctrlGenome")
-            ctrl_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+        if(std::stoi(split_str[1]) == gen_to_load){
+            if(split_str[0] == "morphGenome")
+                morph_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+            else if(split_str[0] == "ctrlGenome")
+                ctrl_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+        }
     }
     for(const auto& elt: morph_files){
         std::pair<std::string,std::string> file_pair;

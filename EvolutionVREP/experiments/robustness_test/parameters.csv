@@ -6,7 +6,8 @@
 
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/Two_rooms_2.ttt
 #repository,string,/home/leni/are-logs
-#folderToLoad,string,/home/leni/git/genomes/robustness/rooms/wa/150/1/
+#folderToLoad,string,/home/leni/are-logs/robustness/rooms/wa/150/1/
+#genToLoad,int,19
 
 #populationSize,int,200
 #maxEvalTime,float,120
@@ -34,9 +35,10 @@
 #reloadController,bool,1
 
 #maxVelocity,double,10.
-#nbrWaypoints,int,10
+#nbrWaypoints,int,600
 #withBeacon,bool,1
-#randomOrientation,bool,1
+#randomOrientation,bool,0
+#robotOrientation,float,0
 
 #fitnessFile,string,fitnesses.csv
 #behavDescFile,string,final_pos.csv

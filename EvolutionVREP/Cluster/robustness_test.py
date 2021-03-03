@@ -27,8 +27,10 @@ def main():
         csv_reader = csv.reader(param_file,delimiter=',')
         csv_writer = csv.writer(new_param_file,delimiter=',',lineterminator='\n')
         for row in csv_reader :
+            if(len(row)==0):
+                continue
             if(row[0] == "#folderToLoad") :
-                row[2] = "/" + args.folder_name.split("/")[-2] + "/" + folder + "/"
+                row[2] = args.folder_name + folder + "/"
             if(row[0] == "#genToLoad") :
                 row[2] = gen
             csv_writer.writerow(row)

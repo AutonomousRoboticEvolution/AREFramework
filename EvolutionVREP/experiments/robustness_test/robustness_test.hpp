@@ -75,7 +75,7 @@ public:
 private:
     int currentIndIndex;
 
-    void load_gen_files(list_files_pair_t& list_gen_files, const std::string& folder);
+    void load_gen_files(list_files_pair_t& list_gen_files, const std::string& folder, int gen_to_load);
 };
 
 }
