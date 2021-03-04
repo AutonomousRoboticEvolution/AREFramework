@@ -164,12 +164,11 @@ void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std
         boost::split(split_str,filename,boost::is_any_of("/"));
         boost::split(split_str,split_str.back(),boost::is_any_of("_"));
 
-        if(std::stoi(split_str[1]) == gen_to_load){
-            if(split_str[0] == "morphGenome")
-                morph_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
-            else if(split_str[0] == "ctrlGenome")
-                ctrl_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
-        }
+        if(split_str[0] == "morphGenome" && std::stoi(split_str[1]) == gen_to_load)
+            morph_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+        else if(split_str[0] == "ctrlGenome" && std::stoi(split_str[1]) == gen_to_load)
+            ctrl_files.emplace(stoi(split_str[1])*100+stoi(split_str[2]),filename);
+
     }
     for(const auto& elt: morph_files){
         std::pair<std::string,std::string> file_pair;
