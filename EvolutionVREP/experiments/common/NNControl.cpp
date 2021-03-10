@@ -9,14 +9,8 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
     double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
     boost::mt19937 rng(randomNum->getSeed());
     std::vector<double> inputs = sensorValues;
-    if(noiselvl > 0.0){
-        for(double &sv : inputs){
-            boost::normal_distribution<> normal(sv,noiselvl);
-            sv = normal(rng);
-        }
-    }
-
-    nn.Flush();
+    nn.Input(inputs);
+//    nn.Flush();
 
 //    std::cout << "sensor values : ";
 //    for(double sv : sensorValues)
@@ -29,12 +23,11 @@ std::vector<double> NNControl::update(const std::vector<double> &sensorValues)
     if(useInternalBias)
         nn.ActivateUseInternalBias();
     else nn.Activate();
-
-    //Have to activate a second time to activate the outputs
-    if(useInternalBias)
-        nn.ActivateUseInternalBias();
-    else nn.Activate();
-
+//    //Have to activate a second time to activate the outputs
+//    if(useInternalBias)
+//        nn.ActivateUseInternalBias();
+//    else nn.Activate();
+    
     std::vector<double> output = nn.Output();
     if(noiselvl > 0.0){
         for(double &o : output){
