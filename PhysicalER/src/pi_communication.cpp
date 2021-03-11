@@ -14,7 +14,7 @@ void are::phy::send_ctrl_genome(std::string& str_rpl, const std::string& genome,
 bool are::phy::send_order(OrderType order, zmq::socket_t& request){
 
 //TODO rewrite this function
-    std::cout << "send order" << std::endl;
+    //std::cout << "send order" << std::endl;
 
     zmq::message_t order_msg(1);
     int ord[1] = {static_cast<int>(order)};
@@ -33,7 +33,7 @@ bool are::phy::send_order(OrderType order, zmq::socket_t& request){
 }
 
 void are::phy::wait_for_message(std::string &str_mess, zmq::socket_t &subscriber){
-    std::cout << "wait for message" << std::endl;
+    //std::cout << "wait for message" << std::endl;
 
     zmq::message_t msg;
     subscriber.recv(&msg);

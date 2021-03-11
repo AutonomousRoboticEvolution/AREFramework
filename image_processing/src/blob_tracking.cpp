@@ -15,8 +15,10 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
     params.blobColor = 255;
     params.filterByConvexity = false;
     params.filterByArea = true;
+    params.minArea = 100;
     params.maxArea = 500000;
-    params.filterByInertia = false;
+    params.filterByInertia = true;
+    params.minInertiaRatio = 0.01;
     cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
     std::vector<cv::KeyPoint> key_pts;
     detector->detect(mask,key_pts);
@@ -29,16 +31,26 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
                 max_size = kp.size;
             }
         }
+//        cv::Mat kp_image;
+//        cv::drawKeypoints(mask,{keyPt},kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS); // just the main keypoint
+//        cv::imshow("Blob",kp_image);
+//        cv::waitKey(1);
+
+        std::cout<< keyPt.pt.x <<","<< keyPt.pt.y ; // main keypoint first
+        for(const cv::KeyPoint& kp : key_pts){ std::cout<<","<< kp.pt.x <<","<< kp.pt.y ;} // all the keypoints (in case the wrong one is picked up)
+        std::cout<<std::endl;
+    }else{
+        std::cout<< -999 <<","<< -999 <<std::endl; // no keypoints found
     }
 
-// if feedback on
-    cv::Mat kp_image;
-    cv::drawKeypoints(mask,key_pts,kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
-    cv::imshow("Frame", image);
-    cv::imshow("Blob",kp_image);
-    cv::waitKey(1);
-    for(const auto k : key_pts)
-        std::cout << k.pt.x << "," << k.pt.y << std::endl;
+
+
+//    cv::Mat kp_image;
+//    cv::drawKeypoints(mask,key_pts,kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
+//    cv::imshow("Blob",kp_image);
+//    cv::imshow("frame", image);
+//    for(const auto k : key_pts)
+
 }
 
 

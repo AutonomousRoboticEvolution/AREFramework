@@ -86,7 +86,7 @@ bool ER::execute(){
     }
 
     else if(robot_state == BUSY){
-        std::cout << "update eval" << std::endl;
+//        std::cout << "update eval" << std::endl;
         if(update_evaluation())
             robot_state = FINISHED;
     }
@@ -103,7 +103,7 @@ bool ER::execute(){
 
 void ER::start_evaluation(){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
-        std::cout << "Starting Evaluation" << std::endl;
+        std::cout << "Starting Evaluation\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
 
@@ -138,7 +138,7 @@ bool ER::update_evaluation(){
     std::string message;
     wait_for_message(message,subscriber);
     message.erase(0,message.find(" ")+1);
-    std::cout << message << std::endl;
+    //std::cout << message << std::endl;
 
     return  /*eval_time <= eval_duration.count() ||*/ message=="finish";
 

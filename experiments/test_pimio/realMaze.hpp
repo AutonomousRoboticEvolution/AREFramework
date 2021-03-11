@@ -21,6 +21,8 @@ private:
 
     cv::VideoCapture video_capture;
     std::pair<cv::Scalar,cv::Scalar> colour_range;
+
+    bool usingIPCamera;
 };
 
 } //are
