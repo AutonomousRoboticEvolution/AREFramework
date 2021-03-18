@@ -31,8 +31,6 @@ void TestsLog::saveLog(EA::Ptr &ea)
         for(int j = 0; j < manRes.size(); j++){
             logFileStream << manRes[j] << ",";
         }
-        //logFileStream << ea->get_population()[ind]->getObjectives()[0] << ",";
-        logFileStream << std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getManScore() << ",";
         logFileStream << std::endl;
     }
     logFileStream.close();
@@ -51,46 +49,6 @@ void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
             logFileStream << morphDesc(j) << ",";
         }
         logFileStream << std::endl;
-    }
-    logFileStream.close();
-}
-
-void morphDescSymLog::saveLog(EA::Ptr &ea)
-{
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-    int generation = ea->get_generation();
-    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        logFileStream << generation * ea->get_population().size() + ind << ",";
-        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getSymDesc();
-        for(int j = 0; j < morphDesc.size(); j++){
-            logFileStream << morphDesc(j) << ",";
-        }
-        logFileStream << std::endl;
-    }
-    logFileStream.close();
-}
-
-void ProtoMatrixLog::saveLog(EA::Ptr &ea)
-{
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-    int generation = ea->get_generation();
-    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        std::vector<std::vector<std::vector<int>>> graphMatrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getGraphMatrix();
-        for(int x = 0; x < graphMatrix.size(); x++){
-            logFileStream << generation * ea->get_population().size() + ind << ",";
-            for(int y = 0; y < graphMatrix[x].size(); y++){
-                for(int z = 0; z < graphMatrix[x][y].size(); z++){
-                    // EB: Ignore voxels in the middle. They are always empty!
-                    if(z <= 5 || z >= 7) /// \todo EB: These should be constansts else where!
-                        logFileStream << graphMatrix[x][y][z] << ",";
-                }
-            };
-            logFileStream << std::endl;
-        }
     }
     logFileStream.close();
 }

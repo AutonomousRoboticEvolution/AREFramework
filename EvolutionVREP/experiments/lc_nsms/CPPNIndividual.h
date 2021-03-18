@@ -31,7 +31,6 @@ public :
         arch & morphGenome;
         arch & morphDesc;
         arch & testRes;
-        arch & manScore;
     }
     // Serialization
     std::string to_string();
@@ -41,20 +40,14 @@ public :
     NEAT::NeuralNetwork getGenome(){return nn;};
 
     std::vector<bool> getManRes(){return testRes;};
-    double getManScore(){ return manScore;};
     void setGenome();
 
     void setManRes();
-    void setManScore();
 
     /// Setters for descritors
     void setMorphDesc();
-    void setGraphMatrix();
-    void setSymDesc();
     /// Getters for descritors
     Eigen::VectorXd getMorphDesc(){return morphDesc;};
-    std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphMatrix;};
-    Eigen::VectorXd getSymDesc(){return symDesc;};
 
 protected:
     void createController() override;
@@ -62,12 +55,9 @@ protected:
 
     NEAT::NeuralNetwork nn;
     std::vector<bool> testRes;
-    double manScore;
 
     /// Descritors
-    std::vector<std::vector<std::vector<int>>> graphMatrix;
     Eigen::VectorXd morphDesc;
-    Eigen::VectorXd symDesc;
 };
 
 }//are
