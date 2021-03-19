@@ -3,6 +3,8 @@
 
 #include <string>
 #include <list>
+#include <vector>
+#include <eigen3/Eigen/Core>
 
 namespace are {
 

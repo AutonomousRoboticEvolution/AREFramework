@@ -50,8 +50,8 @@ public :
     void set_final_position(const std::vector<double> fp){final_position = fp;}
     const std::vector<double> get_final_position(){return final_position;}
 
-    void set_trajectory(const std::vector<sim::waypoint> &traj){trajectory = traj;}
-    const std::vector<sim::waypoint> &get_trajectory(){return trajectory;}
+    void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
     int genType = 2;
 
@@ -72,7 +72,7 @@ protected:
     void createController() override;
     void createMorphology() override;
     std::vector<double> final_position;
-    std::vector<sim::waypoint> trajectory;
+    std::vector<waypoint> trajectory;
 };
 
 }//are

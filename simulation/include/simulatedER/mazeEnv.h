@@ -17,26 +17,6 @@ namespace are {
 
 namespace sim{
 
-struct waypoint{
-    float position[3];
-    float orientation[3];
-
-    std::string to_string() const{
-        std::stringstream sstr;
-        sstr << position[0] << "," << position[1] << "," << position[2] << ";"
-             << orientation[0] << "," << orientation[1] << "," << orientation[2];
-        return sstr.str();
-    }
-
-    template<class archive>
-    void serialize(archive &arch, const unsigned int v)
-    {
-        arch & position;
-        arch & orientation;
-    }
-
-};
-
 class MazeEnv : public VirtualEnvironment
 {
 public:

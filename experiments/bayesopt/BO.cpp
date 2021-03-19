@@ -15,7 +15,7 @@ obs_fct_t obs_fcts::trajectory = [](const BOIndividual::Ptr &ind) -> Eigen::Vect
     std::vector<sim::waypoint> traj = ind->get_trajectory();
     Eigen::VectorXd o(6*traj.size());
     int i = 0;
-    for(sim::waypoint wp : traj){
+    for(waypoint wp : traj){
         o(i++) = wp.position[0];
         o(i++) = wp.position[1];
         o(i++) = wp.position[2];
