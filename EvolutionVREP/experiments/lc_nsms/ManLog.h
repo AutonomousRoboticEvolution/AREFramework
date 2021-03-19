@@ -36,22 +36,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class morphDescSymLog : public Logging
-{
-public:
-    morphDescSymLog(const std::string &file) : Logging(file, true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
-class ProtoMatrixLog : public Logging
-{
-public:
-    ProtoMatrixLog(const std::string &file) : Logging(file, true){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
-
 }//are
 
 #endif //ER_MANLOG_H

@@ -113,18 +113,12 @@ void LC_NSMS::epoch(){
 
         std::vector<Eigen::VectorXd> pop_desc;
         for(const auto& ind : population) {
-            if(isSymDesc)
-                pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc());
-            else
-                pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc());
+            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc());
         }
         //compute novelty score
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc;
-            if(isSymDesc)
-                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc();
-            else
-                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
             //Compute distances to find the k nearest neighbors of ind
             std::vector<size_t> pop_indexes;
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -133,7 +127,8 @@ void LC_NSMS::epoch(){
             double ind_nov = Novelty::sparseness(distances);
 
             /** Linear Combination **/
-            double manScore = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getManScore();
+            /// \todo EB: Change to fitness!!!
+            double manScore = 0.0;
 
             //set the objetives
             std::vector<double> objectives = {linearCombAlpha * (ind_nov / 2.64)  + (1-linearCombAlpha) * manScore}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
@@ -143,10 +138,7 @@ void LC_NSMS::epoch(){
         //update archive for novelty score
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc;
-            if(isSymDesc)
-                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getSymDesc();
-            else
-                ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(ind)->getMorphDesc();
 
             double ind_nov = ind->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
