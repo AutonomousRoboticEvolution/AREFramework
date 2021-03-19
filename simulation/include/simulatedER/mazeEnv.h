@@ -15,30 +15,7 @@
 
 namespace are {
 
-<<<<<<< HEAD:EvolutionVREP/include/ARE/mazeEnv.h
-=======
 namespace sim{
-
-struct waypoint{
-    float position[3];
-    float orientation[3];
-
-    std::string to_string() const{
-        std::stringstream sstr;
-        sstr << position[0] << "," << position[1] << "," << position[2] << ";"
-             << orientation[0] << "," << orientation[1] << "," << orientation[2];
-        return sstr.str();
-    }
-
-    template<class archive>
-    void serialize(archive &arch, const unsigned int v)
-    {
-        arch & position;
-        arch & orientation;
-    }
-
-};
->>>>>>> real_experiment:simulation/include/simulatedER/mazeEnv.h
 
 class MazeEnv : public VirtualEnvironment
 {
@@ -57,9 +34,6 @@ public:
 
     ///time point to check the status of the robot
     float timeCheck = 0.0;
-
-    const std::vector<double> &get_final_position(){return final_position;}
-
     void build_tiled_floor(std::vector<int> &tiles_handles);
 
 private:

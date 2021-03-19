@@ -128,7 +128,16 @@ void NIPES::epoch(){
     }
     /**/
 
-    cmaStrategy->set_population(population);
+    std::vector<IPOPCMAStrategy::individual_t> pop;
+    for(const auto &ind : population){
+        IPOPCMAStrategy::individual_t cma_ind;
+        cma_ind.genome = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
+        cma_ind.descriptor = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->get_final_position();
+        cma_ind.objectives = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->getObjectives();
+        pop.push_back(cma_ind);
+    }
+
+    cmaStrategy->set_population(pop);
     cmaStrategy->eval();
     cmaStrategy->tell();
     bool stop = cmaStrategy->stop();
@@ -196,10 +205,8 @@ bool NIPES::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(
-                    std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_final_position());
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(
-                    std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_trajectory());
+        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
     }
 
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;

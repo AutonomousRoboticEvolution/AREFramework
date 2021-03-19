@@ -3,7 +3,6 @@
 
 #include <memory>
 #include "ARE/EA.h"
-#include "NNParamGenome.hpp"
 
 namespace are {
 
@@ -133,13 +132,31 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class NNParamGenomeLog : public Logging
+
+template <class ind_t>
+class TrajectoryLog : public Logging
 {
 public:
-    NNParamGenomeLog() : Logging(true){} //Logging at the end of the generation
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& log_file){}
+    TrajectoryLog() : Logging(true){}
+    void saveLog(EA::Ptr& ea){
+        std::ofstream ofs;
+        int generation = ea->get_generation();
+        for(size_t i = 0; i < ea->get_population().size(); i++){
+            std::vector<are::waypoint> traj = std::dynamic_pointer_cast<ind_t>(ea->getIndividual(i))->get_trajectory();
+            std::stringstream filepath;
+            filepath << "/traj_" << generation << "_" << i;
+            logFile = filepath.str();
+
+            if(!openOLogFile(ofs))
+                return;
+            for(const are::waypoint& wp: traj)
+                ofs << wp.to_string() << std::endl;
+            ofs.close();
+        }
+    }
+    void loadLog(const std::string &file){}
 };
+
 
 } //are
 #endif //LOGGING_H

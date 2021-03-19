@@ -69,7 +69,7 @@ int main(int argc, char** argv)
     double best_fit = 1e14;
     std::vector<double> best_gen;
     int eval = 0;
-    misc::RandNum rn(0);
+    are::misc::RandNum rn(0);
 
     while(best_fit > 0.5){
         pop = bo.get_population();

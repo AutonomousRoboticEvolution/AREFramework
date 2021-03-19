@@ -78,8 +78,8 @@ public:
     //GETTERS & SETTERS
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
     const std::vector<double>& get_final_position(){return final_position;}
-    void set_trajectory(const std::vector<sim::waypoint>& traj){trajectory = traj;}
-    const std::vector<sim::waypoint>& get_trajectory(){return trajectory;}
+    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
     double get_energy_cost(){return energy_cost;}
     double get_sim_time(){return sim_time;}
 
@@ -89,7 +89,7 @@ protected:
     void createController() override;
 
     std::vector<double> final_position;
-    std::vector<sim::waypoint> trajectory;
+    std::vector<waypoint> trajectory;
     double energy_cost=0;
     double sim_time=0;
 };

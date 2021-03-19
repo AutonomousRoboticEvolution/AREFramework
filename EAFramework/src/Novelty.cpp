@@ -14,7 +14,7 @@ double Novelty::sparseness(const std::vector<double> &dist){
         for(int i = 0; i < k_value; i++)
             sum += dist[i];
     }
-    if(isnan(sum/static_cast<double>(k_value))){
+    if(std::isnan(sum/static_cast<double>(k_value))){
         std::cerr << "NaN found" << std::endl;
     }
     return sum/static_cast<double>(k_value);

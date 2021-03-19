@@ -21,7 +21,7 @@ target_link_libraries(NIPES ARE simulatedER cmaes tbb)
 
 add_executable(nipes_test nipes_test.cpp)
 target_include_directories(nipes_test PUBLIC ${INCLUDES})
-target_link_libraries(nipes_test NIPES cmaes)
+target_link_libraries(nipes_test ARE NIPES cmaes)
 
 install(TARGETS NIPES DESTINATION lib)
 install(DIRECTORY . DESTINATION include/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

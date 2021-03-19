@@ -137,43 +137,7 @@ private:
 
 };
 
-<<<<<<< HEAD:EvolutionVREP/include/ARE/learning/NIPES.hpp
-class NIPES : public EA
-{
-public:
-    NIPES() : EA(){}
-    NIPES(const settings::ParametersMapPtr& param) : EA(param){}
-    ~NIPES(){
-        cmaStrategy.reset();
-    }
 
-    void init() override;
-    void epoch() override;
-    void init_next_pop() override;
-    bool update(const Environment::Ptr&) override;
-
-    bool is_finish() override;
-    bool finish_eval() override;
-
-    bool restarted(){return !cmaStrategy->log_stopping_criterias.empty();}
-    std::string pop_stopping_criterias(){
-        std::string res = cmaStrategy->log_stopping_criterias.back();
-        cmaStrategy->log_stopping_criterias.pop_back();
-        return res;
-    }
-    const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
-
-protected:
-    IPOPCMAStrategy::Ptr cmaStrategy;
-    cma::CMASolutions best_run;
-    bool _is_finish = false;
-    std::vector<Eigen::VectorXd> archive;
-    int reevaluated = 0;
-};
-
-}
-=======
->>>>>>> real_experiment:EAFramework/include/ARE/learning/ipop_cmaes.hpp
 
 }//are
 

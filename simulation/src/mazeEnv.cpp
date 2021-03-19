@@ -25,7 +25,6 @@ void MazeEnv::init(){
 
     VirtualEnvironment::init();
 
-<<<<<<< HEAD:EvolutionVREP/src/ARE/mazeEnv.cpp
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string scenePath = settings::getParameter<settings::String>(parameters,"#scenePath").value;
     if(verbose){
@@ -39,9 +38,6 @@ void MazeEnv::init(){
         }
     }
 
-
-=======
->>>>>>> real_experiment:simulation/src/mazeEnv.cpp
     target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                        settings::getParameter<settings::Double>(parameters,"#target_y").value,
                        settings::getParameter<settings::Double>(parameters,"#target_z").value};
@@ -81,15 +77,11 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
     };
     std::vector<double> d(1);
     d[0] = 1 - distance(final_position,target_position)/max_dist;
-<<<<<<< HEAD:EvolutionVREP/src/ARE/mazeEnv.cpp
 
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f) || f < 0)
             f = 0;
         else if(f > 1) f = 1;
-
-=======
->>>>>>> real_experiment:simulation/src/mazeEnv.cpp
 
     return d;
 }

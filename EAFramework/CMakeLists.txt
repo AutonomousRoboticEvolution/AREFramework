@@ -32,7 +32,9 @@ if (RASPBERRY)
 
     target_link_libraries(piARE ${Boost_LIBRARIES})
 else()
-find_package(PolyVox REQUIRED)
+
+    find_package(MultiNEAT REQUIRED)
+    message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 
 if(WITH_NN2 AND LIMBO_FOLDER)
     FILE(GLOB SOURCES 
@@ -45,7 +47,7 @@ elseif(WITH_NN2)
             "src/*"
             "src/misc/*" 
             "src/nn2/*"
-            "src/learning/NIPES.cpp")
+            "src/learning/ipop_cmaes.cpp")
 else()
     FILE(GLOB SOURCES    
             "src/*"

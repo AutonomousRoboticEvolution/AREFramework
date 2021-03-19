@@ -4,6 +4,7 @@
 #include <ARE/Genome.h>
 #include <boost/random.hpp>
 #include <boost/algorithm/string.hpp>
+#include <ARE/Logging.h>
 
 namespace are{
 
@@ -129,15 +130,10 @@ public:
      * @return
      */
     std::string to_string() const override;
-    void from_string(const std::string & str) override;
+    void from_string(const std::string & gen_str) override;
     void from_file(const std::string &filename);
 
-<<<<<<< HEAD:EvolutionVREP/include/ARE/NNParamGenome.hpp
-=======
-    void from_string(const std::string &gen_str) override;
 
-    void from_file(const std::string &filename);
->>>>>>> real_experiment:EAFramework/include/ARE/NNParamGenome.hpp
 
     friend class boost::serialization::access;
     template <class archive>
@@ -153,6 +149,13 @@ private:
     std::vector<double> biases;
 };
 
+class NNParamGenomeLog : public Logging
+{
+public:
+    NNParamGenomeLog() : Logging(true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
 
 }
 

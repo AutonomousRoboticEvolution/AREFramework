@@ -5,14 +5,9 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 elseif(COPPELIASIM_FOLDER)
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
-    SET(COPPELIASIM_FOUND ON)
-    SET(VREP_FOUND OFF)
-=======
     message("COPPELIA FOUND!")
     SET(COPPELIASIM_FOUND ON CACHE BOOL "" FORCE) #CACHE BOOL "" FORCE option allows this variable to be accessed in other CMakeLists of the project
     SET(VREP_FOUND OFF CACHE BOOL "" FORCE)
->>>>>>> real_experiment:simulation/CMakeLists.txt
     add_definitions(-DCOPPELIASIM)
     if (WIN32)
         set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
@@ -29,14 +24,9 @@ elseif(COPPELIASIM_FOLDER)
         message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
     endif()
 elseif(VREP_FOLDER)
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
-    SET(VREP_FOUND ON)
-    SET(COPPELIASIM_FOUND OFF)
-=======
     message("VREP FOUND!")
     SET(VREP_FOUND ON CACHE BOOL "" FORCE)
     SET(COPPELIASIM_FOUND OFF CACHE BOOL "" FORCE)
->>>>>>> real_experiment:simulation/CMakeLists.txt
     add_definitions(-DVREP)
     if (WIN32)
         set(VREP_LIB_FOLDER "${VREP_FOLDER}")
@@ -56,14 +46,12 @@ else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
 
+
 find_package(MultiNEAT REQUIRED)
 message("MultiNEAT Folder : ${MultiNEAT_DIR}")
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
 find_package(PolyVox REQUIRED)
 
 
-=======
->>>>>>> real_experiment:simulation/CMakeLists.txt
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
@@ -82,28 +70,12 @@ else()
     FILE(GLOB SRC src/*)
 endif()
 
-
-if(WITH_NN2 AND LIMBO_FOLDER)
-    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/*")
-elseif(WITH_NN2)
-    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC} "src/ARE/nn2/*" "src/ARE/learning/NIPES.cpp")
-else()
-    FILE(GLOB SOURCES ${CORE_SRC} ${MISC_SRC})
-endif()
-
-add_library(ER_library SHARED ${VREP_SRC} ${SOURCES})
-=======
-if(WITH_NN2)
-    FILE(GLOB SRC src/* src/nn2/*)
-else()
-    FILE(GLOB SRC src/*)
-endif()
-
 add_library(simulatedER SHARED  ${VREP_SRC} ${SRC})
 target_include_directories(simulatedER PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "include"
+    "ERClient/include"
     "../EAFramework/include")
 target_link_libraries(simulatedER
     MultiNEAT::MultiNEAT
@@ -120,7 +92,6 @@ elseif(COPPELIASIM_FOUND)
 endif()
 
 
->>>>>>> real_experiment:simulation/CMakeLists.txt
 
 add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
 
@@ -178,8 +149,4 @@ elseif(UNIX)
 endif()
 
 add_subdirectory(ERClient)
-<<<<<<< HEAD:EvolutionVREP/CMakeLists.txt
-add_subdirectory(modules)
-add_subdirectory(experiments)
-=======
->>>>>>> real_experiment:simulation/CMakeLists.txt
+

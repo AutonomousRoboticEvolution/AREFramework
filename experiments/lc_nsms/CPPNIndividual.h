@@ -9,11 +9,8 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
-<<<<<<< HEAD:EvolutionVREP/experiments/lc_nsms/CPPNIndividual.h
-#include "misc/eigen_boost_serialization.hpp"
-=======
+
 #include "ARE/misc/eigen_boost_serialization.hpp"
->>>>>>> real_experiment:experiments/lc_nsms/CPPNIndividual.h
 
 namespace are {
 

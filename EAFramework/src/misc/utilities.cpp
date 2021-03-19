@@ -18,3 +18,15 @@ void misc::split_line(const std::string& line, const std::string& delim,
         values.push_back(l);
     }
 }
+
+void misc::stdvect_to_eigenvect(const std::vector<double>& std_v, Eigen::VectorXd &eigen_v){
+    eigen_v = Eigen::VectorXd::Zero(std_v.size());
+    for(size_t i = 0; i < std_v.size(); i++)
+        eigen_v(i) = std_v[i];
+}
+
+void misc::eigenvect_to_stdvect(const Eigen::VectorXd &eigen_v, std::vector<double>& std_v){
+    std_v.resize(eigen_v.rows());
+    for(long i = 0; i < eigen_v.rows(); i++)
+        std_v[i] = eigen_v[i];
+}

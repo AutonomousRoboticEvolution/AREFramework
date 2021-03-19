@@ -334,7 +334,6 @@ void Morphology_CPPNMatrix::create()
         exportMesh(loadInd, listVertices.at(0),listIndices.at(0));
         exportRobotModel(loadInd);
     }
-<<<<<<< HEAD:EvolutionVREP/src/ARE/Morphology_CPPNMatrix.cpp
     // Get info from body plan for body plan descriptors or logging.
     if(indVerResult || convexDecompositionSuccess){
         // For the graph descriptor
@@ -387,12 +386,8 @@ void Morphology_CPPNMatrix::create()
         indDesc.cartDesc.countOrgans(_organSpec);
         indDesc.cartDesc.setCartDesc();
     }
-    cop::retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
-=======
-    //exportRobotModel(loadInd);
-//    getObjectHandles();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
->>>>>>> real_experiment:simulation/src/Morphology_CPPNMatrix.cpp
+
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.

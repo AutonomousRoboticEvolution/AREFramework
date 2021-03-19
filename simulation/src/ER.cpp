@@ -1,37 +1,7 @@
-<<<<<<< HEAD:EvolutionVREP/src/ARE/ER.cpp
-#include "ARE/ER.h"
-
-using namespace are;
-=======
-// bubbleRob plugin artefact:
-// "
-// Copyright 2006-2014 Dr. Marc Andreas Freese. All rights reserved.
-// marc@coppeliarobotics.com
-// www.coppeliarobotics.com
-//
-// -------------------------------------------------------------------
-// This file is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-//
-// You are free to use/modify/distribute this file for whatever purpose!
-// -------------------------------------------------------------------
-//
-// This file was automatically created for V-REP release V3.1.0 on January 20th 2014
-
-//**************************************************
-/* This file represents the main class of the ER plugin. The ER plugin is
-* currently in a pre-alpha stage and still under development.
-* contact Frank at f.veenstra00@gmail.com for more information.
-*/
-//**************************************************
-// "
-
 #include "simulatedER/ER.h"
 
 using namespace are::sim;
 namespace interproc = boost::interprocess;
->>>>>>> real_experiment:simulation/src/ER.cpp
 
 
 /// Initialize the settings class; it will read a settings file or it will use default parameters if it cannot read a

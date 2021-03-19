@@ -34,7 +34,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::BehavDescLog<are::sim::NN2Individual>::Ptr bdlog(new are::BehavDescLog<are::sim::NN2Individual>(behav_desc_log_file));
     logs.push_back(bdlog);
 
-    are::sim::TrajectoryLog<are::sim::NN2Individual>::Ptr trajlog(new are::sim::TrajectoryLog<are::sim::NN2Individual>);
+    are::TrajectoryLog<are::sim::NN2Individual>::Ptr trajlog(new are::TrajectoryLog<are::sim::NN2Individual>);
     logs.push_back(trajlog);
 
     std::string energy_cost_log_file = are::settings::getParameter<are::settings::String>(param,"#energyCostFile").value;
