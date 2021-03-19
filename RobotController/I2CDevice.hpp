@@ -83,6 +83,9 @@ class I2CDevice {
 		*/
 		int read16From(uint8_t subAddress);
 
+                void writeLittleEndian16To(uint8_t subAddress, uint16_t data);
+                int readLittleEndian16From(uint8_t subAddress);
+
 	protected :
 		int devHandle;	///< The handle to the bus access file for this device
 };
