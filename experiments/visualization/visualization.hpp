@@ -7,8 +7,8 @@
 #include "ARE/Logging.h"
 #include "ARE/Individual.h"
 #include "ARE/NNParamGenome.hpp"
-#include "ARE/nn2/NN2Individual.hpp"
-#include "ARE/Morphology_CPPNMatrix.h"
+#include "simulatedER/nn2/NN2Individual.hpp"
+#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/CPPNGenome.h"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/Settings.h"
@@ -16,7 +16,7 @@
 
 namespace are {
 
-using CPPNMorph = Morphology_CPPNMatrix;
+using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 class VisuInd : public Individual
 {

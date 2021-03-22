@@ -2,10 +2,19 @@
 #define CMAES_LEARNER_HPP
 
 #include "ARE/Learner.h"
-#include "ARE/learning/NIPES.hpp"
+#include "ARE/learning/ipop_cmaes.hpp"
+#include "ARE/learning/Novelty.hpp"
+#include "ARE/nn2/NN2Control.hpp"
+#include "ARE/nn2/NN2Settings.hpp"
 #include "misc/RandNum.h"
 
 namespace are {
+
+using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
+using connection_t = nn2::Connection<double>;
+using ffnn_t = nn2::Mlp<neuron_t,connection_t>;
+using elman_t = nn2::Elman<neuron_t,connection_t>;
+using rnn_t = nn2::Rnn<neuron_t,connection_t>;
 
 class CMAESLearner : public Learner
 {

@@ -4,7 +4,6 @@
 #include <iostream>
 #include <vector>
 #include <memory>
-#include <multineat/Substrate.h>
 #include "ARE/Morphology.hpp"
 #include "ARE/misc/RandNum.h"
 #include "ARE/Settings.h"

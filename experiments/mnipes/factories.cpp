@@ -1,18 +1,18 @@
-#include "ARE/mazeEnv.h"
+#include "simulatedER/mazeEnv.h"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::MazeEnv);
+    are::Environment::Ptr env(new are::sim::MazeEnv);
     env->set_parameters(param);
     return env;
 }
 
 
 
-extern "C" are::EA::Ptr EAFactory(const misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
+extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
     are::EA::Ptr ea;
 

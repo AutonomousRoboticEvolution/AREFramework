@@ -7,14 +7,14 @@
 #include "ARE/Logging.h"
 #include "ARE/Individual.h"
 #include "ARE/NNParamGenome.hpp"
-#include "ARE/nn2/NN2Individual.hpp"
+#include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/CPPNGenome.h"
-#include "ARE/Morphology_CPPNMatrix.h"
+#include "simulatedER/Morphology_CPPNMatrix.h"
 
 
 
 namespace are {
-using CPPNMorph = Morphology_CPPNMatrix;
+using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 class RobustInd : public Individual
 {

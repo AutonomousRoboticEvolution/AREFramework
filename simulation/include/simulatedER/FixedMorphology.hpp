@@ -4,6 +4,7 @@
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 #include "simulatedER/Morphology.h"
+#include <multineat/Substrate.h>
 
 namespace are {
 

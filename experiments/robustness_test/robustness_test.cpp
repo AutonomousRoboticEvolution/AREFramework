@@ -9,18 +9,18 @@ void RobustInd::createMorphology(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
 
-    morphology.reset(new Morphology_CPPNMatrix(parameters));
+    morphology.reset(new CPPNMorph(parameters));
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setGenome(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    morphology->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
     float pos[3];
-    simGetObjectPosition(morphology->getMainHandle(),-1,pos);
+    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
 }
 
 void RobustInd::createController(){
@@ -82,7 +82,7 @@ void RobustInd::update(double delta_time){
 
     std::vector<double> outputs = control->update(inputs);
 
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->command(outputs);
 }
 
 

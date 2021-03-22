@@ -71,18 +71,18 @@ void M_NIPESIndividual::createMorphology(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
 
-    morphology.reset(new Morphology_CPPNMatrix(parameters));
+    morphology.reset(new CPPNMorph(parameters));
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setGenome(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    morphology->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
     float pos[3];
-    simGetObjectPosition(morphology->getMainHandle(),-1,pos);
+    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
     setGenome();
     setMorphDesc();
     setManRes();
@@ -148,7 +148,7 @@ void M_NIPESIndividual::update(double delta_time){
     std::vector<double> outputs = control->update(inputs);
 
     morphology->command(outputs);
-    energy_cost += morphology->get_energy_cost();
+    energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
     if(std::isnan(energy_cost))
         energy_cost = 0;
     sim_time = delta_time;
@@ -156,32 +156,32 @@ void M_NIPESIndividual::update(double delta_time){
 
 void M_NIPESIndividual::setGenome()
 {
-    nn = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getGenome();
 }
 
 void M_NIPESIndividual::setMorphDesc()
 {
-    morphDesc = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getMorphDesc();
+    morphDesc = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMorphDesc();
 }
 
 void M_NIPESIndividual::setManRes()
 {
-    testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
+    testRes = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getRobotManRes();
 }
 
 void M_NIPESIndividual::setManScore()
 {
-    manScore = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getManScore();
+    manScore = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getManScore();
 }
 
 void M_NIPESIndividual::setGraphMatrix()
 {
-    graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
+    graphMatrix =  std::dynamic_pointer_cast<CPPNMorph>(morphology)->getGraphMatrix();
 }
 
 void M_NIPESIndividual::setSymDesc()
 {
-    symDesc =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getSymDesc();
+    symDesc =  std::dynamic_pointer_cast<CPPNMorph>(morphology)->getSymDesc();
 }
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
@@ -439,10 +439,8 @@ bool M_NIPES::update(const Environment::Ptr& env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(
-                    std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(
-                    std::dynamic_pointer_cast<MazeEnv>(env)->get_trajectory());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
         std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
                         ind->getObjectives(),
                         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
@@ -621,7 +619,7 @@ bool M_NIPES::finish_eval(){
                          (a[2] - b[2])*(a[2] - b[2]));
     };
 
-    int handle = population[currentIndIndex]->get_morphology()->getMainHandle();
+    int handle = std::dynamic_pointer_cast<CPPNMorph>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
     double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);

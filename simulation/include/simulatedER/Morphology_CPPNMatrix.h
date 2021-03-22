@@ -2,7 +2,7 @@
 #define Morphology_CPPNMatrix_H
 
 #include "simulatedER/Morphology.h"
-
+#include <multineat/NeuralNetwork.h>
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 #include "eigen3/Eigen/Core"
