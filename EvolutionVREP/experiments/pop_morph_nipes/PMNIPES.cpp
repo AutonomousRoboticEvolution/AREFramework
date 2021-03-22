@@ -45,9 +45,6 @@ void PMNIPESIndividual::createMorphology(){
     setGenome();
     setMorphDesc();
     setManRes();
-    setManScore();
-    setGraphMatrix();
-    setSymDesc();
 }
 
 void PMNIPESIndividual::createController(){
@@ -106,21 +103,6 @@ void PMNIPESIndividual::setMorphDesc()
 void PMNIPESIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-}
-
-void PMNIPESIndividual::setManScore()
-{
-    manScore = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getManScore();
-}
-
-void PMNIPESIndividual::setGraphMatrix()
-{
-    graphMatrix =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
-}
-
-void PMNIPESIndividual::setSymDesc()
-{
-    symDesc =  std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getSymDesc();
 }
 
 std::string PMNIPESIndividual::to_string()
