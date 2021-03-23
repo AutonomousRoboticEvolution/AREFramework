@@ -86,9 +86,6 @@ void M_NIPESIndividual::createMorphology(){
     setGenome();
     setMorphDesc();
     setManRes();
-    setManScore();
-    setGraphMatrix();
-    setSymDesc();
 }
 
 void M_NIPESIndividual::createController(){
@@ -99,9 +96,9 @@ void M_NIPESIndividual::createController(){
     //If first evaluation on this morphology : init the learner (CMAES)
     if(std::dynamic_pointer_cast<CMAESLearner>(learner)->get_nbr_eval() == 0)
     {
-        int wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.wheelNumber;
-        int joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.jointNumber;
-        int sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getIndDesc().cartDesc.sensorNumber;
+        int wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
+        int joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
+        int sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
 
         nn_inputs = sensor_nbr*2;
         nn_outputs = wheel_nbr + joint_nbr;
@@ -169,20 +166,7 @@ void M_NIPESIndividual::setManRes()
     testRes = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getRobotManRes();
 }
 
-void M_NIPESIndividual::setManScore()
-{
-    manScore = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getManScore();
-}
 
-void M_NIPESIndividual::setGraphMatrix()
-{
-    graphMatrix =  std::dynamic_pointer_cast<CPPNMorph>(morphology)->getGraphMatrix();
-}
-
-void M_NIPESIndividual::setSymDesc()
-{
-    symDesc =  std::dynamic_pointer_cast<CPPNMorph>(morphology)->getSymDesc();
-}
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;

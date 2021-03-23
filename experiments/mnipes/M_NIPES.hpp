@@ -13,8 +13,6 @@
 
 namespace are{
 
-
-
 using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 typedef
@@ -114,12 +112,9 @@ public:
     void setGenome();
 
     void setManRes();
-    void setManScore();
 
     /// Setters for descritors
     void setMorphDesc();
-    void setGraphMatrix();
-    void setSymDesc();
 
     void set_nn_inputs(int nni){nn_inputs = nni;}
     void set_nn_outputs(int nno){nn_outputs = nno;}

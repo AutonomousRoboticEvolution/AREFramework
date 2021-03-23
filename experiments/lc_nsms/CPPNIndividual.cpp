@@ -30,10 +30,7 @@ void CPPNIndividual::createMorphology()
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
     setGenome();
     setMorphDesc();
-    setManRes();
-    setManScore();
-    setGraphMatrix();
-    setSymDesc();
+
 }
 
 void CPPNIndividual::createController()
@@ -77,17 +74,3 @@ void CPPNIndividual::from_string(const std::string &str){
     iarch >> *this;
 }
 
-void CPPNIndividual::setManScore()
-{
-    manScore = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getManScore();
-}
-
-void CPPNIndividual::setGraphMatrix()
-{
-    graphMatrix =  std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGraphMatrix();
-}
-
-void CPPNIndividual::setSymDesc()
-{
-    symDesc =  std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSymDesc();
-}

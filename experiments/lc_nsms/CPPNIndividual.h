@@ -46,12 +46,10 @@ public :
     void setGenome();
 
     void setManRes();
-    void setManScore();
 
     /// Setters for descritors
     void setMorphDesc();
-    void setGraphMatrix();
-    void setSymDesc();
+
     /// Getters for descritors
     Eigen::VectorXd getMorphDesc(){return morphDesc;};
     std::vector<std::vector<std::vector<int>>> getGraphMatrix(){return graphMatrix;};
