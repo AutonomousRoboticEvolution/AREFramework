@@ -501,9 +501,9 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
             // Create organ if any
             if(organType > 0){
                 std::vector<float> tempPosVector(3);
-                tempPosVector.at(0) = (float) input[0] * VOXEL_REAL_SIZE;
-                tempPosVector.at(1) = (float) input[1] * VOXEL_REAL_SIZE;
-                tempPosVector.at(2) = (float) input[2] * VOXEL_REAL_SIZE;
+                tempPosVector.at(0) = static_cast<float>(input[0] * VOXEL_REAL_SIZE);
+                tempPosVector.at(1) = static_cast<float>(input[1] * VOXEL_REAL_SIZE);
+                tempPosVector.at(2) = static_cast<float>(input[2] * VOXEL_REAL_SIZE);
                 tempPosVector.at(2) += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
                 std::vector<float> tempOriVector(3);
                 generateOrientations(skeletonSurfaceCoord[m][n].at(3), skeletonSurfaceCoord[m][n].at(4), skeletonSurfaceCoord[m][n].at(5), tempOriVector);
