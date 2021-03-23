@@ -8,13 +8,26 @@ After, having successfully installed the framework, you can refer to the next tu
 
 ## Required software
 
-* Preferably use Ubuntu 18.04 as OS
-* V-REP Pro Edu 3.6.2 - [link](https://www.coppeliarobotics.com/files/V-REP_PLAYER_V3_6_2_Ubuntu18_04.tar.xz)
-* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
-* Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
+Preferably use Ubuntu 18.04 as OS
+
+Mandatory dependencies:
+
+* V-REP Pro Edu 3.6.1 - [link](https://www.coppeliarobotics.com/files/V-REP_PRO_EDU_V3_6_1_Ubuntu18_04.tar.xz)
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
-* Boost
-* Eigen 3
+* Boost (apt package libboost-all-dev)
+* Eigen 3 (apt package libeigen3-dev)
+* TBB - (apt package libtbb-dev)
+
+Dependencies for Morphogenesis and Hyperneat
+
+* Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
+* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
+
+Dependencies for learning 
+
+* LIBCMAES - [link](https://github.com/beniz/libcmaes)
+* NN2 (please put this code in modules) - [link](https://github.com/LeniLeGoff/nn2)
+* Limbo (cmake -DLIMBO_FOLDER=/limbo_folder/) .. - [link](https://github.com/resibots/limbo)
 
 ## Installation
 
@@ -57,11 +70,35 @@ make
 make install # add sudo before the command if the install prefix is /usr/local (default value)
 ```
 
+Install LIBCMAES
+```
+git clone https://github.com/beniz/libcmaes.git
+cd libcmaes
+mkdir build
+cd build
+cmake -DCMAKE_INSTALL_PREFIX=/usr/local  .. # you can install somewhere else if you'd like, but this is default
+make
+sudo make install
+```
+
+Install Limbo
+```
+git clone https://github.com/resibots/limbo.git
+```
+This library has headers only, so there is no need to be compiled or installed. 
+
+Install NN2
+```
+git clone https://github.com/LeniLeGoff/nn2
+```
+This library has headers only, so there is no need to be compiled or installed. 
+And this is a module of the framework
+
 ### The framework
 
 In order to install the framework
 ```
-git clone https://legoffl@bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework.git
+git clone https://bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework.git
 cd evolutionary_robotics_framework
 mkdir build && cd build
 cmake -DCMAKE_INSTALL_PREFIX=/install/path -DVREP_FOLDER=/vrep/folder/path ..
