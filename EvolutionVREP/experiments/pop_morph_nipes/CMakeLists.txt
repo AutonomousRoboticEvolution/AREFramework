@@ -10,6 +10,7 @@ set(INCLUDES
     "../../modules/")
 
 add_library(PM_NIPES SHARED 
+    ../common/straightLineEnv.cpp
     factories.cpp
     PMNIPES.cpp
     NIPESLoggings.cpp

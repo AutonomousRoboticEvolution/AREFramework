@@ -286,7 +286,7 @@ bool PMNIPES::update(const Environment::Ptr & env){
 void PMNIPES::init_next_pop(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-    if(numberEvaluation >= maxNbrEval || _is_finish || nbr_dropped_eval >= 50)
+    if(numberEvaluation >= maxNbrEval || _is_finish /*|| nbr_dropped_eval >= 50*/)
     {
         population.clear();
         cmaStrategy->reset_search_state();
@@ -362,7 +362,7 @@ void PMNIPES::init_next_pop(){
 bool PMNIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-    return (numberEvaluation >= maxNbrEval || _is_finish || nbr_dropped_eval >= 50) && morphCounter >= morphIDList.size();
+    return (numberEvaluation >= maxNbrEval || _is_finish /*|| nbr_dropped_eval >= 50*/) && morphCounter >= morphIDList.size();
 }
 
 void PMNIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
