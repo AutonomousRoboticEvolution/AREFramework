@@ -32,6 +32,10 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     // Check collision with other organs
     for (int oH : objectHandles) {
         for (auto &organComp : organList) {
+            if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
+                continue;
+            if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
+                continue;
             for (auto &i : organComp.objectHandles) {
                 collisionResult = simCheckCollision(oH, i);
                 if (collisionResult == 1) { // Collision detected!
@@ -88,6 +92,8 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     /// \todo EB: Wheels are ignored in the following loop.
     // Check collision with other organs
     for (auto &organComp : organList) {
+        if(organComp.isOrganRemoved() && organComp.isOrganChecked())
+            continue;
         for (auto &i : organComp.objectHandles) {
             collisionResult = simCheckCollision(gripperHandle, i);
             if (collisionResult == 1) // Collision detected!
@@ -285,7 +291,7 @@ void Organ::createOrgan(int skeletonHandle)
 #elif ISROBOTSTATIC == 0
     simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
-    simSetObjectInt32Parameter(handle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
     if(organType != 0)
         createMaleConnector(skeletonHandle);
