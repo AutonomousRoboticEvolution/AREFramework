@@ -12,7 +12,7 @@ obs_fct_t obs_fcts::final_position = [](const BOIndividual::Ptr &ind) -> Eigen::
 };
 
 obs_fct_t obs_fcts::trajectory = [](const BOIndividual::Ptr &ind) -> Eigen::VectorXd{
-    std::vector<sim::waypoint> traj = ind->get_trajectory();
+    std::vector<waypoint> traj = ind->get_trajectory();
     Eigen::VectorXd o(6*traj.size());
     int i = 0;
     for(waypoint wp : traj){
@@ -28,11 +28,11 @@ obs_fct_t obs_fcts::trajectory = [](const BOIndividual::Ptr &ind) -> Eigen::Vect
 
 
 obs_fct_t obs_fcts::pos_traj = [](const BOIndividual::Ptr &ind) -> Eigen::VectorXd{
-    std::vector<sim::waypoint> traj = ind->get_trajectory();
+    std::vector<waypoint> traj = ind->get_trajectory();
     std::cout << "Compute observation, trajectory size : " << traj.size() << std::endl;
     Eigen::VectorXd o(3*traj.size());
     int i = 0;
-    for(sim::waypoint wp : traj){
+    for(waypoint wp : traj){
         o(i++) = wp.position[0];
         o(i++) = wp.position[1];
         o(i++) = wp.position[2];
