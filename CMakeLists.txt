@@ -5,6 +5,18 @@ add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+if(NOT RASPBERRY)
+    set(RASPBERRY 0)
+endif()
+
+if(NOT ONLY_PHYSICAL)
+    set(ONLY_PHYSICAL 0)
+endif()
+
+if(NOT ONLY_SIMULATION)
+    set(ONLY_SIMULATION 0)
+endif()
+
 if (RASPBERRY)
     add_subdirectory(EAFramework)
     add_subdirectory(PhysicalER)
