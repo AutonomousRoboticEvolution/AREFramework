@@ -1,24 +1,14 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "ARE/nn2/NN2Individual.hpp"
+#include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/CPPNGenome.h"
-#include "ARE/Morphology_CPPNMatrix.h"
-#include "v_repLib.h"
-#include "eigen_boost_serialization.hpp"
-
-// Learning
-#include "ARE/nn2/NN2Control.hpp"
-#include "ARE/NNParamGenome.hpp"
-#include "ARE/nn2/NN2Settings.hpp"
-#include "ARE/Settings.h"
-#include "nn2/mlp.hpp"
-#include "nn2/elman.hpp"
-#include "nn2/rnn.hpp"
+#include "simulatedER/Morphology_CPPNMatrix.h"
+#include "ARE/misc/eigen_boost_serialization.hpp"
 
 namespace are {
 
-class CPPNIndividual : public NN2Individual
+class CPPNIndividual : public sim::NN2Individual
 {
 public :
     CPPNIndividual() : NN2Individual(){}

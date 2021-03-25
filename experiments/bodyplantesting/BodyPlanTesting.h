@@ -2,18 +2,12 @@
 #define BODYPLANTESTING_H
 
 #include "ARE/EA.h"
-#include "ARE/CPPNGenome.h"
-#include "ARE/Morphology_CPPNMatrix.h"
 #include "CPPNIndividual.h"
-
 #include "eigen3/Eigen/Core"
-
+#include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
-// Learning stuff...
 #include <limbo/init/lhs.hpp>
-#include "ARE/nn2/NN2Settings.hpp"
-#include "ARE/Settings.h"
-#include "ARE/nn2/NN2Individual.hpp"
+
 
 namespace are {
 

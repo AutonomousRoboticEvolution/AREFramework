@@ -16,20 +16,20 @@ void CPPNIndividual::update(double delta_time)
     }
 
     std::vector<double> outputs = control->update(inputs);
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->command(outputs);
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->command(outputs);
 }
 
 void CPPNIndividual::createMorphology()
 {
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
-    morphology.reset(new Morphology_CPPNMatrix(parameters));
+    morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setGenome(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    morphology->createAtPosition(init_x,init_y,0.15);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
     setGenome();
     setMorphDesc();
     setManRes();
@@ -37,17 +37,17 @@ void CPPNIndividual::createMorphology()
 
 void CPPNIndividual::setGenome()
 {
-    nn = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGenome();
 }
 
 void CPPNIndividual::setMorphDesc()
 {
-    morphDesc = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getMorphDesc();
+    morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
 }
 
 void CPPNIndividual::setManRes()
 {
-    testRes = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getRobotManRes();
+    testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
