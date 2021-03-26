@@ -46,8 +46,7 @@ int main()
     int seed = rd();
     are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
 
-    are::NSGC nsgc(std::make_shared<are_set::ParametersMap>(parameters));
-    nsgc.set_randomNum(rngen);
+    are::NSGC nsgc(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     nsgc.init();
 //    nsgc.set_obj_bounds({{1,0},{1,0}});
     std::vector<double> best_gen;

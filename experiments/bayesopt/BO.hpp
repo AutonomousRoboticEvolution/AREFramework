@@ -34,7 +34,7 @@ class BO : public EA
 {
 public:
     BO() : EA(){}
-    BO(const settings::ParametersMapPtr& param) : EA(param){}
+    BO(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~BO() override {}
 
     void init() override;

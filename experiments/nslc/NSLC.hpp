@@ -58,7 +58,7 @@ public:
     typedef std::shared_ptr<const NSLC> ConstPtr;
 
     NSLC() : NSGA2<NSLCIndividual>(){}
-    NSLC(const settings::ParametersMapPtr& param) : NSGA2<NSLCIndividual>(param){}
+    NSLC(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : NSGA2(rn, param){}
 
     void init() override;
 

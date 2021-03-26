@@ -41,8 +41,8 @@ int main()
     int seed = rd();
     are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
 
-    are::BasicEA ea(std::make_shared<are_set::ParametersMap>(parameters));
-    ea.set_randomNum(rngen);
+    are::BasicEA ea(rngen,std::make_shared<are_set::ParametersMap>(parameters));
+
     ea.init();
     std::vector<are::Individual::Ptr> pop;
     int gen_size = std::dynamic_pointer_cast<are::NNParamGenome>(ea.get_population()[0]->get_ctrl_genome())->get_full_genome().size();

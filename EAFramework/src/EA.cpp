@@ -4,8 +4,9 @@
 
 using namespace are;
 
-EA::EA(const settings::ParametersMapPtr& param){
+EA::EA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param){
     parameters = param;
+    randomNum = rn;
 }
 
 EA::~EA()
@@ -14,13 +15,6 @@ EA::~EA()
     parameters.reset();
     for(auto& ind : population)
         ind.reset();
-}
-
-
-void EA::setSettings(const settings::ParametersMapPtr &param,const misc::RandNum::Ptr &rn)
-{
-    parameters = param;
-	randomNum = rn;
 }
 
 

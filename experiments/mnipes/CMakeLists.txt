@@ -18,7 +18,7 @@ add_library(M_NIPES SHARED
    MNIPESLoggings.cpp
     )
 target_include_directories(M_NIPES PUBLIC ${INCLUDES})
-target_link_libraries(M_NIPES ER_library cmaes tbb)
+target_link_libraries(M_NIPES ARE simulatedER cmaes tbb)
 
 install(TARGETS M_NIPES DESTINATION lib)
 install(DIRECTORY . DESTINATION include/mnipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

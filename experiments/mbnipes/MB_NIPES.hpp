@@ -28,7 +28,7 @@ public:
     typedef std::unique_ptr<const MB_NIPES> ConstPtr;
 
     MB_NIPES() : NIPES(){}
-    MB_NIPES(const settings::ParametersMapPtr& param) : NIPES(param){}
+    MB_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
 
     void init();
     void epoch();

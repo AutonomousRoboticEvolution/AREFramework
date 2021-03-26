@@ -25,7 +25,7 @@ public:
     typedef EA::Ptr (Factory)(const misc::RandNum::Ptr&,const settings::ParametersMapPtr&);
 
     EA(){}
-    EA(const settings::ParametersMapPtr& param);
+    EA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
     //no copyable object
 //    EA(const EA& ea) :
 //        settings(ea.settings),
@@ -39,10 +39,6 @@ public:
 //    {}
     virtual ~EA();
 
-
-    std::vector<int> popNextIndNumbers;
-    /// This method initilizes setting for EA and random number generator seed
-    void setSettings(const settings::ParametersMapPtr &param, const misc::RandNum::Ptr &rn);
 
     /// This method sets the fitness value of an individual
     virtual void setObjectives(size_t indIndex, const std::vector<double> &objectives)
@@ -113,6 +109,7 @@ public:
     const settings::ParametersMapPtr &get_parameters() const {return parameters;}
     const misc::RandNum::Ptr get_randomNum() const {return randomNum;}
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+    void set_parameters(const settings::ParametersMapPtr& param){parameters = param;}
     void set_generation(int gen){generation = gen;}
     int get_generation() const {return generation;}
     void incr_generation(){generation++;}

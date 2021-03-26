@@ -15,5 +15,5 @@ target_include_directories(bodyplantesting PUBLIC
     "../common/"
     "/usr/include/eigen3"
     )
-target_link_libraries(bodyplantesting ER_library)
+target_link_libraries(bodyplantesting ARE)
 install(TARGETS bodyplantesting DESTINATION lib)

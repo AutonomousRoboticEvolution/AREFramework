@@ -40,8 +40,7 @@ public:
 
     NSGA2() : EA(){
     }
-    NSGA2(const settings::ParametersMapPtr& param) : EA(param){
-    }
+    NSGA2(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~NSGA2() {
         parents.clear();
         mixed_pop.clear();

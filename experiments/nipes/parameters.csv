@@ -1,9 +1,9 @@
-#experimentName,string,cmabo
-#expPluginName,string,/usr/local/lib/libCMABO.so
+#experimentName,string,nipes
+#expPluginName,string,/usr/local/lib/libNIPES.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/easy_race.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck-longrange.ttm
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/AREPuck.ttm
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,4
 #maxEvalTime,float,120

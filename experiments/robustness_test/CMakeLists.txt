@@ -14,6 +14,6 @@ target_include_directories(robustnessTest PUBLIC
     "/usr/include/eigen3"
     "../../modules/"
     )
-target_link_libraries(robustnessTest ER_library)
+target_link_libraries(robustnessTest ARE simulatedER)
 install(TARGETS robustnessTest DESTINATION lib)
 install(DIRECTORY . DESTINATION include/robustnessTest  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

@@ -16,7 +16,7 @@ public:
     typedef std::shared_ptr<const RandomController> ConstPtr;
 
     RandomController(){}
-    RandomController(const settings::ParametersMapPtr& param) : EA(param){}
+    RandomController(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
     void init_pop();
     void init_next_pop() override;

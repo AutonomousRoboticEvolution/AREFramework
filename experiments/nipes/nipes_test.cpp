@@ -50,8 +50,7 @@ int main()
     int seed = rd();
     are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
 
-    are::NIPES nipes(std::make_shared<are_set::ParametersMap>(parameters));
-    nipes.set_randomNum(rngen);
+    are::NIPES nipes(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     nipes.init();
     std::vector<are::Individual::Ptr> pop;
     int gen_size = std::dynamic_pointer_cast<are::NNParamGenome>(nipes.get_population()[0]->get_ctrl_genome())->get_full_genome().size();

@@ -14,7 +14,7 @@ class BasicEA : public EA
 {
 public:
     BasicEA() : EA(){}
-    BasicEA(const settings::ParametersMapPtr& param) : EA(param){}
+    BasicEA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~BasicEA() {
         childrens.clear();
     }

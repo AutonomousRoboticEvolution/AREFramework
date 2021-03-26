@@ -16,7 +16,7 @@ class LC_NSMS : public EA
 {
 public:
     LC_NSMS() : EA(){}
-    LC_NSMS(const settings::ParametersMapPtr& param) : EA(param){}
+    LC_NSMS(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~LC_NSMS() override {}
 
     void init() override;

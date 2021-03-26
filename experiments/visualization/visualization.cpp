@@ -89,16 +89,17 @@ void Visu::init(){
 
 
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
-
+    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
+    int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
 
     std::string ctrl_gen_file;
     std::stringstream sstr;
-    sstr << folder_to_load << "/ctrl_genome";
+    sstr << folder_to_load << "/ctrlGenome_" << generation << "_" << indIdx;
     ctrl_gen_file = sstr.str();
 
     std::string morph_gen_file;
     std::stringstream sstr2;
-    sstr2 << folder_to_load << "/morph_genome";
+    sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
     morph_gen_file = sstr2.str();
 
 

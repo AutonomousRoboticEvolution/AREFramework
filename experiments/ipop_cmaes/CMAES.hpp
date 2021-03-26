@@ -108,7 +108,7 @@ class CMAES : public EA
 {
 public:
     CMAES() : EA(){}
-    CMAES(const settings::ParametersMapPtr& param) : EA(param){}
+    CMAES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~CMAES(){
         cmaStrategy.reset();
     }

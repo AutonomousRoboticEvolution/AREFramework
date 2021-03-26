@@ -52,8 +52,7 @@ class NSGC : public NSGA2<NSGCIndividual>
 {
 public:
     NSGC() : NSGA2<NSGCIndividual>(){}
-    NSGC(const settings::ParametersMapPtr& param) : NSGA2<NSGCIndividual>(param){}
-
+    NSGC(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : NSGA2(rn, param){}
     void init() override;
 
     void epoch() override;

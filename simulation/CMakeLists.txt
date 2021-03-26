@@ -49,8 +49,6 @@ endif()
 find_package(MultiNEAT REQUIRED)
 message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 
-
-
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>

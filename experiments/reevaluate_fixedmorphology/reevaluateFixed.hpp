@@ -18,7 +18,7 @@ class ReevaluateFixed : public EA
 {
 public:
     ReevaluateFixed() : EA(){}
-    ReevaluateFixed(const settings::ParametersMapPtr& param) : EA(param){}
+    ReevaluateFixed(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~ReevaluateFixed(){
     }
 

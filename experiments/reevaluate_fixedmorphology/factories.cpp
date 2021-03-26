@@ -17,9 +17,7 @@ extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::
 {
     are::EA::Ptr ea;
 
-    ea.reset(new are::ReevaluateFixed(st));
-
-    ea->set_randomNum(rn);
+    ea.reset(new are::ReevaluateFixed(rn,st));
     return ea;
 }
 

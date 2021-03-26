@@ -14,6 +14,6 @@ target_include_directories(visualization PUBLIC
     "/usr/include/eigen3"
     "../../modules"
     )
-target_link_libraries(visualization ER_library cmaes)
+target_link_libraries(visualization ARE simulatedER)
 install(TARGETS visualization DESTINATION lib)
 install(DIRECTORY . DESTINATION include/visu_population  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

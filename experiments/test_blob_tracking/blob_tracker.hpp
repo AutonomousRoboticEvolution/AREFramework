@@ -28,7 +28,7 @@ public:
     typedef std::shared_ptr<const BlobTracker> ConstPtr;
 
     BlobTracker(){}
-    BlobTracker(const settings::ParametersMapPtr& param) : EA(param){}
+    BlobTracker(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
 
 };

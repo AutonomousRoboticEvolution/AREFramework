@@ -196,7 +196,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
 SIM_DLLEXPORT void simEnd()
 { // This is called just once, at the end of V-REP
     unloadSimLibrary(simLib);
-
 }
 
 SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData, int* replyData)
@@ -263,6 +262,7 @@ void localMessageHandler(int message){
     }
 
     // START NEW SIMULATION
+    std::cout << simulationState << " " << ERVREP->get_ea()->get_population().size() <<std::endl;
     if (simulationState == FREE && ERVREP->get_ea()->get_population().size() > 0)
     {
         simulationState = STARTING;

@@ -48,8 +48,7 @@ class MONIPES : public NIPES, public NSGA2<MONN2Individual>
 {
 public:
     MONIPES() : NIPES(), NSGA2<MONN2Individual>(){}
-    MONIPES(const settings::ParametersMapPtr& param) : NIPES(param), NSGA2<MONN2Individual>(param){}
-
+    MONIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
     void epoch() override;
     bool update(const Environment::Ptr&) override;

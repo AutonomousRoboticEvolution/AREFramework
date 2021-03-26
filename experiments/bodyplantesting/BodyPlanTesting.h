@@ -15,7 +15,7 @@ class BODYPLANTESTING : public EA
 {
 public:
     BODYPLANTESTING() : EA(){}
-    BODYPLANTESTING(const settings::ParametersMapPtr& param) : EA(param){}
+    BODYPLANTESTING(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~BODYPLANTESTING() override {}
 
     void init() override;

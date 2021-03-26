@@ -175,7 +175,7 @@ public:
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 
     M_NIPES() : EA(){}
-    M_NIPES(const settings::ParametersMapPtr& param) : EA(param){}
+    M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
 
     void init() override;
     void init_morph_pop();

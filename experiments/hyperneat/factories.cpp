@@ -16,9 +16,7 @@ extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::
 {
     are::EA::Ptr ea;
 
-    ea.reset(new are::EA_HyperNEAT(st));
-
-    ea->set_randomNum(rn);
+    ea.reset(new are::EA_HyperNEAT(rn,st));
     return ea;
 }
 

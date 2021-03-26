@@ -14,8 +14,8 @@ public:
     typedef std::shared_ptr<RandNum> Ptr;
     typedef std::shared_ptr<const RandNum> ConstPtr;
 
-	RandNum(int seed); // instantiate the class and specify the initial seed. 
-	~RandNum();
+    RandNum(int seed); // instantiate the class and specify the initial seed.
+    ~RandNum();
 
     /**
      * @brief random number between a lower bound and a upper bound included
@@ -23,7 +23,7 @@ public:
      * @param upper bound (double)
      * @return a double
      */
-	double randDouble(double lower, double upper); // creates a random float between two specified values.
+    double randDouble(double lower, double upper); // creates a random float between two specified values.
 
     /**
      * @brief random number between a lower bound and a upper bound included

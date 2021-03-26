@@ -47,7 +47,7 @@ class FricEA : public EA
 {
 public:
     FricEA() : EA(){}
-    FricEA(const settings::ParametersMapPtr& param) :  EA(param){}
+    FricEA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
     void init_next_pop() override;
     bool is_finish() override;

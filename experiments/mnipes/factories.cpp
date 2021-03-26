@@ -15,10 +15,7 @@ extern "C" are::Environment::Ptr environmentFactory
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
     are::EA::Ptr ea;
-
-    ea.reset(new are::M_NIPES(st));
-
-    ea->set_randomNum(rn);
+    ea.reset(new are::M_NIPES(rn,st));
     return ea;
 }
 

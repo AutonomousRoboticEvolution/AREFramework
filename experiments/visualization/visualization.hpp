@@ -44,7 +44,7 @@ class Visu : public EA
 {
 public:
     Visu() : EA(){}
-    Visu(const settings::ParametersMapPtr& param) : EA(param){}
+    Visu(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~Visu(){
     }
 

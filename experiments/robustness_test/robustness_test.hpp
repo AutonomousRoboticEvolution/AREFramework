@@ -63,7 +63,7 @@ public:
     using list_files_pair_t = std::vector<std::pair<std::string,std::string>>;
 
     RobustnessTest() : EA(){}
-    RobustnessTest(const settings::ParametersMapPtr& param) : EA(param){}
+    RobustnessTest(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~RobustnessTest(){
     }
 

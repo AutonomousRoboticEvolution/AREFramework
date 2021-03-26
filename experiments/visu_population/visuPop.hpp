@@ -48,7 +48,7 @@ class VisuPop : public EA
 {
 public:
     VisuPop() : EA(){}
-    VisuPop(const settings::ParametersMapPtr& param) : EA(param){}
+    VisuPop(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~VisuPop(){
     }
 

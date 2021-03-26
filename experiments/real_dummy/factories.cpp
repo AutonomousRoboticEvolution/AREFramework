@@ -13,8 +13,7 @@ extern "C" are::Environment::Ptr environmentFactory
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
-    are::EA::Ptr ea(new are::DummyEA(st));
-    ea->set_randomNum(rn);
+    are::EA::Ptr ea(new are::DummyEA(rn,st));
     return ea;
 }
 

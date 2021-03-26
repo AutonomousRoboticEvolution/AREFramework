@@ -33,7 +33,7 @@ class DummyEA : public EA
 {
 public:
     DummyEA() : EA(){}
-    DummyEA(const settings::ParametersMapPtr& param) : EA(param){}
+    DummyEA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
 };
 

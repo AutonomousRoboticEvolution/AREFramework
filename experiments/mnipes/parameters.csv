@@ -7,14 +7,14 @@
 #shouldReopenConnections,bool,0
 #seed,int,-1
 
-#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/hard_race.ttt
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 
 #loadExperiment,string,/home/leni/git/genomes/20200929/traitDescriptor/lc_nsms_6_7_14-45-54-4706-2402252332/
-#loadPrevExperiment,bool,1
+#loadPrevExperiment,bool,0
 #startFromExperiment,string,/home/leni/are-logs/mnipes_forth/withca/arena/mnipes_2_11_10-55-43-3902-2304031719/
-
+#startFromRandom,bool,1
 
 #maxNbrOrgans,int,16
 #morphDescFile,string,MD_Cart_WDH.csv

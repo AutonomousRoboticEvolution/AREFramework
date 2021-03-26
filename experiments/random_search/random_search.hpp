@@ -16,7 +16,7 @@ class RandomSearch : public EA
 {
 public:
     RandomSearch() : EA(){}
-    RandomSearch(const settings::ParametersMapPtr& param) : EA(param){}
+    RandomSearch(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~RandomSearch(){}
 
     void init();

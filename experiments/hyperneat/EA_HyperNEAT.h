@@ -17,7 +17,7 @@ class EA_HyperNEAT : public EA
 {
 public:
     EA_HyperNEAT() : EA(){}
-    EA_HyperNEAT(const settings::ParametersMapPtr& param) : EA(param){}
+    EA_HyperNEAT(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~EA_HyperNEAT() override {}
 
     void init() override;

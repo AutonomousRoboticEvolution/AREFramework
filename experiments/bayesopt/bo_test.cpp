@@ -57,8 +57,7 @@ int main(int argc, char** argv)
     int seed = rd();
     are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
 
-    are::BO bo(std::make_shared<are_set::ParametersMap>(parameters));
-    bo.set_randomNum(rngen);
+    are::BO bo(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     bo.init();
     bo.set_simulator_side(false);
     int max_iter = 100;

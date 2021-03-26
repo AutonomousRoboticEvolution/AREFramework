@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0)
+    cmake_minimum_required(VERSION 3.0)
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
 
 find_package(Boost REQUIRED COMPONENTS serialization filesystem)

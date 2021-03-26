@@ -21,7 +21,7 @@ class NIPES : public EA
 {
 public:
     NIPES() : EA(){}
-    NIPES(const settings::ParametersMapPtr& param) : EA(param){}
+    NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~NIPES(){
         cmaStrategy.reset();
     }
