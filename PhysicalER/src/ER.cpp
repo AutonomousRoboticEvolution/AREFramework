@@ -11,10 +11,10 @@ void ER::initialize(){
     sstream2 << "tcp://" << pi_address << ":5555";
 
     //ZMQ's communication socket
-    request = zmq::socket_t(context, ZMQ_REQ);
+//    request = zmq::socket_t(context, ZMQ_REQ);
     request.connect (sstream1.str().c_str());//TODO parametrize ip address
 
-    subscriber = zmq::socket_t(context,ZMQ_SUB);
+//    subscriber = zmq::socket_t(context,ZMQ_SUB);
     subscriber.connect(sstream2.str().c_str());
     subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
 

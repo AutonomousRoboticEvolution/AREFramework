@@ -29,7 +29,9 @@ public:
     typedef std::unique_ptr<ER> Ptr;
     typedef std::unique_ptr<const ER> ConstPtr;
 
-    ER(): context(1){}
+    ER(): context(1),
+        request(context, ZMQ_REQ),
+    subscriber(context, ZMQ_SUB){}
     virtual ~ER(){
         if(parameters.get())
             parameters.reset();
