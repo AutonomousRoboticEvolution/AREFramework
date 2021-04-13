@@ -48,11 +48,16 @@ void MazeEnv::init(){
     if(withBeacon){
         float bSize[3] = {0.1f,0.1f,0.1f};
         int beacon_handle = simCreatePureShape(1,0,bSize,0.05f,nullptr); //create a sphere as beacon;
-        float tPos[3] = {static_cast<float>(target_position[0]),
+
+        simSetObjectName(beacon_handle,"IRBeacon_0");
+        const float tPos[3] = {static_cast<float>(target_position[0]),
                          static_cast<float>(target_position[1]),
                          static_cast<float>(0.05f)};
-        simSetObjectName(beacon_handle,"IRBeacon_0");
-        simSetObjectPosition(beacon_handle,-1,tPos);
+
+        if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
+            std::cerr << "Set object position failed" << std::endl;
+            exit(1);
+        }
         simSetObjectSpecialProperty(beacon_handle,sim_objectspecialproperty_detectable_infrared);
         simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
     }
@@ -91,7 +96,6 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
     int morphHandle = morph->getMainHandle();
-
 
     waypoint wp;
     simGetObjectPosition(morphHandle, -1, wp.position);
