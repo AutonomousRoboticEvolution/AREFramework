@@ -1,6 +1,7 @@
 #ifndef COPPELIA_COMMUNICATION_HPP
 #define COPPELIA_COMMUNICATION_HPP
 
+#include <iostream>
 #include <functional>
 #include <cmath>
 #include <vector>
@@ -12,6 +13,7 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
+
 
 
 namespace are {
@@ -92,6 +94,13 @@ void getJointsPosition(const std::vector<int>& handles, std::vector<double>& pos
  * @param absolute maximum velocity
  */
 void sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity);
+
+/**
+ * @brief print on the standard output the name of the state corresponding to the argument
+ * @param simulator state integer code
+ */
+void printSimulatorState(int simState);
+
 
 }//sim
 

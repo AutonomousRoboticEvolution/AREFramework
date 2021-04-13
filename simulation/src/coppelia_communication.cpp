@@ -43,8 +43,8 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
             name = simGetObjectName(obj_h);
             float ref_euler[3];
             if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
-            float euler[3] = {std::atan2(pos[2],pos[1]) - M_PI/2.f,
-                              std::asin(pos[0]/dist),
+            float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
+                              static_cast<float>(std::asin(pos[0]/dist)),
                               0};
             simSetObjectOrientation(occlusion_detector,handle,euler);
             occl = simReadProximitySensor(occlusion_detector,pos,&obj_h,norm);
@@ -128,4 +128,27 @@ void sim::getJointsPosition(const std::vector<int>& handles,std::vector<double>&
 void sim::sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity){
     for (size_t i = 0; i < handles.size(); i++)
         simSetJointTargetVelocity(handles[i],static_cast<float>(commands[i]*max_velocity));
+}
+
+void sim::printSimulatorState(int simState){
+    std::cout << "Simulator State : ";
+    if(simState == sim_simulation_stopped)
+        std::cout << "STOPPED" << std::endl;
+    else if(simState == sim_simulation_paused)
+        std::cout << "PAUSED" << std::endl;
+    else if(simState == sim_simulation_advancing)
+        std::cout << "ADVANCING" << std::endl;
+    else if(simState == sim_simulation_advancing_running)
+        std::cout << "ADVANCING RUNNING" << std::endl;
+    else if(simState == sim_simulation_advancing_abouttostop)
+        std::cout << "ADVANCING ABOUT TO STOP" << std::endl;
+    else if(simState == sim_simulation_advancing_firstafterstop)
+        std::cout << "ADVANCING FIRST AFTER STOP" << std::endl;
+    else if(simState == sim_simulation_advancing_lastbeforestop)
+        std::cout << "ADVANCING LAST BEFORE STOP" << std::endl;
+    else if(simState == sim_simulation_advancing_firstafterpause)
+        std::cout << "ADVANCING FIRST AFTER PAUSE" << std::endl;
+    else if(simState == sim_simulation_advancing_lastbeforepause)
+        std::cout << "ADVANCING LAST BEFORE PAUSE" << std::endl;
+    else std::cout << "UNKNOWN" << std::endl;
 }
