@@ -51,6 +51,7 @@ public:
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
+    double get_energy_cost(){return energy_cost;}
 
 protected:
     misc::RandNum::Ptr randomNum;

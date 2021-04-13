@@ -25,22 +25,18 @@ public:
     typedef Morphology::Ptr (Factory)(int,misc::RandNum::Ptr);
 
     Morphology(){}
-    Morphology(const settings::ParametersMapPtr &param) : parameters(param){}
+    Morphology(const settings::ParametersMapPtr &param) : are::Morphology(param){}
     Morphology(const Morphology& morph) :
         mainHandle(morph.mainHandle),
         jointHandles(morph.jointHandles),
         wheelHandles(morph.wheelHandles),
         proxHandles(morph.proxHandles),
         IRHandles(morph.IRHandles),
-        cameraHandle(morph.cameraHandle),
-        randomNum(morph.randomNum),
-        energy_cost(morph.energy_cost)
+        cameraHandle(morph.cameraHandle)
     {}
     virtual ~Morphology()
     {
-        parameters.reset();
-        properties.reset();
-        randomNum.reset();
+
     }
 
     virtual are::Morphology::Ptr clone() const = 0;
@@ -65,15 +61,9 @@ public:
 
     //GETTERS & SETTERS
     virtual int getMainHandle(){return mainHandle;}
-    void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
-    const settings::ParametersMapPtr &get_parameters(){return parameters;}
-    const settings::Property::Ptr &get_properties(){return properties;}
-    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
+
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
-    void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
-
-    double get_energy_cost(){return energy_cost;}
 
 protected:
     int mainHandle;
@@ -87,10 +77,6 @@ protected:
 
     int client_id;
 
-    misc::RandNum::Ptr randomNum;
-    settings::ParametersMapPtr parameters;
-    settings::Property::Ptr properties;
-    double energy_cost = 0;
 };
 
 }//sim

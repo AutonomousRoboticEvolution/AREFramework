@@ -66,18 +66,29 @@ else()
     FILE(GLOB SRC src/*)
 endif()
 
-add_library(simulatedER SHARED  ${VREP_SRC} ${SRC})
+add_library(simulatedER SHARED ${VREP_SRC} ${SRC})
 target_include_directories(simulatedER PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "include"
     "ERClient/include"
-    "../EAFramework/include")
+    "../EAFramework/include"
+)
 target_link_libraries(simulatedER
     MultiNEAT::MultiNEAT
-    dlibxx dl rt tbb cmaes
-    ${Boost_LIBRARIES}
-    ARE)
+    dlibxx dl rt
+    ${Boost_LIBRARIES} tbb cmaes
+    ARE
+    )
+target_compile_definitions(simulatedER PUBLIC
+    "NON_MATLAB_PARSING"
+    "MAX_EXT_API_CONNECTIONS=255"
+)
+set_target_properties(simulatedER PROPERTIES
+    CXX_STANDARD 14
+#    COMPILE_FLAGS "-w"
+    POSITION_INDEPENDENT_CODE ON
+)
 
 if(VREP_FOUND)
     SET(LIB_EXT v_repExtER)
@@ -108,15 +119,15 @@ target_compile_definitions(${LIB_EXT} PUBLIC
 # tool to help remove the warnings when using GCC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 
-set_target_properties(${LIB_EXT} PROPERTIES 
+
+set_target_properties(${LIB_EXT} PROPERTIES
     CXX_STANDARD 14
-#    COMPILE_FLAGS "-w"
+##    COMPILE_FLAGS "-w"
     POSITION_INDEPENDENT_CODE ON
 )
 
 target_link_libraries(${LIB_EXT}
-    MultiNEAT::MultiNEAT
-    dlibxx dl rt tbb cmaes
+    dlibxx dl #rt #asan
     ${Boost_LIBRARIES}
     ARE
     simulatedER

@@ -6,7 +6,7 @@
 #include "ARE/learning/Novelty.hpp"
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
-#include "misc/RandNum.h"
+#include "ARE/misc/RandNum.h"
 
 namespace are {
 

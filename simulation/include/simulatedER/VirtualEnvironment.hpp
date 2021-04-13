@@ -20,13 +20,10 @@ public:
 
     VirtualEnvironment(){}
     VirtualEnvironment(const VirtualEnvironment& env) :
-        parameters(env.parameters),
         envObjectHandles(env.envObjectHandles),
         initialPos(env.initialPos),
         maxTime(env.maxTime),
-        name(env.name),
-        randNum(env.randNum){}
-
+        name(env.name){}
     ~VirtualEnvironment(){}
 
     /**
@@ -60,8 +57,6 @@ public:
     void set_randNum(misc::RandNum::Ptr &rn){randNum = rn;}
 
 protected:
-    ///setting of the environment
-    settings::ParametersMapPtr parameters;
     ///handle of the object in the environment
     std::vector<int> envObjectHandles;
     ///initial position of the object
@@ -69,7 +64,6 @@ protected:
     ///maximum simulation time
     float maxTime = 0.0;
     std::string name;
-    misc::RandNum::Ptr randNum;
 
 };
 

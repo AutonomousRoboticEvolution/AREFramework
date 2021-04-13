@@ -32,25 +32,24 @@ namespace are_c = are::client;
 //CCreatureCreator* creatureCreator = NULL;
 //CUserInterface* userInterfaceCreator = NULL;
 
+
 #ifdef _WIN32
-#ifdef QT_COMPIL
-#include <direct.h>
-#else
-#include <shlwapi.h>
-#pragma comment(lib, "Shlwapi.lib")
-#endif
+    #ifdef QT_COMPIL
+        #include <direct.h>
+    #else
+        #include <shlwapi.h>
+        #pragma comment(lib, "Shlwapi.lib")
+    #endif
 #endif /* _WIN32 */
 #if defined (__linux) || defined (__APPLE__)
-extern "C" {
-#include <unistd.h>
-}
-#define WIN_AFX_MANAGE_STATE
+    #include <unistd.h>
+    #define WIN_AFX_MANAGE_STATE
 #endif /* __linux || __APPLE__ */
 
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
-LIBRARY simLib;
+static LIBRARY simLib;
 
 ///save time log
 void saveLog(int num)
@@ -119,22 +118,24 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     }
 
 
-//    // Check the V-REP version:
-//    int vrepVer;
-//    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
-//    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
-//    {
-//        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
+    // Check the V-REP version:
+    int vrepVer;
+    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
+    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
+    {
+        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
 
 
-//        unloadSimLibrary(simLib);
+        unloadSimLibrary(simLib);
 
 
-//        return(0); // Means error, V-REP will unload this plugin
-//    }
+        return(0); // Means error, V-REP will unload this plugin
+    }
 
+    simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
-                are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
+                are_sett::loadParameters(parameters_filepath));
+    simReleaseBuffer(parameters_filepath);
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
@@ -156,8 +157,8 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         std::cout << "loading experiment : " << are_sett::getParameter<are_sett::String>(parameters,"#expPluginName").value << std::endl;
         std::cout << "---------------------------------" << std::endl;
     }
-    are_sett::Property::Ptr properties(new are_sett::Property);
-    ERVREP->set_properties(properties);
+    //are_sett::Property::Ptr properties(new are_sett::Property);
+    //ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
     if(seed < 0){
         std::random_device rd;
@@ -168,7 +169,7 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
     simulationState = FREE;
-    properties.reset();
+//    //properties.reset();
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
         //Write parameters in the log folder.
@@ -182,7 +183,8 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     }
     //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
-    return(9); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
+
+    return(10); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
     // version 1 was for CoppeliaSim versions before CoppeliaSim 2.5.12
     // version 2 was for CoppeliaSim versions before CoppeliaSim 2.6.0
     // version 5 was for CoppeliaSim versions before CoppeliaSim 3.1.0
@@ -190,6 +192,7 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     // version 7 is for CoppeliaSim versions after CoppeliaSim 3.2.0 (completely rewritten)
     // version 8 is for CoppeliaSim versions after CoppeliaSim 3.3.0 (using stacks for data exchange with scripts)
     // version 9 is for CoppeliaSim versions after CoppeliaSim 3.4.0 (new API notation)
+    // version 10 is for CoppeliaSim versions after CoppeliaSim 4.1.0 (threads via coroutines)
 }
 
 // Release the v-rep lib
@@ -262,7 +265,6 @@ void localMessageHandler(int message){
     }
 
     // START NEW SIMULATION
-    std::cout << simulationState << " " << ERVREP->get_ea()->get_population().size() <<std::endl;
     if (simulationState == FREE && ERVREP->get_ea()->get_population().size() > 0)
     {
         simulationState = STARTING;

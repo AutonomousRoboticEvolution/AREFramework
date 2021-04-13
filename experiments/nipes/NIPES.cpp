@@ -209,6 +209,8 @@ bool NIPES::update(const Environment::Ptr & env){
         std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
     }
 
+
+
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
 //    if(reevaluated < nbReEval)
 //        return false;

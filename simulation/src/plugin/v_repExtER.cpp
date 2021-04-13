@@ -22,7 +22,6 @@
 
 #include "v_repLib.h"
 
-
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
 #include <random>
@@ -74,7 +73,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
               << "STARTING WITH ARE FRAMEWORK" << std::endl
               << "---------------------------" << std::endl;
 
-
     // This is called just once, at the start of V-REP.
     // Dynamically load and bind V-REP functions:
     char curDirAndFile[1024];
@@ -99,8 +97,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 #elif defined (__APPLE__)
     temp += "/libv_rep.dylib";
 #endif /* __linux || __APPLE__ */
-
-
 
 
     simLib = loadVrepLibrary(temp.c_str());
@@ -129,8 +125,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
+
+    simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
-                are_sett::loadParameters(simGetStringParameter(sim_stringparam_app_arg1)));
+                are_sett::loadParameters(parameters_filepath));
+    simReleaseBuffer(parameters_filepath);
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
@@ -163,7 +162,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are::misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
-    simulationState = FREE;
+    simulationState = CLEANUP;
     properties.reset();
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
@@ -177,7 +176,6 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
     }
     //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
-
     return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
     // version 1 was for V-REP versions before V-REP 2.5.12
     // version 2 was for V-REP versions before V-REP 2.6.0
@@ -213,9 +211,10 @@ void localMessageHandler(int message){
     are_sett::ParametersMap param = (*ERVREP->get_parameters());
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
-    int errorModeSaved;
-    simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
-    simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
+//    int errorModeSaved;
+//    simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
+//    simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
+
 
     // ABOUT TO START
     if (message == sim_message_eventcallback_simulationabouttostart)
@@ -232,6 +231,7 @@ void localMessageHandler(int message){
     else if (message == sim_message_eventcallback_modulehandle)
     {
         assert(simulationState == BUSY);
+
         ERVREP->handleSimulation(); // handling the simulation.
     }
     // SIMULATION ENDED
@@ -260,6 +260,7 @@ void localMessageHandler(int message){
     {
         simulationState = STARTING;
         counter = 0;
+
         simStartSimulation();
     }else if(simulationState == FREE && ERVREP->get_ea()->get_population().size() == 0){
         ERVREP->endOfSimulation();

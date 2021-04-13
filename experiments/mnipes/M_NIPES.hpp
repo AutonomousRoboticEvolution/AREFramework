@@ -8,7 +8,7 @@
 #include "ARE/nn2/NN2Control.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "cmaes_learner.hpp"
-#include "misc/eigen_boost_serialization.hpp"
+#include "ARE/misc/eigen_boost_serialization.hpp"
 #include <multineat/Population.h>
 
 namespace are{

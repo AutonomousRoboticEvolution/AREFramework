@@ -1,5 +1,5 @@
 #include "BO.hpp"
-#include "misc/RandNum.h"
+#include "ARE/misc/RandNum.h"
 #include <random>
 #include <fstream>
 

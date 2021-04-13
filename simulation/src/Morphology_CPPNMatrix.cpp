@@ -5,7 +5,7 @@
 #include "simLib.h"
 #endif
 #include <stdio.h>
-#include "misc/coppelia_communication.hpp"
+#include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
@@ -337,7 +337,12 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
     robotPos[1] = y;
     robotPos[2] = z;
 
-    simSetObjectPosition(mainHandle, -1, robotPos);
+    if(simSetObjectPosition(mainHandle, -1, robotPos) < 0){
+        std::cerr << "Set object position failed" << std::endl;
+        exit(1);
+    }
+
+
 }
 
 bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh,
