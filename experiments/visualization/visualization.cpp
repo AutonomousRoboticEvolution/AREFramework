@@ -19,11 +19,16 @@ void VisuInd::createMorphology(){
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
-    float pos[3];
-    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
+//    float pos[3];
+//    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
 }
 
 void VisuInd::createController(){
+
+    bool empty_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
+    if(empty_gen)
+        return;
+
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
 
@@ -78,6 +83,11 @@ void VisuInd::createController(){
 }
 
 void VisuInd::update(double delta_time){
+
+    bool empty_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
+    if(empty_gen)
+        return;
+
     std::vector<double> inputs = morphology->update();
 
     std::vector<double> outputs = control->update(inputs);
@@ -91,34 +101,67 @@ void Visu::init(){
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
     int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
     int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
+    bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
 
-    std::string ctrl_gen_file;
-    std::stringstream sstr;
-    sstr << folder_to_load << "/ctrlGenome_" << generation << "_" << indIdx;
-    ctrl_gen_file = sstr.str();
+    std::vector<std::string> ctrl_gen_files;
+    if(!empty_ctrl_gen){
+        if(indIdx < 0){
+            int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+            for(int i = 0; i < pop_size; i++){
+                std::stringstream sstr2;
+                sstr2 << folder_to_load << "/ctrlGenome_" << generation << "_" << i;
+                ctrl_gen_files.push_back(sstr2.str());
+            }
+        }
+        else{
+            std::string ctrl_gen_file;
+            std::stringstream sstr;
+            sstr << folder_to_load << "/ctrlGenome_" << generation << "_" << indIdx;
+            ctrl_gen_files.push_back(sstr.str());
+        }
+    }
 
-    std::string morph_gen_file;
-    std::stringstream sstr2;
-    sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
-    morph_gen_file = sstr2.str();
+
+    std::vector<std::string> morph_gen_files;
+    if(indIdx < 0){
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        for(int i = 0; i < pop_size; i++){
+            std::stringstream sstr2;
+            sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << i;
+            morph_gen_files.push_back(sstr2.str());
+        }
+    }else
+    {
+        std::stringstream sstr2;
+        sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
+        morph_gen_files.push_back(sstr2.str());
+    }
 
 
-    population.resize(1);
-    NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters));
-    ctrl_gen->from_file(ctrl_gen_file);
-
+    CPPNGenome::Ptr morph_gen;
+    Genome::Ptr ctrl_gen;
     //load morphology genome
-    std::stringstream filepath;
-    NEAT::Genome neat_gen(morph_gen_file.c_str());
-    CPPNGenome::Ptr morph_gen(new CPPNGenome(neat_gen));
-    morph_gen->set_randNum(randomNum);
-    morph_gen->set_parameters(parameters);
+    for(size_t i = 0; i < morph_gen_files.size(); i++){
+        std::stringstream filepath;
+        NEAT::Genome neat_gen(morph_gen_files[i].c_str());
+        morph_gen.reset(new CPPNGenome(neat_gen));
+        morph_gen->set_randNum(randomNum);
+        morph_gen->set_parameters(parameters);
 
+        if(empty_ctrl_gen)
+            ctrl_gen.reset(new EmptyGenome);
+        else{
+            ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
+            std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_files[i]);
+        }
 
-    Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-    ind->set_parameters(parameters);
-    ind->set_randNum(randomNum);
-    population[0] = ind;
+        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }
 
+    morph_gen.reset();
+    ctrl_gen.reset();
 }
 

@@ -21,7 +21,7 @@ using CPPNMorph = sim::Morphology_CPPNMatrix;
 class VisuInd : public Individual
 {
 public:
-    VisuInd(const CPPNGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
+    VisuInd(const CPPNGenome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen)
         : Individual(morph_gen,ctrl_gen)
     {
     }
