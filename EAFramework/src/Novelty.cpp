@@ -7,8 +7,6 @@ double Novelty::novelty_thr = 0.9;
 double Novelty::archive_adding_prob = 0.4;
 
 double Novelty::sparseness(const std::vector<double> &dist){
-
-
     double sum = 0;
     if(dist.size() >  k_value + 1){
         for(int i = 0; i < k_value; i++)
@@ -97,7 +95,7 @@ void Novelty::update_archive(const Eigen::VectorXd &ind_desc,
                              std::vector<Eigen::VectorXd> &archive,
                              const misc::RandNum::Ptr &rn){
 
-   if(ind_nov > novelty_thr || rn->randInt(0,1) < archive_adding_prob){
+   if(ind_nov > novelty_thr || rn->randFloat(0,1) < archive_adding_prob){
         archive.push_back(ind_desc);
     }
 
