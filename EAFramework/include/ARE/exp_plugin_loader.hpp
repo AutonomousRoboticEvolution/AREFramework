@@ -29,15 +29,15 @@ inline std::unique_ptr<dlibxx::handle> &load_plugin(const std::string &plugin_na
     auto insertion = loaded_plugins.insert(std::make_pair(plugin_name, std::move(libhandler)));
 
     // True if the pair was actually inserted
-    assert(insertion.second);
+//    assert(insertion.second);
 
     return insertion.first->second;
 }
 
 template <typename fct_type>
-int load_fct_exp_plugin(std::function<fct_type>& fct, const std::string& plugin_name, const std::string& fct_name) {
+int load_fct_exp_plugin(std::function<fct_type>& fct, std::unique_ptr<dlibxx::handle> &libhandler, const std::string& fct_name) {
     try {
-        std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(plugin_name);
+//        std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(plugin_name);
 
         auto fct_sym = libhandler->lookup<fct_type>(fct_name);
         if(!fct_sym)
@@ -48,7 +48,7 @@ int load_fct_exp_plugin(std::function<fct_type>& fct, const std::string& plugin_
 
         fct = fct_sym.get();
 
-        //libhandler.close();
+//        libhandler->close();
 
     } catch (std::runtime_error &e) {
         std::cerr << e.what() << std::endl;

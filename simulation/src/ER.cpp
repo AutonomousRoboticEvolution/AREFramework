@@ -25,27 +25,26 @@ void ER::initialize()
 
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
 
     if(!load_fct_exp_plugin<VirtualEnvironment::Factory>
-            (environmentFactory,exp_plugin_name,"environmentFactory"))
+            (environmentFactory,libhandler,"environmentFactory"))
         exit(1);
-
     environment = environmentFactory(parameters);
     environment->set_randNum(randNum);
-    if(!load_fct_exp_plugin<Logging::Factory>
-            (loggingFactory,exp_plugin_name,"loggingFactory"))
-        exit(1);
-
-
 
     if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,exp_plugin_name,"EAFactory"))
+            (EAFactory,libhandler,"EAFactory"))
         exit(1);
     ea = EAFactory(randNum, parameters);
     ea->init();
 
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,libhandler,"loggingFactory"))
+        exit(1);
     loggingFactory(logs,parameters);
 
+    libhandler->close();
 }
 
 
@@ -102,11 +101,13 @@ void ER::handleSimulation()
     //    if(instance_type == settings::INSTANCE_SERVER)
     //        simSetFloatSignal("simulationTime",simulationTime);
 
+
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
 
     if (simulationTime >
-            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value || ea->finish_eval()) {
+            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
+            ea->finish_eval()) {
         simStopSimulation();
     }
 }
