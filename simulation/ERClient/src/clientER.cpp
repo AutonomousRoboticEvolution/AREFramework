@@ -32,15 +32,16 @@ void ER::initialize(){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
     Logging::create_log_folder(repository + std::string("/") + exp_name);
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
 
     if(!load_fct_exp_plugin<Logging::Factory>
-            (loggingFactory,exp_plugin_name,"loggingFactory"))
+            (loggingFactory,libhandler,"loggingFactory"))
         exit(1);
 
     loggingFactory(logs,parameters);
 
     if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,exp_plugin_name,"EAFactory"))
+            (EAFactory,libhandler,"EAFactory"))
         exit(1);
 
     ea = EAFactory(randNum, parameters);
