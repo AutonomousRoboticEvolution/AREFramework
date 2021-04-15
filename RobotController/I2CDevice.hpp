@@ -63,13 +63,6 @@ class I2CDevice {
 		void write16To(uint8_t subAddress, uint16_t data);
 
 		/**
-			@brief Write 16-bit value in little-endian format to specified register of device.
-			@param subAddress The address of the target internal register (not device address)
-			@param data The 16-bit word to be written
-		*/
-		void writeLittleEndian16To(uint8_t subAddress, uint16_t data);
-
-		/**
 			@brief Read 8-bit value directly from device (no subaddress), for cases when the
 			internal register doesn't have it's own address.
 			@return The data read from the device
@@ -90,12 +83,8 @@ class I2CDevice {
 		*/
 		int read16From(uint8_t subAddress);
 
-		/**
-			@brief Read 16-bit value in little-endian format from specified register of device.
-			@param subAddress The address of the target internal register (not device address)
-			@return The data read from the device
-		*/
-		int readLittleEndian16From(uint8_t subAddress);
+                void writeLittleEndian16To(uint8_t subAddress, uint16_t data);
+                int readLittleEndian16From(uint8_t subAddress);
 
 	protected :
 		int devHandle;	///< The handle to the bus access file for this device

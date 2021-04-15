@@ -1,0 +1,33 @@
+Script started on 2020-09-18 17:28:23+01:00 [TERM="xterm-256color" TTY="/dev/pts/6" COLUMNS="80" LINES="24"]
+]0;leni@UltimateBook: ~/git/evolutionary_robotics_framework/EvolutionVREP/experiments[01;32mleni@UltimateBook[00m:[01;34m~/git/evolutionary_robotics_framework/EvolutionVREP/experiments[00m$ cd scripts/
+]0;leni@UltimateBook: ~/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts[01;32mleni@UltimateBook[00m:[01;34m~/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts[00m$ jupyter-notebook 
+[32m[I 17:28:29.923 NotebookApp](B[m The port 8888 is already in use, trying another port.
+[32m[I 17:28:29.925 NotebookApp](B[m Serving notebooks from local directory: /home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts
+[32m[I 17:28:29.926 NotebookApp](B[m The Jupyter Notebook is running at:
+[32m[I 17:28:29.926 NotebookApp](B[m http://localhost:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+[32m[I 17:28:29.926 NotebookApp](B[m  or http://127.0.0.1:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+[32m[I 17:28:29.926 NotebookApp](B[m Use Control-C to stop this server and shut down all kernels (twice to skip confirmation).
+[C 17:28:29.944 NotebookApp] 
+    
+    To access the notebook, open this file in a browser:
+        file:///home/leni/.local/share/jupyter/runtime/nbserver-34792-open.html
+    Or copy and paste one of these URLs:
+        http://localhost:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+     or http://127.0.0.1:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+[32m[I 17:28:37.924 NotebookApp](B[m Kernel started: 8b505acd-e0a9-46b7-9173-90ca44b13ee9
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+[32m[I 17:28:55.659 NotebookApp](B[m Starting buffering for 8b505acd-e0a9-46b7-9173-90ca44b13ee9:d096d06fadef479794794b90d468d783
+[IPKernelApp] ERROR | No such comm target registered: jupyter.widget.version
+^C[32m[I 21:35:00.080 NotebookApp](B[m interrupted
+Serving notebooks from local directory: /home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts
+1 active kernel
+The Jupyter Notebook is running at:
+http://localhost:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+ or http://127.0.0.1:8889/?token=85b9331ee51d9c87c54c2afb9f5c9b52a185955108eb2468
+Shutdown this notebook server (y/[n])? y
+[C 21:35:01.723 NotebookApp] Shutdown confirmed
+[32m[I 21:35:01.724 NotebookApp](B[m Shutting down 1 kernel
+[32m[I 21:35:01.926 NotebookApp](B[m Kernel shutdown: 8b505acd-e0a9-46b7-9173-90ca44b13ee9
+]0;leni@UltimateBook: ~/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts[01;32mleni@UltimateBook[00m:[01;34m~/git/evolutionary_robotics_framework/EvolutionVREP/experiments/scripts[00m$ exit
+
+Script done on 2020-09-18 21:35:04+01:00 [COMMAND_EXIT_CODE="0"]
