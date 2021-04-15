@@ -4,7 +4,7 @@
 #verbose,bool,1
 #instanceType,int,0
 
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/Two_rooms_2.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/Two_rooms_2.ttt
 #repository,string,/home/leni/are-logs
 #folderToLoad,string,/home/leni/are-logs/robustness/rooms/wa/150/1/
 #genToLoad,int,19
@@ -48,5 +48,5 @@
 #isJoint,bool,1
 #isCaster,bool,1
 #isExportModel,bool,0
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
 #isSegmentedRobot,bool,1

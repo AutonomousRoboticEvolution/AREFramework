@@ -1,12 +1,10 @@
 #experimentName,string,nslc
 #expPluginName,string,/usr/local/lib/libNSLC.so
-#extSettingsClass,bool,0
-#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
 #robotPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/AREPuck.ttm
 #modelPath,string,/home/leni/git/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
 #populationSize,int,12
-#maxEvalTime,float,60
+#maxEvalTime,float,10
 #maxNbrEval,int,100
 #numberOfGeneration,int,2
 #noiseLevel,double,0.
@@ -21,7 +19,7 @@
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
-#timeStep,float,1.
+#timeStep,float,0.1
 #shouldReopenConnections,bool,0
 #seed,int,-1
 #arenaSize,double,2.

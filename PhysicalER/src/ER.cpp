@@ -38,26 +38,30 @@ void ER::initialize(){
         std::cout << "ER initialize" << std::endl;
     }
 
+
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,exp_plugin_name,"environmentFactory"))
-        exit(1);
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
 
+    if(!load_fct_exp_plugin<Environment::Factory>
+            (environmentFactory,libhandler,"environmentFactory"))
+        exit(1);
     environment = environmentFactory(parameters);
     environment->set_randNum(randNum);
-    if(!load_fct_exp_plugin<Logging::Factory>
-            (loggingFactory,exp_plugin_name,"loggingFactory"))
-        exit(1);
-
-    loggingFactory(logs,parameters);
-
 
     if(!load_fct_exp_plugin<EA::Factory>
-            (EAFactory,exp_plugin_name,"EAFactory"))
+            (EAFactory,libhandler,"EAFactory"))
         exit(1);
     ea = EAFactory(randNum, parameters);
     ea->init();
+
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,libhandler,"loggingFactory"))
+        exit(1);
+    loggingFactory(logs,parameters);
+
+    libhandler->close();
+
 }
 
 void ER::load_data(bool is_update){

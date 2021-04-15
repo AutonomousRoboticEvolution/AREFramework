@@ -22,8 +22,7 @@ public:
     VirtualEnvironment(const VirtualEnvironment& env) :
         envObjectHandles(env.envObjectHandles),
         initialPos(env.initialPos),
-        maxTime(env.maxTime),
-        name(env.name){}
+        maxTime(env.maxTime){}
     ~VirtualEnvironment(){}
 
     /**
@@ -63,7 +62,6 @@ protected:
     std::vector<float> initialPos;
     ///maximum simulation time
     float maxTime = 0.0;
-    std::string name;
 
 };
 
