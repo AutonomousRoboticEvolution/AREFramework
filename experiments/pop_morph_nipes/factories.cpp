@@ -17,7 +17,6 @@ extern "C" are::Environment::Ptr environmentFactory
     }else{
         std::cerr << "unknown environment : 0 for Maze or 1 for Straight Line" << std::endl;
     }
-
     return env;
 }
 

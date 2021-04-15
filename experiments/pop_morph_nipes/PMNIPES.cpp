@@ -304,7 +304,7 @@ bool PMNIPES::update(const Environment::Ptr & env){
 void PMNIPES::init_next_pop(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
 
-    if(numberEvaluation >= maxNbrEval || _is_finish/* || nbr_dropped_eval >= 50*/)
+    if(numberEvaluation >= maxNbrEval || _is_finish /*|| nbr_dropped_eval >= 50*/)
     {
         population.clear();
         cmaStrategy->reset_search_state();
