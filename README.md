@@ -8,8 +8,8 @@ After, having successfully installed the framework, you can refer to the next tu
 
 ## Required software
 
-* Preferably use Ubuntu 18.04 as OS
-* CoppeliaSim Edu 4.1.0 18.04 - [link](https://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz) (do not use either version 4.0.0 or version 4.2.0)
+* Preferably use Ubuntu 18.04 as OS. Works also with Ubuntu 20.04
+* CoppeliaSim Edu 4.1.0 18.04 - [link](https://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04.tar.xz) (do not use either version 4.0.0 or version 4.2.0). Works also with V-REP 3.6.2.
 * MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
@@ -95,12 +95,24 @@ And this is a module of the framework
 
 ### The framework
 
+The framework has compilation options you can pass to cmake:
+
+* VREP_FOLDER: the path to V-REP simulator if using V-REP 3.6.2
+* COPPELIASIM_FOLDER: the path Coppelia simulator if using CoppeliaSim 4.1.0
+* ONLY_SIMULATION: (0|1) whether to compile only for simulation
+* ONLY_PHYSICAL: (0|1) whether to compile only for real experiment
+* RASPBERRY: (0|1) compile on a raspberry pi. Will compile only the part needed to control a ARE robot or Thymio
+* LIMBO_FODLER: path to limbo headers, if using bayesian optimisation
+* WITH_NN2: (0|1) if using the NN2 headers library
+
+**Note on the options VREP_FOLDER and COPPELIASIM_FOLDER** Only one of these options have to be used. The other one have to be let empty. There are both empty per default but if you want to switch from V-REP to CoppeliaSim (or the opposite) you have to explicitly set one to empty.  
+
 In order to install the framework
 ```
 git clone https://bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework.git
 cd evolutionary_robotics_framework
 mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/install/path -DVREP_FOLDER=/vrep/folder/path ..
+cmake -DCMAKE_INSTALL_PREFIX=/install/path -DCOPPELIASIM_FOLDER=/coppeliasim/folder/path .. #add the other option needed 
 make
 make install # add sudo if the install prefix is /usr/local/ (default value)
 ```
