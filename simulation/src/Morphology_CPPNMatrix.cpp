@@ -118,9 +118,18 @@ void Morphology_CPPNMatrix::create()
         if(convexDecompositionSuccess){
             // Recompute mass and inertia to fix object vibration
             // skeleton of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
-            //simComputeMassAndInertia(mainHandle, 1.3f);
+            // 1300 kg.m-3 for a solid plastic. For a printed skeleton, let say around 100 times less dense. Value to reestimate.
+            simComputeMassAndInertia(mainHandle, 13); //kg.m-3
+            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-            simComputeMassAndInertia(mainHandle, 20.0f);
+            float mass;
+            float inertiaMatrix[9];
+            float centerOfMass[3];
+            simGetShapeMassAndInertia(mainHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+            if(verbose)
+                std::cout << "Mass :" << mass + 0.503 << std::endl;
+            //Add the weight of the head organ (503g).
+            simSetShapeMassAndInertia(mainHandle,mass+0.503,inertiaMatrix,centerOfMass,nullptr);
 
             // Create organs
             for(auto & i : organList){

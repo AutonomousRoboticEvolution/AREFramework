@@ -43,7 +43,6 @@ void MazeEnv::init(){
                        settings::getParameter<settings::Double>(parameters,"#target_z").value};
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
-    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
 
     if(withBeacon){
         float bSize[3] = {0.1f,0.1f,0.1f};
@@ -64,10 +63,9 @@ void MazeEnv::init(){
 
     trajectory.clear();
 
-    if(!flatFloor){
-        std::vector<int> th;
-        build_tiled_floor(th);
-    }
+    std::vector<int> th;
+    build_tiled_floor(th);
+
 
 }
 
@@ -122,7 +120,10 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
 }
 
 void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
-    float tile_size[3] = {0.25f,0.25f,0.01f};
+    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
+
+    float tile_size[3] = {0.249f,0.249f,0.01f};
+    float tile_increment = 0.25;
     float starting_pos[3] = {-0.875f,-0.875f,0.005f};
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
@@ -130,9 +131,13 @@ void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
             std::stringstream name;
             name << "tile_" << i << j;
             simSetObjectName(tiles_handles.back(),name.str().c_str());
-            float pos[3] = {starting_pos[0] + i*tile_size[0],starting_pos[1] + j*tile_size[1],randNum->randFloat(-0.005,-0.001)};
+            float height = -0.004;
+            if(!flatFloor){
+                height = randNum->randFloat(-0.005,-0.001);
+            }
+            float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
             simSetObjectPosition(tiles_handles.back(),-1,pos);
-            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,randNum->randFloat(0,1));
+            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,1000);//randNum->randFloat(0,1000));
             simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
             simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
         }
