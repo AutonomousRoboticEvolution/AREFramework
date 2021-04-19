@@ -18,6 +18,7 @@ if (RASPBERRY)
             "src/Settings.cpp"
             "src/Individual.cpp"
             "src/Genome.cpp"
+            "src/Logging.cpp"
             "src/NNParamGenome.cpp"
             "src/misc/*")
     endif()
