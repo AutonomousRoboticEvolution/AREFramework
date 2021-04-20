@@ -328,9 +328,6 @@ void Morphology_CPPNMatrix::create()
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
-    if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
-        robotScreenshot();
-    }
 }
 
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
@@ -546,26 +543,6 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     if(result == -1){
         std::cerr << "Something went wrong when exporting robot model! " << std::endl;
     }
-}
-
-void Morphology_CPPNMatrix::robotScreenshot()
-{
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
-    modelsPath += "screenshotSensor.ttm";
-    int screenShotSensor;
-    int generalCamera;
-    screenShotSensor = simLoadModel(modelsPath.c_str());
-    generalCamera = simGetObjectHandle("Camera0");
-    simSetObjectParent(screenShotSensor, generalCamera, 1);
-    screenShotSensor = simLoadModel(modelsPath.c_str());
-    generalCamera = simGetObjectHandle("Camera1");
-    simSetObjectParent(screenShotSensor, generalCamera, 1);
-    screenShotSensor = simLoadModel(modelsPath.c_str());
-    generalCamera = simGetObjectHandle("Camera2");
-    simSetObjectParent(screenShotSensor, generalCamera, 1);
-    screenShotSensor = simLoadModel(modelsPath.c_str());
-    generalCamera = simGetObjectHandle("Camera3");
-    simSetObjectParent(screenShotSensor, generalCamera, 1);
 }
 
 void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix)

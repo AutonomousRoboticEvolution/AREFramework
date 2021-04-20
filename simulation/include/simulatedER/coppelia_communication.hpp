@@ -101,6 +101,7 @@ void sentCommandToWheels(const std::vector<int>& handles, const std::vector<doub
  */
 void printSimulatorState(int simState);
 
+void robotScreenshot(int individual, int generation, std::string repository);
 
 }//sim
 
