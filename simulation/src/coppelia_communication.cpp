@@ -1,3 +1,4 @@
+#include <sstream>
 #include "simulatedER/coppelia_communication.hpp"
 
 using namespace are;
@@ -151,4 +152,77 @@ void sim::printSimulatorState(int simState){
     else if(simState == sim_simulation_advancing_lastbeforepause)
         std::cout << "ADVANCING LAST BEFORE PAUSE" << std::endl;
     else std::cout << "UNKNOWN" << std::endl;
+}
+
+void sim::robotScreenshot(int individual, int generation, std::string repository)
+{
+    // https://www.coppeliarobotics.com/helpFiles/en/regularApi/simCreateVisionSensor.htm
+    const int resX = 1152, resY = 1152;
+    const float nearClippingPlane = 0.02, farClippingPlane = 2.0, camAngle = M_PI_4, xSize = 0.01, ySize = 0.01, zSize = 0.01;
+    int intParams[4] = {resX, resY, 0, 0};
+    float floatParams[11] = {nearClippingPlane, farClippingPlane, camAngle, xSize, ySize, zSize, 0.0, 0.0, 0.0, 0.0, 0.0};
+    int handleVisionSensor = simCreateVisionSensor(1, intParams, floatParams, NULL);
+    int generalCamera;
+    for(int i = 0; i<4; i++){
+        if(i == 0)
+            generalCamera = simGetObjectHandle("Camera0");
+        else if(i == 1)
+            generalCamera = simGetObjectHandle("Camera1");
+        else if(i == 2)
+            generalCamera = simGetObjectHandle("Camera2");
+        else if(i == 3)
+            generalCamera = simGetObjectHandle("Camera3");
+        else
+            abort();
+
+        float identityMatrix[12];
+        simBuildIdentityMatrix(identityMatrix);
+        simSetObjectMatrix(handleVisionSensor, generalCamera, identityMatrix);
+        simSetObjectParent(handleVisionSensor, generalCamera, true);
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_resolution_x,resX);
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_resolution_y,resY);
+        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_perspective_angle,camAngle*M_PI_2);
+
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_pov_focal_blur,1);
+        const float focalDistance = 2.0, aperture = 0.5;
+        const int blurSamples = 10;
+        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_pov_blur_distance,focalDistance);
+        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_pov_aperture,aperture);
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_pov_blur_sampled,blurSamples);
+
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_render_mode,0);
+        /// \todo Double-check this
+        simInt savedVisibilityMask = 0;
+        simGetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,&savedVisibilityMask);
+        simSetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,0);
+
+        int newAttr = sim_displayattribute_renderpass +  sim_displayattribute_forvisionsensor + sim_displayattribute_ignorerenderableflag;
+        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_rendering_attributes,newAttr);
+        float* auxValues=nullptr;
+        int* auxValuesCount=nullptr;
+        float averageColor[3]={0.0f,0.0f,0.0f};
+        if (simHandleVisionSensor(handleVisionSensor,&auxValues,&auxValuesCount)>=0)
+        {
+            if ((auxValuesCount[0]>0)||(auxValuesCount[1]>=15))
+            {
+                averageColor[0]=auxValues[11];
+                averageColor[1]=auxValues[12];
+                averageColor[2]=auxValues[13];
+            }
+            simReleaseBuffer((char*)auxValues);
+            simReleaseBuffer((char*)auxValuesCount);
+        }
+
+        simSetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,savedVisibilityMask);
+        int resolutionX, resolutionY;
+        const simUChar* image_buf_char = simGetVisionSensorCharImage(handleVisionSensor, &resolutionX, &resolutionY);
+        std::stringstream filepath;
+        filepath << repository << "/robot" << "_" << generation << "_" << individual << "_" << i << ".png";
+        const std::string temp = filepath.str();
+
+        simInt res[2];
+        simGetVisionSensorResolution(handleVisionSensor,res);
+        simSaveImage(image_buf_char,res,0,temp.c_str(),-1, nullptr);
+        simReleaseBuffer((simChar*)image_buf_char);
+    }
 }

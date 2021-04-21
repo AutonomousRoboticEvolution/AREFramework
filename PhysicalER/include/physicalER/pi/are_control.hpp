@@ -26,12 +26,13 @@ public:
 
 private:
     NN2Individual controller;
-    float _max_eval_time = 3000000; // microseconds
+    float _max_eval_time = 30000000; // microseconds
     float _time_step = 100000; // microseconds
 
     std::shared_ptr<MotorOrgan> wheel0;
     std::shared_ptr<MotorOrgan> wheel1;
     std::shared_ptr<MotorOrgan> wheel2;
+    std::shared_ptr<MotorOrgan> wheel3;
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;
 };

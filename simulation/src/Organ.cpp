@@ -52,7 +52,7 @@ void Organ::isOrganGoodOrientation()
     float diffPosZ;
     diffPosZ = connectorPos[2] - organPos[2];
     /// \todo EB: remove this hard-coded value
-    organGoodOrientation = diffPosZ < 0.005; // Is organ pointing downwards?
+    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing downwards?
 }
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)

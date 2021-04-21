@@ -112,8 +112,6 @@ public:
      */
     void exportRobotModel(int indNum);
 
-    void robotScreenshot();
-
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////

@@ -13,6 +13,7 @@ AREControl::AREControl(const NN2Individual &ind){
     wheel0.reset(new MotorOrgan(0x60));
     wheel1.reset(new MotorOrgan(0x61));
     wheel2.reset(new MotorOrgan(0x62));
+    wheel3.reset(new MotorOrgan(0x63));
 
     // initialise the LED and flash green to show ready
     ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be cahnged
@@ -23,7 +24,7 @@ AREControl::AREControl(const NN2Individual &ind){
         ledDriver->setBrightness(leds[i], 150);
         ledDriver->setColour(leds[i],GREEN);
     }
-    usleep(500000); // 0.5 second
+    usleep(1000000); // 1 second
     for (int i=0; i<4; ++i) { // loop through and turn off all the LEDS
         ledDriver->setMode(leds[i],FULL_OFF,ALL);
     }
@@ -31,18 +32,20 @@ AREControl::AREControl(const NN2Individual &ind){
 
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendMotorCommands(std::vector<double> values){
-    std::cout << "wheel0 setSpeed to: " << values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    std::cout << "wheel1 setSpeed to: " << values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    std::cout << "wheel2 setSpeed to: " << values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
+    //std::cout << "wheel0 setSpeed to: " << values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
+    //std::cout << "wheel1 setSpeed to: " << values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
+    //std::cout << "wheel2 setSpeed to: " << values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
+    //std::cout << "wheel3 setSpeed to: " << values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
     wheel0->setSpeed(values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
     wheel1->setSpeed(values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
     wheel2->setSpeed(values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    wheel3->setSpeed(values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // Sensors are not yet implemented for ARE robot
     //sensor_vals.clear();
-    sensor_vals = {0,0};
+    sensor_vals = {};
 }
 
 int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
@@ -51,6 +54,7 @@ int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
     double time = 0;
+    std::cout << "time,nn_output 0,nn_output 1,nn_output 2,nn_output 3"<< std::endl;
     while(time <= _max_eval_time){
 
         retrieveSensorValues(sensor_values);
@@ -61,10 +65,11 @@ int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
         nn_outputs = controller.get_ouputs();
 
         // some debugging messages
-        std::cout << "Time now: " << time << std::endl;
-        std::cout << "nn_outputs 0: " << nn_outputs[0] << std::endl;
-        std::cout << "nn_outputs 1: " << nn_outputs[1] << std::endl;
-        std::cout << "nn_outputs 2: " << nn_outputs[2] << std::endl;
+        std::cout << float(time)/1000000 <<","<< nn_outputs[0] <<","<< nn_outputs[1] <<","<< nn_outputs[2] <<","<< nn_outputs[3] <<","<< std::endl;
+        //std::cout << "nn_outputs : " << nn_outputs[0] << std::endl;
+        //std::cout << "nn_outputs 1: " << nn_outputs[1] << std::endl;
+        //std::cout << "nn_outputs 2: " << nn_outputs[2] << std::endl;
+        //std::cout << "nn_outputs 3: " << nn_outputs[3] << std::endl;
         
         // send the new values to the actuators
         sendMotorCommands(nn_outputs);
@@ -85,6 +90,7 @@ int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
     wheel0->standby();
     wheel1->standby();
     wheel2->standby();
+    wheel3->standby();
     daughterBoards->turnOff();
 
     
