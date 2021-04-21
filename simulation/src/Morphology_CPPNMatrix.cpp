@@ -18,6 +18,7 @@ void Morphology_CPPNMatrix::create()
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
     mainHandle = -1;
     gripperHandle = -1;
+    int convexHandle, brainHandle;
     createGripper();
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
     numSkeletonVoxels = 0;
@@ -81,13 +82,19 @@ void Morphology_CPPNMatrix::create()
             float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
-            int convexHandle;
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
+            // Recompute mass and inertia to fix object vibration
+            // skeleton of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
+            // 1300 kg.m-3 for a solid plastic. For a printed skeleton, let say around 50 times less dense. Value to reestimate.
+            simComputeMassAndInertia(convexHandle, 65); //kg.m-3
+            float mass;
+            float inertiaMatrix[9];
+            float centerOfMass[3];
+            simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
             mainHandle = convexHandle;
             // Create brain primitive
             float brainSize[3] = {0.084,0.084,0.11};
-            int brainHandle;
-            brainHandle = simCreatePureShape(0,0,brainSize,0.250,nullptr);
+            brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
             float brainPos[3] = {0.0,0.0,0.06};
             simSetObjectPosition(brainHandle,-1,brainPos);
             // Group primitives
@@ -116,21 +123,6 @@ void Morphology_CPPNMatrix::create()
         }
 
         if(convexDecompositionSuccess){
-            // Recompute mass and inertia to fix object vibration
-            // skeleton of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
-            // 1300 kg.m-3 for a solid plastic. For a printed skeleton, let say around 100 times less dense. Value to reestimate.
-            simComputeMassAndInertia(mainHandle, 13); //kg.m-3
-            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
-            float mass;
-            float inertiaMatrix[9];
-            float centerOfMass[3];
-            simGetShapeMassAndInertia(mainHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
-            if(verbose)
-                std::cout << "Mass :" << mass + 0.503 << std::endl;
-            //Add the weight of the head organ (503g).
-            simSetShapeMassAndInertia(mainHandle,mass+0.503,inertiaMatrix,centerOfMass,nullptr);
-
             // Create organs
             for(auto & i : organList){
                 setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
@@ -336,6 +328,14 @@ void Morphology_CPPNMatrix::create()
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 {
     create();
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if(verbose){
+        float mass;
+        float inertiaMatrix[9];
+        float centerOfMass[3];
+        simGetShapeMassAndInertia(mainHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+        std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
+    }
     setPosition(x,y,z);
 }
 
