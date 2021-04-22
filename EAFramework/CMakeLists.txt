@@ -64,7 +64,7 @@ target_include_directories(ARE PUBLIC
     "${LIMBO_FOLDER}/src/"
 )
 
-target_link_libraries(ARE cmaes tbb ${Boost_LIBRARIES})
+target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})
 
 
 install(TARGETS ARE DESTINATION lib)

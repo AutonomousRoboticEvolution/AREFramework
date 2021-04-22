@@ -76,7 +76,7 @@ target_include_directories(simulatedER PUBLIC
 target_link_libraries(simulatedER
     dlibxx dl rt
     ${Boost_LIBRARIES} tbb cmaes
-    ARE ${PolyVox_LIBRARIES}
+    ARE
     )
 target_compile_definitions(simulatedER PUBLIC
     "NON_MATLAB_PARSING"
