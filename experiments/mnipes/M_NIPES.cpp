@@ -223,10 +223,10 @@ void M_NIPES::init(){
 
     //Initialized the population of morphologies
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
-        if(start_from_exp){//Load controller archive from previous experiment
+        if(start_from_exp){
             std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
             generation = findLastGen(exp_folder);
-            if(use_ctrl_arch){
+            if(use_ctrl_arch){//Load controller archive from previous experiment
                 std::stringstream sstr;
                 sstr << generation;
                 loadControllerArchive(exp_folder + std::string("/") + "controller_archive"+ sstr.str());
@@ -236,7 +236,7 @@ void M_NIPES::init(){
                 int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
                 controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
                 bool bootst_ca = settings::getParameter<settings::Boolean>(parameters,"#bootstrapControllerArchive").value;
-                if(bootst_ca){
+                if(bootst_ca){//Load controller archive from previous experiment
                     std::string load_archive = settings::getParameter<settings::String>(parameters,"#loadPreviousArchive").value;
                     loadControllerArchive(load_archive);
                     controller_archive.reset_fitnesses();
@@ -346,9 +346,11 @@ void M_NIPES::init_morph_pop(){
             if(verbose)
                 std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
             morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
-        }else
+            morph_population->AccessGenomeByIndex(i) = morph_gen;
+        }else{
             loadNEATGenome(morphIDList[i],morph_gen);
-        morph_population->AccessGenomeByIndex(i) = morph_gen;
+            morph_population->AccessGenomeByIndex(i) = morph_gen;
+        }
     }
     for(unsigned i = 0; i < pop_size ; i++){
         NEAT::Genome mgen = morph_population->AccessGenomeByIndex(i);
