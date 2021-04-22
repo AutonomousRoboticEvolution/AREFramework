@@ -63,7 +63,11 @@ multi_maze :
 		- 0.;-0.5;0.05 #bottom right part
 		- 0.5;0.75;0.05  #upper right upper part
 		- 0.75;0.45;0.05 #upper right bottom part 
-
-
-
 		
+2_paths :
+    start : 0.0,-0.75,0.12
+    target : 0.0,0.25,0.12
+
+two_rooms_2 :
+    start : 0.0,0.75,0.12 
+    target : -0.5,-0.4,0.12  
