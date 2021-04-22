@@ -83,14 +83,19 @@ void Morphology_CPPNMatrix::create()
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-            // Recompute mass and inertia to fix object vibration
-            // skeleton of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
-            // 1300 kg.m-3 for a solid plastic. For a printed skeleton, let say around 50 times less dense. Value to reestimate.
-            simComputeMassAndInertia(convexHandle, 65); //kg.m-3
+
+            //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
+            // The issue come from a mismatch between the mass computed by verp and the one expected.
+            //Call this to compute the approximate moment of inertia and center of mass
+            simComputeMassAndInertia(convexHandle, 84); //kg.m-3
+            float skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
             float mass;
             float inertiaMatrix[9];
             float centerOfMass[3];
             simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+            simSetShapeMassAndInertia(convexHandle,skeletonMass,inertiaMatrix,centerOfMass,nullptr);
+            //*/
+
             mainHandle = convexHandle;
             // Create brain primitive
             float brainSize[3] = {0.084,0.084,0.11};
@@ -528,11 +533,9 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
 void Morphology_CPPNMatrix::exportRobotModel(int indNum)
 {
     simSetObjectProperty(mainHandle,sim_objectproperty_selectmodelbaseinstead);
-    std::string repository = settings::getParameter<settings::String>(parameters, "#repository").value;
-    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
 
     std::stringstream filepath;
-    filepath << loadExperiment << "/model" << indNum << ".ttm";
+    filepath << Logging::log_folder << "/model" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;

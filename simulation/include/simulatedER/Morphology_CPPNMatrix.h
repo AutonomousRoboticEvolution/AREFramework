@@ -4,6 +4,7 @@
 #include "simulatedER/Morphology.h"
 #include "simulatedER/Organ.h"
 #include "simulatedER/GenomeDecoder.h"
+#include "ARE/Logging.h"
 
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
