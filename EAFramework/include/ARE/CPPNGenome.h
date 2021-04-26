@@ -3,6 +3,7 @@
 
 #include <boost/serialization/export.hpp>
 #include "ARE/Genome.h"
+#include "ARE/morphology_descriptors.hpp"
 #include <multineat/Genome.h>
 
 namespace are {
@@ -49,10 +50,15 @@ public:
     {
         arch & boost::serialization::base_object<Genome>(*this);
         arch & neat_genome;
+        arch & morpho_desc;
     }
+
+    void set_morpho_desc(const CartDesc& md){morpho_desc = md;}
+    const CartDesc &get_morpho_desc(){return morpho_desc;}
 
 private:
     NEAT::Genome neat_genome;
+    CartDesc morpho_desc;
 };
 
 

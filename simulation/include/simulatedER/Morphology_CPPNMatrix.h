@@ -1,6 +1,8 @@
 #ifndef Morphology_CPPNMatrix_H
 #define Morphology_CPPNMatrix_H
 
+#include "ARE/morphology_descriptors.hpp"
+
 #include "simulatedER/Morphology.h"
 #include "simulatedER/Organ.h"
 #include "simulatedER/GenomeDecoder.h"
@@ -8,6 +10,7 @@
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 #include "eigen3/Eigen/Core"
+
 
 #include "math.h"
 
@@ -120,71 +123,33 @@ public:
     void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
 
     /// Getters for descriptors.
-    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
+    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();};
+    const CartDesc& getCartDesc(){return indDesc.cartDesc;}
     int get_wheelNumber(){return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber(){return indDesc.cartDesc.jointNumber;}
     int get_sensorNumber(){return indDesc.cartDesc.sensorNumber;}
 
 private:
-    ///////////////////////
-    ///// Descriptors /////
-    ///////////////////////
-
-    class CartDesc
-    {
+    class Descriptors{
     public:
-        //const int ORGANTRAITLIMIT = 5;
-        const int ORGANTRAITLIMIT = 16;
-        //const float DIMENSIONLIMIT = 0.23;
-        const float DIMENSIONLIMIT = 0.55; // Skeleton - > 0.23m; Joint - > 0.08; 1 Skeleton + 4 Joints
-        float robotWidth; // X
-        float robotDepth; // Y
-        float robotHeight; // Z
-        int voxelNumber;
-        int wheelNumber;
-        int sensorNumber;
-        int casterNumber;
-        int jointNumber;
-        Eigen::VectorXd cartDesc;
-        // Constructor
-        CartDesc(){
-            cartDesc.resize(8);
-            robotWidth = 0;
-            robotDepth = 0;
-            robotHeight = 0;
-            voxelNumber = 0;
-            wheelNumber = 0;
-            sensorNumber = 0;
-            casterNumber = 0;
-            jointNumber = 0;
-            setCartDesc();
-        }
-        void setCartDesc(){
-            cartDesc(0) = robotWidth / DIMENSIONLIMIT;
-            cartDesc(1) = robotDepth / DIMENSIONLIMIT;
-            cartDesc(2) = robotHeight / DIMENSIONLIMIT;
-            cartDesc(3) = (double) voxelNumber / VOXELS_NUMBER;
-            cartDesc(4) = (double) wheelNumber / ORGANTRAITLIMIT;
-            cartDesc(5) = (double) sensorNumber / ORGANTRAITLIMIT;
-            cartDesc(6) = (double) jointNumber / ORGANTRAITLIMIT;
-            cartDesc(7) = (double) casterNumber / ORGANTRAITLIMIT;
-        }
+        CartDesc cartDesc;
+
         void countOrgans(std::vector<Organ> organList){
             for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
                 if(!it->isOrganRemoved() && it->isOrganChecked()) {
                     if (it->getOrganType() == 1)
-                        wheelNumber++;
+                        cartDesc.wheelNumber++;
                     if (it->getOrganType() == 2)
-                        sensorNumber++;
+                        cartDesc.sensorNumber++;
                     if (it->getOrganType() == 3)
-                        jointNumber++;
+                        cartDesc.jointNumber++;
                     if (it->getOrganType() == 4)
-                        casterNumber++;
+                        cartDesc.casterNumber++;
                 }
 
             }
         }
-        void getRobotDimmensions(std::vector<Organ> organList){
+        void getRobotDimensions(std::vector<Organ> organList){
             float minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
             for(auto & i : organList) {
                 if (!i.isOrganRemoved() && i.isOrganChecked()) {
@@ -203,38 +168,13 @@ private:
                 }
             }
             // Get dimmensions
-            robotWidth = abs(maxX - minX);
-            robotDepth = abs(maxY - minY);
-            robotHeight = abs(maxZ - minZ);
+            cartDesc.robotWidth = abs(maxX - minX);
+            cartDesc.robotDepth = abs(maxY - minY);
+            cartDesc.robotHeight = abs(maxZ - minZ);
         }
     };
 
-    class Descriptors{
-    public:
-        CartDesc cartDesc;
-    };
-
-
-
-private:
     NEAT::NeuralNetwork nn;
-
-    /////////////////////
-    /////////////////////
-    constexpr static const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
-    // WAS 4 -> 3.6mm
-    // 6 -> 5.4mm
-    // 11 -> 9.9mm (EB: with this value there is no stack overflow!)
-    static const int VOXEL_MULTIPLIER = 22;
-    constexpr static const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
-    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
-    static const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
-    const float SHAPE_SCALE_VALUE = VOXEL_REAL_SIZE; // results into 23.76x23.76x23.76 cm³ - in reality is 28x28x25 cm³
-    static const int VOXELS_NUMBER = MATRIX_SIZE * MATRIX_SIZE *MATRIX_SIZE;
-    constexpr static const float MATRIX_SIZE_M = MATRIX_SIZE * VOXEL_REAL_SIZE;
-
-    static const short int EMPTYVOXEL = 0;
-    static const short int FILLEDVOXEL = 255;
 
     unsigned int id;
     // Variables used to contain handles.
