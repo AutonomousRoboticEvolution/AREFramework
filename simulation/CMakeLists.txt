@@ -46,7 +46,7 @@ else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
 find_package(PolyVox REQUIRED)
-
+find_package(MultiNEAT REQUIRED)
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
@@ -74,9 +74,9 @@ target_include_directories(simulatedER PUBLIC
     "../EAFramework/include"
 )
 target_link_libraries(simulatedER
-    dlibxx dl rt
+    dlibxx dl rt MultiNEAT::MultiNEAT
     ${Boost_LIBRARIES} tbb cmaes
-    ARE ${PolyVox_LIBRARIES}
+    ARE
     )
 target_compile_definitions(simulatedER PUBLIC
     "NON_MATLAB_PARSING"

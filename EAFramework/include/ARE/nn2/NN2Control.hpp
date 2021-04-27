@@ -2,6 +2,7 @@
 #define NN2CONTROL_H
 
 #include "ARE/Control.h"
+#include "NN2Settings.hpp"
 #include <eigen3/Eigen/Core>
 
 #include <boost/random.hpp>
@@ -12,6 +13,14 @@
 #include "nn2/rnn.hpp"
 
 namespace are {
+
+using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
+using connection_t = nn2::Connection<double>;
+using ffnn_t = nn2::Mlp<neuron_t,connection_t>;
+using elman_t = nn2::Elman<neuron_t,connection_t>;
+using rnn_t = nn2::Rnn<neuron_t,connection_t>;
+
+
 
 template<class nn_t>
 class NN2Control : public Control
@@ -77,6 +86,18 @@ public:
 
 };
 
+inline void get_nbr_weights_biases(int nbr_inputs,int nbr_outputs, int nbr_hiddens, int nn_type, int &nbr_weights, int &nbr_biases){
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+}
 
 }
 

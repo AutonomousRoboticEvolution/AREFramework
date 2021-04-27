@@ -6,12 +6,12 @@
 #include "physicalER/pi/are_control.hpp"
 #include "ARE/Settings.h"
 #include "ARE/misc/RandNum.h"
-
 using namespace are;
 
 
 //TODO implement other orders like abort
 
+using are_sett = are::setting;
 
 int main(int argc, char** argv) {
     //*/  Prepare our context and socket
@@ -30,7 +30,6 @@ int main(int argc, char** argv) {
     misc::RandNum::Ptr randomNumber(new misc::RandNum(0));
 
     zmq::message_t message("");
-
     EmptyGenome::Ptr empy_gen(new EmptyGenome);
     NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
 

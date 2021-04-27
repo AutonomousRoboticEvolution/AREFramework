@@ -3,6 +3,7 @@
 using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
+
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + port));
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
@@ -73,6 +74,9 @@ bool ER::execute()
     return updateSimulation();
 }
 
+
+
+
 void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
@@ -81,7 +85,6 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndexVec[slaveIndex] = indToEval.back();
     if(!indToEval.empty())
         indToEval.pop_back();
-    currentIndVec[slaveIndex]->set_properties(properties);
 }
 
 void ER::endOfSimulation(int slaveIndex){
