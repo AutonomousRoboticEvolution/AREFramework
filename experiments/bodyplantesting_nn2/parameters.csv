@@ -1,9 +1,9 @@
-#experimentName,string,bodyplantesting
-#expPluginName,string,/usr/local/lib/libbodyplantesting.so
+#experimentName,string,bodyplantesting_nn2
+#expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
 #extSettingsClass,bool,0
+#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
-#numberEvaluations,int,10
 #populationSize,int,25
 #maxEvalTime,float,1
 #numberOfGeneration,int,25

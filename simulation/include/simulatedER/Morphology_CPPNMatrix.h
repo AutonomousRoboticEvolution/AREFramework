@@ -72,7 +72,7 @@ public:
      * @brief Takes the last three outputs of the network and converts them into rotations (radians) in x, y and z.
      * \todo EB: This method needs updating. Only one output required.
      */
-    void setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ& organ);
+    void setOrganOrientation(Organ& organ);
     /**
      * @brief Removes the gripper created with createTemporalGripper
      */
@@ -93,7 +93,9 @@ public:
     /**
      * @brief This method generates organs only in specific regions of the surface of the skeleton according to the cppn.
      */
-    void generateOrgans(NEAT::NeuralNetwork &cppn, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
+    void generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
+
+
     /**
      * @brief This method generates the orientation of the organ accoriding to the "normal" of the surface
      * In reality, it takes the position of the last outer voxel. In other words, it generates orientations in
@@ -118,12 +120,21 @@ public:
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
-    std::vector<bool> getRobotManRes(){return robotManRes.getResVector();};
-    NEAT::NeuralNetwork getGenome(){return nn;};
-    void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
+    const std::vector<bool> &getRobotManRes(){return robotManRes.getResVector();}
+    const NEAT::NeuralNetwork &getNEATCPPN(){return cppn;}
+    const nn2_cppn_t &getNN2CPPN(){return nn2_cppn;}
+
+    void setNEATCPPN(const NEAT::NeuralNetwork &genome){
+        use_neat = true;
+        cppn = genome;
+    }
+    void setNN2CPPN(const nn2_cppn_t &nn){
+        use_neat = false;
+        nn2_cppn = nn;
+    }
 
     /// Getters for descriptors.
-    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();};
+    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();}
     const CartDesc& getCartDesc(){return indDesc.cartDesc;}
     int get_wheelNumber(){return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber(){return indDesc.cartDesc.jointNumber;}
@@ -174,7 +185,9 @@ private:
         }
     };
 
-    NEAT::NeuralNetwork nn;
+    bool use_neat=true;
+    NEAT::NeuralNetwork cppn;
+    nn2_cppn_t nn2_cppn;
 
     unsigned int id;
     // Variables used to contain handles.

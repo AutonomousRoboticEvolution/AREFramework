@@ -7,6 +7,8 @@
 
 #include "PolyVox/RawVolume.h"
 #include <multineat/Substrate.h>
+#include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "ARE/morphology_descriptors.hpp"
 #include <vector>
 
 namespace are {
@@ -23,21 +25,6 @@ struct AREVoxel{
 
 class GenomeDecoder{
 private:
-    /// \todo EB: This shouldn't be here!
-    static const short int EMPTYVOXEL = 0;
-    static const short int FILLEDVOXEL = 255;
-    // Skeleton dimmesions in voxels
-    static const short int xHeadUpperLimit = 2;
-    static const short int xHeadLowerLimit = -2;
-    static const short int yHeadUpperLimit = 2;
-    static const short int yHeadLowerLimit = -2;
-    // Parameters for skeleton base
-    static const short int skeletonBaseThickness = 1;
-    static const short int skeletonBaseHeight = 2;
-    static const int VOXEL_MULTIPLIER = 22;
-    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
-    static const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
-
     std::vector<std::vector<std::vector<int>>> skeletonRegionCoord;
 
 public:
@@ -51,12 +38,34 @@ public:
      */
     void genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
+
     /**
-     * @brief Reads the genome and creates the regions for each organ.
+     * @brief Runs all the steps to decode the genome.
+     * @param cppn - Body plan genome
+     * @param areMatrix - All regions for each organ.
+     * @param skeletonMatrix - Main skeleton matrix.
+     * @param skeletonSurfaceCoord - Voxels on the surface of the skeleton.
+     * @param numSkeletonVoxels - Keeps track of the number of voxels (for descriptor purposes).
+     */
+    void genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                      std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
+
+    /**
+     * @brief Reads the cppn from MultiNEAT and creates the regions for each organ.
      * @param areMatrix - All regions for each organ.
      * @param cppn - Body plan genome
      */
     static void decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::NeuralNetwork &cppn);
+
+    /**
+     * @brief Reads the cppn from nn2 and creates the regions for each organ.
+     * @param areMatrix - All regions for each organ.
+     * @param cppn - Body plan genome
+     */
+    static void decodeGenome(PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+
     /**
      * @brief Creates the skeleton.
      * @param areMatrix - All regions for each organ.

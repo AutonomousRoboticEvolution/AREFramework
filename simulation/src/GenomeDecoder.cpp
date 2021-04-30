@@ -31,26 +31,73 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::
                 // Activate NN
                 cppn.Activate();
                 // Take output from NN and store it.
-                areVoxel.bone = EMPTYVOXEL;
-                areVoxel.wheel = EMPTYVOXEL;
-                areVoxel.sensor = EMPTYVOXEL;
-                areVoxel.joint = EMPTYVOXEL;
-                areVoxel.caster = EMPTYVOXEL;
+                areVoxel.bone = morph_const::empty_voxel;
+                areVoxel.wheel = morph_const::empty_voxel;
+                areVoxel.sensor = morph_const::empty_voxel;
+                areVoxel.joint = morph_const::empty_voxel;
+                areVoxel.caster = morph_const::empty_voxel;
 
                 if(cppn.Output()[1] > 0) {
-                    areVoxel.bone = FILLEDVOXEL;
+                    areVoxel.bone = morph_const::filled_voxel;
                 }
                 if(cppn.Output()[2] > 0){
-                    areVoxel.wheel = FILLEDVOXEL;
+                    areVoxel.wheel = morph_const::filled_voxel;
                 }
                 if(cppn.Output()[3] > 0) {
-                    areVoxel.sensor = FILLEDVOXEL;
+                    areVoxel.sensor = morph_const::filled_voxel;
                 }
                 if(cppn.Output()[4] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.caster = FILLEDVOXEL;
+                    areVoxel.caster = morph_const::filled_voxel;
                 }
                 if(cppn.Output()[5] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.joint = FILLEDVOXEL;
+                    areVoxel.joint = morph_const::filled_voxel;
+                }
+
+                areMatrix.setVoxel(x, y, z, areVoxel);
+            }
+        }
+    }
+}
+
+void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn)
+{
+    std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
+    std::vector<double> outputs;
+    AREVoxel areVoxel;
+    // Generate voxel matrix
+    auto region = areMatrix.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                input[0] = static_cast<double>(x);
+                input[1] = static_cast<double>(y);
+                input[2] = static_cast<double>(z);
+                input[3] = static_cast<double>(sqrt(pow(x,2)+pow(y,2)+pow(z,2)));
+
+                // Activate NN
+                cppn.step(input);
+                outputs = cppn.outf();
+                // Take output from NN and store it.
+                areVoxel.bone = morph_const::empty_voxel;
+                areVoxel.wheel = morph_const::empty_voxel;
+                areVoxel.sensor = morph_const::empty_voxel;
+                areVoxel.joint = morph_const::empty_voxel;
+                areVoxel.caster = morph_const::empty_voxel;
+
+                if(outputs[1] > 0) {
+                    areVoxel.bone = morph_const::filled_voxel;
+                }
+                if(outputs[2] > 0){
+                    areVoxel.wheel = morph_const::filled_voxel;
+                }
+                if(outputs[3] > 0) {
+                    areVoxel.sensor = morph_const::filled_voxel;
+                }
+                if(outputs[4] > 0) { /// \todo EB WARNING! Verify the order
+                    areVoxel.caster = morph_const::filled_voxel;
+                }
+                if(outputs[5] > 0) { /// \todo EB WARNING! Verify the order
+                    areVoxel.joint = morph_const::filled_voxel;
                 }
 
                 areMatrix.setVoxel(x, y, z, areVoxel);
@@ -67,13 +114,13 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
     auto region = skeletonMatrix.getEnclosingRegion();
     bool isSkeletonConnected = false;
 
-    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + skeletonBaseHeight; z += 1) {
+    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + morph_const::skeletonBaseHeight; z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                if(x <= xHeadUpperLimit + skeletonBaseThickness && x >= xHeadLowerLimit - skeletonBaseThickness &&
-                   y <= yHeadUpperLimit + skeletonBaseThickness && y >= yHeadLowerLimit - skeletonBaseThickness){
-                    if(x <= xHeadUpperLimit && x >= xHeadLowerLimit &&
-                       y <= yHeadUpperLimit && y >= yHeadLowerLimit){
+                if(x <= morph_const::xHeadUpperLimit + morph_const::skeletonBaseThickness && x >= morph_const::xHeadLowerLimit - morph_const::skeletonBaseThickness &&
+                   y <= morph_const::yHeadUpperLimit + morph_const::skeletonBaseThickness && y >= morph_const::yHeadLowerLimit - morph_const::skeletonBaseThickness){
+                    if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit &&
+                       y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit){
                         //isSkeletonConnected = false;
                     }
                     else{
@@ -100,11 +147,11 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
                     voxel = areVoxel.bone;
 
                     if(voxel > 0.5){
-                        uVoxelValue = FILLEDVOXEL;
+                        uVoxelValue = morph_const::filled_voxel;
                         numSkeletonVoxels++;
                     }
                     else
-                        uVoxelValue = EMPTYVOXEL;
+                        uVoxelValue = morph_const::empty_voxel;
 
                     skeletonMatrix.setVoxel(x, y, z, uVoxelValue);
                 }
@@ -116,21 +163,21 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
 void GenomeDecoder::createSkeletonBase(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
 {
     auto region = skeletonMatrix.getEnclosingRegion();
-    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + skeletonBaseHeight; z += 1) {
+    for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + morph_const::skeletonBaseHeight; z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                if(x <= xHeadUpperLimit + skeletonBaseThickness && x >= xHeadLowerLimit - skeletonBaseThickness &&
-                   y <= yHeadUpperLimit + skeletonBaseThickness && y >= yHeadLowerLimit - skeletonBaseThickness){ // Additive condition
-                    if(x <= xHeadUpperLimit && x >= xHeadLowerLimit &&
-                       y <= yHeadUpperLimit && y >= yHeadLowerLimit){ // Substractive condition
-                        if(skeletonMatrix.getVoxel(x, y, z) != EMPTYVOXEL){
-                            skeletonMatrix.setVoxel(x, y, z, EMPTYVOXEL);
+                if(x <= morph_const::xHeadUpperLimit + morph_const::skeletonBaseThickness && x >= morph_const::xHeadLowerLimit - morph_const::skeletonBaseThickness &&
+                   y <= morph_const::yHeadUpperLimit + morph_const::skeletonBaseThickness && y >= morph_const::yHeadLowerLimit - morph_const::skeletonBaseThickness){ // Additive condition
+                    if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit &&
+                       y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit){ // Substractive condition
+                        if(skeletonMatrix.getVoxel(x, y, z) != morph_const::empty_voxel){
+                            skeletonMatrix.setVoxel(x, y, z, morph_const::empty_voxel);
                             numSkeletonVoxels--;
                         }
                     }
                     else{
-                        if(skeletonMatrix.getVoxel(x, y, z) != FILLEDVOXEL){
-                            skeletonMatrix.setVoxel(x, y, z, FILLEDVOXEL);
+                        if(skeletonMatrix.getVoxel(x, y, z) != morph_const::filled_voxel){
+                            skeletonMatrix.setVoxel(x, y, z, morph_const::filled_voxel);
                             numSkeletonVoxels++;
                         }
                     }
@@ -146,9 +193,9 @@ void GenomeDecoder::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skeletonMatri
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                if(x <= xHeadUpperLimit && x >= xHeadLowerLimit && y <= yHeadUpperLimit && y >= yHeadLowerLimit){
-                    if(skeletonMatrix.getVoxel(x,y,z) == FILLEDVOXEL){
-                        skeletonMatrix.setVoxel(x, y, z, EMPTYVOXEL);
+                if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit && y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit){
+                    if(skeletonMatrix.getVoxel(x,y,z) == morph_const::filled_voxel){
+                        skeletonMatrix.setVoxel(x, y, z, morph_const::empty_voxel);
                         numSkeletonVoxels--;
                     }
                 }
@@ -160,7 +207,7 @@ void GenomeDecoder::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skeletonMatri
 void GenomeDecoder::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // This matrix stores the visited elements.
-    PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2), PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
     uint8_t voxel;
     int regionCounter = 0;
     auto region = skeletonMatrix.getEnclosingRegion();
@@ -168,7 +215,7 @@ void GenomeDecoder::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &skeletonM
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 voxel = skeletonMatrix.getVoxel(x, y, z);
-                if(voxel == FILLEDVOXEL && !visitedVoxels.getVoxel(x, y, z)){
+                if(voxel == morph_const::filled_voxel && !visitedVoxels.getVoxel(x, y, z)){
                     regionCounter++;
                     skeletonRegionCoord.resize(regionCounter);
                     std::vector<int> newCoord{x, y, z};
@@ -186,11 +233,11 @@ void GenomeDecoder::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &skeletonM
     if(skeletonRegionCoord.size() > 1){
         for(int i = 0; i < skeletonRegionCoord.size(); i++){
             for(int j = 0; j < skeletonRegionCoord[i].size(); j++){
-                if(skeletonRegionCoord[i][j][0] <= xHeadUpperLimit + skeletonBaseThickness &&
-                   skeletonRegionCoord[i][j][0] >= xHeadLowerLimit - skeletonBaseThickness &&
-                   skeletonRegionCoord[i][j][1] <= yHeadUpperLimit + skeletonBaseThickness &&
-                   skeletonRegionCoord[i][j][1] >= yHeadLowerLimit - skeletonBaseThickness &&
-                   skeletonRegionCoord[i][j][2] <= -6 + skeletonBaseHeight){ /// \todo :EB make this a constant!
+                if(skeletonRegionCoord[i][j][0] <= morph_const::xHeadUpperLimit + morph_const::skeletonBaseThickness &&
+                   skeletonRegionCoord[i][j][0] >= morph_const::xHeadLowerLimit - morph_const::skeletonBaseThickness &&
+                   skeletonRegionCoord[i][j][1] <= morph_const::yHeadUpperLimit + morph_const::skeletonBaseThickness &&
+                   skeletonRegionCoord[i][j][1] >= morph_const::yHeadLowerLimit - morph_const::skeletonBaseThickness &&
+                   skeletonRegionCoord[i][j][2] <= -6 + morph_const::skeletonBaseHeight){ /// \todo :EB make this a constant!
                     regionConnected = i;
                     break;
                 }
@@ -217,36 +264,36 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
     uint8_t voxel;
     // Explore neighbourhood.
     for (int dz = -1; dz <= 1; dz+=1) {
-        if (posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
+        if (posZ + dz > -morph_const::matrix_size/2 && posZ + dz < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX, posY, posZ + dz);
-            if (!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == FILLEDVOXEL) {
+            if (!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY, posZ + dz, surfaceCounter, skeletonSurfaceCoord);
             }
-            else if(!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == EMPTYVOXEL) {
+            else if(!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == morph_const::empty_voxel) {
                 std::vector<int> newCoord{posX, posY, posZ, 0, 0, dz};
                 skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
             }
         }
     }
     for (int dy = -1; dy <= 1; dy+=1) {
-        if (posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE) {
+        if (posY + dy > -morph_const::matrix_size/2 && posY + dy < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX, posY + dy, posZ);
-            if (!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == FILLEDVOXEL) {
+            if (!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY + dy, posZ, surfaceCounter, skeletonSurfaceCoord);
             }
-            else if(!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == EMPTYVOXEL) {
+            else if(!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == morph_const::empty_voxel) {
                 std::vector<int> newCoord{posX, posY, posZ, 0, dy, 0};
                 skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
             }
         }
     }
     for (int dx = -1; dx <= 1; dx+=1) {
-        if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE) {
+        if (posX + dx > -morph_const::matrix_size/2 && posX + dx < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX + dx, posY, posZ);
-            if (!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == FILLEDVOXEL) {
+            if (!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX + dx, posY, posZ, surfaceCounter, skeletonSurfaceCoord);
             }
-            else if(!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == EMPTYVOXEL) {
+            else if(!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == morph_const::empty_voxel) {
                 std::vector<int> newCoord{posX, posY, posZ, dx, 0, 0};
                 skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
             }
@@ -263,9 +310,9 @@ void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonM
     for (int dz = -1; dz <= 1; dz+=1) {
         for (int dy = -1; dy <= 1; dy+=1) {
             for (int dx = -1; dx <= 1; dx+=1) {
-                if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE &&
-                    posY + dy > -MATRIX_HALF_SIZE && posY + dy < MATRIX_HALF_SIZE &&
-                    posZ + dz > -MATRIX_HALF_SIZE && posZ + dz < MATRIX_HALF_SIZE) {
+                if (posX + dx > -morph_const::matrix_size/2 && posX + dx < morph_const::matrix_size/2 &&
+                    posY + dy > -morph_const::matrix_size/2 && posY + dy < morph_const::matrix_size/2 &&
+                    posZ + dz > -morph_const::matrix_size/2 && posZ + dz < morph_const::matrix_size/2) {
                     voxel = skeletonMatrix.getVoxel(posX + dx, posY + dy, posZ + dz);
                     if (!visitedVoxels.getVoxel(posX + dx, posY + dy, posZ + dz) && voxel > 120) {
                         std::vector<int> newCoord{posX + dx, posY + dy, posZ + dz};
@@ -281,7 +328,7 @@ void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonM
 void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
     // This matrix stores the visited elements.
-    PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2), PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
     uint8_t voxel;
     int surfaceCounter = 0;
     auto region = skeletonMatrix.getEnclosingRegion();
@@ -289,7 +336,7 @@ void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMat
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 2) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 2) {
                 voxel = skeletonMatrix.getVoxel(x, y, z);
-                if(voxel == FILLEDVOXEL && !visitedVoxels.getVoxel(x, y, z)){
+                if(voxel == morph_const::filled_voxel && !visitedVoxels.getVoxel(x, y, z)){
                     surfaceCounter++;
                     skeletonSurfaceCoord.resize(surfaceCounter);
                     exploreSkeleton(skeletonMatrix, visitedVoxels, x, y, z, surfaceCounter, skeletonSurfaceCoord);
@@ -300,6 +347,20 @@ void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMat
 }
 
 void GenomeDecoder::genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
+                                 PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                                 std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
+                                 int &numSkeletonVoxels)
+{
+    decodeGenome(areMatrix, cppn);
+    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
+    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
+    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
+    skeletonRegionCounter(skeletonMatrix);
+    removeSkeletonRegions(skeletonMatrix);
+    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
+}
+
+void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
                                  int &numSkeletonVoxels)

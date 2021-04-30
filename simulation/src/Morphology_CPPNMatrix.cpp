@@ -24,12 +24,12 @@ void Morphology_CPPNMatrix::create()
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
     numSkeletonVoxels = 0;
     createHead();
-    PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size, mc::matrix_size, mc::matrix_size)));
-    PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size, mc::matrix_size, mc::matrix_size)));
+    PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
+    PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     // Decoding CPPN
     GenomeDecoder genomeDecoder;
-    genomeDecoder.genomeDecoder(nn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-
+    if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+    else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
@@ -44,7 +44,7 @@ void Morphology_CPPNMatrix::create()
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
-        generateOrgans(nn,skeletonSurfaceCoord);
+        generateOrgans(skeletonSurfaceCoord);
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, listVertices.at(0).data(), listVertices.at(0).size(), listIndices.at(0).data(),
                                         listIndices.at(0).size(), nullptr);
         if (meshHandle == -1) {
@@ -126,7 +126,7 @@ void Morphology_CPPNMatrix::create()
         if(convexDecompositionSuccess){
             // Create organs
             for(auto & i : organList){
-                setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
+                setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     i.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
@@ -256,7 +256,7 @@ void Morphology_CPPNMatrix::create()
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
 
-                        setOrganOrientation(nn, organ); // Along z-axis relative to the organ itself
+                        setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
                         int tempDummy = simCreateDummy(0.01, nullptr);
@@ -424,20 +424,27 @@ void Morphology_CPPNMatrix::createGripper()
 #endif
 }
 
-void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ &organ)
+void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
 {
     // Vector used as input of the Neural Network (NN).
-    std::vector<double> input{0,0,0};
+    std::vector<double> input{0,0,0,0};
+    std::vector<double> output;
     input[0] = static_cast<int>(std::round(organ.organPos[0]/mc::voxel_real_size));
     input[1] = static_cast<int>(std::round(organ.organPos[1]/mc::voxel_real_size));
     input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
     input[2] -= mc::matrix_size/2;
-    // Set inputs to NN
-    cppn.Input(input);
-    // Activate NN
-    cppn.Activate();
+    if(use_neat){
+        // Set inputs to NN
+        cppn.Input(input);
+        // Activate NN
+        cppn.Activate();
+        output = cppn.Output();
+    }else{
+        nn2_cppn.step(input);
+        output = nn2_cppn.outf();
+    }
     float rotZ;
-    rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
+    rotZ = output[0] * M_2_PI - M_1_PI;
     organ.organOri.push_back(rotZ);
 }
 
@@ -474,10 +481,12 @@ void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices,
     delete[] indicesSizesMesh;
 }
 
-void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
+
+
+void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
-    float tempPos[3];
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
+    std::vector<double> output;
     int organType;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
         // Generate organs every two voxels.
@@ -486,26 +495,33 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
             input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
             input[3] = static_cast<double>(sqrt(pow(skeletonSurfaceCoord[m][n].at(0),2)+pow(skeletonSurfaceCoord[m][n].at(1),2)+pow(skeletonSurfaceCoord[m][n].at(2),2)));
-            // Set inputs to NN
-            cppn.Input(input);
-            // Activate NN
-            cppn.Activate();
+            if(use_neat){
+                // Set inputs to NN
+                cppn.Input(input);
+                // Activate NN
+                cppn.Activate();
+                output = cppn.Output();
+            }else{
+                nn2_cppn.step(input);
+                output = nn2_cppn.outf();
+            }
+
             // Is there an organ?
             organType = -1;
-            if(cppn.Output()[2] > 0.99){ // Wheel
+            if(output[2] > 0.99){ // Wheel
                 // These if statements should be always true but they are here for debugging.
                 if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
                     organType = 1;
             }
-            else if(cppn.Output()[3] > 0.99) { // Sensor
+            else if(output[3] > 0.99) { // Sensor
                 if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
                     organType = 2;
             }
-            else if(cppn.Output()[4] > 0.99) { // Joint
+            else if(output[4] > 0.99) { // Joint
                 if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
                     organType = 3;
             }
-            else if(cppn.Output()[5] > 0.99) { // Caster
+            else if(output[5] > 0.99) { // Caster
                 if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
                     organType = 4;
             }
