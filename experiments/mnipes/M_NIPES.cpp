@@ -2,42 +2,6 @@
 
 using namespace are;
 
-void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
-{
-    archive.resize(max_wheels+1);
-    for(auto& a_w : archive){
-        a_w.resize(max_joints+1);
-        for(auto& a_j: a_w){
-            a_j.resize(max_sensors+1);
-        }
-    }
-
-    for(auto& w : archive){
-        for(auto& j : w){
-            for(auto& s : j){
-                s.first.reset(new NNParamGenome());
-                s.second = 0;
-            }
-        }
-    }
-}
-
-void ControllerArchive::reset_fitnesses(){
-    for(auto& w : archive){
-        for(auto& j : w){
-            for(auto& s : j){
-                s.second = 0;
-            }
-        }
-    }
-}
-
-void ControllerArchive::update(const NNParamGenome::Ptr &genome, double fitness, int wheels, int joints, int sensors){
-    if(archive[wheels][joints][sensors].second < fitness)
-        archive[wheels][joints][sensors] = std::make_pair(genome,fitness);
-}
-
-
 fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner::Ptr& learner) -> double
 {
     return 1 - learner->get_best_solution().first;
@@ -75,7 +39,7 @@ void M_NIPESIndividual::createMorphology(){
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNEATCPPN(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
@@ -153,7 +117,7 @@ void M_NIPESIndividual::update(double delta_time){
 
 void M_NIPESIndividual::setGenome()
 {
-    nn = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getNEATCPPN();
 }
 
 void M_NIPESIndividual::setMorphDesc()
