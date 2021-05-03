@@ -5,12 +5,17 @@
 #include "ARE/Individual.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
+#include "ARE/learning/NSGA2.hpp"
 
 namespace are {
 
-class CPPNIndividual : public Individual
+class CPPNIndividual : public Individual, public NSGAIndividual<CPPNIndividual>
 {
 public :
+
+    typedef std::shared_ptr<CPPNIndividual> Ptr;
+    typedef std::shared_ptr<const CPPNIndividual> ConstPtr;
+
     CPPNIndividual() : Individual(){}
     CPPNIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
             Individual(morph_gen, ctrl_gen){}

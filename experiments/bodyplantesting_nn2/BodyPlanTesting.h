@@ -6,16 +6,15 @@
 #include "eigen3/Eigen/Core"
 #include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
-#include <limbo/init/lhs.hpp>
 
 
 namespace are {
 
-class BODYPLANTESTING : public EA
+class BODYPLANTESTING : public NSGA2<CPPNIndividual>
 {
 public:
-    BODYPLANTESTING() : EA(){}
-    BODYPLANTESTING(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
+    BODYPLANTESTING() : NSGA2<CPPNIndividual>(){}
+    BODYPLANTESTING(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : NSGA2<CPPNIndividual>(rn, param){}
     ~BODYPLANTESTING() override {}
 
     void init() override;
@@ -23,7 +22,6 @@ public:
     void epoch() override;
     bool is_finish() override;
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
-    void init_next_pop() override;
     bool update(const Environment::Ptr&);
 
     NEAT::Genome loadInd(short int genomeID);

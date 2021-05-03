@@ -4,6 +4,10 @@ using namespace are;
 
 void BODYPLANTESTING::init()
 {
+    nb_obj = 1;
+    max_obj = {1};
+    min_obj = {0};
+
     initPopulation();
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
@@ -67,6 +71,9 @@ void BODYPLANTESTING::epoch(){
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
     }
+
+    NSGA2::epoch();
+
 }
 
 void BODYPLANTESTING::setObjectives(size_t indIdx, const std::vector<double> &objectives){
@@ -74,11 +81,6 @@ void BODYPLANTESTING::setObjectives(size_t indIdx, const std::vector<double> &ob
     population[indIdx]->setObjectives(objectives);
 }
 
-void BODYPLANTESTING::init_next_pop(){
-    for(const auto& ind : population){
-        ind->mutate();
-    }
-}
 
 bool BODYPLANTESTING::is_finish()
 {

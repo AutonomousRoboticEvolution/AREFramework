@@ -120,7 +120,7 @@ public:
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
-    const std::vector<bool> &getRobotManRes(){return robotManRes.getResVector();}
+    std::vector<bool> getRobotManRes(){return robotManRes.getResVector();}
     const NEAT::NeuralNetwork &getNEATCPPN(){return cppn;}
     const nn2_cppn_t &getNN2CPPN(){return nn2_cppn;}
 

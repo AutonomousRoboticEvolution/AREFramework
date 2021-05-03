@@ -71,7 +71,7 @@ void Morphology_CPPNMatrix::create()
             // EB: V-HACD is not a good idea. It crashes randomly. This is an issue with the library itself.
             // http://forum.coppeliarobotics.com/viewtopic.php?f=5&t=8024
             // Convex decomposition parameters
-            // EB: Warning, the more triangles are used the more accurate would me the final representation. However,
+            // EB: Warning, the more triangles are used the more accurate would be the final representation. However,
             // This make the decomposition process slower and more important the likelihood of the decomposition to
             // crash higher. To prevent this I decided to decrease the maximum concavity as mush as possible.
             // EB: IMPORTANT! for the pre-morphogensis stage keep the number of triangles low (100) and high concavity (100).
