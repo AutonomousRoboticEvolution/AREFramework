@@ -68,6 +68,10 @@ multi_maze :
     start : 0.0,-0.75,0.12
     target : 0.0,0.25,0.12
 
-two_rooms_2 :
+Two_rooms_2 :
     start : 0.0,0.75,0.12 
-    target : -0.5,-0.4,0.12  
+    target : -0.5,-0.4,0.12 
+
+Two_rooms_2_2 :
+    start : 0.0,0.75,0.12 
+    target : -0.6,-0.4,0.12  
