@@ -87,11 +87,14 @@ void Morphology_CPPNMatrix::create()
             // Recompute mass and inertia to fix object vibration
             // skeleton of PLA is 1.210–1.430 g·cm−3 cit. Wikipedia
             // 1300 kg.m-3 for a solid plastic. For a printed skeleton, let say around 50 times less dense. Value to reestimate.
-            simComputeMassAndInertia(convexHandle, 65); //kg.m-3
+            simComputeMassAndInertia(convexHandle, 84); //kg.m-3
+            float skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
             float mass;
             float inertiaMatrix[9];
             float centerOfMass[3];
             simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+            simSetShapeMassAndInertia(convexHandle,skeletonMass,inertiaMatrix,centerOfMass,nullptr);
+
             mainHandle = convexHandle;
             // Create brain primitive
             float brainSize[3] = {0.084,0.084,0.11};
