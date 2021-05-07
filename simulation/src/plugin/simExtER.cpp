@@ -231,6 +231,10 @@ void localMessageHandler(int message){
     {
         assert(simulationState == STARTING);
         simulationState = BUSY;
+        // https://forum.coppeliarobotics.com/viewtopic.php?t=1907
+        if(are_sett::getParameter<are_sett::Boolean>(param,"#isVideoRecordingEnable").value)
+            simSetBoolParameter(sim_boolparam_video_recording_triggered,1);
+
         // Initializes population
         ERVREP->startOfSimulation();  //start from here after simStartSimulation is called
         if (verbose) {
