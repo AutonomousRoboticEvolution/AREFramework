@@ -37,9 +37,11 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
+        cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
+        cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
     }
 //    NN2CPPNGenome(const NEAT::Genome &neat_gen) : neat_genome(neat_gen){}
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
