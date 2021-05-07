@@ -35,6 +35,8 @@ public :
     {
         arch & objectives;
         arch & morphGenome;
+        arch & morphDesc;
+        arch & testRes;
     }
     // Serialization
     std::string to_string();

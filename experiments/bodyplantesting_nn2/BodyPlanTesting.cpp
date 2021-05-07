@@ -16,19 +16,31 @@ void BODYPLANTESTING::init()
 
 void BODYPLANTESTING::initPopulation()
 {
-    const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     rng.Seed(randomNum->getSeed());
     // Morphology
-    for (size_t i = 0; i < population_size; i++){ // Body plans
+    if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        morphgenome->init();
+        morphgenome->random();
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
+    }else{
+        const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        for (size_t i = 0; i < population_size; i++){ // Body plans
+            EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+            NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+            morphgenome->random();
+            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+            ind->set_parameters(parameters);
+            ind->set_randNum(randomNum);
+            population.push_back(ind);
+        }
     }
+
 }
 
 void BODYPLANTESTING::epoch(){

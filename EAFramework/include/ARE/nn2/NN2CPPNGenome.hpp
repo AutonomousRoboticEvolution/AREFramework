@@ -36,12 +36,14 @@ public:
     typedef std::shared_ptr<NN2CPPNGenome> Ptr;
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
-    NN2CPPNGenome() : Genome(){}
+    NN2CPPNGenome() : Genome(){
+    }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
-        Genome(rn,param){}
+        Genome(rn,param){
+    }
 //    NN2CPPNGenome(const NEAT::Genome &neat_gen) : neat_genome(neat_gen){}
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen){}
+        Genome(gen), cppn(gen.cppn){}
     ~NN2CPPNGenome() override {}
 
     Genome::Ptr clone() const override {
@@ -49,10 +51,13 @@ public:
     }
 
     void init() override {
-        cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
-        cppn.random();
         cppn.init();
     }
+
+    void random(){
+        cppn.random();
+    }
+
     void mutate() override {
         cppn.mutate();
     }
@@ -81,6 +86,7 @@ public:
     void serialize(archive &arch, const unsigned int v)
     {
         arch & boost::serialization::base_object<Genome>(*this);
+        arch & cppn;
     }
 
 
