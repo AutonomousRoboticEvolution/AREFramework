@@ -135,15 +135,24 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
 
 
     std::vector<double> weights;
     std::vector<double> bias;
     int i = 0;
-    for(; i < _nbr_weights; i++)
-        weights.push_back(_population[_counter](i));
-    for(; i < _dimension; i++)
-        bias.push_back(_population[_counter](i));
+    for(; i < _nbr_weights; i++){
+        double w = _population[_counter](i);
+        if(w > max_weight) w = max_weight;
+        else if(w < -max_weight) w = -max_weight;
+        weights.push_back(w);
+    }
+    for(; i < _dimension; i++){
+        double b = _population[_counter](i);
+        if(b > max_weight) b = max_weight;
+        else if(b < -max_weight) b = -max_weight;
+        bias.push_back(b);
+    }
 
     if(nn_type == settings::nnType::FFNN){
         control.reset(new NN2Control<ffnn_t>());
