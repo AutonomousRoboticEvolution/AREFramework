@@ -12,13 +12,13 @@
 
 namespace are {
 
-//class GenomeLog : public Logging
-//{
-//public:
-//    GenomeLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
-//    void saveLog(EA::Ptr & ea);
-//    void loadLog(const std::string& logFile){}
-//};
+class GenomeLog : public Logging
+{
+public:
+    GenomeLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
 
 class TestsLog : public Logging
 {
