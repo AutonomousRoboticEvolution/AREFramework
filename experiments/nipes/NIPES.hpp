@@ -34,7 +34,7 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
 
     bool is_finish() override;
-    bool finish_eval() override;
+    bool finish_eval(const Environment::Ptr& env) override;
 
     bool restarted(){return !cmaStrategy->log_stopping_criterias.empty();}
     std::string pop_stopping_criterias(){

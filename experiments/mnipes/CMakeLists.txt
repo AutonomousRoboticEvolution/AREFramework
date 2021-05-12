@@ -24,6 +24,7 @@ SET(VREP_SRC
 
 add_library(M_NIPES SHARED 
     ${VREP_SRC}
+    multiTargetMaze.cpp
    factories.cpp
    M_NIPES.cpp 
    cmaes_learner.cpp

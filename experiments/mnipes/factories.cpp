@@ -1,12 +1,11 @@
-#include "simulatedER/mazeEnv.h"
+#include "multiTargetMaze.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::sim::MazeEnv);
-    env->set_parameters(param);
+    are::Environment::Ptr env(new are::sim::MultiTargetMaze(param));
     return env;
 }
 

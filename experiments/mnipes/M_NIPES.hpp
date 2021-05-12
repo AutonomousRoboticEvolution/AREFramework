@@ -11,6 +11,7 @@
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include <multineat/Population.h>
+#include "multiTargetMaze.hpp"
 
 namespace are{
 
@@ -65,6 +66,15 @@ public:
 
     void update(double delta_time) override;
 
+    void add_reward(double reward){rewards.push_back(reward);}
+    void compute_fitness(){
+        double fitness = 0;
+        for(const auto &r : rewards)
+            fitness += r;
+        fitness /= static_cast<double>(rewards.size());
+        objectives[0] = fitness;
+    }
+
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
@@ -111,6 +121,12 @@ public:
 
     void set_ctrl_archive(const ControllerArchive& ctrl_arc){controller_archive = ctrl_arc;}
 
+    int get_number_times_evaluated(){return rewards.size();}
+    void reset_rewards(){rewards.clear();}
+
+    bool is_actuated(){return !no_actuation;}
+    bool has_sensor(){return !no_sensors;}
+
 private:
     void createMorphology() override;
     void createController() override;
@@ -122,10 +138,15 @@ private:
     Eigen::VectorXd morphDesc; // <width,depth,height,voxels,wheels,sensor,joint,caster>
     Eigen::VectorXd symDesc;
 
+    bool no_actuation = false;
+    bool no_sensors = false;
+
+
     double energy_cost;
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
+    std::vector<double> rewards;
 
     int nn_inputs;
     int nn_outputs;
@@ -149,7 +170,9 @@ public:
     void epoch() override;
     bool update(const Environment::Ptr &) override;
 //    bool is_finish() override;
-    bool finish_eval() override;
+    bool finish_eval(const Environment::Ptr& env) override;
+
+    void setObjectives(size_t indIndex, const std::vector<double> &objectives) override;
 
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
@@ -189,6 +212,7 @@ private:
     float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
+    bool learning_finished = false;
 };
 
 }

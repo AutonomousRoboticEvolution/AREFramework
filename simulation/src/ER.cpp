@@ -111,7 +111,7 @@ void ER::handleSimulation()
 
     if (simulationTime >
             settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
-            ea->finish_eval()) {
+            ea->finish_eval(environment)) {
         simStopSimulation();
     }
 }
