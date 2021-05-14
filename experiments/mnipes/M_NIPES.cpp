@@ -415,11 +415,12 @@ bool M_NIPES::update(const Environment::Ptr& env){
         else{
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-            learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
             std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
                             ind->getObjectives(),
                             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
                         );
+            learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
+
             if(learning_finished){
                 auto obj = ind->getObjectives();
                 obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
