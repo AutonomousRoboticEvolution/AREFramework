@@ -1,13 +1,18 @@
 #ifndef VIRTUAL_ENVIRONMENT_HPP
 #define VIRTUAL_ENVIRONMENT_HPP
 
+#if defined (VREP)
+#include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
+
 #include "ARE/Environment.h"
 #include "simulatedER/Morphology.h"
 
 namespace are{
 
 namespace sim {
-
 
 class VirtualEnvironment : public Environment
 {

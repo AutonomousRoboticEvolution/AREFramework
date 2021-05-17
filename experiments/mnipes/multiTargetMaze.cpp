@@ -49,7 +49,7 @@ void MultiTargetMaze::init(){
         simSetObjectName(beacon_handle,"IRBeacon_0");
         const float tPos[3] = {static_cast<float>(target_positions[current_target][0]),
                          static_cast<float>(target_positions[current_target][1]),
-                         static_cast<float>(0.05f)};
+                         static_cast<float>(target_positions[current_target][2])};
 
         if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
             std::cerr << "Set object position failed" << std::endl;
