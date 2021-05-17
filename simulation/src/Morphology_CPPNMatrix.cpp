@@ -511,20 +511,21 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
 
             // Is there an organ?
             organType = -1;
-            if(output[2] > 0.99){ // Wheel
+            int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
+            if(maxIndex == 2){ // Wheel
                 // These if statements should be always true but they are here for debugging.
                 if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
                     organType = 1;
             }
-            else if(output[3] > 0.99) { // Sensor
+            else if(maxIndex == 3) { // Sensor
                 if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
                     organType = 2;
             }
-            else if(output[4] > 0.99) { // Joint
+            else if(maxIndex == 4) { // Joint
                 if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
                     organType = 3;
             }
-            else if(output[5] > 0.99) { // Caster
+            else if(maxIndex == 5) { // Caster
                 if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
                     organType = 4;
             }

@@ -27,6 +27,7 @@ elseif(ONLY_SIMULATION)
     add_subdirectory(lc_nsms)
     add_subdirectory(friction_estimation)
     add_subdirectory(bodyplantesting)
+    add_subdirectory(bodyplantesting_nn2)
 else()
 
     if(VREP_FOUND)
