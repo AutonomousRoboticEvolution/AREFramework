@@ -142,15 +142,11 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
     std::vector<double> bias;
     int i = 0;
     for(; i < _nbr_weights; i++){
-        double w = _population[_counter](i);
-        if(w > max_weight) w = max_weight;
-        else if(w < -max_weight) w = -max_weight;
+        double w = std::tanh(_population[_counter](i)); // filtering to put values between -1 and 1
         weights.push_back(w);
     }
     for(; i < _dimension; i++){
-        double b = _population[_counter](i);
-        if(b > max_weight) b = max_weight;
-        else if(b < -max_weight) b = -max_weight;
+        double b = std::tanh(_population[_counter](i)); // filtering to put values between -1 and 1
         bias.push_back(b);
     }
 
