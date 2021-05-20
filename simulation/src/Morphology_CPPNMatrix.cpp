@@ -129,7 +129,8 @@ void Morphology_CPPNMatrix::create()
         if(convexDecompositionSuccess){
             // Create organs
             for(auto & i : organList){
-                setOrganOrientation(i); // Along z-axis relative to the organ itself
+                if(i.getOrganType() != 0)
+                    setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     i.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
@@ -259,7 +260,8 @@ void Morphology_CPPNMatrix::create()
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
 
-                        setOrganOrientation(organ); // Along z-axis relative to the organ itself
+                        if(organ.getOrganType() !=0)
+                            setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
                         int tempDummy = simCreateDummy(0.01, nullptr);
@@ -448,7 +450,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
     }
     float rotZ;
     rotZ = output[0] * M_2_PI - M_1_PI;
-    organ.organOri.push_back(rotZ);
+    organ.organOri.at(2) = rotZ;
 }
 
 void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices)
