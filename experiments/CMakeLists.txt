@@ -1,3 +1,4 @@
+add_subdirectory(morphneuro)
 if(ONLY_PHYSICAL)
     if(WITH_NN2)
         add_subdirectory(test_pimio)
