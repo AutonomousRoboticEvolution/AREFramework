@@ -41,7 +41,7 @@ void CMAESLearner::init(std::vector<double> initial_point){
 void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
     IPOPCMAStrategy::individual_t ind;
     for(unsigned i = 0; i < _population[_counter-1].rows(); i++)
-        ind.genome.push_back(_population[_counter-1](i));
+        ind.genome.push_back(std::tanh(_population[_counter-1](i)));
     ind.objectives = obj;
     ind.descriptor.resize(desc.rows());
     for(int i = 0; i < desc.rows(); i++)

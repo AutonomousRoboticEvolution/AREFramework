@@ -6,7 +6,7 @@
 #shouldReopenConnections,bool,0
 #seed,int,-1
 ,,
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/steps_arena.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/obstacles.ttt
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
 #repository,string,/home/leni/are-logs
 ,,
@@ -32,10 +32,11 @@
 #energyCostFile,string,energy_cost.csv
 #simTimeFile,string,sim_time.csv
 ,,
+#envType,int,1
 #arenaSize,double,2.
-#targets,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/amphitheatre_targets
-#init_x,float,0
-#init_y,float,0
+#targets,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/two_rooms_targets
+#init_x,float,0.
+#init_y,float,0.
 #init_z,float,0.12
 ,,
 #noiseLevel,double,0.
@@ -48,8 +49,8 @@
 #reloadController,bool,1
 #jointControllerType,int,2
 ,,
-#populationSize,int,10
-#maxEvalTime,float,60
+#populationSize,int,25
+#maxEvalTime,float,30
 #timeStep,float,0.1
 #numberOfGeneration,int,10
 #fitnessType,int,0

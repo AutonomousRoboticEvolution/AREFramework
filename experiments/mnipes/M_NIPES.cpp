@@ -388,7 +388,7 @@ void M_NIPES::init_next_pop(){
     }
 }
 
-bool M_NIPES::update(const Environment::Ptr& env){
+bool M_NIPES::update_multi_target_maze(const Environment::Ptr &env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;
 
@@ -406,6 +406,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
 
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+
 
         int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
 
@@ -430,6 +431,50 @@ bool M_NIPES::update(const Environment::Ptr& env){
             }else return false;
         }
     }else return true;
+}
+
+bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
+    endEvalTime = hr_clock::now();
+    numberEvaluation++;
+
+    Individual::Ptr ind = population[currentIndIndex];
+
+    if(simulator_side){
+
+        if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+            auto obj = ind->getObjectives();
+            obj[0] = 0;
+            ind->setObjectives(obj);
+            return true;
+        }
+
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+
+        //LEARNING WITH NIP-ES
+        std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
+                    ind->getObjectives(),
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
+                    );
+        learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
+
+        if(learning_finished){
+            auto obj = ind->getObjectives();
+            obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
+            ind->setObjectives(obj);
+            learning_finished = false;
+            return true;
+        }else return false;
+    }
+    return true;
+}
+
+bool M_NIPES::update(const Environment::Ptr& env){
+    if(env->get_name() == "multi_target_maze")
+        return update_multi_target_maze(env);
+    else if(env->get_name() == "obstacle_avoidance")
+        return update_obstacle_avoidance(env);
 }
 
 //bool M_NIPES::is_finish(){
@@ -585,26 +630,9 @@ int M_NIPES::findLastGen(const std::string &exp_folder){
 }
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
-    std::vector<double> target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
-
-    float tPos[3];
-    tPos[0] = static_cast<float>(target[0]);
-    tPos[1] = static_cast<float>(target[1]);
-    tPos[2] = static_cast<float>(target[2]);
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-
-    auto distance = [](float* a,float* b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
-
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
 
     if(simGetSimulationTime() < 0.1){
         current_ind_past_pos[0] = pos[0];
@@ -620,16 +648,39 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         current_ind_past_pos[0] = pos[0];
         current_ind_past_pos[1] = pos[1];
         current_ind_past_pos[2] = pos[2];
-
     }
 
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
     if(drop_eval) nbr_dropped_eval++;
-    bool stop = dist < fTarget || drop_eval;
 
-    if(stop){
-        std::cout << "STOP !" << std::endl;
+    if(env->get_name() == "multi_target_maze")
+    {
+        std::vector<double> target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
+
+        float tPos[3];
+        tPos[0] = static_cast<float>(target[0]);
+        tPos[1] = static_cast<float>(target[1]);
+        tPos[2] = static_cast<float>(target[2]);
+        double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+        double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+
+        auto distance = [](float* a,float* b) -> double
+        {
+            return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                    (a[1] - b[1])*(a[1] - b[1]) +
+                    (a[2] - b[2])*(a[2] - b[2]));
+        };
+
+        double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+
+        bool stop = dist < fTarget || drop_eval;
+
+        if(stop){
+            std::cout << "STOP !" << std::endl;
+        }
+
+        return  stop;
+    }else if(env->get_name() == "obstacle_avoidance"){
+        return drop_eval;
     }
-
-    return  stop;
 }

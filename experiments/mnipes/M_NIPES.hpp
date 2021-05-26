@@ -64,7 +64,7 @@ public:
         return std::make_shared<M_NIPESIndividual>(*this);
     }
 
-    void update(double delta_time) override;
+    void update(double delta_time) override;    
 
     void add_reward(double reward){rewards.push_back(reward);}
     void compute_fitness(){
@@ -173,6 +173,9 @@ public:
     bool finish_eval(const Environment::Ptr& env) override;
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives) override;
+
+    bool update_multi_target_maze(const Environment::Ptr& env);
+    bool update_obstacle_avoidance(const Environment::Ptr& env);
 
     //GETTERS
     const std::string& subFolder(){return sub_folder;}

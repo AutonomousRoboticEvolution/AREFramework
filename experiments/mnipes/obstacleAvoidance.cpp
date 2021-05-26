@@ -1,27 +1,23 @@
-#include "multiTargetMaze.hpp"
+#include "obstacleAvoidance.hpp"
 
 #include <boost/algorithm/string.hpp>
 
 using namespace are::sim;
 
-MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
+ObstacleAvoidance::ObstacleAvoidance(const settings::ParametersMapPtr& params)
 {
     parameters = params;
 
     final_position.resize(3);
-    name = "multi_target_maze";
+    name = "obstacle_avoidance";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
-
-    std::string targets_file = settings::getParameter<settings::String>(parameters,"#targets").value;
-    load_target_positions(targets_file);
 }
 
-void MultiTargetMaze::init(){
+void ObstacleAvoidance::init(){
 
     VirtualEnvironment::init();
 
@@ -38,68 +34,37 @@ void MultiTargetMaze::init(){
         }
     }
 
-    bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
-
-    if(withBeacon){
-        float bSize[3] = {0.1f,0.1f,0.1f};
-        int beacon_handle = simCreatePureShape(1,0,bSize,0.05f,nullptr); //create a sphere as beacon;
-
-        simSetObjectName(beacon_handle,"IRBeacon_0");
-        const float tPos[3] = {static_cast<float>(target_positions[current_target][0]),
-                         static_cast<float>(target_positions[current_target][1]),
-                         static_cast<float>(target_positions[current_target][2])};
-
-        if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
-            std::cerr << "Set object position failed" << std::endl;
-            exit(1);
-        }
-        simSetObjectSpecialProperty(beacon_handle,sim_objectspecialproperty_detectable_infrared);
-        simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
-    }
-
     trajectory.clear();
+
+    grid_zone = Eigen::MatrixXi::Zero(8,8);
+    number_of_collisions = 0;
 
     std::vector<int> th;
     build_tiled_floor(th);
+
+
 }
 
-void MultiTargetMaze::load_target_positions(const std::string& filename){
-    std::ifstream ifs(filename);
-    double pos1,pos2,pos3;
-    do{
-        if(ifs >> pos1 >> pos2 >> pos3)
-            target_positions.push_back({pos1,pos2,pos3});
-    }while(ifs.peek() != EOF);
-    ifs.close();
+std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
+    if(number_of_collisions == 0)
+        return {static_cast<double>(grid_zone.sum())/64.f};
+    return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
 }
 
-std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
-    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
-    std::vector<double> d(1);
-    d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
+std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std::vector<double> &pos){
+    std::pair<int,int> indexes;
 
-    for(double& f : d)
-        if(std::isnan(f) || std::isinf(f) || f < 0)
-            f = 0;
-        else if(f > 1) f = 1;
-
-    //Go to next target
-    current_target+=1;
-    if(current_target >= target_positions.size())
-        current_target=0;
-
-    return d;
+    indexes.first = static_cast<int>(std::floor(pos[0]/0.25)) + 4;
+    indexes.second = static_cast<int>(std::floor(pos[1]/0.25)) + 4;
+    if(indexes.first == 8)
+        indexes.first = 7;
+    if(indexes.second == 8)
+        indexes.second = 7;
+    return indexes;
 }
 
 
-float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &morph){
+float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
     int morphHandle = morph->getMainHandle();
@@ -107,6 +72,22 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     waypoint wp;
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
+
+    int obst_handle;
+    int coll;
+    for(int i = 0; i < 11; i++){
+        std::stringstream sstr;
+        sstr << "Obstacle_" << i;
+        obst_handle = simGetObjectHandle(sstr.str().c_str());
+        int nbr_handles;
+        int* handles = simGetObjectsInTree(morphHandle,sim_handle_all,0,&nbr_handles);
+        coll = simCheckCollision(morphHandle,obst_handle);
+        assert(coll >= 0);
+        for(int j = 0; j < nbr_handles; j++)
+            coll += simCheckCollision(handles[j],obst_handle);
+        if(coll > 0 && number_of_collisions < 64)
+            number_of_collisions+=1;
+    }
 //    std::cout << wp.to_string() << std::endl;
 
     if(wp.is_nan())
@@ -121,6 +102,9 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     final_position[1] = static_cast<double>(wp.position[1]);
     final_position[2] = static_cast<double>(wp.position[2]);
 
+    std::pair<int,int> indexes = real_coordinate_to_matrix_index(final_position);
+    grid_zone(indexes.first,indexes.second) = 1;
+
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
@@ -128,7 +112,7 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     return 0;
 }
 
-void MultiTargetMaze::build_tiled_floor(std::vector<int> &tiles_handles){
+void ObstacleAvoidance::build_tiled_floor(std::vector<int> &tiles_handles){
     bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
 
     float tile_size[3] = {0.249f,0.249f,0.01f};
