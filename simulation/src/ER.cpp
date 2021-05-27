@@ -154,7 +154,6 @@ void ER::endOfSimulation()
                 std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
-
         }
         if(ea->is_finish()){
             if(verbose)

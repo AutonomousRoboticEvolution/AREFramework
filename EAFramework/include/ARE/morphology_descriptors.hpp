@@ -48,7 +48,7 @@ struct CartDesc
     int casterNumber = 0;
     int jointNumber = 0;
 
-    Eigen::VectorXd getCartDesc(){
+    Eigen::VectorXd getCartDesc() const {
         Eigen::VectorXd cartDesc(8);
         cartDesc(0) = robotWidth / morph_const::dimension_limit;
         cartDesc(1) = robotDepth / morph_const::dimension_limit;

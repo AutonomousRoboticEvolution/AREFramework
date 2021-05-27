@@ -49,6 +49,7 @@ void ER::initialize(){
     ea->set_simulator_side(false);
     ea->init();
     ea->set_startEvalTime(hr_clock::now());
+    population_size = ea->get_population().size();
     for(int i = 0; i < ea->get_population().size(); i++)
         indToEval.push_back(i);
 }
@@ -74,17 +75,14 @@ bool ER::execute()
     return updateSimulation();
 }
 
-
-
-
 void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
     currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
-    currentIndexVec[slaveIndex] = indToEval.back();
+    currentIndexVec[slaveIndex] = indToEval.front();
     if(!indToEval.empty())
-        indToEval.pop_back();
+        indToEval.erase(indToEval.begin());
 }
 
 void ER::endOfSimulation(int slaveIndex){
@@ -101,6 +99,12 @@ void ER::endOfSimulation(int slaveIndex){
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
     ea->update(environment);
+    if(population_size < ea->get_population().size()){
+        for(int i = population_size; i < ea->get_population().size(); i++)
+            indToEval.push_back(i);
+        population_size = ea->get_population().size();
+    }
+
     //        if(evalIsFinish)
     //            currentIndIndex++;
 

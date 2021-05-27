@@ -49,7 +49,6 @@ public:
                 sv = normal(rng);
             }
         }
-
         nn.step(inputs);
         std::vector<double> output = nn.outf();
 

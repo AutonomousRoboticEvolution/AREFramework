@@ -5,9 +5,8 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include "nn2/cppn.hpp"
-
 #include "ARE/Genome.h"
-
+#include "ARE/morphology_descriptors.hpp"
 
 namespace are {
 
@@ -37,15 +36,24 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
+        static int static_id = 0;
+        _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
+        type = "nn2_cppn_genome";
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
+        static int static_id = 0;
+        _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
+        type = "nn2_cppn_genome";
     }
-//    NN2CPPNGenome(const NEAT::Genome &neat_gen) : neat_genome(neat_gen){}
+    NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
+        static int static_id = 0;
+        _id = static_id++;
+    }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn){}
+        Genome(gen), cppn(gen.cppn), _id(gen._id), morph_desc(gen.morph_desc){}
     ~NN2CPPNGenome() override {}
 
     Genome::Ptr clone() const override {
@@ -64,7 +72,7 @@ public:
         cppn.mutate();
     }
 
-    const nn2_cppn_t& get_cppn(){return cppn;}
+    const nn2_cppn_t& get_cppn() const {return cppn;}
 
     void from_string(const std::string & str) override
     {
@@ -89,11 +97,21 @@ public:
     {
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
+        arch & morph_desc;
     }
 
+    const CartDesc& get_morph_desc() const {return morph_desc;}
+    void set_morph_desc(const CartDesc& md){morph_desc = md;}
+
+    const int id() const {return _id;}
+    const std::vector<int>& get_parents_ids() const {return parents_ids;}
+    void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
 
 private:
+    std::vector<int> parents_ids;
+    int _id;
     nn2_cppn_t cppn;
+    CartDesc morph_desc;
 };
 
 
