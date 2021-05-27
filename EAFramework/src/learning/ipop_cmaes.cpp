@@ -41,13 +41,13 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
        descriptors.push_back(desc);
    }
 
-   Eigen::VectorXd mean = Eigen::VectorXd::Zero(3);
+   Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
    for(Eigen::VectorXd desc : descriptors){
        mean += desc;
    }
    mean = mean/static_cast<double>(descriptors.size());
 
-   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(3);
+   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(descriptors[0].rows());
    for(Eigen::VectorXd desc : descriptors)
        stddev += (desc - mean).cwiseProduct(desc - mean);
 
