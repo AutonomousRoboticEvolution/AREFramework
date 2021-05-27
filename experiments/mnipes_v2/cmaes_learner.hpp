@@ -78,6 +78,8 @@ public:
 
     std::vector<w_b_pair_t> get_new_population();
 
+    bool is_initialized() const {return initialized;}
+
 protected:
     void next_pop();
     void iterate();
@@ -97,6 +99,8 @@ protected:
     archive_t _archive;
     std::vector<Eigen::VectorXd> _novelty_archive;
     int nbr_dropped_eval = 0;
+
+    bool initialized = false;
 };
 
 }//are

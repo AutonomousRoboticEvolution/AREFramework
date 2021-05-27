@@ -432,7 +432,7 @@ void M_NIPES::clean_learning_pool(){
     std::vector<int> elt_to_remove;
     int i = 0;
     for(const learner_t& l : learning_pool){
-        if(l.ctrl_learner.is_learning_finish())
+        if(l.ctrl_learner.is_initialized() && l.ctrl_learner.is_learning_finish())
             elt_to_remove.push_back(0);
         i++;
     }

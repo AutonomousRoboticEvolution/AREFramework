@@ -37,6 +37,7 @@ void CMAESLearner::init(std::vector<double> initial_point){
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
     next_pop();
+    initialized = true;
 }
 
 void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
