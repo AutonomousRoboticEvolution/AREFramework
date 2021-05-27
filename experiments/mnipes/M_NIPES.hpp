@@ -12,6 +12,7 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include <multineat/Population.h>
 #include "multiTargetMaze.hpp"
+#include "obstacleAvoidance.hpp"
 
 namespace are{
 
@@ -31,6 +32,11 @@ typedef enum FitnessType{
     LEARNING_PROG = 2,
     DIVERSITY = 3
 }FitnessType;
+
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
 
 /**
  * @brief The M_NIPESIndividual class
@@ -111,6 +117,7 @@ public:
         arch & nn_outputs;
         arch & controller_archive;
         arch & morphDesc;
+        arch & visited_zones;
     }
 
     std::string to_string() override;
@@ -126,6 +133,8 @@ public:
 
     bool is_actuated(){return !no_actuation;}
     bool has_sensor(){return !no_sensors;}
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
 
 private:
     void createMorphology() override;
@@ -152,6 +161,9 @@ private:
     int nn_outputs;
 
     ControllerArchive controller_archive;
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 class M_NIPES : public EA
@@ -187,6 +199,8 @@ public:
     void set_controller_archive(const ControllerArchive::controller_archive_t archive){
         controller_archive.archive = archive;
     }
+
+
 
 private:
     typedef struct morph_desc_t{

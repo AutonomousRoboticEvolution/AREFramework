@@ -139,10 +139,16 @@ void M_NIPESIndividual::setManRes()
 
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    Eigen::VectorXd desc(3);
-    desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
-    return desc;
+    if(descriptor_type == FINAL_POSITION){
+        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        Eigen::VectorXd desc(3);
+        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
+        return desc;
+    }else if(descriptor_type == VISITED_ZONES){
+        Eigen::MatrixXd vz = visited_zones.cast<double>();
+        Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
+        return desc;
+    }
 }
 
 std::string M_NIPESIndividual::to_string()
@@ -406,7 +412,7 @@ bool M_NIPES::update_multi_target_maze(const Environment::Ptr &env){
 
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(FINAL_POSITION);
 
         int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
 
@@ -440,7 +446,6 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
-
         if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
             auto obj = ind->getObjectives();
             obj[0] = 0;
@@ -451,6 +456,8 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
 
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
 
         //LEARNING WITH NIP-ES
         std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
