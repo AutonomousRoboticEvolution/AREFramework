@@ -124,6 +124,8 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
+    else if(simulationTime >= evalTime)
+        trajectory.push_back(wp);
 
     return 0;
 }

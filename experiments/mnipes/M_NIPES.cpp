@@ -442,12 +442,12 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     if(simulator_side){
 
         if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
             auto obj = ind->getObjectives();
             obj[0] = 0;
             ind->setObjectives(obj);
             return true;
         }
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
 
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
@@ -471,10 +471,12 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
 }
 
 bool M_NIPES::update(const Environment::Ptr& env){
-    if(env->get_name() == "multi_target_maze")
-        return update_multi_target_maze(env);
-    else if(env->get_name() == "obstacle_avoidance")
-        return update_obstacle_avoidance(env);
+    if(simulator_side){
+        if(env->get_name() == "multi_target_maze")
+            return update_multi_target_maze(env);
+        else if(env->get_name() == "obstacle_avoidance")
+            return update_obstacle_avoidance(env);
+    }
 }
 
 //bool M_NIPES::is_finish(){
