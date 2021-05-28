@@ -53,7 +53,7 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
 
    bool stop = true;
    for(int i = 0; i < stddev.rows(); i++)
-       stop = stop && sqrt(stddev(i/static_cast<double>(descriptors.size() - 1))) <= pop_stag_thres;
+       stop = stop && sqrt(stddev(i)/static_cast<double>(descriptors.size() - 1)) <= pop_stag_thres;
 
    if(stop){
        std::stringstream sstr;
@@ -68,8 +68,6 @@ bool IPOPCMAStrategy::pop_fit_stagnation(){
     std::vector<double> fvalues;
     for(const auto& ind : _pop)
        fvalues.push_back(ind.objectives[0]);
-
-
 
     double mean=0.0;
     for(double fv : fvalues)
