@@ -79,7 +79,7 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
+    currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
     currentIndexVec[slaveIndex] = indToEval.front();
     if(!indToEval.empty())
         indToEval.erase(indToEval.begin());
