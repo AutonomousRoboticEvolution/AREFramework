@@ -41,14 +41,12 @@ void ObstacleAvoidance::init(){
 
     std::vector<int> th;
     build_tiled_floor(th);
-
-
 }
 
 std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
-    if(number_of_collisions == 0)
-        return {static_cast<double>(grid_zone.sum())/64.f};
-    return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
+//    if(number_of_collisions == 0)
+    return {static_cast<double>(grid_zone.sum())/64.f};
+//    return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
 }
 
 std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std::vector<double> &pos){
