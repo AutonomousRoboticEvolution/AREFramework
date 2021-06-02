@@ -320,7 +320,7 @@ void M_NIPES::init_morph_pop(){
             std::stringstream sstr;
             sstr << generation << "_" << i;
             if(verbose)
-                std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
+                std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome_" + sstr.str() << std::endl;
             morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
         }else
             loadNEATGenome(morphIDList[i],morph_gen);
@@ -446,13 +446,14 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+
         if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
             auto obj = ind->getObjectives();
             obj[0] = 0;
             ind->setObjectives(obj);
             return true;
         }
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
 
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
