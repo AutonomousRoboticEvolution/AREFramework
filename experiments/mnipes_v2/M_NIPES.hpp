@@ -185,7 +185,7 @@ private:
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
 
-    std::vector<double> current_ind_past_pos;
+    float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
 };

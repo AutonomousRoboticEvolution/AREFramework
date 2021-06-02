@@ -332,7 +332,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //-
 
                 //remove learner from learning pool and remove oldest gene
-//                remove_learner(morph_id);
                 remove_oldest_gene();
                 increment_age();
                 //-
