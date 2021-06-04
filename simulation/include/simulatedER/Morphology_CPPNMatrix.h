@@ -215,7 +215,11 @@ private:
         CartDesc cartDesc;
     };
 
+    //TODO: define the function
+public:
+    NEAT::Substrate get_substrate() {
 
+    };
 
 private:
     NEAT::NeuralNetwork nn;

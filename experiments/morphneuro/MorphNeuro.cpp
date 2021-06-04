@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "ARE/mazeEnv.h"
+#include "simulatedER/mazeEnv.h"
 #include "v_repLib.h"
 
 using namespace are;
@@ -831,7 +831,7 @@ bool MorphNeuro::update(const Environment::Ptr & env){
     reevaluated++;
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_final_position());
         std::vector<double> test_pos = env->get_final_position();
     }
 

@@ -4,11 +4,12 @@
 #include "ARE/EA.h"
 #include "ARE/CPPNGenome.h"
 #include "CPPNIndividual.h"
-#include "ARE/Morphology_CPPNMatrix.h"
+#include "simulatedER/Morphology_CPPNMatrix.h"
 
 #include "eigen3/Eigen/Core"
 
 #include "ARE/learning/Novelty.hpp"
+#include "multineat/Population.h"
 
 namespace are {
 
@@ -16,7 +17,7 @@ namespace are {
     {
     public:
         MorphNeuro() : EA(){}
-        MorphNeuro(const settings::ParametersMapPtr& param) : EA(param){}
+        MorphNeuro(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
         ~MorphNeuro() override {}
 
         void init() override;
@@ -61,7 +62,7 @@ namespace are {
     {
     public:
         LC_NSMS() : EA(){}
-        LC_NSMS(const settings::ParametersMapPtr& param) : EA(param){}
+        LC_NSMS(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
         ~LC_NSMS() override {}
 
         void init() override;

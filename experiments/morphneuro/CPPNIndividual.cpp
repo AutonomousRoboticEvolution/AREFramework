@@ -1,7 +1,8 @@
 #include "CPPNIndividual.h"
-#include "ARE/mazeEnv.h"
+#include "simulatedER/mazeEnv.h"
 
 using namespace are;
+using namespace are::sim;
 
 CPPNIndividual::CPPNIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
         Individual(morph_gen,ctrl_gen)
@@ -66,11 +67,10 @@ void CPPNIndividual::createMorphology()
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        morphology->createAtPosition(start_position[0],start_position[1],start_position[2]);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
         setManRes();
-        setManScore();
 
     }
     else if(loadSpecificIndividual) {
@@ -88,11 +88,10 @@ void CPPNIndividual::createMorphology()
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        morphology->createAtPosition(start_position[0],start_position[1],start_position[2]);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
         setManRes();
-        setManScore();
     }
     else {
         NEAT::Genome gen =
@@ -101,11 +100,10 @@ void CPPNIndividual::createMorphology()
         NEAT::NeuralNetwork nn;
         gen.BuildPhenotype(nn);
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        morphology->createAtPosition(start_position[0],start_position[1],start_position[2]);  //fixed position
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);  //fixed position
         setGenome();
         setMorphDesc();
         setManRes();
-        setManScore();
     }
 
 }
@@ -126,7 +124,6 @@ void CPPNIndividual::createController()
         std::cout << s.str() << std::endl;
 
         control.reset(new NNControl);
-        control->set_properties(properties);
         control->set_parameters(parameters);
 
         NEAT::NeuralNetwork nn;
@@ -150,7 +147,6 @@ void CPPNIndividual::createController()
         std::cout << s.str() << std::endl;
 
         control.reset(new NNControl);
-        control->set_properties(properties);
         control->set_parameters(parameters);
 
         NEAT::NeuralNetwork nn;
@@ -225,10 +221,11 @@ void CPPNIndividual::from_string(const std::string &str){
     iarch >> *this;
 }
 
+/*
 void CPPNIndividual::setManScore()
 {
     manScore = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getManScore();
-}
+}*/
 
 int CPPNIndividual::findBestIndividual()
 {

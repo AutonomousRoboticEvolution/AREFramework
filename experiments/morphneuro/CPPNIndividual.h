@@ -3,11 +3,11 @@
 
 #include "ARE/Individual.h"
 #include "ARE/CPPNGenome.h"
-#include "ARE/Morphology_CPPNMatrix.h"
+#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "v_repLib.h"
 #include "eigen_boost_serialization.hpp"
 #include "NNControl.h"
-#include "ARE/mazeEnv.h"
+#include "simulatedER/mazeEnv.h"
 
 namespace are {
 
@@ -63,7 +63,7 @@ namespace are {
         void setMorphDesc();
         void setManRes();
         void setProtoPhenotype();
-        void setManScore();
+        //void setManScore();
 
         Eigen::VectorXd descriptor(std::vector<double> final_position);
 //    {

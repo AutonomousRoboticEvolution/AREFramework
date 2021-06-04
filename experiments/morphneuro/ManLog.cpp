@@ -100,14 +100,21 @@ void GenomeLog::saveLog(EA::Ptr &ea)
         for(size_t i = 0; i < ea->get_population().size(); i++){
             //NEAT::NeuralNetwork nn;
             //nn = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->getGenomeMorphology();
+//            std::stringstream filepath;
+//            filepath << Logging::log_folder << "/genome_morph" << generation * ea->get_population().size() + i;
+//            std::cout << generation * ea->get_population().size() + i << std::endl;
+//            FILE *file = fopen(filepath.str().c_str(), "w");
+//            std::dynamic_pointer_cast<CPPNGenome>(std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))
+//                                                          ->get_morph_genome())->saveGenome(file); // save CPPN
+
             std::stringstream filepath;
-            filepath << Logging::log_folder << "/genome_morph" << generation * ea->get_population().size() + i;
-            std::cout << generation * ea->get_population().size() + i << std::endl;
-            FILE *file = fopen(filepath.str().c_str(), "w");
-            std::dynamic_pointer_cast<CPPNGenome>(std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))
-                                                          ->get_morph_genome())->saveGenome(file); // save CPPN
+            filepath << Logging::log_folder << "/morphGenome_" << generation << "_" <<  i;
+            const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_morph_genome();
+            NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
+            genome.Save(filepath.str().c_str());
+
             //nn.Save(file);
-            fclose(file);
+            //fclose(file);
             //nn.Clear();
         }
     }
@@ -122,16 +129,21 @@ void ControlLog::saveLog(EA::Ptr &ea)
     if (pop_size_current == pop_size) {
         for (size_t i = 0; i < ea->get_population().size(); i++) {
             NEAT::NeuralNetwork nn;
-            std::stringstream filepath;
-            filepath << Logging::log_folder << "/genome_control" << generation * ea->get_population().size() + i;
-            FILE *file = fopen(filepath.str().c_str(), "w");
-            std::dynamic_pointer_cast<CPPNGenome>(std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))
-                                                          ->get_ctrl_genome())->saveGenome(file); // save CPPN
+//            std::stringstream filepath;
+//            filepath << Logging::log_folder << "/genome_control" << generation * ea->get_population().size() + i;
+//            FILE *file = fopen(filepath.str().c_str(), "w");
+//            std::dynamic_pointer_cast<CPPNGenome>(std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))
+//                                                          ->get_ctrl_genome())->saveGenome(file); // save CPPN
             //        std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))
             //                                                      ->getGenomeController().Save(file); // save CPPN
             //std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_control()->saveControl(file); // save generated ANN; Note: this line has issue in cluster
-            fclose(file);
+            //fclose(file);
             //        nn.Clear();
+            std::stringstream filepath;
+            filepath << Logging::log_folder << "/morphGenome_" << generation << "_" <<  i;
+            const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_ctrl_genome();
+            NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
+            genome.Save(filepath.str().c_str());
         }
     }
 }

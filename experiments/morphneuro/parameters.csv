@@ -1,15 +1,15 @@
 #experimentName,string,morphNeuro
-#expPluginName,string,/usr/local/lib/libmorphNeuro.so
+#expPluginName,string,/home/wei/Softwares/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04/lib/libmorphNeuro.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
-#organsPath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
-#repository,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
+#vrepFolder,string,/home/wei/Softwares/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04
+#organsPath,string,/home/wei/Projects/ARE/evolutionary_robotics_framework/experiments/sim/
+#repository,string,/home/wei/Softwares/V-REP_PRO_EDU_V3_6_2_Ubuntu16_04
 #populationSize,int,2
 #maxEvalTime,float,10
 #numberOfGeneration,int,4
 
 
-#scenePath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
+#scenePath,string,/home/wei/Projects/ARE/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
 #start_x,double,0
 #start_y,double,-0.5
 #start_z,double,1
@@ -105,3 +105,6 @@
 #isExportModel,bool,0
 #FTarget,double,0.15
 #jointControllerType,int,2
+
+#isScreenshotEnable,bool,0
+#reloadController,bool,1
