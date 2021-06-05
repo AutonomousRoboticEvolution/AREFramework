@@ -217,9 +217,7 @@ private:
 
     //TODO: define the function
 public:
-    NEAT::Substrate get_substrate() {
-
-    };
+    NEAT::Substrate get_substrate() { return substrate;};
 
 private:
     NEAT::NeuralNetwork nn;
@@ -248,6 +246,7 @@ private:
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
     int gripperHandle;
+    NEAT::Substrate substrate;
 };
 
 }//sim
