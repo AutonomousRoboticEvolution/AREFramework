@@ -1,7 +1,7 @@
-#experimentName,string,mnipes
+#experimentName,string,mnipes2
 #expPluginName,string,/usr/local/lib/libM_NIPES2.so
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,-1
@@ -51,13 +51,13 @@
 #jointControllerType,int,2
 ,,
 #populationSize,int,4
-#maxEvalTime,float,60
+#maxEvalTime,float,10
 #timeStep,float,0.1
-#numberOfGeneration,int,10
+#maxNbrEval,int,100
 #fitnessType,int,0
 ,,
-#cmaesNbrEval,int,4
-#cmaesPopSize,int,2
+#cmaesNbrEval,int,10
+#cmaesPopSize,int,4
 #CMAESStep,double,1.
 #FTarget,double,0.05
 #elitistRestart,bool,0

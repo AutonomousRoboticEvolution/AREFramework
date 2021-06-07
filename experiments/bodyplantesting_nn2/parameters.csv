@@ -9,7 +9,7 @@
 #numberOfGeneration,int,25
 #repository,string,/home/leni/are-logs/
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0

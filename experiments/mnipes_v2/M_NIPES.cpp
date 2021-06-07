@@ -432,7 +432,7 @@ void M_NIPES::clean_learning_pool(){
     int i = 0;
     for(const learner_t& l : learning_pool){
         if(l.ctrl_learner.is_initialized() && l.ctrl_learner.is_learning_finish())
-            elt_to_remove.push_back(0);
+            elt_to_remove.push_back(i);
         i++;
     }
 
