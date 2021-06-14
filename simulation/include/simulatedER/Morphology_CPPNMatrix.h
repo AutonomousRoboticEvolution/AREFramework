@@ -117,12 +117,12 @@ public:
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
-    std::vector<bool> getRobotManRes(){return robotManRes.getResVector();};
-    NEAT::NeuralNetwork getGenome(){return nn;};
-    void setGenome(NEAT::NeuralNetwork genome){nn = genome;};
+    std::vector<bool> getRobotManRes(){return robotManRes.getResVector();}
+    NEAT::NeuralNetwork getGenome(){return nn;}
+    void setGenome(NEAT::NeuralNetwork genome){nn = genome;}
 
     /// Getters for descriptors.
-    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.cartDesc;};
+    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();}
     int get_wheelNumber(){return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber(){return indDesc.cartDesc.jointNumber;}
     int get_sensorNumber(){return indDesc.cartDesc.sensorNumber;}
@@ -177,12 +177,6 @@ private:
             cartDesc.robotHeight = abs(maxZ - minZ);
         }
     };
-
-    class Descriptors{
-    public:
-        CartDesc cartDesc;
-    };
-
 
 
     NEAT::NeuralNetwork nn;

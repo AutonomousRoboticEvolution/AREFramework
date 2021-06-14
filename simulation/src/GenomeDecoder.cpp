@@ -146,9 +146,9 @@ void GenomeDecoder::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skeletonMatri
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                if(x <= xHeadUpperLimit && x >= xHeadLowerLimit && y <= yHeadUpperLimit && y >= yHeadLowerLimit){
-                    if(skeletonMatrix.getVoxel(x,y,z) == FILLEDVOXEL){
-                        skeletonMatrix.setVoxel(x, y, z, EMPTYVOXEL);
+                if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit && y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit){
+                    if(skeletonMatrix.getVoxel(x,y,z) == morph_const::filled_voxel){
+                        skeletonMatrix.setVoxel(x, y, z, morph_const::empty_voxel);
                         numSkeletonVoxels--;
                     }
                 }
@@ -229,7 +229,7 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
         }
     }
     for (int dy = -1; dy <= 1; dy+=1) {
-        if (posY + dy > -MATRIX_HALF_SIZE && posY + dy < morph_const::matrix_size/2) {
+        if (posY + dy > -morph_const::matrix_size/2 && posY + dy < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX, posY + dy, posZ);
             if (!visitedVoxels.getVoxel(posX, posY + dy, posZ) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY + dy, posZ, surfaceCounter, skeletonSurfaceCoord);
@@ -241,12 +241,12 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
         }
     }
     for (int dx = -1; dx <= 1; dx+=1) {
-        if (posX + dx > -MATRIX_HALF_SIZE && posX + dx < MATRIX_HALF_SIZE) {
+        if (posX + dx > -morph_const::matrix_size/2 && posX + dx < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX + dx, posY, posZ);
-            if (!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == FILLEDVOXEL) {
+            if (!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX + dx, posY, posZ, surfaceCounter, skeletonSurfaceCoord);
             }
-            else if(!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == EMPTYVOXEL) {
+            else if(!visitedVoxels.getVoxel(posX + dx, posY, posZ) && voxel == morph_const::empty_voxel) {
                 std::vector<int> newCoord{posX, posY, posZ, dx, 0, 0};
                 skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
             }

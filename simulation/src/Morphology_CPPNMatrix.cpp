@@ -434,10 +434,10 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
 {
     // Vector used as input of the Neural Network (NN).
     std::vector<double> input{0,0,0};
-    input[0] = static_cast<int>(std::round(organ.organPos[0]/VOXEL_REAL_SIZE));
-    input[1] = static_cast<int>(std::round(organ.organPos[1]/VOXEL_REAL_SIZE));
-    input[2] = static_cast<int>(std::round(organ.organPos[2]/VOXEL_REAL_SIZE));
-    input[2] -= MATRIX_HALF_SIZE;
+    input[0] = static_cast<int>(std::round(organ.organPos[0]/morph_const::voxel_real_size));
+    input[1] = static_cast<int>(std::round(organ.organPos[1]/morph_const::voxel_real_size));
+    input[2] = static_cast<int>(std::round(organ.organPos[2]/morph_const::voxel_real_size));
+    input[2] -= morph_const::matrix_size/2;
     // Set inputs to NN
     cppn.Input(input);
     // Activate NN
@@ -496,6 +496,7 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
             cppn.Input(input);
             // Activate NN
             cppn.Activate();
+            std::vector<double> output = cppn.Output();
             // Is there an organ?
             organType = -1;
             int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
