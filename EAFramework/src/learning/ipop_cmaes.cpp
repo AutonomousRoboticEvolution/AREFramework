@@ -47,7 +47,7 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
    }
    mean = mean/static_cast<double>(descriptors.size());
 
-   Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
+   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(descriptors[0].rows());
    for(Eigen::VectorXd desc : descriptors)
        stddev += (desc - mean).cwiseProduct(desc - mean);
 
