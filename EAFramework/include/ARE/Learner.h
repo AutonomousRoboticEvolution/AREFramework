@@ -14,6 +14,7 @@ public:
     typedef std::shared_ptr<const Learner> ConstPtr;
 
     Learner(){}
+    Learner(const Learner& l): parameters(l.parameters){}
     virtual ~Learner(){
         parameters.reset();
     }

@@ -25,7 +25,8 @@ public:
         parameters(gen.parameters),
         properties(gen.properties),
         randomNum(gen.randomNum),
-        initialized(gen.initialized)
+        initialized(gen.initialized),
+        type(gen.type)
     {}
     virtual ~Genome();
 
@@ -51,9 +52,13 @@ public:
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+    const std::string& get_type(){return type;}
+
+
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
+        arch && type;
 //        arch & initialized;
     }
 
@@ -65,6 +70,8 @@ protected:
     misc::RandNum::Ptr randomNum;
 
     bool initialized = false;
+    std::string type;
+
 };
 
 /**
@@ -73,18 +80,18 @@ protected:
 class EmptyGenome : public Genome
 {
 public:
+    EmptyGenome() {type = "empty_genome";}
     Genome::Ptr clone() const{return nullptr;}
     void init(){}
     void mutate(){}
     std::string to_string() const override{return "";}
     void from_string(const std::string &) override{}
 
-//    template <class archive>
-//    void serialize(archive &arch, const unsigned int v)
-//    {
-//    }
-
-
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & boost::serialization::base_object<Genome>(*this);
+    }
 };
 
 
