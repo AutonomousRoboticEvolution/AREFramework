@@ -51,7 +51,7 @@ void MazeEnv::init(){
         simSetObjectName(beacon_handle,"IRBeacon_0");
         const float tPos[3] = {static_cast<float>(target_position[0]),
                          static_cast<float>(target_position[1]),
-                         static_cast<float>(0.05f)};
+                         static_cast<float>(target_position[2])};
 
         if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
             std::cerr << "Set object position failed" << std::endl;
