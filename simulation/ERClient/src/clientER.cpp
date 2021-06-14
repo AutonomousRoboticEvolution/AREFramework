@@ -81,7 +81,6 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndexVec[slaveIndex] = indToEval.back();
     if(!indToEval.empty())
         indToEval.pop_back();
-    currentIndVec[slaveIndex]->set_properties(properties);
 }
 
 void ER::endOfSimulation(int slaveIndex){
@@ -108,12 +107,13 @@ bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool all_instances_finish = true;
+    int state = IDLE;
 
     if(ea->get_population().size() > 0){
 
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
         {
-            int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
+            state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
             all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
             //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;
