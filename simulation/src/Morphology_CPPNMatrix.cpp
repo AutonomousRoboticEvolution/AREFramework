@@ -10,6 +10,7 @@
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
 
+using mc = are::morph_const;
 using namespace are::sim;
 
 void Morphology_CPPNMatrix::create()
@@ -23,8 +24,8 @@ void Morphology_CPPNMatrix::create()
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
     numSkeletonVoxels = 0;
     createHead();
-    PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
-    PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE, -MATRIX_HALF_SIZE), PolyVox::Vector3DInt32(MATRIX_HALF_SIZE, MATRIX_HALF_SIZE, MATRIX_HALF_SIZE)));
+    PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
+    PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     // Decoding CPPN
     GenomeDecoder genomeDecoder;
     genomeDecoder.genomeDecoder(nn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
@@ -130,7 +131,8 @@ void Morphology_CPPNMatrix::create()
         if(convexDecompositionSuccess){
             // Create organs
             for(auto & i : organList){
-                setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
+                if(i.getOrganType() != 0)
+                    setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     i.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
@@ -235,16 +237,16 @@ void Morphology_CPPNMatrix::create()
                 std::vector<int> organTypeList(CHILDORGANNUMBER,-1);
                 // Check each side of the child skeleton
                 for(int j = 0; j < CHILDORGANNUMBER; j++){
-                    if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).wheel == FILLEDVOXEL){
+                    if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).wheel == mc::filled_voxel){
                         organTypeList.at(j) = 1;
                         break;
-                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).sensor == FILLEDVOXEL){
+                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).sensor == mc::filled_voxel){
                         organTypeList.at(j) = 2;
                         break;
-                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).joint == FILLEDVOXEL){
+                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).joint == mc::filled_voxel){
                         organTypeList.at(j) = 3;
                         break;
-                    }  else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).caster == FILLEDVOXEL){
+                    }  else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).caster == mc::filled_voxel){
                         organTypeList.at(j) = 4;
                         break;
                     }
@@ -259,8 +261,8 @@ void Morphology_CPPNMatrix::create()
                         std::vector<float> tempOriVector(3);
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
-
-                        setOrganOrientation(nn, organ); // Along z-axis relative to the organ itself
+                        if(organ.getOrganType() !=0)
+                            setOrganOrientation(nn, organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
                         int tempDummy = simCreateDummy(0.01, nullptr);
@@ -292,32 +294,31 @@ void Morphology_CPPNMatrix::create()
         for(auto & i : organList) {
             if(!i.isOrganChecked()) // Stop when the organs not checked or generated start.
                 break;
-            int voxelPosX = static_cast<int>(std::round(i.connectorPos[0]/VOXEL_REAL_SIZE));
-            int voxelPosY = static_cast<int>(std::round(i.connectorPos[1]/VOXEL_REAL_SIZE));
-            int voxelPosZ = static_cast<int>(std::round(i.connectorPos[2]/VOXEL_REAL_SIZE));
+            int voxelPosX = static_cast<int>(std::round(i.connectorPos[0]/mc::voxel_real_size));
+            int voxelPosY = static_cast<int>(std::round(i.connectorPos[1]/mc::voxel_real_size));
+            int voxelPosZ = static_cast<int>(std::round(i.connectorPos[2]/mc::voxel_real_size));
             int matPosX, matPosY, matPosZ;
-            matPosX = voxelPosX + MATRIX_HALF_SIZE;
-            matPosY = voxelPosY + MATRIX_HALF_SIZE;
-            matPosZ = voxelPosZ + MATRIX_HALF_SIZE;
+            matPosX = voxelPosX + mc::matrix_size/2;
+            matPosY = voxelPosY + mc::matrix_size/2;
+            matPosZ = voxelPosZ + mc::matrix_size/2;
 
-            if(matPosX > MATRIX_SIZE)
-                matPosX = MATRIX_SIZE-1;
+            if(matPosX > mc::matrix_size)
+                matPosX = mc::matrix_size-1;
             if(matPosX < 0)
                 matPosX = 0;
-            if(matPosY > MATRIX_SIZE)
-                matPosY = MATRIX_SIZE-1;
+            if(matPosY > mc::matrix_size)
+                matPosY = mc::matrix_size-1;
             if(matPosY < 0)
                 matPosY = 0;
-            if(matPosZ > MATRIX_SIZE)
-                matPosZ = MATRIX_SIZE-1;
+            if(matPosZ > mc::matrix_size)
+                matPosZ = mc::matrix_size-1;
             if(matPosZ < 0)
                 matPosZ = 0;
 
         }
-        indDesc.cartDesc.getRobotDimmensions(organList);
+        indDesc.getRobotDimensions(organList);
         indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
-        indDesc.cartDesc.countOrgans(organList);
-        indDesc.cartDesc.setCartDesc();
+        indDesc.countOrgans(organList);
     }
     destroyGripper();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
@@ -374,9 +375,9 @@ bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uin
             if (prev != nullptr and (*prev) != pos) pointObject = false;
             prev = &pos;
         }
-        vertices.emplace_back(pos.getX() * SHAPE_SCALE_VALUE);
-        vertices.emplace_back(pos.getY() * SHAPE_SCALE_VALUE);
-        vertices.emplace_back(pos.getZ() * SHAPE_SCALE_VALUE);
+        vertices.emplace_back(pos.getX() * mc::shape_scale_value);
+        vertices.emplace_back(pos.getY() * mc::shape_scale_value);
+        vertices.emplace_back(pos.getZ() * mc::shape_scale_value);
     }
 
     // If all vectors are the same, we have an object the size of point. This is considered a failed viability.
@@ -497,30 +498,31 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
             cppn.Activate();
             // Is there an organ?
             organType = -1;
-            if(cppn.Output()[2] > 0.99){ // Wheel
+            int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
+            if(maxIndex == 2){ // Wheel
                 // These if statements should be always true but they are here for debugging.
                 if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
                     organType = 1;
             }
-            else if(cppn.Output()[3] > 0.99) { // Sensor
+            else if(maxIndex == 3) { // Sensor
                 if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
                     organType = 2;
             }
-            else if(cppn.Output()[4] > 0.99) { // Joint
+            else if(maxIndex == 4) { // Joint
                 if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
                     organType = 3;
             }
-            else if(cppn.Output()[5] > 0.99) { // Caster
+            else if(maxIndex == 5) { // Caster
                 if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
                     organType = 4;
             }
             // Create organ if any
             if(organType > 0){
                 std::vector<float> tempPosVector(3);
-                tempPosVector.at(0) = static_cast<float>(input[0] * VOXEL_REAL_SIZE);
-                tempPosVector.at(1) = static_cast<float>(input[1] * VOXEL_REAL_SIZE);
-                tempPosVector.at(2) = static_cast<float>(input[2] * VOXEL_REAL_SIZE);
-                tempPosVector.at(2) += MATRIX_HALF_SIZE * VOXEL_REAL_SIZE;
+                tempPosVector.at(0) = static_cast<float>(input[0] * mc::voxel_real_size);
+                tempPosVector.at(1) = static_cast<float>(input[1] * mc::voxel_real_size);
+                tempPosVector.at(2) = static_cast<float>(input[2] * mc::voxel_real_size);
+                tempPosVector.at(2) += mc::matrix_size/2 * mc::voxel_real_size;
                 std::vector<float> tempOriVector(3);
                 generateOrientations(skeletonSurfaceCoord[m][n].at(3), skeletonSurfaceCoord[m][n].at(4), skeletonSurfaceCoord[m][n].at(5), tempOriVector);
                 Organ organ(organType, tempPosVector, tempOriVector, parameters);
