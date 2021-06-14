@@ -41,19 +41,22 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
        descriptors.push_back(desc);
    }
 
-   Eigen::VectorXd mean = Eigen::VectorXd::Zero(3);
+   Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
    for(Eigen::VectorXd desc : descriptors){
        mean += desc;
    }
    mean = mean/static_cast<double>(descriptors.size());
 
-   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(3);
+   Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
    for(Eigen::VectorXd desc : descriptors)
        stddev += (desc - mean).cwiseProduct(desc - mean);
 
+   for(int i = 0; i < stddev.rows(); i++)
+       stddev(i) = sqrt(stddev(i)/static_cast<double>(descriptors.size() - 1));
+
    bool stop = true;
    for(int i = 0; i < stddev.rows(); i++)
-       stop = stop && sqrt(stddev(i/static_cast<double>(descriptors.size() - 1))) <= pop_stag_thres;
+       stop = stop && stddev(i) <= pop_stag_thres;
 
    if(stop){
        std::stringstream sstr;
