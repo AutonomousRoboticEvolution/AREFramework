@@ -1,0 +1,4 @@
+#experimentName,string,real_dummy
+#expPluginName,string,/usr/local/lib/libreal_dummy.so
+#verbose,bool,1
+#repository,string,/home/leni/are-logs

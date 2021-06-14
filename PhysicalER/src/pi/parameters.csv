@@ -1,0 +1,7 @@
+#NNType,int,2
+#NbrInputNeurones,int,2
+#NbrHiddenNeurones,int,8
+#NbrOutputNeurones,int,3
+
+#UseInternalBias,bool,0
+#noiseLevel,double,0
