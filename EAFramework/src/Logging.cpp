@@ -29,9 +29,12 @@ void are::Logging::create_log_folder(const std::string &exp_name){
 
     log_folder = exp_name + "_" + stream.str();
 
-    if(!boost::filesystem::exists(log_folder))
-        boost::filesystem::create_directory(log_folder);
+    create_folder(log_folder);
+}
 
+void are::Logging::create_folder(const std::string &name){
+    if(!boost::filesystem::exists(name))
+        boost::filesystem::create_directory(name);
 }
 
 

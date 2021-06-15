@@ -11,6 +11,7 @@ class Logging
 public:
 
     static void create_log_folder(const std::string &exp_name);
+    static void create_folder(const std::string &name);
     static std::string log_folder;
 
     typedef std::shared_ptr<Logging> Ptr;

@@ -31,8 +31,7 @@ void ER::initialize(){
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
-    Logging::create_log_folder(repository + std::string("/") + exp_name);
-
+    Logging::create_folder(repository + std::string("/") + exp_name);
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
