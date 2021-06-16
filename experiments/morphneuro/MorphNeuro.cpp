@@ -546,41 +546,18 @@ void MorphNeuro::init_next_pop(){
     }
     population.clear();
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool ismultieval = settings::getParameter<settings::Boolean>(parameters,"#isMulti").value;
     bool ismultieval_random = settings::getParameter<settings::Boolean>(parameters,"#isMultiRandom").value;
     bool ismultieval_mutate = settings::getParameter<settings::Boolean>(parameters,"#isMultiMutate").value;
     int eval_num = settings::getParameter<settings::Integer>(parameters,"#eval_num").value;
     int inner_loop_number = settings::getParameter<settings::Integer>(parameters, "#inner_loop_num").value;
     for (int i = 0; i < pop_size; i++)
     {
-        if(ismultieval_random){
-            //Get the 1-1 pair
-            std::vector<Individual::Ptr> Morph_Contrl_Idv;
-            CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
-            CPPNGenome::Ptr contrgenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
-            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,contrgenome));
-            ind->set_parameters(parameters);
-            population.push_back(ind);
-
-            //Generate random controller
-            rng.Seed(randomNum->getSeed());
-            int population_rand_int = randomNum->randInt(0, 10000);
-            NEAT::Genome contr_genome_rand(0, 7, 10, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, paramsCtrl, 2);
-            contr_population_rand = std::make_unique<NEAT::Population>(contr_genome_rand, paramsCtrl, true, 1.0, population_rand_int);
-
-            //Pair random controller with morphology
-            for (size_t j = 0; j < eval_num - 1; j ++){
-                CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
-                CPPNGenome::Ptr contrlGenome(new CPPNGenome(contr_population_rand->AccessGenomeByIndex(randomNum->randInt(0, params.PopulationSize - 1))));
-                CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,contrlGenome));
-                ind->set_parameters(parameters);
-                ind->set_randNum(randomNum);
-                population.push_back(ind);
-            }
-        }else if (ismultieval_mutate && pop_size_current == pop_size){
+        if (ismultieval && pop_size_current == pop_size){
 
             multi_params = NEAT::Parameters();
             /// Set parameters for NEAT
-            multi_params.EliteFraction = 0.05;
+            multi_params.EliteFraction = 0.2;
             multi_params.PopulationSize = int(eval_num * pop_size);
             multi_params.DynamicCompatibility = true;
             multi_params.CompatTreshold = 2.0;
@@ -630,7 +607,7 @@ void MorphNeuro::init_next_pop(){
 
             multi_paramsCtrl = NEAT::Parameters();
 //    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-            multi_paramsCtrl.EliteFraction = 0.05;
+            multi_paramsCtrl.EliteFraction = 0.2;
             multi_paramsCtrl.PopulationSize = int(eval_num * pop_size);
             multi_paramsCtrl.DynamicCompatibility = true;
             multi_paramsCtrl.CompatTreshold = 2.0;
@@ -701,14 +678,30 @@ void MorphNeuro::init_next_pop(){
             multi_morph_population->AccessGenomeByIndex(i * eval_num) = morph_population->AccessGenomeByIndex(i);
             multi_contr_population->AccessGenomeByIndex(i * eval_num) = contr_population->AccessGenomeByIndex(i);
 
+            //Generate random controller
+            rng.Seed(randomNum->getSeed());
+            int population_rand_int = randomNum->randInt(0, 10000);
+            NEAT::Genome contr_genome_rand(0, 7, 10, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, paramsCtrl, 2);
+            contr_population_rand = std::make_unique<NEAT::Population>(contr_genome_rand, paramsCtrl, true, 1.0, population_rand_int);
+
+
 
             //Pair random controller with morphology
             for (size_t j = 0; j < eval_num - 1; j++) {
-                CPPNGenome(contr_population->AccessGenomeByIndex(i)).mutate();// MAY NOT BE CORRECT
-                CPPNGenome::Ptr mutate_contrgenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
-                CPPNIndividual::Ptr inner_ind(new CPPNIndividual(morphgenome, mutate_contrgenome));
-                inner_ind->set_parameters(parameters);
-                population.push_back(inner_ind);
+                if(ismultieval_mutate){
+                    CPPNGenome(contr_population->AccessGenomeByIndex(i)).mutate();// MAY NOT BE CORRECT
+                    CPPNGenome::Ptr new_contrgenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
+                    CPPNIndividual::Ptr inner_ind(new CPPNIndividual(morphgenome, new_contrgenome));
+                    inner_ind->set_parameters(parameters);
+                    population.push_back(inner_ind);
+                }
+                if(ismultieval_random){
+                    CPPNGenome::Ptr new_contrgenome(new CPPNGenome(contr_population_rand->AccessGenomeByIndex(randomNum->randInt(0, params.PopulationSize - 1)))); //Notice that although this is called mutated_contr but it is randomed for testing purpose
+                    CPPNIndividual::Ptr inner_ind(new CPPNIndividual(morphgenome, new_contrgenome));
+                    inner_ind->set_parameters(parameters);
+                    population.push_back(inner_ind);
+                }
+
                 multi_morph_population->AccessGenomeByIndex(
                         i * eval_num + j + 1) = morph_population->AccessGenomeByIndex(i);
                 //testing
@@ -716,11 +709,11 @@ void MorphNeuro::init_next_pop(){
                         i * eval_num + j + 1) = contr_population->AccessGenomeByIndex(i);
             }
         }
-        else if(ismultieval_mutate && pop_size_current != pop_size) {
+        else if(ismultieval && pop_size_current != pop_size) {
             population.clear();
-            for (int i = 0; i < eval_num * pop_size; i++) {
-                CPPNGenome::Ptr multi_morph_genome(new CPPNGenome(multi_morph_population->AccessGenomeByIndex(i)));
-                CPPNGenome::Ptr multi_contr_genome(new CPPNGenome(multi_contr_population->AccessGenomeByIndex(i)));
+            for (int l = 0; l < eval_num * pop_size; l++) {
+                CPPNGenome::Ptr multi_morph_genome(new CPPNGenome(multi_morph_population->AccessGenomeByIndex(l)));
+                CPPNGenome::Ptr multi_contr_genome(new CPPNGenome(multi_contr_population->AccessGenomeByIndex(l)));
                 CPPNIndividual::Ptr ind(new CPPNIndividual(multi_morph_genome, multi_contr_genome));
                 ind->set_parameters(parameters);
                 population.push_back(ind);
@@ -794,36 +787,6 @@ std::vector<int> MorphNeuro::listInds()
     return robotList;
 }
 
-/*
-bool MorphNeuro::finish_eval()
-{
-    float tPos[3];
-    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
-    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
-    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-
-    auto distance = [](float* a,float* b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
-
-//    std::cout << "currentIndIndex: " << currentIndIndex << std::endl;
-
-    int handle = (morph_population->AccessGenomeByIndex(currentIndIndex).get_morphology())->getMainHandle();
-    float pos[3];
-    simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
-
-    if(dist < fTarget){
-        std::cout << "STOP !" << std::endl;
-    }
-
-    return  dist < fTarget;
-}*/
 
 bool MorphNeuro::update(const Environment::Ptr & env){
     endEvalTime = hr_clock::now();
@@ -834,11 +797,5 @@ bool MorphNeuro::update(const Environment::Ptr & env){
         std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_final_position(std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_final_position());
         std::vector<double> test_pos = env->get_final_position();
     }
-
-//    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
-//    if(reevaluated < nbReEval)
-//        return false;
-
-//    reevaluated = 0;
     return true;
 }
