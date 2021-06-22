@@ -1,0 +1,14 @@
+#experimentName,string,test_are_generate
+#expPluginName,string,/usr/local/lib/libtest_are_generate.so
+#verbose,bool,1
+#repository,string,/home/leni/are-logs
+#seed,int,-1
+
+#populationSize,int,10
+
+#archiveAddingProbability,double,0.4
+#noveltyThreshold,double,0.9
+
+#init_x,float,0
+#init_y,float,0
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiment/sim/
