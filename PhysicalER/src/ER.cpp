@@ -32,6 +32,7 @@ void ER::initialize(){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
     Logging::create_folder(repository + std::string("/") + exp_name);
+    Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built"));
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
@@ -69,9 +70,14 @@ void ER::load_data(bool is_update){
     }else{
         ea->load_data_for_generate();
     }
-    //load list of data files
-    //load population -> genomes
-    //load fitnesses
+}
+
+void ER::write_data(bool is_update){
+    if(is_update){
+        ea->write_data_for_update();
+    }else{
+        ea->write_data_for_generate();
+    }
 }
 
 void ER::generate(){

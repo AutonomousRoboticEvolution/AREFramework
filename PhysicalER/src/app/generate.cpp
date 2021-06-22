@@ -15,6 +15,7 @@ int main(int argc, char** argv){
     er->initialize();
     er->load_data(false);
     er->generate();
+    er->write_data(false);
     er->save_logs();
 
     return 0;

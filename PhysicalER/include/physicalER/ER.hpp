@@ -53,6 +53,7 @@ public:
     bool execute();
 
     void load_data(bool is_update = true);
+    void write_data(bool is_update = true);
     void generate();
 
     void start_evaluation();
