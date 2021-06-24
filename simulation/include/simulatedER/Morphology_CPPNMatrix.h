@@ -33,7 +33,7 @@ public:
             noBadOrientations = true;
             isGripperAccess = true;
         }
-        std::vector<bool> getResVector(){
+        std::vector<bool> getResVector() const{
             std::vector<bool> resVector;
             resVector.push_back(noCollisions);
             resVector.push_back(noBadOrientations);
@@ -117,15 +117,16 @@ public:
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
-    std::vector<bool> getRobotManRes(){return robotManRes.getResVector();}
-    NEAT::NeuralNetwork getGenome(){return nn;}
+    std::vector<bool> getRobotManRes() const {return robotManRes.getResVector();}
+    const NEAT::NeuralNetwork &getGenome() const {return nn;}
     void setGenome(NEAT::NeuralNetwork genome){nn = genome;}
 
     /// Getters for descriptors.
-    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();}
-    int get_wheelNumber(){return indDesc.cartDesc.wheelNumber;}
-    int get_jointNumber(){return indDesc.cartDesc.jointNumber;}
-    int get_sensorNumber(){return indDesc.cartDesc.sensorNumber;}
+    Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
+    const CartDesc& getCastDesc() const {return indDesc.cartDesc;}
+    int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
+    int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
+    int get_sensorNumber() const {return indDesc.cartDesc.sensorNumber;}
 
 private:
     ///////////////////////
@@ -135,7 +136,6 @@ private:
     class Descriptors
     {
     public:
-
         CartDesc cartDesc;
 
         void countOrgans(std::vector<Organ> organList){
