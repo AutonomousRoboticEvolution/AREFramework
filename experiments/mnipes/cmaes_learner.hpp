@@ -1,6 +1,8 @@
 #ifndef CMAES_LEARNER_HPP
 #define CMAES_LEARNER_HPP
 
+#include <cmath>
+
 #include "ARE/Learner.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"

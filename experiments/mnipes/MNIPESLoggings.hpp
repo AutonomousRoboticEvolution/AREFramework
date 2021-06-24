@@ -19,7 +19,7 @@ public:
 class MorphDescCartWHDLog : public Logging
 {
 public:
-    MorphDescCartWHDLog(const std::string &file) : Logging(true){} //Logging at the end of the generation
+    MorphDescCartWHDLog(const std::string &file) : Logging(file,true){} //Logging at the end of the generation
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };

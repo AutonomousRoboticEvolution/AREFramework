@@ -10,45 +10,12 @@
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include <multineat/Population.h>
+#include "ARE/learning/controller_archive.hpp"
+#include "obstacleAvoidance.hpp"
 
 namespace are{
 
 using CPPNMorph = sim::Morphology_CPPNMatrix;
-
-typedef
-/**
- * @brief Archive of controller ordered in a 3D vector with the following dimension : number of wheels, number of joints, number of sensors
- *      The archive store pairs of controller genome and associated fitness.
- */
-struct ControllerArchive{
-    typedef std::vector<std::vector<std::vector<std::pair<NNParamGenome::Ptr,double>>>> controller_archive_t;
-    controller_archive_t archive;
-
-    void init(int max_wheels,int max_joints, int max_sensors);
-
-    /**
-     * @brief update the archive. If the fitness of the candidate controller is greater than the stored one.
-     * @param candidate new genome
-     * @param associate fitness
-     * @param number of wheels
-     * @param number of joints
-     * @param number of sensors
-     */
-    void update(const NNParamGenome::Ptr& genome, double fitness, int wheels, int joints, int sensors);
-
-    /**
-     * @brief reset all fitnesses at 0 while keeping the controllers genomes
-     */
-    void reset_fitnesses();
-
-    template<class archive_t>
-    void serialize(archive_t &arch, const unsigned int v)
-    {
-        arch & archive;
-    }
-
-
-} ControllerArchive;
 
 typedef std::function<double(const CMAESLearner::Ptr&)> fitness_fct_t;
 
@@ -64,7 +31,10 @@ typedef enum FitnessType{
     LEARNING_PROG = 2,
     DIVERSITY = 3
 }FitnessType;
-
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
 /**
  * @brief The M_NIPESIndividual class
  */
@@ -135,6 +105,8 @@ public:
         arch & nn_outputs;
         arch & controller_archive;
         arch & morphDesc;
+        arch & visited_zones;
+
     }
 
     std::string to_string() override;
@@ -144,6 +116,13 @@ public:
     Eigen::VectorXd getMorphDesc(){return  morphDesc;}
 
     void set_ctrl_archive(const ControllerArchive& ctrl_arc){controller_archive = ctrl_arc;}
+
+    bool is_actuated(){return !no_actuation;}
+    bool has_sensor(){return !no_sensors;}
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
+
+
 
 private:
     void createMorphology() override;
@@ -156,6 +135,9 @@ private:
     Eigen::VectorXd morphDesc; // <width,depth,height,voxels,wheels,sensor,joint,caster>
     Eigen::VectorXd symDesc;
 
+    bool no_actuation = false;
+    bool no_sensors = false;
+
     double energy_cost;
     std::vector<waypoint> trajectory;
     double sim_time;
@@ -165,6 +147,9 @@ private:
     int nn_outputs;
 
     ControllerArchive controller_archive;
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 class M_NIPES : public EA
@@ -183,8 +168,9 @@ public:
     void epoch() override;
     bool update(const Environment::Ptr &) override;
 //    bool is_finish() override;
-    bool finish_eval() override;
-
+    bool finish_eval(const Environment::Ptr &) override;
+    bool update_maze(const Environment::Ptr& env);
+    bool update_obstacle_avoidance(const Environment::Ptr& env);
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
 
@@ -223,6 +209,8 @@ private:
     float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
+    bool learning_finished = false;
+
 };
 
 }

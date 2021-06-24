@@ -2,42 +2,6 @@
 
 using namespace are;
 
-void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
-{
-    archive.resize(max_wheels+1);
-    for(auto& a_w : archive){
-        a_w.resize(max_joints+1);
-        for(auto& a_j: a_w){
-            a_j.resize(max_sensors+1);
-        }
-    }
-
-    for(auto& w : archive){
-        for(auto& j : w){
-            for(auto& s : j){
-                s.first.reset(new NNParamGenome());
-                s.second = 0;
-            }
-        }
-    }
-}
-
-void ControllerArchive::reset_fitnesses(){
-    for(auto& w : archive){
-        for(auto& j : w){
-            for(auto& s : j){
-                s.second = 0;
-            }
-        }
-    }
-}
-
-void ControllerArchive::update(const NNParamGenome::Ptr &genome, double fitness, int wheels, int joints, int sensors){
-    if(archive[wheels][joints][sensors].second < fitness)
-        archive[wheels][joints][sensors] = std::make_pair(genome,fitness);
-}
-
-
 fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner::Ptr& learner) -> double
 {
     return 1 - learner->get_best_solution().first;
@@ -79,6 +43,11 @@ void M_NIPESIndividual::createMorphology(){
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+
+    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber() == 0
+            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber() == 0;
+    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber() == 0;
+
 
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
     float pos[3];
@@ -169,16 +138,22 @@ void M_NIPESIndividual::setManRes()
 
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    Eigen::VectorXd desc(3);
-    desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
-    return desc;
+    if(descriptor_type == FINAL_POSITION){
+        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        Eigen::VectorXd desc(3);
+        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
+        return desc;
+    }else if(descriptor_type == VISITED_ZONES){
+        Eigen::MatrixXd vz = visited_zones.cast<double>();
+        Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
+        return desc;
+    }
 }
 
 std::string M_NIPESIndividual::to_string()
 {
     std::stringstream sstream;
-    boost::archive::text_oarchive oarch(sstream); 
+    boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<M_NIPESIndividual>();
     oarch.register_type<NNParamGenome>();
     oarch.register_type<CPPNGenome>();
@@ -244,11 +219,11 @@ void M_NIPES::init(){
             }
         }
         init_morph_pop();
-//        std::stringstream sstr;
-//        sstr << "morph_" << morphIDList[morphCounter];
-//        sub_folder = sstr.str();
-//        if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
-//            boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
+        //        std::stringstream sstr;
+        //        sstr << "morph_" << morphIDList[morphCounter];
+        //        sub_folder = sstr.str();
+        //        if(!boost::filesystem::exists(Logging::log_folder + std::string("/") + sub_folder))
+        //            boost::filesystem::create_directory(Logging::log_folder + std::string("/") + sub_folder);
     }
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         NEAT::Genome mgen(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, neat_params, 10);
@@ -346,11 +321,11 @@ void M_NIPES::init_morph_pop(){
             if(verbose)
                 std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
             morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
-            morph_population->AccessGenomeByIndex(i) = morph_gen;
         }else{
             loadNEATGenome(morphIDList[i],morph_gen);
-            morph_population->AccessGenomeByIndex(i) = morph_gen;
         }
+        morph_population->AccessGenomeByIndex(i) = morph_gen;
+
     }
     for(unsigned i = 0; i < pop_size ; i++){
         NEAT::Genome mgen = morph_population->AccessGenomeByIndex(i);
@@ -381,6 +356,8 @@ void M_NIPES::epoch(){
         for(const auto& ind: population){
             //Pick up the best controller found by the learner
             auto &best_controller = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->get_best_solution();
+            if(best_controller.second.empty())
+                continue;
             nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
             weights.clear();
             biases.clear();
@@ -418,7 +395,7 @@ void M_NIPES::init_next_pop(){
     }
 }
 
-bool M_NIPES::update(const Environment::Ptr& env){
+bool M_NIPES::update_maze(const Environment::Ptr &env){
     endEvalTime = hr_clock::now();
     numberEvaluation++;
 
@@ -428,8 +405,8 @@ bool M_NIPES::update(const Environment::Ptr& env){
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
         std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
-                        ind->getObjectives(),
-                        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
+                    ind->getObjectives(),
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
                     );
 
         //LEARNING WITH NIP-ES
@@ -442,6 +419,52 @@ bool M_NIPES::update(const Environment::Ptr& env){
             return true;
         }
     }else return true;
+}
+
+bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
+    endEvalTime = hr_clock::now();
+    numberEvaluation++;
+
+    Individual::Ptr ind = population[currentIndIndex];
+
+    if(simulator_side){
+        if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
+            auto obj = ind->getObjectives();
+            obj[0] = 0;
+            ind->setObjectives(obj);
+            return true;
+        }
+
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+
+        //LEARNING WITH NIP-ES
+        std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
+                    ind->getObjectives(),
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
+                    );
+        learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
+
+        if(learning_finished){
+            auto obj = ind->getObjectives();
+            obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
+            ind->setObjectives(obj);
+            learning_finished = false;
+            return true;
+        }else return false;
+    }
+    return true;
+}
+
+bool M_NIPES::update(const Environment::Ptr& env){
+    if(simulator_side){
+        if(env->get_name() == "mazeEnv")
+            return update_maze(env);
+        else if(env->get_name() == "obstacle_avoidance")
+            return update_obstacle_avoidance(env);
+    }
 }
 
 //bool M_NIPES::is_finish(){
@@ -590,25 +613,10 @@ int M_NIPES::findLastGen(const std::string &exp_folder){
     return std::stoi(gen_str);
 }
 
-bool M_NIPES::finish_eval(){
-    float tPos[3];
-    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
-    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
-    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-
-    auto distance = [](float* a,float* b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
-
+bool M_NIPES::finish_eval(const Environment::Ptr &env){
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
 
     if(simGetSimulationTime() < 0.1){
         current_ind_past_pos[0] = pos[0];
@@ -624,16 +632,37 @@ bool M_NIPES::finish_eval(){
         current_ind_past_pos[0] = pos[0];
         current_ind_past_pos[1] = pos[1];
         current_ind_past_pos[2] = pos[2];
-
     }
 
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
     if(drop_eval) nbr_dropped_eval++;
-    bool stop = dist < fTarget || drop_eval;
 
-    if(stop){
-        std::cout << "STOP !" << std::endl;
+    if(env->get_name() == "mazeEnv")
+    {
+        float tPos[3];
+        tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
+        tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
+        tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+        double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+        double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+
+        auto distance = [](float* a,float* b) -> double
+        {
+            return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                    (a[1] - b[1])*(a[1] - b[1]) +
+                    (a[2] - b[2])*(a[2] - b[2]));
+        };
+
+        double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+
+        bool stop = dist < fTarget || drop_eval;
+
+        if(stop){
+            std::cout << "STOP !" << std::endl;
+        }
+
+        return  stop;
+    }else if(env->get_name() == "obstacle_avoidance"){
+        return drop_eval;
     }
-
-    return  stop;
 }

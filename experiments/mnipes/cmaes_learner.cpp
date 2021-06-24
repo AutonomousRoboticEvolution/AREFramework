@@ -41,7 +41,7 @@ void CMAESLearner::init(std::vector<double> initial_point){
 void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
     IPOPCMAStrategy::individual_t ind;
     for(unsigned i = 0; i < _population[_counter-1].rows(); i++)
-        ind.genome.push_back(_population[_counter-1](i));
+        ind.genome.push_back(std::tanh(_population[_counter-1](i)));
     ind.objectives = obj;
     ind.descriptor.resize(desc.rows());
     for(int i = 0; i < desc.rows(); i++)
@@ -140,10 +140,14 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
     std::vector<double> weights;
     std::vector<double> bias;
     int i = 0;
-    for(; i < _nbr_weights; i++)
-        weights.push_back(_population[_counter](i));
-    for(; i < _dimension; i++)
-        bias.push_back(_population[_counter](i));
+    for(; i < _nbr_weights; i++){
+        double w = std::tanh(_population[_counter](i)); // filtering to put values between -1 and 1
+        weights.push_back(w);
+    }
+    for(; i < _dimension; i++){
+        double b = std::tanh(_population[_counter](i)); // filtering to put values between -1 and 1
+        bias.push_back(b);
+    }
 
     if(nn_type == settings::nnType::FFNN){
         control.reset(new NN2Control<ffnn_t>());
