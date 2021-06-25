@@ -108,7 +108,7 @@ void GenomeLog::saveLog(EA::Ptr &ea)
 //                                                          ->get_morph_genome())->saveGenome(file); // save CPPN
 
             std::stringstream filepath;
-            filepath << Logging::log_folder << "/morphGenome_" << generation << "_" <<  i;
+            filepath << Logging::log_folder << "/genome_morph_" << generation << "_" <<  i;
             const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_morph_genome();
             NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
             genome.Save(filepath.str().c_str());
@@ -140,7 +140,7 @@ void ControlLog::saveLog(EA::Ptr &ea)
             //fclose(file);
             //        nn.Clear();
             std::stringstream filepath;
-            filepath << Logging::log_folder << "/morphGenome_" << generation << "_" <<  i;
+            filepath << Logging::log_folder << "/genome_control_" << generation << "_" <<  i;
             const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_ctrl_genome();
             NEAT::Genome genome = std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
             genome.Save(filepath.str().c_str());
