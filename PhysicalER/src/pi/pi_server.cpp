@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_communication.hpp"
 #include "physicalER/pi/are_control.hpp"
 #include "ARE/Settings.h"
 #include "ARE/misc/RandNum.h"
@@ -22,26 +23,30 @@ int main(int argc, char** argv) {
     reply.bind ("tcp://*:5556");
     /**/
 
-    //*/ Load Parameter file. Change to be retrieve through communication
-    settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
-                settings::loadParameters(argv[1]));
-    /**/
+    settings::ParametersMapPtr parameters;
     
     misc::RandNum::Ptr randomNumber(new misc::RandNum(0));
-
-    zmq::message_t message("");
 
     EmptyGenome::Ptr empy_gen(new EmptyGenome);
     NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
 
+    std::string str_ctrl, str_param; 
+
     while(1){
-        zmq::message_t reply_msg;
-        strcpy(static_cast<char*>(reply_msg.data()),"starting");
-        reply.recv(&message);
-        reply.send(reply_msg);
-        
+        //receive parameters
+        phy::receive_string(str_param,"parameters_received",reply);
+        str_param.erase(0,str_ctrl.find(' ')+1);
+        parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
+
+
+        //receive parameters
+        phy::receive_string(str_param,"organ_addresses_received",reply);
+        str_param.erase(0,str_ctrl.find(' ')+1);
+        // load the addresses
+
+        phy::receive_string(str_ctrl,"starting",reply);
         // this generates the neural network controller ind
-        std::string str_ctrl(static_cast<char*>(message.data()));
+
         str_ctrl.erase(0,str_ctrl.find(' ')+1);
         std::cout << str_ctrl << std::endl;
         ctrl_gen->from_string(str_ctrl);
@@ -54,8 +59,6 @@ int main(int argc, char** argv) {
         pi::AREControl AREController(ind);
         AREController.exec(argc,argv,publisher);
         std::cout<<"finished running the controller"<<std::endl;
-        
-
     }
 
 

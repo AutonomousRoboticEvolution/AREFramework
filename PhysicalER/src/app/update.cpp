@@ -2,6 +2,7 @@
 
 namespace are_set = are::settings;
 
+
 int main(int argc, char** argv){
 
     if(argc != 2){

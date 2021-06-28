@@ -32,7 +32,7 @@ void ER::initialize(){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
     Logging::create_folder(repository + std::string("/") + exp_name);
-    Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built"));
+    Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built/"));
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
@@ -66,6 +66,7 @@ void ER::initialize(){
 
 void ER::load_data(bool is_update){
     if(is_update){
+        //load the bus addresses
         ea->load_data_for_update();
     }else{
         ea->load_data_for_generate();
@@ -126,9 +127,19 @@ void ER::start_evaluation(){
 
 //    if(!send_order(are::phy::OrderType::LAUNCH,request))
 //        exit(1);
-    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
+
     std::string reply;
-    send_ctrl_genome(reply,ctrl_gen,request);
+    std::string param = settings::toString(*parameters.get());
+    send_string(reply,param,request);
+    assert(reply == "parameters_received");
+
+    //get the addresses
+    send_string(reply,param,request);
+    assert(reply == "organ_addresses_received");
+
+    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
+    send_string(reply,ctrl_gen,request);
+    assert(reply == "starting");
 
     ea->setCurrentIndIndex(currentIndIndex);
 }

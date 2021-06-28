@@ -108,3 +108,34 @@ void settings::saveParameters(const std::string& file,const ParametersMapPtr &pa
 
     ofs.close();
 }
+
+std::string settings::toString(const ParametersMap &params){
+    std::stringstream sstr;
+    for(const auto &elt : params)
+        sstr << toString(elt.first,elt.second);
+    return sstr.str();
+}
+
+settings::ParametersMap settings::fromString(const std::string &str_params){
+    settings::ParametersMap parameters;
+
+    std::istringstream istr(str_params.c_str());
+
+
+    std::string line;
+    std::list<std::string> values;
+    std::vector<std::string> param;
+    while(std::getline(istr,line)){
+        param.clear();
+        values.clear();
+        misc::split_line(line,",",values);
+
+        for(auto v : values)
+            param.push_back(v);
+
+        Type::Ptr val = buildType(param[1]);
+        val->fromString(param[2]);
+        parameters.emplace(param[0],val);
+    }
+    return parameters;
+}

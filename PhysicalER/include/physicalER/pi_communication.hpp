@@ -16,7 +16,22 @@ typedef enum OrderType{
     ABORT = 1//not in use
 } OrderType;
 
-void send_ctrl_genome(std::string& str_rpl, const std::string& genome, zmq::socket_t& request);
+/**
+ * @brief send a string message and receive the reply
+ * @param reply
+ * @param message
+ * @param communication socket of request type (ZMQ_REQ)
+ */
+void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t& request);
+
+/**
+ * @brief receive a string message and send a reply
+ * @param message
+ * @param reply
+ * @param communication socket of reply type (ZMQ_REP)
+ */
+void receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply);
+
 
 bool send_order(OrderType order, zmq::socket_t& publisher);
 void wait_for_message(std::string& str_mess, zmq::socket_t& subscriber);
