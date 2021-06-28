@@ -12,7 +12,7 @@ struct NSGAInfo
     std::vector<std::shared_ptr<individual_t>> dominated; //List of dominated individual by this
     int domination_counter; //number of individuals who dominates this
     float crowd_dist;
-    int rank;
+    int rank_;
 };
 
 template <class individual_t>
@@ -133,10 +133,10 @@ public:
         if(compute_crowd_distance)
             crowding_distance(i);
         std::sort(front[i].begin(),front[i].end(),[&](const indPtr &ind1,const indPtr &ind2) -> bool{
-            if(ind1->get_nsga_info().rank < ind2->get_nsga_info().rank)
+            if(ind1->get_nsga_info().rank_ < ind2->get_nsga_info().rank_)
                 return true;
             else if(compute_crowd_distance &&
-                    ind1->get_nsga_info().rank == ind2->get_nsga_info().rank &&
+                    ind1->get_nsga_info().rank_ == ind2->get_nsga_info().rank_ &&
                     ind1->get_nsga_info().crowd_dist > ind2->get_nsga_info().crowd_dist)
                 return true;
             return false;
@@ -246,7 +246,7 @@ private:
 
 
             if(ind1->get_nsga_info().domination_counter == 0){
-                ind1->access_nsga_info().rank = 1;
+                ind1->access_nsga_info().rank_ = 1;
                 front[0].push_back(ind1);
             }
         }
@@ -264,7 +264,7 @@ private:
                     indPtr ind2 = std::dynamic_pointer_cast<individual_t>(ind2_);
                     ind2->access_nsga_info().domination_counter--;
                     if(ind2->get_nsga_info().domination_counter == 0){
-                        ind2->access_nsga_info().rank = fi + 1;
+                        ind2->access_nsga_info().rank_ = fi + 1;
                         subfront.push_back(ind2);
                     }
                 }

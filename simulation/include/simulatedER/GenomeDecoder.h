@@ -8,6 +8,7 @@
 #include "PolyVox/RawVolume.h"
 #include <multineat/Substrate.h>
 #include <vector>
+#include "ARE/morphology_descriptors.hpp"
 
 namespace are {
 
@@ -23,21 +24,6 @@ struct AREVoxel{
 
 class GenomeDecoder{
 private:
-    /// \todo EB: This shouldn't be here!
-    static const short int EMPTYVOXEL = 0;
-    static const short int FILLEDVOXEL = 255;
-    // Skeleton dimmesions in voxels
-    static const short int xHeadUpperLimit = 2;
-    static const short int xHeadLowerLimit = -2;
-    static const short int yHeadUpperLimit = 2;
-    static const short int yHeadLowerLimit = -2;
-    // Parameters for skeleton base
-    static const short int skeletonBaseThickness = 1;
-    static const short int skeletonBaseHeight = 2;
-    static const int VOXEL_MULTIPLIER = 22;
-    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
-    static const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
-
     std::vector<std::vector<std::vector<int>>> skeletonRegionCoord;
 
 public:

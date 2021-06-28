@@ -11,7 +11,7 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include <multineat/Population.h>
 #include "ARE/learning/controller_archive.hpp"
-#include "obstacleAvoidance.hpp"
+#include "multiTargetMaze.hpp"
 
 namespace are{
 
@@ -31,10 +31,9 @@ typedef enum FitnessType{
     LEARNING_PROG = 2,
     DIVERSITY = 3
 }FitnessType;
-typedef enum DescriptorType{
-    FINAL_POSITION = 0,
-    VISITED_ZONES = 1
-}DescriptorType;
+
+
+
 /**
  * @brief The M_NIPESIndividual class
  */
@@ -68,6 +67,15 @@ public:
     }
 
     void update(double delta_time) override;
+
+    void add_reward(double reward){rewards.push_back(reward);}
+    void compute_fitness(){
+        double fitness = 0;
+        for(const auto &r : rewards)
+            fitness += r;
+        fitness /= static_cast<double>(rewards.size());
+        objectives[0] = fitness;
+    }
 
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
@@ -105,8 +113,6 @@ public:
         arch & nn_outputs;
         arch & controller_archive;
         arch & morphDesc;
-        arch & visited_zones;
-
     }
 
     std::string to_string() override;
@@ -117,12 +123,11 @@ public:
 
     void set_ctrl_archive(const ControllerArchive& ctrl_arc){controller_archive = ctrl_arc;}
 
+    int get_number_times_evaluated(){return rewards.size();}
+    void reset_rewards(){rewards.clear();}
+
     bool is_actuated(){return !no_actuation;}
     bool has_sensor(){return !no_sensors;}
-    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
-    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
-
-
 
 private:
     void createMorphology() override;
@@ -142,14 +147,12 @@ private:
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
+    std::vector<double> rewards;
 
     int nn_inputs;
     int nn_outputs;
 
     ControllerArchive controller_archive;
-
-    Eigen::MatrixXi visited_zones;
-    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 class M_NIPES : public EA
@@ -168,9 +171,9 @@ public:
     void epoch() override;
     bool update(const Environment::Ptr &) override;
 //    bool is_finish() override;
-    bool finish_eval(const Environment::Ptr &) override;
-    bool update_maze(const Environment::Ptr& env);
-    bool update_obstacle_avoidance(const Environment::Ptr& env);
+    bool finish_eval(const Environment::Ptr &env) override;
+    void setObjectives(size_t indIndex, const std::vector<double> &objectives) override;
+
     //GETTERS
     const std::string& subFolder(){return sub_folder;}
 
@@ -209,6 +212,7 @@ private:
     float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
+
     bool learning_finished = false;
 
 };

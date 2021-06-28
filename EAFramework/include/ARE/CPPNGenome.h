@@ -4,12 +4,17 @@
 #include <boost/serialization/export.hpp>
 #include "ARE/Genome.h"
 #include <multineat/Genome.h>
+#include "ARE/morphology_descriptors.hpp"
+
 
 namespace are {
 
 class CPPNGenome : public Genome
 {
 public:
+    typedef std::shared_ptr<CPPNGenome> Ptr;
+    typedef std::shared_ptr<const CPPNGenome> ConstPtr;
+
     CPPNGenome() : Genome(){}
     CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){}
@@ -49,10 +54,15 @@ public:
     {
         arch & boost::serialization::base_object<Genome>(*this);
         arch & neat_genome;
+        arch & morpho_desc;
     }
 
+
+    void set_morpho_desc(const CartDesc& md){morpho_desc = md;}
+    const CartDesc &get_morpho_desc(){return morpho_desc;}
 private:
     NEAT::Genome neat_genome;
+    CartDesc morpho_desc;
 };
 
 
