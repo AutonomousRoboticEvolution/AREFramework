@@ -3,9 +3,10 @@
 from subprocess import Popen # for reading out messages
 import math, serial
 import numpy as np
+import time
 
 DEBUG_PRINT = True
-DEBUG_PRINT_VERBOSITY_LEVEL = 999 #higher value will mean more stuff gets spewed to command line.
+DEBUG_PRINT_VERBOSITY_LEVEL = 1 #higher value will mean more stuff gets spewed to command line.
 READ_OUT_VERBOSITY_LEVEL = -1 #higher value will mean more stuff gets read out by the computerised voice
 
 ## Prints its input string.
@@ -16,21 +17,31 @@ READ_OUT_VERBOSITY_LEVEL = -1 #higher value will mean more stuff gets read out b
 def debugPrint ( msg , messageVerbosity = 0):
 
     if DEBUG_PRINT_VERBOSITY_LEVEL >= messageVerbosity:
-        for i in range(messageVerbosity): # indents the more low-level messages to improve readability
-            msg="\t"+msg
+        # for i in range(messageVerbosity): # indents the more low-level messages to improve readability
+        msg=messageVerbosity*"\t"+msg.replace("\n","\n"+messageVerbosity*"\t")
         print ( msg )
     if READ_OUT_VERBOSITY_LEVEL >= messageVerbosity:
         cmd = 'espeak "'+msg+'"'
         Popen ( cmd, shell=True )
 
 
+# helper function to make a coordinate transform from more human-friendly input.
+# inputs should be linear transform in mm and rotations (Euler angles, in zyx order) in degrees
+def makeTransformMillimetersDegrees(x=0.0, y=0.0, z=0.0, rotX=0.0, rotY=0.0, rotZ=0.0):
+    return makeTransformInputFormatted([x/1000,y/1000,z/1000,math.radians(rotX),math.radians(rotY),math.radians(rotZ)])
+
 ## helper function to make a coordinate transform from more human-friendly input.
-#
+# inputs should be linear transform in meter and rotations (Euler angles, in zyx order) in radians - these are the default units
+def makeTransform(x=0.0, y=0.0, z=0.0, rotX=0.0, rotY=0.0, rotZ=0.0):
+    return makeTransformInputFormatted([x,y,z,rotX,rotY,rotZ])
+
+
+## helper function to make a coordinate transform from more human-friendly input.
 #  Input should be a list of numbers which can be [x,y,z] to make a linear transform with no rotation
 #   OR
 #  [x,y,z,rx,ry,rz] where the rotations are angles IN RADIANS around Euler angles, applied in ZYX order.
 #  This is different from convertPoseToTransform, which expects the rotation to be a rotation vector.
-def makeTransform ( inputValues=None ):
+def makeTransformInputFormatted (inputValues=None):
     if inputValues is None:
         inputValues = [ 0.0, 0.0, 0.0 ]
     if len ( inputValues ) == 3:
@@ -57,9 +68,7 @@ def makeTransform ( inputValues=None ):
         #adds in transform
         transformOut = np.column_stack ( (rotationMatrix, np.transpose (
             np.matrix ( inputValues [ 0:3 ] ) )) )  # add the linear part of the transform to make the right column
-        #finally scaling row
-        transformOut = np.row_stack (
-            (transformOut, np.matrix ( [ 0, 0, 0, 1 ] )) )  # append 0,0,0,1 to make the bottom row
+        transformOut = np.row_stack ((transformOut, np.matrix ( [ 0, 0, 0, 1 ] )) )  # append 0,0,0,1 to make the bottom row
     else:
         raise ValueError ( "inputValues is wrong length. Should either be [x,y,z] or [x,y,z,rx,ry,rz]." )
     return transformOut
@@ -75,7 +84,7 @@ def convertPoseToTransform ( inputPose ):
     rotationVector = np.array ( inputPose [ 3:6 ] )
     theta = np.linalg.norm ( rotationVector )  # magnitude of rotation
     if theta == 0:  # no rotation
-        return makeTransform ( inputPose [ 0:3 ] )
+        return makeTransformInputFormatted (inputPose [0:3])
     else:
         unitRotationVector = rotationVector / theta
         # matching notation from https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula:
@@ -183,7 +192,8 @@ def connect2USB ( expectedMessage ):
 ## computes the angle between the given axis of the two Transformation matrices A and B, returned in radians
 ## Axis should be "x", "y" or "z"
 ## if axis="x", will return the angle BETWEEN the x axis in A nad the x axis in B, NOT the rotation about that axis
-def findAngleBetweenTransforms(A , B=makeTransform() , axis="x"):
+def findAngleBetweenTransforms(A, B=makeTransformInputFormatted(), axis="x"):
+
     # returns the unit vector in the direction of the input
     # the vectors in a Transformation matrix should already be unit vectors, but it's good to make sure
     def make_unit_vector(v):
@@ -198,3 +208,76 @@ def findAngleBetweenTransforms(A , B=makeTransform() , axis="x"):
 
     dotProduct = np.dot(vectorA.transpose(), vectorB)
     return float( np.arccos( np.clip ( dotProduct , -1.0,1.0 )) )
+
+
+# finds the x,y and z translation from B to A. Also returns the direction of this translation in the xy plane, as a rotation value about z, ie -atan(delta_x/delta_y).
+# all four outputs are returned in a dictionary containing delta_x, delta_y, delta_z, direction_about_z
+def findDisplacementBetweenTransforms(transformA, transformB=None):
+
+    if transformB is None:
+        transformB=makeTransformInputFormatted()
+
+    outputDictionary={}
+    outputDictionary["delta_x"] = transformA[0,3] - transformB[0,3]
+    outputDictionary["delta_y"] = transformA[1,3] - transformB[1,3]
+    outputDictionary["delta_z"] = transformA[2,3] - transformB[2,3]
+
+    outputDictionary["direction_about_z"] = -math.atan2(outputDictionary["delta_x"],outputDictionary["delta_y"])
+
+    return outputDictionary
+
+# change a specified linear coordinate in a transfrom
+# inputTransform: the original transform
+# axis: "x", "y" or "z", which coordinate to change
+# newValue: the value to replace it with
+def changeCoordinateValue(inputTransform, axis, newValue):
+    outputTransform = np.copy(inputTransform)
+    if axis=="x":
+        outputTransform[0,3] = newValue
+    elif axis=="y":
+        outputTransform[1,3] = newValue
+    elif axis=="z":
+        outputTransform[2,3] = newValue
+    else:
+        raise Exception("Axis not specified correctly")
+    return outputTransform
+
+# will keep applying transformToIterateBy to inputTransform, until the z value is less than (or equal to) ceilingValue, and return the resulting transform
+def applyCeiling(inputTransform, ceilingValue, transformToIterateBy=makeTransformMillimetersDegrees(z=1)):
+    outputTransform=inputTransform
+
+    i=0
+    while outputTransform[2, 3] > ceilingValue:
+        i+=1
+        if i==10000: # not reaching ceiling, try other direction
+            transformToIterateBy = transformToIterateBy*-1
+            outputTransform = inputTransform
+            import warnings
+            warnings.warn("applyCeiling failed to reach the ceiling value, will now try applying transformToIterateBy in other direction")
+        if i>=20000:
+            raise RuntimeError("failed to apply a ceiling, check the iterator moves in the right direction")
+
+        outputTransform = outputTransform*transformToIterateBy
+        # print (outputTransform[2, 3])
+
+    return outputTransform
+
+
+class Timer:
+    def __init__(self):
+        self.timestamps=[]
+        self.timestamp_names=[]
+
+    def start(self):
+        self.timestamps.append(time.time())
+        self.timestamp_names.append("Start")
+    def finish(self):
+        self.timestamps.append(time.time())
+        self.timestamp_names.append("Finish")
+        for i in range(len(self.timestamps)):
+            if i>0:
+                print("{} to {}:\t: {}".format(self.timestamp_names[i-1],self.timestamp_names[i],self.timestamps[i]-self.timestamps[i-1]))
+
+    def add(self,name):
+        self.timestamp_names.append(name)
+        self.timestamps.append(time.time())

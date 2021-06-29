@@ -26,6 +26,9 @@ Servo PWMservo;
 #define SERVO_POSITION_PIN A0
 #define SERVO_PWM_PIN 4
 
+//TESTCODE
+#define I2CENABLE 15
+
 // we need a buffer for an 8-bit register, and another 8-bit byte for the actual value of received data:
 uint8_t input_buffer[2];
 uint8_t send_buffer;
@@ -49,7 +52,10 @@ void setup(){
   Wire.onRequest(sendData);
   Serial.println("I2C Ready!");
 
-
+  //TESTCODE Open the I2C channel to the outside world (active-low)
+  pinMode(I2CENABLE, OUTPUT);
+  digitalWrite(I2CENABLE, LOW);
+  Serial.println("I2C to outside world enabled");
 }
 
 void loop(){

@@ -1,8 +1,10 @@
 // Firmware for the wheel organ, with encoder. Authour: Matt
-// This code is written for an Arduino Nano
-#define SERIAL_DEBUG_PRINTING
+// This pin assignments are the same as for the arduino Uno
+//#define SERIAL_DEBUG_PRINTING
 //#define OPEN_LOOP_VALUES_FINDER
-#define STEP_INPUT_TEST
+//#define STEP_INPUT_TEST
+
+#define SLAVE_ADDRESS 0x61 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 #include <Wire.h>
 
@@ -10,9 +12,7 @@
 #define DRV_CONTROL_REG_ADDR 0x00
 #define DRV_FAULT_REG_ADDR 0x01 // not (yet?) implemented
 
-#define SLAVE_ADDRESS 0x20
-
-//IN1 and IN2 states
+// states defined by the 0th and 1st bits of a command signal
 #define STANDBY 0x0
 #define REVERSE 0x1
 #define FORWARD 0x2
@@ -22,13 +22,13 @@
 // [7:2] motorSpeed bits
 // [1:0] motorState bits
 
-// pin definitions (Arduino Nano pins):
+// pin definitions (Arduino Uno pins):
 #define PIN_ENCODER_A 0 // THIS IS PIN 2 - see table at bottom of this page: https://www.arduino.cc/reference/en/language/functions/external-interrupts/attachinterrupt/
 #define PIN_ENCODER_B 1 // THIS IS PIN 3
-#define PIN_DRIVER_AIN1 8
-#define PIN_DRIVER_AIN2 7
-#define PIN_DRIVER_APWM 6
-#define PIN_DRIVER_ENABLE 9
+#define PIN_MOTOR_PWM_PIN 5
+#define PIN_MOTOR_DIR_PIN 6
+#define PIN_I2CENABLE 15
+#define PIN_INDICATOR_LED 9
 
 // define controller settings:
 #define LOOP_TIME_US 10000 // will set the controller update frequency; 10,000us -> 100Hz
@@ -53,11 +53,15 @@ volatile unsigned long time_of_last_but_one_tick=0;
 volatile int last_tick_direction = 0;
 float measured_velocity_ticks_per_timestep;
 
+#ifdef STEP_INPUT_TEST
 // data logging for step input test
-#define N_POINTS_TO_LOG 100
+#define N_POINTS_TO_LOG 50
 int8_t data_log[N_POINTS_TO_LOG-1];
+int8_t data_log_inputs[N_POINTS_TO_LOG-1];
 bool logging_running=false;
 unsigned int i=0;
+#endif
+
 
 // interrupt service routines - these are called when the encoder ticks:
 void A_rises(){
@@ -84,6 +88,8 @@ void B_falls(){
     else {encoder_ticks_this_timestep --;}
     attachInterrupt(PIN_ENCODER_B, B_rises, RISING); // start waiting for the other ISR - only one can be active on any particular pin at a time
 }
+
+
 // helper functions for incrementing/decrementing the encoder tracking:
 void increment_positive(){
     last_tick_direction=1;
@@ -97,6 +103,8 @@ void increment_negative(){
     time_of_last_but_one_tick = time_of_last_tick;
     time_of_last_tick=micros();
 }
+
+
 
 // from the raw 8-bit input value, extract the motor state and demand velocity values
 void interpret_control_register_value(){
@@ -125,27 +133,28 @@ void interpret_control_register_value(){
     Serial.print("New demand velocity:");
     Serial.println(demand_velocity);
     Serial.print("OL controller value:");
-    Serial.println(controller( demand_velocity, demand_velocity ));
+    Serial.println(FF_controller( demand_velocity ));
 #endif
 }
 
+
 // triggered on every i2c conversation:
 void receiveData(int received_data_byte_count){
-
   // the first byte received is the register value, and determines what we should do
-  input_buffer[0] = Wire.read(); // register
+    input_buffer[0] = Wire.read(); // register
+  #ifdef SERIAL_DEBUG_PRINTING
+    Serial.print("Received: 0x");
+    Serial.print(input_buffer[0],HEX);
+  #endif
   if (received_data_byte_count>1){
     input_buffer[1] = Wire.read(); // value
+    #ifdef SERIAL_DEBUG_PRINTING
+      Serial.print(", 0x");
+      Serial.println(input_buffer[1],HEX);
+    #endif
   }else{
     input_buffer[1] = 0;
   }
-//  debugging:
-#ifdef SERIAL_DEBUG_PRINTING//
-  Serial.print("Received: 0x");
-  Serial.print(input_buffer[0],HEX);
-  Serial.print(", 0x");
-  Serial.println(input_buffer[1],HEX);
-#endif
 
   switch (input_buffer[0]) {
     case DRV_CONTROL_REG_ADDR: // set control register
@@ -154,65 +163,41 @@ void receiveData(int received_data_byte_count){
       break;
   
     default:
-//      Serial.print("Attempt to access unkown register: 0x");
-//      Serial.println(input_buffer[0], HEX);
+      #ifdef SERIAL_DEBUG_PRINTING
+        Serial.print("Attempt to access unknown register: 0x");
+        Serial.println(input_buffer[0], HEX);
+      #endif
       break;
   }
-}     
+}
+ 
 
 int get_measured_velocity_from_encoder(){
     int temp_value = encoder_ticks_this_timestep;
     encoder_ticks_this_timestep=encoder_ticks_this_timestep-temp_value;
     return temp_value;
-//    float temp_value = (1.0/30) * 1000000.0/ (time_of_last_tick-time_of_last_but_one_tick) * last_tick_direction;
-//    last_tick_direction=0;
-//    return temp_value;
-
-
 }
 
-void disable_motor(){
-  if (is_enabled){
-    is_enabled=false;
-    digitalWrite(PIN_DRIVER_ENABLE, LOW);
-  }
-}
 
-void enable_motor(){
-    if (!is_enabled){
-        is_enabled=true;
-        digitalWrite(PIN_DRIVER_ENABLE, HIGH);
-    }
-}
-
-void brake_motor(){
-    enable_motor();
-    digitalWrite(PIN_DRIVER_AIN1,HIGH);
-    digitalWrite(PIN_DRIVER_AIN2,HIGH);
-    digitalWrite(PIN_DRIVER_APWM,0);
-}
-
-// will return the raw motor power value, in the range -255 to +255
-# define OPEN_LOOP_CONSTANT 2.5
-# define OPEN_LOOP_MULTIPLE 7.248
-#define K_P 5.0
-#define K_I 0.0
+// controller parameters
+#define K_P 10.0
+#define K_I 0.5
+#define MAX_INTEGRAL_VALUE 150 // for anti-windup, the integral term will never have magnitude greater than this
 int sign(int number){
     if (number==0){return 0;}
     else if (number<0){return -1;}
     else{ return 1;}
 }
+
+// will return the raw motor power value, in the range -255 to +255
 int controller( int demand_velocity, int measured_velocity ){
     // open-loop controller
-    float controller_value;
-    if (demand_velocity==0){
-        controller_value=0;
-    }else{
-        controller_value = sign(demand_velocity)*OPEN_LOOP_CONSTANT + demand_velocity*OPEN_LOOP_MULTIPLE;
-    }
+    float controller_value;    
+    controller_value = FF_controller(demand_velocity);
 
     // compute new integral_value
     integral_value += K_I* (demand_velocity-measured_velocity);
+    integral_value = constrain(integral_value,-MAX_INTEGRAL_VALUE,MAX_INTEGRAL_VALUE);
 
     // add on proportional and integral components:
     controller_value += K_P*(demand_velocity-measured_velocity) + integral_value;
@@ -221,33 +206,46 @@ int controller( int demand_velocity, int measured_velocity ){
     else {return int(controller_value);}
 }
 
+// will return the raw motor power value, in the range -255 to +255, using only the a lookup table to make a feedforward controller
+float FF_controller(int demand_velocity){
+int table[][2] = {{0, 0}, {40,8}, {80,23}, {120,29}, {240,35}};
+int x0, x1, y0, y1;
+for (int i = 0; i < 5; i++){ // loop through each of the "brackets" of the table
+  if ( abs(demand_velocity) <= table[i + 1][1]){ // we are in the right bracket
+    y0 = table[i][1];  //lower bound
+      y1 = table[i + 1][1]; //upper bound
+      x0 = table[i][0];
+      x1 = table[i + 1][0];
+      return sign(demand_velocity) * float(table[i][0] + ((table[i + 1][0] - table[i][0] ) * (float(abs(demand_velocity) - table[i][1]) / float(table[i + 1][1] - table[i][1])))); // linear interpolation
+      //                                  (x0          + ((x1              - x0          ) * (     (y                    - y0         ) /      (y1              - y0         ))));
+    }
+  }
+  // if we get here, demand must be greater than highest table value, so return max power
+  return sign(demand_velocity) * 240;
+}
+
 void set_motor_power_value(int value){
     if (value<0){
         // negative
-        digitalWrite(PIN_DRIVER_AIN1,LOW);
-        digitalWrite(PIN_DRIVER_AIN2,HIGH);
-        analogWrite(PIN_DRIVER_APWM,-value);
+        digitalWrite(PIN_MOTOR_DIR_PIN,LOW);
+        analogWrite(PIN_MOTOR_PWM_PIN,-value);
     }
     else if (value>0){
         // positive
-        digitalWrite(PIN_DRIVER_AIN1,HIGH);
-        digitalWrite(PIN_DRIVER_AIN2,LOW);
-        analogWrite(PIN_DRIVER_APWM,value);
+        digitalWrite(PIN_MOTOR_DIR_PIN,HIGH);
+        analogWrite(PIN_MOTOR_PWM_PIN,value);
     } else { //zero
-        digitalWrite(PIN_DRIVER_APWM,0);
+        digitalWrite(PIN_MOTOR_PWM_PIN,0);
     }
 }
 
+
 void setup(){
     // set the pin modes
-    pinMode(PIN_DRIVER_AIN1, OUTPUT);
-    pinMode(PIN_DRIVER_AIN2, OUTPUT);
-    pinMode(PIN_DRIVER_APWM, OUTPUT);
-    pinMode(PIN_DRIVER_ENABLE, OUTPUT);
-    pinMode(encoder_A_is_high, INPUT);
-    pinMode(encoder_B_is_high, INPUT);
-
-    digitalWrite(PIN_DRIVER_ENABLE, LOW); // start not enabled
+    pinMode(PIN_MOTOR_DIR_PIN, OUTPUT);
+    pinMode(PIN_MOTOR_PWM_PIN, OUTPUT);
+    pinMode(PIN_INDICATOR_LED, OUTPUT);
+    pinMode(PIN_I2CENABLE, OUTPUT);
 
     //encoder start
     attachInterrupt(PIN_ENCODER_A, A_rises, RISING);
@@ -261,20 +259,19 @@ void setup(){
     loop_target_end_time = micros();
 
     #ifdef OPEN_LOOP_VALUES_FINDER
-        // should not normally be run. This applied a series of fixed values, and sees what the restuling steady state velocity is
+        // should not normally be run. This applied a series of fixed values, and sees what the resulting steady state velocity is
         Serial.begin(115200);
         Serial.println("Open loop test...");
         Serial.println("power,velocity");
-        enable_motor();
-        for(int power=-240;power<255;power+=16) {
-            brake_motor();
+        for(int power=-240;power<=240;power+=5) {
+            set_motor_power_value(0);
             delay(500);
             set_motor_power_value(power);
             delay(2500); // time to settle to steady state
             Serial.print(power);
             get_measured_velocity_from_encoder();
             loop_target_end_time=micros()+LOOP_TIME_US;
-            for (int i = 0; i < 40; i++){
+            for (int i = 0; i < 10; i++){
 
                 // wait until it is time for next loop
                 unsigned long time_now = micros();
@@ -284,14 +281,14 @@ void setup(){
                 loop_target_end_time = loop_target_end_time+ LOOP_TIME_US;
 
                 Serial.print(",");
-//                Serial.print(micros());
                 Serial.print(get_measured_velocity_from_encoder());
             }
             Serial.println();
         }
-        brake_motor();
+        set_motor_power_value(0);
         while(true){delay(1000);} // hang
     #endif
+
     #ifdef SERIAL_DEBUG_PRINTING//
         Serial.begin(115200); // for debugging only
         Serial.println("I am a wheel organ...");
@@ -303,37 +300,18 @@ void loop(){
     unsigned long time_now = micros();
     loop_target_end_time += LOOP_TIME_US;
     if (loop_target_end_time > time_now) {
-        if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383
+        if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383 so use delay() instead if longer than this
         { delay( (loop_target_end_time - time_now )/1000 );}
         else{delayMicroseconds(loop_target_end_time - time_now); }
-    }else{ // couldn't keep up
+    }
+    else
+    { // couldn't keep up
         #ifdef SERIAL_DEBUG_PRINTING
             Serial.println("can't keep up");
         #endif
         loop_target_end_time = time_now+ LOOP_TIME_US;
     }
     measured_velocity_ticks_per_timestep = get_measured_velocity_from_encoder(); // this should happen as soon as possible after the delay
-//    #ifdef SERIAL_DEBUG_PRINTING
-//        Serial.println(measured_velocity_ticks_per_timestep);
-//    #endif
-
-    #ifdef STEP_INPUT_TEST   // Data logging:
-        if (logging_running){
-            data_log[i] = measured_velocity_ticks_per_timestep; // save value
-            i++;
-            if (i>=N_POINTS_TO_LOG){
-                logging_running = false;
-                Serial.println("================");
-                Serial.print("Demand value was: ");
-                Serial.println(demand_velocity);
-                Serial.println("================");
-                for (i = 0; i < N_POINTS_TO_LOG; i++) {
-                    Serial.println(data_log[i]);
-                }
-                i=0;
-            }
-        }
-    #endif
 
   // check for new demand value:
   if(new_control_register_value_received_flag){
@@ -344,19 +322,33 @@ void loop(){
     interpret_control_register_value();
   }
 
+  int raw_motor_power_value;
   // depending on motor_state, decide what to do:
-  if (motor_state == STANDBY){
-      disable_motor();
-  }
-  else if (motor_state == BRAKE){
-      brake_motor();
-  }
-  else { // must be FORWARD or REVERSE
-        enable_motor();
-        int raw_motor_power_value = controller(demand_velocity, measured_velocity_ticks_per_timestep);
+  if (motor_state == STANDBY){set_motor_power_value(0);}
+  else { // must be FORWARD, REVERSE, or BRAKE (brake is treated as a target velocity of zero, so controller still applied)
+        raw_motor_power_value = controller(demand_velocity, measured_velocity_ticks_per_timestep);
         set_motor_power_value(raw_motor_power_value);
-//        #ifdef SERIAL_DEBUG_PRINTING//
-//          Serial.println(raw_motor_power_value);
-//        #endif
     }
+
+  #ifdef STEP_INPUT_TEST   // Data logging:
+        if (logging_running){
+            data_log[i] = measured_velocity_ticks_per_timestep; // save value
+            data_log_inputs[i] = raw_motor_power_value;
+            i++;
+            if (i>=N_POINTS_TO_LOG){
+                logging_running = false;
+                for (i = 0; i < N_POINTS_TO_LOG; i++) {
+                    Serial.print(data_log_inputs[i]);
+                    Serial.print(",");
+                }
+                Serial.println();
+                for (i = 0; i < N_POINTS_TO_LOG; i++) {
+                    Serial.print(data_log[i]);
+                    Serial.print(",");
+                }
+                Serial.println();
+                i=0;
+            }
+        }
+    #endif
 }

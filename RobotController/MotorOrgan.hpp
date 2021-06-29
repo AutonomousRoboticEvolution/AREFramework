@@ -130,6 +130,8 @@ class MotorOrgan  : protected I2CDevice {
 		*/
 		void clearFaultReg();
 
+		void test();
+
 	private :
 		/**
 			@brief Update the CONTROL register with the current state and speed.

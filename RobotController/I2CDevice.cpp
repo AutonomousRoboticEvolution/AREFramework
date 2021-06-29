@@ -6,7 +6,7 @@ I2CDevice::I2CDevice(uint8_t address) {
 
 	//Set Linux filehandle for device
 	if ((this->devHandle = wiringPiI2CSetup(address)) == -1) {
-		printf("[I2CDevice %02X] Init failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] Init failed: %s\n", devAddress, strerror(errno));
 	}
 }
 
@@ -14,7 +14,7 @@ I2CDevice::I2CDevice(uint8_t address) {
 void I2CDevice::write8(uint8_t data) {
 	//Attempt to write to the device, report if error
 	if(wiringPiI2CWrite(devHandle, data) < 0) {
-		printf("[I2CDevice %02X] 8-bit write failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 8-bit write failed: %s\n", devAddress, strerror(errno));
 	}
 }
 
@@ -22,7 +22,7 @@ void I2CDevice::write8(uint8_t data) {
 void I2CDevice::write8To(uint8_t subAddress, uint8_t data) {
 	//Attempt to write to the device, report if error
 	if(wiringPiI2CWriteReg8(devHandle, subAddress, data) < 0) {
-		printf("[I2CDevice %02X] 8-bit write to %02X failed: %s\n", devAddress, subAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 8-bit write to %02X failed: %s\n", devAddress, subAddress, strerror(errno));
 	}
 }
 
@@ -30,7 +30,7 @@ void I2CDevice::write8To(uint8_t subAddress, uint8_t data) {
 void I2CDevice::write16To(uint8_t subAddress, uint16_t data) {
 	//Attempt to write to the device, report if error
 	if(wiringPiI2CWriteReg16(devHandle, subAddress, data) < 0) {
-		printf("[I2CDevice %02X] 16-bit write failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 16-bit write failed: %s\n", devAddress, strerror(errno));
 	}
 }
 
@@ -40,7 +40,7 @@ void I2CDevice::writeLittleEndian16To(uint8_t subAddress, uint16_t data) {
 	uint16_t littleEndian = (data && 0x00FF) << 8 | (data & 0xFF00) >> 8;
 	//Attempt to write to the device, report if error
 	if(wiringPiI2CWriteReg16(devHandle, subAddress, littleEndian) < 0) {
-		printf("[I2CDevice %02X] 16-bit write failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 16-bit write failed: %s\n", devAddress, strerror(errno));
 	}
 }
 
@@ -49,7 +49,7 @@ int I2CDevice::read8() {
 	//Attempt to read from the device, report if error
 	int rxData = wiringPiI2CRead(devHandle);
 	if(rxData < 0) {
-		printf("[I2CDevice %02X] 8-bit read failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 8-bit read failed: %s\n", devAddress, strerror(errno));
 	}
 	return rxData;
 }
@@ -59,7 +59,7 @@ int I2CDevice::read8From(uint8_t subAddress) {
 	//Attempt to read from the device, report if error
 	int rxData = wiringPiI2CReadReg8(devHandle, subAddress);
 	if(rxData < 0) {
-		printf("[I2CDevice %02X] 8-bit read failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 8-bit read failed: %s\n", devAddress, strerror(errno));
 	}
 	return rxData;
 }
@@ -69,7 +69,7 @@ int I2CDevice::read16From(uint8_t subAddress) {
 	//Attempt to read from the device, report if error
 	int rxData = wiringPiI2CReadReg16(devHandle, subAddress);
 	if(rxData < 0) {
-		printf("[I2CDevice %02X] 16-bit read failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 16-bit read failed: %s\n", devAddress, strerror(errno));
 	}
 	return rxData;
 }
@@ -79,7 +79,7 @@ int I2CDevice::readLittleEndian16From(uint8_t subAddress) {
 	//Attempt to read from the device, report if error
 	int rxData = wiringPiI2CReadReg16(devHandle, subAddress);
 	if(rxData < 0) {
-		printf("[I2CDevice %02X] 16-bit read failed: %s\n", devAddress, strerror(errno));
+		printf("[I2CDevice 0x%02X] 16-bit read failed: %s\n", devAddress, strerror(errno));
 	}
 	//Swap bytes. Low byte << 8 OR'd with high byte >> 8
 	int byteSwappedRxData = (rxData && 0x00FF) << 8 | (rxData & 0xFF00) >> 8;

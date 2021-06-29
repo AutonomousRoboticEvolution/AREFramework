@@ -50,4 +50,4 @@ class RobotConnection:
             self.ssh_client.close()
             print("Connection port to robot closed")
         else:
-            print("Robot not connected")
+            print("Tried to close the connection, but the robot was not connected")

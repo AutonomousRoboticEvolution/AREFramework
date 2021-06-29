@@ -9,26 +9,29 @@ DaughterBoards::DaughterBoards() {
 }
 
 void DaughterBoards::test() {
-    std::cout << "turn on daughter boards" << std::endl;
+    
     turnOn();
-    usleep(200000); // 2 seconds
-    std::cout << "turn off daughter boards" << std::endl;
+    sleep(2); // 2 seconds
     turnOff();
+    sleep(2); // 2 seconds
+    turnOn();
 }
 
 void DaughterBoards::init(){
     wiringPiSetupGpio();
     pinMode (DAUGHTER_BOARD1_GPIO_PIN, OUTPUT);
     pinMode (DAUGHTER_BOARD2_GPIO_PIN, OUTPUT);
-    turnOff();
+    turnOn(); // on by default
 };
 
 void DaughterBoards::turnOn(){
     digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, HIGH);
     digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, HIGH);
+	std::cout << "turn on daughter boards" << std::endl;
 };
 
 void DaughterBoards::turnOff(){
     digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, LOW);
     digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, LOW);
+	std::cout << "turn off daughter boards" << std::endl;
 };
