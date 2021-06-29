@@ -1,11 +1,11 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#folderToLoad,string,/home/leni/are-logs/visualisation/
-#genToLoad,int,40
+#folderToLoad,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/
+#genToLoad,int,1
 #indToLoad,int,-1
 #maxEvalTime,float,10
-#numberOfGeneration,int,1
+#numberOfGeneration,int,100
 #populationSize,int,20
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
@@ -49,4 +49,5 @@
 #isSegmentedRobot,bool,1
 ,,
 #reloadController,bool,1
-#isScreenshotEnable,bool,0
+#isScreenshotEnable,bool,1
+#imageRepository,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/images/
