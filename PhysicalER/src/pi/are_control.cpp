@@ -18,17 +18,18 @@ AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans
     while(std::getline(organsListSS,line)){
         std::cout<<"line: "<<line<<std::endl;
         std::istringstream thisOrganSS(line);
-        string tempString;
+        std::string tempString;
         std::getline(thisOrganSS, tempString,','); // first value before the comma is the type of organ: 0=Head, 1=wheel, 2=Sensor
-        if (tempString == '1'){ // this is a wheel
+        if (tempString == "1"){ // this is a wheel
             numberOfOutputs++;
             std::getline(thisOrganSS, tempString,','); // the second value in the line is the i2c address of the organ
             listOfWheels.push_back( new MotorOrgan( tempString ) ); // add a new wheel to the list, with the i2c address just extracted from the line
         }
-        else if (tempString == '2'){ // this is a sensor
+        else if (tempString == "2"){ // this is a sensor
             numberOfInputs++;
             std::getline(thisOrganSS, tempString,','); // the second value in the line is the i2c address of the organ
-            listOfSensors.push_back( new SensorOrgan( tempString ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            uint8_t tempAddress = std::stoi(tempString);
+            listOfSensors.push_back( new SensorOrgan( tempAddress ) ); // add a new sensor to the list, with the i2c address just extracted from the line
         }
 
         std::cout<<"debugging...\n number of outputs/wheels was :"<<numberOfOutputs<<"\nnumber of inputs/sensors was: "<<numberOfOutputs<<std::endl;
@@ -60,10 +61,10 @@ void AREControl::sendMotorCommands(std::vector<double> values){
     //std::cout << "wheel1 setSpeed to: " << values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
     //std::cout << "wheel2 setSpeed to: " << values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
     //std::cout << "wheel3 setSpeed to: " << values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    wheel0->setSpeed(values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    wheel1->setSpeed(values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    wheel2->setSpeed(values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    wheel3->setSpeed(values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    //wheel0->setSpeed(values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    //wheel1->setSpeed(values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    //wheel2->setSpeed(values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    //wheel3->setSpeed(values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
