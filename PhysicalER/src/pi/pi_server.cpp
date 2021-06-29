@@ -30,24 +30,23 @@ int main(int argc, char** argv) {
     EmptyGenome::Ptr empy_gen(new EmptyGenome);
     NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
 
-    std::string str_ctrl, str_param; 
+    std::string str_ctrl, str_organs_list, str_param;
 
     while(1){
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply);
-        str_param.erase(0,str_ctrl.find(' ')+1);
+        //str_param.erase(0,str_param.find(' ')+1);
         parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
 
+        //receive organ addresses list
+        phy::receive_string(str_organs_list,"organ_addresses_received",reply);
+        std::cout<<"Oragns list: "<<str_organs_list<<std::endl;
+        //str_organs_list.erase(0,str_organs_list.find(' ')+1);
 
-        //receive parameters
-        phy::receive_string(str_param,"organ_addresses_received",reply);
-        str_param.erase(0,str_ctrl.find(' ')+1);
-        // load the addresses
-
-        phy::receive_string(str_ctrl,"starting",reply);
         // this generates the neural network controller ind
+        phy::receive_string(str_ctrl,"starting",reply);
+        //str_ctrl.erase(0,str_ctrl.find(' ')+1);
 
-        str_ctrl.erase(0,str_ctrl.find(' ')+1);
         std::cout << str_ctrl << std::endl;
         ctrl_gen->from_string(str_ctrl);
         pi::NN2Individual ind(empy_gen,ctrl_gen);
@@ -56,7 +55,7 @@ int main(int argc, char** argv) {
         ind.init();
 
         std::cout<<"running a controller"<<std::endl;        
-        pi::AREControl AREController(ind);
+        pi::AREControl AREController(ind, str_organs_list);
         AREController.exec(argc,argv,publisher);
         std::cout<<"finished running the controller"<<std::endl;
     }
