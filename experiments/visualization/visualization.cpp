@@ -99,7 +99,7 @@ void Visu::init(){
 
 
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
-    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
+    generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
     int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
     bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
 
