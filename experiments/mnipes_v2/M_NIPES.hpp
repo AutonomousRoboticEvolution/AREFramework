@@ -145,8 +145,6 @@ private:
 class M_NIPES: public EA
 {
 public:
-
-
     typedef std::unique_ptr<M_NIPES> Ptr;
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 

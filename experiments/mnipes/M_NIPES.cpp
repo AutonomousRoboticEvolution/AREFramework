@@ -401,15 +401,6 @@ bool M_NIPES::update_maze(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
-
-        if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-            auto obj = ind->getObjectives();
-            obj[0] = 0;
-            ind->setObjectives(obj);
-            return true;
-        }
-
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
         std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
@@ -417,27 +408,14 @@ bool M_NIPES::update_maze(const Environment::Ptr &env){
                     std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
                     );
 
-        int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
-
         //LEARNING WITH NIP-ES
-        if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets)
+        if(!std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step())
             return false;
         else{
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-            std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
-                            ind->getObjectives(),
-                            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
-                        );
-            learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
-
-            if(learning_finished){
-                auto obj = ind->getObjectives();
-                obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
-                ind->setObjectives(obj);
-                learning_finished = false;
-                return true;
-            }else return false;
+            auto obj = ind->getObjectives();
+            obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
+            ind->setObjectives(obj);
+            return true;
         }
     }else return true;
 }
@@ -449,7 +427,6 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
 
         if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
             auto obj = ind->getObjectives();
@@ -481,42 +458,6 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     return true;
 }
 
-bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
-    endEvalTime = hr_clock::now();
-    numberEvaluation++;
-
-    Individual::Ptr ind = population[currentIndIndex];
-
-    if(simulator_side){
-        if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
-            auto obj = ind->getObjectives();
-            obj[0] = 0;
-            ind->setObjectives(obj);
-            return true;
-        }
-
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-
-        //LEARNING WITH NIP-ES
-        std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->update_pop_info(
-                    ind->getObjectives(),
-                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->descriptor()
-                    );
-        learning_finished = std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner())->step();
-
-        if(learning_finished){
-            auto obj = ind->getObjectives();
-            obj[0] = fitness_fct(std::dynamic_pointer_cast<CMAESLearner>(ind->get_learner()));
-            ind->setObjectives(obj);
-            learning_finished = false;
-            return true;
-        }else return false;
-    }
-    return true;
-}
 
 bool M_NIPES::update(const Environment::Ptr& env){
     if(simulator_side){
@@ -533,11 +474,7 @@ bool M_NIPES::update(const Environment::Ptr& env){
 //    return (numberEvaluation >= maxNbrEval || _is_finish || );
 //}
 
-void M_NIPES::setObjectives(size_t indIndex, const std::vector<double> &objectives){
-    currentIndIndex = indIndex;
-    std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
-    population[indIndex]->setObjectives(objectives);
-}
+
 
 void M_NIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
