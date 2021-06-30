@@ -6,13 +6,13 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
+
 #include "ARE/Environment.h"
 #include "simulatedER/Morphology.h"
 
 namespace are{
 
 namespace sim {
-
 
 class VirtualEnvironment : public Environment
 {

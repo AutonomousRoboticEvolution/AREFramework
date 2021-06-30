@@ -55,7 +55,6 @@ public:
     void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     const std::string& get_type(){return type;}
 
-
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {

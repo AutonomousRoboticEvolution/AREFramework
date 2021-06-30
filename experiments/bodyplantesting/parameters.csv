@@ -1,14 +1,13 @@
 #experimentName,string,bodyplantesting
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting.so
+#expPluginName,string,/usr/local/lib/libbodyplantesting.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/ebb505/ARE_Project/vrep/
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt
-#organsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
 #numberEvaluations,int,10
 #populationSize,int,25
 #maxEvalTime,float,1
 #numberOfGeneration,int,25
-#repository,string,/home/ebb505/ARE_Project/are-logs/
+#repository,string,/home/leni/are-logs/
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -41,7 +40,7 @@
 #isCaster,bool,1
 
 #isBootstrapEvolution,bool,0
-#loadExperiment,string,/home/ebb505/ARE_Project/are-logs/
+#loadExperiment,string,/home/leni/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
 #isScreenshotEnable,bool,1

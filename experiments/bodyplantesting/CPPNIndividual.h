@@ -42,9 +42,9 @@ public :
     void from_string(const std::string &str);
 
     // Setters and getters
-    NEAT::NeuralNetwork getGenome(){return nn;};
+    NEAT::NeuralNetwork getGenome(){return nn;}
 
-    std::vector<bool> getManRes(){return testRes;};
+    std::vector<bool> getManRes(){return testRes;}
     void setGenome();
 
     void setManRes();
@@ -56,7 +56,7 @@ public :
     void set_nn_inputs(int nni){nn_inputs = nni;}
     void set_nn_outputs(int nno){nn_outputs = nno;}
     /// Getters for descritors
-    Eigen::VectorXd getMorphDesc(){return morphDesc;};
+    Eigen::VectorXd getMorphDesc(){return morphDesc;}
 
     Eigen::VectorXd descriptor();
 

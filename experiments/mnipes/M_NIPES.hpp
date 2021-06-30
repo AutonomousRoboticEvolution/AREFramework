@@ -4,6 +4,7 @@
 #include "ARE/CPPNGenome.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
+#include "ARE/learning/controller_archive.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/nn2/NN2Control.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -67,7 +68,16 @@ public:
         return std::make_shared<M_NIPESIndividual>(*this);
     }
 
-    void update(double delta_time) override;
+    void update(double delta_time) override;    
+
+    void add_reward(double reward){rewards.push_back(reward);}
+    void compute_fitness(){
+        double fitness = 0;
+        for(const auto &r : rewards)
+            fitness += r;
+        fitness /= static_cast<double>(rewards.size());
+        objectives[0] = fitness;
+    }
 
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
@@ -98,9 +108,9 @@ public:
         arch & morphGenome;
         arch & ctrlGenome;
         arch & final_position;
-        arch & energy_cost;
+//        arch & energy_cost;
         arch & trajectory;
-        arch & sim_time;
+//        arch & sim_time;
         arch & nn_inputs;
         arch & nn_outputs;
         arch & controller_archive;
@@ -142,6 +152,7 @@ private:
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
+    std::vector<double> rewards;
 
     int nn_inputs;
     int nn_outputs;
@@ -181,6 +192,8 @@ public:
     void set_controller_archive(const ControllerArchive::controller_archive_t archive){
         controller_archive.archive = archive;
     }
+
+
 
 private:
     typedef struct morph_desc_t{

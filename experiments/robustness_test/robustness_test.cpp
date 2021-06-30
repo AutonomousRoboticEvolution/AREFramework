@@ -13,7 +13,7 @@ void RobustInd::createMorphology(){
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNEATCPPN(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;

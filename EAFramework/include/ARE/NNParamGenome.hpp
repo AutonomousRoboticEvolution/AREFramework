@@ -102,12 +102,12 @@ public:
 
 
     void set_weights(const std::vector<double>& w){weights = w;}
-    const std::vector<double>& get_weights(){return weights;}
+    const std::vector<double>& get_weights() const {return weights;}
 
     void set_biases(const std::vector<double>& b){biases = b;}
-    const std::vector<double>& get_biases(){return biases;}
+    const std::vector<double>& get_biases() const {return biases;}
 
-    std::vector<double> get_full_genome(){
+    std::vector<double> get_full_genome() const {
         std::vector<double> genome = weights;
         genome.insert(genome.end(),biases.begin(),biases.end());
         return genome;

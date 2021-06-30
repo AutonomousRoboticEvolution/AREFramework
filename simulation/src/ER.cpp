@@ -64,7 +64,7 @@ void ER::startOfSimulation()
     currentInd->init();
     // Get images?
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
-        robotScreenshot(currentIndIndex,ea->get_generation(),settings::getParameter<settings::String>(parameters, "#imageRepository").value);
+        robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder);//,settings::getParameter<settings::String>(parameters, "#imageRepository").value);
     }
     ea->setCurrentIndIndex(currentIndIndex);
 }
@@ -154,7 +154,6 @@ void ER::endOfSimulation()
                 std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
-
         }
         if(ea->is_finish()){
             if(verbose)
