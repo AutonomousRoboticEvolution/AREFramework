@@ -87,7 +87,8 @@ public:
         Genome(rn,param){
     }
     NNParamGenome(const NNParamGenome &ngen) :
-        Genome(ngen), weights(ngen.weights), biases(ngen.biases){}
+        Genome(ngen), weights(ngen.weights), biases(ngen.biases),
+        nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),nbr_hidden(ngen.nbr_hidden){}
 
     Genome::Ptr clone() const override {
         return std::make_shared<NNParamGenome>(*this);
@@ -107,7 +108,15 @@ public:
     void set_biases(const std::vector<double>& b){biases = b;}
     const std::vector<double>& get_biases() const {return biases;}
 
-    std::vector<double> get_full_genome() const {
+    void set_nbr_input(int ni){nbr_input = ni;}
+    void set_nbr_output(int no){nbr_output = no;}
+    void set_nbr_hidden(int nh){nbr_hidden = nh;}
+
+    int get_nbr_input(){return nbr_input;}
+    int get_nbr_output(){return nbr_output;}
+    int get_nbr_hidden(){return nbr_hidden;}
+
+    std::vector<double> get_full_genome(){
         std::vector<double> genome = weights;
         genome.insert(genome.end(),biases.begin(),biases.end());
         return genome;
@@ -140,11 +149,17 @@ public:
         arch & boost::serialization::base_object<Genome>(*this);
         arch & weights;
         arch & biases;
+        arch & nbr_input;
+        arch & nbr_output;
+        arch & nbr_hidden;
     }
 
 private:
     std::vector<double> weights;
     std::vector<double> biases;
+    int nbr_input;
+    int nbr_output;
+    int nbr_hidden;
 };
 
 class NNParamGenomeLog : public Logging
