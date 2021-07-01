@@ -188,24 +188,14 @@ void NNParamGenome::from_string(const std::string &gen_str){
 void NNParamGenome::from_file(const std::string &filename){
     std::ifstream logFileStream;
     logFileStream.open(filename);
-    std::string line;
-    std::getline(logFileStream,line);
-    int nbr_weights = std::stoi(line);
-    std::getline(logFileStream,line);
-    int nbr_bias = std::stoi(line);
 
-    weights.clear();
-    for(int i = 0; i < nbr_weights; i++){
-        std::getline(logFileStream,line);
-        weights.push_back(std::stod(line));
-    }
+    std::string gen_str = "",line;
+    while(std::getline(logFileStream,line))
+        gen_str = gen_str + line;
 
-    biases.clear();
-    for(int i = 0; i < nbr_bias; i++){
-        std::getline(logFileStream,line);
-        biases.push_back(std::stod(line));
-    }
+    from_string(gen_str);
 }
+
 
 void NNParamGenomeLog::saveLog(EA::Ptr &ea)
 {
