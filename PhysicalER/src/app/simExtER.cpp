@@ -9,8 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include <random>
 
-namespace are_sett = are::settings;
-namespace are_c = are::client;
+//namespace are_sett = are::settings;
+//namespace are_c = are::client;
 
 //CCatContainer* catContainer = NULL;
 //CCreatureCreator* creatureCreator = NULL;
@@ -42,10 +42,10 @@ void saveLog(int num)
     logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
     clock_t now = clock();
     //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
-    sysTime = clock();
-    counter = 0;
+//    int deltaSysTime = now - sysTime;
+//    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
+//    sysTime = clock();
+//    counter = 0;
     logFile.close();
 }
 
@@ -145,41 +145,41 @@ void localMessageHandler(int message){
     simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
 
-    // ABOUT TO START
-    if (message == sim_message_eventcallback_simulationabouttostart)
-    {
-        assert(simulationState == STARTING);
-        simulationState = BUSY;
-    }
-    //Runing Simulation
-    else if (message == sim_message_eventcallback_modulehandle)
-    {
-        assert(simulationState == BUSY);
-    }
-    // SIMULATION ENDED
-    else if (message == sim_message_eventcallback_simulationended)
-    {
-        assert(simulationState == BUSY);
-        simulationState = CLEANUP;
-        loadingPossible = true;  // start another simulation
-    }
-
-    if (simulationState == CLEANUP) {
-        timeCount++;  //need to wait a few time steps to start a new simulation
-    }
-
-    if (simulationState == CLEANUP && timeCount > 10) {
-        simulationState = FREE;
-        timeCount = 0;
-    }
-
-    // START NEW SIMULATION
-    if (simulationState == FREE)
-    {
-        simulationState = STARTING;
-        counter = 0;
-        simStartSimulation();
-    }
+//    // ABOUT TO START
+//    if (message == sim_message_eventcallback_simulationabouttostart)
+//    {
+//        assert(simulationState == STARTING);
+//        simulationState = BUSY;
+//    }
+//    //Runing Simulation
+//    else if (message == sim_message_eventcallback_modulehandle)
+//    {
+//        assert(simulationState == BUSY);
+//    }
+//    // SIMULATION ENDED
+//    else if (message == sim_message_eventcallback_simulationended)
+//    {
+//        assert(simulationState == BUSY);
+//        simulationState = CLEANUP;
+//        loadingPossible = true;  // start another simulation
+//    }
+//
+//    if (simulationState == CLEANUP) {
+//        timeCount++;  //need to wait a few time steps to start a new simulation
+//    }
+//
+//    if (simulationState == CLEANUP && timeCount > 10) {
+//        simulationState = FREE;
+//        timeCount = 0;
+//    }
+//
+//    // START NEW SIMULATION
+//    if (simulationState == FREE)
+//    {
+//        simulationState = STARTING;
+//        counter = 0;
+//        simStartSimulation();
+//    }
 }
 
 void clientMessageHandler(int message){
@@ -187,111 +187,111 @@ void clientMessageHandler(int message){
     if(message == sim_message_eventcallback_modelloaded)
         return;
 
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
-
-    // client and v-rep plugin communicates using signal and remote api
-    int clientState[1] = {10111};
-    simGetIntegerSignal((simChar*) "clientState", clientState);
-
-    if (simulationState == FREE
-            && simGetSimulationState() == sim_simulation_stopped)
-    {
-        simSetIntegerSignal("simulationState",are_c::IDLE);
-
-        // time out when not receiving commands for 5 minutes.
-        if (!timerOn) {
-            sysTime = clock();
-            timeElapsed = 0;
-            timerOn = true;
-        } else {
-            // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
-            if (timeElapsed > 300)
-            {
-                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
-                simQuitSimulator(true);
-            }
-        }
-
-        // wait until command is received
-
-    }
-
-    // ABOUT TO START
-    if (message == sim_message_eventcallback_simulationabouttostart)
-    {
-        simulationState = BUSY;
-
-        if (verbose) {
-            std::cout << "SIMULATION ABOUT TO START" << std::endl;
-        }
-        //        simStartSimulation();
-        ERVREP->initEnv();
-        ERVREP->initIndividual();//startOfSimulation();
-        // Initializes population
-        simSetIntegerSignal("simulationState",are_c::BUSY);
-        simSetFloatSignal("simulationTime",0);
-        //        extApi_sleepMs(50);
-
-    }
-    //Runing Simulation
-    else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
-    {
-        ERVREP->handleSimulation(); // handling the simulation.
-        simSetIntegerSignal("simulationState",are_c::BUSY);
-    }\
-    // SIMULATION ENDED
-    else if (message == sim_message_eventcallback_simulationended)
-    {
-        simulationState = CLEANUP;
-        ERVREP->endOfSimulation();
-        std::cout << ERVREP->get_evalIsFinish() << std::endl;
-        if(ERVREP->get_evalIsFinish()){
-
-            std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
-            simSetIntegerSignal("simulationState",are_c::FINISH);
-
-            //loadingPossible = true;  // start another simulation
-            if (verbose) {
-                std::cout << "EVALUATION ENDED" << std::endl;
-            }
-        }
-        else{
-            // Initializes population
-            if (verbose) {
-                std::cout << "SIMULATION ENDED" << std::endl;
-            }
-            simSetIntegerSignal("simulationState",are_c::RESTART);
-            simulationState = RESTART;
-            std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
-            loadingPossible = true;  // start another simulation
-            return;
-       }
-
-//        std::string indString = ERVREP->get_currentInd()->to_string();
-//        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-//        simSetIntegerSignal("simulationState",are_c::FINISH);
-
-//        if (verbose) {
-//            std::cout << "SIMULATION ENDED" << std::endl;
+//    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+//
+//    // client and v-rep plugin communicates using signal and remote api
+//    int clientState[1] = {10111};
+//    simGetIntegerSignal((simChar*) "clientState", clientState);
+//
+//    if (simulationState == FREE
+//            && simGetSimulationState() == sim_simulation_stopped)
+//    {
+//        simSetIntegerSignal("simulationState",are_c::IDLE);
+//
+//        // time out when not receiving commands for 5 minutes.
+//        if (!timerOn) {
+//            sysTime = clock();
+//            timeElapsed = 0;
+//            timerOn = true;
+//        } else {
+//            // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
+//            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
+//            if (timeElapsed > 300)
+//            {
+//                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+//                simQuitSimulator(true);
+//            }
 //        }
-    }
-
-    if (clientState[0] == are_c::IDLE)
-    {
-        timerOn = false;
-        simulationState = STARTING;
-        simSetIntegerSignal("simulationState",are_c::READY);
-    }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
-        simStartSimulation();
-    }
-    else if(clientState[0] == 99){
-        std::cout << "Stop Instance !" << std::endl;
-        simQuitSimulator(true);
-    }
+//
+//        // wait until command is received
+//
+//    }
+//
+//    // ABOUT TO START
+//    if (message == sim_message_eventcallback_simulationabouttostart)
+//    {
+//        simulationState = BUSY;
+//
+//        if (verbose) {
+//            std::cout << "SIMULATION ABOUT TO START" << std::endl;
+//        }
+//        //        simStartSimulation();
+//        ERVREP->initEnv();
+//        ERVREP->initIndividual();//startOfSimulation();
+//        // Initializes population
+//        simSetIntegerSignal("simulationState",are_c::BUSY);
+//        simSetFloatSignal("simulationTime",0);
+//        //        extApi_sleepMs(50);
+//
+//    }
+//    //Runing Simulation
+//    else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
+//    {
+//        ERVREP->handleSimulation(); // handling the simulation.
+//        simSetIntegerSignal("simulationState",are_c::BUSY);
+//    }\
+//    // SIMULATION ENDED
+//    else if (message == sim_message_eventcallback_simulationended)
+//    {
+//        simulationState = CLEANUP;
+//        ERVREP->endOfSimulation();
+//        std::cout << ERVREP->get_evalIsFinish() << std::endl;
+//        if(ERVREP->get_evalIsFinish()){
+//
+//            std::string indString = ERVREP->get_currentInd()->to_string();
+//            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+//            simSetIntegerSignal("simulationState",are_c::FINISH);
+//
+//            //loadingPossible = true;  // start another simulation
+//            if (verbose) {
+//                std::cout << "EVALUATION ENDED" << std::endl;
+//            }
+//        }
+//        else{
+//            // Initializes population
+//            if (verbose) {
+//                std::cout << "SIMULATION ENDED" << std::endl;
+//            }
+//            simSetIntegerSignal("simulationState",are_c::RESTART);
+//            simulationState = RESTART;
+//            std::string indString = ERVREP->get_currentInd()->to_string();
+//            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+//            loadingPossible = true;  // start another simulation
+//            return;
+//       }
+//
+////        std::string indString = ERVREP->get_currentInd()->to_string();
+////        simSetStringSignal("currentInd",indString.c_str(),indString.size());
+////        simSetIntegerSignal("simulationState",are_c::FINISH);
+//
+////        if (verbose) {
+////            std::cout << "SIMULATION ENDED" << std::endl;
+////        }
+//    }
+//
+//    if (clientState[0] == are_c::IDLE)
+//    {
+//        timerOn = false;
+//        simulationState = STARTING;
+//        simSetIntegerSignal("simulationState",are_c::READY);
+//    }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
+//        simStartSimulation();
+//    }
+//    else if(clientState[0] == 99){
+//        std::cout << "Stop Instance !" << std::endl;
+//        simQuitSimulator(true);
+//    }
 
 }
 

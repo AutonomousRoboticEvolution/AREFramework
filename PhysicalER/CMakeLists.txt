@@ -30,19 +30,127 @@ target_link_libraries(physicalER ARE dlibxx zmq)
 install(TARGETS physicalER DESTINATION lib)
 install(DIRECTORY . DESTINATION include/PhysicalER FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
-add_executable(are-generate src/app/generate.cpp)
-target_include_directories(are-generate PUBLIC
-     ${OpenCV_INCLUDE_DIRS}
-    "include/"
-     "../EAFramework/include")
-target_link_libraries(are-generate ARE physicalER)
-
 add_executable(are-update src/app/update.cpp)
 target_include_directories(are-update PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     "include/"
      "../EAFramework/include")
 target_link_libraries(are-update ARE physicalER)
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+# CoppeliaSim stuff
+
+if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
+    message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
+elseif(COPPELIASIM_FOLDER)
+    message("COPPELIA FOUND!")
+    SET(COPPELIASIM_FOUND ON CACHE BOOL "" FORCE) #CACHE BOOL "" FORCE option allows this variable to be accessed in other CMakeLists of the project
+    SET(VREP_FOUND OFF CACHE BOOL "" FORCE)
+    add_definitions(-DCOPPELIASIM)
+    if (WIN32)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.exe")
+    elseif(APPLE)
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/coppeliaSim")
+    else()
+        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+elseif(VREP_FOLDER)
+    message("VREP FOUND!")
+    SET(VREP_FOUND ON CACHE BOOL "" FORCE)
+    SET(COPPELIASIM_FOUND OFF CACHE BOOL "" FORCE)
+    add_definitions(-DVREP)
+    if (WIN32)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.exe")
+    elseif(APPLE)
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}/vrep.app/Contents/MacOS/")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.app/Contents/MacOS/vrep")
+    else()
+        set(VREP_LIB_FOLDER "${VREP_FOLDER}")
+        set(VREP_EXE "${VREP_FOLDER}/vrep.sh")
+    endif()
+
+    if(NOT EXISTS ${VREP_EXE})
+        message(FATAL_ERROR "VREP_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+    endif()
+else()
+    message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
+endif()
+find_package(PolyVox REQUIRED)
+find_package(MultiNEAT REQUIRED)
+
+SET(VREP_SRC
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+        )
+
+#add_library(simulatedER SHARED ${VREP_SRC} ${SRC})
+
+#target_include_directories(simulatedER PUBLIC
+#        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+#        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+#        "include"
+#        "ERClient/include"
+#        "../EAFramework/include"
+#        )
+
+if(VREP_FOUND)
+    SET(LIB_EXT v_repExtERGenerate)
+    SET(PLUGIN_SRC src/app/v_repExtER.cpp)
+elseif(COPPELIASIM_FOUND)
+    #SET(LIB_EXT simExtER)
+    SET(LIB_EXT simExtGenerate)
+    SET(PLUGIN_SRC src/app/simExtER.cpp)
+endif()
+
+add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
+
+target_include_directories(${LIB_EXT} PUBLIC
+#        "include"
+#        "ERClient/include"
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+        )
+
+if (COPPELIASIM_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${COPPELIASIM_FOLDER})
+elseif (VREP_FOUND)
+    install(TARGETS ${LIB_EXT} DESTINATION ${VREP_FOLDER})
+endif()
+
+target_compile_definitions(${LIB_EXT} PUBLIC
+        "MAX_EXT_API_CONNECTIONS=255"
+        "NON_MATLAB_PARSING"
+        )
+
+if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
+    target_compile_definitions(${LIB_EXT} PUBLIC "__WINDOWS__")
+elseif(APPLE)
+    target_compile_definitions(${LIB_EXT} PUBLIC "__APPLE__")
+elseif(UNIX)
+    target_compile_definitions(${LIB_EXT} PUBLIC "__linux")
+endif()
+
+add_executable(are-generate src/app/generate.cpp)
+target_include_directories(are-generate PUBLIC
+        ${OpenCV_INCLUDE_DIRS}
+        "include/"
+        "../EAFramework/include")
+target_link_libraries(are-generate ARE physicalER)
 
 install(TARGETS are-generate are-update DESTINATION bin)
 endif()

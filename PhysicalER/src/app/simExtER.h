@@ -4,10 +4,10 @@
 
 #include <ctime>
 #include <memory>
-#include "ARE/exp_plugin_loader.hpp"
+#include "/home/ebb505/ARE_Project/evolutionary_robotics_framework/EAFramework/include/ARE/exp_plugin_loader.hpp"
 
 /// an unique pointer to ER_VREP class
-are::sim::ER::Ptr ERVREP;
+//are::sim::ER::Ptr ERVREP;
 
 /// This variable marks the start of evolution.
 bool startEvolution;
