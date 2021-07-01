@@ -239,11 +239,9 @@ void M_NIPES::init(){
 void M_NIPES::init_morph_pop(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
-    bool start_from_rand = settings::getParameter<settings::Boolean>(parameters,"#startFromRandom").value;
-    unsigned int pop_size = 0;
-    if(start_from_exp || start_from_rand)
-        pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    else{
+    bool bootstrap_pop = settings::getParameter<settings::Boolean>(parameters,"#bootstrapPopulation").value;
+    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(bootstrap_pop){
         //Load the bootstrap population
         listMorphGenomeID(morphIDList);
         pop_size = morphIDList.size();
@@ -303,25 +301,19 @@ void M_NIPES::init_morph_pop(){
 
     std::string exp_folder = settings::getParameter<settings::String>(parameters,"#startFromExperiment").value;
 
-    for(unsigned i = 0; i < pop_size; i++){
-        if(start_from_rand){
-            NEAT::RNG rng;
-            const misc::RandNum::Ptr rn = get_randomNum();
-            rng.Seed(rn->randInt(1,100000));
-            morph_population->AccessGenomeByIndex(i).Randomize_LinkWeights(neat_params.MaxWeight,rng);
-            morph_population->AccessGenomeByIndex(i).Mutate_NeuronBiases(neat_params,rng);
-        }
-        else if(start_from_exp){
-            std::stringstream sstr;
-            sstr << generation << "_" << i;
-            if(verbose)
-                std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
-            morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
-        }else{
-            loadNEATGenome(morphIDList[i],morph_gen);
-        }
-        morph_population->AccessGenomeByIndex(i) = morph_gen;
 
+    if(bootstrap_pop || start_from_exp){
+        for(unsigned i = 0; i < pop_size; i++){
+            if(start_from_exp){
+                std::stringstream sstr;
+                sstr << generation << "_" << i;
+                if(verbose)
+                    std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
+                morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
+            }else if(bootstrap_pop)
+                loadNEATGenome(morphIDList[i],morph_gen);
+            morph_population->AccessGenomeByIndex(i) = morph_gen;
+        }
     }
     for(unsigned i = 0; i < pop_size ; i++){
         NEAT::Genome mgen = morph_population->AccessGenomeByIndex(i);
