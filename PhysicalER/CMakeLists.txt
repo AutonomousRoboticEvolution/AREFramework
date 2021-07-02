@@ -132,11 +132,20 @@ elseif (VREP_FOUND)
     install(TARGETS ${LIB_EXT} DESTINATION ${VREP_FOLDER})
 endif()
 
+target_link_libraries(${LIB_EXT}
+        dlibxx dl rt
+        ${Boost_LIBRARIES}
+        )
+
 target_compile_definitions(${LIB_EXT} PUBLIC
         "MAX_EXT_API_CONNECTIONS=255"
         "NON_MATLAB_PARSING"
         )
-
+set_target_properties(${LIB_EXT} PROPERTIES
+        CXX_STANDARD 14
+        ##    COMPILE_FLAGS "-w"
+        POSITION_INDEPENDENT_CODE ON
+        )
 if (WIN32) #if(MSVC OR MSYS OR MINGW) for detecting specific compilers
     target_compile_definitions(${LIB_EXT} PUBLIC "__WINDOWS__")
 elseif(APPLE)
@@ -145,12 +154,13 @@ elseif(UNIX)
     target_compile_definitions(${LIB_EXT} PUBLIC "__linux")
 endif()
 
-add_executable(are-generate src/app/generate.cpp)
-target_include_directories(are-generate PUBLIC
-        ${OpenCV_INCLUDE_DIRS}
-        "include/"
-        "../EAFramework/include")
-target_link_libraries(are-generate ARE physicalER)
-
-install(TARGETS are-generate are-update DESTINATION bin)
+#add_executable(are-generate src/app/generate.cpp)
+#target_include_directories(are-generate PUBLIC
+#        ${OpenCV_INCLUDE_DIRS}
+#        "include/"
+#        "../EAFramework/include")
+#target_link_libraries(are-generate ARE physicalER)
+#
+#install(TARGETS are-generate are-update DESTINATION bin)
+install(TARGETS simExtGenerate are-update DESTINATION bin)
 endif()
