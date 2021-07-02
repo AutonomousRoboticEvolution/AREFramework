@@ -80,6 +80,8 @@ public:
 
     bool is_initialized() const {return initialized;}
 
+    void to_be_erased() {initialized = true; _is_finish = true;}
+
 protected:
     void next_pop();
     void iterate();

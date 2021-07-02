@@ -6,15 +6,9 @@
 #shouldReopenConnections,bool,0
 #seed,int,-1
 ,,
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/hard_race.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
 #repository,string,/home/leni/are-logs
-,,
-#loadExperiment,string,/home/leni/git/genomes/20200929/traitDescriptor/lc_nsms_6_7_14-45-54-4706-2402252332/
-#loadPrevExperiment,bool,0
-#startFromExperiment,string,/home/leni/are-logs/mnipes_forth/withca/arena/mnipes_2_11_10-55-43-3902-2304031719/
-#startFromRandom,bool,1
-#bootstrapControllerArchive,bool,0
 ,,
 #maxNbrOrgans,int,16
 #isSegmentedRobot,bool,1

@@ -194,7 +194,9 @@ void M_NIPES::init(){
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
             morphgenome->random();
             learner_t new_learner(*morphgenome.get());
+            new_learner.ctrl_learner.set_parameters(parameters);
             learning_pool.push_back(new_learner);
+
             M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -270,6 +272,7 @@ bool M_NIPES::is_finish(){
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
     if(numberEvaluation >= max_nbr_eval)
         return true;
+    return false;
 }
 
 bool M_NIPES::update(const Environment::Ptr &env){
@@ -299,6 +302,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             }else{
                 genome_t new_gene(learner.morph_genome,NNParamGenome(),{0});
                 gene_pool.push_back(new_gene);
+                learner.ctrl_learner.to_be_erased();
             }
         }else{
             numberEvaluation++;

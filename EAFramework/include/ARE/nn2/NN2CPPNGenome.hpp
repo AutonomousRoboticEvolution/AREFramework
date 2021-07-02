@@ -53,7 +53,7 @@ public:
         _id = static_id++;
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), _id(gen._id), morph_desc(gen.morph_desc){}
+        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc){}
     ~NN2CPPNGenome() override {}
 
     Genome::Ptr clone() const override {
@@ -98,6 +98,7 @@ public:
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
         arch & morph_desc;
+        arch & parents_ids;
     }
 
     const CartDesc& get_morph_desc() const {return morph_desc;}
@@ -109,7 +110,6 @@ public:
 
 private:
     std::vector<int> parents_ids;
-    int _id;
     nn2_cppn_t cppn;
     CartDesc morph_desc;
 };
