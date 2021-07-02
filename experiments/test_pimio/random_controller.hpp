@@ -21,6 +21,9 @@ public:
     void init_pop();
     void init_next_pop() override;
     void load_data_for_update() override;
+
+private:
+    NNParamGenome::Ptr makeRandomController(int numberOfInputs, int numberOfOutputs);
 };
 
 }//are
