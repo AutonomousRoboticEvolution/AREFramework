@@ -51,9 +51,9 @@ void saveLog(int num)
 
 SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
 {
-    std::cout << "---------------------------" << std::endl
-              << "STARTING WITH ARE FRAMEWORK" << std::endl
-              << "---------------------------" << std::endl;
+    std::cout << "---------------" << std::endl
+              << "STARTING PLUGIN" << std::endl
+              << "---------------" << std::endl;
 
 
     // This is called just once, at the start of V-REP.
@@ -80,9 +80,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
 #elif defined (__APPLE__)
     temp += "/libcoppeliaSim.dylib";
 #endif /* __linux || __APPLE__ */
-
-
-
 
     simLib = loadSimLibrary(temp.c_str());
     if (simLib == NULL)
@@ -130,13 +127,19 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
 // Release the v-rep lib
 SIM_DLLEXPORT void simEnd()
 { // This is called just once, at the end of V-REP
+    std::cout << "---" << std::endl
+              << "END" << std::endl
+              << "---" << std::endl;
     unloadSimLibrary(simLib);
 }
 
 SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
+//    std::cout << "-------" << std::endl
+//              << "MESSAGE" << std::endl
+//              << "-------" << std::endl;
     localMessageHandler(message);
-    clientMessageHandler(message);
+//    clientMessageHandler(message);
 }
 
 void localMessageHandler(int message){
@@ -145,41 +148,41 @@ void localMessageHandler(int message){
     simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
 
-//    // ABOUT TO START
-//    if (message == sim_message_eventcallback_simulationabouttostart)
-//    {
-//        assert(simulationState == STARTING);
-//        simulationState = BUSY;
-//    }
-//    //Runing Simulation
-//    else if (message == sim_message_eventcallback_modulehandle)
-//    {
-//        assert(simulationState == BUSY);
-//    }
-//    // SIMULATION ENDED
-//    else if (message == sim_message_eventcallback_simulationended)
-//    {
-//        assert(simulationState == BUSY);
-//        simulationState = CLEANUP;
+    // ABOUT TO START
+    if (message == sim_message_eventcallback_simulationabouttostart)
+    {
+        assert(simulationState == STARTING);
+        simulationState = BUSY;
+    }
+    //Runing Simulation
+    else if (message == sim_message_eventcallback_modulehandle)
+    {
+        assert(simulationState == BUSY);
+    }
+    // SIMULATION ENDED
+    else if (message == sim_message_eventcallback_simulationended)
+    {
+        assert(simulationState == BUSY);
+        simulationState = CLEANUP;
 //        loadingPossible = true;  // start another simulation
-//    }
-//
-//    if (simulationState == CLEANUP) {
+    }
+
+    if (simulationState == CLEANUP) {
 //        timeCount++;  //need to wait a few time steps to start a new simulation
-//    }
-//
+    }
+
 //    if (simulationState == CLEANUP && timeCount > 10) {
 //        simulationState = FREE;
 //        timeCount = 0;
 //    }
-//
-//    // START NEW SIMULATION
-//    if (simulationState == FREE)
-//    {
-//        simulationState = STARTING;
+
+    // START NEW SIMULATION
+    if (simulationState == FREE)
+    {
+        simulationState = STARTING;
 //        counter = 0;
-//        simStartSimulation();
-//    }
+        simStartSimulation();
+    }
 }
 
 void clientMessageHandler(int message){

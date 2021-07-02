@@ -9,8 +9,16 @@
 /// an unique pointer to ER_VREP class
 //are::sim::ER::Ptr ERVREP;
 
-/// This variable marks the start of evolution.
-bool startEvolution;
+enum SimulationState {
+    INITIALIZING,
+    FREE,
+    STARTING,
+    BUSY,
+    CLEANUP,
+    RESTART
+};
+
+SimulationState simulationState = FREE;
 
 #ifdef _WIN32
     #define SIM_DLLEXPORT extern "C" __declspec(dllexport)
