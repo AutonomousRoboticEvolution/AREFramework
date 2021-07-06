@@ -311,7 +311,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             bool is_ctrl_next_gen = learner.ctrl_learner.step();
             //-
 
-            if(learner.ctrl_learner.is_learning_finish() && is_ctrl_next_gen){//learning is finished for this body plan
+            if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
 
                 //Update Controller Archive
                 std::vector<double> weights;

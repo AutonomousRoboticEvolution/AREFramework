@@ -122,8 +122,8 @@ bool CMAESLearner::step(){
     if(_cma_strat->get_population().size() < _population.size())
         return false;
 
-    if(is_learning_finish())
-        return true;
+//    if(is_learning_finish())
+//        return true;
 
     iterate();
     _archive.emplace(_generation,_cma_strat->get_population());

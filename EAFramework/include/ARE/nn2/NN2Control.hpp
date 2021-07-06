@@ -39,7 +39,6 @@ public:
     }
 
     std::vector<double> update(const std::vector<double> &sensorValues){
-        bool useInternalBias = settings::getParameter<settings::Boolean>(parameters,"#UseInternalBias").value;
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
         boost::mt19937 rng(randomNum->getSeed());
         std::vector<double> inputs = sensorValues;
