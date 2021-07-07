@@ -35,6 +35,7 @@ int main(int argc, char** argv) {
     while(1){
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply);
+        std::cout<<"parameters_received"<<std::endl;
         //str_param.erase(0,str_param.find(' ')+1);
         parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
 
@@ -56,7 +57,7 @@ int main(int argc, char** argv) {
 
         std::cout<<"running a controller"<<std::endl;        
         pi::AREControl AREController(ind, str_organs_list);
-        AREController.exec(argc,argv,publisher);
+        AREController.exec(publisher);
         std::cout<<"finished running the controller"<<std::endl;
     }
 

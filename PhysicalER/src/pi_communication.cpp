@@ -9,15 +9,18 @@ void are::phy::send_string(std::string& str_rpl, const std::string& str_msg,  zm
     zmq::message_t reply;
     request.recv(&reply);
     str_rpl = static_cast<char*>(reply.data());
+    str_rpl.resize(reply.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
+    std::cout<<"Got reply of \""<<str_rpl<<"\" (length "<<str_rpl.size()<<")"<<std::endl;
 }
 
-void are::phy::receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply){
-    zmq::message_t reply_msg;
-    strcpy(static_cast<char*>(reply_msg.data()),str_req.c_str());
+void are::phy::receive_string(std::string& str_msg, const std::string& str_reply, zmq::socket_t& reply){
+    zmq::message_t reply_msg(str_reply.size());
+    strcpy(static_cast<char*>(reply_msg.data()),str_reply.c_str());
     zmq::message_t message;
     reply.recv(&message);
     reply.send(reply_msg);
     str_msg = static_cast<char*>(message.data());
+    std::cout<<"Sending reply of \""<<static_cast<char*>(reply_msg.data())<<"\" (length "<<str_reply.size()<<")"<<std::endl;
 }
 
 bool are::phy::send_order(OrderType order, zmq::socket_t& request){

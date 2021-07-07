@@ -5,7 +5,7 @@ using namespace are::phy;
 void ER::initialize(){
 
 
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
 
     if(seed < 0){

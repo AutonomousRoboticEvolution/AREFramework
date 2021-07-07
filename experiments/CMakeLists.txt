@@ -1,6 +1,6 @@
 if(ONLY_PHYSICAL)
     if(WITH_NN2)
-        add_subdirectory(test_pimio)
+        add_subdirectory(physical_update)
     endif()
     add_subdirectory(test_blob_tracking)
     add_subdirectory(test_are_generate)
