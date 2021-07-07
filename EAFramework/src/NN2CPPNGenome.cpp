@@ -4,6 +4,8 @@ using namespace are;
 
 std::mt19937 nn2::rgen_t::gen;
 
+int static_id = 0;
+
 float cppn_params::_rate_add_neuron = 0.5;
 float cppn_params::_rate_del_neuron = 0.05;
 float cppn_params::_rate_add_conn = 0.2;

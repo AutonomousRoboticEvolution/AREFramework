@@ -66,14 +66,10 @@ void M_NIPESIndividual::createController(){
     if(ctrlGenome->get_type() == "empty_genome")
         return;
 
-    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
-    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    int wheel_nbr = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().wheelNumber;
-    int joint_nbr = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().jointNumber;
-    int sensor_nbr = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().sensorNumber;
-    int nn_inputs = sensor_nbr*2;
-    int nn_outputs = wheel_nbr + joint_nbr;
-
+    int nn_inputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
+    int nn_outputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();
+    int nb_hidden = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_hidden();
+    int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nn_type();
 
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
@@ -356,19 +352,19 @@ bool M_NIPES::update(const Environment::Ptr &env){
                                     break;
                                 }
                             if(!already_drawn)
-                                random_indexes.push_back(randomNum->randInt(0,gene_pool.size()-1));
+                                random_indexes.push_back(rand_idx);
                         }while(random_indexes.size() < 4);
                         std::vector<genome_t> gene_subset;
                         for(const int &idx: random_indexes)
                             gene_subset.push_back(gene_pool[idx]);
                         NN2CPPNGenome new_morph_gene = selection_fct(gene_subset);
+                        new_morph_gene.set_parameters(parameters);
+                        new_morph_gene.set_randNum(randomNum);
                         learner_t new_learner(new_morph_gene);
                         learning_pool.push_back(new_learner);
 
                         //Add it to the population with an empty ctrl genome to be build and determine its type.
                         NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
-                        morph_genome->set_randNum(randomNum);
-                        morph_genome->set_parameters(parameters);
                         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
                         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morph_genome,ctrl_genome));
                         ind->set_parameters(parameters);
@@ -484,11 +480,18 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
 
 void M_NIPES::init_new_ctrl_pop(learner_t &learner){
     auto new_ctrl_pop = learner.ctrl_learner.get_new_population();
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+
     for(const auto &wb : new_ctrl_pop){
         NN2CPPNGenome::Ptr morph_gen(new NN2CPPNGenome(learner.morph_genome));
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters));
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_output(learner.morph_genome.get_morph_desc().wheelNumber + learner.morph_genome.get_morph_desc().jointNumber);
+        ctrl_gen->set_nbr_input(learner.morph_genome.get_morph_desc().sensorNumber*2);
+        ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);

@@ -29,6 +29,8 @@ struct cppn_params{
 
 using nn2_cppn_t = nn2::CPPN<cppn_params>;
 
+static int static_id;
+
 class NN2CPPNGenome : public Genome
 {
 public:
@@ -36,24 +38,21 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
-        static int static_id = 0;
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
         type = "nn2_cppn_genome";
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
-        static int static_id = 0;
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
         type = "nn2_cppn_genome";
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
-        static int static_id = 0;
         _id = static_id++;
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc){}
+        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){}
     ~NN2CPPNGenome() override {}
 
     Genome::Ptr clone() const override {
