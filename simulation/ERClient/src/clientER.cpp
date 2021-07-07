@@ -141,6 +141,7 @@ bool ER::updateSimulation()
             }
             else if(state == BUSY)
             {
+                continue;
                 //            float simTime = slave->getFloatSignal("simulationTime");
                 //            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
             }
@@ -165,7 +166,8 @@ bool ER::updateSimulation()
                 std::cerr << "An error happened on the server side" << std::endl;
             }
             else if(state == READY && indToEval.empty()){
-                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+                continue;
+//                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
             }
             else{
                 std::cerr << "state value unknown : " << state << std::endl
