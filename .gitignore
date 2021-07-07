@@ -41,3 +41,5 @@ modules/nn2
 simulation/.idea/
 
 simulation/Cluster/__pycache__/
+
+wiki/
