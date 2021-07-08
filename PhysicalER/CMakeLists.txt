@@ -16,13 +16,13 @@ target_include_directories(are-pi-server PUBLIC
 target_link_libraries(are-pi-server piARE zmq  ${Boost_LIBRARIES} wiringPi)#Qt5::Core Qt5::DBus Qt5::Test
 
 else()
-find_package(OpenCV REQUIRED)
+#find_package(OpenCV REQUIRED)
 
 file(GLOB SRC src/*)
 
 add_library(physicalER SHARED ${SRC} src/pi/pi_individual.cpp)
 target_include_directories(physicalER PUBLIC
-     ${OpenCV_INCLUDE_DIRS}
+    # ${OpenCV_INCLUDE_DIRS}
     "include/"
      "../EAFramework/include")
 target_link_libraries(physicalER ARE dlibxx zmq)
@@ -32,7 +32,7 @@ install(DIRECTORY . DESTINATION include/PhysicalER FILES_MATCHING PATTERN "*.hpp
 
 add_executable(are-update src/app/update.cpp)
 target_include_directories(are-update PUBLIC
-    ${OpenCV_INCLUDE_DIRS}
+    #${OpenCV_INCLUDE_DIRS}
     "include/"
      "../EAFramework/include")
 target_link_libraries(are-update ARE physicalER)
@@ -155,11 +155,10 @@ elseif(UNIX)
 endif()
 
 #add_executable(are-generate src/app/generate.cpp)
-#target_include_directories(are-generate PUBLIC
-#        ${OpenCV_INCLUDE_DIRS}
-#        "include/"
-#        "../EAFramework/include")
-#target_link_libraries(are-generate ARE physicalER)
+target_include_directories(simExtGenerate PUBLIC
+        "include/"
+        "../EAFramework/include")
+target_link_libraries(simExtGenerate ARE physicalER)
 #
 #install(TARGETS are-generate are-update DESTINATION bin)
 install(TARGETS simExtGenerate are-update DESTINATION bin)

@@ -4,7 +4,8 @@
 
 #include <ctime>
 #include <memory>
-#include "/home/ebb505/ARE_Project/evolutionary_robotics_framework/EAFramework/include/ARE/exp_plugin_loader.hpp"
+#include "ARE/exp_plugin_loader.hpp"
+#include "physicalER/ER.hpp"
 
 /// an unique pointer to ER_VREP class
 //are::sim::ER::Ptr ERVREP;
