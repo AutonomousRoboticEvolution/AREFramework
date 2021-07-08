@@ -1,4 +1,4 @@
-#include "simExtER.h"
+#include "simExtGenerate.h"
 //#include "luaFunctionData.h"
 #include <iostream>
 #include <fstream>
@@ -9,8 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include <random>
 
-//namespace are_sett = are::settings;
 //namespace are_c = are::client;
+namespace are_set = are::settings;
 
 //CCatContainer* catContainer = NULL;
 //CCreatureCreator* creatureCreator = NULL;
@@ -54,7 +54,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     std::cout << "---------------" << std::endl
               << "STARTING PLUGIN" << std::endl
               << "---------------" << std::endl;
-
 
     // This is called just once, at the start of V-REP.
     // Dynamically load and bind V-REP functions:
@@ -182,6 +181,23 @@ void localMessageHandler(int message){
         simulationState = STARTING;
 //        counter = 0;
         simStartSimulation();
+        simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
+
+//        if(argc != 2){
+//            std::cout << "usage :" << std::endl;
+//            std::cout << "\targ1 - path to the parameter file" << std::endl;
+//        }
+
+        are::phy::ER::Ptr er(new are::phy::ER);
+//        are_set::ParametersMap param = are_set::loadParameters(argv[1]);
+        are_set::ParametersMapPtr parameters = std::make_shared<are_set::ParametersMap>(
+                are_set::loadParameters(parameters_filepath));
+        simReleaseBuffer(parameters_filepath);
+//        er->set_parameters(std::make_shared<are_set::ParametersMap>(param));
+//        er->initialize();
+//        er->load_data(false);
+//        er->generate();
+//        er->save_logs();
     }
 }
 

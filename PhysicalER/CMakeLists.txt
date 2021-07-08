@@ -114,7 +114,7 @@ if(VREP_FOUND)
 elseif(COPPELIASIM_FOUND)
     #SET(LIB_EXT simExtER)
     SET(LIB_EXT simExtGenerate)
-    SET(PLUGIN_SRC src/app/simExtER.cpp)
+    SET(PLUGIN_SRC src/app/simExtGenerate.cpp)
 endif()
 
 add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
@@ -122,6 +122,8 @@ add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
 target_include_directories(${LIB_EXT} PUBLIC
 #        "include"
 #        "ERClient/include"
+        "../EAFramework/include"
+        "include"
         $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
         $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
         )
