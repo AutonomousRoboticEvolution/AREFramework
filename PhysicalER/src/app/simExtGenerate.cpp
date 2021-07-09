@@ -193,11 +193,11 @@ void localMessageHandler(int message){
         are_set::ParametersMapPtr parameters = std::make_shared<are_set::ParametersMap>(
                 are_set::loadParameters(parameters_filepath));
         simReleaseBuffer(parameters_filepath);
-//        er->set_parameters(std::make_shared<are_set::ParametersMap>(param));
-//        er->initialize();
-//        er->load_data(false);
-//        er->generate();
-//        er->save_logs();
+        er->set_parameters(parameters);
+        er->initialize();
+        er->load_data(false);
+        er->generate();
+        er->save_logs();
     }
 }
 
