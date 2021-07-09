@@ -2,8 +2,9 @@
 
 using namespace are::pi;
 
-AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans){
+AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000000.0;
 
     // need to turn on the daughter boards
     daughterBoards->init();
@@ -13,7 +14,7 @@ AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans
     std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
     std::string thisLine;
     std::stringstream temp_string_stream(stringListOfOrgans);
-    std::cout<< "looping:"<< std::endl;
+    std::cout<< "starting main loop:"<< std::endl;
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
@@ -45,24 +46,39 @@ AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans
 
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendMotorCommands(std::vector<double> values){
-    for (int i=0; i<listOfWheels.size();i++){
-        std::cout<<i<<std::endl;
-    }
-//    int i=0;
-//    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
-//        thisWheel->setSpeed( values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER );
+    int i=0;
+    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
+        thisWheel->setSpeed( values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER );
 //        std::cout<<"Wheel "<<i<<" output set to "<<values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER<<std::endl;
-//        i++;
-//    }
+        i++;
+    }
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // loop through each sensor and get it's value
     sensor_vals.clear();
     sensor_vals = {};
+    int i=0;
     for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
-        sensor_vals.push_back( thisSensor->readTimeOfFlight() );
+        int raw_value = thisSensor->readTimeOfFlight();
+        sensor_vals.push_back( std::max ( std::min(1.0,float(raw_value)/1000.0) , 0.0) );
     }
+    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+        int raw_value = thisSensor->readInfrared();
+        if (raw_value > INFRARED_SENSOR_THREASHOLD) sensor_vals.push_back(1.0);
+        else sensor_vals.push_back(0.0);
+    }
+
+    // debugging: display sensor values as bars:
+    for(i=0;i<sensor_vals.size();i++){
+        int n_blocks=sensor_vals[i]*10.0;
+        for (int i_block=0; i_block<10;i_block++){
+            if (i_block<n_blocks) std::cout<<"x";
+            else std::cout<<" ";
+        }
+        std::cout<<"|";
+    }
+    std::cout<<std::endl;
 }
 
 int AREControl::exec(zmq::socket_t& socket){
@@ -71,7 +87,7 @@ int AREControl::exec(zmq::socket_t& socket){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
     double time = 0;
-    std::cout << "time,nn_output 0,nn_output 1,nn_output 2,nn_output 3"<< std::endl;
+    std::cout<<"evaluation time: "<<_max_eval_time<<std::endl;
     while(time <= _max_eval_time){
 
         retrieveSensorValues(sensor_values);
@@ -80,13 +96,6 @@ int AREControl::exec(zmq::socket_t& socket){
         controller.set_inputs(sensor_values);
         controller.update(time);
         nn_outputs = controller.get_ouputs();
-
-        // some debugging messages
-        std::cout << float(time)/1000000 <<","<< nn_outputs[0] <<","<< nn_outputs[1] <<","<< nn_outputs[2] <<","<< nn_outputs[3] <<","<< std::endl;
-        //std::cout << "nn_outputs : " << nn_outputs[0] << std::endl;
-        //std::cout << "nn_outputs 1: " << nn_outputs[1] << std::endl;
-        //std::cout << "nn_outputs 2: " << nn_outputs[2] << std::endl;
-        //std::cout << "nn_outputs 3: " << nn_outputs[3] << std::endl;
         
         // send the new values to the actuators
         sendMotorCommands(nn_outputs);
@@ -100,6 +109,7 @@ int AREControl::exec(zmq::socket_t& socket){
         socket.send(message);
         
         // wait for next timestep
+//        std::cout<<" === "<<time<<" === "<<std::endl;
         usleep(_time_step);
     }
 

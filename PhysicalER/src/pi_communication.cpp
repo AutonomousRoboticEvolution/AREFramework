@@ -20,6 +20,7 @@ void are::phy::receive_string(std::string& str_msg, const std::string& str_reply
     reply.recv(&message);
     reply.send(reply_msg);
     str_msg = static_cast<char*>(message.data());
+    str_msg.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
     std::cout<<"Sending reply of \""<<static_cast<char*>(reply_msg.data())<<"\" (length "<<str_reply.size()<<")"<<std::endl;
 }
 

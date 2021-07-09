@@ -76,7 +76,7 @@ void RandomController::load_data_for_update(){
                     std::string organType = thisLine.substr(0, thisLine.find(","));
                     if (organType=="0") {} //Head
                     if (organType=="1") numberOfOutputs++ ; //wheel
-                    if (organType=="2") numberOfInputs++ ; //sensor
+                    if (organType=="2") numberOfInputs+=2 ; //sensor
                 }
                 std::cout<<"numberOfInputs: "<<numberOfInputs<<std::endl;
                 std::cout<<"numberOfOutputs: "<<numberOfOutputs<<std::endl;

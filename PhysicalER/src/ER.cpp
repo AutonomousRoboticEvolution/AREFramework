@@ -105,7 +105,7 @@ void ER::start_evaluation(){
     std::string ctrlGenomeFolder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value;
     std::string waitingToBeEvalutatedFolderPath = ctrlGenomeFolder + std::string("waiting_to_be_evaluated/");
 
-    std::string robotID = "test1"; // TODO get this from user input based on those available in waiting_to_be_evaluated
+    std::string robotID = "test2"; // TODO get this from user input based on those available in waiting_to_be_evaluated
     if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<robotID<<"\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
@@ -147,8 +147,10 @@ void ER::start_evaluation(){
     subscriber.connect(sstream2.str().c_str());
     subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
 
+    //send the parameters as a string
     std::string reply;
     std::string param = settings::toString(*parameters.get());
+    std::cout<<"params : \n"<<param<<std::endl;
     send_string(reply,param,request);
     assert(reply == "parameters_received");
 

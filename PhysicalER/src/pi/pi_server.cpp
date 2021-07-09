@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
         std::cout<<"parameters_received"<<std::endl;
         //str_param.erase(0,str_param.find(' ')+1);
         parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
-
+        std::cout<<"Paramters as sting:\n"<<str_param<<std::endl;
         //receive organ addresses list
         phy::receive_string(str_organs_list,"organ_addresses_received",reply);
         std::cout<<"Oragns list: "<<str_organs_list<<std::endl;
@@ -47,16 +47,15 @@ int main(int argc, char** argv) {
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply);
         //str_ctrl.erase(0,str_ctrl.find(' ')+1);
-
-        std::cout << str_ctrl << std::endl;
         ctrl_gen->from_string(str_ctrl);
+        std::cout<<"NN Genome as sting:\n"<<str_ctrl<<std::endl;
         pi::NN2Individual ind(empy_gen,ctrl_gen);
         ind.set_parameters(parameters);
         ind.set_randNum(randomNumber);
         ind.init();
 
         std::cout<<"running a controller"<<std::endl;        
-        pi::AREControl AREController(ind, str_organs_list);
+        pi::AREControl AREController(ind, str_organs_list, parameters);
         AREController.exec(publisher);
         std::cout<<"finished running the controller"<<std::endl;
     }
