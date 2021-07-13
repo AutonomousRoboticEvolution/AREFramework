@@ -71,7 +71,17 @@ int main()
 /************ Sensor test ********************************************/
     SensorOrgan mySensor(SENSOR_ADDRESS);
 	mySensor.test();
-
+    
+    int listOfAddresses[] = {0x30,0x32,0x40,0x42,0x44};
+    int n_sensors = 5;
+    for (int i=0,i<n_sensors,i++){
+        listOfSensors.push_back( SensorOrgan( listOfAddresses[i] ) ); // add a new wheel to the list, with the i2c address just extracted
+    }
+    
+    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+        int raw_value = thisSensor->readTimeOfFlight();
+        sensor_vals.push_back( std::max ( std::min(1.0,float(raw_value)/1000.0) , 0.0) );
+    }
 //	daughterBoards.turnOff();
 
 }
