@@ -18,14 +18,15 @@
 #target_z,double,0.12
 
 
-#isMulti,bool,1
-#isMultiRandom,bool,1
+#isMulti,bool,0
+#isMultiRandom,bool,0
 #isMultiMutate,bool,0
-#eval_num,int,2
+#eval_num,int,0
 #is1tomany,bool,0
-#isDuaLoop,bool,1
-#inner_loop_num,int,2
-#islamarkian,bool,1
+#isDuaLoop,bool,0
+#issingleloop,bool,1
+#inner_loop_num,int,0
+#islamarkian,bool,0
 
 #isRNN,bool,1
 #isNovelty,bool,1
@@ -40,7 +41,7 @@
 
 
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
@@ -69,7 +70,7 @@
 #showBestIndPath,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/files/morphNeuro_28_5_16-15-44-4633-3205248434
 
 
-#loadSpecificIndividual,bool,1
+#loadSpecificIndividual,bool,0
 #individualNum,int,1
 
 #isWheel,bool,1

@@ -145,19 +145,19 @@ void MorphNeuro::initPopulation()
     bool iscontrlbootstrap_2 = settings::getParameter<settings::Boolean>(parameters,"#isCtrlBootstrapEvolution_2").value;
     for (size_t i = 0; i < params.PopulationSize ; i++)
     {
-        if(isBootstrapPopulation) {
-            NEAT::Genome indGenome;
-            indGenome = loadInd(robotList[i]);
-            morph_population->AccessGenomeByIndex(i) = indGenome;  //individual genome
-        }
-
-        if(iscontrlbootstrap_2){
-//      controller bootstrap method 2
-            NEAT::Genome indGenome_contr;
-            indGenome_contr = loadContrInd(robotList[i]);
-            contr_population->AccessGenomeByIndex(i) = indGenome_contr;  //individual genome
-
-        }
+//        if(isBootstrapPopulation) {
+//            NEAT::Genome indGenome;
+//            indGenome = loadInd(robotList[i]);
+//            morph_population->AccessGenomeByIndex(i) = indGenome;  //individual genome
+//        }
+//
+//        if(iscontrlbootstrap_2){
+////      controller bootstrap method 2
+//            NEAT::Genome indGenome_contr;
+//            indGenome_contr = loadContrInd(robotList[i]);
+//            contr_population->AccessGenomeByIndex(i) = indGenome_contr;  //individual genome
+//
+//        }
 
         CPPNGenome::Ptr contrlGenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
         CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
@@ -189,6 +189,7 @@ void MorphNeuro::epoch() {
     idx_to_keep.empty();
     bool is1tomany = settings::getParameter<settings::Boolean>(parameters, "#is1tomany").value;
     bool isdualoop = settings::getParameter<settings::Boolean>(parameters, "#isDuaLoop").value;
+    bool issingleloop = settings::getParameter<settings::Boolean>(parameters, "#issingleloop").value;
 
     if (is1tomany && idv_count != pop_size) {
         int eval_num = settings::getParameter<settings::Integer>(parameters, "#eval_num").value;
@@ -528,6 +529,20 @@ void MorphNeuro::epoch() {
             morph_population->Epoch();
             contr_population->Epoch();
         }
+
+    }
+
+    if (issingleloop){
+        int indCounter = 0; /// \todo EB: There must be a better way to do this!
+        for(const auto& ind : population){
+            morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
+            // TO CHANGE
+            contr_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
+            indCounter++;
+        }
+        morph_population->Epoch();
+        // TO CHANGE
+        contr_population->Epoch();
 
     }
 }
