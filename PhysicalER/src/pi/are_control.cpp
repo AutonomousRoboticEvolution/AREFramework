@@ -2,43 +2,32 @@
 
 using namespace are::pi;
 
-AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans){
+AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000000.0;
 
-	// need to turn on the daughter boards
-	daughterBoards->init();
+    // need to turn on the daughter boards
+    daughterBoards->init();
     daughterBoards->turnOn();
 
     // each organ needs to be initiated with its i2c address, obtained from stringListOfOrgans
     std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
-    std::istringstream organsListSS(stringListOfOrgans);
-    std::string line;
-    int numberOfInputs=0; // for counting the NNInputs
-    int numberOfOutputs=0; // for counting the NNOutputs
-    while(std::getline(organsListSS,line)){
-        std::cout<<"line: "<<line<<std::endl;
-        std::istringstream thisOrganSS(line);
-        std::string tempString;
-        std::getline(thisOrganSS, tempString,','); // first value before the comma is the type of organ: 0=Head, 1=wheel, 2=Sensor
-        if (tempString == "1"){ // this is a wheel
-            numberOfOutputs++;
-            std::getline(thisOrganSS, tempString,','); // the second value in the line is the i2c address of the organ
-            listOfWheels.push_back( new MotorOrgan( tempString ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+    std::string thisLine;
+    std::stringstream temp_string_stream(stringListOfOrgans);
+    std::cout<< "starting main loop:"<< std::endl;
+    while( std::getline(temp_string_stream, thisLine,'\n') ){
+        std::string organType = thisLine.substr(0, thisLine.find(","));
+        std::string addressValue = thisLine.substr(thisLine.find(",")+1);
+        if (organType=="0") {} //Head
+        if (organType=="1"){//wheel
+            std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
+            listOfWheels.push_back( MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
         }
-        else if (tempString == "2"){ // this is a sensor
-            numberOfInputs++;
-            std::getline(thisOrganSS, tempString,','); // the second value in the line is the i2c address of the organ
-            uint8_t tempAddress = std::stoi(tempString);
-            listOfSensors.push_back( new SensorOrgan( tempAddress ) ); // add a new sensor to the list, with the i2c address just extracted from the line
+        if (organType=="2") { //sensor
+            std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
+            listOfSensors.push_back( SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
         }
-
-        std::cout<<"debugging...\n number of outputs/wheels was :"<<numberOfOutputs<<"\nnumber of inputs/sensors was: "<<numberOfOutputs<<std::endl;
-
-
-//    wheel0.reset(new MotorOrgan(0x60));
-//    wheel1.reset(new MotorOrgan(0x61));
-//    wheel2.reset(new MotorOrgan(0x62));
-//    wheel3.reset(new MotorOrgan(0x63));
+    }
 
     // initialise the LED and flash green to show ready
     ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be cahnged
@@ -57,29 +46,48 @@ AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans
 
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendMotorCommands(std::vector<double> values){
-    //std::cout << "wheel0 setSpeed to: " << values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    //std::cout << "wheel1 setSpeed to: " << values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    //std::cout << "wheel2 setSpeed to: " << values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    //std::cout << "wheel3 setSpeed to: " << values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER << std::endl;
-    //wheel0->setSpeed(values[0]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    //wheel1->setSpeed(values[1]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    //wheel2->setSpeed(values[2]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
-    //wheel3->setSpeed(values[3]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER);
+    int i=0;
+    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
+        thisWheel->setSpeed( values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER );
+//        std::cout<<"Wheel "<<i<<" output set to "<<values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER<<std::endl;
+        i++;
+    }
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
-    // Sensors are not yet implemented for ARE robot
-    //sensor_vals.clear();
+    // loop through each sensor and get it's value
+    sensor_vals.clear();
     sensor_vals = {};
+    int i=0;
+    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+        int raw_value = thisSensor->readTimeOfFlight();
+        sensor_vals.push_back( std::max ( std::min(1.0,float(raw_value)/1000.0) , 0.0) );
+    }
+    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+        int raw_value = thisSensor->readInfrared();
+        if (raw_value > INFRARED_SENSOR_THREASHOLD) sensor_vals.push_back(1.0);
+        else sensor_vals.push_back(0.0);
+    }
+
+    // debugging: display sensor values as bars:
+    for(i=0;i<sensor_vals.size();i++){
+        int n_blocks=sensor_vals[i]*10.0;
+        for (int i_block=0; i_block<10;i_block++){
+            if (i_block<n_blocks) std::cout<<"x";
+            else std::cout<<" ";
+        }
+        std::cout<<"|";
+    }
+    std::cout<<std::endl;
 }
 
-int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
+int AREControl::exec(zmq::socket_t& socket){
     //QCoreApplication qapp(argc,argv);
 
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
     double time = 0;
-    std::cout << "time,nn_output 0,nn_output 1,nn_output 2,nn_output 3"<< std::endl;
+    std::cout<<"evaluation time: "<<_max_eval_time<<std::endl;
     while(time <= _max_eval_time){
 
         retrieveSensorValues(sensor_values);
@@ -88,13 +96,6 @@ int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
         controller.set_inputs(sensor_values);
         controller.update(time);
         nn_outputs = controller.get_ouputs();
-
-        // some debugging messages
-        std::cout << float(time)/1000000 <<","<< nn_outputs[0] <<","<< nn_outputs[1] <<","<< nn_outputs[2] <<","<< nn_outputs[3] <<","<< std::endl;
-        //std::cout << "nn_outputs : " << nn_outputs[0] << std::endl;
-        //std::cout << "nn_outputs 1: " << nn_outputs[1] << std::endl;
-        //std::cout << "nn_outputs 2: " << nn_outputs[2] << std::endl;
-        //std::cout << "nn_outputs 3: " << nn_outputs[3] << std::endl;
         
         // send the new values to the actuators
         sendMotorCommands(nn_outputs);
@@ -108,14 +109,14 @@ int AREControl::exec(int argc, char** argv, zmq::socket_t& socket){
         socket.send(message);
         
         // wait for next timestep
+//        std::cout<<" === "<<time<<" === "<<std::endl;
         usleep(_time_step);
     }
 
     // turn everything off
-    wheel0->standby();
-    wheel1->standby();
-    wheel2->standby();
-    wheel3->standby();
+    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
+        thisWheel->standby() ;
+    }
     daughterBoards->turnOff();
 
     

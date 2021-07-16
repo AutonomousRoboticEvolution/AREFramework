@@ -2,6 +2,7 @@
 #define ARE_CONTROL_HPP
 
 #define NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER 30.f
+#define INFRARED_SENSOR_THREASHOLD 100
 
 #include <iostream>
 #include <vector>
@@ -18,7 +19,7 @@ namespace pi {
 class AREControl{
 public:
 
-    AREControl(const NN2Individual& ind , std::string stringListOfOrgans);
+    AREControl(const NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
     void sendMotorCommands(std::vector<double> values);
     void retrieveSensorValues(std::vector<double> &sensor_vals);
@@ -27,7 +28,7 @@ public:
 
 private:
     NN2Individual controller;
-    float _max_eval_time = 30000000; // microseconds
+    float _max_eval_time ; // microseconds
     float _time_step = 100000; // microseconds
 
 //    std::shared_ptr<MotorOrgan> wheel0;
