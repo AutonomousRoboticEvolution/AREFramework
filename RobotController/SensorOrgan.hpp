@@ -16,9 +16,12 @@
 #define FLASH_INDICATOR_LED_REGISTER 0x03
 #define SET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x04 // set the i2c address of the VL53L0X sensor
 #define GET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x05 // return what the arduino thinks is the i2c address of the VL53L0X sensor
+#define REQUEST_INFRARED_RAW_VALUE_REGISTER 0x06 // return the raw IR value, without the filtering
 
 
 #define TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS 5
+#define MAXIMUM_RANGE_VALUE 2000
+#define VALUE_TO_RETURN_ON_TIMEOUT MAXIMUM_RANGE_VALUE
 #define VL53L0X_RESULT_RANGE_STATUS 0x14
 #define VL53L0X_RESULT_INTERRUPT_STATUS 0x13
 #define VL53L0X_SYSTEM_INTERRUPT_CLEAR 0x0B
@@ -40,11 +43,13 @@ class SensorOrgan  : protected I2CDevice {
     public :
         SensorOrgan(uint8_t address);
         uint16_t readInfrared();
+        uint16_t readInfraredRaw();
         uint16_t readTimeOfFlight();
         uint16_t getTimeOfFlightI2CAddress();
         void flashIndicatorLED(uint8_t numberOfFlashes);
         void setTimOfFlightI2CAddress(uint8_t newAddress);
         void test();
+        int getOrganI2CAddress(){ return getI2CAddress();}
 
 	private:
 		VL53L0X* timeOfFlight;

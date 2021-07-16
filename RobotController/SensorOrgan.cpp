@@ -7,6 +7,7 @@
 #include <iostream> // for cout debugging
 #include "SensorOrgan.hpp"
 #include <wiringPi.h> // for millis()
+#include <bitset>
 
 // Time of flight sensor (aka VL53L0X) constructor
 VL53L0X::VL53L0X(uint8_t address) : I2CDevice(address){} // just call i2c device constructor
@@ -28,21 +29,33 @@ uint16_t SensorOrgan::readTimeOfFlight() {
 		if (TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS > 0 && ((uint16_t)(millis() - timeout_start_ms) > TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS)) {
             std::cout<<"ERROR: Timeout attempting to read the time-of-flight sensor"<<std::endl;
         	timeOfFlight->write8To(VL53L0X_SYSTEM_INTERRUPT_CLEAR, 0x01);
-			return 65535;
+            return VALUE_TO_RETURN_ON_TIMEOUT;
 		}
 	}
     // did not timeout :)
+    usleep(100000);
 	uint16_t first_byte=timeOfFlight->read8From(VL53L0X_RESULT_RANGE_STATUS + 10);
 	uint16_t second_byte=timeOfFlight->read8();
 	uint16_t range = first_byte<<8 | second_byte;
+//    std::cout<<"raw range: "<<range<<std::endl;
 	timeOfFlight->write8To(VL53L0X_SYSTEM_INTERRUPT_CLEAR, 0x01);
-	return range;
+    if (range>MAXIMUM_RANGE_VALUE) return MAXIMUM_RANGE_VALUE;
+    else return range;
+
 }
 
 
 //Reads the infrared sensor
 uint16_t SensorOrgan::readInfrared() {
 	write8To(REQUEST_INFRARED_REGISTER,0x00);
+    uint8_t first_byte = read8();
+    uint8_t second_byte = read8();
+	return (first_byte<<8) | second_byte;
+}
+
+//Reads the infrared sensor without any filtering etc
+uint16_t SensorOrgan::readInfraredRaw() {
+	write8To(REQUEST_INFRARED_RAW_VALUE_REGISTER,0x00);
     uint8_t first_byte = read8();
     uint8_t second_byte = read8();
 	return (first_byte<<8) | second_byte;
@@ -69,44 +82,74 @@ void SensorOrgan::test()
 //    // keep taking readings and displaying:
 //	for (int i=0;i<100;i++){
 		uint16_t TOFvalue = readTimeOfFlight();
+		std::bitset<8> TOFbits(TOFvalue);
 		uint16_t IRvalue = readInfrared();
-		std::cout<<"IR: "<<IRvalue;
-		std::cout<<"\tTOF: "<<TOFvalue<<std::endl;
+		std::bitset<8> IRbits(IRvalue);
+		uint16_t IRraw = readInfraredRaw();
+		std::bitset<8> IRRawbits(IRraw);
+
+		std::cout<<"IR: "<<IRvalue<<"\t"<<IRbits<<std::endl;
+		std::cout<<"TOF: "<<TOFvalue<<"\t"<<TOFbits<<std::endl;
+		std::cout<<"IRraw: "<<IRraw<<"\t"<<IRRawbits<<std::endl;
 //		usleep(500000);
 //	}
 
     //flashIndicatorLED(3);
-
+	
+	/*
     // testing the time-of-flight calibration
-    #define number_of_ranges_to_test 25
+    #define number_of_ranges_to_test 15
+    #define number_of_offsets_to_test 1
     #define starting_distance 100
     #define distance_between_each_range 100
-    #define number_of_readings_at_each_range 40
-    #define length_of_usleep_between_readings 200000
+    #define number_of_readings_at_each_range 50
+    #define length_of_usleep_between_readings 30000
     std::cout<<"Range calibration testing"<<std::endl;
     int actual_distances [number_of_ranges_to_test] = { };
-    uint16_t measured_values[number_of_ranges_to_test][number_of_readings_at_each_range];
+    uint16_t measured_values_TOF[number_of_ranges_to_test][number_of_offsets_to_test][number_of_readings_at_each_range];
+    uint16_t measured_values_IR[number_of_ranges_to_test][number_of_offsets_to_test][number_of_readings_at_each_range];
 
-    for(int i = 0; i < number_of_ranges_to_test; i++) {
-        actual_distances[i] = starting_distance + i*distance_between_each_range;
-        std::cout << i <<": set the sensor to be at "<<actual_distances[i]/10 <<"cm"<<std::endl;
-        std::cout<< "press enter when ready"<<std::endl;
-        std::cin.get();
-        std::cout<< "taking readings, stay still!"<<std::endl;
-        for(int j=0; j<number_of_readings_at_each_range; j++){
-            usleep(length_of_usleep_between_readings);
-            measured_values[i][j] = readTimeOfFlight();
-            std::cout<<"TOF: "<<measured_values[i][j] <<std::endl;
+    for(int i_offset = 0; i_offset < number_of_offsets_to_test; i_offset++) {
+        std::cout<<"Set sideways offset of: "<<i_offset*distance_between_each_range<<std::endl;
+        for(int i = 0; i < number_of_ranges_to_test; i++) {
+            actual_distances[i] = starting_distance + i*distance_between_each_range;
+            std::cout << i <<": set the sensor to be at "<<actual_distances[i]/10 <<"cm"<<std::endl;
+            std::cout<< "press enter when ready"<<std::endl;
+            std::cin.get();
+            std::cout<< "taking readings, stay still!"<<std::endl;
+            for(int j=0; j<number_of_readings_at_each_range; j++){
+                usleep(length_of_usleep_between_readings + rand()%length_of_usleep_between_readings);
+                measured_values_TOF[i][i_offset][j] = readTimeOfFlight();
+//                std::cout<<measured_values_TOF[i][i_offset][j]<<std::endl;
+                usleep(100);
+                measured_values_IR[i][i_offset][j] = readInfrared();
+            }
         }
     }
-    std::cout<<"Finished testing, data: "<<std::endl;
+    std::cout<<"\n\nTime of flight sensor:\n: "<<std::endl;
     std::cout<<"Actual,\tmeasured ("<<number_of_readings_at_each_range<<" values)"<<std::endl;
-    for(int i = 0; i < number_of_ranges_to_test; i++) {
-        std::cout<< actual_distances[i];
-            for(int j=0; j<number_of_readings_at_each_range; j++){
-                std::cout<<","<<(unsigned)measured_values[i][j];
-            }
-        std::cout<<std::endl;
+    for(int i_offset = 0; i_offset < number_of_offsets_to_test; i_offset++) {
+        std::cout<<"Sideways offset: "<<i_offset*distance_between_each_range<<std::endl;
+        for(int i = 0; i < number_of_ranges_to_test; i++) {
+            std::cout<< actual_distances[i];
+                for(int j=0; j<number_of_readings_at_each_range; j++){
+                    uint16_t temp = measured_values_TOF[i][i_offset][j];
+                    std::cout<<","<< temp ;
+                }
+            std::cout<<std::endl;
+        }
     }
+    std::cout<<"\n\nInfrared:\n: "<<std::endl;
+    for(int i_offset = 0; i_offset < number_of_offsets_to_test; i_offset++) {
+        std::cout<<"Sideways offset: "<<i_offset*distance_between_each_range<<std::endl;
+        for(int i = 0; i < number_of_ranges_to_test; i++) {
+            std::cout<< actual_distances[i];
+                for(int j=0; j<number_of_readings_at_each_range; j++){
+                    std::cout<<","<< measured_values_IR[i][i_offset][j];
+                }
+            std::cout<<std::endl;
+        }
+    }
+	*/
 
 }
