@@ -71,11 +71,6 @@ int getBeaconLevel(FIFO* samplingWindow, int windowSize, int wrappingBitmask) {
     Serial.println(averageHigh);
   #endif
 
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.print("Beacon Level computed as :");
-    Serial.println(averageHigh - averageLow);
-  #endif
-
   //Return the difference; this is the beacon level reading
   return averageHigh - averageLow;
 }

@@ -87,7 +87,9 @@ void sendData(){
     
     #ifdef SERIAL_DEBUG_PRINTING
       Serial.print("Sent: 0x");
-      Serial.println(send_buffer,HEX);
+      Serial.print(send_buffer,HEX);
+      Serial.print("\t= ");
+      Serial.println(send_buffer,BIN);
     #endif
 
   }else if (TOF_address_is_requested) {
@@ -109,7 +111,7 @@ void sendData(){
       first_byte_has_been_sent=true;
   
       #ifdef SERIAL_DEBUG_PRINTING
-        Serial.print("IR value: ");
+        Serial.print("Raw IR value: ");
         Serial.print(reading);
         Serial.print(" = 0x");
         Serial.println(reading,HEX);
@@ -123,7 +125,9 @@ void sendData(){
     Wire.write(send_buffer);
     #ifdef SERIAL_DEBUG_PRINTING
       Serial.print("Sent: 0x");
-      Serial.println(send_buffer,HEX);
+      Serial.print(send_buffer,HEX);
+      Serial.print("\t= ");
+      Serial.println(send_buffer,BIN);
     #endif
     
   }else{

@@ -112,9 +112,6 @@ void setup() {
       Serial.println("Failed to detect and initialize sensor!");
     #endif
   }
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.println("here");
-  #endif
 
   // set to "long range":
   timeOfFlightSensor.setSignalRateLimit(0.1); // lower the return signal rate limit (default is 0.25 MCPS)
