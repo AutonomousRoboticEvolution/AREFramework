@@ -7,6 +7,7 @@
 #include <iostream> // for cout debugging
 #include "SensorOrgan.hpp"
 #include <wiringPi.h> // for millis()
+#include <bitset>
 
 // Time of flight sensor (aka VL53L0X) constructor
 VL53L0X::VL53L0X(uint8_t address) : I2CDevice(address){} // just call i2c device constructor
@@ -32,6 +33,7 @@ uint16_t SensorOrgan::readTimeOfFlight() {
 		}
 	}
     // did not timeout :)
+    usleep(100000);
 	uint16_t first_byte=timeOfFlight->read8From(VL53L0X_RESULT_RANGE_STATUS + 10);
 	uint16_t second_byte=timeOfFlight->read8();
 	uint16_t range = first_byte<<8 | second_byte;
@@ -46,6 +48,14 @@ uint16_t SensorOrgan::readTimeOfFlight() {
 //Reads the infrared sensor
 uint16_t SensorOrgan::readInfrared() {
 	write8To(REQUEST_INFRARED_REGISTER,0x00);
+    uint8_t first_byte = read8();
+    uint8_t second_byte = read8();
+	return (first_byte<<8) | second_byte;
+}
+
+//Reads the infrared sensor without any filtering etc
+uint16_t SensorOrgan::readInfraredRaw() {
+	write8To(REQUEST_INFRARED_RAW_VALUE_REGISTER,0x00);
     uint8_t first_byte = read8();
     uint8_t second_byte = read8();
 	return (first_byte<<8) | second_byte;
@@ -72,17 +82,24 @@ void SensorOrgan::test()
 //    // keep taking readings and displaying:
 //	for (int i=0;i<100;i++){
 		uint16_t TOFvalue = readTimeOfFlight();
+		std::bitset<8> TOFbits(TOFvalue);
 		uint16_t IRvalue = readInfrared();
-		std::cout<<"IR: "<<IRvalue;
-		std::cout<<"\tTOF: "<<TOFvalue<<std::endl;
+		std::bitset<8> IRbits(IRvalue);
+		uint16_t IRraw = readInfraredRaw();
+		std::bitset<8> IRRawbits(IRraw);
+
+		std::cout<<"IR: "<<IRvalue<<"\t"<<IRbits<<std::endl;
+		std::cout<<"TOF: "<<TOFvalue<<"\t"<<TOFbits<<std::endl;
+		std::cout<<"IRraw: "<<IRraw<<"\t"<<IRRawbits<<std::endl;
 //		usleep(500000);
 //	}
 
     //flashIndicatorLED(3);
-
+	
+	/*
     // testing the time-of-flight calibration
     #define number_of_ranges_to_test 15
-    #define number_of_offsets_to_test 4
+    #define number_of_offsets_to_test 1
     #define starting_distance 100
     #define distance_between_each_range 100
     #define number_of_readings_at_each_range 50
@@ -133,5 +150,6 @@ void SensorOrgan::test()
             std::cout<<std::endl;
         }
     }
+	*/
 
 }
