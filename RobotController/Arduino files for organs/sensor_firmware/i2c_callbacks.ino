@@ -48,6 +48,20 @@ void receiveData(int received_data_byte_count){
     case REQUEST_INFRARED_RAW_VALUE_REGISTER:
       raw_IR_value_is_requested = true;
       break;
+
+    case SET_TEST_VALUE_REGISTER:
+      test_register_value = input_buffer[1];
+        #ifdef SERIAL_DEBUG_PRINTING
+        Serial.print("new test_register_value: 0x");
+        Serial.print(test_register_value, HEX);
+        Serial.print("\t= ");
+        Serial.println(test_register_value);
+      #endif
+      break;
+    
+    case GET_TEST_VALUE_REGISTER:
+      test_resgister_is_requested = true;
+      break;
      
     default:
       #ifdef SERIAL_DEBUG_PRINTING
@@ -128,6 +142,16 @@ void sendData(){
       Serial.print(send_buffer,HEX);
       Serial.print("\t= ");
       Serial.println(send_buffer,BIN);
+    #endif
+
+  } else if (test_resgister_is_requested){
+    test_resgister_is_requested=false;
+    Wire.write(test_register_value);
+    #ifdef SERIAL_DEBUG_PRINTING
+      Serial.print("test register value us requested, sent: 0x");
+      Serial.print(test_register_value,HEX);
+      Serial.print("\t= ");
+      Serial.println(test_register_value);
     #endif
     
   }else{

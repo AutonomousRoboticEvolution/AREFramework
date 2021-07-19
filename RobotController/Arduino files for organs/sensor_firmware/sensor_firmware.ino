@@ -22,10 +22,10 @@
 #include <VL53L0X.h>
 VL53L0X timeOfFlightSensor;
 
-#define SLAVE_ADDRESS 0x32 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x30 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
-//#define SERIAL_DEBUG_PRINTING
+#define SERIAL_DEBUG_PRINTING
 //#define SERIAL_DEBUG_FILTERING_RAW_DATA
 
 // define register addresses this slave device provides
@@ -35,6 +35,8 @@ VL53L0X timeOfFlightSensor;
 #define SET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x04 // set the i2c address of the VL53L0X sensor
 #define GET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x05 // return what the arduino thinks is the i2c address of the VL53L0X sensor
 #define REQUEST_INFRARED_RAW_VALUE_REGISTER 0x06 // return the raw IR value, without the filtering
+#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
+#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
 // define pins:
 #define INDICATOR_LED_PIN 9
@@ -64,6 +66,8 @@ uint16_t reading; // variable to store the reading to be sent back to master
 unsigned int number_of_flashes_requested = 0;
 unsigned long time_of_previous_led_flash =0;
 bool led_is_on = false;
+uint8_t test_register_value = 0;
+bool test_resgister_is_requested = false;
 
 bool new_address_for_time_of_flight_sensor_received = false;
 int new_address_of_time_of_flight_sensor = TIME_OF_FLIGHT_SENSOR_HARDWARE_DEFAULT_ADDRESS;

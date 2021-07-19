@@ -74,13 +74,26 @@ uint16_t SensorOrgan::getTimeOfFlightI2CAddress(){
     return read8From(GET_TIME_OF_FLIGHT_ADDRESS_REGISTER);
 }
 
+
+void SensorOrgan::set_test_value(uint8_t value){
+    write8To(SET_TEST_VALUE_REGISTER, value);
+}
+uint8_t SensorOrgan::get_test_value(){
+    return read8From(GET_TEST_VALUE_REGISTER);
+}
+
 //Useful for testing and checking the organ works, not intended for general use
 void SensorOrgan::test()
 {
     std::cout<<"Testing the sensor..."<<std::endl;
-	
-//    // keep taking readings and displaying:
-//	for (int i=0;i<100;i++){
+    int value_to_send = 0b10101010 ;
+    for (int i=0;i<10;i++){
+        set_test_value(value_to_send);
+        std::cout<<int(value_to_send)<< ",\t"<< int( get_test_value() ) << std::endl;
+    }
+/*
+    // keep taking readings and displaying:
+	for (int i=0;i<100;i++){
 		uint16_t TOFvalue = readTimeOfFlight();
 		std::bitset<8> TOFbits(TOFvalue);
 		uint16_t IRvalue = readInfrared();
@@ -91,8 +104,9 @@ void SensorOrgan::test()
 		std::cout<<"IR: "<<IRvalue<<"\t"<<IRbits<<std::endl;
 		std::cout<<"TOF: "<<TOFvalue<<"\t"<<TOFbits<<std::endl;
 		std::cout<<"IRraw: "<<IRraw<<"\t"<<IRRawbits<<std::endl;
-//		usleep(500000);
-//	}
+		usleep(500000);
+	}
+*/
 
     //flashIndicatorLED(3);
 	
