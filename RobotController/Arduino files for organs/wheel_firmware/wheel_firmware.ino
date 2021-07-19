@@ -1,16 +1,19 @@
 // Firmware for the wheel organ, with encoder. Authour: Matt
 // This pin assignments are the same as for the arduino Uno
-//#define SERIAL_DEBUG_PRINTING
+#define SERIAL_DEBUG_PRINTING
 //#define OPEN_LOOP_VALUES_FINDER
 //#define STEP_INPUT_TEST
 
-#define SLAVE_ADDRESS 0x61 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x63 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 #include <Wire.h>
 
 // This code should interface with Mike's driver code, and so mimics the register(s) used by the i2c motor driver (DRV8830):
 #define DRV_CONTROL_REG_ADDR 0x00
 #define DRV_FAULT_REG_ADDR 0x01 // not (yet?) implemented
+
+#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
+#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
 // states defined by the 0th and 1st bits of a command signal
 #define STANDBY 0x0
@@ -43,6 +46,9 @@ int motor_state; //will be either STANDBY, REVERSE, FORWARD or BRAKE defined abo
 int demand_velocity;
 uint8_t input_buffer[2];
 float integral_value;
+
+uint8_t test_register_value = 0;
+bool test_resgister_is_requested = false;
 
 // encoder global variables
 volatile int encoder_ticks_this_timestep;
@@ -161,6 +167,20 @@ void receiveData(int received_data_byte_count){
       raw_input_for_control_register = input_buffer[1];
       new_control_register_value_received_flag = true;
       break;
+
+    case SET_TEST_VALUE_REGISTER:
+      test_register_value = input_buffer[1];
+        #ifdef SERIAL_DEBUG_PRINTING
+        Serial.print("new test_register_value: 0x");
+        Serial.print(test_register_value, HEX);
+        Serial.print("\t= ");
+        Serial.println(test_register_value);
+      #endif
+      break;
+    
+    case GET_TEST_VALUE_REGISTER:
+      test_resgister_is_requested = true;
+      break;
   
     default:
       #ifdef SERIAL_DEBUG_PRINTING
@@ -168,6 +188,25 @@ void receiveData(int received_data_byte_count){
         Serial.println(input_buffer[0], HEX);
       #endif
       break;
+  }
+}
+
+// gets called whenever master wants to read a register:
+void sendData(){
+  if (test_resgister_is_requested){
+    test_resgister_is_requested=false;
+    Wire.write(test_register_value);
+    #ifdef SERIAL_DEBUG_PRINTING
+      Serial.print("test register value us requested, sent: 0x");
+      Serial.print(test_register_value,HEX);
+      Serial.print("\t= ");
+      Serial.println(test_register_value);
+    #endif
+    
+  }else{
+    #ifdef SERIAL_DEBUG_PRINTING
+      Serial.println("ERROR! in sendData, but no request flag is true");
+    #endif
   }
 }
  
@@ -254,6 +293,7 @@ void setup(){
     // start i2c comms
     Wire.begin(SLAVE_ADDRESS);
     Wire.onReceive(receiveData);
+    Wire.onRequest(sendData);
 
     // prepare for loop start
     loop_target_end_time = micros();
