@@ -36,11 +36,13 @@ public:
     float timeCheck = 0.0;
 
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
-
+    void load_target_positions();
     void build_tiled_floor(std::vector<int> &tiles_handles);
 
 private:
+    int current_target = 0;
     std::vector<double> target_position;
+    std::vector<std::vector<double>> target_position_all;
     int move_counter = 0;
 };
 
