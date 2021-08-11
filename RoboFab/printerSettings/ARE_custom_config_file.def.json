@@ -1,0 +1,17 @@
+{
+	"id": "ARE_custom_config",
+	"version": 2,
+	"name": "",
+	"inherits": "lulzbot_taz6_moarstruder",
+    "overrides":
+    {
+        "machine_start_gcode":
+        {
+            "default_value": ";Modified start g-code for ARE project MOARstruder\nM73 P0 ; clear GLCD progress bar\nM75 ; start GLCD timer\nG26 ; clear potential 'probe fail' condition\nG21 ; set units to millimeters\nM107 ; disable fans\nM420 S0 ; disable previous leveling matrix\nG90 ; absolute positioning\nM82 ; set extruder to absolute mode\nG92 E0 ; set extruder position to 0\nM140 S60 ; start bed heating up\nM109 R140 ; soften filament before homing Z\nG28 XY ; home X and Y\nG1 X-19 Y258 F1000 ; move to safe homing position\nG28 Z ; Home Z\nG1 E-30 F100 ; retract filament\nM109 R140 ; wait for extruder to reach wiping temp\nG1 X-15 Y100 F3000 ; move above wiper pad\nG1 Z1 ; push nozzle into wiper\nG1 X-17 Y95 F1000 ; slow wipe\nG1 X-17 Y90 F1000 ; slow wipe\nG1 X-17 Y85 F1000 ; slow wipe\nG1 X-15 Y90 F1000 ; slow wipe\nG1 X-17 Y80 F1000 ; slow wipe\nG1 X-15 Y95 F1000 ; slow wipe\nG1 X-17 Y75 F2000 ; fast wipe\nG1 X-15 Y65 F2000 ; fast wipe\nG1 X-17 Y70 F2000 ; fast wipe\nG1 X-15 Y60 F2000 ; fast wipe\nG1 X-17 Y55 F2000 ; fast wipe\nG1 X-15 Y50 F2000 ; fast wipe\nG1 X-17 Y40 F2000 ; fast wipe\nG1 X-15 Y45 F2000 ; fast wipe\nG1 X-17 Y35 F2000 ; fast wipe\nG1 X-15 Y40 F2000 ; fast wipe\nG1 X-17 Y70 F2000 ; fast wipe\nG1 X-15 Y30 Z2 F2000 ; fast wipe\nG1 X-17 Y35 F2000 ; fast wipe\nG1 X-15 Y25 F2000 ; fast wipe\nG1 X-17 Y30 F2000 ; fast wipe\nG1 X-15 Y25 Z1.5 F1000 ; slow wipe\nG1 X-17 Y23 F1000 ; slow wipe\nG1 Z10 ; raise extruder\nM109 R140 ; wait for extruder to reach probe temp\nG1 X-9 Y-9 ; move above first probe point\nM204 S100 ; set probing acceleration\nG29       ; start auto-leveling sequence\nM204 S500 ; restore standard acceleration\nG1 X0 Y0 Z15 F5000 ; move up off last probe point\nG4 S1 ; pause\nM400 ; wait for moves to finish\nM117 Heating... ; progress indicator message on LCD\nM109 R210 ; wait for extruder to reach printing temp\nM190 R60 ; wait for bed to reach printing temp\nG1 Z2 E0 F75 ; prime tiny bit of filament into the nozzle\nM117 TAZ 6 Printing... ; progress indicator message on LCD\n;end of start g-code\n"
+        },
+        "machine_end_gcode":
+        {
+            "default_value": ";custom end g-code for ARE project\nM400 ; wait for moves to finish\nM104 S0 ; disable hotend\nM107 ; disable fans\nG91  ; relative positioning\nG1 E-1 F300 ; filament retraction to release pressure\nG1 Z20 E-5 X-20 Y-20 F3000 ; lift up and retract even more filament\nG1 E6 ; re-prime extruder\nM117 Cooling please wait ; progress indicator message on LCD\nG90  ; absolute positioning\nG1 Y303 F3000 ; present finished print\nM77 ; stop GLCD timer\nM84  ; disable steppers\nG90  ; absolute positioning\n\nM117 Print Complete. ; print complete message\n;end of end g-code\n"
+        }
+    }
+}

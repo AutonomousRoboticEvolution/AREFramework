@@ -4,21 +4,8 @@ using namespace are::phy;
 
 void ER::initialize(){
 
-    std::string pi_address = settings::getParameter<settings::String>(parameters,"#piAddress").value;
 
-    std::stringstream sstream1,sstream2;
-    sstream1 << "tcp://" << pi_address << ":5556";
-    sstream2 << "tcp://" << pi_address << ":5555";
-
-    //ZMQ's communication socket
-//    request = zmq::socket_t(context, ZMQ_REQ);
-    request.connect (sstream1.str().c_str());//TODO parametrize ip address
-
-//    subscriber = zmq::socket_t(context,ZMQ_SUB);
-    subscriber.connect(sstream2.str().c_str());
-    subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
-
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
 
     if(seed < 0){
@@ -62,6 +49,7 @@ void ER::initialize(){
 
     libhandler->close();
 
+    if (verbose) std::cout << "ER initialized" << std::endl;
 }
 
 void ER::load_data(bool is_update){
@@ -112,8 +100,13 @@ bool ER::execute(){
 }
 
 void ER::start_evaluation(){
-    if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
-        std::cout << "Starting Evaluation\n=====" << std::endl;
+
+    // get relevent paramters
+    std::string ctrlGenomeFolder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value;
+    std::string waitingToBeEvalutatedFolderPath = ctrlGenomeFolder + std::string("waiting_to_be_evaluated/");
+
+    std::string robotID = "test2"; // TODO get this from user input based on those available in waiting_to_be_evaluated
+    if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<robotID<<"\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
 
@@ -122,22 +115,50 @@ void ER::start_evaluation(){
         environment->init();
     }
 
-    currentInd = ea->getIndividual(currentIndIndex);
-    currentInd->init();
+//    currentInd = ea->getIndividual(currentIndIndex);
+//    currentInd->init();
 
-//    if(!send_order(are::phy::OrderType::LAUNCH,request))
-//        exit(1);
 
+    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
+    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
+
+    // get IP address of robot from the first line of the list_of_organs file
+    std::string firstLine;
+    std::getline(organListFileStream,firstLine); // get first line
+    std::string pi_address = firstLine.substr( firstLine.find(",")+1,firstLine.find("\n")-2) ; // the first line should be "0,[pi address]\n"
+    if (verbose) std::cout<< "pi IP address: "<< pi_address << std::endl;
+    std::string stringListOfOrgans;
+    for (std::string line; std::getline(organListFileStream, line); ) stringListOfOrgans.append(line+"\n");
+    std::cout<<"organ list: \n"<<stringListOfOrgans<<"=="<<std::endl;
+
+    // get the controller genome as string, from the genome file
+    std::ifstream controllerGenomeFileStream(waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
+    if(!controllerGenomeFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
+    std::string ctrl_gen;
+    for (std::string line; std::getline(controllerGenomeFileStream, line); ) ctrl_gen.append(line+"\n");
+
+    //start ZMQ
+    std::stringstream sstream1,sstream2;
+    sstream1 << "tcp://" << pi_address << ":5556";
+    sstream2 << "tcp://" << pi_address << ":5555";
+//    request = zmq::socket_t(context, ZMQ_REQ);
+    request.connect (sstream1.str().c_str());
+//    subscriber = zmq::socket_t(context,ZMQ_SUB);
+    subscriber.connect(sstream2.str().c_str());
+    subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
+
+    //send the parameters as a string
     std::string reply;
     std::string param = settings::toString(*parameters.get());
+    std::cout<<"params : \n"<<param<<std::endl;
     send_string(reply,param,request);
     assert(reply == "parameters_received");
 
-    //get the addresses
-    send_string(reply,param,request);
+    //send the list of organ addresses
+    send_string(reply,stringListOfOrgans,request);
     assert(reply == "organ_addresses_received");
 
-    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
+//    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
     send_string(reply,ctrl_gen,request);
     assert(reply == "starting");
 

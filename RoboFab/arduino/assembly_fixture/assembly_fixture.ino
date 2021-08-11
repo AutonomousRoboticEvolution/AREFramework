@@ -11,7 +11,7 @@
 #define ACCEL_RAMP_STEPS ((STEP_MAX_DURATION_US - STEP_MIN_DURATION_US)/ACCEL_INCREMENT_US) //Steps required to transition between min and max speed
 
 #define HOMING_RETREAT_DEGREES 10 //Homing routine retreats this much from endstop before doing final homing pass
-#define HOME_POSITION_DEG (360 - 237.6) //Starting position relative to angle at which endstop is triggered
+#define HOME_POSITION_DEG (360 - 235.5) //Starting position relative to angle at which endstop is triggered
 
 #define DEBUG 0 //To enable or disable debug messages
 

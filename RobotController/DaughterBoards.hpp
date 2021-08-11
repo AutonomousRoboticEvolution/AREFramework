@@ -12,6 +12,12 @@
 
 #include <wiringPi.h>
 
+/**
+	used to select between the two daghter boards.
+    "left" and "right" are defined as the camera on the Head looking forward.
+*/
+enum boardSelection {LEFT, RIGHT, BOTH, NONE};
+
 class DaughterBoards{
     public:
         DaughterBoards();
@@ -26,7 +32,7 @@ class DaughterBoards{
         /**
          * Enable the daughter boards
          */
-        void turnOn();
+        void turnOn(boardSelection boardToEnable=BOTH);
 
         /**
          * Disable the daughter boards

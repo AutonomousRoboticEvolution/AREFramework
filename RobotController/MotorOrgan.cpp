@@ -78,6 +78,23 @@ void MotorOrgan::clearFaultReg()  {
 	write8To(DRV_FAULT_REG_ADDR, clear);
 }
 
+//Useful for testing and checking the organ works, not intended for general use
+void MotorOrgan::test(){
+	setSpeed(25);
+	sleep(1); // seconds
+	standby();
+
+//	// for feedforward controller values finding:
+//    for (int speed_val=10; speed_val<=40; speed_val+=10){
+//        myWheel.setSpeed(speed_val);
+//        sleep(2); // seconds
+//        //myWheel.standby();
+//        myWheel.setSpeed(0);
+//        sleep(2);
+//    }
+}
+
+
 /**PRIVATE FUNCTIONS ***/
 //Write current speed and state values to control register
 void MotorOrgan::writeControlReg() {
