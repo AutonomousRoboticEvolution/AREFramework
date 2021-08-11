@@ -8,13 +8,13 @@
 #include <functional>
 #include <memory>
 #include <list>
+#include <cassert>
 
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
 
 #define WHEEL_ADDRESS 0x60
-#define SENSOR_ADDRESS 0x30
 
 #define LED_DRIVER_ADDR 0x6A
 
@@ -55,61 +55,101 @@ int main()
 /************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
 //    batteryMonitor.setBatteryChargeRemaining(2000);
-    batteryMonitor.testingDisplayBatteryLevels();
+//    batteryMonitor.testingDisplayBatteryLevels();
 //    batteryMonitor.printAllPages();
 
 /************ Fan and daughter boards enable testing *********************************/
     Fan fan;
     DaughterBoards daughterBoards;
     //fan.test();
-    //daughterBoards.test();
+    // daughterBoards.test();
+
+/************ LEDs ********************************************/
+    LedDriver ledDriver(0x6A); // <- the Led driver is always the same i2c address, it cannot be cahnged
+    ledDriver.init();
+    
 
 /************ Wheel test ********************************************/
-    MotorOrgan myWheel(WHEEL_ADDRESS);
+//    MotorOrgan myWheel(WHEEL_ADDRESS);
 //	myWheel.test();
 
-
 /************ Sensor test ********************************************/
-    SensorOrgan mySensor(SENSOR_ADDRESS);
-	mySensor.test();
+
     
-    #define n_distances_to_test 100
-    #define start_distance 200
-    #define gap_between_distances start_distance
-    #define n_repeats_per_distance 1
-
-	/*
-    //int listOfAddresses[] = {0x30,0x32,0x40,0x42,0x44};
-    int listOfAddresses[] = {0x46};
-    int n_sensors = 1;
     std::list<SensorOrgan> listOfSensors;
-    std::cout<<"n_distances_to_test,"<<n_distances_to_test<<std::endl;
-    std::cout<<"n_repeats_per_distance,"<<n_repeats_per_distance<<std::endl;
-    std::cout<<"n_sensors,"<<n_sensors<<std::endl;
-    std::cout<<"sensor addresses,";
-
-    for (int i=0;i<n_sensors;i++){
-        listOfSensors.push_back( SensorOrgan( listOfAddresses[i] ) ); // add a new wheel to the list, with the i2c address just extracted
-        std::cout<<listOfAddresses[i]<<",";
+    listOfSensors.push_back( SensorOrgan( 0x30 ) );
+    listOfSensors.push_back( SensorOrgan( 0x32 ) );
+    listOfSensors.push_back( SensorOrgan( 0x34 ) );
+    listOfSensors.push_back( SensorOrgan( 0x36 ) );
+    listOfSensors.push_back( SensorOrgan( 0x38 ) );
+    listOfSensors.push_back( SensorOrgan( 0x3A ) );
+    listOfSensors.push_back( SensorOrgan( 0x3C ) );
+    listOfSensors.push_back( SensorOrgan( 0x3E ) );
+    boardSelection organDaugherBoardLocations[listOfSensors.size()];
+    
+    int i=-1;
+    std::cout<<"Finding which daughter board each organ is attached to:"<<std::endl;
+    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+        i++;
+        daughterBoards.turnOn(LEFT);
+        if(thisSensor->test()){
+            organDaugherBoardLocations[i]=LEFT;
+            std::cout<<"\tleft"<<std::endl;
+        }else{
+            daughterBoards.turnOn(RIGHT);
+            if(thisSensor->test()){
+            organDaugherBoardLocations[i]=RIGHT;
+                std::cout<<"\tright"<<std::endl;
+            }else{
+            organDaugherBoardLocations[i]=NONE;
+                std::cout<<"\tmissing!"<<std::endl;
+            }
+        }
     }
+    
+    int distance=0;
+    std::cout<<std::endl;
+    while(distance<1500){
+        distance += 100;
+        i=-1;
+        std::cout<<distance<<",";
+        for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+            i++;
+            usleep(5000);
+            daughterBoards.turnOn(organDaugherBoardLocations[i]);
+            usleep(5000);
+            //std::cout<<thisSensor->readTimeOfFlight()<<",";
+            std::cout<<thisSensor->readInfrared()<<",";
+        }
+        //std::cout<<std::endl;
+        std::cin.get();
+    }
+    
+    
+    /*
+    #define n_distances_to_test 15
+    #define start_distance 100
+    #define gap_between_distances start_distance
+    #define n_repeats_per_distance 50
+    
+    SensorOrgan mySensor(0x36);
+    daughterBoards.turnOn(LEFT);
+
     std::cout<<std::endl;
 
     for (int i_distance=0;i_distance<n_distances_to_test;i_distance++){
+        int this_distance=start_distance + i_distance*gap_between_distances;
+        std::cout<<this_distance<<",";
         for (int i_repeat=0;i_repeat<n_repeats_per_distance;i_repeat++){
-            int this_distance=start_distance + i_distance*gap_between_distances;
-            for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
-                //int raw_value = thisSensor->readTimeOfFlight();
-                usleep(20000);
-                //std::cout<<thisSensor->getOrganI2CAddress() <<","<< this_distance<<","<<thisSensor->readTimeOfFlight() <<std::endl;
-                std::cout<<thisSensor->getOrganI2CAddress() <<","<<thisSensor->readTimeOfFlight() <<","<<thisSensor->readInfrared() <<std::endl;
-            }
+            std::cout<<mySensor.readInfrared()<<",";
             usleep(20000);
         }
         std::cin.get();
     }
-	*/
+    */
+	
 
-//	daughterBoards.turnOff();
+	daughterBoards.turnOff();
 
 }
 

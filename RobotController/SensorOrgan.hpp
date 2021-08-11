@@ -49,7 +49,7 @@ class SensorOrgan  : protected I2CDevice {
         uint16_t getTimeOfFlightI2CAddress();
         void flashIndicatorLED(uint8_t numberOfFlashes);
         void setTimOfFlightI2CAddress(uint8_t newAddress);
-        void test();
+        bool test();
         void set_test_value(uint8_t value);
         uint8_t get_test_value();
         //int getOrganI2CAddress(){ return getI2CAddress();}

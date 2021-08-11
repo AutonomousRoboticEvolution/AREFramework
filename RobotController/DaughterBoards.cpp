@@ -4,6 +4,8 @@
 #include <bitset> // to display values in binary, e.g. std::cout << std::bitset<8>(myNumber) << std::endl
 #include <unistd.h> // for usleep
 
+#define debugPrinting false
+
 DaughterBoards::DaughterBoards() {
     init();
 }
@@ -29,7 +31,6 @@ void DaughterBoards::init(){
 };
 
 void DaughterBoards::turnOn(boardSelection boardToEnable){
-    bool debugPrinting=true;
     if (boardToEnable==BOTH){
         digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, HIGH);
         digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, HIGH);
@@ -53,5 +54,5 @@ void DaughterBoards::turnOn(boardSelection boardToEnable){
 void DaughterBoards::turnOff(){
     digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, LOW);
     digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, LOW);
-	std::cout << "turn off daughter boards" << std::endl;
+	if (debugPrinting) std::cout << "turn off daughter boards" << std::endl;
 };
