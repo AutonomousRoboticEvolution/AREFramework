@@ -8,6 +8,7 @@
 #define SENSORORGAN_HPP
 
 #include "I2CDevice.hpp"
+#include "DaughterBoards.hpp"
 //#include "VL53L0X.h"
 
 //the registers, these must match those defined in the Arduino firmware
@@ -42,6 +43,10 @@ class VL53L0X: protected I2CDevice {
 */
 class SensorOrgan  : protected I2CDevice {
     public :
+
+        //Public variables
+        boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
+
         SensorOrgan(uint8_t address);
         uint16_t readInfrared();
         uint16_t readInfraredRaw();
@@ -55,7 +60,7 @@ class SensorOrgan  : protected I2CDevice {
         //int getOrganI2CAddress(){ return getI2CAddress();}
 
 	private:
-		VL53L0X* timeOfFlight;
+        VL53L0X* timeOfFlight;
 };
 
 

@@ -9,6 +9,10 @@
 
 #include <cstdlib> //for abs() function
 #include "I2CDevice.hpp"
+#include "DaughterBoards.hpp"
+
+#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
+#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
 //Register subaddresses for DRV8830 chip
 #define DRV_CONTROL_REG_ADDR 0x00
@@ -66,6 +70,8 @@ class MotorOrgan  : protected I2CDevice {
 		//Vars for motor state and speed
 		uint8_t currentState = STANDBY; ///< Motor state: STANDBY, REVERSE, FORWARD or BRAKE, defined in MotorOrgan.hpp
 		uint8_t currentSpeed = 0; ///< Magnitude of motor speed, unsigned 6 bit value, so 0-63 range. Direction is given by currentState
+
+        boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
 
 		//Public member functions
 		/**
@@ -130,7 +136,10 @@ class MotorOrgan  : protected I2CDevice {
 		*/
 		void clearFaultReg();
 
-		void test();
+        bool test();
+
+        void set_test_value(uint8_t value);
+        uint8_t get_test_value();
 
 	private :
 		/**

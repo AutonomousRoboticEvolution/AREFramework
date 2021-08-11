@@ -19,7 +19,6 @@ SensorOrgan::SensorOrgan(uint8_t address) : I2CDevice(address){
     timeOfFlight = new VL53L0X(address+1);
 }
 
-
 // Returns a range reading in millimeters. Continuous mode should already be active, as it is set by the Arduino at boot.
 // the registers used here were found from the Arduino library.
 uint16_t SensorOrgan::readTimeOfFlight() {
@@ -86,9 +85,7 @@ uint8_t SensorOrgan::get_test_value(){
 bool SensorOrgan::test()
 {
     //std::cout<<"Testing the sensor..."<<std::endl;
-    int value_to_send = 0 ;
-    srand(time(NULL));
-    value_to_send = rand() % 255;
+    int value_to_send = rand() % 255;
     set_test_value(value_to_send);
     int returned_value = get_test_value();
     //std::cout<<"sent: "<<value_to_send<<", got: "<<returned_value<<std::endl;

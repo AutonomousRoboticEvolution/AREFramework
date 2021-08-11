@@ -105,7 +105,7 @@ void ER::start_evaluation(){
     std::string ctrlGenomeFolder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value;
     std::string waitingToBeEvalutatedFolderPath = ctrlGenomeFolder + std::string("waiting_to_be_evaluated/");
 
-    std::string robotID = "test2"; // TODO get this from user input based on those available in waiting_to_be_evaluated
+    std::string robotID = "test3"; // TODO get this from user input based on those available in waiting_to_be_evaluated
     if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<robotID<<"\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
@@ -119,6 +119,7 @@ void ER::start_evaluation(){
 //    currentInd->init();
 
 
+    // find the organs list (should be in the waitingToBeEvalutatedFolderPath folder)
     std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
     if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
 
