@@ -28,7 +28,7 @@
 #define DO_WHEEL_TEST false
 #define WHEEL_ADDRESS 0x65
 
-#define DO_SENSOR_TEST true
+#define DO_SENSOR_TEST false
 #define DO_MULTI_SENSOR_TEST false
 
 
@@ -130,7 +130,7 @@ int main()
 /************ LEDs ********************************************/
     LedDriver ledDriver(0x6A); // <- the Led driver is always the same i2c address, it cannot be cahnged
     ledDriver.init();
-    //ledDriver.flash();
+    ledDriver.flash(BLUE, 1000000 ,20);
 
 
 /************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/

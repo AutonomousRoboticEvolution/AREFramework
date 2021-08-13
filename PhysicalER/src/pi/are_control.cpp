@@ -6,6 +6,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     controller = ind;
     _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
+    std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
     // need to turn on the daughter boards
     daughterBoards->init();
@@ -124,6 +125,8 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // loop through each sensor and get it's time-of-flight value, then loop through again for the IR values
     sensor_vals.clear();
     sensor_vals = {};
+    
+    uint32_t measured_time_start = micros();
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
@@ -131,6 +134,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
             sensor_vals.push_back( thisSensor->readTimeOfFlightNormalised() );
         }
     }
+    uint32_t measured_time_TOF = micros();
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
@@ -138,6 +142,8 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
             sensor_vals.push_back( thisSensor->readInfraredNormalised() );
         }
     }
+    uint32_t measured_time_IR = micros();
+    std::cout<<"Sensor times: "<< measured_time_TOF-measured_time_start<<" / "<<measured_time_IR-measured_time_TOF<<std::endl;
 
     if(debugDisplayOnPi){
         // debugging: display sensor values as bars:
@@ -197,24 +203,30 @@ int AREControl::exec(zmq::socket_t& socket){
     uint32_t this_loop_start_time = start_time;
 
     while(this_loop_start_time <= _max_eval_time){
+        uint32_t measured_time_start = micros();
 
         retrieveSensorValues(sensor_values);
+        uint32_t measured_time_sensors = micros();
 
         // tell the controller to update
         controller.set_inputs(sensor_values);
         controller.update ( this_loop_start_time*1000.0 ); //expects time in microseconds, I think? (Matt)
         nn_outputs = controller.get_ouputs();
+        uint32_t measured_time_controller = micros();
 
         // send the new values to the actuators
         sendOutputOrganCommands(nn_outputs);
+        uint32_t measured_time_wheels = micros();
 
         // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
         if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}
+        uint32_t measured_time_LEDs = micros();
 
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);
         strcpy(static_cast<char*>(message.data()),"pi busy");
         socket.send(message);
+        uint32_t measured_time_zmq = micros();
 
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
@@ -229,6 +241,16 @@ int AREControl::exec(zmq::socket_t& socket){
                 delayMicroseconds(1);
             }
         }
+        uint32_t measured_time_waiting = micros();
+    
+        std::cout<<"Timings:"<<
+"\nsensors: "<< measured_time_sensors - measured_time_start<<
+"\ncontroller: "<< measured_time_controller - measured_time_sensors <<
+"\nwheels: "<< measured_time_wheels - measured_time_controller<<
+"\nLEDs: "<< measured_time_LEDs - measured_time_wheels<<
+"\nzmq: "<< measured_time_zmq - measured_time_LEDs<<
+"\nwaiting: "<< measured_time_waiting - measured_time_zmq<<
+"\n\n"<<std::endl;
 
     }
 
