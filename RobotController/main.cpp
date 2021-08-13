@@ -16,6 +16,8 @@
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
 
+#define DO_JOINT_TORQUE_TEST true
+
 #define DO_JOINT_TEST false
 #define JOINT1_ADDRESS 0x09
 #define JOINT2_ADDRESS 0x08
@@ -82,7 +84,8 @@ int main()
     ledDriver.init();
     //ledDriver.flash();
 
-/************ temp! ********************************************/
+
+/************ temp! to be deleted ************************************
 std::list<Organ> listOfOrgans;
 listOfOrgans.push_back( SensorOrgan( 0x3A ) );
 listOfOrgans.push_back( MotorOrgan( WHEEL_ADDRESS ) );
@@ -99,14 +102,57 @@ for (std::list<Organ>::iterator thisOrgan = listOfOrgans.begin(); thisOrgan != l
     OrganType thisOrganType = thisOrgan->organType;
     if (thisOrganType == WHEEL ){
         std::cout<<"this is a sensor"<<std::endl;
-        std::cout<<thisOrgan-> <<std::endl;
     }else{
         std::cout<<"this is not a sensor"<<std::endl;    
     }
 
     usleep(50000);
 }
+*/
 
+
+/************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
+if (DO_JOINT_TORQUE_TEST){
+    
+    int jointAddress = 0x09;
+
+    #define START_CURRENT 1000
+    #define CURRENT_STEP 50
+
+    std::cout<<"Doing the joint torque test for "<< jointAddress<<std::endl;
+    
+    // make joint
+    JointOrgan joint(jointAddress);
+    joint.setTargetAngleNormalised(1);
+    sleep(2);
+    
+    int currentLimit_mA = START_CURRENT-CURRENT_STEP;
+    bool has_failed = true;
+    while(has_failed){
+        //Set new current limit
+        currentLimit_mA+=CURRENT_STEP;
+        std::cout<<"Current limit: "<<currentLimit_mA<<"mA"<<std::endl;
+        joint.setCurrentLimit(currentLimit_mA/10);
+        sleep(1);
+
+        joint.setTargetAngleNormalised(-1);
+        sleep(2);
+        int measured_value = joint.readMeasuredAngle();
+        if (measured_value<-70){
+            has_failed=false;
+            std::cout<<"Success!"<<std::endl;
+            joint.setTargetAngleNormalised(1);
+        }else{
+            std::cout<<"Fail..."<<measured_value<<std::endl;
+            if(currentLimit_mA>=1200){
+                std::cout<<"Max torque, still failed"<<std::endl;
+                has_failed=false;
+            }
+            joint.setTargetAngleNormalised(1);
+            sleep(4);
+        }
+    }
+}
 
 /************ joint test ********************************************/
 if (DO_JOINT_TEST){

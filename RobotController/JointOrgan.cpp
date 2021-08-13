@@ -19,6 +19,23 @@ void JointOrgan::setTargetAngle(int8_t newTarget) {
     write8To(TARGET_POSITION_REGISTER, newTarget);
 }
 
+
+//new Target is a signed float between -1 and 1, which will be converted to angle of +/-MAX_MAGNITUDE_TARGET_ANGLE degrees
+void JointOrgan::setTargetAngleNormalised(float newTargetNormalised) {
+	if (newTargetNormalised>1){
+        if(DEBUG_PRINT){std::cout<<"Setting target angle to: "<<MAX_MAGNITUDE_TARGET_ANGLE<<std::endl;}
+        setTargetAngle(MAX_MAGNITUDE_TARGET_ANGLE);
+    }
+	else if (newTargetNormalised<-1){
+        if(DEBUG_PRINT){std::cout<<"Setting target angle to: "<<-MAX_MAGNITUDE_TARGET_ANGLE<<std::endl;}
+        setTargetAngle(-MAX_MAGNITUDE_TARGET_ANGLE);
+    }
+    else{
+        if(DEBUG_PRINT){std::cout<<"Setting target angle to: "<<(MAX_MAGNITUDE_TARGET_ANGLE*newTargetNormalised)<<std::endl;}
+        setTargetAngle(MAX_MAGNITUDE_TARGET_ANGLE*newTargetNormalised);
+    }
+}
+
 //Turn off servo so it should move freely
 void JointOrgan::setServoOff() {
     write8To(SERVO_ENABLE_REGISTER, false);
