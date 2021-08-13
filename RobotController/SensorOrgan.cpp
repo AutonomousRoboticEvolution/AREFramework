@@ -12,6 +12,9 @@ VL53L0X::VL53L0X(uint8_t address) : I2CDevice(address){} // just call i2c device
 
 //Main Sensor organ Constructor
 SensorOrgan::SensorOrgan(uint8_t address) : Organ(address){
+    // record organ type:
+    organType = SENSOR;
+
     // the VL53L0X is also an I2CDevice, and is always set to have the address one higher than the sensor organ Arduino
     // The Arduino will handle all the setup, init() and address change of the VL53L0X
     timeOfFlight = new VL53L0X(address+1);

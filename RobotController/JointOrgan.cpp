@@ -11,6 +11,9 @@
 //Constructor
 JointOrgan::JointOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
+    
+    // record organ type:
+    organType = JOINT;
 }
 
 //new Target is a signed value in degrees for the target angle to move to

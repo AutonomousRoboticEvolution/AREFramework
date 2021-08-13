@@ -25,10 +25,11 @@
 #define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
 
 
-#define DO_WHEEL_TEST true
+#define DO_WHEEL_TEST false
 #define WHEEL_ADDRESS 0x65
 
-#define DO_SENSOR_TEST false
+#define DO_SENSOR_TEST true
+#define DO_MULTI_SENSOR_TEST false
 
 
 #define LED_DRIVER_ADDR 0x6A
@@ -245,7 +246,21 @@ if (DO_WHEEL_TEST){
 }
 
 /************ Sensor test ********************************************/
-if(DO_SENSOR_TEST){
+/************ Sensor test ********************************************/
+if (DO_SENSOR_TEST){
+
+    SensorOrgan mySensor(0x32);
+    daughterBoards.turnOn(LEFT);
+
+    std::cout<<std::endl;
+    
+    while(1){
+        delay(1000);
+        std::cout<<mySensor.readTimeOfFlight()<<","<< int(mySensor.readInfrared())<<std::endl;
+    }
+}
+
+if(DO_MULTI_SENSOR_TEST){
 
     std::list<SensorOrgan> listOfSensors;
     listOfSensors.push_back( SensorOrgan( 0x30 ) );
@@ -295,29 +310,9 @@ if(DO_SENSOR_TEST){
         //std::cout<<std::endl;
         std::cin.get();
     }
-    
-    
-    /*
-    #define n_distances_to_test 15
-    #define start_distance 100
-    #define gap_between_distances start_distance
-    #define n_repeats_per_distance 50
-    
-    SensorOrgan mySensor(0x36);
-    daughterBoards.turnOn(LEFT);
 
-    std::cout<<std::endl;
+    
 
-    for (int i_distance=0;i_distance<n_distances_to_test;i_distance++){
-        int this_distance=start_distance + i_distance*gap_between_distances;
-        std::cout<<this_distance<<",";
-        for (int i_repeat=0;i_repeat<n_repeats_per_distance;i_repeat++){
-            std::cout<<mySensor.readInfrared()<<",";
-            usleep(20000);
-        }
-        std::cin.get();
-    }
-    */
 }
 	
 

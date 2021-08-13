@@ -9,6 +9,9 @@
 //Constructor
 MotorOrgan::MotorOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
+
+    // record organ type:
+    organType = WHEEL;
 }
 
 //Speed input is a signed 8-bit integer where -ve value denotes reverse direction
