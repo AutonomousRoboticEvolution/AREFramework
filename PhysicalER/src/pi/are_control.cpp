@@ -111,7 +111,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     }
 
     // debugging: display sensor values as bars:
-    for(i=0;i<sensor_vals.size();i++){
+    for(int i=0;i<sensor_vals.size();i++){
         int n_blocks=sensor_vals[i]*10.0;
         for (int i_block=0; i_block<10;i_block++){
             if (i_block<n_blocks) std::cout<<"x";
