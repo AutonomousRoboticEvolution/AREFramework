@@ -177,29 +177,15 @@ class LedDriver : protected I2CDevice {
             @brief shortcut to set all LEDs the given colour
             @param colour the ledColour to use
 		*/
-        void setAllTo(ledColour colour);
+        void setAllTo(ledColour colour, int brightness=100);
 
-		/**
-			@brief shortcut to set all LEDs solid red
-		*/
-		void allRed();
-
-		/**
-			@brief shortcut to set all LEDs solid blue
-		*/
-		void allBlue();
-
-		/**
-			@brief shortcut to turn all LEDs off
-		*/
-		void allOff();
 
 		/**
 			@brief Shortcut to turn the LEDs on, wait some time then turn them off. Will block while waiting.
 			@param colour The ledColour to use (i.e. RED, GREEN, BLUE, YELLOW, CYAN, MAGENTA or WHITE). Default GREEN.
             @param time The number of microseconds to wait for. Default 100,000 = 1/10th of a second
 		*/
-        void flash(ledColour colour=GREEN, int time=100000);
+        void flash(ledColour colour=GREEN, int time=100000, int brightness=100);
 
 		/**
 			@brief Runs a test illumination sequence on the LEDs.
