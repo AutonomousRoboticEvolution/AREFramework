@@ -13,6 +13,7 @@
 #cameraHeight,double,200
 
 #maxEvalTime,float,50
+#timeStep,float,0.1
 #arenaSize,double,2
 
 #ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
