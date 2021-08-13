@@ -146,8 +146,6 @@ class MotorOrgan  : public Organ {
         */
         float readMeasuredVelocityRPM();
 
-        OrganType organType = WHEEL;
-
 
 	private :
 		/**

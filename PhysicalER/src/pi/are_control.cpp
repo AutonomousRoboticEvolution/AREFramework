@@ -23,24 +23,26 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
-        if (organType=="0") {} //Head, do nothing
-        if (organType=="1"){//wheel
+        switch (stoi(organType)) {
+        case 0: //head
+            //do nothing
+            break;
+        case 1: //wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
-        }
-        if (organType=="2") { //sensor
+            break;
+        case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
-        }
-        if (organType=="3") { // joint
+            break;
+        case 3: //joint
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a joint, address: "<<addressValue<<std::endl;
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
-        }
-        if (organType=="4") { // caster
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Caster wheel in blueprint, ignored by are-control"<<std::endl;
-        // do nothing
-        }
-        else{ // shouldn't be here
+            break;
+        case 4: //caster
+            //do nothing
+            break;
+        default:// shouldn't be here
             std::cerr << "ERROR! the list of organs contains an entry of uknown type: " <<organType<< std::endl;
         }
     }
@@ -73,14 +75,16 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     ledDriver->flash();
 
 
-    // get the Head LEDs ready for the debugging outputs, if necessary
+    // set debug printing flag - this prints a representation of the inputs and outputs to terminal
     if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
+        debugDisplayOnPi = true;
+    }
+    // get the Head LEDs ready for the debugging outputs, if necessary
+    if (settings::getParameter<settings::Boolean>(parameters,"#debugLEDsOnPi").value){
         ledDriver->setColour(RGB0,GREEN);
         ledDriver->setColour(RGB1,RED);
         ledDriver->setColour(RGB2,BLUE);
-        debugDisplayOnPi = true;
     }
-
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
@@ -89,13 +93,13 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
     int i=0;
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
     for (auto thisOrgan : listOfOrgans) {
-        if (thisOrgan->organType = WHEEL) {
+        if (thisOrgan->organType == WHEEL) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
             i++;
         }
-        if (thisOrgan->organType = JOINT) {
+        if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             thisJoint->setTargetAngleNormalised(values[i]);
@@ -120,16 +124,15 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // loop through each sensor and get it's time-of-flight value, then loop through again for the IR values
     sensor_vals.clear();
     sensor_vals = {};
-    //for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
     for (auto thisOrgan : listOfOrgans) {
-        if (thisOrgan->organType = SENSOR) {
+        if (thisOrgan->organType == SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             SensorOrgan* thisSensor = static_cast<SensorOrgan *>(thisOrgan);
             sensor_vals.push_back( thisSensor->readTimeOfFlightNormalised() );
         }
     }
     for (auto thisOrgan : listOfOrgans) {
-        if (thisOrgan->organType = SENSOR) {
+        if (thisOrgan->organType == SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             SensorOrgan* thisSensor = static_cast<SensorOrgan *>(thisOrgan);
             sensor_vals.push_back( thisSensor->readInfraredNormalised() );
@@ -206,7 +209,7 @@ int AREControl::exec(zmq::socket_t& socket){
         sendOutputOrganCommands(nn_outputs);
 
         // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
-        if (debugDisplayOnPi){setLedDebugging(sensor_values,nn_outputs);}
+        if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}
 
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);

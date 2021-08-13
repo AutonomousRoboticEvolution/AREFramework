@@ -55,7 +55,6 @@ class SensorOrgan  : public Organ {
 
         //Public variables
         SensorOrgan(uint8_t address);
-        OrganType organType = SENSOR;
         uint8_t infraredSensorThreashold = INFRARED_SENSOR_DEFAULT_THREASHOLD;
 
         uint8_t readInfrared();

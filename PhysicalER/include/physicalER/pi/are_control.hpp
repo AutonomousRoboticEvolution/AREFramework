@@ -36,7 +36,8 @@ private:
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;
 
-    bool debugDisplayOnPi=false; // Don't change here, set by defining #debugDisplayOnPi,bool,1 in the paramters file. Determines whether to show debugging infomation in terminal and as Head LEDs.
+    bool debugDisplayOnPi=false; // Don't change here, set by defining #debugDisplayOnPi,bool,1 in the paramters file. Determines whether to show show input/output values in terminal.
+    bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
 
     // private functions:
 
