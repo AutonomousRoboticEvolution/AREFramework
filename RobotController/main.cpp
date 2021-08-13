@@ -63,6 +63,53 @@ void setup_sigint_catch()
 
 #include <bitset> // for displaying binary values
 
+bool wheel_torque_test_helper(MotorOrgan wheel,int value){
+    std::cout<< "Limit: "<<value*10<<"mA";
+
+    wheel.setCurrentLimit(value);
+    sleep(1);
+    wheel.setSpeed(20);
+    sleep(2);
+    
+    int speed=0;
+    int current=0;
+    for(int i=0;i<10;i++){
+        speed+= wheel.readMeasuredVelocity();
+        current+= wheel.readMeasuredCurrent();
+        usleep(20000);
+    }
+    wheel.standby();
+    std::cout<<", speed: "<<float(speed)/10.0 <<", current: "<<float(current)/10.0 <<std::endl;
+    if (speed>15){return true;}
+    else {return false;}
+}
+
+void wheel_torque_test(MotorOrgan wheel){
+    
+    int lower_bound=0;
+    int upper_bound=100;
+    bool found_value=false;
+
+    while(found_value==false){
+        
+        int new_test_value = lower_bound + (upper_bound-lower_bound)/2;
+        if ( wheel_torque_test_helper(wheel, new_test_value) ){
+            // passed
+            upper_bound=new_test_value;
+        }else{
+            // failed
+            lower_bound=new_test_value;
+        }
+        
+        if (upper_bound-lower_bound<=1) { found_value=true; }
+    }
+
+    std::cout<<"required torque is between "<<lower_bound*10<<" and "<<upper_bound*10<<" mA.";
+    
+
+}
+
+
 
 int main()
 {
@@ -70,7 +117,7 @@ int main()
 /************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
 //    batteryMonitor.setBatteryChargeRemaining(2000);
-//    batteryMonitor.testingDisplayBatteryLevels();
+    batteryMonitor.testingDisplayBatteryLevels();
 //    batteryMonitor.printAllPages();
 
 /************ Fan and daughter boards enable testing *********************************/
@@ -188,31 +235,9 @@ if (DO_WHEEL_TEST){
     daughterBoards.turnOn(RIGHT);
     std::cout<<"Testing wheel functionality"<<std::endl;
     MotorOrgan myWheel(WHEEL_ADDRESS);
-
-    if(myWheel.testConnection()){
-        std::cout<<"wheel connection successful"<<std::endl;
-        ledDriver.flash(GREEN);
-        
-        for (int current_limit_mA = 200; current_limit_mA<=800; current_limit_mA+=200){
-            myWheel.setCurrentLimit(current_limit_mA/10);
-            sleep(1);
-            myWheel.setSpeed(20);
-            sleep(3);
-            int speed=0;
-            for(int i=0;i<10;i++){
-                std::cout<<i<<std::endl;
-                speed+=myWheel.readMeasuredVelocity();
-                usleep(20000);
-            }
-            std::cout<<"Current limit: "<<current_limit_mA<<"mA, measured veloicty: "<<float(speed)/10<<" ticks/timestep"<<std::endl;
-            myWheel.standby();
-            sleep(1);
-        }
-
-    }else{
-        std::cout<<"wheel connection failed"<<std::endl;
-        ledDriver.flash(RED);
-    }
+    
+    
+    wheel_torque_test(myWheel);
     
     myWheel.standby();
     //daughterBoards.turnOff();
