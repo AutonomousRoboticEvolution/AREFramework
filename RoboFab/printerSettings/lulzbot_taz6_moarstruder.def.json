@@ -1,0 +1,36 @@
+{
+    "id": "LulzBot_Taz6_MOARstruder",
+    "name": "LulzBot TAZ 6 MOARstruder",
+    "inherits": "lulzbot_taz6",
+    "version": 2,
+    "metadata":
+    {
+        "machine_extruder_trains":
+        {
+            "0": "lulzbot_taz6_moarstruder_extruder"
+        },
+        "type": "machine",
+        "visible": true,
+        "toolhead_info_link": "https://www.lulzbot.com/store/tool-heads/lulzbot-taz-moarstruder-tool-head",
+        "firmware_toolhead_name": "MOARstruder"
+    },
+    "overrides":
+    {
+        "machine_name":
+        {
+            "default_value": "LulzBot TAZ 6 MOARstruder"
+        },
+        "machine_start_gcode":
+        {
+            "default_value_from_file": "lulzbot_taz6_start"
+        },
+        "machine_end_gcode":
+        {
+            "default_value_from_file": "lulzbot_taz6_end"
+        },
+        "machine_nozzle_size":
+        {
+            "default_value": 1.2
+        }
+    }
+}

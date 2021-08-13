@@ -7,7 +7,7 @@ if(RASPBERRY)
 #find_package(Qt5 COMPONENTS Core Test DBus REQUIRED)
 
 file(GLOB SRC src/pi/* src/pi_communication.cpp)
-set(CTRL_SRC ../RobotController/I2CDevice.cpp ../RobotController/MotorOrgan.cpp ../RobotController/SensorOrgan.cpp ../RobotController/DaughterBoards.cpp ../RobotController/LedDriver.cpp ../RobotController/Sensors.cpp)
+set(CTRL_SRC ../RobotController/I2CDevice.cpp ../RobotController/MotorOrgan.cpp ../RobotController/SensorOrgan.cpp ../RobotController/DaughterBoards.cpp ../RobotController/LedDriver.cpp)
 add_executable(are-pi-server ${SRC} ${CTRL_SRC})
 target_include_directories(are-pi-server PUBLIC
     "include"

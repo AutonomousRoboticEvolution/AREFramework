@@ -9,26 +9,49 @@ DaughterBoards::DaughterBoards() {
 }
 
 void DaughterBoards::test() {
-    std::cout << "turn on daughter boards" << std::endl;
+    
     turnOn();
-    usleep(200000); // 2 seconds
-    std::cout << "turn off daughter boards" << std::endl;
-    turnOff();
+    sleep(2);
+    turnOn(LEFT);
+    sleep(2);
+    turnOn(RIGHT);
+    sleep(2);
+    turnOn(NONE);
+    sleep(2);
+    turnOn();
 }
 
 void DaughterBoards::init(){
     wiringPiSetupGpio();
     pinMode (DAUGHTER_BOARD1_GPIO_PIN, OUTPUT);
     pinMode (DAUGHTER_BOARD2_GPIO_PIN, OUTPUT);
-    turnOff();
+    turnOn(); // on by default
 };
 
-void DaughterBoards::turnOn(){
-    digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, HIGH);
-    digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, HIGH);
+void DaughterBoards::turnOn(boardSelection boardToEnable){
+    bool debugPrinting=true;
+    if (boardToEnable==BOTH){
+        digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, HIGH);
+        digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, HIGH);
+	    if (debugPrinting) std::cout << "turn on both daughter boards" << std::endl;
+    }
+    else if (boardToEnable==LEFT){
+        digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, HIGH);
+        digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, LOW);
+	    if (debugPrinting) std::cout << "turn on left daughter board" << std::endl;
+    }
+    else if (boardToEnable==RIGHT){
+        digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, LOW);
+        digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, HIGH);
+	    if (debugPrinting) std::cout << "turn on right daughter board" << std::endl;
+    }
+    else {
+        this->turnOff();
+    }
 };
 
 void DaughterBoards::turnOff(){
     digitalWrite (DAUGHTER_BOARD1_GPIO_PIN, LOW);
     digitalWrite (DAUGHTER_BOARD2_GPIO_PIN, LOW);
+	std::cout << "turn off daughter boards" << std::endl;
 };

@@ -12,7 +12,7 @@
  * If this is set false, any positive value will set the fan to full, zero (or negative) will turn off
  * This will result in a bang-bang thermostat style controller instead of proportional.
  */
-#define USE_PWM_OUTPUT true
+#define USE_PWM_OUTPUT false
 
 #define FAN_GPIO_PIN 18
 

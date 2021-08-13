@@ -8,9 +8,9 @@ void NN2Individual::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
     nn_type = st::getParameter<st::Integer>(parameters,"#NNType").value;
-    int nb_input = st::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    int nb_hidden = st::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    int nb_output = st::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+    nb_input = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
+    nb_hidden = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_hidden();
+    nb_output = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();
 
     if(nn_type == st::nnType::FFNN){
         control.reset(new NN2Control<ffnn_t>());

@@ -87,6 +87,7 @@ private:
     int nbrEval = 0;
 
     bool isEnvInit = false;
+    bool verbose=false;
 
     ///used to create the environment
     std::function<Environment::Factory> environmentFactory;
