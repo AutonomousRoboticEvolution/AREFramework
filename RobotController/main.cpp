@@ -85,32 +85,6 @@ int main()
     //ledDriver.flash();
 
 
-/************ temp! to be deleted ************************************
-std::list<Organ> listOfOrgans;
-listOfOrgans.push_back( SensorOrgan( 0x3A ) );
-listOfOrgans.push_back( MotorOrgan( WHEEL_ADDRESS ) );
-
-for (std::list<Organ>::iterator thisOrgan = listOfOrgans.begin(); thisOrgan != listOfOrgans.end(); ++thisOrgan){
-    if(thisOrgan->testConnection()){
-        std::cout<<"connection test successful"<<std::endl;
-        ledDriver.flash(GREEN);    
-    }else{
-        std::cout<<"connection test fail"<<std::endl;
-        ledDriver.flash(RED);    
-    }
-    
-    OrganType thisOrganType = thisOrgan->organType;
-    if (thisOrganType == WHEEL ){
-        std::cout<<"this is a sensor"<<std::endl;
-    }else{
-        std::cout<<"this is not a sensor"<<std::endl;    
-    }
-
-    usleep(50000);
-}
-*/
-
-
 /************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
 if (DO_JOINT_TORQUE_TEST){
     
@@ -211,6 +185,7 @@ for (int n=0; n<numRepetitions; ++n) {
 
 /************ Wheel test ********************************************/
 if (DO_WHEEL_TEST){
+    daughterBoards.turnOn(RIGHT);
     std::cout<<"Testing wheel functionality"<<std::endl;
     MotorOrgan myWheel(WHEEL_ADDRESS);
 
@@ -218,12 +193,18 @@ if (DO_WHEEL_TEST){
         std::cout<<"wheel connection successful"<<std::endl;
         ledDriver.flash(GREEN);
         
-        for (int current_limit_mA = 100; current_limit_mA<=200; current_limit_mA+=100){
+        for (int current_limit_mA = 200; current_limit_mA<=800; current_limit_mA+=200){
             myWheel.setCurrentLimit(current_limit_mA/10);
             sleep(1);
-            myWheel.setSpeedNormalised(0.5);
+            myWheel.setSpeed(20);
             sleep(3);
-            std::cout<<"Current limit: "<<current_limit_mA<<"mA, measured veloicty: "<<myWheel.readMeasuredVelocityRPM()<<"rpm"<<std::endl;
+            int speed=0;
+            for(int i=0;i<10;i++){
+                std::cout<<i<<std::endl;
+                speed+=myWheel.readMeasuredVelocity();
+                usleep(20000);
+            }
+            std::cout<<"Current limit: "<<current_limit_mA<<"mA, measured veloicty: "<<float(speed)/10<<" ticks/timestep"<<std::endl;
             myWheel.standby();
             sleep(1);
         }
@@ -232,7 +213,9 @@ if (DO_WHEEL_TEST){
         std::cout<<"wheel connection failed"<<std::endl;
         ledDriver.flash(RED);
     }
-
+    
+    myWheel.standby();
+    //daughterBoards.turnOff();
     ledDriver.flash(BLUE);
 }
 

@@ -75,7 +75,7 @@ int8_t MotorOrgan::readMeasuredVelocity() {
     return read8From(GET_MEASURED_VELOCITY_REGISTER);
 }
 
-int8_t MotorOrgan::readMeasuredVelocityRPM() {
+float MotorOrgan::readMeasuredVelocityRPM() {
     return float(this->readMeasuredVelocity())*CONVERT_ENCODER_TICKS_PER_TIMESTEP_TO_REV_PER_MINUTE;
 }
 
