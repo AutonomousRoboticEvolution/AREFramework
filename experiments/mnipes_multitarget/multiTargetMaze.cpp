@@ -1,27 +1,27 @@
-#include "simulatedER/mazeEnv.h"
+#include "multiTargetMaze.hpp"
 
 #include <boost/algorithm/string.hpp>
 
 using namespace are::sim;
 
-MazeEnv::MazeEnv()
+MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
 {
-    target_position.resize(3);
+    parameters = params;
+
     final_position.resize(3);
-    name = "mazeEnv";
+    name = "multi_target_maze";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_y",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
     settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
+    std::string targets_file = settings::getParameter<settings::String>(parameters,"#targets").value;
+    load_target_positions(targets_file);
 }
 
-void MazeEnv::init(){
+void MultiTargetMaze::init(){
 
     VirtualEnvironment::init();
 
@@ -38,10 +38,6 @@ void MazeEnv::init(){
         }
     }
 
-    target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-                       settings::getParameter<settings::Double>(parameters,"#target_y").value,
-                       settings::getParameter<settings::Double>(parameters,"#target_z").value};
-
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
 
     if(withBeacon){
@@ -49,9 +45,9 @@ void MazeEnv::init(){
         int beacon_handle = simCreatePureShape(1,0,bSize,0.05f,nullptr); //create a sphere as beacon;
 
         simSetObjectName(beacon_handle,"IRBeacon_0");
-        const float tPos[3] = {static_cast<float>(target_position[0]),
-                         static_cast<float>(target_position[1]),
-                         static_cast<float>(target_position[2])};
+        const float tPos[3] = {static_cast<float>(target_positions[current_target][0]),
+                         static_cast<float>(target_positions[current_target][1]),
+                         static_cast<float>(target_positions[current_target][2])};
 
         if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
             std::cerr << "Set object position failed" << std::endl;
@@ -65,11 +61,23 @@ void MazeEnv::init(){
 
     std::vector<int> th;
     build_tiled_floor(th);
-
-
 }
 
-std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
+void MultiTargetMaze::load_target_positions(const std::string& filename){
+    std::ifstream ifs(filename);
+    if(!ifs){
+        std::cerr << "unable to open file : " << filename << std::endl;
+        exit(1);
+    }
+    double pos1,pos2,pos3;
+    do{
+        if(ifs >> pos1 >> pos2 >> pos3)
+            target_positions.push_back({pos1,pos2,pos3});
+    }while(ifs.peek() != EOF);
+    ifs.close();
+}
+
+std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     double max_dist = sqrt(2*arena_size*arena_size);
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
@@ -79,18 +87,23 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
                          (a[2] - b[2])*(a[2] - b[2]));
     };
     std::vector<double> d(1);
-    d[0] = 1 - distance(final_position,target_position)/max_dist;
+    d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
 
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f) || f < 0)
             f = 0;
         else if(f > 1) f = 1;
 
+    //Go to next target
+    current_target+=1;
+    if(current_target >= target_positions.size())
+        current_target=0;
+
     return d;
 }
 
 
-float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
+float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
     int morphHandle = morph->getMainHandle();
@@ -115,11 +128,13 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
+    else if(simulationTime >= evalTime)
+        trajectory.push_back(wp);
 
     return 0;
 }
 
-void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
+void MultiTargetMaze::build_tiled_floor(std::vector<int> &tiles_handles){
     bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
 
     float tile_size[3] = {0.249f,0.249f,0.01f};
@@ -143,3 +158,5 @@ void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
         }
     }
 }
+
+

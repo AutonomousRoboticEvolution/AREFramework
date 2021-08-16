@@ -85,7 +85,7 @@ public:
      * @brief ending condition of the evaluation. This condition is added with OR to the default condition the time limit.
      * @return
      */
-    virtual bool finish_eval(){
+    virtual bool finish_eval(const Environment::Ptr& env){
         return false;
     }
 

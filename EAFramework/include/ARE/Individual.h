@@ -41,11 +41,14 @@ public:
 
     virtual void init()
     {
+        morphGenome->init();
         createMorphology();
         int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
         bool reload_ctrl = settings::getParameter<settings::Boolean>(parameters,"#reloadController").value;
-        if(control == nullptr || instance_type == settings::INSTANCE_SERVER || reload_ctrl)
+        if(control == nullptr || instance_type == settings::INSTANCE_SERVER || reload_ctrl){
+            ctrlGenome->init();
             createController();
+        }
     }
 
     virtual void update(double delta_time) = 0;

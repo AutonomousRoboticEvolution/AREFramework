@@ -22,17 +22,17 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
     )
 
-add_library(M_NIPES SHARED 
+add_library(MNIPESMulti SHARED 
     ${VREP_SRC}
    factories.cpp
    M_NIPES.cpp 
    cmaes_learner.cpp
-        obstacleAvoidance.cpp
    MNIPESLoggings.cpp
+   multiTargetMaze.cpp
     )
-target_include_directories(M_NIPES PUBLIC ${INCLUDES})
-target_link_libraries(M_NIPES ARE simulatedER cmaes tbb)
+target_include_directories(MNIPESMulti PUBLIC ${INCLUDES})
+target_link_libraries(MNIPESMulti ARE simulatedER cmaes tbb)
 
-install(TARGETS M_NIPES DESTINATION lib)
-install(DIRECTORY . DESTINATION include/mnipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+install(TARGETS MNIPESMulti DESTINATION lib)
+install(DIRECTORY . DESTINATION include/mnipes_multitarget FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

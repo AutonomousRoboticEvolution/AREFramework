@@ -1,19 +1,11 @@
-#include "simulatedER/mazeEnv.h"
-#include "obstacleAvoidance.hpp"
+#include "multiTargetMaze.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
-    are::Environment::Ptr env;
-    if(env_type == 0){
-        env.reset(new are::sim::MazeEnv);
-        env->set_parameters(param);
-    }
-    else if(env_type == 1)
-        env.reset(new are::sim::ObstacleAvoidance(param));
+    are::Environment::Ptr env(new are::sim::MultiTargetMaze(param));
     return env;
 }
 
