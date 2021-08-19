@@ -8,7 +8,7 @@
 #include "physicalER/ER.hpp"
 
 /// an unique pointer to ER_VREP class
-//are::sim::ER::Ptr ERVREP;
+are::phy::ER::Ptr ERCOPPELIA;
 
 enum SimulationState {
     INITIALIZING,

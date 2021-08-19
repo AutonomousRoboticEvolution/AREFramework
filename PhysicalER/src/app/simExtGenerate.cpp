@@ -97,6 +97,17 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
+    simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
+    ERCOPPELIA = std::make_unique<are::phy::ER>();   // The class used to handle the EA
+    are_set::ParametersMapPtr parameters = std::make_shared<are_set::ParametersMap>(
+            are_set::loadParameters(parameters_filepath));
+    simReleaseBuffer(parameters_filepath);
+    ERCOPPELIA->set_parameters(parameters);
+    ERCOPPELIA->initialize();
+    ERCOPPELIA->load_data(false);
+    ERCOPPELIA->generate();
+//    ERCOPPELIA->execute();
+    ERCOPPELIA->save_logs();
 
     // Check the V-REP version:
     int vrepVer;
@@ -181,23 +192,15 @@ void localMessageHandler(int message){
         simulationState = STARTING;
 //        counter = 0;
         simStartSimulation();
-        simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
 
 //        if(argc != 2){
 //            std::cout << "usage :" << std::endl;
 //            std::cout << "\targ1 - path to the parameter file" << std::endl;
 //        }
 
-        are::phy::ER::Ptr er(new are::phy::ER);
+//        are::phy::ER::Ptr er(new are::phy::ER);
 //        are_set::ParametersMap param = are_set::loadParameters(argv[1]);
-        are_set::ParametersMapPtr parameters = std::make_shared<are_set::ParametersMap>(
-                are_set::loadParameters(parameters_filepath));
-        simReleaseBuffer(parameters_filepath);
-        er->set_parameters(parameters);
-        er->initialize();
-        er->load_data(false);
-        er->generate();
-        er->save_logs();
+
     }
 }
 
