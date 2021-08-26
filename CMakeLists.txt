@@ -1,12 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(ARE)
 
-
-
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
-#set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CTEST_MEMORYCHECK_SANITIZER_OPTIONS}")
-
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

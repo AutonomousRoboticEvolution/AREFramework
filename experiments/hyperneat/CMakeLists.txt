@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-
+set(VREP_FOLDER "/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
@@ -10,7 +10,6 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
     )
-
 
 add_library(hyperneat SHARED
     ${VREP_SRC}

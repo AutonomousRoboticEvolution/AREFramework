@@ -178,7 +178,10 @@ private:
         }
     };
 
+public:
+    NEAT::Substrate get_substrate() { return substrate;};
 
+private:
     NEAT::NeuralNetwork nn;
 
     unsigned int id;
@@ -188,6 +191,7 @@ private:
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
     int gripperHandle;
+    NEAT::Substrate substrate;
 };
 
 }//sim

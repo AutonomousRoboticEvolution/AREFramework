@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0)
-
+set(VREP_FOLDER "/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
@@ -20,8 +20,6 @@ add_library(lc_nsms SHARED
     CPPNIndividual.cpp
     factories.cpp
     ManLog.cpp)
-
-
 
 target_include_directories(lc_nsms PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
