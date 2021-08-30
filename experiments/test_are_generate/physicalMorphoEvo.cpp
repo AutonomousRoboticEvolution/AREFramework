@@ -83,7 +83,6 @@ void PhysicalMorphoEvo::init_next_pop(){
         PMEIndividual::Ptr ind(new PMEIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        ind->create_morphology();
         population.push_back(ind);
     }
 }
