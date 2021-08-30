@@ -97,9 +97,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     temp += "/libcoppeliaSim.dylib";
 #endif /* __linux || __APPLE__ */
 
-
-
-
     simLib = loadSimLibrary(temp.c_str());
     if (simLib == NULL)
     {
@@ -117,20 +114,6 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
-
-    // Check the V-REP version:
-    int vrepVer;
-    simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
-    if (vrepVer < 30200) // if V-REP version is smaller than 3.02.00
-    {
-        std::cout << "Sorry, your V-REP copy is somewhat old, V-REP 3.2.0 or higher is required. Cannot start 'BubbleRob' plugin.\n";
-
-
-        unloadSimLibrary(simLib);
-
-
-        return(0); // Means error, V-REP will unload this plugin
-    }
 
     simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
