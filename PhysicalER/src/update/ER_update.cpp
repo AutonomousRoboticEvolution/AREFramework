@@ -1,10 +1,8 @@
-#include "physicalER/ER.hpp"
+#include "physicalER/update/ER_update.hpp"
 
-using namespace are::phy;
+using namespace are::phy::update;
 
 void ER::initialize(){
-
-
     verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
 
@@ -24,7 +22,6 @@ void ER::initialize(){
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
     }
-
 
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
@@ -52,27 +49,14 @@ void ER::initialize(){
     if (verbose) std::cout << "ER initialized" << std::endl;
 }
 
-void ER::load_data(bool is_update){
-    if(is_update){
-        //load the bus addresses
-        ea->load_data_for_update();
-    }else{
-        ea->load_data_for_generate();
-    }
+void ER::load_data(){
+    ea->load_data_for_update();
 }
 
-void ER::write_data(bool is_update){
-    if(is_update){
-        ea->write_data_for_update();
-    }else{
-        ea->write_data_for_generate();
-    }
+void ER::write_data(){
+    ea->write_data_for_update();
 }
 
-void ER::generate(){
-    ea->epoch();
-    ea->init_next_pop();
-}
 
 bool ER::execute(){
 

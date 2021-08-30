@@ -5,10 +5,12 @@
 #include <ctime>
 #include <memory>
 #include "ARE/exp_plugin_loader.hpp"
-#include "physicalER/ER.hpp"
+#include "physicalER/generate/ER_generate.hpp"
 
-/// an unique pointer to ER_VREP class
-are::phy::ER::Ptr ERCOPPELIA;
+namespace are_set = are::settings;
+namespace gen = are::phy::generate;
+
+gen::ER::Ptr ER;
 
 enum SimulationState {
     INITIALIZING,
