@@ -4,7 +4,7 @@ using namespace are::pi;
 
 AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
-    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000000.0;
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
 
     // need to turn on the daughter boards
     daughterBoards->init();
@@ -54,16 +54,6 @@ AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans
     ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be cahnged
     ledDriver->init();
     ledDriver->flash();
-//    ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
-//    for (int i=0; i<4; ++i) { // loop through and turn on all the LEDS
-//        ledDriver->setMode(leds[i], PWM, ALL);
-//        ledDriver->setBrightness(leds[i], 150);
-//        ledDriver->setColour(leds[i],GREEN);
-//    }
-//    usleep(1000000); // 1 second
-//    for (int i=0; i<4; ++i) { // loop through and turn off all the LEDS
-//        ledDriver->setMode(leds[i],FULL_OFF,ALL);
-//    }
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
@@ -111,31 +101,42 @@ int AREControl::exec(zmq::socket_t& socket){
 
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
-    double time = 0;
-    std::cout<<"evaluation time: "<<_max_eval_time<<std::endl;
-    while(time <= _max_eval_time){
+
+    // set up timing system
+    uint32_t start_time = millis();
+    uint32_t this_loop_start_time = start_time;
+
+    while(this_loop_start_time <= _max_eval_time){
 
         retrieveSensorValues(sensor_values);
 
         // tell the controller to update
         controller.set_inputs(sensor_values);
-        controller.update(time);
+        controller.update ( this_loop_start_time*1000.0 ); //expects time in microseconds, I think? (Matt)
         nn_outputs = controller.get_ouputs();
         
         // send the new values to the actuators
         sendMotorCommands(nn_outputs);
         
-        // update timestep
-        time+=_time_step;
-
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);
         strcpy(static_cast<char*>(message.data()),"pi busy");
         socket.send(message);
         
-        // wait for next timestep
-//        std::cout<<" === "<<time<<" === "<<std::endl;
-        usleep(_time_step);
+        // update timestep value ready for next loop
+        this_loop_start_time+=_time_step; // increment
+        std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
+        if (millis() > this_loop_start_time){
+            // already too late for next loop, so we are falling behind!
+            std::cout<<"WARNING: main are_control loop cannot keep up"<<std::endl;
+            this_loop_start_time=millis(); // so we don't get further behind
+        }else{
+            // wait for next loop start time
+            while( millis() < this_loop_start_time) { // this is now actaully the target start time of the next loop
+                delayMicroseconds(1);
+            }
+        }
+
     }
 
     // turn everything off
