@@ -130,6 +130,8 @@ SIM_DLLEXPORT void simEnd()
 SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
 
+    void* retVal=NULL;
+
     int errorModeSaved;
     simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
     simSetIntegerParameter(sim_intparam_error_report_mode, sim_api_errormessage_ignore);
@@ -139,20 +141,29 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
     {
         assert(simulationState == STARTING);
         simulationState = BUSY;
-
         ER->manufacturability_test();
     }
     //Runing Simulation
     else if (message == sim_message_eventcallback_modulehandle)
     {
         assert(simulationState == BUSY);
+        simStopSimulation();
     }
     // SIMULATION ENDED
     else if (message == sim_message_eventcallback_simulationended)
     {
         assert(simulationState == BUSY);
         simulationState = CLEANUP;
-        ER->save_logs();
+        ER->write_data();
+    }
+
+    if (simulationState == CLEANUP) {
+        timeCount++;  //need to wait a few time steps to start a new simulation
+    }
+
+    if (simulationState == CLEANUP && timeCount > 10) {
+        simulationState = FREE;
+        timeCount = 0;
     }
 
 
@@ -162,4 +173,6 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
         simulationState = STARTING;
         simStartSimulation();
     }
+
+    return retVal;
 }

@@ -17,3 +17,7 @@
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
+
+#isSegmentedRobot,bool,1
+#isExportModel,bool,0
+#reloadController,bool,0

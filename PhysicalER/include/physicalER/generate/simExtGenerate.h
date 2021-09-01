@@ -11,6 +11,7 @@ namespace are_set = are::settings;
 namespace gen = are::phy::generate;
 
 gen::ER::Ptr ER;
+int timeCount = 0;
 
 enum SimulationState {
     INITIALIZING,

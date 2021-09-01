@@ -186,6 +186,8 @@ SIM_DLLEXPORT void simEnd()
 
 SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
+    void* retVal = NULL;
+
     are_sett::ParametersMapPtr param = ERVREP->get_parameters();
     //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
@@ -199,6 +201,8 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
         clientMessageHandler(message);
     }
     param.reset();
+
+    return retVal;
 }
 
 void localMessageHandler(int message){

@@ -17,6 +17,7 @@ void ER::initialize(){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
 
     Logging::create_folder(repository + std::string("/") + exp_name);
+    Logging::set_log_folder(repository + std::string("/") + exp_name);
     Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built/"));
 
     if (verbose) {
@@ -67,10 +68,10 @@ void ER::manufacturability_test(){
         std::cout << "Starting Simulation" << std::endl;
 
     environment->init();
-
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->init();
-    simStopSimulation();
+    ea->setCurrentIndIndex(currentIndIndex);
+    currentIndIndex++;
 }
 
 
