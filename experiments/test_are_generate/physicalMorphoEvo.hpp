@@ -64,11 +64,13 @@ public:
     PhysicalMorphoEvo(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
     void init_next_pop() override;
+
     void load_data_for_generate() override{}
     void write_data_for_generate() override;
 private:
     NEAT::Parameters params;
     std::unique_ptr<NEAT::Population> morph_population;
+
 };
 
 }//are

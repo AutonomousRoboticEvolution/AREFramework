@@ -33,10 +33,8 @@ void Morphology_CPPNMatrix::create()
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
-    std::vector<std::vector<simFloat>> listVertices;
-    std::vector<std::vector<simInt>> listIndices;
-    listVertices.emplace_back();
-    listIndices.emplace_back();
+    std::vector<std::vector<simFloat>> listVertices(1);
+    std::vector<std::vector<simInt>> listIndices(1);
     listVertices.back().reserve(decodedMesh.getNoOfVertices());
     listIndices.back().reserve(decodedMesh.getNoOfIndices());
     bool indVerResult = false;

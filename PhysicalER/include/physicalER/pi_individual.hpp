@@ -11,7 +11,7 @@
 
 namespace are{
 
-namespace pi{
+namespace phy{
 
 using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
 using connection_t = nn2::Connection<double>;
