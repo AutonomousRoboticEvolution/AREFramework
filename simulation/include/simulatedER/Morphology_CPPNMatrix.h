@@ -105,11 +105,6 @@ public:
     ///// Miscellanous functions /////
     //////////////////////////////////
     /**
-     * @brief Export mesh file (stl) from a list of vertices and indices.
-     * \todo EB: We might not want this method here and this should be in logging instead.
-     */
-    void exportMesh(int loadInd);
-    /**
      * @brief Export the robot as ttm model
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
