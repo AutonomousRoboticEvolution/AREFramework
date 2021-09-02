@@ -25,6 +25,26 @@
 #define SERVO_POS_READING_MAX 1000
 #define SERVO_POS_READING_RANGE (SERVO_POS_READING_MAX - SERVO_POS_READING_MIN)
 
+//Calibration params
+#define PWM_START_LO_US 600
+#define PWM_START_HI_US 2350
+#define TEST_INCREMENT_US 10
+#define MANUAL_INCREMENT_US 5
+#define MIN_MEASURED_ENCODER_DIFFERENCE 2 //any smaller change than this during test, assume limit has been reached (smaller changes assumed to be noise)
+#define LONG_WAIT_MS 1200
+#define SHORT_WAIT_MS 100
+#define CALIB_AVERAGING_WINDOW_SIZE 200
+#define TEST_MAX_ANGLE 1
+#define TEST_MIN_ANGLE 0
+
+//Calibration variables
+int pwmAtMaxAngle;
+int pwmAtMinAngle;
+int pwmAtCentrePoint;
+int pwmRange;
+int encoderValAtMaxAngle; //occurs at LOW pwm values
+int encoderValAtMinAngle; //occurs at HIGH pwm values
+int encoderRange;
 
 //Servo global variables
 Servo joint_servo;
@@ -61,29 +81,81 @@ void setup() {
   Wire.begin();
 
   //Print instructions
-  Serial.println("Type microsecond values to test. 550 and 2400 are reasonable starting points");
+  Serial.println("Type microsecond values to test. 600 and 2400 are reasonable endpoint estimations");
   Serial.println("Type 'e' to see the encoder reading at the current position");
+  Serial.println("Calibration step 1: Type 'l' to find upper/lower limits and centre the servo");
+  Serial.println("Calibration step 2: Place the horn on the servo, in straightest available spline position");
+  Serial.println("Calibration step 3: Use '[' and ']' to fine-adjust the position until the horn is straight");
 }
 
 void loop() {
 
+//Respond to individual character from serial or construct a string
 while(Serial.available()) {
-  //Read input in as a string
+  //Read next character in
   recvdChar = Serial.read();
 
-  //Special case: typing 'e' returns the encoder state
-  if (recvdChar == 'e') {
-    //Report the encoder reading at this position
-    encoderReading = analogRead(SERVO_POSITION_PIN);
-    Serial.print("Encoder reading at this position is: ");
-    Serial.println(encoderReading);
-  } else {
-    //If not 'e', carry on producing a string
-    inputString += recvdChar; //add next char to string
-    delay(2); //slow to allow next character to enter buffer  
+  switch (recvdChar) {
+    //'e' to print current encoder reading
+    case 'e' :
+      //Report the encoder reading at this position
+      encoderReading = getFilteredEncoderPos();
+      Serial.print("Encoder reading at this position is: ");
+      Serial.println(encoderReading);
+      break;
+
+    //'l' to find end limits and centre the servo
+    case 'l' :
+      //Find lower angle limit
+      //This also updates the global min encoder value variable
+      Serial.println("Finding lower angle limit...");
+      pwmAtMinAngle = autoFindLimit(TEST_MIN_ANGLE);
+      Serial.print("Encoder value at lower limit is: ");
+      Serial.print(encoderValAtMinAngle);
+      Serial.print(", at a PWM value of: ");
+      Serial.print(pwmAtMinAngle);
+      Serial.println("us");
+
+      //Find upper angle limit
+      //This also updates the global min encoder value variable
+      Serial.println("Finding upper angle limit...");
+      pwmAtMaxAngle = autoFindLimit(TEST_MAX_ANGLE);
+      Serial.print("Encoder value at upper limit is: ");
+      Serial.print(encoderValAtMaxAngle);
+      Serial.print(", at a PWM value of: ");
+      Serial.print(pwmAtMaxAngle);
+      Serial.println("us");
+
+      //Calculate ranges for global encoder and PWM values
+      pwmRange = pwmAtMinAngle - pwmAtMaxAngle;
+      encoderRange = encoderValAtMaxAngle - encoderValAtMinAngle;
+      Serial.print("Total encoder range is: ");
+      Serial.println(encoderRange);
+      Serial.print("Total PWM range is: ");
+      Serial.print(pwmRange);
+      Serial.println("us");
+      Serial.println("Moving to centre position...");
+      Serial.println("Place horn and straighten up with [ and ], then press p to output calibration parameters");
+
+      //Move to centre position
+      joint_servo.writeMicroseconds(pwmAtMaxAngle + pwmRange/2);
+      break;
+
+    //']' to increment angle (decrement PWM width)
+
+    //'[' to decrement angle (increment PWM width)
+
+    //'p' to print out the calibrated parameters
+
+    default :
+      //If not a special character, assume is a number and carry on producing a string
+      inputString += recvdChar; //add next char to string
+      delay(2); //slow to allow next character to enter buffer
+      break;     
   }
 }
 
+//Set PWM to specific number entered as text string
 if (inputString.length() > 0) {
   //Convert input string into a number
   int recvdValue = inputString.toInt();
@@ -96,17 +168,6 @@ if (inputString.length() > 0) {
   Serial.println(" us");
 }
 
- // //Movement test code
-//	int delayPeriod = 10;
-//	for (int us_value = 400; us_value < 2500; us_value+= 10) {
-//		joint_servo.writeMicroseconds(us_value);
-//		delay(delayPeriod);
-//	}
-//	for (int us_value = 2500; us_value > 400; us_value-= 10) {
-//		joint_servo.writeMicroseconds(us_value);
-//		delay(delayPeriod);
-//	}
-//	
 }
 
 
@@ -136,6 +197,24 @@ void extI2CEnable(bool on_not_off) {
     digitalWrite(I2C_ENABLE, HIGH);
   }
 }
+
+/*
+  getFilteredEncoderPos
+  @brief Acquires multiple samples of encoder position and averages them to reduce noise
+  This is slow and intended for calibration. A moving average would be used for a 'live' version
+*/
+int getFilteredEncoderPos() {
+  float averagingTotal = 0;
+
+  //Generate a summation of all the samples in the window
+  for (int i=0; i < CALIB_AVERAGING_WINDOW_SIZE; ++i) {
+        averagingTotal += analogRead(SERVO_POSITION_PIN);
+  }
+  //Average the summation over the window size to produce filtered result
+  return averagingTotal/CALIB_AVERAGING_WINDOW_SIZE;
+}
+
+
 /*
   setCurrentLimit
   @brief Sets the current limit for the joint servo.
@@ -180,4 +259,57 @@ void setCurrentLimit (uint8_t tens_of_milliamps) {
   Serial.print(current_limit_mA);
   Serial.println("mA");
   }
+}
+
+
+int autoFindLimit(bool testMaxNotMinAngle) {
+  int currentPwmVal, newPwmVal;
+  int currentEncoderVal, newEncoderVal, encoderValDifference;
+  float averagingTotal = 0;
+  bool exitFlag = false;
+
+  //Move to starting point
+  currentPwmVal = testMaxNotMinAngle ? PWM_START_LO_US : PWM_START_HI_US;
+  joint_servo.writeMicroseconds(currentPwmVal);
+  delay(LONG_WAIT_MS);
+  currentEncoderVal = analogRead(SERVO_POSITION_PIN);
+
+  //Increment until encoder stops changing
+  while(!exitFlag) {
+    //Move servo another increment
+    newPwmVal = testMaxNotMinAngle ? currentPwmVal - TEST_INCREMENT_US : currentPwmVal + TEST_INCREMENT_US;
+    joint_servo.writeMicroseconds(newPwmVal);
+
+    //Wait for movement and test position, filtered
+    delay(SHORT_WAIT_MS);
+    newEncoderVal = getFilteredEncoderPos();
+
+    if(DEBUG) {
+      Serial.print("Current (last) encoder value: ");
+      Serial.print(currentEncoderVal);
+      Serial.print(", New encoder value: ");
+      Serial.println(newEncoderVal);
+    }
+
+    //If position hasn't changed, the last position was the limit
+    encoderValDifference = newEncoderVal - currentEncoderVal;
+    if (abs(encoderValDifference) < MIN_MEASURED_ENCODER_DIFFERENCE) {
+      exitFlag = true; //Break out of this while loop
+    } else {
+      //Otherwise update last pwm and encoder values and go back round the loop
+      currentEncoderVal = newEncoderVal;
+      currentPwmVal = newPwmVal;
+    }
+  }
+
+  //Update min or max encoder values. Note that these are counterintuitive.
+  //Max encoder value occurs at minimum PWM pulsewidth and vice versa.
+  if (testMaxNotMinAngle) {
+    encoderValAtMaxAngle = currentEncoderVal;
+  } else {
+    encoderValAtMinAngle = currentEncoderVal;
+  }
+
+  //Once limit has been found, return it
+  return currentPwmVal;
 }
