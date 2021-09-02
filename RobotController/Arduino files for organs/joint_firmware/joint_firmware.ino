@@ -116,22 +116,6 @@ void loop() {
     setTargetPosition(target_position_setting);
     update_target_position_flag = false;
   }
-
-  // //TEST CODE FOR MOVEMENT
-  // int delayPeriod = 100;
-  // for (int pos = 0; pos <= 180; pos += 1)
-  // {
-  //  setTargetPosition(pos);
-  //  readServoPosition();
-  //  readServoCurrent();
-  //  delay(delayPeriod);
-  // }
-  // for (int pos = 180; pos >= 0; pos -= 1) {
-  //  setTargetPosition(pos);
-  //  readServoPosition();
-  //  readServoCurrent();
-  //  delay(delayPeriod);
-  // }
 }
 
 /*******FUNCTIONS*****************/
