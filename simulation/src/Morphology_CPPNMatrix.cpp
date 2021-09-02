@@ -465,10 +465,8 @@ void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices,
     indicesMesh[0] = indices.data();
     indicesSizesMesh[0] = indices.size();
 
-    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
-
     std::stringstream filepath;
-    filepath << loadExperiment << "mesh" << loadInd << ".stl";
+    filepath << Logging::log_folder << "/mesh" << loadInd << ".stl";
 
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
