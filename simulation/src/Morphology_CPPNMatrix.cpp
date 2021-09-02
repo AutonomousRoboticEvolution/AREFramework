@@ -33,18 +33,17 @@ void Morphology_CPPNMatrix::create()
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
-    std::vector<std::vector<simFloat>> listVertices(1);
-    std::vector<std::vector<simInt>> listIndices(1);
-    listVertices.back().reserve(decodedMesh.getNoOfVertices());
-    listIndices.back().reserve(decodedMesh.getNoOfIndices());
+
+    skeletonListVertices.reserve(decodedMesh.getNoOfVertices());
+    skeletonListIndices.reserve(decodedMesh.getNoOfIndices());
     bool indVerResult = false;
-    indVerResult = getIndicesVertices(decodedMesh,listVertices.back(),listIndices.back());
+    indVerResult = getIndicesVertices(decodedMesh);
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(nn,skeletonSurfaceCoord);
-        meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, listVertices.at(0).data(), listVertices.at(0).size(), listIndices.at(0).data(),
-                                        listIndices.at(0).size(), nullptr);
+        meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
+                                        skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
             std::cerr << "Importing mesh NOT succesful! " << __func__  << std::endl;
         }
@@ -284,7 +283,7 @@ void Morphology_CPPNMatrix::create()
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportMesh(loadInd, listVertices.at(0),listIndices.at(0));
+        exportMesh(loadInd);
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
@@ -356,8 +355,7 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
 
 }
 
-bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh,
-                                         std::vector<simFloat> &vertices, std::vector<simInt> &indices)
+bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh)
 {
     const unsigned int n_vertices = decodedMesh.getNoOfVertices();
     const unsigned int n_indices = decodedMesh.getNoOfIndices();
@@ -374,21 +372,21 @@ bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uin
             if (prev != nullptr and (*prev) != pos) pointObject = false;
             prev = &pos;
         }
-        vertices.emplace_back(pos.getX() * mc::shape_scale_value);
-        vertices.emplace_back(pos.getY() * mc::shape_scale_value);
-        vertices.emplace_back(pos.getZ() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getX() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getY() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getZ() * mc::shape_scale_value);
     }
 
     // If all vectors are the same, we have an object the size of point. This is considered a failed viability.
     // and it makes the vertex decomposition to crash badly.
     if (pointObject) {
-        vertices.clear();
-        indices.clear();
+        skeletonListVertices.clear();
+        skeletonListIndices.clear();
         return false;
     }
 
     for (unsigned int i=0; i < n_indices; i++) {
-        indices.emplace_back(decodedMesh.getIndex(i));
+        skeletonListIndices.emplace_back(decodedMesh.getIndex(i));
     }
 
     return true;
@@ -447,7 +445,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     organ.organOri.push_back(rotZ);
 }
 
-void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices)
+void Morphology_CPPNMatrix::exportMesh(int loadInd)
 {
 #ifndef ISCLUSTER
     std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
@@ -460,10 +458,10 @@ void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices,
 #endif
     auto *verticesSizesMesh = new simInt[2];
     auto *indicesSizesMesh = new simInt[2];
-    verticesMesh[0] = vertices.data();
-    verticesSizesMesh[0] = vertices.size();
-    indicesMesh[0] = indices.data();
-    indicesSizesMesh[0] = indices.size();
+    verticesMesh[0] = skeletonListVertices.data();
+    verticesSizesMesh[0] = skeletonListVertices.size();
+    indicesMesh[0] = skeletonListIndices.data();
+    indicesSizesMesh[0] = skeletonListIndices.size();
 
     std::stringstream filepath;
     filepath << Logging::log_folder << "/mesh" << loadInd << ".stl";
