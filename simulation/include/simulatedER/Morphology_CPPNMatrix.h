@@ -131,6 +131,8 @@ public:
     std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();};
     std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();};
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();};
+    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
 private:
     ///////////////////////

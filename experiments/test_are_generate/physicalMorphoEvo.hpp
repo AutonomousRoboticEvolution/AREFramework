@@ -46,6 +46,8 @@ public:
     const std::vector<int> &getListOrganTypes() const {return listOrganTypes;}
     const std::vector<std::vector<float>> &getListOrganPos() const {return listOrganPos;}
     const std::vector<std::vector<float>> &getListOrganOri() const {return listOrganOri;}
+    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
 private:
     void createMorphology() override;
@@ -56,9 +58,9 @@ private:
     std::vector<bool> testRes;
     std::vector<int> listOrganTypes;
     std::vector<std::vector<float>> listOrganPos;
-
-private:
     std::vector<std::vector<float>> listOrganOri;
+    std::vector<float> skeletonListVertices;
+    std::vector<int> skeletonListIndices;
 
 };
 

@@ -18,6 +18,8 @@ void PMEIndividual::createMorphology(){
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
     listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
     listOrganOri = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganOriList();
+    skeletonListIndices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListIndices();
+    skeletonListVertices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListVertices();
 }
 
 
@@ -106,8 +108,10 @@ void PhysicalMorphoEvo::write_data_for_generate(){
     for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
         ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
 
+    // Export blueprint
+
     std::stringstream sst_blueprint;
-    sst_blueprint << "blueprint_" << currentIndIndex;
+    sst_blueprint << "blueprint_" << currentIndIndex << ".csv";
     std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() , std::ios::out | std::ios::ate | std::ios::app);
     if(!ofs)
     {
@@ -125,4 +129,27 @@ void PhysicalMorphoEvo::write_data_for_generate(){
                       << tempOrganOri.at(i).at(2) << ","
                       << std::endl;
     }
+
+    // Export mesh file
+
+    const auto **verticesMesh = new const simFloat *[2];
+    const auto **indicesMesh = new const simInt *[2];
+    auto *verticesSizesMesh = new simInt[2];
+    auto *indicesSizesMesh = new simInt[2];
+    verticesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().data();
+    verticesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().size();
+    indicesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().data();
+    indicesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().size();
+
+    std::stringstream filepath;
+    filepath << Logging::log_folder << "/waiting_to_be_built/mesh" << currentIndIndex << ".stl";
+
+    //fileformat: the fileformat to export to:
+    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
+    simExportMesh(3, filepath.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
+
+    delete[] verticesMesh;
+    delete[] verticesSizesMesh;
+    delete[] indicesMesh;
+    delete[] indicesSizesMesh;
 }
