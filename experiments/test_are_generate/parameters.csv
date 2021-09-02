@@ -1,8 +1,8 @@
 #experimentName,string,test_are_generate
-#expPluginName,string,/usr/local/lib/libtest_are_generate.so
+#expPluginName,string,/home/edgar/coppeliaSim/lib/libtest_are_generate.so
 #verbose,bool,1
 #instanceType,int,0
-#repository,string,/home/leni/are-logs
+#repository,string,/home/edgar/are-logs
 #seed,int,-1
 
 #populationSize,int,10
@@ -12,12 +12,12 @@
 
 #init_x,float,0
 #init_y,float,0
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#organsPath,string,/home/edgar/evolutionary_robotics_framework/experiments/sim/
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
 
 #isSegmentedRobot,bool,1
-#isExportModel,bool,0
+#isExportModel,bool,1
 #reloadController,bool,0

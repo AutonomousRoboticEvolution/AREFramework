@@ -23,7 +23,7 @@ add_library(test_pimio SHARED
     )
 
 target_include_directories(test_pimio PUBLIC ${INCLUDES})
-target_link_libraries(test_pimio ${OpenCV_LIBRARIES} ARE AREImageProc physicalER)
+target_link_libraries(test_pimio ${OpenCV_LIBRARIES} ARE AREImageProc)
 
 install(TARGETS test_pimio DESTINATION lib)
 install(DIRECTORY . DESTINATION include/test_pimio FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

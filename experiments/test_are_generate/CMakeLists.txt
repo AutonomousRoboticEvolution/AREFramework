@@ -21,7 +21,7 @@ add_library(test_are_generate SHARED
     )
 
 target_include_directories(test_are_generate PUBLIC ${INCLUDES})
-target_link_libraries(test_are_generate ${OpenCV_LIBRARIES} ARE simulatedER physicalER)
+target_link_libraries(test_are_generate ${OpenCV_LIBRARIES} ARE simulatedER)
 
 install(TARGETS test_are_generate DESTINATION lib)
 install(DIRECTORY . DESTINATION include/test_are_generate FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

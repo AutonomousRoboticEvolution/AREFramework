@@ -15,6 +15,9 @@ void PMEIndividual::createMorphology(){
     nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGenome();
     morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
+    listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
+    listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
+    listOrganOri = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganOriList();
 }
 
 
@@ -103,4 +106,23 @@ void PhysicalMorphoEvo::write_data_for_generate(){
     for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
         ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
 
+    std::stringstream sst_blueprint;
+    sst_blueprint << "blueprint_" << currentIndIndex;
+    std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() , std::ios::out | std::ios::ate | std::ios::app);
+    if(!ofs)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() << std::endl;
+        return;
+    }
+    std::vector<int> tempOrganTypes = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganTypes();
+    std::vector<std::vector<float>> tempOrganPos = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganPos();
+    std::vector<std::vector<float>> tempOrganOri = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganOri();
+    for (int i = 0; i < tempOrganTypes.size(); i++) {
+        ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
+                      << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
+                      << tempOrganPos.at(i).at(2) << ","
+                      << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
+                      << tempOrganOri.at(i).at(2) << ","
+                      << std::endl;
+    }
 }

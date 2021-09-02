@@ -319,6 +319,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
     }
     destroyGripper();
+    blueprint.createBlueprint(organList);
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -441,7 +442,8 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     // Activate NN
     cppn.Activate();
     float rotZ;
-    rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
+    // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
+    rotZ = 0;
     organ.organOri.push_back(rotZ);
 }
 

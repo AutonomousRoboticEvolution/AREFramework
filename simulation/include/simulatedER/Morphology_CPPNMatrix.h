@@ -10,6 +10,7 @@
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 #include "eigen3/Eigen/Core"
 #include "ARE/morphology_descriptors.hpp"
+#include "simulatedER/Blueprint.h"
 
 #include "math.h"
 
@@ -127,6 +128,9 @@ public:
     int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
     int get_sensorNumber() const {return indDesc.cartDesc.sensorNumber;}
+    std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();};
+    std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();};
+    std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();};
 
 private:
     ///////////////////////
@@ -188,6 +192,7 @@ private:
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
     int gripperHandle;
+    Blueprint blueprint;
 };
 
 }//sim
