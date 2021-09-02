@@ -283,7 +283,6 @@ void Morphology_CPPNMatrix::create()
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportMesh(loadInd);
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
@@ -443,37 +442,6 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
     rotZ = 0;
     organ.organOri.push_back(rotZ);
-}
-
-void Morphology_CPPNMatrix::exportMesh(int loadInd)
-{
-#ifndef ISCLUSTER
-    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
-#elif ISCLUSTER == 0
-    const auto **verticesMesh = new const simFloat *[2];
-    const auto **indicesMesh = new const simInt *[2];
-#elif ISCLUSTER == 1
-    auto **verticesMesh = new simFloat *[2];
-    auto **indicesMesh = new simInt *[2];
-#endif
-    auto *verticesSizesMesh = new simInt[2];
-    auto *indicesSizesMesh = new simInt[2];
-    verticesMesh[0] = skeletonListVertices.data();
-    verticesSizesMesh[0] = skeletonListVertices.size();
-    indicesMesh[0] = skeletonListIndices.data();
-    indicesSizesMesh[0] = skeletonListIndices.size();
-
-    std::stringstream filepath;
-    filepath << Logging::log_folder << "/mesh" << loadInd << ".stl";
-
-    //fileformat: the fileformat to export to:
-    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
-    simExportMesh(3, filepath.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
-
-    delete[] verticesMesh;
-    delete[] verticesSizesMesh;
-    delete[] indicesMesh;
-    delete[] indicesSizesMesh;
 }
 
 void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
