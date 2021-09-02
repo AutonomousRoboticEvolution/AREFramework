@@ -181,7 +181,7 @@ private:
 
     NEAT::NeuralNetwork nn;
 
-    unsigned int id;
+    unsigned int id = 0;
     // Variables used to contain handles.
     std::vector<Organ> organList;
     int numSkeletonVoxels;

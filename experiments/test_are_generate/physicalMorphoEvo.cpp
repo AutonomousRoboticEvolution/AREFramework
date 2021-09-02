@@ -78,30 +78,29 @@ void PhysicalMorphoEvo::init_next_pop(){
     NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
     for (size_t i = 0; i < population_size; i++){ // Body plans
-        EmptyGenome::Ptr ctrl_gen;
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
         PMEIndividual::Ptr ind(new PMEIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        ind->create_morphology();
         population.push_back(ind);
     }
 }
 
 void PhysicalMorphoEvo::write_data_for_generate(){
-    int i = 0;
-    for(const auto& ind: population){
-        std::stringstream sst;
-        sst << "morph_desc_" << i;
-        std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
 
-        if(!ofs)
-        {
-            std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() << std::endl;
-            return;
-        }
+    const auto& ind = population[currentIndIndex];
+    std::stringstream sst;
+    sst << "morph_desc_" << currentIndIndex;
+    std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
 
-        for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
-            ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
+    if(!ofs)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() << std::endl;
+        return;
     }
+
+    for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
+        ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
+
 }

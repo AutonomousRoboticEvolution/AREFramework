@@ -13,6 +13,7 @@
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
+#include "JointOrgan.hpp"
 
 #define WHEEL_ADDRESS 0x60
 
@@ -67,7 +68,16 @@ int main()
 /************ LEDs ********************************************/
     LedDriver ledDriver(0x6A); // <- the Led driver is always the same i2c address, it cannot be cahnged
     ledDriver.init();
-    
+    ledDriver.flash();
+
+/************ joint test ********************************************/
+bool do_joint_test = true;
+if (do_joint_test){
+    uint8_t address = 0x08;
+    JointOrgan myJoint(address);
+    myJoint.testFunction();
+}
+
 
 /************ Wheel test ********************************************/
 //    MotorOrgan myWheel(WHEEL_ADDRESS);
@@ -75,7 +85,8 @@ int main()
 
 /************ Sensor test ********************************************/
 
-    
+    /*
+
     std::list<SensorOrgan> listOfSensors;
     listOfSensors.push_back( SensorOrgan( 0x30 ) );
     listOfSensors.push_back( SensorOrgan( 0x32 ) );
@@ -147,9 +158,8 @@ int main()
         std::cin.get();
     }
     */
-	
 
-	daughterBoards.turnOff();
+	
 
 }
 

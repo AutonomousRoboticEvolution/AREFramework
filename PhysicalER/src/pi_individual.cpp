@@ -1,7 +1,7 @@
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 
 
-using namespace are::pi;
+using namespace are::phy;
 namespace st = are::settings;
 
 void NN2Individual::createController(){

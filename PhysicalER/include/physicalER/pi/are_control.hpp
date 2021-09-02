@@ -12,6 +12,8 @@
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
 #include <zmq.hpp>
+#include <wiringPi.h> //for timing functions
+
 
 namespace are {
 namespace pi {
@@ -28,13 +30,9 @@ public:
 
 private:
     NN2Individual controller;
-    float _max_eval_time ; // microseconds
-    float _time_step = 100000; // microseconds
+    float _max_eval_time ; // millieconds
+    float _time_step = 100; // milliseconds
 
-//    std::shared_ptr<MotorOrgan> wheel0;
-//    std::shared_ptr<MotorOrgan> wheel1;
-//    std::shared_ptr<MotorOrgan> wheel2;
-//    std::shared_ptr<MotorOrgan> wheel3;
     std::list<MotorOrgan> listOfWheels;
     std::list<SensorOrgan> listOfSensors;
 

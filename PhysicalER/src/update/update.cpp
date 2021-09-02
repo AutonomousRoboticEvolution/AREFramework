@@ -1,6 +1,7 @@
-#include "physicalER/ER.hpp"
+#include "physicalER/update/ER_update.hpp"
 
 namespace are_set = are::settings;
+namespace up = are::phy::update;
 
 int main(int argc, char** argv){
 
@@ -9,14 +10,12 @@ int main(int argc, char** argv){
         std::cout << "\targ1 - path to the parameter file" << std::endl;
     }
 
-    are::phy::ER::Ptr er(new are::phy::ER);
+    up::ER::Ptr er(new up::ER);
     are_set::ParametersMap param = are_set::loadParameters(argv[1]);
     er->set_parameters(std::make_shared<are_set::ParametersMap>(param));
     er->initialize();
-    er->load_data(false);
-    er->generate();
-    er->write_data(false);
+    er->load_data();
+    while(er->execute()) usleep(500);
     er->save_logs();
-
     return 0;
 }

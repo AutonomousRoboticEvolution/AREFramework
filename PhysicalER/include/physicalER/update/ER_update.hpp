@@ -9,11 +9,11 @@
 #include "ARE/Environment.h"
 #include "ARE/misc/RandNum.h"
 #include "physicalER/pi_communication.hpp"
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 
 namespace are {
-
 namespace phy {
+namespace update {
 
 typedef enum robot_state_t{
     READY,
@@ -52,9 +52,8 @@ public:
 
     bool execute();
 
-    void load_data(bool is_update = true);
-    void write_data(bool is_update = true);
-    void generate();
+    void load_data();
+    void write_data();
 
     void start_evaluation();
     bool update_evaluation();
@@ -106,12 +105,14 @@ private:
 
     zmq::context_t context;
     zmq::socket_t subscriber;
-    zmq::socket_t request   ;
+    zmq::socket_t request;
 
 };
 
-}
+}//update
 
-}
+}//phy
+
+}//are
 
 #endif //PHY_ER_HPP

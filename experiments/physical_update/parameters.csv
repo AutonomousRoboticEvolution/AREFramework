@@ -12,7 +12,7 @@
 #aspectRatio_y,double,1
 #cameraHeight,double,200
 
-#maxEvalTime,float,30
+#maxEvalTime,float,10
 #arenaSize,double,2
 
 #ctrlGenomeFolder,string,/home/matt/are-logs/test/

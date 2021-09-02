@@ -5,7 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include "ARE/EA.h"
 #include "ARE/Settings.h"
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 
 namespace are{
 
