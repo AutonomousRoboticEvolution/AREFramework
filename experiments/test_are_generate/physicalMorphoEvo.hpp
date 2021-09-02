@@ -80,6 +80,9 @@ public:
 private:
     NEAT::Parameters params;
     std::unique_ptr<NEAT::Population> morph_population;
+    std::vector<std::string> morph_gen_files;
+    std::vector<std::pair<int,int>> ids;
+
 
 };
 

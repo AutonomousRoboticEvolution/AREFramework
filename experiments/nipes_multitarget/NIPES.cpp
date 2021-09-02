@@ -75,6 +75,10 @@ void NIPES::init(){
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_output(nb_output);
+
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
         Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
@@ -164,6 +168,9 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     dMat new_samples = cmaStrategy->ask();
@@ -184,6 +191,10 @@ void NIPES::init_next_pop(){
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_output(nb_output);
+
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
         Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
