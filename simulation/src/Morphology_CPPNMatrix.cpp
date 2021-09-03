@@ -18,7 +18,6 @@ void Morphology_CPPNMatrix::create()
     int meshHandle = -1;
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
     mainHandle = -1;
-    gripperHandle = -1;
     int convexHandle, brainHandle;
     createGripper();
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
@@ -132,7 +131,14 @@ void Morphology_CPPNMatrix::create()
                     setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
-                    i.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
+                    if(i.getOrganType() == 1)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                    else if(i.getOrganType() == 2)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+                    else if(i.getOrganType() == 3)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                    else if(i.getOrganType() == 4)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 /// Cap the number of organs.
@@ -271,7 +277,16 @@ void Morphology_CPPNMatrix::create()
                         organ.organOri[2] += tempOri[2];
                         simRemoveObject(tempDummy);
                         organ.createOrgan(organList.at(i).objectHandles[1]);
-                        organ.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
+
+                        if(organ.getOrganType() == 1)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 2)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 3)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 4)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+
                         organ.organGoodOrientation = true; // Ignore orientation as these organs always have good orientations.
                         organ.repressOrgan();
                         organList.push_back(organ);
@@ -350,8 +365,6 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
         std::cerr << "Set object position failed" << std::endl;
         exit(1);
     }
-
-
 }
 
 bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh)
@@ -406,24 +419,33 @@ void Morphology_CPPNMatrix::createGripper()
 {
     float gripperPosition[3];
     float gripperOrientation[3];
-    std::string modelsPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
-    modelsPath += "C_Gripper.ttm";
-    gripperHandle = simLoadModel(modelsPath.c_str());
-    assert(gripperHandle != -1);
+    int tempGripperHandle = -1;
+    std::string gripperWheelPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
+    gripperWheelPath += "C_GripperW.ttm";
+    tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles.push_back(tempGripperHandle);
+    tempGripperHandle = -1;
+    std::string gripperSensorPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
+    gripperSensorPath += "C_GripperS.ttm";
+    tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles.push_back(tempGripperHandle);
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
 
-    simSetObjectPosition(gripperHandle, -1, gripperPosition);
-    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
-
+    for(auto & i : gripperHandles){
+        simSetObjectPosition(i, -1, gripperPosition);
+        simSetObjectOrientation(i, -1, gripperOrientation);
 #ifndef ISROBOTSTATIC
-    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
+    }
 }
 
 void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ &organ)
@@ -440,8 +462,12 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     cppn.Activate();
     float rotZ;
     // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
-    rotZ = 0;
-    organ.organOri.push_back(rotZ);
+    /// \todo EB: This is temporal.
+    if(organ.getOrganType() == 1)
+        rotZ = 0.0;
+    if(organ.getOrganType() == 2)
+        rotZ = M_PI_2;
+    organ.organOri.at(2) = rotZ;
 }
 
 void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
@@ -534,7 +560,9 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
 
 void Morphology_CPPNMatrix::destroyGripper()
 {
-    simRemoveModel(gripperHandle);
+    for(auto & i : gripperHandles) {
+        simRemoveModel(i);
+    }
 }
 
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
