@@ -24,77 +24,56 @@ void PMEIndividual::createMorphology(){
 
 
 void PhysicalMorphoEvo::init(){
-    params = NEAT::Parameters();
-    /// Set parameters for NEAT
-    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    params.PopulationSize = pop_size;
-    params.DynamicCompatibility = true;
-    params.CompatTreshold = 2.0;
-    params.YoungAgeTreshold = 15;
-    params.SpeciesMaxStagnation = 100;
-    params.OldAgeTreshold = 50;
-    params.MinSpecies = 5;
-    params.MaxSpecies = 10;
-    params.RouletteWheelSelection = false;
 
-    params.MutateRemLinkProb = 0.02;
-    params.RecurrentProb = 0.0;
-    params.OverallMutationRate = 0.15;
-    params.MutateAddLinkProb = 0.08;
-    params.MutateAddNeuronProb = 0.01;
-    params.MutateWeightsProb = 0.90;
-    params.MaxWeight = 8.0;
-    params.WeightMutationMaxPower = 0.2;
-    params.WeightReplacementMaxPower = 1.0;
+    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
+    int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
 
-    params.MutateActivationAProb = 0.0;
-    params.ActivationAMutationMaxPower = 0.5;
-    params.MinActivationA = 0.05;
-    params.MaxActivationA = 6.0;
+    if(indIdx < 0){
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        for(int i = 0; i < pop_size; i++){
+            std::stringstream sstr2;
+            sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << i;
+            morph_gen_files.push_back(sstr2.str());
+            ids.push_back(std::make_pair(generation,i));
+        }
+    }else
+    {
+        std::stringstream sstr2;
+        sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
+        morph_gen_files.push_back(sstr2.str());
+        ids.push_back(std::make_pair(generation,indIdx));
+    }
 
-    params.MutateNeuronActivationTypeProb = 0.03;
 
-    // Crossover
-    params.SurvivalRate = 0.01;
-    params.CrossoverRate = 0.01;
-    params.CrossoverRate = 0.01;
-    params.InterspeciesCrossoverRate = 0.01;
+    CPPNGenome::Ptr morph_gen;
+    EmptyGenome::Ptr ctrl_gen;
+    //load morphology genome
+    for(size_t i = 0; i < morph_gen_files.size(); i++){
+        NEAT::Genome neat_gen(morph_gen_files[i].c_str());
+        morph_gen.reset(new CPPNGenome(neat_gen));
+        morph_gen->set_randNum(randomNum);
+        morph_gen->set_parameters(parameters);
 
-    params.ActivationFunction_SignedSigmoid_Prob = 0.0;
-    params.ActivationFunction_UnsignedSigmoid_Prob = 0.0;
-    params.ActivationFunction_Tanh_Prob = 1.0;
-    params.ActivationFunction_TanhCubic_Prob = 0.0;
-    params.ActivationFunction_SignedStep_Prob = 1.0;
-    params.ActivationFunction_UnsignedStep_Prob = 0.0;
-    params.ActivationFunction_SignedGauss_Prob = 1.0;
-    params.ActivationFunction_UnsignedGauss_Prob = 0.0;
-    params.ActivationFunction_Abs_Prob = 0.0;
-    params.ActivationFunction_SignedSine_Prob = 1.0;
-    params.ActivationFunction_UnsignedSine_Prob = 0.0;
-    params.ActivationFunction_Linear_Prob = 1.0;
+        ctrl_gen.reset(new EmptyGenome);
 
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-}
-
-void PhysicalMorphoEvo::init_next_pop(){
-    const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    // Morphology
-    NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
-    morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
-    for (size_t i = 0; i < population_size; i++){ // Body plans
-        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-        CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
-        PMEIndividual::Ptr ind(new PMEIndividual(morphgenome,ctrl_gen));
+        Individual::Ptr ind(new PMEIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }
+    ctrl_gen.reset();
+    morph_gen.reset();
+}
+
+void PhysicalMorphoEvo::init_next_pop(){
+
 }
 
 void PhysicalMorphoEvo::write_data_for_generate(){
 
     const auto& ind = population[currentIndIndex];
+    const auto& id = ids[currentIndIndex];
     std::stringstream sst;
     sst << "morph_desc_" << currentIndIndex;
     std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
@@ -111,7 +90,7 @@ void PhysicalMorphoEvo::write_data_for_generate(){
     // Export blueprint
 
     std::stringstream sst_blueprint;
-    sst_blueprint << "blueprint_" << currentIndIndex << ".csv";
+    sst_blueprint << "blueprint_" << id.first << "_" << id.second << ".csv";
     std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() , std::ios::out | std::ios::ate | std::ios::app);
     if(!ofs)
     {
@@ -142,7 +121,7 @@ void PhysicalMorphoEvo::write_data_for_generate(){
     indicesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().size();
 
     std::stringstream filepath;
-    filepath << Logging::log_folder << "/waiting_to_be_built/mesh" << currentIndIndex << ".stl";
+    filepath << Logging::log_folder << "/waiting_to_be_built/mesh_" << id.first << "_" << id.second << ".stl";
 
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format

@@ -72,9 +72,7 @@ void ER::manufacturability_test(){
     currentInd->init();
     ea->setCurrentIndIndex(currentIndIndex);
     currentIndIndex++;
-    if(currentIndIndex >= ea->getPopSize()){
-        exit(0);
-    }
+
 }
 
 
