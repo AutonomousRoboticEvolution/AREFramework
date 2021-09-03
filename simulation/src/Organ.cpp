@@ -78,7 +78,7 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     if(organType == 1) // Wheels
         gripperPosition[2] = -0.13;
     else if(organType == 2) // Sensors
-        gripperPosition[2] = -0.13;
+        gripperPosition[2] = -0.15;
     else if(organType == 3) // Joints
         gripperPosition[2] = -0.195;
     else if(organType == 4) // Caster
@@ -108,6 +108,8 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
         }
     }
     organGripperAccess = true;
+    gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
+    simSetObjectPosition(gripperHandle, -1, gripperPosition);
 }
 
 void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
@@ -143,7 +145,7 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
 {
     IsOrganColliding(skeletonHandles, organList);
     isOrganGoodOrientation();
-//    isGripperCollision(gripperHandle, skeletonHandles, organList);
+    isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 

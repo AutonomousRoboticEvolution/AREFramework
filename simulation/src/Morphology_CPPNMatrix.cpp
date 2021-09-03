@@ -131,13 +131,14 @@ void Morphology_CPPNMatrix::create()
                     setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
-                    if(i.getOrganType() == 0)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
-                    else if(i.getOrganType() == 1)
+                    if(i.getOrganType() == 1)
                         i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     else if(i.getOrganType() == 2)
                         i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
-
+                    else if(i.getOrganType() == 3)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                    else if(i.getOrganType() == 4)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 /// Cap the number of organs.
@@ -277,12 +278,14 @@ void Morphology_CPPNMatrix::create()
                         simRemoveObject(tempDummy);
                         organ.createOrgan(organList.at(i).objectHandles[1]);
 
-                        if(organ.getOrganType() == 0)
-                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
-                        else if(organ.getOrganType() == 1)
+                        if(organ.getOrganType() == 1)
                             organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                         else if(organ.getOrganType() == 2)
                             organ.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 3)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 4)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
 
                         organ.organGoodOrientation = true; // Ignore orientation as these organs always have good orientations.
                         organ.repressOrgan();
@@ -362,8 +365,6 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
         std::cerr << "Set object position failed" << std::endl;
         exit(1);
     }
-
-
 }
 
 bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh)
@@ -461,7 +462,11 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     cppn.Activate();
     float rotZ;
     // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
-    rotZ = M_PI_2;
+    /// \todo EB: This is temporal.
+    if(organ.getOrganType() == 1)
+        rotZ = 0.0;
+    if(organ.getOrganType() == 2)
+        rotZ = M_PI_2;
     organ.organOri.at(2) = rotZ;
 }
 
