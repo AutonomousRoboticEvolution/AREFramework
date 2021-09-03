@@ -137,12 +137,10 @@ void Visu::init(){
         morph_gen_files.push_back(sstr2.str());
     }
 
-
     CPPNGenome::Ptr morph_gen;
     Genome::Ptr ctrl_gen;
     //load morphology genome
     for(size_t i = 0; i < morph_gen_files.size(); i++){
-        std::stringstream filepath;
         NEAT::Genome neat_gen(morph_gen_files[i].c_str());
         morph_gen.reset(new CPPNGenome(neat_gen));
         morph_gen->set_randNum(randomNum);
