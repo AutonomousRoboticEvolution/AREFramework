@@ -2,7 +2,7 @@
 
 using namespace are::pi;
 
-AREControl::AREControl(const NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
+AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
     _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
 
@@ -65,6 +65,17 @@ void AREControl::sendMotorCommands(std::vector<double> values){
 //        std::cout<<"Wheel "<<i<<" output set to "<<values[i]*NEURAL_NETWORK_OUTPUT_TO_WHEEL_INPUT_MULTIPLIER<<std::endl;
         i++;
     }
+
+    // debugging: display sensor values as bars:
+    for(i=0;i<values.size();i++){
+        int n_blocks=values[i]*10.0;
+        for (int i_block=0; i_block<10;i_block++){
+            if (i_block<n_blocks) std::cout<<"o";
+            else std::cout<<" ";
+        }
+        std::cout<<"|";
+    }
+    std::cout<<std::endl;
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
@@ -125,7 +136,7 @@ int AREControl::exec(zmq::socket_t& socket){
         
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
-        std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
+        //std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
         if (millis() > this_loop_start_time){
             // already too late for next loop, so we are falling behind!
             std::cout<<"WARNING: main are_control loop cannot keep up"<<std::endl;
