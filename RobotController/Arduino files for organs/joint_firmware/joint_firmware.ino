@@ -35,7 +35,7 @@
 #define SERVO_ENABLE 6 //change this to pin 7 for v1.2+ boards
 #define SERVO_PWM 5
 #define SETI_PIN 6 //Current measurement
-#define SERVO_POSITION_PIN A3 //19
+#define SERVO_POSITION_PIN A3
 
 //Register addresses
 #define SERVO_ENABLE_REGISTER 0X10
@@ -116,22 +116,6 @@ void loop() {
     setTargetPosition(target_position_setting);
     update_target_position_flag = false;
   }
-
-  // //TEST CODE FOR MOVEMENT
-  // int delayPeriod = 100;
-  // for (int pos = 0; pos <= 180; pos += 1)
-  // {
-  //  setTargetPosition(pos);
-  //  readServoPosition();
-  //  readServoCurrent();
-  //  delay(delayPeriod);
-  // }
-  // for (int pos = 180; pos >= 0; pos -= 1) {
-  //  setTargetPosition(pos);
-  //  readServoPosition();
-  //  readServoCurrent();
-  //  delay(delayPeriod);
-  // }
 }
 
 /*******FUNCTIONS*****************/
