@@ -3,20 +3,6 @@
 
 using namespace are;
 
-Eigen::VectorXd NIPESIndividual::descriptor()
-{
-    if(descriptor_type == FINAL_POSITION){
-        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-        Eigen::VectorXd desc(3);
-        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
-        return desc;
-    }else if(descriptor_type == VISITED_ZONES){
-        Eigen::MatrixXd vz = visited_zones.cast<double>();
-        Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
-        return desc;
-    }
-}
-
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -89,9 +75,13 @@ void NIPES::init(){
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_output(nb_output);
+
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
+        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -178,6 +168,9 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
     int pop_size = cmaStrategy->get_parameters().lambda();
 
     dMat new_samples = cmaStrategy->ask();
@@ -198,9 +191,13 @@ void NIPES::init_next_pop(){
 
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_output(nb_output);
+
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
+        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -219,12 +216,8 @@ bool NIPES::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-        if(env->get_name() == "obstacle_avoidance"){
-            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-        }
+        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
     }
 
 
@@ -243,26 +236,24 @@ bool NIPES::is_finish(){
     return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 
-bool NIPES::finish_eval(const Environment::Ptr & env){
+bool NIPES::finish_eval(const Environment::Ptr &env){
 
-    if(env->get_name() == "obstacle_avoidance")
-        return false;
-
+    std::vector<double> target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
     float tPos[3];
-    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
-    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
-    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    tPos[0] = static_cast<float>(target[0]);
+    tPos[1] = static_cast<float>(target[1]);
+    tPos[2] = static_cast<float>(target[2]);
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
     auto distance = [](float* a,float* b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
+                (a[1] - b[1])*(a[1] - b[1]) +
+                (a[2] - b[2])*(a[2] - b[2]));
     };
 
-    int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
+    int handle = std::dynamic_pointer_cast<sim::FixedMorphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
     double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);

@@ -23,21 +23,17 @@ SET(VREP_SRC
     )
 
 
-add_library(NIPES SHARED 
+add_library(NIPES_MULTITARGET SHARED 
     ${VREP_SRC}
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
-    obstacleAvoidance.cpp
+    multiTargetMaze.cpp
     )
-target_include_directories(NIPES PUBLIC ${INCLUDES})
-target_link_libraries(NIPES ARE
+target_include_directories(NIPES_MULTITARGET PUBLIC ${INCLUDES})
+target_link_libraries(NIPES_MULTITARGET ARE
     simulatedER cmaes tbb)
 
-add_executable(nipes_test nipes_test.cpp)
-target_include_directories(nipes_test PUBLIC ${INCLUDES})
-target_link_libraries(nipes_test ARE NIPES cmaes)
-
-install(TARGETS NIPES DESTINATION lib)
-install(DIRECTORY . DESTINATION include/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+install(TARGETS NIPES_MULTITARGET DESTINATION lib)
+install(DIRECTORY . DESTINATION include/nipes_multitarget FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

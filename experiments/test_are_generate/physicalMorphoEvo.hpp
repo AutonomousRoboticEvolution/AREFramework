@@ -43,6 +43,11 @@ public:
     }
 
     const Eigen::VectorXd &get_morphDesc() const {return morphDesc;}
+    const std::vector<int> &getListOrganTypes() const {return listOrganTypes;}
+    const std::vector<std::vector<float>> &getListOrganPos() const {return listOrganPos;}
+    const std::vector<std::vector<float>> &getListOrganOri() const {return listOrganOri;}
+    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
 private:
     void createMorphology() override;
@@ -51,6 +56,11 @@ private:
     NEAT::NeuralNetwork cppn;
     Eigen::VectorXd morphDesc;
     std::vector<bool> testRes;
+    std::vector<int> listOrganTypes;
+    std::vector<std::vector<float>> listOrganPos;
+    std::vector<std::vector<float>> listOrganOri;
+    std::vector<float> skeletonListVertices;
+    std::vector<int> skeletonListIndices;
 
 };
 
@@ -70,6 +80,9 @@ public:
 private:
     NEAT::Parameters params;
     std::unique_ptr<NEAT::Population> morph_population;
+    std::vector<std::string> morph_gen_files;
+    std::vector<std::pair<int,int>> ids;
+
 
 };
 

@@ -64,6 +64,7 @@ public:
     void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
+    bool is_finish(){return currentIndIndex >= ea->getPopSize();}
 
 private:
     ///pointer to settting of EA
