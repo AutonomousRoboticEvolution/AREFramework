@@ -169,7 +169,7 @@ private:
     int numSkeletonVoxels;
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
-    int gripperHandle;
+    std::vector<int> gripperHandles;
     Blueprint blueprint;
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
