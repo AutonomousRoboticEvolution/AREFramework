@@ -136,7 +136,7 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
 {
     IsOrganColliding(skeletonHandles, organList);
     isOrganGoodOrientation();
-    isGripperCollision(gripperHandle, skeletonHandles, organList);
+//    isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
@@ -161,9 +161,9 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         modelsPath += "C_HeadV3.ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV2.ttm";
+        modelsPath += "C_WheelV3.ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_Sensor.ttm";
+        modelsPath += "C_SensorV3.ttm";
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster
@@ -211,12 +211,10 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         tempConnectorPos[2] = tempOrganPos[2] + 0.02;
     else if(organType == 1){ // Wheels
-        tempConnectorPos[1] = tempOrganPos[1] - 0.015;
-        tempConnectorPos[2] = tempOrganPos[2] + 0.00;
+        tempConnectorPos[1] = organPos[1] - 0.025;
     }
     else if(organType == 2) { // Sensors
-        tempConnectorPos[0] = tempOrganPos[0] + 0.01;
-        tempConnectorPos[2] = tempOrganPos[2] + 0.02;
+        tempConnectorPos[2] = organPos[2] + 0.02;
     }else if(organType == 3) // Joints
         tempConnectorPos[2] = tempOrganPos[2] + 0.035;
     else if(organType == 4)  // Caster
@@ -257,7 +255,6 @@ void Organ::createOrgan(int skeletonHandle)
     else if(organType == 1) // Wheels
         tempOrganPos[2] = -0.03;
     else if(organType == 2) { // Sensors
-        tempOrganPos[0] = -0.01;
         tempOrganPos[2] = -0.03;
     }else if(organType == 3) // Joints
         tempOrganPos[2] = -0.045;
