@@ -68,12 +68,11 @@ void AREControl::sendMotorCommands(std::vector<double> values){
 
     // debugging: display sensor values as bars:
     for(i=0;i<values.size();i++){
-        int n_blocks=values[i]*10.0;
+        int n_blocks=values[i]*5.0 + 5;
         for (int i_block=0; i_block<10;i_block++){
             if (i_block<n_blocks) std::cout<<"o";
             else std::cout<<" ";
         }
-        std::cout<<"|";
     }
     std::cout<<std::endl;
 }
@@ -104,7 +103,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         }
         std::cout<<"|";
     }
-    std::cout<<std::endl;
+    std::cout<<"-----|";
 }
 
 int AREControl::exec(zmq::socket_t& socket){

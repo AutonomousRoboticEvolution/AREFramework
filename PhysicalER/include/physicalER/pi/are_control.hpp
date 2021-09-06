@@ -31,7 +31,7 @@ public:
 private:
     phy::NN2Individual controller;
     float _max_eval_time ; // millieconds
-    float _time_step = 100; // milliseconds
+    float _time_step = 1000; // milliseconds
 
     std::list<MotorOrgan> listOfWheels;
     std::list<SensorOrgan> listOfSensors;
