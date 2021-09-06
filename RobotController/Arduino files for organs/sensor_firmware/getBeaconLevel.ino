@@ -7,11 +7,11 @@
 */
 int getBeaconLevel(FIFO* samplingWindow, int windowSize, int wrappingBitmask) {
 
-  //Find min and max values
+  
   int maximumValueInSample = 0;
   int minimumValueInSample = 1023;
   int currentSample;
-
+  //Find min and max values
   for (int i=0; i<windowSize; ++i) {
     //Read next sample from the window
     currentSample = fifoReadOffset(samplingWindow, i, wrappingBitmask);
@@ -71,8 +71,17 @@ int getBeaconLevel(FIFO* samplingWindow, int windowSize, int wrappingBitmask) {
     Serial.println(averageHigh);
   #endif
 
-  //Return the difference; this is the beacon level reading
-  return averageHigh - averageLow;
+  //Calculate the difference; this is the beacon level reading
+  int differentialReading = averageHigh - averageLow;
+
+  //Map this down to a 1-byte range
+  int mappedReading = map(differentialReading, 0, IR_MAX_DIFFERENTIAL_READING, 0, 255);
+  //If reading exceeds max, map() function will output something in excess of 255, so constrain this
+  if (mappedReading > 255) {
+    mappedReading = 255;
+  }
+
+  return mappedReading;
 }
 
 
