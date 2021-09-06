@@ -8,7 +8,7 @@ from helperFunctions import makeTransformInputFormatted, makeTransformMillimeter
 import math
 import numpy as np
 
-LOG_FOLDER = "/home/robofab/are-logs/test"
+LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
 
 def makeFile(location):
 
@@ -223,9 +223,9 @@ def makeFile(location):
 			[1, 94.655/1000, 245.06/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x62)], # wheel 3
 			[1, 94.655/1000, 327.06/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x63)], # wheel 4
 			[2, 166.631/1000, 96.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x30)], # sensor 1
-			[2, 166.631/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x31)], # sensor 2
-			[2, (166.631+60)/1000, 96.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor 3
-			[2, (166.631+60)/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x33)], # sensor 4
+			[2, 166.631/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor 2
+			[2, (166.631+60)/1000, 96.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x34)], # sensor 3
+			[2, (166.631+60)/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x36)], # sensor 4
 			[3 , 154.56/1000, 33.66/1000, 17.5/1000, math.radians(180), 0, math.radians(90), ""], #castor
 			[4 , 300.061/1000, 74.881/1000 , 28.5/1000, 0, 0, math.radians(90), str(0x08)] #joint
 			],

@@ -1,12 +1,12 @@
 #experimentName,string,reevaluate_fixed
 #expPluginName,string,/usr/local/lib/libreevaluateFixed.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/AREPuck.ttm
-#modelPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#scenePath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
+#robotPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/AREPuck.ttm
+#modelPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/
 #populationSize,int,200
 #maxEvalTime,float,30
 #numberOfGeneration,int,10
-#repository,string,/home/leni/are-logs
+#repository,string,/home/robofab/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #noiseLevel,double,0
@@ -27,7 +27,7 @@
 #NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,8
 #UseInternalBias,bool,1
-#folderToLoad,string,nipes_multitarget/nipes_multitarget_1_8_16-27-10-410-2022255347/
+#folderToLoad,string,nipes_multitarget_1_8_16-27-10-410-2022255347/
 #genToLoad,int,99
 #indToLoad,int,4
 #genType,int,2
