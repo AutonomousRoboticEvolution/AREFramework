@@ -2,7 +2,7 @@
 #expPluginName,string,/usr/local/lib/libtest_are_generate.so
 #verbose,bool,1
 #instanceType,int,0
-#repository,string,/home/leni/are-logs
+#repository,string,/home/robofab/are-logs
 #seed,int,-1
 
 #populationSize,int,10
@@ -12,7 +12,7 @@
 
 #init_x,float,0
 #init_y,float,0
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#organsPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -22,6 +22,6 @@
 #isExportModel,bool,0
 #reloadController,bool,0
 
-#folderToLoad,string,/home/leni/are-logs/robot_14_9_13_6_0-33-37-7032-299933944/
+#folderToLoad,string,/home/robofab/are-logs/robot_14_9_13_6_0-33-37-7032-299933944/
 #genToLoad,int,14
 #indToLoad,int,9

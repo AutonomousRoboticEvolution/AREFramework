@@ -1,10 +1,10 @@
 #experimentName,string,physical_update
-#expPluginName,string,/home/matt/ARE/evolutionary_robotics_framework/build/experiments/physical_update/libphysical_update.so
+#expPluginName,string,/usr/local/lib/libphysical_update.so
 #verbose,bool,1
-#repository,string,/home/matt/are-logs
+#repository,string,/home/robofab/are-logs
 #seed,int,-1
 
-#cameraPipe,string,v4l2src device=/dev/video0 ! videoconvert ! appsink
+#cameraPipe,string,http://192.168.2.248/img/video.mjpeg
 #focalDistance,double,20
 #principlePoint_x,double,2
 #principlePoint_y,double,2
@@ -12,10 +12,10 @@
 #aspectRatio_y,double,1
 #cameraHeight,double,200
 
-#maxEvalTime,float,30
+#maxEvalTime,float,600
 #arenaSize,double,2
 
-#ctrlGenomeFolder,string,/home/matt/are-logs/test/
+#ctrlGenomeFolder,string,/home/robofab/are-logs/test/
 #fitnessFile,string,fitnesses.csv
 
 #target_x,double,0

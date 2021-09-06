@@ -9,6 +9,8 @@
 #include "ARE/learning/Novelty.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/CPPNGenome.h"
+#include "simLib.h"
+
 
 namespace are{
 
