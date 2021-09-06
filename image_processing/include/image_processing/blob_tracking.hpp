@@ -16,6 +16,15 @@ namespace image_proc {
 void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt);
 
 /**
+ * @brief pixel_to_world_frame
+ * @param point
+ * @param position
+ * @param parameters
+ */
+void pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
+
+
+/**
  * @brief conversion from pixel coordinate to world 2D coordinate
  *        \f$x = \frac{(u-o_x)*s_x*z}{f}\f$
  *        \f$y = \frac{(u-o_y)*s_y*z}{f}\f$
@@ -30,7 +39,8 @@ void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::
  * @param point
  * @param position
  */
-void pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
+void topdown_camera_pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
+
 
 }
 
