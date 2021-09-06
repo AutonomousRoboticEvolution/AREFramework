@@ -5,12 +5,12 @@
 */
 
 //DEBUG FLAG
-#define DEBUG 1
+#define DEBUG 0
 
 //CALIBRATION VALUES (for this particular servo)
 #define zero_degree_us 400
 #define size_of_us_range 1950 // the difference between the zero and 180degree positions
-#define SLAVE_ADDRESS 0x07
+#define SLAVE_ADDRESS 0x08
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout

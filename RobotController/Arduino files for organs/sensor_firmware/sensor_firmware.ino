@@ -22,10 +22,10 @@
 #include <VL53L0X.h>
 VL53L0X timeOfFlightSensor;
 
-#define SLAVE_ADDRESS 0x30 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x36 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
-#define SERIAL_DEBUG_PRINTING
+//#define SERIAL_DEBUG_PRINTING
 //#define SERIAL_DEBUG_FILTERING_RAW_DATA
 
 // define register addresses this slave device provides
@@ -94,10 +94,8 @@ void setup() {
   pinMode(PIN_I2CENABLE, OUTPUT);
   digitalWrite(PIN_I2CENABLE, HIGH); // close i2c to outside world
 
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.begin(2000000);
-    Serial.println("Sensor Organ Reporting");
-  #endif
+  Serial.begin(115200); //formerly 2000000
+  Serial.println("Sensor Organ Reporting");
   
   // start i2c comms
   Wire.begin(SLAVE_ADDRESS);

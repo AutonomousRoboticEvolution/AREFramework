@@ -7,7 +7,7 @@
 #include <Servo.h>
 #include <Wire.h>
 
-#define DEBUG 1
+#define DEBUG 0
 
 #define SERVO_ENABLE 6 //change this to pin 7 for v1.2+ boards
 #define SERVO_PWM 5
@@ -18,7 +18,7 @@
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
 #define MIN_CURRENT_MA 330 //milliamps
 #define MAX_CURRENT_MA 1250 //milliamps
-#define DEFAULT_CURRENT_LIMIT MIN_CURRENT_MA
+#define DEFAULT_CURRENT_LIMIT 500//MIN_CURRENT_MA
 
 //Servo position
 #define SERVO_POS_READING_MIN 30
@@ -33,15 +33,16 @@
 #define MIN_MEASURED_ENCODER_DIFFERENCE 2 //any smaller change than this during test, assume limit has been reached (smaller changes assumed to be noise)
 #define LONG_WAIT_MS 1200
 #define SHORT_WAIT_MS 100
-#define CALIB_AVERAGING_WINDOW_SIZE 200
+#define CALIB_AVERAGING_WINDOW_SIZE 300
 #define TEST_MAX_ANGLE 1
 #define TEST_MIN_ANGLE 0
+#define PWM_AT_MAX_ANGLE 540 //540us, seems consistent across servos
+#define PWM_AT_MIN_ANGLE 2400 //2400us, seems consistent across servos
+#define PWM_US_RANGE (PWM_AT_MIN_ANGLE-PWM_AT_MAX_ANGLE)
+#define PWM_AT_CENTRE_OF_TRAVEL 1470 //(PWM_AT_MAX_ANGLE + PWM_US_RANGE/2)
 
 //Calibration variables
-int pwmAtMaxAngle;
-int pwmAtMinAngle;
-int pwmAtCentrePoint;
-int pwmRange;
+int pwmAtCentrePoint = PWM_AT_CENTRE_OF_TRAVEL;
 int encoderValAtMaxAngle; //occurs at LOW pwm values
 int encoderValAtMinAngle; //occurs at HIGH pwm values
 int encoderRange;
@@ -109,41 +110,45 @@ while(Serial.available()) {
       //Find lower angle limit
       //This also updates the global min encoder value variable
       Serial.println("Finding lower angle limit...");
-      pwmAtMinAngle = autoFindLimit(TEST_MIN_ANGLE);
+      joint_servo.writeMicroseconds(PWM_AT_MIN_ANGLE);
+      delay(LONG_WAIT_MS);
+      encoderValAtMinAngle = getFilteredEncoderPos();
       Serial.print("Encoder value at lower limit is: ");
-      Serial.print(encoderValAtMinAngle);
-      Serial.print(", at a PWM value of: ");
-      Serial.print(pwmAtMinAngle);
-      Serial.println("us");
+      Serial.println(encoderValAtMinAngle);
 
       //Find upper angle limit
       //This also updates the global min encoder value variable
       Serial.println("Finding upper angle limit...");
-      pwmAtMaxAngle = autoFindLimit(TEST_MAX_ANGLE);
+      joint_servo.writeMicroseconds(PWM_AT_MAX_ANGLE);
+      delay(LONG_WAIT_MS);
+      encoderValAtMaxAngle = getFilteredEncoderPos();
       Serial.print("Encoder value at upper limit is: ");
-      Serial.print(encoderValAtMaxAngle);
-      Serial.print(", at a PWM value of: ");
-      Serial.print(pwmAtMaxAngle);
-      Serial.println("us");
+      Serial.println(encoderValAtMaxAngle);
 
       //Calculate ranges for global encoder and PWM values
-      pwmRange = pwmAtMinAngle - pwmAtMaxAngle;
       encoderRange = encoderValAtMaxAngle - encoderValAtMinAngle;
       Serial.print("Total encoder range is: ");
       Serial.println(encoderRange);
-      Serial.print("Total PWM range is: ");
-      Serial.print(pwmRange);
-      Serial.println("us");
       Serial.println("Moving to centre position...");
       Serial.println("Place horn and straighten up with [ and ], then press p to output calibration parameters");
 
       //Move to centre position
-      joint_servo.writeMicroseconds(pwmAtMaxAngle + pwmRange/2);
+      joint_servo.writeMicroseconds(PWM_AT_CENTRE_OF_TRAVEL);
       break;
-
-    //']' to increment angle (decrement PWM width)
-
-    //'[' to decrement angle (increment PWM width)
+//
+//    //']' to increment angle (decrement PWM width)
+//    case ']' :
+//      //Move centrepoint and servo position in +ve direction
+//      pwmAtCentrePoint -= MANUAL_INCREMENT_US;
+//      joint_servo.writeMicroseconds(pwmAtCentrePoint);
+//      break;
+//
+//    //'[' to decrement angle (increment PWM width)
+//    case '[' :
+//      //Move centrepoint and servo position in -ve direction
+//      pwmAtCentrePoint += MANUAL_INCREMENT_US;
+//      joint_servo.writeMicroseconds(pwmAtCentrePoint);
+//      break;
 
     //'p' to print out the calibrated parameters
 
@@ -261,11 +266,14 @@ void setCurrentLimit (uint8_t tens_of_milliamps) {
   }
 }
 
-
+/*
+  autoFindLimit
+  @brief Automatically finds the endpoints of the servo using the encoder.
+  @param testMaxNotMinAngle Define which endpoint to find (true = max angle, false = min angle)
+*/
 int autoFindLimit(bool testMaxNotMinAngle) {
   int currentPwmVal, newPwmVal;
   int currentEncoderVal, newEncoderVal, encoderValDifference;
-  float averagingTotal = 0;
   bool exitFlag = false;
 
   //Move to starting point
