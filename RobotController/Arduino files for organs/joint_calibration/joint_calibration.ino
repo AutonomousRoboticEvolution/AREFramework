@@ -18,7 +18,7 @@
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
 #define MIN_CURRENT_MA 330 //milliamps
 #define MAX_CURRENT_MA 1250 //milliamps
-#define DEFAULT_CURRENT_LIMIT 500//MIN_CURRENT_MA
+#define DEFAULT_CURRENT_LIMIT MIN_CURRENT_MA
 
 //Servo position
 #define SERVO_POS_READING_MIN 30
@@ -29,7 +29,7 @@
 #define PWM_START_LO_US 600
 #define PWM_START_HI_US 2350
 #define TEST_INCREMENT_US 10
-#define MANUAL_INCREMENT_US 5
+#define MANUAL_INCREMENT_US 10
 #define MIN_MEASURED_ENCODER_DIFFERENCE 2 //any smaller change than this during test, assume limit has been reached (smaller changes assumed to be noise)
 #define LONG_WAIT_MS 1200
 #define SHORT_WAIT_MS 100
@@ -84,9 +84,11 @@ void setup() {
   //Print instructions
   Serial.println("Type microsecond values to test. 600 and 2400 are reasonable endpoint estimations");
   Serial.println("Type 'e' to see the encoder reading at the current position");
+  Serial.println("Type 'c' to move the horn to the set centre position");  
   Serial.println("Calibration step 1: Type 'l' to find upper/lower limits and centre the servo");
   Serial.println("Calibration step 2: Place the horn on the servo, in straightest available spline position");
   Serial.println("Calibration step 3: Use '[' and ']' to fine-adjust the position until the horn is straight");
+  Serial.println("Calibration step 4: Type 'p' to print out the calibration parameters to be copied into the firmware.");
 }
 
 void loop() {
@@ -135,28 +137,48 @@ while(Serial.available()) {
       //Move to centre position
       joint_servo.writeMicroseconds(PWM_AT_CENTRE_OF_TRAVEL);
       break;
-//
-//    //']' to increment angle (decrement PWM width)
-//    case ']' :
-//      //Move centrepoint and servo position in +ve direction
-//      pwmAtCentrePoint -= MANUAL_INCREMENT_US;
-//      joint_servo.writeMicroseconds(pwmAtCentrePoint);
-//      break;
-//
-//    //'[' to decrement angle (increment PWM width)
-//    case '[' :
-//      //Move centrepoint and servo position in -ve direction
-//      pwmAtCentrePoint += MANUAL_INCREMENT_US;
-//      joint_servo.writeMicroseconds(pwmAtCentrePoint);
-//      break;
+
+    //']' to increment angle (decrement PWM width)
+    case ']' :
+      //Move centrepoint and servo position in +ve direction
+      pwmAtCentrePoint -= MANUAL_INCREMENT_US;
+      joint_servo.writeMicroseconds(pwmAtCentrePoint);
+      break;
+
+    //'[' to decrement angle (increment PWM width)
+    case '[' :
+      //Move centrepoint and servo position in -ve direction
+      pwmAtCentrePoint += MANUAL_INCREMENT_US;
+      joint_servo.writeMicroseconds(pwmAtCentrePoint);
+      break;
 
     //'p' to print out the calibrated parameters
+    case 'p' :
+      Serial.println("");
+      Serial.print("#define CALIB_CENTRE_POSITION_US ");
+      Serial.println(pwmAtCentrePoint);
+      Serial.print("#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE ");
+      Serial.println(encoderValAtMinAngle);
+      Serial.print("#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE ");
+      Serial.println(encoderValAtMaxAngle);
+    break;
 
-    default :
-      //If not a special character, assume is a number and carry on producing a string
+    //'c' to return to centre point, e.g. after using manual microsecond commands
+    case 'c' :
+      //Move to centre position
+      joint_servo.writeMicroseconds(PWM_AT_CENTRE_OF_TRAVEL);
+      break;
+
+    //Number strings for manual microseconds sertting
+    case '0' : case '1' : case '2' : case '3' : case '4' : case '5' : case '6' : case '7' : case '8' : case '9' :
+      //If  is a number, carry on producing a string
       inputString += recvdChar; //add next char to string
       delay(2); //slow to allow next character to enter buffer
-      break;     
+      break;
+
+    default :
+      Serial.print("Invalid character received: ");
+      Serial.println(recvdChar);
   }
 }
 
