@@ -16,8 +16,11 @@
 #include "JointOrgan.hpp"
 
 #define WHEEL_ADDRESS 0x60
-#define JOINT1_ADDRESS 0x08
-#define JOINT2_ADDRESS 0x09
+#define JOINT1_ADDRESS 0x09
+#define JOINT2_ADDRESS 0x08
+#define JOINT1_CURRENT_LIMIT 66 //x10 = 660mA
+#define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
+
 
 #define LED_DRIVER_ADDR 0x6A
 
@@ -80,19 +83,25 @@ if (do_joint_test){
     myJoint.testFunction();
 }
 
-int stepDuration 100000; //us
-int numRepetitions 10;
+int stepDuration =  10000; //us
+int numRepetitions = 10;
 
 //Create 2 joints
 JointOrgan joint1(JOINT1_ADDRESS); //proximal
 JointOrgan joint2(JOINT2_ADDRESS); //distal
+
+//Set current limits
+joint1.setCurrentLimit(JOINT1_CURRENT_LIMIT);
+sleep(1);
+joint2.setCurrentLimit(JOINT2_CURRENT_LIMIT);
+sleep(1);
 
 //Set to centre position
 joint1.setTargetAngle(0);
 joint2.setTargetAngle(0);
 sleep(1);
 
-for (n=0; n<numRepetitions; ++n) {
+for (int n=0; n<numRepetitions; ++n) {
     for (int i=0; i<=180; ++i) {
         joint1.setTargetAngle(i);
         joint2.setTargetAngle(i);
