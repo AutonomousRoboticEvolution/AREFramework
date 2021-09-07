@@ -85,10 +85,10 @@ if (do_joint_test){
 
 const int stepDuration =  10000; //us
 const int numRepetitions = 10;
-const int proximalMin = 60;
-const int proximalMax = 120;
-const int distalMin = 60;
-const int distalMax = 120;
+const int proximalMin = 80;
+const int proximalMax = 135;
+const int distalMin = 30;
+const int distalMax = 150;
 
 //Create 2 joints
 JointOrgan proximalJoint(JOINT1_ADDRESS); //proximal
@@ -100,34 +100,38 @@ sleep(1);
 distalJoint.setCurrentLimit(JOINT2_CURRENT_LIMIT);
 sleep(1);
 
-//Set to centre position
+//Set to start position
 proximalJoint.setTargetAngle(proximalMin);
 distalJoint.setTargetAngle(distalMin);
 sleep(3);
 
-//Distal forward
-for (int i=distalMin; i<=distalMax; ++i) {
-    distalJoint.setTargetAngle(i);
-    usleep(stepDuration);
+//Walking motion
+for (n=0; n<numRepetitions; ++n) {
+    //Distal forward
+    for (int i=distalMin; i<=distalMax; ++i) {
+        distalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Proximal down
+    for (int i=proximalMin; i<=proximalMax; ++i) {
+        proximalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Distal back
+    for (int i=distalMax; i>=distalMin; --i) {
+        distalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Proximal up
+    for (int i=proximalMax; i>=proximalMin; --i) {
+        proximalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
 }
 
-//Proximal down
-for (int i=proximalMin; i<=proximalMax; ++i) {
-    proximalJoint.setTargetAngle(i);
-    usleep(stepDuration);
-}
-
-//Distal back
-for (int i=distalMax; i>=distalMin; --i) {
-    distalJoint.setTargetAngle(i);
-    usleep(stepDuration);
-}
-
-//Proximal up
-for (int i=proximalMax; i>=proximalMin; --i) {
-    proximalJoint.setTargetAngle(i);
-    usleep(stepDuration);
-}
 
 //Wiggle
 // for (int n=0; n<numRepetitions; ++n) {
