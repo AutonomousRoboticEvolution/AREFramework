@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include <vector>
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 #include "MotorOrgan.hpp"
 #include "SensorOrgan.hpp"
 #include "DaughterBoards.hpp"
@@ -21,7 +21,7 @@ namespace pi {
 class AREControl{
 public:
 
-    AREControl(const NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
+    AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
     void sendMotorCommands(std::vector<double> values);
     void retrieveSensorValues(std::vector<double> &sensor_vals);
@@ -29,9 +29,9 @@ public:
     int exec( zmq::socket_t& socket);
 
 private:
-    NN2Individual controller;
+    phy::NN2Individual controller;
     float _max_eval_time ; // millieconds
-    float _time_step = 100; // milliseconds
+    float _time_step = 1000; // milliseconds
 
     std::list<MotorOrgan> listOfWheels;
     std::list<SensorOrgan> listOfSensors;

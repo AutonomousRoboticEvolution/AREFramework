@@ -64,14 +64,21 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     gripperOrientation[0] = connectorOri[0]; gripperOrientation[1] = connectorOri[1]; gripperOrientation[2] = connectorOri[2];
     simSetObjectPosition(gripperHandle, -1, gripperPosition);
     simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
+
+    // Orientation
+    gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
+    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
+    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI;
+    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
+
     // Move relative to gripper.
-    gripperPosition[0] = 0.0;
+    gripperPosition[0] = -0.035;
     gripperPosition[1] = 0.0;
     /// \todo EB: This offset should be somewhere else or constant.
     if(organType == 1) // Wheels
-        gripperPosition[2] = -0.11;
+        gripperPosition[2] = -0.13;
     else if(organType == 2) // Sensors
-        gripperPosition[2] = -0.1;
+        gripperPosition[2] = -0.15;
     else if(organType == 3) // Joints
         gripperPosition[2] = -0.195;
     else if(organType == 4) // Caster
@@ -101,6 +108,8 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
         }
     }
     organGripperAccess = true;
+    gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
+    simSetObjectPosition(gripperHandle, -1, gripperPosition);
 }
 
 void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
@@ -161,9 +170,9 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         modelsPath += "C_HeadV3.ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV2.ttm";
+        modelsPath += "C_WheelV3.ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_Sensor.ttm";
+        modelsPath += "C_SensorV3.ttm";
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster
@@ -211,12 +220,10 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         tempConnectorPos[2] = tempOrganPos[2] + 0.02;
     else if(organType == 1){ // Wheels
-        tempConnectorPos[1] = tempOrganPos[1] - 0.015;
-        tempConnectorPos[2] = tempOrganPos[2] + 0.00;
+        tempConnectorPos[1] = organPos[1] - 0.025;
     }
     else if(organType == 2) { // Sensors
-        tempConnectorPos[0] = tempOrganPos[0] + 0.01;
-        tempConnectorPos[2] = tempOrganPos[2] + 0.02;
+        tempConnectorPos[2] = organPos[2] + 0.02;
     }else if(organType == 3) // Joints
         tempConnectorPos[2] = tempOrganPos[2] + 0.035;
     else if(organType == 4)  // Caster
@@ -257,7 +264,6 @@ void Organ::createOrgan(int skeletonHandle)
     else if(organType == 1) // Wheels
         tempOrganPos[2] = -0.03;
     else if(organType == 2) { // Sensors
-        tempOrganPos[0] = -0.01;
         tempOrganPos[2] = -0.03;
     }else if(organType == 3) // Joints
         tempOrganPos[2] = -0.045;

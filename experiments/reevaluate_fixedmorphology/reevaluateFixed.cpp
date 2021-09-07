@@ -13,16 +13,15 @@ void ReevaluateFixed::init(){
     int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
     int ind = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
 
-
-
     std::string folder = repository + "/" + folder_to_load;
 
     std::vector<std::string> gen_files;
     std::vector<int> gen_index;
     if(ind >= 0){
         std::stringstream sstr;
-        sstr << folder << "/genome_" << generation << "_" << ind;
+        sstr << folder << "/ctrlGenome_" << generation << "_" << ind;
         gen_files.push_back(sstr.str());
+        gen_index.push_back(0);
     }
     else{
         std::string filename;
@@ -31,7 +30,7 @@ void ReevaluateFixed::init(){
             filename = dirit.path().string();
             boost::split(split_str,filename,boost::is_any_of("/"));
             boost::split(split_str,split_str.back(),boost::is_any_of("_"));
-            if(split_str[0] == "genome" &&
+            if(split_str[0] == "ctrlGenome" &&
                     std::stoi(split_str[1]) == generation){
 
                 gen_files.push_back(filename);
@@ -62,8 +61,6 @@ void ReevaluateFixed::init(){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
         NNParamGenome::Ptr genome(new NNParamGenome(randomNum,parameters));
         genome->from_file(gen_files[i]);
-
-
 
         Individual::Ptr ind(new sim::NN2Individual(morph_gen,genome));
         ind->set_parameters(parameters);

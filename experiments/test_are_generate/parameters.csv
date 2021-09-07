@@ -21,3 +21,7 @@
 #isSegmentedRobot,bool,1
 #isExportModel,bool,0
 #reloadController,bool,0
+
+#folderToLoad,string,/home/leni/are-logs/robot_14_9_13_6_0-33-37-7032-299933944/
+#genToLoad,int,14
+#indToLoad,int,9
