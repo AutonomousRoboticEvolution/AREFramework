@@ -48,7 +48,7 @@
 //Slew rate limiting parameter
 //Total output range is -255 to +255 (510 total), so e.g. a value of 10 here would take 51 timesteps to do a maximum end-end swing
 //For a loop time of 10ms this example would be 510ms
-//A rate of 125 of more is too fast (motor cuts out).
+//A rate of 125 of more is too fast (motor cuts out). 100 appears to be ok but is probably borderline.
 #define MAX_OUTPUT_SLEW_RATE 50 //Motor power demand output cannot change by more than this per timestep.
 
 int last_output_power = 0; //store last demanded power from motor for slew rate control
