@@ -16,6 +16,8 @@
 #include "JointOrgan.hpp"
 
 #define WHEEL_ADDRESS 0x60
+#define JOINT1_ADDRESS 0x08
+#define JOINT2_ADDRESS 0x09
 
 #define LED_DRIVER_ADDR 0x6A
 
@@ -71,13 +73,37 @@ int main()
     ledDriver.flash();
 
 /************ joint test ********************************************/
-bool do_joint_test = true;
+bool do_joint_test = false;
 if (do_joint_test){
     uint8_t address = 0x08;
     JointOrgan myJoint(address);
     myJoint.testFunction();
 }
 
+int stepDuration 100000; //us
+int numRepetitions 10;
+
+//Create 2 joints
+JointOrgan joint1(JOINT1_ADDRESS); //proximal
+JointOrgan joint2(JOINT2_ADDRESS); //distal
+
+//Set to centre position
+joint1.setTargetAngle(0);
+joint2.setTargetAngle(0);
+sleep(1);
+
+for (n=0; n<numRepetitions; ++n) {
+    for (int i=0; i<=180; ++i) {
+        joint1.setTargetAngle(i);
+        joint2.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+    for (int i=180; i>=0; --i) {
+        joint1.setTargetAngle(i);
+        joint2.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+}
 
 /************ Wheel test ********************************************/
 //    MotorOrgan myWheel(WHEEL_ADDRESS);

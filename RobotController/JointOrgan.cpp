@@ -41,6 +41,8 @@ int8_t JointOrgan::readMeasuredCurrent() {
     return read8From(MEASURED_CURRENT_REGISTER);
 }
 
+//NOTE: Must have a delay between using this function and further writes to I2C
+//I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
 void JointOrgan::setCurrentLimit(uint8_t tensOfMilliamps){
     write8To(CURRENT_LIMIT_REGISTER, tensOfMilliamps);
 }
@@ -55,7 +57,7 @@ void JointOrgan::testFunction(){
         std::cout<<"New limit: "<<int(limit_value)<<std::endl;
 
         this->setCurrentLimit(limit_value);
-	sleep(1); //Sleep to avoid interrupting while ext i2c is turned off
+	   sleep(1); //Sleep to avoid interrupting while ext i2c is turned off
         this->setTargetAngle(45);
         sleep(1);
         this->setTargetAngle(135);
