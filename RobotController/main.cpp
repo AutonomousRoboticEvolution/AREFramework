@@ -87,8 +87,8 @@ const int stepDuration =  10000; //us
 const int numRepetitions = 10;
 const int proximalMin = 60;
 const int proximalMax = 120;
-const int distalMin = 30;
-const int distalMax = 150;
+const int distalMin = 60;
+const int distalMax = 120;
 
 //Create 2 joints
 JointOrgan proximalJoint(JOINT1_ADDRESS); //proximal
@@ -101,8 +101,8 @@ distalJoint.setCurrentLimit(JOINT2_CURRENT_LIMIT);
 sleep(1);
 
 //Set to centre position
-proximalJoint.setTargetAngle(90);
-distalJoint.setTargetAngle(90);
+proximalJoint.setTargetAngle(proximalMin);
+distalJoint.setTargetAngle(distalMin);
 sleep(3);
 
 //Distal forward
