@@ -55,6 +55,7 @@ void JointOrgan::testFunction(){
         std::cout<<"New limit: "<<int(limit_value)<<std::endl;
 
         this->setCurrentLimit(limit_value);
+	sleep(1); //Sleep to avoid interrupting while ext i2c is turned off
         this->setTargetAngle(45);
         sleep(1);
         this->setTargetAngle(135);

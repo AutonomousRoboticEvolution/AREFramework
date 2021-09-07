@@ -19,7 +19,8 @@
 #define CURRENT_LIMIT_REGISTER 0x14
 #define LED_BRIGHTNESS_REGISTER 0x15
 
-
+#define SERVO_OFF 0
+#define SERVO_ON 1
 
 /**
 
