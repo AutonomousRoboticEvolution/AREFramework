@@ -106,7 +106,7 @@ distalJoint.setTargetAngle(distalMin);
 sleep(3);
 
 //Walking motion
-for (n=0; n<numRepetitions; ++n) {
+for (int n=0; n<numRepetitions; ++n) {
     //Distal forward
     for (int i=distalMin; i<=distalMax; ++i) {
         distalJoint.setTargetAngle(i);
