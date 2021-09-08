@@ -22,12 +22,12 @@
 #include <VL53L0X.h>
 VL53L0X timeOfFlightSensor;
 
-#define SLAVE_ADDRESS 0x3A // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x3E // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
 //#define SERIAL_DEBUG_PRINTING
 //#define SERIAL_DEBUG_FILTERING_RAW_DATA
-#define SERIAL_DEBUG_IR_SENSOR
+//#define SERIAL_DEBUG_IR_SENSOR
 
 // define register addresses this slave device provides
 #define REQUEST_TIME_OF_FLIGHT_REGISTER 0x01 // depricated
@@ -160,7 +160,7 @@ void loop() {
     fifoWrite(&irWindow, value, IR_WINDOW_WRAPPING_BITMASK);
 
     //Calculate a new reading
-    current_filtered_beacon_level = getBeaconLevelAlt(&irWindow, IR_WINDOW_SIZE, IR_WINDOW_WRAPPING_BITMASK);
+    current_filtered_beacon_level = getBeaconLevel(&irWindow, IR_WINDOW_SIZE, IR_WINDOW_WRAPPING_BITMASK);
 
     #ifdef SERIAL_DEBUG_IR_SENSOR
 //      Serial.print("Filtered beacon reading: ");
