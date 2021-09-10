@@ -5,12 +5,11 @@
 */
 
 #include "JointOrgan.hpp"
-#include <iostream> // for cout debugging
 
 
 
 //Constructor
-JointOrgan::JointOrgan(uint8_t address) : I2CDevice(address){
+JointOrgan::JointOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
 }
 
@@ -47,26 +46,6 @@ void JointOrgan::setCurrentLimit(uint8_t tensOfMilliamps){
     write8To(CURRENT_LIMIT_REGISTER, tensOfMilliamps);
 }
 
-void JointOrgan::testFunction(){
-    std::cout<<"Testing the joint.."<<std::endl;
-
-    std::cout<<"Power On"<<std::endl;
-    this->setServoOn();
-
-    for (uint8_t limit_value=40; limit_value<150; limit_value+=20){
-        std::cout<<"New limit: "<<int(limit_value)<<std::endl;
-
-        this->setCurrentLimit(limit_value);
-	   sleep(1); //Sleep to avoid interrupting while ext i2c is turned off
-        this->setTargetAngle(45);
-        sleep(1);
-        this->setTargetAngle(135);
-        sleep(1);
-
-    }
-
-
-}
 
 
 

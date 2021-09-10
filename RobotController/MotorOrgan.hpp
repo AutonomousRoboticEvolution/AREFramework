@@ -8,11 +8,12 @@
 #define MOTORORGAN_HPP
 
 #include <cstdlib> //for abs() function
-#include "I2CDevice.hpp"
-#include "DaughterBoards.hpp"
+#include "Organ.hpp"
 
-#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
-#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
+// The demand wheel velocity, in ticks-per-timestep, which corresponds to a normalised input of 1.0
+// note to convert from ticks-per-timestep to revolutions-per-minute (rpm), multiply by 1.67785
+// e.g. 36 ticks-per-timestep = 60.4rpm
+#define MAXIMUM_TARGET_VELOICTY 36
 
 //Register subaddresses for DRV8830 chip
 #define DRV_CONTROL_REG_ADDR 0x00
@@ -63,7 +64,7 @@
 	setting with the DIP switches is contained on Drive under 20.50 User Documentation 
 	- "Motor Organ I2C Address Setting.pdf"
 */
-class MotorOrgan  : protected I2CDevice {
+class MotorOrgan  : public Organ {
 	public :
 
 		//Public variables
@@ -93,6 +94,11 @@ class MotorOrgan  : protected I2CDevice {
 			the motor is loaded at the time.
 		*/
 		void setSpeed(int8_t speed);
+
+        /**
+            @brief Way to call the speed controlling method with a normalised input. Will convert the input value to the correct range and then call setSpeed().
+            @param speed Float. Expected input range is -1 to +1, values outside this range will be capped.
+        */
 
 		/**
 			@brief Stop the motor using the braking feature.
@@ -136,10 +142,6 @@ class MotorOrgan  : protected I2CDevice {
 		*/
 		void clearFaultReg();
 
-        bool test();
-
-        void set_test_value(uint8_t value);
-        uint8_t get_test_value();
 
 	private :
 		/**

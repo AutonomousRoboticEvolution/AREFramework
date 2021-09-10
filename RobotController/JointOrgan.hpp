@@ -9,7 +9,8 @@
 
 
 //#include <cstdlib> //for abs() function
-#include "I2CDevice.hpp"
+#include "Organ.hpp"
+#include <iostream> // for cout debugging
 
 //Register addresses
 #define SERVO_ENABLE_REGISTER 0X10
@@ -26,7 +27,7 @@
 
 	Controller class for the arduino-pico based servo controller in the joint organ
 */
-class JointOrgan  : protected I2CDevice {
+class JointOrgan  : public Organ {
 	public :
 		//Public variables
 		//Vars for state and target position
@@ -81,8 +82,6 @@ class JointOrgan  : protected I2CDevice {
         */
         int8_t readMeasuredCurrent();
 
-        // testing out the functions:
-        void testFunction();
 
 };
 
