@@ -22,7 +22,7 @@
 #include <VL53L0X.h>
 VL53L0X timeOfFlightSensor;
 
-#define SLAVE_ADDRESS 0x3E // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x30 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
 //#define SERIAL_DEBUG_PRINTING

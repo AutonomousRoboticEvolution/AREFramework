@@ -5,13 +5,12 @@
 */
 
 //I2C ADDRESS
-#define SLAVE_ADDRESS 0x09 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x08 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
-#define CALIB_CENTRE_POSITION_US 1470
+#define CALIB_CENTRE_POSITION_US 1450
 #define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 110
-#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 877
-
+#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 872
 
 //DEBUG FLAG
 #define DEBUG 0
@@ -22,18 +21,15 @@
 #define NOMINAL_PWM_MIN_US 540  //Consistent across servos
 #define NOMINAL_PWM_MAX_US 2400 //Consistent across servos
 #define NOMINAL_PWM_RANGE_US (NOMINAL_PWM_MAX_US - NOMINAL_PWM_MIN_US)
+#define SERVO_MOVEMENT_RANGE_DEG 173.0  //Empirically determined. Assumed evenly split around centrepoint (not tested)
 
+#define HALF_SERVO_MOVEMENT_RANGE_DEG (SERVO_MOVEMENT_RANGE_DEG/2)
 #define CENTRE_OFFSET_US (CALIB_CENTRE_POSITION_US - NOMINAL_PWM_CENTRE_US)
 #define UPPER_PWM_RANGE_US (NOMINAL_PWM_MAX_US - CENTRE_OFFSET_US - NOMINAL_PWM_CENTRE_US)
 #define LOWER_PWM_RANGE_US (NOMINAL_PWM_CENTRE_US - NOMINAL_PWM_MIN_US + CENTRE_OFFSET_US)
-#define MAX_SERVO_ANGLE (90 + (LOWER_PWM_RANGE_US/2) * DEG_PER_US)
-#define MIN_SERVO_ANGLE (90 - (UPPER_PWM_RANGE_US/2) * DEG_PER_US)
+#define MAX_SERVO_ANGLE (LOWER_PWM_RANGE_US * DEG_PER_US)
+#define MIN_SERVO_ANGLE -(UPPER_PWM_RANGE_US * DEG_PER_US)
 //NOTE TO SELF: can use map() to map servo angles to encoder values
-
-#define zero_degree_us 400
-#define size_of_us_range 1950 // the difference between the zero and 180degree positions
-
-
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
@@ -79,11 +75,11 @@ int current_limit_in_milliamps;
 
 //Measurements global variables
 uint8_t measured_current;
-uint8_t measured_position;
+int8_t measured_position;
 
 //Settings global variables
 uint8_t current_limit_setting;
-uint8_t target_position_setting;
+int8_t target_position_setting;
 uint8_t led_brightness;
 
 //Flags for updating settings
@@ -126,6 +122,7 @@ void setup() {
 
 /******MAIN LOOP********************/
 void loop() {
+
   //Update measurements
   measured_position = readServoPosition();
   measured_current = readServoCurrent();
@@ -260,8 +257,8 @@ int readServoPosition() {
   //Get analog reading from input pin
   int servo_position = analogRead(SERVO_POSITION_PIN);
   
-  //Calculate value in degrees
-  int servo_position_degrees = 180*(((float)servo_position - SERVO_POS_READING_MIN)/SERVO_POS_READING_RANGE);
+  //Calculate value in degrees. Note enc. value is at maximum when servo is at min angle, hence reversing of arguments 2 and 3
+  int servo_position_degrees = map(servo_position, CALIB_ENCODER_VALUE_AT_MAX_ANGLE, CALIB_ENCODER_VALUE_AT_MIN_ANGLE, MIN_SERVO_ANGLE, MAX_SERVO_ANGLE); //
 
   //Debug info
   if(DEBUG) {
@@ -278,17 +275,18 @@ int readServoPosition() {
   setTargetPosition
   @brief Set the servo to a target position in degrees.
   The exact PWM is determined from the calibrated microsecond values for each joint.
-  @param target_position The target position in degrees 0-180. Full range may not be available.
+  @param target_position The target position in degrees -90 to 90. Full range will not actually be available.
 */
-void setTargetPosition (uint8_t target_position) {
+void setTargetPosition (int8_t target_position) {
   //Enable power to servo if not already
   if(!servo_is_started) {
     servoEnable(true);
   }
   
   //Calculate microseconds value and move servo
-  //centrepoint_us + size_of_us_range/2 * (float)(target_position - 90)/180
-  unsigned int us_value = zero_degree_us +  size_of_us_range* float(target_position/180.0);
+  //Note that for any calibrated centrepoint which is not exactly halfway in the PWM range,
+  //the servo will not actually be able to reach the full extent in one of the directions
+  unsigned int us_value = CALIB_CENTRE_POSITION_US + (float)target_position/DEG_PER_US;
   joint_servo.writeMicroseconds(us_value);
 
   //Debug info
