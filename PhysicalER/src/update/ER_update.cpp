@@ -18,6 +18,7 @@ void ER::initialize(){
 
     Logging::create_folder(repository + std::string("/") + exp_name);
     Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built/"));
+    Logging::set_log_folder(repository + std::string("/") + exp_name);
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
@@ -89,7 +90,8 @@ void ER::start_evaluation(){
     std::string ctrlGenomeFolder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value;
     std::string waitingToBeEvalutatedFolderPath = ctrlGenomeFolder + std::string("waiting_to_be_evaluated");
 
-    std::string robotID = "AREpuck"; // TODO get this from user input based on those available in waiting_to_be_evaluated
+    std::string robotID = settings::getParameter<settings::String>(parameters,"#robotID").value;
+    //std::string robotID = "AREpuck"; // TODO get this from user input based on those available in waiting_to_be_evaluated
     if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<robotID<<"\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
@@ -157,9 +159,10 @@ bool ER::update_evaluation(){
 
     eval_t2 = steady_clock::now();
     duration<float> eval_duration = duration_cast<duration<float>>(eval_t2 - eval_t1);
+    double current_time = duration_cast<seconds>(eval_duration).count();
 
     //currentInd->update(eval_duration.count());
-    environment->update_info();
+    environment->update_info(current_time);
 
     std::string message;
     wait_for_message(message,subscriber);
@@ -187,23 +190,22 @@ bool ER::stop_evaluation(){
 
     nbrEval++;
 
-    if(currentIndIndex < ea->get_population().size())
-    {
-        std::vector<double> objectives = environment->fitnessFunction(currentInd);
-        if(verbose){
-            std::cout << "fitnesses = " << std::endl;
-            for(const double fitness : objectives)
-                std::cout << fitness << std::endl;
-        }
-        ea->setObjectives(currentIndIndex,objectives);
 
-        if(ea->update(environment)){
-            currentIndIndex++;
-            nbrEval = 0;
-        }
-        ea->set_endEvalTime(hr_clock::now());
-        save_logs(false);
+    std::vector<double> objectives = environment->fitnessFunction(currentInd);
+    if(verbose){
+        std::cout << "fitnesses = " << std::endl;
+        for(const double fitness : objectives)
+            std::cout << fitness << std::endl;
     }
+    //ea->setObjectives(currentIndIndex,objectives);
+
+    if(ea->update(environment)){
+        currentIndIndex++;
+        nbrEval = 0;
+    }
+    ea->set_endEvalTime(hr_clock::now());
+    save_logs(false);
+
 
     if(currentIndIndex >= ea->get_population().size())
     {

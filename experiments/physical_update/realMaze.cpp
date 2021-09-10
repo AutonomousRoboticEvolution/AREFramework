@@ -21,8 +21,9 @@ void RealMaze::init(){
      if(verbose) std::cout<<"usingIPCamera: "<<usingIPCamera<<std::endl;
      video_capture = cv::VideoCapture(pipe);
 
-     colour_range.first = cv::Scalar(0,104,96);
-     colour_range.second = cv::Scalar(51,255,181);
+
+     colour_range.first = cv::Scalar(0,133,71);
+     colour_range.second = cv::Scalar(11,255,188);
 
 
      target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
@@ -44,7 +45,7 @@ std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
     return d;
 }
 
-void RealMaze::update_info(){
+void RealMaze::update_info(double time){
 
     cv::Mat image;
     if (usingIPCamera==true){
@@ -73,6 +74,24 @@ void RealMaze::update_info(){
     cv::KeyPoint key_pt(0,0,0);
     image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
     image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
+
+    float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
+    int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
+
+    float interval = evalTime/static_cast<float>(nbr_wp);
+    if(time >= interval*trajectory.size()){
+        waypoint wp;
+        wp.position[0] = current_position[0];
+        wp.position[1] = current_position[1];
+        wp.position[2] = 0;
+        wp.orientation[0] = 0;
+        wp.orientation[1] = 0;
+        wp.orientation[2] = 0;
+
+        trajectory.push_back(wp);
+    }
+
+
 //    for(const auto &val : current_position)
 //        std::cout << val << ",";
 //    std::cout << key_pt.pt.x <<","<<key_pt.pt.y << std::endl;

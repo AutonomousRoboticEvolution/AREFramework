@@ -59,6 +59,7 @@ void RandomController::load_data_for_update(){
         if(split_str[0]+"_"+split_str[1]+"_"+split_str[2] == "list_of_organs"){
             // get the robot ID
             std::string robotID = filename.substr(15,filename.length()-19);
+            ids.push_back(robotID);
 
             // check if a conroller file already exists
             if (fs::exists(waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID)){
@@ -90,6 +91,25 @@ void RandomController::load_data_for_update(){
 
             }
         }
+    }
+}
+
+void RandomController::write_data_for_update(){
+    for(int i=0; i < trajectories.size(); i++){
+        std::stringstream filepath;
+        filepath << "/traj_" << ids[i];
+
+        std::ofstream logFileStream(Logging::log_folder + std::string("/")  + filepath.str(), std::ios::out | std::ios::ate | std::ios::app);
+
+        if(!logFileStream)
+        {
+            std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filepath.str() << std::endl;
+            return;
+        }
+
+        for(const are::waypoint& wp: trajectories[i])
+            logFileStream << wp.to_string() << std::endl;
+        logFileStream.close();
     }
 }
 
@@ -131,4 +151,8 @@ void RandomController::init(){
 
 void RandomController::init_next_pop(){
     init_pop();
+}
+
+bool RandomController::update(const Environment::Ptr &env){
+    trajectories.push_back(env->get_trajectory());
 }

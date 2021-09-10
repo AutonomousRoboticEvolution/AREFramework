@@ -1,6 +1,7 @@
 #ifndef REALMAZE_HPP
 #define REALMAZE_HPP
 
+#include <chrono>
 #include "ARE/Environment.h"
 #include "image_processing/blob_tracking.hpp"
 
@@ -21,6 +22,7 @@ private:
 
     cv::VideoCapture video_capture;
     std::pair<cv::Scalar,cv::Scalar> colour_range;
+    bool usingIPCamera = true;
 };
 
 } //are

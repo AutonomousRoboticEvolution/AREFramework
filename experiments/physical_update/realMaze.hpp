@@ -13,7 +13,7 @@ public:
     RealMaze();
     void init() override;
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
-    void update_info() override;
+    void update_info(double time) override;
 
 private:
     std::vector<double> current_position;
