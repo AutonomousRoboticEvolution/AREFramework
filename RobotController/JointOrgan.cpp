@@ -14,8 +14,8 @@ JointOrgan::JointOrgan(uint8_t address) : I2CDevice(address){
 	//Just uses the I2CDevice constructor
 }
 
-//new Target is an 8-bit number representing angle in degrees (0 to 180)
-void JointOrgan::setTargetAngle(uint8_t newTarget) {
+//new Target is a signed value in degrees for the target angle to move to
+void JointOrgan::setTargetAngle(int8_t newTarget) {
 	//Send to device (write8To inherited from I2CDevice)
     write8To(TARGET_POSITION_REGISTER, newTarget);
 }

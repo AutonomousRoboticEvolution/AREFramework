@@ -43,10 +43,10 @@ class JointOrgan  : protected I2CDevice {
 		JointOrgan(uint8_t address);
 
 		/**
-			@brief Target angle setting method. Will automatically active the servo
-			@param target angle is an unsigned 8-bit integer, linearly spaced over the possible range of approximately 180 degrees.
+            @brief Target angle setting method. Will automatically activate the servo
+            @param target angle is a signed value in degrees
 		*/
-		void setTargetAngle(uint8_t newTarget);
+        void setTargetAngle(int8_t newTarget);
 
         /**
             @brief Set the current limit value
