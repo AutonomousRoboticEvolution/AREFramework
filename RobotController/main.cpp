@@ -15,11 +15,17 @@
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
 
-#define WHEEL_ADDRESS 0x60
+#define DO_JOINT_TEST false
 #define JOINT1_ADDRESS 0x09
 #define JOINT2_ADDRESS 0x08
 #define JOINT1_CURRENT_LIMIT 66 //x10 = 660mA
 #define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
+
+
+#define DO_WHEEL_TEST true
+#define WHEEL_ADDRESS 0x60
+
+#define DO_SENSOR_TEST false
 
 
 #define LED_DRIVER_ADDR 0x6A
@@ -73,15 +79,10 @@ int main()
 /************ LEDs ********************************************/
     LedDriver ledDriver(0x6A); // <- the Led driver is always the same i2c address, it cannot be cahnged
     ledDriver.init();
-    ledDriver.flash();
+    //ledDriver.flash();
 
 /************ joint test ********************************************/
-bool do_joint_test = false;
-if (do_joint_test){
-    uint8_t address = 0x08;
-    JointOrgan myJoint(address);
-    myJoint.testFunction();
-}
+if (DO_JOINT_TEST){
 
 const int stepDuration =  10000; //us
 const int numRepetitions = 10;
@@ -132,28 +133,34 @@ for (int n=0; n<numRepetitions; ++n) {
     }
 }
 
+}
 
-//Wiggle
-// for (int n=0; n<numRepetitions; ++n) {
-//     for (int i=0; i<=180; ++i) {
-//         proximalJoint.setTargetAngle(i);
-//         distalJoint.setTargetAngle(i);
-//         usleep(stepDuration);
-//     }
-//     for (int i=180; i>=0; --i) {
-//         proximalJoint.setTargetAngle(i);
-//         distalJoint.setTargetAngle(i);
-//         usleep(stepDuration);
-//     }
-// }
+
 
 /************ Wheel test ********************************************/
-//    MotorOrgan myWheel(WHEEL_ADDRESS);
-//	myWheel.test();
+if (DO_WHEEL_TEST){
+    MotorOrgan myWheel(WHEEL_ADDRESS);
+    if(myWheel.testConnection()){
+        std::cout<<"wheel connection successful"<<std::endl;
+        ledDriver.flash(GREEN);
+        
+        for(float speed=-1.0; speed<=1.0; speed+=0.25){
+            myWheel.setSpeedNormalised(speed);
+            std::cout<<"Set speed to: "<<speed<<std::endl;
+            sleep(1);
+        }
+        myWheel.standby();
+        
+    }else{
+        std::cout<<"wheel connection failed"<<std::endl;
+        ledDriver.flash(RED);
+    }
+
+    ledDriver.flash(BLUE);
+}
 
 /************ Sensor test ********************************************/
-
-    /*
+if(DO_SENSOR_TEST){
 
     std::list<SensorOrgan> listOfSensors;
     listOfSensors.push_back( SensorOrgan( 0x30 ) );
@@ -171,12 +178,12 @@ for (int n=0; n<numRepetitions; ++n) {
     for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
         i++;
         daughterBoards.turnOn(LEFT);
-        if(thisSensor->test()){
+        if(thisSensor->testConnection()){
             organDaugherBoardLocations[i]=LEFT;
             std::cout<<"\tleft"<<std::endl;
         }else{
             daughterBoards.turnOn(RIGHT);
-            if(thisSensor->test()){
+            if(thisSensor->testConnection()){
             organDaugherBoardLocations[i]=RIGHT;
                 std::cout<<"\tright"<<std::endl;
             }else{
@@ -226,7 +233,7 @@ for (int n=0; n<numRepetitions; ++n) {
         std::cin.get();
     }
     */
-
+}
 	
 
 }
