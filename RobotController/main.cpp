@@ -16,6 +16,11 @@
 #include "JointOrgan.hpp"
 
 #define WHEEL_ADDRESS 0x60
+#define JOINT1_ADDRESS 0x09
+#define JOINT2_ADDRESS 0x08
+#define JOINT1_CURRENT_LIMIT 66 //x10 = 660mA
+#define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
+
 
 #define LED_DRIVER_ADDR 0x6A
 
@@ -71,13 +76,76 @@ int main()
     ledDriver.flash();
 
 /************ joint test ********************************************/
-bool do_joint_test = true;
+bool do_joint_test = false;
 if (do_joint_test){
     uint8_t address = 0x08;
     JointOrgan myJoint(address);
     myJoint.testFunction();
 }
 
+const int stepDuration =  10000; //us
+const int numRepetitions = 10;
+const int proximalMin = 80;
+const int proximalMax = 135;
+const int distalMin = 30;
+const int distalMax = 150;
+
+//Create 2 joints
+JointOrgan proximalJoint(JOINT1_ADDRESS); //proximal
+JointOrgan distalJoint(JOINT2_ADDRESS); //distal
+
+//Set current limits
+proximalJoint.setCurrentLimit(JOINT1_CURRENT_LIMIT);
+sleep(1);
+distalJoint.setCurrentLimit(JOINT2_CURRENT_LIMIT);
+sleep(1);
+
+//Set to start position
+proximalJoint.setTargetAngle(proximalMin);
+distalJoint.setTargetAngle(distalMin);
+sleep(3);
+
+//Walking motion
+for (int n=0; n<numRepetitions; ++n) {
+    //Distal forward
+    for (int i=distalMin; i<=distalMax; ++i) {
+        distalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Proximal down
+    for (int i=proximalMin; i<=proximalMax; ++i) {
+        proximalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Distal back
+    for (int i=distalMax; i>=distalMin; --i) {
+        distalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+
+    //Proximal up
+    for (int i=proximalMax; i>=proximalMin; --i) {
+        proximalJoint.setTargetAngle(i);
+        usleep(stepDuration);
+    }
+}
+
+
+//Wiggle
+// for (int n=0; n<numRepetitions; ++n) {
+//     for (int i=0; i<=180; ++i) {
+//         proximalJoint.setTargetAngle(i);
+//         distalJoint.setTargetAngle(i);
+//         usleep(stepDuration);
+//     }
+//     for (int i=180; i>=0; --i) {
+//         proximalJoint.setTargetAngle(i);
+//         distalJoint.setTargetAngle(i);
+//         usleep(stepDuration);
+//     }
+// }
 
 /************ Wheel test ********************************************/
 //    MotorOrgan myWheel(WHEEL_ADDRESS);

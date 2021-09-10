@@ -4,13 +4,36 @@
   Description: Firmware for Joint Organ v1.2
 */
 
-//DEBUG FLAG
-#define DEBUG 1
+//I2C ADDRESS
+#define SLAVE_ADDRESS 0x09 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
-//CALIBRATION VALUES (for this particular servo)
+//CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
+#define CALIB_CENTRE_POSITION_US 1470
+#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 110
+#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 877
+
+
+//DEBUG FLAG
+#define DEBUG 0
+
+//CALIBRATION CALCULATIONS
+#define DEG_PER_US 0.093011  //Approximately measured empirically based on a travel of ~173 degrees
+#define NOMINAL_PWM_CENTRE_US 1470
+#define NOMINAL_PWM_MIN_US 540  //Consistent across servos
+#define NOMINAL_PWM_MAX_US 2400 //Consistent across servos
+#define NOMINAL_PWM_RANGE_US (NOMINAL_PWM_MAX_US - NOMINAL_PWM_MIN_US)
+
+#define CENTRE_OFFSET_US (CALIB_CENTRE_POSITION_US - NOMINAL_PWM_CENTRE_US)
+#define UPPER_PWM_RANGE_US (NOMINAL_PWM_MAX_US - CENTRE_OFFSET_US - NOMINAL_PWM_CENTRE_US)
+#define LOWER_PWM_RANGE_US (NOMINAL_PWM_CENTRE_US - NOMINAL_PWM_MIN_US + CENTRE_OFFSET_US)
+#define MAX_SERVO_ANGLE (90 + (LOWER_PWM_RANGE_US/2) * DEG_PER_US)
+#define MIN_SERVO_ANGLE (90 - (UPPER_PWM_RANGE_US/2) * DEG_PER_US)
+//NOTE TO SELF: can use map() to map servo angles to encoder values
+
 #define zero_degree_us 400
 #define size_of_us_range 1950 // the difference between the zero and 180degree positions
-#define SLAVE_ADDRESS 0x07
+
+
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
@@ -264,6 +287,7 @@ void setTargetPosition (uint8_t target_position) {
   }
   
   //Calculate microseconds value and move servo
+  //centrepoint_us + size_of_us_range/2 * (float)(target_position - 90)/180
   unsigned int us_value = zero_degree_us +  size_of_us_range* float(target_position/180.0);
   joint_servo.writeMicroseconds(us_value);
 
