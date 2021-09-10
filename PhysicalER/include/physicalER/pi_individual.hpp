@@ -68,12 +68,17 @@ public:
     void set_inputs(const std::vector<double>& in){inputs=in;}
     const std::vector<double>& get_ouputs(){return outputs;}
 
+    void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+
 protected:
     void createMorphology() override{}
     void createController() override;
 
     std::vector<double> inputs;
     std::vector<double> outputs;
+
+    std::vector<waypoint> trajectory;
 
     int nb_input;
     int nb_output;

@@ -12,10 +12,11 @@
 #aspectRatio_y,double,1
 #cameraHeight,double,200
 
-#maxEvalTime,float,600
+#maxEvalTime,float,50
 #arenaSize,double,2
 
-#ctrlGenomeFolder,string,/home/robofab/are-logs/test/
+#ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
+#robotID,string,14_9
 #fitnessFile,string,fitnesses.csv
 
 #target_x,double,0
@@ -27,3 +28,8 @@
 #NbrHiddenNeurones,int,1
 #noiseLevel,double,0.0
 #UseInternalBias,bool,1
+
+#referencePtX,int,173
+#referencePtY,int,173
+#pixelImageScale,int,347
+#nbrWaypoints,int,100

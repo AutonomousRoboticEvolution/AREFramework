@@ -18,6 +18,7 @@ void RealMaze::init(){
          std::cout << "camera pipe: " << pipe << std::endl;
 
      video_capture = cv::VideoCapture(pipe);
+     usingIPCamera = pipe.substr(0,4).compare("http") == 0; // if the pipe starts "http", we're using an IP camera. This is important later because the buffer needs flushing on each update
 
      colour_range.first = cv::Scalar(0,100,110);
      colour_range.second = cv::Scalar(200,255,255);
@@ -47,7 +48,29 @@ std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
 void RealMaze::update_info(){
 
     cv::Mat image;
-    video_capture.read(image);
+    if (usingIPCamera==true){
+        // this is a rather hacky method to flush the buffer created when using an IP camera.
+        // We time how long it takes to get a frame - if it was very quick, it probably came from the buffer, so we discard it and get another frame.
+        // This only works because we are requesting frames at a slower rate than they are created.
+        // inspired by answers.opencv.org/question/29957/highguivideocapture-buffer-introducing-lag/?answer=38217#post-id-38217/
+        int framesWithDelayCount = 0;
+        while (framesWithDelayCount < 1)
+        {
+            auto time_before = std::chrono::system_clock::now();
+            video_capture.grab();
+            auto time_after = std::chrono::system_clock::now();
+            std::chrono::duration<double> elapsedTime = time_after-time_before;
+            if(elapsedTime > std::chrono::milliseconds(3)) framesWithDelayCount++;
+        }
+        video_capture.retrieve(image);
+    }else{
+        video_capture.read(image);
+    }
+
+    if (image.empty()) {
+        std::cerr << "ERROR! the frame is empty\n";
+    }
+
     cv::KeyPoint key_pt(0,0,0);
     image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
     image_proc::pixel_to_world_frame(key_pt,current_position,parameters);

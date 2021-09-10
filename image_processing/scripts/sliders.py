@@ -77,18 +77,16 @@ def sliders_do(image):
     
 
     # if the `q` key was pressed, break from the loop
-    #if cv2.waitKey(1) & 0xFF == ord("q"):
-        #break
+    if cv2.waitKey(1) & 0xFF == ord("q"):
+        return
 
 # Capture frames from the camera
 if is_picamera:
-
     for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
         image = frame.array
         sliders_do(image)
 else:
     while(1):
-
         ret,image = rawCapture.read()
         sliders_do(image)
 

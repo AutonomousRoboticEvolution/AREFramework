@@ -22,6 +22,6 @@
 #isExportModel,bool,0
 #reloadController,bool,0
 
-#folderToLoad,string,/home/robofab/are-logs/robot_14_9_13_6_0-33-37-7032-299933944/
+#folderToLoad,string,/home/robofab/are-logs/test_are_generate/waiting_to_be_built
 #genToLoad,int,14
 #indToLoad,int,9

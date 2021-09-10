@@ -24,8 +24,9 @@ int main(int argc, char** argv){
     std::cout<<"usingIPCamera: "<<usingIPCamera<<std::endl;
     video_capture = cv::VideoCapture(pipe);
 
-    colour_range.first = cv::Scalar(0,104,96);
-    colour_range.second = cv::Scalar(51,255,181);
+
+    colour_range.first = cv::Scalar(0,133,71);
+    colour_range.second = cv::Scalar(11,255,188);
 
     are::settings::ParametersMapPtr parameters(new are::settings::ParametersMap);
     parameters->emplace("#referencePtX",new are::settings::Integer(std::stoi(argv[2])));

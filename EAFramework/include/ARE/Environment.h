@@ -67,7 +67,7 @@ public:
      */
     virtual std::vector<double> fitnessFunction(const Individual::Ptr &ind) = 0;
 
-    virtual void update_info() = 0;
+    virtual void update_info(double time) = 0;
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
