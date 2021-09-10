@@ -370,6 +370,7 @@ int sign(int number){
 }
 
 // will return the raw motor power value, in the range -255 to +255
+// both demand_velocity and measured_velocity are measured in ticks-per-timestep.
 int controller( int demand_velocity, int measured_velocity ){
     // open-loop controller
     float controller_value;    

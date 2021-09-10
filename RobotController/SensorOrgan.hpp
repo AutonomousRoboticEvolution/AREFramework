@@ -61,6 +61,8 @@ class SensorOrgan  : public Organ {
         void flashIndicatorLED(uint8_t numberOfFlashes);
         void setTimOfFlightI2CAddress(uint8_t newAddress);
 
+        OrganType organType = SENSOR;
+
 	private:
         VL53L0X* timeOfFlight;
 };

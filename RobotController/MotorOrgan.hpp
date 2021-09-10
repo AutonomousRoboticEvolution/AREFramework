@@ -99,6 +99,7 @@ class MotorOrgan  : public Organ {
             @brief Way to call the speed controlling method with a normalised input. Will convert the input value to the correct range and then call setSpeed().
             @param speed Float. Expected input range is -1 to +1, values outside this range will be capped.
         */
+        void setSpeedNormalised(float speed);
 
 		/**
 			@brief Stop the motor using the braking feature.
@@ -141,6 +142,8 @@ class MotorOrgan  : public Organ {
 			This can be used to clear errors in the case of a fault which stops operation.
 		*/
 		void clearFaultReg();
+
+        OrganType organType = WHEEL;
 
 
 	private :

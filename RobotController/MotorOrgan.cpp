@@ -29,6 +29,16 @@ void MotorOrgan::setSpeed(int8_t speed) {
 	writeControlReg();
 }
 
+//Speed input is a signed float, where -1 is maximum reverse and +1 is maximum forward
+void MotorOrgan::setSpeedNormalised(float speed) {
+    // constain the value to be within the expected range of -1 to +1:
+    if (speed>1.0){speed=1.0;}
+    else if(speed<-1.0){speed=-1.0;}
+
+    setSpeed(speed*MAXIMUM_TARGET_VELOICTY);
+
+}
+
 //Stop the motor using the braking feature
 //up to 12 ms recovery time to full duty cycle
 void MotorOrgan::brake() {

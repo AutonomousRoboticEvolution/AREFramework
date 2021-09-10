@@ -14,6 +14,8 @@
  * It inherits from the I2CDevice class, and so provides all those functions (e.g. write8() etc.) to the derived class.
  */
 
+enum OrganType {SENSOR, WHEEL, JOINT};
+
 class Organ : protected I2CDevice
 {
 public:
@@ -30,6 +32,8 @@ public:
      * @return bool whether the organ can be successfully communicated with on the i2c bus
      */
     bool testConnection();
+
+    OrganType organType;
 
 private:
 

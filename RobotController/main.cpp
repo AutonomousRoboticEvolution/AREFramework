@@ -10,6 +10,7 @@
 #include <list>
 #include <cassert>
 
+#include "Organ.hpp"
 #include "SensorOrgan.hpp"
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
@@ -22,7 +23,7 @@
 #define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
 
 
-#define DO_WHEEL_TEST true
+#define DO_WHEEL_TEST false
 #define WHEEL_ADDRESS 0x60
 
 #define DO_SENSOR_TEST false
@@ -81,6 +82,32 @@ int main()
     ledDriver.init();
     //ledDriver.flash();
 
+/************ temp! ********************************************/
+std::list<Organ> listOfOrgans;
+listOfOrgans.push_back( SensorOrgan( 0x3A ) );
+listOfOrgans.push_back( MotorOrgan( WHEEL_ADDRESS ) );
+
+for (std::list<Organ>::iterator thisOrgan = listOfOrgans.begin(); thisOrgan != listOfOrgans.end(); ++thisOrgan){
+    if(thisOrgan->testConnection()){
+        std::cout<<"connection test successful"<<std::endl;
+        ledDriver.flash(GREEN);    
+    }else{
+        std::cout<<"connection test fail"<<std::endl;
+        ledDriver.flash(RED);    
+    }
+    
+    OrganType thisOrganType = thisOrgan->organType;
+    if (thisOrganType == WHEEL ){
+        std::cout<<"this is a sensor"<<std::endl;
+        std::cout<<thisOrgan-> <<std::endl;
+    }else{
+        std::cout<<"this is not a sensor"<<std::endl;    
+    }
+
+    usleep(50000);
+}
+
+
 /************ joint test ********************************************/
 if (DO_JOINT_TEST){
 
@@ -134,7 +161,6 @@ for (int n=0; n<numRepetitions; ++n) {
 }
 
 }
-
 
 
 /************ Wheel test ********************************************/

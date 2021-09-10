@@ -82,6 +82,7 @@ class JointOrgan  : public Organ {
         */
         int8_t readMeasuredCurrent();
 
+        OrganType organType = JOINT;
 
 };
 
