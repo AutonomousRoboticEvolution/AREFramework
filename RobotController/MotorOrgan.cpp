@@ -78,20 +78,24 @@ void MotorOrgan::clearFaultReg()  {
 	write8To(DRV_FAULT_REG_ADDR, clear);
 }
 
-//Useful for testing and checking the organ works, not intended for general use
-void MotorOrgan::test(){
-	setSpeed(25);
-	sleep(1); // seconds
-	standby();
+void MotorOrgan::set_test_value(uint8_t value){
+    write8To(SET_TEST_VALUE_REGISTER, value);
+}
+uint8_t MotorOrgan::get_test_value(){
+    return read8From(GET_TEST_VALUE_REGISTER);
+}
 
-//	// for feedforward controller values finding:
-//    for (int speed_val=10; speed_val<=40; speed_val+=10){
-//        myWheel.setSpeed(speed_val);
-//        sleep(2); // seconds
-//        //myWheel.standby();
-//        myWheel.setSpeed(0);
-//        sleep(2);
-//    }
+//Useful for testing and checking the organ works, not intended for general use
+bool MotorOrgan::test(){
+    int value_to_send = rand() % 255;
+    set_test_value(value_to_send);
+    int returned_value = get_test_value();
+    //std::cout<<"sent: "<<value_to_send<<", got: "<<returned_value<<std::endl;
+    if (returned_value == value_to_send){
+        return true;
+    }else{
+        return false;
+    }
 }
 
 

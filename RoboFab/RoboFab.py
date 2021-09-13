@@ -22,10 +22,11 @@ from printer import Printer
 
 # debugging flags, human switchable to turn parts of the process on/off
 DO_PRINT_SKELETON = 0
-DO_CORE_ORGAN_INSERT = 0
+DO_CORE_ORGAN_INSERT = 1
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
-DO_TURN_MAGNETS_OFF = 0
+DO_TURN_MAGNETS_OFF = 1
+DO_EXPORT_ORGANS_LIST=1
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -72,17 +73,19 @@ class RoboFab_host:
         self.robotID = robotID
 
         # open blueprint and parse basic organ data
-        debugPrint ( "making blueprintList list from the blueprint file: blueprint" + robotID , messageVerbosity=1 )
+        debugPrint ( "making blueprintList list from the blueprint file: blueprint_" + robotID , messageVerbosity=1 )
         blueprintList = []
-        with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
+        # with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
+        with open ( '/home/robofab/are-logs/test_are_generate/waiting_to_be_built/blueprint_'+robotID+'.csv', newline='' ) as blueprintFile:
             blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
             for rowString in blueprintReader:
                 rowAsListOfStrings = rowString [ 0 ].split ( ',' )
+                print(rowAsListOfStrings[5:8])
                 #Reads the information about organs and converts to correct format
                 #i = 0,1 type & parent ID,  i = 2-4 position in m, i = 5-7 rotation in radians
                 blueprintRowToAppend: List[float] = [ int(float(i)) for i in rowAsListOfStrings[0:2] ] + \
                                        [float(i) for i in rowAsListOfStrings[2:5]] + \
-                                       [float(i) for i in rowAsListOfStrings[5:]]
+                                       [float(i) for i in rowAsListOfStrings[5:8]]
                 
                 blueprintList.append(blueprintRowToAppend) # converted to meters & radians
         debugPrint( 'organ locations are: ' + str( blueprintList ) ,messageVerbosity=1 )
@@ -151,7 +154,8 @@ class RoboFab_host:
             self.UR5.moveBetweenStations("home")
         timer.finish()
 
-        self.save_log_files()
+        if DO_EXPORT_ORGANS_LIST:
+            self.save_log_files()
 
     def save_log_files( self ):
         file = open ( "robot_build_file.txt", "w" )
@@ -165,6 +169,8 @@ class RoboFab_host:
         print("{}/blueprint_archive".format(self.logDirectory))
         os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
         shutil.move ( "robot_build_file.txt","{}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
+        print("Saved list of organs as: {}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
+
         ## move the blueprint to the archive folder
         # os.makedirs("{}/blueprint_archive".format(self.logDirectory), exist_ok=True) # create the folder if it doesn't already exists
         # shutil.move ( "{}/waiting_to_be_built/blueprint{}.csv".format(self.logDirectory,self.robotID), "{}/blueprint_archive/blueprint{}.csv".format(self.logDirectory,self.robotID))
@@ -275,7 +281,7 @@ if __name__ == "__main__":
     RoboFab = RoboFab_host (configurationData)
 
     # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "1689" )
+    RoboFab.setupRobotObject ( robotID= "14_9" )
 
 
     # make robot:

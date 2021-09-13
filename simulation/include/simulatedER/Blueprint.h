@@ -29,6 +29,7 @@ public:
                 organOriList.push_back(it->organOri);
             }
         }
+        organPosList.at(0).at(2)  = 0.0054;
     }
 
     std::vector<int> getOrganTypes()

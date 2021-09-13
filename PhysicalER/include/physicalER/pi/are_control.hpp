@@ -6,12 +6,14 @@
 
 #include <iostream>
 #include <vector>
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 #include "MotorOrgan.hpp"
 #include "SensorOrgan.hpp"
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
 #include <zmq.hpp>
+#include <wiringPi.h> //for timing functions
+
 
 namespace are {
 namespace pi {
@@ -19,7 +21,7 @@ namespace pi {
 class AREControl{
 public:
 
-    AREControl(const NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
+    AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
     void sendMotorCommands(std::vector<double> values);
     void retrieveSensorValues(std::vector<double> &sensor_vals);
@@ -27,14 +29,10 @@ public:
     int exec( zmq::socket_t& socket);
 
 private:
-    NN2Individual controller;
-    float _max_eval_time ; // microseconds
-    float _time_step = 100000; // microseconds
+    phy::NN2Individual controller;
+    float _max_eval_time ; // millieconds
+    float _time_step = 1000; // milliseconds
 
-//    std::shared_ptr<MotorOrgan> wheel0;
-//    std::shared_ptr<MotorOrgan> wheel1;
-//    std::shared_ptr<MotorOrgan> wheel2;
-//    std::shared_ptr<MotorOrgan> wheel3;
     std::list<MotorOrgan> listOfWheels;
     std::list<SensorOrgan> listOfSensors;
 

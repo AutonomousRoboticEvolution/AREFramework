@@ -11,14 +11,14 @@
 //#include <cstdlib> //for abs() function
 #include "I2CDevice.hpp"
 
-//Register subaddresses for DRV8830 chip
-#define TARGET_POSTIION_REGISTER 0x10
-#define JOINT_MODE_REGISTER 0X11
+//Register addresses
+#define SERVO_ENABLE_REGISTER 0X10
+#define TARGET_POSITION_REGISTER 0x11
 #define MEASURED_POSITION_REGISTER 0x12
+#define MEASURED_CURRENT_REGISTER 0x13
+#define CURRENT_LIMIT_REGISTER 0x14
+#define LED_BRIGHTNESS_REGISTER 0x15
 
-//the options for JOINT_MODE_REGISTER
-#define SERVO_OFF 0x00
-#define SERVO_ON 0x01
 
 
 /**
@@ -47,6 +47,12 @@ class JointOrgan  : protected I2CDevice {
 		*/
 		void setTargetAngle(uint8_t newTarget);
 
+        /**
+            @brief Set the current limit value
+            @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
+        */
+        void setCurrentLimit(uint8_t tensOfMilliamps);
+
 		/**
 			@brief Turn the servo off so it should turn freely (and draw no power)
 		*/
@@ -62,10 +68,17 @@ class JointOrgan  : protected I2CDevice {
 			@brief Read the current angle of the servo.
 			@return
 		*/
+        int8_t readMeasuredAngle();
 
-        int16_t readMeasuredAngle();
-		uint8_t readTestRegister(); // undocumented test register
 
+        /**
+            @brief Read the current draw.
+            @return
+        */
+        int8_t readMeasuredCurrent();
+
+        // testing out the functions:
+        void testFunction();
 
 };
 
