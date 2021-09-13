@@ -9,7 +9,8 @@
 
 
 //#include <cstdlib> //for abs() function
-#include "I2CDevice.hpp"
+#include "Organ.hpp"
+#include <iostream> // for cout debugging
 
 //Register addresses
 #define SERVO_ENABLE_REGISTER 0X10
@@ -19,13 +20,14 @@
 #define CURRENT_LIMIT_REGISTER 0x14
 #define LED_BRIGHTNESS_REGISTER 0x15
 
-
+#define SERVO_OFF 0
+#define SERVO_ON 1
 
 /**
 
 	Controller class for the arduino-pico based servo controller in the joint organ
 */
-class JointOrgan  : protected I2CDevice {
+class JointOrgan  : public Organ {
 	public :
 		//Public variables
 		//Vars for state and target position
@@ -42,14 +44,17 @@ class JointOrgan  : protected I2CDevice {
 		JointOrgan(uint8_t address);
 
 		/**
-			@brief Target angle setting method. Will automatically active the servo
-			@param target angle is an unsigned 8-bit integer, linearly spaced over the possible range of approximately 180 degrees.
+            @brief Target angle setting method. Will automatically activate the servo
+            @param target angle is a signed value in degrees
 		*/
-		void setTargetAngle(uint8_t newTarget);
+        void setTargetAngle(int8_t newTarget);
 
         /**
             @brief Set the current limit value
             @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
+            
+            NOTE: Must have a delay between using this function and further writes to I2C
+			I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
         */
         void setCurrentLimit(uint8_t tensOfMilliamps);
 
@@ -77,8 +82,7 @@ class JointOrgan  : protected I2CDevice {
         */
         int8_t readMeasuredCurrent();
 
-        // testing out the functions:
-        void testFunction();
+        OrganType organType = JOINT;
 
 };
 
