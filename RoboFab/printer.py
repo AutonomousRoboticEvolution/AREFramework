@@ -16,8 +16,9 @@ class Printer:
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
         self.openSCADDirectory = "./OpenSCAD/"
-        self.meshesNoClipsDirectory = "./meshes_no_clips/"
-        self.blueprintsDirectory = "./blueprints/"
+        # self.meshesNoClipsDirectory = "./meshes_no_clips/"
+        self.meshesNoClipsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
+        self.blueprintsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
         self.meshesDirectory = "./meshes/"
 
         self.IPAddress=IPAddress # IP address of the Raspberry Pi running OctoPrint
@@ -37,7 +38,7 @@ class Printer:
     ## higher-level function to slice, upload and start printing a given stl file. The file ./meshes/mesh[IDNumber].stl must exist
     def printARobot(self, IDNumber, FAKE_SLICE_ONLY=False):
 
-        filename = "mesh" + IDNumber
+        filename = "mesh_" + IDNumber
 
         if FAKE_SLICE_ONLY:
             self.fakeSlice(filename)
@@ -59,7 +60,9 @@ class Printer:
     ## ./blueprints/blueprint[ID_number].csv
     def createSTL(self, ID_number: str):
         debugPrint("Creating an STL file for individual {}".format(ID_number))
-        blueprintFilename = "blueprint" + ID_number + ".csv"
+        blueprintFilename = "blueprint_" + ID_number + ".csv"
+        debugPrint("using blueprint: {}{}".format(self.blueprintsDirectory, blueprintFilename),messageVerbosity=2)
+        debugPrint("and mesh file: {}mesh_{}.stl".format(self.meshesNoClipsDirectory, ID_number),messageVerbosity=2)
         with open("{}{}".format(self.blueprintsDirectory, blueprintFilename), "r") as blueprintFile:
             blueprint_string = blueprintFile.read()
             blueprintFile.close()
@@ -72,7 +75,7 @@ class Printer:
         debugPrint("Organs:" + blueprint_string, messageVerbosity=2)
 
         # copy the mesh (with no clips) into the openSCAD directory as inputMesh.stl (a temporary file)
-        shutil.copyfile("{}mesh{}.stl".format(self.meshesNoClipsDirectory, ID_number),
+        shutil.copyfile("{}mesh_{}.stl".format(self.meshesNoClipsDirectory, ID_number),
                         "{}inputMesh.stl".format(self.openSCADDirectory))
 
         # make a new (temporary) openscad file, with the blueprint data at the start:
@@ -91,10 +94,10 @@ class Printer:
             raise RuntimeError("OpenSCAD terminal command failed")
 
         # copy the resulting mesh (with clips) into the meshes folder
-        if os.path.isfile("{}mesh{}.stl".format(self.meshesDirectory, ID_number)):
-            debugPrint("WARNING: mesh file mesh{}.stl already exists, will be overwritten".format(ID_number))
+        if os.path.isfile("{}mesh_{}.stl".format(self.meshesDirectory, ID_number)):
+            debugPrint("WARNING: mesh file mesh_{}.stl already exists, will be overwritten".format(ID_number))
         shutil.move(self.openSCADDirectory + "outputMesh.stl",
-                    "{}mesh{}.stl".format(self.meshesDirectory, ID_number))
+                    "{}mesh_{}.stl".format(self.meshesDirectory, ID_number))
 
 
         # tidy up by removing temporary files

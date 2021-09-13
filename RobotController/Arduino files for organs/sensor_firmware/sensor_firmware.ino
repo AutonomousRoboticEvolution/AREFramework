@@ -25,8 +25,9 @@ VL53L0X timeOfFlightSensor;
 #define SLAVE_ADDRESS 0x30 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
-#define SERIAL_DEBUG_PRINTING
+//#define SERIAL_DEBUG_PRINTING
 //#define SERIAL_DEBUG_FILTERING_RAW_DATA
+//#define SERIAL_DEBUG_IR_SENSOR
 
 // define register addresses this slave device provides
 #define REQUEST_TIME_OF_FLIGHT_REGISTER 0x01 // depricated
@@ -45,8 +46,9 @@ VL53L0X timeOfFlightSensor;
 
 // define sensor filtering parameters
 #define LOOP_TIME_US 5668 // the time (in microseconds) between taking samples. Must NOT be an integer multiple of the time between flashes of the beacon. E.g., beacon is 600Hz->1667us, we choose 5668us (176Hz) which is a multiple of 3.4
-#define IR_WINDOW_SIZE 128 //Window size _must_ be a power of two: 2,4,8,16,32,64,128,256 etc
+#define IR_WINDOW_SIZE 64 //Window size _must_ be a power of two: 2,4,8,16,32,64,128,256 etc
 #define IR_WINDOW_WRAPPING_BITMASK (IR_WINDOW_SIZE - 1)
+#define IR_MAX_DIFFERENTIAL_READING 400 //Max output seen from the IR sensor, obtained by observation
 
 //define other constants
 #define LED_FLASH_HALF_TIMEPERIOD 500000 // the time between the LED coming on and going off (and vice versa) when flashes are requested, in microseconds
@@ -68,6 +70,7 @@ unsigned long time_of_previous_led_flash =0;
 bool led_is_on = false;
 uint8_t test_register_value = 0;
 bool test_resgister_is_requested = false;
+int current_filtered_beacon_level =0; //recalculated from new readings each timestep
 
 bool new_address_for_time_of_flight_sensor_received = false;
 int new_address_of_time_of_flight_sensor = TIME_OF_FLIGHT_SENSOR_HARDWARE_DEFAULT_ADDRESS;
@@ -94,10 +97,8 @@ void setup() {
   pinMode(PIN_I2CENABLE, OUTPUT);
   digitalWrite(PIN_I2CENABLE, HIGH); // close i2c to outside world
 
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.begin(2000000);
-    Serial.println("Sensor Organ Reporting");
-  #endif
+  Serial.begin(115200); //formerly 2000000
+  Serial.println("Sensor Organ Reporting");
   
   // start i2c comms
   Wire.begin(SLAVE_ADDRESS);
@@ -157,6 +158,17 @@ void loop() {
     //Read IR measurement and add to the FIFO buffer that is the measurement window
     int value = analogRead(IR_MEASURE_PIN);
     fifoWrite(&irWindow, value, IR_WINDOW_WRAPPING_BITMASK);
+
+    //Calculate a new reading
+    current_filtered_beacon_level = getBeaconLevel(&irWindow, IR_WINDOW_SIZE, IR_WINDOW_WRAPPING_BITMASK);
+
+    #ifdef SERIAL_DEBUG_IR_SENSOR
+//      Serial.print("Filtered beacon reading: ");
+      Serial.println(current_filtered_beacon_level);
+    #endif
+
+    //Indicate beacon reading on the LED
+    analogWrite(INDICATOR_LED_PIN, current_filtered_beacon_level);
   }
 
   // is it time to turn the LED on or off?

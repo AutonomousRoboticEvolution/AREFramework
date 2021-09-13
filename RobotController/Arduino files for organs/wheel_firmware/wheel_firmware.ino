@@ -1,10 +1,12 @@
-// Firmware for the wheel organ, with encoder. Authour: Matt
+// Firmware for the wheel organ, with encoder. Authors: Matt, Mike
 // This pin assignments are the same as for the arduino Uno
-#define SERIAL_DEBUG_PRINTING
+//#define SERIAL_DEBUG_PRINTING
 //#define OPEN_LOOP_VALUES_FINDER
 //#define STEP_INPUT_TEST
+#define INDICATOR_LED_SHOW_MOTOR_POWER
+#define DEBUG 0
 
-#define SLAVE_ADDRESS 0x63 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x60 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 #include <Wire.h>
 
@@ -32,9 +34,24 @@
 #define PIN_MOTOR_DIR_PIN 6
 #define PIN_I2CENABLE 15
 #define PIN_INDICATOR_LED 9
+#define PIN_MOTOR_ENABLE 14
+
+//CURRENT LIMITER DEFAULTS
+#define DIG_POT_ADDRESS 0x2E //7-bit address of programmable resistor. Wire library uses 7 bit addressing throughout
+#define MIN_CURRENT_MA 45 //milliamps
+#define MAX_CURRENT_MA 990 //milliamps
+#define DEFAULT_CURRENT_LIMIT MAX_CURRENT_MA
 
 // define controller settings:
 #define LOOP_TIME_US 10000 // will set the controller update frequency; 10,000us -> 100Hz
+
+//Slew rate limiting parameter
+//Total output range is -255 to +255 (510 total), so e.g. a value of 10 here would take 51 timesteps to do a maximum end-end swing
+//For a loop time of 10ms this example would be 510ms
+//A rate of 125 of more is too fast (motor cuts out). 100 appears to be ok but is probably borderline.
+#define MAX_OUTPUT_SLEW_RATE 50 //Motor power demand output cannot change by more than this per timestep.
+
+int last_output_power = 0; //store last demanded power from motor for slew rate control
 
 // flags and global variables:
 bool is_enabled = false;
@@ -46,6 +63,7 @@ int motor_state; //will be either STANDBY, REVERSE, FORWARD or BRAKE defined abo
 int demand_velocity;
 uint8_t input_buffer[2];
 float integral_value;
+int current_limit_in_milliamps;
 
 uint8_t test_register_value = 0;
 bool test_resgister_is_requested = false;
@@ -68,6 +86,129 @@ bool logging_running=false;
 unsigned int i=0;
 #endif
 
+
+void setup(){
+    // set the pin modes
+    pinMode(PIN_MOTOR_DIR_PIN, OUTPUT);
+    pinMode(PIN_MOTOR_PWM_PIN, OUTPUT);
+    pinMode(PIN_INDICATOR_LED, OUTPUT);
+    pinMode(PIN_I2CENABLE, OUTPUT);
+    pinMode(PIN_MOTOR_ENABLE, OUTPUT);
+
+    //encoder start
+    attachInterrupt(PIN_ENCODER_A, A_rises, RISING);
+    attachInterrupt(PIN_ENCODER_B, B_rises, RISING);
+
+    // start i2c comms
+    Wire.begin(SLAVE_ADDRESS);
+    Wire.onReceive(receiveData);
+    Wire.onRequest(sendData);
+
+    //Enable motor
+    motorEnable(true);
+
+    //Set current limit to default value (scaled to tens of mA)
+    setCurrentLimit(DEFAULT_CURRENT_LIMIT/10);
+
+    //Open I2C channel to outside world
+    extI2CEnable(true);
+
+    // prepare for loop start
+    loop_target_end_time = micros();
+
+    #ifdef OPEN_LOOP_VALUES_FINDER
+        // should not normally be run. This applied a series of fixed values, and sees what the resulting steady state velocity is
+        Serial.begin(115200);
+        Serial.println("Open loop test...");
+        Serial.println("power,velocity");
+        for(int power=-240;power<=240;power+=5) {
+            set_motor_power_value(0);
+            delay(500);
+            set_motor_power_value(power);
+            delay(2500); // time to settle to steady state
+            Serial.print(power);
+            get_measured_velocity_from_encoder();
+            loop_target_end_time=micros()+LOOP_TIME_US;
+            for (int i = 0; i < 10; i++){
+
+                // wait until it is time for next loop
+                unsigned long time_now = micros();
+                if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383
+                { delay( (loop_target_end_time - time_now )/1000 );}
+                else{delayMicroseconds(loop_target_end_time - time_now); }
+                loop_target_end_time = loop_target_end_time+ LOOP_TIME_US;
+
+                Serial.print(",");
+                Serial.print(get_measured_velocity_from_encoder());
+            }
+            Serial.println();
+        }
+        set_motor_power_value(0);
+        while(true){delay(1000);} // hang
+    #endif
+
+    //Start serial and report existence
+    Serial.begin(115200); // for debugging only
+    Serial.println("I am a wheel organ...");
+}
+
+void loop(){
+    // wait until it is time for next loop
+    unsigned long time_now = micros();
+    loop_target_end_time += LOOP_TIME_US;
+    if (loop_target_end_time > time_now) {
+        if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383 so use delay() instead if longer than this
+        { delay( (loop_target_end_time - time_now )/1000 );}
+        else{delayMicroseconds(loop_target_end_time - time_now); }
+    }
+    else
+    { // couldn't keep up
+        #ifdef SERIAL_DEBUG_PRINTING
+            Serial.println("can't keep up");
+        #endif
+        loop_target_end_time = time_now+ LOOP_TIME_US;
+    }
+    measured_velocity_ticks_per_timestep = get_measured_velocity_from_encoder(); // this should happen as soon as possible after the delay
+
+  // check for new demand value:
+  if(new_control_register_value_received_flag){
+    new_control_register_value_received_flag=false;
+    #ifdef STEP_INPUT_TEST
+      logging_running=true;
+    #endif
+    interpret_control_register_value();
+  }
+
+  int raw_motor_power_value;
+  // depending on motor_state, decide what to do:
+  if (motor_state == STANDBY){set_motor_power_value(0);}
+  else { // must be FORWARD, REVERSE, or BRAKE (brake is treated as a target velocity of zero, so controller still applied)
+        raw_motor_power_value = controller(demand_velocity, measured_velocity_ticks_per_timestep);
+        set_motor_power_value(raw_motor_power_value);
+    }
+
+  #ifdef STEP_INPUT_TEST   // Data logging:
+        if (logging_running){
+            data_log[i] = measured_velocity_ticks_per_timestep; // save value
+            data_log_inputs[i] = raw_motor_power_value;
+            i++;
+            if (i>=N_POINTS_TO_LOG){
+                logging_running = false;
+                for (i = 0; i < N_POINTS_TO_LOG; i++) {
+                    Serial.print(data_log_inputs[i]);
+                    Serial.print(",");
+                }
+                Serial.println();
+                for (i = 0; i < N_POINTS_TO_LOG; i++) {
+                    Serial.print(data_log[i]);
+                    Serial.print(",");
+                }
+                Serial.println();
+                i=0;
+            }
+        }
+    #endif
+}
 
 // interrupt service routines - these are called when the encoder ticks:
 void A_rises(){
@@ -229,6 +370,7 @@ int sign(int number){
 }
 
 // will return the raw motor power value, in the range -255 to +255
+// both demand_velocity and measured_velocity are measured in ticks-per-timestep.
 int controller( int demand_velocity, int measured_velocity ){
     // open-loop controller
     float controller_value;    
@@ -263,132 +405,133 @@ for (int i = 0; i < 5; i++){ // loop through each of the "brackets" of the table
   return sign(demand_velocity) * 240;
 }
 
-void set_motor_power_value(int value){
-    if (value<0){
+void set_motor_power_value(int target_power){
+
+    //Check the magnitude of the demanded change in output
+    int change_magnitude = absDiff(target_power, last_output_power);
+    int output_power_set;
+
+    //If target value is too far from previous value, constrain the magnitude of the change to restrict the slew rate
+    if (change_magnitude > MAX_OUTPUT_SLEW_RATE) {
+        //Add (or subtract, for negative the maximum increment from the last output power if demanded slew rate is too fast
+        output_power_set = (target_power > last_output_power) ? (last_output_power + MAX_OUTPUT_SLEW_RATE) : (last_output_power - MAX_OUTPUT_SLEW_RATE);
+    } else {
+        //Otherwise can go straight to the full target power
+        output_power_set = target_power;
+    }
+
+    //Set the motor output to the target value
+    if (output_power_set<0){
         // negative
         digitalWrite(PIN_MOTOR_DIR_PIN,LOW);
-        analogWrite(PIN_MOTOR_PWM_PIN,-value);
+        analogWrite(PIN_MOTOR_PWM_PIN,-output_power_set);
     }
-    else if (value>0){
+    else if (output_power_set>0){
         // positive
         digitalWrite(PIN_MOTOR_DIR_PIN,HIGH);
-        analogWrite(PIN_MOTOR_PWM_PIN,value);
+        analogWrite(PIN_MOTOR_PWM_PIN,output_power_set);
     } else { //zero
         digitalWrite(PIN_MOTOR_PWM_PIN,0);
     }
-}
 
+    //Update the global variable for the last output value
+    last_output_power = output_power_set;
 
-void setup(){
-    // set the pin modes
-    pinMode(PIN_MOTOR_DIR_PIN, OUTPUT);
-    pinMode(PIN_MOTOR_PWM_PIN, OUTPUT);
-    pinMode(PIN_INDICATOR_LED, OUTPUT);
-    pinMode(PIN_I2CENABLE, OUTPUT);
-
-    //encoder start
-    attachInterrupt(PIN_ENCODER_A, A_rises, RISING);
-    attachInterrupt(PIN_ENCODER_B, B_rises, RISING);
-
-    // start i2c comms
-    Wire.begin(SLAVE_ADDRESS);
-    Wire.onReceive(receiveData);
-    Wire.onRequest(sendData);
-
-    // prepare for loop start
-    loop_target_end_time = micros();
-
-    #ifdef OPEN_LOOP_VALUES_FINDER
-        // should not normally be run. This applied a series of fixed values, and sees what the resulting steady state velocity is
-        Serial.begin(115200);
-        Serial.println("Open loop test...");
-        Serial.println("power,velocity");
-        for(int power=-240;power<=240;power+=5) {
-            set_motor_power_value(0);
-            delay(500);
-            set_motor_power_value(power);
-            delay(2500); // time to settle to steady state
-            Serial.print(power);
-            get_measured_velocity_from_encoder();
-            loop_target_end_time=micros()+LOOP_TIME_US;
-            for (int i = 0; i < 10; i++){
-
-                // wait until it is time for next loop
-                unsigned long time_now = micros();
-                if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383
-                { delay( (loop_target_end_time - time_now )/1000 );}
-                else{delayMicroseconds(loop_target_end_time - time_now); }
-                loop_target_end_time = loop_target_end_time+ LOOP_TIME_US;
-
-                Serial.print(",");
-                Serial.print(get_measured_velocity_from_encoder());
-            }
-            Serial.println();
-        }
-        set_motor_power_value(0);
-        while(true){delay(1000);} // hang
-    #endif
-
-    #ifdef SERIAL_DEBUG_PRINTING//
-        Serial.begin(115200); // for debugging only
-        Serial.println("I am a wheel organ...");
+    //Display power on indicator LED
+    #ifdef INDICATOR_LED_SHOW_MOTOR_POWER
+        analogWrite(PIN_INDICATOR_LED, abs(output_power_set));
     #endif
 }
 
-void loop(){
-    // wait until it is time for next loop
-    unsigned long time_now = micros();
-    loop_target_end_time += LOOP_TIME_US;
-    if (loop_target_end_time > time_now) {
-        if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383 so use delay() instead if longer than this
-        { delay( (loop_target_end_time - time_now )/1000 );}
-        else{delayMicroseconds(loop_target_end_time - time_now); }
+/*
+    absDiff
+    @brief Finds the absolute difference between two signed integers
+    @param val1 The first integer
+    @param val2 The second integer
+    @return The magnitude of the difference between the two integers
+*/
+int absDiff(int val1, int val2) {
+    //If val1 is greater than val2 (or equal)
+    //Both positive: v1-v2 = +ve
+    //Both negative but val1 smaller: v1-v2 = +ve
+    //Val1 positive and val2 negative: v1-v2 = +ve
+    if (val1 >= val2) {
+        return val1-val2;
+    } else {
+        //If val2 is greater than val1
+        //Same three possibilities as above, all give +ve results
+        return val2-val1;
     }
-    else
-    { // couldn't keep up
-        #ifdef SERIAL_DEBUG_PRINTING
-            Serial.println("can't keep up");
-        #endif
-        loop_target_end_time = time_now+ LOOP_TIME_US;
-    }
-    measured_velocity_ticks_per_timestep = get_measured_velocity_from_encoder(); // this should happen as soon as possible after the delay
+}
 
-  // check for new demand value:
-  if(new_control_register_value_received_flag){
-    new_control_register_value_received_flag=false;
-    #ifdef STEP_INPUT_TEST
-      logging_running=true;
-    #endif
-    interpret_control_register_value();
+/*
+  motorEnable
+  @brief Enables/disables power to the motor via current limiter chip
+  @param on_not_off TRUE to switch on, FALSE to switch off
+*/
+void motorEnable(bool on_not_off) {
+  if (on_not_off) {
+    digitalWrite(PIN_MOTOR_ENABLE, HIGH);
+  } else {
+    digitalWrite(PIN_MOTOR_ENABLE, LOW);
+  }
+}
+
+/*
+  extI2CEnable
+  @brief Enables/disables external I2C bus connection via repeater chip
+  @param on_not_off TRUE to switch on, FALSE to switch off
+*/
+void extI2CEnable(bool on_not_off) {
+  if (on_not_off) {
+    digitalWrite(PIN_I2CENABLE, LOW); //Active-low pin
+  } else {
+    digitalWrite(PIN_I2CENABLE, HIGH);
+  }
+}
+
+/*
+  setCurrentLimit
+  @brief Sets the current limit for the motor.
+  Note that this operation temporarily disconnects from external I2C bus.
+  @param tens_of_milliamps Desired current limit in mA divided by 10. e.g. 33 = 330mA
+*/
+void setCurrentLimit (uint8_t tens_of_milliamps) {
+
+  //Constrain to min and max current limits
+  int current_limit_mA = tens_of_milliamps * 10;
+  if (current_limit_mA > MAX_CURRENT_MA) {
+    current_limit_mA = MAX_CURRENT_MA;
+  } else if(current_limit_mA < MIN_CURRENT_MA) {
+    current_limit_mA = MIN_CURRENT_MA;
   }
 
-  int raw_motor_power_value;
-  // depending on motor_state, decide what to do:
-  if (motor_state == STANDBY){set_motor_power_value(0);}
-  else { // must be FORWARD, REVERSE, or BRAKE (brake is treated as a target velocity of zero, so controller still applied)
-        raw_motor_power_value = controller(demand_velocity, measured_velocity_ticks_per_timestep);
-        set_motor_power_value(raw_motor_power_value);
-    }
+  //Calculate appropriate digital potentiometer setting
+  //Current limit is 4500mA/Rtotal where R is in KOhms
+  //Rtotal = 100K*(pot_value/127) + 4.53K
+  //Rearranging gives pot_value = (127/100)*(4500/current_limit_mA - 4.53)
+  uint8_t pot_value = 1.27*((float)4500/current_limit_mA - 4.53);
 
-  #ifdef STEP_INPUT_TEST   // Data logging:
-        if (logging_running){
-            data_log[i] = measured_velocity_ticks_per_timestep; // save value
-            data_log_inputs[i] = raw_motor_power_value;
-            i++;
-            if (i>=N_POINTS_TO_LOG){
-                logging_running = false;
-                for (i = 0; i < N_POINTS_TO_LOG; i++) {
-                    Serial.print(data_log_inputs[i]);
-                    Serial.print(",");
-                }
-                Serial.println();
-                for (i = 0; i < N_POINTS_TO_LOG; i++) {
-                    Serial.print(data_log[i]);
-                    Serial.print(",");
-                }
-                Serial.println();
-                i=0;
-            }
-        }
-    #endif
+  //Write to digital potentiometer
+  //Must isolate from external I2C bus first to not interact with other joints
+  extI2CEnable(false);
+  Wire.beginTransmission(DIG_POT_ADDRESS); // transmit to device
+  Wire.write(pot_value);            // set register value
+  int tx_info = Wire.endTransmission();     // stop transmitting 
+  extI2CEnable(true);
+
+  //Update global variable for current limit
+  current_limit_in_milliamps = current_limit_mA;
+
+  //Debug info
+  if (DEBUG) {
+  Serial.print("[Current limiter setting] Wire transmission returned ");
+  Serial.println(tx_info);
+  Serial.print("Current limiter SETI resistor set to: ");
+  Serial.print(3.6 + ((float)pot_value/127) * 10);
+  Serial.println("K");
+  Serial.print("Current limit set to: ");
+  Serial.print(current_limit_mA);
+  Serial.println("mA");
+  }
 }

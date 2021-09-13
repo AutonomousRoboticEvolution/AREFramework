@@ -7,7 +7,7 @@
 #include "MotorOrgan.hpp"
 
 //Constructor
-MotorOrgan::MotorOrgan(uint8_t address) : I2CDevice(address){
+MotorOrgan::MotorOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
 }
 
@@ -20,15 +20,23 @@ void MotorOrgan::setSpeed(int8_t speed) {
 	currentSpeed = abs(speed);
 
 	//Constrain to maximum representable value (6 bits; 2^6 = 63)
-	//Speeds correspond to fixed voltages (independent of source voltage)
-	//hence if the source voltage is < 5.06v then motor will reach maximum rpm
-	//at a value lower than the representable maximum of 63
+    //Speeds correspond to target velocity, which the wheel organ firmware will attempt to achieve.
 	if (currentSpeed > 63) {
 		currentSpeed = 63;
 	}
 
 	//Write current values to control register
 	writeControlReg();
+}
+
+//Speed input is a signed float, where -1 is maximum reverse and +1 is maximum forward
+void MotorOrgan::setSpeedNormalised(float speed) {
+    // constain the value to be within the expected range of -1 to +1:
+    if (speed>1.0){speed=1.0;}
+    else if(speed<-1.0){speed=-1.0;}
+
+    setSpeed(speed*MAXIMUM_TARGET_VELOICTY);
+
 }
 
 //Stop the motor using the braking feature
@@ -77,23 +85,6 @@ void MotorOrgan::clearFaultReg()  {
 	uint8_t clear = 0x80; //1000000
 	write8To(DRV_FAULT_REG_ADDR, clear);
 }
-
-//Useful for testing and checking the organ works, not intended for general use
-void MotorOrgan::test(){
-	setSpeed(25);
-	sleep(1); // seconds
-	standby();
-
-//	// for feedforward controller values finding:
-//    for (int speed_val=10; speed_val<=40; speed_val+=10){
-//        myWheel.setSpeed(speed_val);
-//        sleep(2); // seconds
-//        //myWheel.standby();
-//        myWheel.setSpeed(0);
-//        sleep(2);
-//    }
-}
-
 
 /**PRIVATE FUNCTIONS ***/
 //Write current speed and state values to control register

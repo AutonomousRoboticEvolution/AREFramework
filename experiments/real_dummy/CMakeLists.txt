@@ -6,7 +6,7 @@ add_library(real_dummy SHARED
 target_include_directories(real_dummy PUBLIC 
 	"../../EAFramework/include"
 	"../../physicalER/include")
-target_link_libraries(real_dummy ARE physicalER)
+target_link_libraries(real_dummy ARE)
 
 install(TARGETS  real_dummy DESTINATION lib)
 install(DIRECTORY . DESTINATION include/real_dummy FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

@@ -43,7 +43,7 @@ public:
      */
     virtual std::vector<double> fitnessFunction(const Individual::Ptr &ind) = 0;
 
-    virtual void update_info() override{};
+    virtual void update_info(double time) override{};
 
     /**
      * @brief update the info of the objects (e.g. robot) in the environments

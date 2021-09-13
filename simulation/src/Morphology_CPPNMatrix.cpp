@@ -18,7 +18,6 @@ void Morphology_CPPNMatrix::create()
     int meshHandle = -1;
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
     mainHandle = -1;
-    gripperHandle = -1;
     int convexHandle, brainHandle;
     createGripper();
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
@@ -33,14 +32,11 @@ void Morphology_CPPNMatrix::create()
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
-    std::vector<std::vector<simFloat>> listVertices;
-    std::vector<std::vector<simInt>> listIndices;
-    listVertices.emplace_back();
-    listIndices.emplace_back();
-    listVertices.back().reserve(decodedMesh.getNoOfVertices());
-    listIndices.back().reserve(decodedMesh.getNoOfIndices());
+
+    skeletonListVertices.reserve(decodedMesh.getNoOfVertices());
+    skeletonListIndices.reserve(decodedMesh.getNoOfIndices());
     bool indVerResult = false;
-    indVerResult = getIndicesVertices(decodedMesh,listVertices.back(),listIndices.back());
+    indVerResult = getIndicesVertices(decodedMesh);
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
@@ -135,7 +131,14 @@ void Morphology_CPPNMatrix::create()
                     setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
-                    i.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
+                    if(i.getOrganType() == 1)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                    else if(i.getOrganType() == 2)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+                    else if(i.getOrganType() == 3)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                    else if(i.getOrganType() == 4)
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 /// Cap the number of organs.
@@ -275,7 +278,16 @@ void Morphology_CPPNMatrix::create()
                         organ.organOri[2] += tempOri[2];
                         simRemoveObject(tempDummy);
                         organ.createOrgan(organList.at(i).objectHandles[1]);
-                        organ.testOrgan(skeletonMatrix, gripperHandle, skeletonHandles, organList);
+
+                        if(organ.getOrganType() == 1)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 2)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 3)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        else if(organ.getOrganType() == 4)
+                            organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+
                         organ.organGoodOrientation = true; // Ignore orientation as these organs always have good orientations.
                         organ.repressOrgan();
                         organList.push_back(organ);
@@ -287,7 +299,6 @@ void Morphology_CPPNMatrix::create()
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportMesh(loadInd, listVertices.at(0),listIndices.at(0));
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
@@ -322,6 +333,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
     }
     destroyGripper();
+    blueprint.createBlueprint(organList);
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -354,12 +366,9 @@ void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
         std::cerr << "Set object position failed" << std::endl;
         exit(1);
     }
-
-
 }
 
-bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh,
-                                         std::vector<simFloat> &vertices, std::vector<simInt> &indices)
+bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uint8_t>> &decodedMesh)
 {
     const unsigned int n_vertices = decodedMesh.getNoOfVertices();
     const unsigned int n_indices = decodedMesh.getNoOfIndices();
@@ -376,21 +385,21 @@ bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uin
             if (prev != nullptr and (*prev) != pos) pointObject = false;
             prev = &pos;
         }
-        vertices.emplace_back(pos.getX() * mc::shape_scale_value);
-        vertices.emplace_back(pos.getY() * mc::shape_scale_value);
-        vertices.emplace_back(pos.getZ() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getX() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getY() * mc::shape_scale_value);
+        skeletonListVertices.emplace_back(pos.getZ() * mc::shape_scale_value);
     }
 
     // If all vectors are the same, we have an object the size of point. This is considered a failed viability.
     // and it makes the vertex decomposition to crash badly.
     if (pointObject) {
-        vertices.clear();
-        indices.clear();
+        skeletonListVertices.clear();
+        skeletonListIndices.clear();
         return false;
     }
 
     for (unsigned int i=0; i < n_indices; i++) {
-        indices.emplace_back(decodedMesh.getIndex(i));
+        skeletonListIndices.emplace_back(decodedMesh.getIndex(i));
     }
 
     return true;
@@ -411,24 +420,33 @@ void Morphology_CPPNMatrix::createGripper()
 {
     float gripperPosition[3];
     float gripperOrientation[3];
-    std::string modelsPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
-    modelsPath += "C_Gripper.ttm";
-    gripperHandle = simLoadModel(modelsPath.c_str());
-    assert(gripperHandle != -1);
+    int tempGripperHandle = -1;
+    std::string gripperWheelPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
+    gripperWheelPath += "C_GripperW.ttm";
+    tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles.push_back(tempGripperHandle);
+    tempGripperHandle = -1;
+    std::string gripperSensorPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
+    gripperSensorPath += "C_GripperS.ttm";
+    tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles.push_back(tempGripperHandle);
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
 
-    simSetObjectPosition(gripperHandle, -1, gripperPosition);
-    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
-
+    for(auto & i : gripperHandles){
+        simSetObjectPosition(i, -1, gripperPosition);
+        simSetObjectOrientation(i, -1, gripperOrientation);
 #ifndef ISROBOTSTATIC
-    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
-    simSetObjectInt32Parameter(gripperHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
+    }
 }
 
 void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
@@ -451,44 +469,14 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output = nn2_cppn.outf();
     }
     float rotZ;
-    rotZ = output[0] * M_2_PI - M_1_PI;
+    // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
+    /// \todo EB: This is temporal.
+    if(organ.getOrganType() == 1)
+        rotZ = 0.0;
+    if(organ.getOrganType() == 2)
+        rotZ = M_PI_2;
     organ.organOri.at(2) = rotZ;
 }
-
-void Morphology_CPPNMatrix::exportMesh(int loadInd, std::vector<float> vertices, std::vector<int> indices)
-{
-#ifndef ISCLUSTER
-    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
-#elif ISCLUSTER == 0
-    const auto **verticesMesh = new const simFloat *[2];
-    const auto **indicesMesh = new const simInt *[2];
-#elif ISCLUSTER == 1
-    auto **verticesMesh = new simFloat *[2];
-    auto **indicesMesh = new simInt *[2];
-#endif
-    auto *verticesSizesMesh = new simInt[2];
-    auto *indicesSizesMesh = new simInt[2];
-    verticesMesh[0] = vertices.data();
-    verticesSizesMesh[0] = vertices.size();
-    indicesMesh[0] = indices.data();
-    indicesSizesMesh[0] = indices.size();
-
-    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
-
-    std::stringstream filepath;
-    filepath << loadExperiment << "mesh" << loadInd << ".stl";
-
-    //fileformat: the fileformat to export to:
-    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
-    simExportMesh(3, filepath.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
-
-    delete[] verticesMesh;
-    delete[] verticesSizesMesh;
-    delete[] indicesMesh;
-    delete[] indicesSizesMesh;
-}
-
-
 
 void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
@@ -586,7 +574,9 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
 
 void Morphology_CPPNMatrix::destroyGripper()
 {
-    simRemoveModel(gripperHandle);
+    for(auto & i : gripperHandles) {
+        simRemoveModel(i);
+    }
 }
 
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)

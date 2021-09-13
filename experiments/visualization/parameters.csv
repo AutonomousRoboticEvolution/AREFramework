@@ -1,12 +1,12 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#folderToLoad,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/
-#genToLoad,int,1
+#folderToLoad,string,/home/leni/are-logs/mnipes_arena_multi_tcds/wa/mnipes_13_6_8-57-50-458-1831229511/
+#genToLoad,int,14
 #indToLoad,int,-1
-#maxEvalTime,float,10
-#numberOfGeneration,int,100
-#populationSize,int,20
+#maxEvalTime,float,30
+#numberOfGeneration,int,1
+#populationSize,int,25
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
 #instanceType,int,0
@@ -14,7 +14,7 @@
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
 #seed,int,-1
-,,
+
 #noiseLevel,double,0
 #maxVelocity,double,20
 #arenaSize,double,2.
@@ -41,7 +41,7 @@
 #emptyCtrlGenome,bool,0
 #loadAllMorphGenome,bool,0
 #isNEATGenome,bool,1
-,,
+
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -49,7 +49,7 @@
 #isExportModel,bool,0
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
 #isSegmentedRobot,bool,1
-,,
+
 #reloadController,bool,1
 #isScreenshotEnable,bool,1
 #imageRepository,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/images/

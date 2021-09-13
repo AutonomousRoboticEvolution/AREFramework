@@ -12,6 +12,7 @@
 #include "nn2/mlp.hpp"
 #include "nn2/elman.hpp"
 #include "nn2/rnn.hpp"
+#include "nn2/fcp.hpp"
 
 namespace are {
 

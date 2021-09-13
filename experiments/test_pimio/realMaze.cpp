@@ -44,7 +44,7 @@ std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
     return d;
 }
 
-void RealMaze::update_info(){
+void RealMaze::update_info(double time){
 
     cv::Mat image;
     if (usingIPCamera==true){

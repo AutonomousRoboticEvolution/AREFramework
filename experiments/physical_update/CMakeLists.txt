@@ -22,7 +22,7 @@ add_library(physical_update SHARED
     )
 
 target_include_directories(physical_update PUBLIC ${INCLUDES})
-target_link_libraries(physical_update ${OpenCV_LIBRARIES} ARE AREImageProc physicalER)
+target_link_libraries(physical_update ${OpenCV_LIBRARIES} ARE AREImageProc)
 
 install(TARGETS physical_update DESTINATION lib)
 install(DIRECTORY . DESTINATION include/physical_update FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

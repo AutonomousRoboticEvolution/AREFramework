@@ -5,7 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include "ARE/EA.h"
 #include "ARE/Settings.h"
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 
 namespace are{
 
@@ -20,10 +20,14 @@ public:
     void init() override;
     void init_pop();
     void init_next_pop() override;
+    bool update(const Environment::Ptr &) override;
     void load_data_for_update() override;
+    void write_data_for_update() override;
 
 private:
     NNParamGenome::Ptr makeRandomController(int numberOfInputs, int numberOfOutputs);
+    std::vector<std::string> ids;
+    std::vector<std::vector<waypoint>> trajectories;
 };
 
 }//are

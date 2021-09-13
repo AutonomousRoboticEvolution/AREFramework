@@ -3,6 +3,20 @@
 
 using namespace are;
 
+Eigen::VectorXd NIPESIndividual::descriptor()
+{
+    if(descriptor_type == FINAL_POSITION){
+        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        Eigen::VectorXd desc(3);
+        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
+        return desc;
+    }else if(descriptor_type == VISITED_ZONES){
+        Eigen::MatrixXd vz = visited_zones.cast<double>();
+        Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
+        return desc;
+    }
+}
+
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -77,7 +91,7 @@ void NIPES::init(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
+        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -186,7 +200,7 @@ void NIPES::init_next_pop(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
+        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -205,8 +219,12 @@ bool NIPES::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
+        std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance"){
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+        }
     }
 
 
@@ -225,7 +243,10 @@ bool NIPES::is_finish(){
     return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 
-bool NIPES::finish_eval(const Environment::Ptr &){
+bool NIPES::finish_eval(const Environment::Ptr & env){
+
+    if(env->get_name() == "obstacle_avoidance")
+        return false;
 
     float tPos[3];
     tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
