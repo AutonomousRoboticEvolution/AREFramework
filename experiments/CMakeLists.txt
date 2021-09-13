@@ -39,6 +39,7 @@ else()
 
     add_subdirectory(hyperneat)
     if(WITH_NN2)
+        add_subdirectory(physical_update)
         add_subdirectory(neuroEvolution)
         add_subdirectory(nslc)
         add_subdirectory(nsgc)

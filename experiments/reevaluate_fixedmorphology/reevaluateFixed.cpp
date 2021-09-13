@@ -51,6 +51,8 @@ void ReevaluateFixed::init(){
         NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::FCP)
+        NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
