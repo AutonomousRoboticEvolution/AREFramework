@@ -14,11 +14,13 @@ void RandomController::init_pop(){
 
     int nbr_weights, nbr_bias;
     if(nn_type == settings::nnType::FFNN)
-        NN2Control<pi::ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        NN2Control<phy::ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::RNN)
-        NN2Control<pi::rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        NN2Control<phy::rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
-        NN2Control<pi::elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        NN2Control<phy::elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::FCP)
+        NN2Control<phy::fcp_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -37,7 +39,7 @@ void RandomController::init_pop(){
         ctrl_gen->set_nbr_input(nb_input);
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nbr_output(nb_output);
-        Individual::Ptr ind(new pi::NN2Individual(morph_gen,ctrl_gen));
+        Individual::Ptr ind(new phy::NN2Individual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -59,6 +61,7 @@ void RandomController::load_data_for_update(){
         if(split_str[0]+"_"+split_str[1]+"_"+split_str[2] == "list_of_organs"){
             // get the robot ID
             std::string robotID = filename.substr(15,filename.length()-19);
+            ids.push_back(robotID);
 
             // check if a conroller file already exists
             if (fs::exists(waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID)){
@@ -93,6 +96,25 @@ void RandomController::load_data_for_update(){
     }
 }
 
+void RandomController::write_data_for_update(){
+    for(int i=0; i < trajectories.size(); i++){
+        std::stringstream filepath;
+        filepath << "/traj_" << ids[i];
+
+        std::ofstream logFileStream(Logging::log_folder + std::string("/")  + filepath.str(), std::ios::out | std::ios::ate | std::ios::app);
+
+        if(!logFileStream)
+        {
+            std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filepath.str() << std::endl;
+            return;
+        }
+
+        for(const are::waypoint& wp: trajectories[i])
+            logFileStream << wp.to_string() << std::endl;
+        logFileStream.close();
+    }
+}
+
 NNParamGenome::Ptr RandomController::makeRandomController(int numberOfInputs, int numberOfOutputs){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
@@ -100,13 +122,16 @@ NNParamGenome::Ptr RandomController::makeRandomController(int numberOfInputs, in
 
     int nbr_weights, nbr_bias;
     if(nn_type == settings::nnType::FFNN)
-        NN2Control<pi::ffnn_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
+        NN2Control<phy::ffnn_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::RNN)
-        NN2Control<pi::rnn_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
+        NN2Control<phy::rnn_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
-        NN2Control<pi::elman_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
+        NN2Control<phy::elman_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::FCP)
+        NN2Control<phy::fcp_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
     else {
-        throw std::runtime_error( "unknown type of neural network");
+        std::cerr << "unknown type of neural network" << std::endl;
+        return nullptr;
     }
 
     std::vector<double> weights(nbr_weights);
@@ -123,7 +148,7 @@ NNParamGenome::Ptr RandomController::makeRandomController(int numberOfInputs, in
     ctrl_gen->set_nbr_output(numberOfOutputs);
 
     return ctrl_gen;
-    }
+}
 
 void RandomController::init(){
 //    init_pop();
@@ -131,4 +156,8 @@ void RandomController::init(){
 
 void RandomController::init_next_pop(){
     init_pop();
+}
+
+bool RandomController::update(const Environment::Ptr &env){
+    trajectories.push_back(env->get_trajectory());
 }

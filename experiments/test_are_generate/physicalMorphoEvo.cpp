@@ -15,93 +15,108 @@ void PMEIndividual::createMorphology(){
     nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGenome();
     morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
+    listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
+    listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
+    listOrganOri = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganOriList();
+    skeletonListIndices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListIndices();
+    skeletonListVertices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListVertices();
 }
 
 
 void PhysicalMorphoEvo::init(){
-    params = NEAT::Parameters();
-    /// Set parameters for NEAT
-    unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    params.PopulationSize = pop_size;
-    params.DynamicCompatibility = true;
-    params.CompatTreshold = 2.0;
-    params.YoungAgeTreshold = 15;
-    params.SpeciesMaxStagnation = 100;
-    params.OldAgeTreshold = 50;
-    params.MinSpecies = 5;
-    params.MaxSpecies = 10;
-    params.RouletteWheelSelection = false;
 
-    params.MutateRemLinkProb = 0.02;
-    params.RecurrentProb = 0.0;
-    params.OverallMutationRate = 0.15;
-    params.MutateAddLinkProb = 0.08;
-    params.MutateAddNeuronProb = 0.01;
-    params.MutateWeightsProb = 0.90;
-    params.MaxWeight = 8.0;
-    params.WeightMutationMaxPower = 0.2;
-    params.WeightReplacementMaxPower = 1.0;
+    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    int generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
+    int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
 
-    params.MutateActivationAProb = 0.0;
-    params.ActivationAMutationMaxPower = 0.5;
-    params.MinActivationA = 0.05;
-    params.MaxActivationA = 6.0;
+    if(indIdx < 0){
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        for(int i = 0; i < pop_size; i++){
+            std::stringstream sstr2;
+            sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << i;
+            morph_gen_files.push_back(sstr2.str());
+            ids.push_back(std::make_pair(generation,i));
+        }
+    }else
+    {
+        std::stringstream sstr2;
+        sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
+        morph_gen_files.push_back(sstr2.str());
+        ids.push_back(std::make_pair(generation,indIdx));
+    }
 
-    params.MutateNeuronActivationTypeProb = 0.03;
 
-    // Crossover
-    params.SurvivalRate = 0.01;
-    params.CrossoverRate = 0.01;
-    params.CrossoverRate = 0.01;
-    params.InterspeciesCrossoverRate = 0.01;
+    CPPNGenome::Ptr morph_gen;
+    EmptyGenome::Ptr ctrl_gen;
+    //load morphology genome
+    for(size_t i = 0; i < morph_gen_files.size(); i++){
+        NEAT::Genome neat_gen(morph_gen_files[i].c_str());
+        morph_gen.reset(new CPPNGenome(neat_gen));
+        morph_gen->set_randNum(randomNum);
+        morph_gen->set_parameters(parameters);
 
-    params.ActivationFunction_SignedSigmoid_Prob = 0.0;
-    params.ActivationFunction_UnsignedSigmoid_Prob = 0.0;
-    params.ActivationFunction_Tanh_Prob = 1.0;
-    params.ActivationFunction_TanhCubic_Prob = 0.0;
-    params.ActivationFunction_SignedStep_Prob = 1.0;
-    params.ActivationFunction_UnsignedStep_Prob = 0.0;
-    params.ActivationFunction_SignedGauss_Prob = 1.0;
-    params.ActivationFunction_UnsignedGauss_Prob = 0.0;
-    params.ActivationFunction_Abs_Prob = 0.0;
-    params.ActivationFunction_SignedSine_Prob = 1.0;
-    params.ActivationFunction_UnsignedSine_Prob = 0.0;
-    params.ActivationFunction_Linear_Prob = 1.0;
+        ctrl_gen.reset(new EmptyGenome);
 
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+        Individual::Ptr ind(new PMEIndividual(morph_gen,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }
+    ctrl_gen.reset();
+    morph_gen.reset();
 }
 
 void PhysicalMorphoEvo::init_next_pop(){
-    const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    // Morphology
-    NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
-    morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
-    for (size_t i = 0; i < population_size; i++){ // Body plans
-        EmptyGenome::Ptr ctrl_gen;
-        CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
-        PMEIndividual::Ptr ind(new PMEIndividual(morphgenome,ctrl_gen));
-        ind->set_parameters(parameters);
-        ind->set_randNum(randomNum);
-        ind->create_morphology();
-        population.push_back(ind);
-    }
+
 }
 
 void PhysicalMorphoEvo::write_data_for_generate(){
-    int i = 0;
-    for(const auto& ind: population){
-        std::stringstream sst;
-        sst << "morph_desc_" << i;
-        std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
 
-        if(!ofs)
-        {
-            std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() << std::endl;
-            return;
-        }
+    const auto& ind = population[currentIndIndex];
+    const auto& id = ids[currentIndIndex];
 
-        for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
-            ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
+    // Export blueprint
+
+    std::stringstream sst_blueprint;
+    sst_blueprint << "blueprint_" << id.first << "_" << id.second << ".csv";
+    std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str());
+    if(!ofs_blueprint)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() << std::endl;
+        return;
     }
+    std::vector<int> tempOrganTypes = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganTypes();
+    std::vector<std::vector<float>> tempOrganPos = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganPos();
+    std::vector<std::vector<float>> tempOrganOri = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganOri();
+    for (int i = 0; i < tempOrganTypes.size(); i++) {
+        ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
+                      << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
+                      << tempOrganPos.at(i).at(2) << ","
+                      << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
+                      << tempOrganOri.at(i).at(2) << ","
+                      << std::endl;
+    }
+
+    // Export mesh file
+
+    const auto **verticesMesh = new const simFloat *[2];
+    const auto **indicesMesh = new const simInt *[2];
+    auto *verticesSizesMesh = new simInt[2];
+    auto *indicesSizesMesh = new simInt[2];
+    verticesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().data();
+    verticesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().size();
+    indicesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().data();
+    indicesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().size();
+
+    std::stringstream filepath;
+    filepath << Logging::log_folder << "/waiting_to_be_built/mesh_" << id.first << "_" << id.second << ".stl";
+
+    //fileformat: the fileformat to export to:
+    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
+    simExportMesh(3, filepath.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
+
+    delete[] verticesMesh;
+    delete[] verticesSizesMesh;
+    delete[] indicesMesh;
+    delete[] indicesSizesMesh;
 }

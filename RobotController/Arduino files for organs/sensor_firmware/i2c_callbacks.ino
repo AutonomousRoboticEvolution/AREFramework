@@ -78,8 +78,8 @@ void sendData(){
   if(infrared_value_is_requested){
     // the pi will make two read8() requests, the first time we should send the MSB byte, and the second time the LSB byte
     if (!first_byte_has_been_sent){
-      // first byte has not yet been sent, so compute the reading and send the first byte
-      reading = getBeaconLevel(&irWindow, IR_WINDOW_SIZE, IR_WINDOW_WRAPPING_BITMASK);
+      // first byte has not yet been sent, so retrieve the reading and send the first byte
+      reading = current_filtered_beacon_level; //Recalculated at each timestep in main loop
       
       //send the first (MSB) byte
       send_buffer = (reading & 0xFF00 )>>8;

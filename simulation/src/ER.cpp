@@ -60,11 +60,12 @@ void ER::startOfSimulation()
     environment->init();
 
     currentInd = ea->getIndividual(currentIndIndex);
-    currentInd->set_properties(properties);
     currentInd->init();
     // Get images?
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
-        robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder);//,settings::getParameter<settings::String>(parameters, "#imageRepository").value);
+        std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
+        Logging::create_folder(image_repo);
+        robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
     }
     ea->setCurrentIndIndex(currentIndIndex);
 }

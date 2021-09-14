@@ -25,6 +25,7 @@ elseif(COPPELIASIM_FOLDER)
         message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
     endif()
 elseif(VREP_FOLDER)
+    message("Using VREP is deprecated")
     message("VREP FOUND!")
     SET(VREP_FOUND ON CACHE BOOL "" FORCE)
     SET(COPPELIASIM_FOUND OFF CACHE BOOL "" FORCE)
@@ -91,6 +92,7 @@ set_target_properties(simulatedER PROPERTIES
 )
 
 if(VREP_FOUND)
+    message("Using VREP is deprecated")
     SET(LIB_EXT v_repExtER)
     SET(PLUGIN_SRC src/plugin/v_repExtER.cpp)
 elseif(COPPELIASIM_FOUND)
@@ -127,7 +129,7 @@ set_target_properties(${LIB_EXT} PROPERTIES
 )
 
 target_link_libraries(${LIB_EXT}
-    dlibxx dl #rt #asan
+    dlibxx dl #rt
     ${Boost_LIBRARIES}
     ARE
     simulatedER

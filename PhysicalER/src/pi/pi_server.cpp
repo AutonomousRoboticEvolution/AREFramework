@@ -2,7 +2,7 @@
 #include <string>
 #include <iostream>
 
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 #include "physicalER/pi_communication.hpp"
 #include "physicalER/pi/are_control.hpp"
 #include "ARE/Settings.h"
@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
         //str_ctrl.erase(0,str_ctrl.find(' ')+1);
         ctrl_gen->from_string(str_ctrl);
         std::cout<<"NN Genome as sting:\n"<<str_ctrl<<std::endl;
-        pi::NN2Individual ind(empy_gen,ctrl_gen);
+        phy::NN2Individual ind(empy_gen,ctrl_gen);
         ind.set_parameters(parameters);
         ind.set_randNum(randomNumber);
         ind.init();
