@@ -46,3 +46,7 @@ else()
     add_subdirectory(EcosystemManager)
     add_subdirectory(experiments)
 endif()
+
+if(NOT RASPBERRY)
+    file(COPY are_sim.sh DESTINATION ${COPPELIASIM_FOLDER})
+endif()
