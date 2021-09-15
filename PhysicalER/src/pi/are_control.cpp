@@ -18,43 +18,47 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
         std::cout<< "starting main loop:"<< std::endl;
     }
+    int NumberOfOrgans = 0;
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
         if (organType=="0") {} //Head
         if (organType=="1"){//wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
-            listOfWheels.push_back( MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            NumberOfOrgans++;
         }
         if (organType=="2") { //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
-            listOfSensors.push_back( SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            NumberOfOrgans++;
         }
     }
 
-    //loop through each sensor and work out which daughter board it is connected to:
-    if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Finding daughterboards for each sensor..."<<std::endl;
-    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+    //loop through each organ and work out which daughter board it is connected to:
+    if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Finding daughterboards for each organ..."<<std::endl;
+    for (auto thisOrgan : listOfOrgans) {
         daughterBoards->turnOn(LEFT);
-        if (thisSensor->testConnection()){
+        if (thisOrgan->testConnection()){
             // is on LEFT
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"organ on LEFT daughter board"<<std::endl;
-            thisSensor->daughterBoardToEnable=LEFT;
+            thisOrgan->daughterBoardToEnable=LEFT;
         }else{
             daughterBoards->turnOn(RIGHT);
-            if (thisSensor->testConnection()){
+            if (thisOrgan->testConnection()){
                 //is on RIGHT
                 if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"organ on RIGHT daughter board"<<std::endl;
-                thisSensor->daughterBoardToEnable=RIGHT;
+                thisOrgan->daughterBoardToEnable=RIGHT;
             } else{
                 // is not on either - this is bad!
                 if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"WARNING cannot find organ on either daughter board"<<std::endl;
+                thisOrgan->daughterBoardToEnable=NONE;
             }
         }
     }
 
     // initialise the LED and flash green to show ready
-    ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be cahnged
+    ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be changed
     ledDriver->init();
     ledDriver->flash();
 }
@@ -63,10 +67,13 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 void AREControl::sendMotorCommands(std::vector<double> values){
     // for each wheel organ, set it's output. The listOfWheels is in the same order as the relevent NN outputs.
     int i=0;
-    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
-        daughterBoards->turnOn(thisWheel->daughterBoardToEnable);
-        thisWheel->setSpeedNormalised( values[i]);
-        i++;
+    //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType = WHEEL) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            thisOrgan->setSpeedNormalised( values[i]);
+            i++;
+        }
     }
 
     if(DEBUGGING_INPUT_OUTPUT_DISPLAY){
@@ -86,17 +93,18 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // loop through each sensor and get it's value
     sensor_vals.clear();
     sensor_vals = {};
-    int i=0;
-    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
-        daughterBoards->turnOn(thisSensor->daughterBoardToEnable);
-        int raw_value = thisSensor->readTimeOfFlight();
-        sensor_vals.push_back( std::max ( std::min(1.0,float(raw_value)/1000.0) , 0.0) );
+    //for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType = SENSOR) {
+        daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+        sensor_vals.push_back( thisOrgan->readTimeOfFlightNormalised() );
+        }
     }
-    for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
-        daughterBoards->turnOn(thisSensor->daughterBoardToEnable);
-        int raw_value = thisSensor->readInfrared();
-        if (raw_value > INFRARED_SENSOR_THREASHOLD) sensor_vals.push_back(1.0);
-        else sensor_vals.push_back(0.0);
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType = SENSOR) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            sensor_vals.push_back( thisOrgan->readInfraredNormalised() );
+        }
     }
 
     // debugging: display sensor values as bars:

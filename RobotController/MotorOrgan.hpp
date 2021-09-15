@@ -72,8 +72,6 @@ class MotorOrgan  : public Organ {
 		uint8_t currentState = STANDBY; ///< Motor state: STANDBY, REVERSE, FORWARD or BRAKE, defined in MotorOrgan.hpp
 		uint8_t currentSpeed = 0; ///< Magnitude of motor speed, unsigned 6 bit value, so 0-63 range. Direction is given by currentState
 
-        boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
-
 		//Public member functions
 		/**
 			@brief MotorOrgan constructor.

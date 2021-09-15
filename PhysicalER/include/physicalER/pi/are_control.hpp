@@ -4,8 +4,6 @@
 #define DEBUGGING_INPUT_OUTPUT_DISPLAY true
 #define VERBOSE_DEBUG_PRINTING_AT_SETUP true
 
-#define INFRARED_SENSOR_THREASHOLD 100
-
 #include <iostream>
 #include <vector>
 #include "physicalER/pi_individual.hpp"
@@ -35,8 +33,7 @@ private:
     float _max_eval_time ; // millieconds
     float _time_step = 1000; // milliseconds
 
-    std::list<MotorOrgan> listOfWheels;
-    std::list<SensorOrgan> listOfSensors;
+    std::list<Organ*> listOfOrgans;
 
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;

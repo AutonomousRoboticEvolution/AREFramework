@@ -7,6 +7,9 @@
 #ifndef SENSORORGAN_HPP
 #define SENSORORGAN_HPP
 
+#define NORMALISE_TIME_OF_FLIGHT_MAX 1000.0 //the range of TOF sensor that coresponds to a "1" input to the neural network
+#define INFRARED_SENSOR_THREASHOLD 100 // values over this for the IR sensor will be a "1" input, below a "0"
+
 #include "Organ.hpp"
 //#include "VL53L0X.h" // not needed, as the Arduino does the settup of the VL53L0X
 #include <iostream> // for cout debugging
@@ -51,12 +54,12 @@ class SensorOrgan  : public Organ {
     public :
 
         //Public variables
-        boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
-
         SensorOrgan(uint8_t address);
         uint16_t readInfrared();
+        float readInfraredNormalised();
         uint16_t readInfraredRaw();
         uint16_t readTimeOfFlight();
+        float readTimeOfFlightNormalised();
         uint16_t getTimeOfFlightI2CAddress();
         void flashIndicatorLED(uint8_t numberOfFlashes);
         void setTimOfFlightI2CAddress(uint8_t newAddress);

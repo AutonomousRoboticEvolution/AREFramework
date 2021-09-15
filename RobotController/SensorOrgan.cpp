@@ -41,6 +41,10 @@ uint16_t SensorOrgan::readTimeOfFlight() {
 
 }
 
+// return the time of flight as a value between 0 and 1
+float SensorOrgan::readTimeOfFlightNormalised(){
+    return std::max ( std::min(1.0,float( this->readTimeOfFlight() )/NORMALISE_TIME_OF_FLIGHT_MAX) , 0.0);
+}
 
 //Reads the infrared sensor
 uint16_t SensorOrgan::readInfrared() {
@@ -48,6 +52,12 @@ uint16_t SensorOrgan::readInfrared() {
     uint8_t first_byte = read8();
     uint8_t second_byte = read8();
 	return (first_byte<<8) | second_byte;
+}
+
+// return the time of flight as a value between 0 and 1
+float SensorOrgan::readInfraredNormalised(){
+    if (this->readInfrared() >= INFRARED_SENSOR_THREASHOLD) { return 1.0; }
+    else {return 0.0;}
 }
 
 //Reads the infrared sensor without any filtering etc
