@@ -24,7 +24,7 @@ def run_server(args,rank: int):
     if(not args.xvfb) :
         return subprocess.Popen([#"gdb","--ex=r","--args",
             args.vrep,
-            '-h',
+            'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)
@@ -33,7 +33,7 @@ def run_server(args,rank: int):
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
          # "gdb","--ex=r","--args",
             args.vrep,
-            '-h',
+            'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)
@@ -45,12 +45,12 @@ def run_client(args):
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = "./client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen(["gdb","--ex=r","--args",
+    return subprocess.Popen([#"gdb","--ex=r","--args",
         args.client,
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])#,stdout=logfile)
+    ],stdout=logfile)
 
 
 def wait(servers, client, timeout=None):
