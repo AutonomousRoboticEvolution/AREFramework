@@ -41,8 +41,8 @@ void Morphology_CPPNMatrix::create()
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
-        meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, listVertices.at(0).data(), listVertices.at(0).size(), listIndices.at(0).data(),
-                                        listIndices.at(0).size(), nullptr);
+        meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
+                                        skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
             std::cerr << "Importing mesh NOT succesful! " << __func__  << std::endl;
         }
