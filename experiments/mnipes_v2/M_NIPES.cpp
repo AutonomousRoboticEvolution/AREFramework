@@ -337,42 +337,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //-
 
                 //Perform selection and generate a new morph gene.
-                //Add these new gene to learning pool
                 if(gene_pool.size() >= pop_size){
                     assert(gene_pool.size() == pop_size);
-                    while(learning_pool.size() < pop_size){
-                        std::vector<int> random_indexes;
-                        random_indexes.push_back(randomNum->randInt(0,gene_pool.size()-1));
-                        do{
-                            int rand_idx = randomNum->randInt(0,gene_pool.size()-1);
-                            bool already_drawn = false;
-                            for(const int& idx: random_indexes)
-                                if(idx == rand_idx){
-                                    already_drawn = true;
-                                    break;
-                                }
-                            if(!already_drawn)
-                                random_indexes.push_back(rand_idx);
-                        }while(random_indexes.size() < 4);
-                        std::vector<genome_t> gene_subset;
-                        for(const int &idx: random_indexes)
-                            gene_subset.push_back(gene_pool[idx]);
-                        NN2CPPNGenome new_morph_gene = selection_fct(gene_subset);
-                        new_morph_gene.set_parameters(parameters);
-                        new_morph_gene.set_randNum(randomNum);
-                        learner_t new_learner(new_morph_gene);
-                        learning_pool.push_back(new_learner);
-
-                        //Add it to the population with an empty ctrl genome to be build and determine its type.
-                        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
-                        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
-                        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morph_genome,ctrl_genome));
-                        ind->set_parameters(parameters);
-                        ind->set_randNum(randomNum);
-                        population.push_back(ind);
-                        //-
-                    }
-                    //-
+                    reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
 
@@ -385,19 +352,64 @@ bool M_NIPES::update(const Environment::Ptr &env){
     return true;
 }
 
-genome_t &M_NIPES::find_gene(int id){
-    for(auto& gene: gene_pool){
-        if(gene.morph_genome.id() == id)
-            return gene;
+void M_NIPES::reproduction(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+
+    while(learning_pool.size() <= pop_size){ //create offspring until refilling entirely the learning pool
+        //Random selection of indexes without duplicate
+        std::vector<int> random_indexes;
+        random_indexes.push_back(randomNum->randInt(0,gene_pool.size()-1));
+        do{
+            int rand_idx = randomNum->randInt(0,gene_pool.size()-1);
+            bool already_drawn = false;
+            for(const int& idx: random_indexes)
+                if(idx == rand_idx){
+                    already_drawn = true;
+                    break;
+                }
+            if(!already_drawn)
+                random_indexes.push_back(rand_idx);
+        }while(random_indexes.size() < 4);
+        //-
+
+        //Add these new gene to learning pool
+        std::vector<genome_t> gene_subset;
+        for(const int &idx: random_indexes)
+            gene_subset.push_back(gene_pool[idx]);
+        NN2CPPNGenome new_morph_gene = selection_fct(gene_subset);
+        new_morph_gene.set_parameters(parameters);
+        new_morph_gene.set_randNum(randomNum);
+        learner_t new_learner(new_morph_gene);
+        new_learner.ctrl_learner.set_parameters(parameters);
+        learning_pool.push_back(new_learner);
+        //-
+
+        //Add it to the population with an empty ctrl genome to be build and determine its type.
+        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
+        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
+        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morph_genome,ctrl_genome));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+        //-
     }
 }
 
+genome_t &M_NIPES::find_gene(int id){
+    for(auto& gene: gene_pool)
+        if(gene.morph_genome.id() == id)
+            return gene;
+    std::cerr << "Unable to find genome with id: " << id << std::endl;
+    exit(1);
+}
 
-learner_t &M_NIPES::find_learner(int id){
-    for(auto& learner: learning_pool){
+
+learner_t& M_NIPES::find_learner(int id){
+    for(auto& learner: learning_pool)
         if(learner.morph_genome.id() == id)
             return learner;
-    }
+    std::cerr << "Unable to find learner with id: " << id << std::endl;
+    exit(1);
 }
 
 void M_NIPES::remove_learner(int id){

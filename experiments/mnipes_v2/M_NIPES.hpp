@@ -15,12 +15,22 @@ namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 typedef struct learner_t{
+    learner_t(){}
+    learner_t(const learner_t& l) :
+        morph_genome(l.morph_genome),
+        ctrl_learner(l.ctrl_learner){}
     learner_t(const NN2CPPNGenome &mg): morph_genome(mg){}
     NN2CPPNGenome morph_genome;
     CMAESLearner ctrl_learner;
 } learner_t;
 
 typedef struct genome_t{
+    genome_t(){}
+    genome_t(const genome_t& g) :
+        morph_genome(g.morph_genome),
+        ctrl_genome(g.ctrl_genome),
+        objectives(g.objectives),
+        age(g.age){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
@@ -152,7 +162,11 @@ public:
     M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
 
     void init() override;
-    void epoch() override{}
+    void epoch() override{
+        population.clear();
+        if(learning_pool.empty())
+            reproduction();
+    }
     void init_next_pop() override{}
     bool update(const Environment::Ptr &) override;
     bool finish_eval(const Environment::Ptr &env) override;
@@ -162,8 +176,8 @@ public:
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
 
-    genome_t& find_gene(int id);
-    learner_t& find_learner(int id);
+    genome_t &find_gene(int id);
+    learner_t &find_learner(int id);
 
 private:
 
@@ -173,6 +187,7 @@ private:
     void remove_learner(int id);
     void increment_age();
     void clean_learning_pool();
+    void reproduction();
 
 
     fitness_fct_t fitness_fct;

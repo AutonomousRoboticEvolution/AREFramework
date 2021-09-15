@@ -22,31 +22,16 @@ extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::
 extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
-//    std::string fit_log_file = are::settings::getParameter<are::settings::String>(param,"#fitnessFile").value;
-//    are::FitnessLog::Ptr fitlog(new are::FitnessLog(fit_log_file));
-//    logs.push_back(fitlog);
+    std::string fit_log_file = are::settings::getParameter<are::settings::String>(param,"#fitnessFile").value;
+    are::GenomeInfoLog::Ptr gilog(new are::GenomeInfoLog(fit_log_file));
+    logs.push_back(gilog);
 
-//    are::MorphGenomeLog::Ptr mglog(new are::MorphGenomeLog());
-//    logs.push_back(mglog);
 
-//    std::string md_log_file = are::settings::getParameter<are::settings::String>(param,"#morphDescFile").value;
-//    are::MorphDescCartWHDLog::Ptr mdlog(new are::MorphDescCartWHDLog(md_log_file));
-//    logs.push_back(mdlog);
-
-//    are::ControllersLog::Ptr ctrllog(new are::ControllersLog());
-//    logs.push_back(ctrllog);
-
-//    are::NNParamGenomeLog::Ptr ctrlGenLog(new are::NNParamGenomeLog);
-//    logs.push_back(ctrlGenLog);
-
-//    bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
-//    if(use_ctrl_arch){
-//    are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());
-//    logs.push_back(calog);
-//    }
-
-//    are::TrajectoryLog<are::M_NIPESIndividual>::Ptr trajLog(new are::TrajectoryLog<are::M_NIPESIndividual>);
-//    logs.push_back(trajLog);
+    bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
+    if(use_ctrl_arch){
+        are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());
+        logs.push_back(calog);
+    }
 
 }
 

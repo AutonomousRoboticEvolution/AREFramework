@@ -99,7 +99,7 @@ void ER::endOfSimulation(int slaveIndex){
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
     ea->update(environment);
-    if(population_size < ea->get_population().size()){
+    if(population_size < ea->get_population().size() && !ea->is_finish()){
         for(int i = population_size; i < ea->get_population().size(); i++)
             indToEval.push_back(i);
         population_size = ea->get_population().size();

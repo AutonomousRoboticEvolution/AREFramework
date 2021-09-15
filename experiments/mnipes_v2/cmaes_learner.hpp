@@ -48,7 +48,9 @@ public:
         _is_finish(cl._is_finish),
         _archive(cl._archive),
         _novelty_archive(cl._novelty_archive),
-        nbr_dropped_eval(cl.nbr_dropped_eval){}
+        nbr_dropped_eval(cl.nbr_dropped_eval),
+        initialized(cl.initialized),
+        current_nbr_ind(cl.current_nbr_ind){}
 
     void init(std::vector<double> initial_point = std::vector<double>());
 
@@ -101,6 +103,7 @@ protected:
     archive_t _archive;
     std::vector<Eigen::VectorXd> _novelty_archive;
     int nbr_dropped_eval = 0;
+    int current_nbr_ind = 0;
 
     bool initialized = false;
 };

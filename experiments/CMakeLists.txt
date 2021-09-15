@@ -56,8 +56,6 @@ else()
         add_subdirectory(visualization)
         add_subdirectory(robustness_test)
         add_subdirectory(nipes_multitarget)
-        add_subdirectory(physical_update)
-
     endif()
     add_subdirectory(lc_nsms)
     add_subdirectory(friction_estimation)

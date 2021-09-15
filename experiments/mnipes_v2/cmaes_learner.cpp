@@ -50,6 +50,7 @@ void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::
     for(int i = 0; i < desc.rows(); i++)
         ind.descriptor[i] = desc(i);
     _cma_strat->add_individual(ind);
+    current_nbr_ind--;
 }
 
 void CMAESLearner::iterate(){
@@ -135,7 +136,7 @@ bool CMAESLearner::step(){
 
 bool CMAESLearner::is_learning_finish() const{
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
-    return _nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50;
+    return current_nbr_ind == 0 && (_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50);
 
 }
 
@@ -153,6 +154,7 @@ std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
 
         new_pop.push_back(std::make_pair(weights,biases));
     }
+    current_nbr_ind+=new_pop.size();
     return new_pop;
 }
 
