@@ -33,7 +33,7 @@ private:
     float _max_eval_time ; // millieconds
     float _time_step = 1000; // milliseconds
 
-    std::list<Organ*> listOfOrgans;
+    std::vector<Organ*> listOfOrgans;
 
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;

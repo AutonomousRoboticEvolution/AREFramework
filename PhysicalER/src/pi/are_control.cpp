@@ -71,7 +71,8 @@ void AREControl::sendMotorCommands(std::vector<double> values){
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType = WHEEL) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
-            thisOrgan->setSpeedNormalised( values[i]);
+            WheelOrgan* thisWheel = dynamic_cast<WheelOrgan*> (thisOrgan);
+            thisWheel->setSpeedNormalised( values[i]);
             i++;
         }
     }
