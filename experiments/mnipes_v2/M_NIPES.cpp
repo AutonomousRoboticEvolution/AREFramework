@@ -400,7 +400,6 @@ genome_t &M_NIPES::find_gene(int id){
         if(gene.morph_genome.id() == id)
             return gene;
     std::cerr << "Unable to find genome with id: " << id << std::endl;
-    exit(1);
 }
 
 
@@ -409,7 +408,6 @@ learner_t& M_NIPES::find_learner(int id){
         if(learner.morph_genome.id() == id)
             return learner;
     std::cerr << "Unable to find learner with id: " << id << std::endl;
-    exit(1);
 }
 
 void M_NIPES::remove_learner(int id){

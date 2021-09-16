@@ -2,7 +2,7 @@
 #define MNIPES_LOGGINGS_H
 
 #include "ARE/Logging.h"
-
+#include <boost/filesystem.hpp>
 #include "M_NIPES.hpp"
 
 

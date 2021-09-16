@@ -8,14 +8,14 @@ using namespace are;
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
     const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
-    const learner_t& learner = static_cast<M_NIPES*>(ea.get())->find_learner(genome.morph_genome.id());
 
-    if(!genome.ctrl_genome.get_weights().empty() && !learner.ctrl_learner.is_learning_finish())
-        return;
 
     //Log the morph genome
     std::stringstream morph_filepath;
     morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();
+    if(boost::filesystem::exists(morph_filepath.str()))
+        return;
+
     std::ofstream mofstr(morph_filepath.str());
     boost::archive::text_oarchive oarch(mofstr);
     oarch << genome.morph_genome.get_cppn();
@@ -26,7 +26,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
     if(!genome.ctrl_genome.get_weights().empty()){
         std::stringstream ctrl_filepath;
         ctrl_filepath << Logging::log_folder << "/ctrl_genome_" << genome.morph_genome.id();
-        std::ofstream cofstr(morph_filepath.str());
+        std::ofstream cofstr(ctrl_filepath.str());
         cofstr << genome.ctrl_genome.to_string();
         cofstr.close();
     }
@@ -41,6 +41,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << id << ",";
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
+    fitness_file_stream << "\n";
     //-
 }
 
@@ -83,8 +84,13 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
     std::ofstream logFileStream;
     std::stringstream filename;
     filename << "controller_archive";
-    if(!openOLogFile(logFileStream, filename.str()))
+    logFileStream.open(Logging::log_folder + std::string("/")  + filename.str());
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filename.str() << std::endl;
         return;
+    }
+
     for(size_t i = 0; i < static_cast<M_NIPES*>(ea.get())->get_controller_archive().size(); i++)
     {
         for(size_t j = 0; j < static_cast<M_NIPES*>(ea.get())->get_controller_archive()[i].size(); j++)
