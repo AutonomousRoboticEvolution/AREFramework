@@ -25,12 +25,12 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         if (organType=="0") {} //Head
         if (organType=="1"){//wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             NumberOfOrgans++;
         }
         if (organType=="2") { //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             NumberOfOrgans++;
         }
     }
@@ -71,7 +71,7 @@ void AREControl::sendMotorCommands(std::vector<double> values){
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType = WHEEL) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
-            WheelOrgan* thisWheel = dynamic_cast<WheelOrgan*> (thisOrgan);
+            MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
             i++;
         }
@@ -97,14 +97,16 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     //for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType = SENSOR) {
-        daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
-        sensor_vals.push_back( thisOrgan->readTimeOfFlightNormalised() );
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            SensorOrgan* thisSensor = static_cast<SensorOrgan *>(thisOrgan);
+            sensor_vals.push_back( thisSensor->readTimeOfFlightNormalised() );
         }
     }
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType = SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
-            sensor_vals.push_back( thisOrgan->readInfraredNormalised() );
+            SensorOrgan* thisSensor = static_cast<SensorOrgan *>(thisOrgan);
+            sensor_vals.push_back( thisSensor->readInfraredNormalised() );
         }
     }
 
@@ -138,15 +140,15 @@ int AREControl::exec(zmq::socket_t& socket){
         controller.set_inputs(sensor_values);
         controller.update ( this_loop_start_time*1000.0 ); //expects time in microseconds, I think? (Matt)
         nn_outputs = controller.get_ouputs();
-        
+
         // send the new values to the actuators
         sendMotorCommands(nn_outputs);
-        
+
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);
         strcpy(static_cast<char*>(message.data()),"pi busy");
         socket.send(message);
-        
+
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
         //std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
@@ -164,12 +166,16 @@ int AREControl::exec(zmq::socket_t& socket){
     }
 
     // turn everything off
-    for (std::list<MotorOrgan>::iterator thisWheel = listOfWheels.begin(); thisWheel != listOfWheels.end(); ++thisWheel){
-        thisWheel->standby() ;
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType = WHEEL) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
+            thisWheel->standby();
+        }
     }
     daughterBoards->turnOff();
 
-    
+
     // send finished message
     zmq::message_t message(40);
     strcpy(static_cast<char*>(message.data()),"pi finish");
