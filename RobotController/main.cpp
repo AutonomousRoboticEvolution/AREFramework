@@ -16,7 +16,7 @@
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
 
-#define DO_JOINT_TORQUE_TEST true
+#define DO_JOINT_TORQUE_TEST false
 
 #define DO_JOINT_TEST false
 #define JOINT1_ADDRESS 0x09
@@ -25,8 +25,8 @@
 #define JOINT2_CURRENT_LIMIT 33 //x10 = 330mA
 
 
-#define DO_WHEEL_TEST false
-#define WHEEL_ADDRESS 0x60
+#define DO_WHEEL_TEST true
+#define WHEEL_ADDRESS 0x65
 
 #define DO_SENSOR_TEST false
 
@@ -211,18 +211,23 @@ for (int n=0; n<numRepetitions; ++n) {
 
 /************ Wheel test ********************************************/
 if (DO_WHEEL_TEST){
+    std::cout<<"Testing wheel functionality"<<std::endl;
     MotorOrgan myWheel(WHEEL_ADDRESS);
+
     if(myWheel.testConnection()){
         std::cout<<"wheel connection successful"<<std::endl;
         ledDriver.flash(GREEN);
         
-        for(float speed=-1.0; speed<=1.0; speed+=0.25){
-            myWheel.setSpeedNormalised(speed);
-            std::cout<<"Set speed to: "<<speed<<std::endl;
+        for (int current_limit_mA = 100; current_limit_mA<=200; current_limit_mA+=100){
+            myWheel.setCurrentLimit(current_limit_mA/10);
+            sleep(1);
+            myWheel.setSpeedNormalised(0.5);
+            sleep(3);
+            std::cout<<"Current limit: "<<current_limit_mA<<"mA, measured veloicty: "<<myWheel.readMeasuredVelocityRPM()<<"rpm"<<std::endl;
+            myWheel.standby();
             sleep(1);
         }
-        myWheel.standby();
-        
+
     }else{
         std::cout<<"wheel connection failed"<<std::endl;
         ledDriver.flash(RED);

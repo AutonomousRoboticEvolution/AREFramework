@@ -8,6 +8,7 @@
 #include <vector>
 #include "physicalER/pi_individual.hpp"
 #include "MotorOrgan.hpp"
+#include "JointOrgan.hpp"
 #include "SensorOrgan.hpp"
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
