@@ -51,6 +51,12 @@ class JointOrgan  : public Organ {
             @param target angle is a signed value in degrees
 		*/
         void setTargetAngle(int8_t newTarget);
+
+        /**
+            @brief LED brightness setting method.
+            @param value for LED brightness, 0-255, will be the PWM value set by the arduino
+        */
+        void setLEDBrightness(int8_t newValue);
         
 		/**
             @brief Target angle setting method for input directly from the high level controller

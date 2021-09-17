@@ -19,6 +19,12 @@ void JointOrgan::setTargetAngle(int8_t newTarget) {
     write8To(TARGET_POSITION_REGISTER, newTarget);
 }
 
+//newValue is brightness, 0-255
+void JointOrgan::setLEDBrightness(int8_t newValue) {
+    //Send to device (write8To inherited from I2CDevice)
+    write8To(LED_BRIGHTNESS_REGISTER, newValue);
+}
+
 
 //new Target is a signed float between -1 and 1, which will be converted to angle of +/-MAX_MAGNITUDE_TARGET_ANGLE degrees
 void JointOrgan::setTargetAngleNormalised(float newTargetNormalised) {
