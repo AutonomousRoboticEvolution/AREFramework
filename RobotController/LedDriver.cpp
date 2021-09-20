@@ -168,12 +168,7 @@ void LedDriver::setAllTo(ledColour color) {
 }
 
 void LedDriver::flash(ledColour colour, int time){
-    ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
-    for (int i=0; i<4; ++i) { // loop through and turn on all the LEDS
-        this->setMode(leds[i], PWM, ALL);
-        this->setColour(leds[i],colour);
-        this->setBrightness(leds[i], 100);
-    }
+    setAllTo(colour);
     usleep(time);
     this->setAllTo(OFF);
 }
