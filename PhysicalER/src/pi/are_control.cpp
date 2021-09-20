@@ -67,10 +67,20 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         }
     }
 
-    // initialise the LED and flash green to show ready
+    // initialise the Head LEDs and flash green to show ready
     ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be changed
     ledDriver->init();
     ledDriver->flash();
+
+
+    // get the Head LEDs ready for the debugging outputs, if necessary
+    if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
+        ledDriver->setColour(RGB0,GREEN);
+        ledDriver->setColour(RGB1,RED);
+        ledDriver->setColour(RGB2,BLUE);
+        debugDisplayOnPi = true;
+    }
+
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
@@ -93,7 +103,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
         }
     }
 
-    if(DEBUGGING_INPUT_OUTPUT_DISPLAY){
+    if(debugDisplayOnPi){
         // debugging: display output values as bars:
         for(i=0;i<values.size();i++){
             int n_blocks=values[i]*5.0 + 5; // zero blocks is -1, ten blocks is +1 (so 5 blocks is ~0)
@@ -126,7 +136,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         }
     }
 
-    if(DEBUGGING_INPUT_OUTPUT_DISPLAY){
+    if(debugDisplayOnPi){
         // debugging: display sensor values as bars:
         for(int i=0;i<sensor_vals.size();i++){
             int n_blocks=sensor_vals[i]*10.0;
@@ -138,6 +148,39 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         }
         std::cout<<"-----|";
     }
+}
+
+void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
+
+    double lowest_IR_value=0.0;
+    double highest_TOF_value=0.0;
+    double highest_output_value=0.0;
+    int number_of_sensors = nn_inputs.size()/2;
+
+    // find the highest values for each type of sensor, and the largest magnitude output, and set the LED outputs in proportion
+    // TOF sensor values
+    for (int i=0; i<number_of_sensors;i++){
+        if (nn_inputs[i] > highest_TOF_value) highest_TOF_value=nn_inputs[i];
+    }
+
+    // IR sensor values
+    for (int i=number_of_sensors; i<number_of_sensors*2;i++){
+        if (nn_inputs[i] > lowest_IR_value) lowest_IR_value=nn_inputs[i];
+    }
+
+    // output values
+    for (int i=0; i<nn_outputs.size();i++){
+        if ( abs(nn_outputs[i]) > highest_output_value) lowest_IR_value=abs(nn_outputs[i]);
+    }
+
+    // get brightnesses between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
+    int brightness_IR = 10+lowest_IR_value*90;
+    int brightness_TOF = 10+(1.0-lowest_IR_value)*90;
+    int brightness_outputs = 10 + highest_TOF_value*90;
+
+    ledDriver->setBrightness(RGB0, brightness_TOF); // red
+    ledDriver->setBrightness(RGB1, brightness_IR); // green
+    ledDriver->setBrightness(RGB2, brightness_outputs); // blue
 }
 
 int AREControl::exec(zmq::socket_t& socket){
@@ -161,6 +204,9 @@ int AREControl::exec(zmq::socket_t& socket){
 
         // send the new values to the actuators
         sendOutputOrganCommands(nn_outputs);
+
+        // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
+        if (debugDisplayOnPi){setLedDebugging(sensor_values,nn_outputs);}
 
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);
