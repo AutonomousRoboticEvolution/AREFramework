@@ -24,7 +24,7 @@ public:
 
     AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
-    void sendMotorCommands(std::vector<double> values);
+    void sendOutputOrganCommands(std::vector<double> values);
     void retrieveSensorValues(std::vector<double> &sensor_vals);
 
     int exec( zmq::socket_t& socket);
@@ -34,7 +34,7 @@ private:
     float _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
 
-    std::vector<Organ*> listOfOrgans;
+    std::vector<Organ*> listOfOrgans; // a list of (pointers to) all the organ objects
 
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;

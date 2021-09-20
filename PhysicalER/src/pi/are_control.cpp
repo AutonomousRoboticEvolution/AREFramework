@@ -19,20 +19,29 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
         std::cout<< "starting main loop:"<< std::endl;
     }
-    int NumberOfOrgans = 0;
+
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
-        if (organType=="0") {} //Head
+        if (organType=="0") {} //Head, do nothing
         if (organType=="1"){//wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
-            NumberOfOrgans++;
         }
         if (organType=="2") { //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
-            NumberOfOrgans++;
+            listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
+        }
+        if (organType=="3") { // joint
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a joint, address: "<<addressValue<<std::endl;
+            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
+        }
+        if (organType=="4") { // caster
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Caster wheel in blueprint, ignored by are-control"<<std::endl;
+        // do nothing
+        }
+        else{ // shouldn't be here
+            std::cerr << "ERROR! the list of organs contains an entry of uknown type: " <<organType<< std::endl;
         }
     }
 
@@ -65,8 +74,8 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
-void AREControl::sendMotorCommands(std::vector<double> values){
-    // for each wheel organ, set it's output. The listOfWheels is in the same order as the relevent NN outputs.
+void AREControl::sendOutputOrganCommands(std::vector<double> values){
+    // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
     int i=0;
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
     for (auto thisOrgan : listOfOrgans) {
@@ -76,12 +85,18 @@ void AREControl::sendMotorCommands(std::vector<double> values){
             thisWheel->setSpeedNormalised( values[i]);
             i++;
         }
+        if (thisOrgan->organType = JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
+            thisJoint->setTargetAngleNormalised(values[i]);
+            i++;
+        }
     }
 
     if(DEBUGGING_INPUT_OUTPUT_DISPLAY){
-        // debugging: display sensor values as bars:
+        // debugging: display output values as bars:
         for(i=0;i<values.size();i++){
-            int n_blocks=values[i]*5.0 + 5;
+            int n_blocks=values[i]*5.0 + 5; // zero blocks is -1, ten blocks is +1 (so 5 blocks is ~0)
             for (int i_block=0; i_block<10;i_block++){
                 if (i_block<n_blocks) std::cout<<"o";
                 else std::cout<<" ";
@@ -92,7 +107,7 @@ void AREControl::sendMotorCommands(std::vector<double> values){
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
-    // loop through each sensor and get it's value
+    // loop through each sensor and get it's time-of-flight value, then loop through again for the IR values
     sensor_vals.clear();
     sensor_vals = {};
     //for (std::list<SensorOrgan>::iterator thisSensor = listOfSensors.begin(); thisSensor != listOfSensors.end(); ++thisSensor){
@@ -111,16 +126,18 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         }
     }
 
-    // debugging: display sensor values as bars:
-    for(int i=0;i<sensor_vals.size();i++){
-        int n_blocks=sensor_vals[i]*10.0;
-        for (int i_block=0; i_block<10;i_block++){
-            if (i_block<n_blocks) std::cout<<"x";
-            else std::cout<<" ";
+    if(DEBUGGING_INPUT_OUTPUT_DISPLAY){
+        // debugging: display sensor values as bars:
+        for(int i=0;i<sensor_vals.size();i++){
+            int n_blocks=sensor_vals[i]*10.0;
+            for (int i_block=0; i_block<10;i_block++){
+                if (i_block<n_blocks) std::cout<<"x";
+                else std::cout<<" ";
+            }
+            std::cout<<"|";
         }
-        std::cout<<"|";
+        std::cout<<"-----|";
     }
-    std::cout<<"-----|";
 }
 
 int AREControl::exec(zmq::socket_t& socket){
@@ -143,7 +160,7 @@ int AREControl::exec(zmq::socket_t& socket){
         nn_outputs = controller.get_ouputs();
 
         // send the new values to the actuators
-        sendMotorCommands(nn_outputs);
+        sendOutputOrganCommands(nn_outputs);
 
         // the are-update running on the PC expects to get a message on every timestep:
         zmq::message_t message(40);
