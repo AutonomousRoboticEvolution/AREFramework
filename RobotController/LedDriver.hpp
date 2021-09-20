@@ -174,9 +174,10 @@ class LedDriver : protected I2CDevice {
 		void setBlinkDutyCycle(float dutyCycle);
 
 		/**
-			@brief shortcut to set all LEDs solid green
+            @brief shortcut to set all LEDs the given colour
+            @param colour the ledColour to use
 		*/
-		void allGreen();
+        void setAllTo(ledColour colour);
 
 		/**
 			@brief shortcut to set all LEDs solid red

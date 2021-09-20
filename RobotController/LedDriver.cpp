@@ -158,37 +158,12 @@ void LedDriver::setBlinkDutyCycle(float dutyCycle) {
 	write8To(LEDDRIVER_GRPPWM_REG, grppwm);
 }
 
-void LedDriver::allGreen() {
+void LedDriver::setAllTo(ledColour color) {
     ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
     for (int i=0; i<4; ++i) { // loop through and turn on all the LEDS
         this->setMode(leds[i], PWM, ALL);
-        this->setColour(leds[i],GREEN);
+        this->setColour(leds[i],color);
         this->setBrightness(leds[i], 100);
-    }
-}
-
-void LedDriver::allRed() {
-    ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
-    for (int i=0; i<4; ++i) { // loop through and turn on all the LEDS
-        this->setMode(leds[i], PWM, ALL);
-        this->setColour(leds[i],RED);
-        this->setBrightness(leds[i], 100);
-    }
-}
-
-void LedDriver::allBlue() {
-    ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
-    for (int i=0; i<4; ++i) { // loop through and turn on all the LEDS
-        this->setMode(leds[i], PWM, ALL);
-        this->setColour(leds[i],BLUE);
-        this->setBrightness(leds[i], 100);
-    }
-}
-
-void LedDriver::allOff() {
-    ledId leds[4] = {RGB0, RGB1, RGB2, RGB3};
-    for (int i=0; i<4; ++i) { // loop through and turn off all the LEDS
-        this->setMode(leds[i],FULL_OFF,ALL);
     }
 }
 
@@ -200,7 +175,7 @@ void LedDriver::flash(ledColour colour, int time){
         this->setBrightness(leds[i], 100);
     }
     usleep(time);
-    this->allOff();
+    this->setAllTo(OFF);
 }
 
 //Test the LED functions
