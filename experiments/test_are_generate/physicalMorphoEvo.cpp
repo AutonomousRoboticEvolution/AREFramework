@@ -74,25 +74,13 @@ void PhysicalMorphoEvo::write_data_for_generate(){
 
     const auto& ind = population[currentIndIndex];
     const auto& id = ids[currentIndIndex];
-    std::stringstream sst;
-    sst << "morph_desc_" << currentIndIndex;
-    std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
-
-    if(!ofs)
-    {
-        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() << std::endl;
-        return;
-    }
-
-    for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
-        ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
 
     // Export blueprint
 
     std::stringstream sst_blueprint;
     sst_blueprint << "blueprint_" << id.first << "_" << id.second << ".csv";
-    std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() , std::ios::out | std::ios::ate | std::ios::app);
-    if(!ofs)
+    std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str());
+    if(!ofs_blueprint)
     {
         std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() << std::endl;
         return;

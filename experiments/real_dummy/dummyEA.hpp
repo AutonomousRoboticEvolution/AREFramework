@@ -11,7 +11,7 @@ public:
     DummyEnv() : Environment(){}
 
     void init() override{}
-    void update_info() override{}
+    void update_info(double time) override{}
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override{return std::vector<double>(1,0);}
 };
 

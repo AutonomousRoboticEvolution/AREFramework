@@ -19,6 +19,8 @@ void RandomController::init_pop(){
         NN2Control<phy::rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<phy::elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::FCP)
+        NN2Control<phy::fcp_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -125,8 +127,11 @@ NNParamGenome::Ptr RandomController::makeRandomController(int numberOfInputs, in
         NN2Control<phy::rnn_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<phy::elman_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::FCP)
+        NN2Control<phy::fcp_t>::nbr_parameters(numberOfInputs,nb_hidden,numberOfOutputs,nbr_weights,nbr_bias);
     else {
-        throw std::runtime_error( "unknown type of neural network");
+        std::cerr << "unknown type of neural network" << std::endl;
+        return nullptr;
     }
 
     std::vector<double> weights(nbr_weights);
@@ -143,7 +148,7 @@ NNParamGenome::Ptr RandomController::makeRandomController(int numberOfInputs, in
     ctrl_gen->set_nbr_output(numberOfOutputs);
 
     return ctrl_gen;
-    }
+}
 
 void RandomController::init(){
 //    init_pop();
