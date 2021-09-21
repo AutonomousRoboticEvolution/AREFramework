@@ -13,19 +13,29 @@ namespace are {
 
 
 struct cppn_params{
-    static float _rate_add_neuron;
-    static float _rate_del_neuron;
-    static float _rate_add_conn;
-    static float _rate_del_conn;
-    static float _rate_change_conn;
+    struct cppn{
+        static float _rate_add_neuron;
+        static float _rate_del_neuron;
+        static float _rate_add_conn;
+        static float _rate_del_conn;
+        static float _rate_change_conn;
 
-    static size_t _min_nb_neurons;
-    static size_t _max_nb_neurons;
-    static size_t _min_nb_conns;
-    static size_t _max_nb_conns;
+        static size_t _min_nb_neurons;
+        static size_t _max_nb_neurons;
+        static size_t _min_nb_conns;
+        static size_t _max_nb_conns;
 
-    static int nb_inputs;
-    static int nb_outputs;
+        static int nb_inputs;
+        static int nb_outputs;
+    };
+    struct evo_float{
+        static float mutation_rate;
+        static float cross_rate;
+        static nn2::evo_float::mutation_t mutation_type;
+        static nn2::evo_float::cross_over_t cross_over_type;
+        static float eta_m;
+        static float eta_c;
+    };
 };
 
 using nn2_cppn_t = nn2::CPPN<cppn_params>;
@@ -40,14 +50,14 @@ public:
 
     NN2CPPNGenome() : Genome(){
         _id = static_id++;
-        cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
+        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
         _id = static_id++;
-        cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
+        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
     }

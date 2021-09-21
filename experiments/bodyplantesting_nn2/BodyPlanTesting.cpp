@@ -8,15 +8,16 @@ void BODYPLANTESTING::init()
     max_obj = {1};
     min_obj = {0};
 
-    cppn_params::_max_nb_conns = settings::getParameter<settings::Integer>(parameters,"#maxNbrConnections").value;
-    cppn_params::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
-    cppn_params::_max_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#maxNbrNeurons").value;
-    cppn_params::_min_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#minNbrNeurons").value;
-    cppn_params::_rate_add_conn = settings::getParameter<settings::Float>(parameters,"#rateAddConnection").value;
-    cppn_params::_rate_del_conn = settings::getParameter<settings::Float>(parameters,"#rateDeleteConnection").value;
-    cppn_params::_rate_change_conn = settings::getParameter<settings::Float>(parameters,"#rateChangeConnection").value;
-    cppn_params::_rate_add_neuron = settings::getParameter<settings::Float>(parameters,"#rateAddNeuron").value;
-    cppn_params::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
+    cppn_params::cppn::_max_nb_conns = settings::getParameter<settings::Integer>(parameters,"#maxNbrConnections").value;
+    cppn_params::cppn::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
+    cppn_params::cppn::_max_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#maxNbrNeurons").value;
+    cppn_params::cppn::_min_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#minNbrNeurons").value;
+    cppn_params::cppn::_rate_add_conn = settings::getParameter<settings::Float>(parameters,"#rateAddConnection").value;
+    cppn_params::cppn::_rate_del_conn = settings::getParameter<settings::Float>(parameters,"#rateDeleteConnection").value;
+    cppn_params::cppn::_rate_change_conn = settings::getParameter<settings::Float>(parameters,"#rateChangeConnection").value;
+    cppn_params::cppn::_rate_add_neuron = settings::getParameter<settings::Float>(parameters,"#rateAddNeuron").value;
+    cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
+    cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
 
     initPopulation();
 

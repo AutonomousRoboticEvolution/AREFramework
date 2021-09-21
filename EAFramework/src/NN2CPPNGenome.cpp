@@ -6,19 +6,27 @@ std::mt19937 nn2::rgen_t::gen;
 
 int static_id = 0;
 
-float cppn_params::_rate_add_neuron = 0.2;
-float cppn_params::_rate_del_neuron = 0.05;
-float cppn_params::_rate_add_conn = 0.5;
-float cppn_params::_rate_del_conn = 0.02;
-float cppn_params::_rate_change_conn = 0.1;
+float cppn_params::cppn::_rate_add_neuron = 0.2f;
+float cppn_params::cppn::_rate_del_neuron = 0.05f;
+float cppn_params::cppn::_rate_add_conn = 0.5f;
+float cppn_params::cppn::_rate_del_conn = 0.02f;
+float cppn_params::cppn::_rate_change_conn = 0.1f;
 
-size_t cppn_params::_min_nb_neurons = 20;
-size_t cppn_params::_max_nb_neurons = 100;
-size_t cppn_params::_min_nb_conns = 100;
-size_t cppn_params::_max_nb_conns = 50000;
+size_t cppn_params::cppn::_min_nb_neurons = 20;
+size_t cppn_params::cppn::_max_nb_neurons = 100;
+size_t cppn_params::cppn::_min_nb_conns = 100;
+size_t cppn_params::cppn::_max_nb_conns = 50000;
 
-int cppn_params::nb_inputs = 4;
-int cppn_params::nb_outputs = 6;
+int cppn_params::cppn::nb_inputs = 4;
+int cppn_params::cppn::nb_outputs = 6;
+
+
+float mutation_rate = 0.1f;
+float cross_rate = 0.f;
+nn2::evo_float::mutation_t mutation_type = nn2::evo_float::polynomial;
+nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
+float eta_m = 15.f;
+float eta_c = 15.f;
 
 void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
     int generation = ea->get_generation();

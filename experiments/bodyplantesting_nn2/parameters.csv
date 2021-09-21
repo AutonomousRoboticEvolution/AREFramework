@@ -67,3 +67,4 @@
 #rateDeleteNeuron,float,0.01
 #rateDeleteConnection,float,0.01
 #rateChangeConnection,float,0.1
+#CPPNParametersMutationRate,float,0.1
