@@ -27,13 +27,13 @@ public:
     Individual(const Individual& ind) :
         outputs(ind.outputs),
         objectives(ind.objectives),
-        morphGenome(ind.morphGenome),
-        ctrlGenome(ind.ctrlGenome),
         morphology(ind.morphology),
         control(ind.control),
         parameters(ind.parameters),
         learner(ind.learner),
-        randNum(ind.randNum)
+        randNum(ind.randNum),
+        individual_id(ind.individual_id),
+        generation(ind.generation)
     {}
     virtual ~Individual();
 
@@ -75,6 +75,8 @@ public:
     const std::vector<double> &getObjectives(){return objectives;}
     int get_individual_id(){return individual_id;}
     void set_individual_id(int i){individual_id = i;}
+    void set_generation(int g){generation = g;}
+    int get_generation(){return generation;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     bool isEvaluated(){return isEval;}
@@ -91,6 +93,8 @@ public:
         arch & objectives;
         arch & ctrlGenome;
         arch & morphGenome;
+        arch & individual_id;
+        arch & generation;
     }
    const Learner::Ptr & get_learner(){return learner;}
 
@@ -109,6 +113,7 @@ protected:
     bool isEval;
 
     int individual_id; //TODO id system
+    int generation;
 
     int client_id;
 //    std::function<Genome::Factory> createGenome;

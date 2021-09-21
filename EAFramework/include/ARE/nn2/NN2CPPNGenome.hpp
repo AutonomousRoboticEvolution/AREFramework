@@ -7,6 +7,7 @@
 #include "nn2/cppn.hpp"
 #include "ARE/Genome.h"
 #include "ARE/morphology_descriptors.hpp"
+#include "ARE/Logging.h"
 
 namespace are {
 
@@ -41,18 +42,21 @@ public:
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
         type = "nn2_cppn_genome";
+        parents_ids= std::vector<int>(2,-1);
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::nb_inputs,cppn_params::nb_outputs);
         type = "nn2_cppn_genome";
+        parents_ids= std::vector<int>(2,-1);
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
         _id = static_id++;
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){}
+        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){
+    }
     ~NN2CPPNGenome() override {}
 
     Genome::Ptr clone() const override {
@@ -71,7 +75,17 @@ public:
         cppn.mutate();
     }
 
-    const nn2_cppn_t& get_cppn() const {return cppn;}
+    void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
+        *child1 = NN2CPPNGenome(cppn);
+        *child2 = NN2CPPNGenome(std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn());
+        child1->set_parameters(parameters);
+        child2->set_parameters(parameters);
+        child1->set_randNum(randomNum);
+        child2->set_randNum(randomNum);
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child1)->set_parents_ids({_id,partner->id()});
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({_id,partner->id()});
+    }
+
 
     void from_string(const std::string & str) override
     {
@@ -103,9 +117,13 @@ public:
     const CartDesc& get_morph_desc() const {return morph_desc;}
     void set_morph_desc(const CartDesc& md){morph_desc = md;}
 
-    const int id() const {return _id;}
     const std::vector<int>& get_parents_ids() const {return parents_ids;}
     void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
+    void set_cppn(const nn2_cppn_t &c){cppn = c;}
+    const nn2_cppn_t& get_cppn() const {return cppn;}
+
+    int get_nb_neurons(){return cppn.get_nb_neurons();}
+    int get_nb_connections(){return cppn.get_nb_connections();}
 
 private:
     std::vector<int> parents_ids;
@@ -113,6 +131,29 @@ private:
     CartDesc morph_desc;
 };
 
+class NN2CPPNGenomeLog : public Logging
+{
+public:
+    NN2CPPNGenomeLog() : Logging(true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
+
+class NbrConnNeurLog : public Logging
+{
+public:
+    NbrConnNeurLog(const std::string& filename) : Logging(filename, true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
+
+class ParentingLog : public Logging
+{
+public:
+    ParentingLog(const std::string& filename) : Logging(filename, true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
 
 }//are
 

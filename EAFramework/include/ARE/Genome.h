@@ -40,8 +40,8 @@ public:
     virtual void mutate() = 0;
 
     virtual void crossover(const Genome::Ptr& partner,Genome::Ptr child1,Genome::Ptr child2){
-        child1 = partner->clone();
-        child2 = clone();
+        child1 = clone();
+        child2 = partner->clone();
     }
 
     virtual std::string to_string() const = 0;
@@ -54,6 +54,8 @@ public:
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     const std::string& get_type(){return type;}
+    const int id() const {return _id;}
+
 
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
