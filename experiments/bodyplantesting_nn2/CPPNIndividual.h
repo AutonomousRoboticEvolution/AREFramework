@@ -23,7 +23,10 @@ public :
             Individual(ind),
             testRes(ind.testRes),
             morphDesc(ind.morphDesc)
-    {}
+    {
+        morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
+        ctrlGenome = std::make_shared<EmptyGenome>(*std::dynamic_pointer_cast<EmptyGenome>(ind.ctrlGenome));
+    }
     Individual::Ptr clone() override{
         return std::make_shared<CPPNIndividual>(*this);
     }
@@ -37,6 +40,8 @@ public :
         arch & morphGenome;
         arch & morphDesc;
         arch & testRes;
+        arch & individual_id;
+        arch & generation;
     }
     // Serialization
     std::string to_string();

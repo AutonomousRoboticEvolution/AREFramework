@@ -7,21 +7,6 @@
 using namespace are;
 
 
-void GenomeLog::saveLog(EA::Ptr &ea)
-{
-    int generation = ea->get_generation();
-    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        std::stringstream filepath;
-        filepath << Logging::log_folder << "/morphGenome" << generation * ea->get_population().size() + ind;
-
-        const Genome::Ptr morphGenome = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->get_morph_genome();
-        std::ofstream ofstr(filepath.str());
-        boost::archive::text_oarchive oarch(ofstr);
-        oarch << std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-        ofstr.close();
-    }
-}
-
 void TestsLog::saveLog(EA::Ptr &ea)
 {
     std::ofstream logFileStream;

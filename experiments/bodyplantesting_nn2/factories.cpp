@@ -25,9 +25,17 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::FitnessLog::Ptr fitlog(new are::FitnessLog(fit_log_file));
     logs.push_back(fitlog);
 
-//    std::string genome_log_file = are::settings::getParameter<are::settings::String>(param,"#genomeFile").value;
-//    are::GenomeLog::Ptr genlog(new are::GenomeLog(genome_log_file));
-//    logs.push_back(genlog);
+    are::NN2CPPNGenomeLog::Ptr genlog(new are::NN2CPPNGenomeLog);
+    logs.push_back(genlog);
+
+    std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
+    are::NbrConnNeurLog::Ptr ncnlog(new are::NbrConnNeurLog(ncn_file));
+    logs.push_back(ncnlog);
+
+    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
+    are::ParentingLog::Ptr parlog(new are::ParentingLog(par_file));
+    logs.push_back(parlog);
+
 
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));

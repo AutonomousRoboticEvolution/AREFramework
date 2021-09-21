@@ -4,7 +4,7 @@
 #vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
 #organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
-#populationSize,int,25
+#populationSize,int,100
 #maxEvalTime,float,1
 #numberOfGeneration,int,25
 #repository,string,/home/leni/are-logs/
@@ -14,13 +14,6 @@
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
 
-#MaxWeight,float,1.0
-#NNType,int,2
-#NbrInputNeurones,int,20
-#NbrOutputNeurones,int,20
-#NbrHiddenNeurones,int,8
-#UseInternalBias,bool,1
-
 #noiseLevel,double,0.
 #maxVelocity,double,10.
 #nbrWaypoints,int,2
@@ -29,7 +22,8 @@
 #mdCartWdhFile,string,MD_Cart_WDH.csv
 #positionsFile,string,final_positions.csv
 #testsFile,string,tests.csv
-#genomeFile,string,genome
+#nbrConnNeuFile,string,nbr_conn_neu.csv
+#parentingFile,string,parenting.csv
 
 #jointControllerType,int,2
 
@@ -51,13 +45,25 @@
 #archiveAddingProbability,double,0.05
 
 #flatFloor,bool,1
-
+#arenaSize,double,2
 #target_x,double,0.0
 #target_y,double,0.75
 #target_z,double,0.05
-
 #init_x,float,0.0
 #init_y,float,0.0
 #init_z,float,0.2
 
-#seed,int,1
+#seed,int,-1
+#reloadController,bool,0
+#withBeacon,bool,0
+#imageRepository,string,/home/leni/are-logs/images/
+
+#maxNbrConnections,int,500
+#minNbrConnections,int,10
+#maxNbrNeurons,int,10
+#minNbrNeurons,int,1
+#rateAddNeuron,float,0.1
+#rateAddConnection,float,0.1
+#rateDeleteNeuron,float,0.01
+#rateDeleteConnection,float,0.01
+#rateChangeConnection,float,0.1

@@ -8,7 +8,19 @@ void BODYPLANTESTING::init()
     max_obj = {1};
     min_obj = {0};
 
+    cppn_params::_max_nb_conns = settings::getParameter<settings::Integer>(parameters,"#maxNbrConnections").value;
+    cppn_params::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
+    cppn_params::_max_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#maxNbrNeurons").value;
+    cppn_params::_min_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#minNbrNeurons").value;
+    cppn_params::_rate_add_conn = settings::getParameter<settings::Float>(parameters,"#rateAddConnection").value;
+    cppn_params::_rate_del_conn = settings::getParameter<settings::Float>(parameters,"#rateDeleteConnection").value;
+    cppn_params::_rate_change_conn = settings::getParameter<settings::Float>(parameters,"#rateChangeConnection").value;
+    cppn_params::_rate_add_neuron = settings::getParameter<settings::Float>(parameters,"#rateAddNeuron").value;
+    cppn_params::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
+
     initPopulation();
+
+
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
     Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
@@ -44,44 +56,40 @@ void BODYPLANTESTING::initPopulation()
 }
 
 void BODYPLANTESTING::epoch(){
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     /** NOVELTY **/
-    if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
-        if(Novelty::k_value >= population.size())
-            Novelty::k_value = population.size()/2;
-        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    if(Novelty::k_value >= population.size())
+        Novelty::k_value = population.size()/2;
+    else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
-        std::vector<Eigen::VectorXd> pop_desc;
-        for (size_t i = 0; i < population_size; i++) { // Body plans
-            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc());
-        }
-        //compute novelty score
-        for (size_t i = 0; i < population_size; i++) { // Body plans
-            Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();
-            //Compute distances to find the k nearest neighbors of ind
-            std::vector<size_t> pop_indexes;
-            std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
+    std::vector<Eigen::VectorXd> pop_desc;
+    for (size_t i = 0; i < population_size; i++) { // Body plans
+        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc());
+    }
+    //compute novelty score
+    for (size_t i = 0; i < population_size; i++) { // Body plans
+        Eigen::VectorXd ind_desc;
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
+        //Compute distances to find the k nearest neighbors of ind
+        std::vector<size_t> pop_indexes;
+        std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
 
-            //Compute novelty
-            double ind_nov = Novelty::sparseness(distances);
+        //Compute novelty
+        double ind_nov = Novelty::sparseness(distances);
 
-            //set the objetives
-            std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
-            for (size_t j = 0; j < num_eval; j++) { // Body plans
-                std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval + j))->setObjectives(objectives);
-            }
+        //set the objetives
+        std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+        std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
-        }
-        //update archive for novelty score
-        for (size_t i = 0; i < population_size; i++) { // Body plans
-            Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();;
 
-            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getObjectives().back();
-            Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
-        }
+    }
+    //update archive for novelty score
+    for (size_t i = 0; i < population_size; i++) { // Body plans
+        Eigen::VectorXd ind_desc;
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();;
+
+        double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getObjectives().back();
+        Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
     }
 
     NSGA2::epoch();
