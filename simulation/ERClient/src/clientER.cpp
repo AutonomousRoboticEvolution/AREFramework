@@ -136,6 +136,8 @@ bool ER::updateSimulation()
                 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
                 startOfSimulation(slaveIdx);
                 currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
+                currentIndVec[slaveIdx]->set_individual_id(currentIndexVec[slaveIdx]);
+                currentIndVec[slaveIdx]->set_generation(ea->get_generation());
                 serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
             }
