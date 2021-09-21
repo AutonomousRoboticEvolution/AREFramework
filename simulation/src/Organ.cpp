@@ -172,7 +172,7 @@ void Organ::createOrgan(int skeletonHandle)
     else if(organType == 1) // Wheels
         modelsPath += "C_WheelV3.ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_SensorV2.ttm";
+        modelsPath += "C_SensorV3.ttm";
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster
