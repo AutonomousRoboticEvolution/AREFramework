@@ -20,13 +20,7 @@ size_t cppn_params::cppn::_max_nb_conns = 50000;
 int cppn_params::cppn::nb_inputs = 4;
 int cppn_params::cppn::nb_outputs = 6;
 
-
 float cppn_params::evo_float::mutation_rate = 0.1f;
-float cppn_params::evo_float::cross_rate = 0.f;
-nn2::evo_float::mutation_t cppn_params::evo_float::mutation_type = nn2::evo_float::polynomial;
-nn2::evo_float::cross_over_t cppn_params::evo_float::cross_over_type = nn2::evo_float::no_cross_over;
-float cppn_params::evo_float::eta_m = 15.f;
-float cppn_params::evo_float::eta_c = 15.f;
 
 void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
     int generation = ea->get_generation();

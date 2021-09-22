@@ -11,7 +11,6 @@
 
 namespace are {
 
-
 struct cppn_params{
     struct cppn{
         static float _rate_add_neuron;
@@ -30,21 +29,31 @@ struct cppn_params{
     };
     struct evo_float{
         static float mutation_rate;
-        static float cross_rate;
-        static nn2::evo_float::mutation_t mutation_type;
-        static nn2::evo_float::cross_over_t cross_over_type;
-        static float eta_m;
-        static float eta_c;
+        static constexpr float cross_rate = 0.f;
+        static constexpr nn2::evo_float::mutation_t mutation_type = nn2::evo_float::polynomial;
+        static constexpr nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
+        static constexpr float eta_m = 15.f;
+        static constexpr float eta_c = 15.f;
     };
 };
 
-using nn2_cppn_t = nn2::CPPN<cppn_params>;
+
+namespace cppn {
+using af_t = nn2::AfCppn<nn2::cppn::AfParams<cppn_params>>;
+using pf_t = nn2::PfWSum<nn2::EvoFloat<1,cppn_params>>;
+using neuron_t = nn2::Neuron<pf_t,af_t>;
+using connection_t = nn2::Connection<nn2::EvoFloat<1,cppn_params>>;
+}
+
+using nn2_cppn_t = nn2::CPPN<cppn::neuron_t,cppn::connection_t,cppn_params>;
 
 static int static_id;
 
 class NN2CPPNGenome : public Genome
 {
 public:
+
+
     typedef std::shared_ptr<NN2CPPNGenome> Ptr;
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
