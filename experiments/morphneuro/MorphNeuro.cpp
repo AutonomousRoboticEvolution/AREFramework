@@ -9,8 +9,9 @@ using namespace are;
 
 void MorphNeuro::init()
 {
+    ////Initiate parameters
     params = NEAT::Parameters();
-    /// Set parameters for NEAT
+    //// Set parameters for NEAT
     unsigned int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     params.EliteFraction = 0.05;
     params.PopulationSize = pop_size;
@@ -123,24 +124,24 @@ void MorphNeuro::init()
 void MorphNeuro::initPopulation()
 {
     rng.Seed(randomNum->getSeed());
-
+    //// Initiate genomes
     NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     NEAT::Genome contr_genome(0, 7, 10, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, paramsCtrl, 2);
     randomNum->setSeed(time(0));
-    // Morphology and contrller use the same seed
     int population_rand_int = randomNum->randInt(0, 10000);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, population_rand_int);
-    // TO CHANGE
     contr_population = std::make_unique<NEAT::Population>(contr_genome, paramsCtrl, true, 1.0, population_rand_int);
 
     int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
-
+    //// Morphology bootstrap
     bool isBootstrapPopulation = settings::getParameter<settings::Boolean>(parameters,"#isBootstrapEvolution").value;
     std::vector<int> robotList;
     if(isBootstrapPopulation) {
         robotList = listInds();
     }
-
+    //// Controller bootstrap - work in progess, may or may not needed
+    //// Method 1: Import controller genome files
+    //// Method 2: 1-many method for morphology
     bool iscontrlbootstrap_1 = settings::getParameter<settings::Boolean>(parameters,"#isCtrlBootstrapEvolution_1").value;
     bool iscontrlbootstrap_2 = settings::getParameter<settings::Boolean>(parameters,"#isCtrlBootstrapEvolution_2").value;
     for (size_t i = 0; i < params.PopulationSize ; i++)
@@ -158,7 +159,7 @@ void MorphNeuro::initPopulation()
 //            contr_population->AccessGenomeByIndex(i) = indGenome_contr;  //individual genome
 //
 //        }
-
+        // Creat initial population
         CPPNGenome::Ptr contrlGenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
         CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
 //        EmptyGenome::Ptr no_gen(new EmptyGenome);
@@ -172,29 +173,33 @@ void MorphNeuro::initPopulation()
 }
 
 void MorphNeuro::epoch() {
-    //multi-neat
+    ////Core of EA framework
+    ////Epoch does the process of handling genomes, including seleciton, mutation, etc.
+
+    ////log fitness for all individuals from population
     int idv_count = 0;
     std::vector<double> fitness_log_all;
     fitness_log_all.empty();
-
     for (const auto &ind : population) {
         idv_count++;
         fitness_log_all.push_back(ind->getObjectives()[0]);
     }
-
     int pop_size = settings::getParameter<settings::Integer>(parameters, "#populationSize").value;
     double best_fitness = 0.0;
     int best_idx = 0;
     std::vector<double> idx_to_keep;
     idx_to_keep.empty();
+
+    //// 1-many, dual loop, sigle loop parameters
     bool is1tomany = settings::getParameter<settings::Boolean>(parameters, "#is1tomany").value;
     bool isdualoop = settings::getParameter<settings::Boolean>(parameters, "#isDuaLoop").value;
     bool issingleloop = settings::getParameter<settings::Boolean>(parameters, "#issingleloop").value;
 
+    //// 1-many method
     if (is1tomany && idv_count != pop_size) {
+        //// selection individuals from 1-many population
         int eval_num = settings::getParameter<settings::Integer>(parameters, "#eval_num").value;
         int o_to_m_counter = 0;
-        /*multi-eva*/ ////NEED TO BE MODIFIED
         for (int i = 0; i <= idv_count; i++) {
             if (o_to_m_counter != 0 && o_to_m_counter % eval_num == 0) {
                 idx_to_keep.push_back(best_idx);
@@ -217,6 +222,7 @@ void MorphNeuro::epoch() {
         }
         population = temp_population;
 
+        //// Novelty for selected population
         bool isNovelty = settings::getParameter<settings::Boolean>(parameters, "#isNovelty").value;
         if (isNovelty) {
             // Novelty
@@ -274,7 +280,7 @@ void MorphNeuro::epoch() {
             }
         }
 
-
+        //// Epoch for morphology and controller, mutation, selection and reproduction
         int indCounter = 0;
         for (const auto &ind : population) {
             morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
@@ -287,10 +293,12 @@ void MorphNeuro::epoch() {
     }
 
     if (isdualoop && idv_count != pop_size) {
+        //// dual loop method
         static int loop_counter = 0;
         // initiate parameters for inner loop
         int eval_num = settings::getParameter<settings::Integer>(parameters, "#eval_num").value;
         int inner_loop_number = settings::getParameter<settings::Integer>(parameters, "#inner_loop_num").value;
+        //// initiate learning loop population parameters
         inner_params = NEAT::Parameters();
         /// Set parameters for NEAT
         inner_params.EliteFraction = 0.05;
@@ -394,14 +402,14 @@ void MorphNeuro::epoch() {
         inner_paramsCtrl.ActivationFunction_UnsignedSine_Prob = 0.0;
         inner_paramsCtrl.ActivationFunction_Linear_Prob = 1.0;
 
-        // initiate inner loop population
+        //// initiate inner loop population
         NEAT::Genome contr_genome(0, 7, 10, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, inner_paramsCtrl,
                                   2);
         int inner_population_rand_int = randomNum->randInt(0, 10000);
 
         inner_contr_population = std::make_unique<NEAT::Population>(contr_genome, inner_paramsCtrl, true, 1.0,
                                                                     inner_population_rand_int);
-
+        //// conduct Epoch ONLY on controllers
         if (loop_counter < inner_loop_number){//while in inner loop
             std::cout << "Inside Inner Loop" << loop_counter <<std::endl;
             int o_to_m_counter = 0;
@@ -427,6 +435,7 @@ void MorphNeuro::epoch() {
             }
             loop_counter++;
         }else{
+            //// For evolution loop, conduct Epoch on both morphology and controller
             std::cout << "Inside Outer Loop" << std::endl;
             loop_counter = 0;
             //do 1-many selection and epoch both morphology and controller
@@ -450,6 +459,7 @@ void MorphNeuro::epoch() {
             std::cout << "idx_to_keep " << idx_to_keep.size() << std::endl;
             std::vector<Individual::Ptr> temp_population;
 
+            //// Lamarckian method, inheret inner loop controller
             bool lamarkian = settings::getParameter<settings::Boolean>(parameters, "#islamarkian").value;
             for (int i = 0; i < pop_size; i++) {
                 temp_population.push_back(population[idx_to_keep[i]]);
@@ -461,6 +471,8 @@ void MorphNeuro::epoch() {
 
             population = temp_population;
 
+
+            //// Novelty method
             bool isNovelty = settings::getParameter<settings::Boolean>(parameters, "#isNovelty").value;
             if (isNovelty) {
                 // Novelty
@@ -518,7 +530,7 @@ void MorphNeuro::epoch() {
                 }
             }
 
-
+            //// Conduct Epoch on both on morphology and controller genome, notice that controller genome is different for case with/ without Lamarckian method
             int indCounter = 0;
             for (const auto &ind : population) {
                 morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
@@ -533,6 +545,7 @@ void MorphNeuro::epoch() {
     }
 
     if (issingleloop){
+        //// Single loop, Epoch is conducted on both morphology and controller
         int indCounter = 0; /// \todo EB: There must be a better way to do this!
         for(const auto& ind : population){
             morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
@@ -549,17 +562,20 @@ void MorphNeuro::epoch() {
 
 
 void MorphNeuro::setObjectives(size_t indIdx, const std::vector<double> &  objectives){
+    //// setObjectives is to set fitness to individual
     currentIndIndex = indIdx;
     population[indIdx]->setObjectives(objectives);
 }
 
 void MorphNeuro::init_next_pop(){
+    //// prepare population for next generation of evolution
     int manufacturabilityMethod = settings::getParameter<settings::Integer>(parameters,"#manufacturabilityMethod").value;
     int pop_size_current = 0;
     for (const auto &ind : population) {
         pop_size_current++;
     }
     population.clear();
+    //// differet methods require different initial popualtion
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     bool ismultieval = settings::getParameter<settings::Boolean>(parameters,"#isMulti").value;
     bool ismultieval_random = settings::getParameter<settings::Boolean>(parameters,"#isMultiRandom").value;
@@ -569,7 +585,8 @@ void MorphNeuro::init_next_pop(){
     for (int i = 0; i < pop_size; i++)
     {
         if (ismultieval && pop_size_current == pop_size){
-
+            //// in the case of 1-many method and inner learning loop of dual loop method, population size depends on the setting
+            //// the first generation of inner learning loop is generate
             multi_params = NEAT::Parameters();
             /// Set parameters for NEAT
             multi_params.EliteFraction = 0.2;
@@ -673,7 +690,7 @@ void MorphNeuro::init_next_pop(){
             multi_paramsCtrl.ActivationFunction_UnsignedSine_Prob = 0.0;
             multi_paramsCtrl.ActivationFunction_Linear_Prob = 1.0;
 
-            // initiate mutli-eval population
+            //// initiate mutli-eval population, named multi_morph/contr_population
             NEAT::Genome multi_morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0,
                                             multi_params, 10);
             NEAT::Genome multi_contr_genome(0, 7, 10, 1, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0,
@@ -701,7 +718,7 @@ void MorphNeuro::init_next_pop(){
 
 
 
-            //Pair random controller with morphology
+            ////Pair random controller with morphology, can be mutated or randomly generated
             for (size_t j = 0; j < eval_num - 1; j++) {
                 if(ismultieval_mutate){
                     CPPNGenome(contr_population->AccessGenomeByIndex(i)).mutate();// MAY NOT BE CORRECT
@@ -725,6 +742,8 @@ void MorphNeuro::init_next_pop(){
             }
         }
         else if(ismultieval && pop_size_current != pop_size) {
+            //// Things are a bit easier for further generations of innner learning loop
+            //// update inner population
             population.clear();
             for (int l = 0; l < eval_num * pop_size; l++) {
                 CPPNGenome::Ptr multi_morph_genome(new CPPNGenome(multi_morph_population->AccessGenomeByIndex(l)));
@@ -735,6 +754,7 @@ void MorphNeuro::init_next_pop(){
             }
         }
         else{
+            //// For outer evolution loop or single loop
             CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
             CPPNGenome::Ptr contrgenome(new CPPNGenome(contr_population->AccessGenomeByIndex(i)));
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,contrgenome));
@@ -745,13 +765,13 @@ void MorphNeuro::init_next_pop(){
 }
 
 bool MorphNeuro::is_finish()
-{
+{   //// Terminate experiment if reach generation limit
     unsigned int maxGenerations = settings::getParameter<settings::Integer>(parameters,"#numberOfGeneration").value;
     return get_generation() > maxGenerations;
 }
 
 NEAT::Genome MorphNeuro::loadInd(short genomeID)
-{
+{   //// Load specific morphology
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::cout << "Loading genome: " << genomeID << "!" << std::endl;
     std::stringstream filepath;
@@ -761,7 +781,7 @@ NEAT::Genome MorphNeuro::loadInd(short genomeID)
 }
 
 NEAT::Genome MorphNeuro::loadContrInd(short genomeID)
-{
+{   //// load specific controller
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::cout << "Loading genome: " << genomeID << "!" << std::endl;
     std::stringstream filepath;
@@ -771,7 +791,7 @@ NEAT::Genome MorphNeuro::loadContrInd(short genomeID)
 }
 
 std::vector<int> MorphNeuro::listInds()
-{
+{   //// Load a list of individuals, can be used in bootstrap method
     std::vector<int> robotList;
     // This code snippet was taken from: https://www.gormanalysis.com/blog/reading-and-writing-csv-files-with-cpp/
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
@@ -804,6 +824,7 @@ std::vector<int> MorphNeuro::listInds()
 
 
 bool MorphNeuro::update(const Environment::Ptr & env){
+    //// update location information in the maze
     endEvalTime = hr_clock::now();
     numberEvaluation++;
     reevaluated++;
