@@ -576,6 +576,7 @@ void MorphNeuro::init_next_pop(){
     }
     population.clear();
     //// differet methods require different initial popualtion
+    //// notice that for dual loop method, simulation/src/mazeEnv.cpp needs to be modified
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     bool ismultieval = settings::getParameter<settings::Boolean>(parameters,"#isMulti").value;
     bool ismultieval_random = settings::getParameter<settings::Boolean>(parameters,"#isMultiRandom").value;
