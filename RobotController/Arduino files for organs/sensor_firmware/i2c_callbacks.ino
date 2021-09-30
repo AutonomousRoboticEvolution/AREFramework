@@ -20,12 +20,8 @@ void receiveData(int received_data_byte_count){
   }
 
   switch (input_buffer[0]) {
-    case REQUEST_TIME_OF_FLIGHT_REGISTER: // set control register
-      time_of_flight_value_is_requested=true;
-      break;
   
     case REQUEST_INFRARED_REGISTER: // set control register
-      infrared_value_is_requested=true;
       break;
 
     case FLASH_INDICATOR_LED_REGISTER: // increase the requested number of flashes
@@ -38,15 +34,9 @@ void receiveData(int received_data_byte_count){
       break;
 
     case GET_TIME_OF_FLIGHT_ADDRESS_REGISTER:
-      TOF_address_is_requested = true;
       break;
 
-//    case SEARCH_FOR_TIME_OF_FLIGHT_ADDRESS:
-//      findI2CAddress();
-//      break;
-
     case REQUEST_INFRARED_RAW_VALUE_REGISTER:
-      raw_IR_value_is_requested = true;
       break;
 
     case SET_TEST_VALUE_REGISTER:
@@ -59,8 +49,11 @@ void receiveData(int received_data_byte_count){
       #endif
       break;
     
+    case SET_INFRARED_THREASHOLD_REGISTER:
+      IR_threashold = input_buffer[1];
+
+    
     case GET_TEST_VALUE_REGISTER:
-      test_resgister_is_requested = true;
       break;
      
     default:
@@ -75,65 +68,43 @@ void receiveData(int received_data_byte_count){
 // gets called whenever master wants to read a register:
 void sendData(){
    
-  if(infrared_value_is_requested){
-    // the pi will make two read8() requests, the first time we should send the MSB byte, and the second time the LSB byte
-    if (!first_byte_has_been_sent){
-      // first byte has not yet been sent, so retrieve the reading and send the first byte
-      reading = current_filtered_beacon_level; //Recalculated at each timestep in main loop
+  if(input_buffer[0] == REQUEST_INFRARED_REGISTER){
+      Wire.write(reading);
       
-      //send the first (MSB) byte
-      send_buffer = (reading & 0xFF00 )>>8;
-      first_byte_has_been_sent=true;
-  
       #ifdef SERIAL_DEBUG_PRINTING
         Serial.print("IR value: ");
         Serial.print(reading);
         Serial.print(" = 0x");
         Serial.println(reading,HEX);
       #endif
-    } else { // we should send the second byte
-      send_buffer = reading & 0xFF;
-      first_byte_has_been_sent=false;
-      infrared_value_is_requested=false;
-    }
-    // send the value:
-    Wire.write(send_buffer);
-    
-    #ifdef SERIAL_DEBUG_PRINTING
-      Serial.print("Sent: 0x");
-      Serial.print(send_buffer,HEX);
-      Serial.print("\t= ");
-      Serial.println(send_buffer,BIN);
-    #endif
+      
 
-  }else if (TOF_address_is_requested) {
-    TOF_address_is_requested = false;
+  }else if (input_buffer[0] == GET_TIME_OF_FLIGHT_ADDRESS_REGISTER) {
     Wire.write(current_address_of_time_of_flight_sensor);
     #ifdef SERIAL_DEBUG_PRINTING
-      Serial.print("TOF_address_is_requested, sent: 0x");
+      Serial.print("TOF address requested, sent: 0x");
       Serial.println(current_address_of_time_of_flight_sensor,HEX);
     #endif
 
-  } else if (raw_IR_value_is_requested) {
+  } else if (input_buffer[0] == REQUEST_INFRARED_RAW_VALUE_REGISTER) {
     // the pi will make two read8() requests, the first time we should send the MSB byte, and the second time the LSB byte
     if (!first_byte_has_been_sent){
       // first byte has not yet been sent, so compute the reading and send the first byte
-      reading =  analogRead(IR_MEASURE_PIN);
+      raw_reading =  analogRead(IR_MEASURE_PIN);
       
       //send the first (MSB) byte
-      send_buffer = (reading & 0xFF00 )>>8;
+      send_buffer = (raw_reading & 0xFF00 )>>8;
       first_byte_has_been_sent=true;
   
       #ifdef SERIAL_DEBUG_PRINTING
         Serial.print("Raw IR value: ");
-        Serial.print(reading);
+        Serial.print(raw_reading);
         Serial.print(" = 0x");
-        Serial.println(reading,HEX);
+        Serial.println(raw_reading,HEX);
       #endif
     } else { // we should send the second byte
-      send_buffer = reading & 0xFF;
+      send_buffer = raw_reading & 0xFF;
       first_byte_has_been_sent=false;
-      raw_IR_value_is_requested=false;
     }
     // send the value:
     Wire.write(send_buffer);
@@ -144,8 +115,7 @@ void sendData(){
       Serial.println(send_buffer,BIN);
     #endif
 
-  } else if (test_resgister_is_requested){
-    test_resgister_is_requested=false;
+  } else if (input_buffer[0] == GET_TEST_VALUE_REGISTER){
     Wire.write(test_register_value);
     #ifdef SERIAL_DEBUG_PRINTING
       Serial.print("test register value us requested, sent: 0x");
@@ -153,11 +123,10 @@ void sendData(){
       Serial.print("\t= ");
       Serial.println(test_register_value);
     #endif
-    
+
   }else{
     #ifdef SERIAL_DEBUG_PRINTING
-      Serial.println("ERROR! in sendData, but no request flag is true");
+      Serial.println("ERROR! in sendData, but input_buffer[0] is not recognised as a readable register");
     #endif
-    reading=0;
   }
 }
