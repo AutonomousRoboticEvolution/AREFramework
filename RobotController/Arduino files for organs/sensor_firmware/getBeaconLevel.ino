@@ -3,12 +3,12 @@ void getBeaconLevel(){
   unsigned long start_us=micros();
   // Read raw IR measurement and save at SAMPLE_PERIOS_US rate
   for (uint16_t i=0; i<BUFFER_SIZE; i++){
-    while(micros()<start_us+(i*SAMPLE_PERIOS_US)){}
+    while(micros()<start_us+(i*SAMPLE_PERIOD_US)){}
     raw_values[i]= (analogRead(IR_MEASURE_PIN) );
   }
   
   uint16_t samples[WINDOW_SIZE];
-  uint8_t reading = -1;
+  reading = -1;
   
   for (int i=0 ; i<BUFFER_SIZE; i++){
     samples[i%WINDOW_SIZE] = raw_values[i];
@@ -30,7 +30,16 @@ void getBeaconLevel(){
     }
   }
 
-  #ifdef SERIAL_DEBUG_IR_SENSOR
+  // debugging things, not usually called:
+  #ifdef SERIAL_DEBUG_DETAILED_IR_VALUES
+    for (int i=0 ; i<BUFFER_SIZE; i++){
+      Serial.print(raw_values[i]);
+      Serial.print(",");
+      Serial.println(reading);
+    }
+    delay(2000);
+  #endif
+  #ifdef SERIAL_DEBUG_PRINT_IR_READING_VALUE
     Serial.print("Filtered beacon reading: ");
     Serial.println(reading);
   #endif

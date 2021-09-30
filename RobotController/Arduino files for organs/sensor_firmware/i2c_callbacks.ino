@@ -72,7 +72,7 @@ void sendData(){
       Wire.write(reading);
       
       #ifdef SERIAL_DEBUG_PRINTING
-        Serial.print("IR value: ");
+        Serial.print("Sending IR value: ");
         Serial.print(reading);
         Serial.print(" = 0x");
         Serial.println(reading,HEX);
