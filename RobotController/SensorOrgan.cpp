@@ -13,12 +13,18 @@ VL53L0X::VL53L0X(uint8_t address) : I2CDevice(address){} // just call i2c device
 //Main Sensor organ Constructor
 SensorOrgan::SensorOrgan(uint8_t address) : Organ(address){
     // the VL53L0X is also an I2CDevice, and is always set to have the address one higher than the sensor organ Arduino
-    // The Arduino will hangle all the setup, init() and address change of the VL53L0X
+    // The Arduino will handle all the setup, init() and address change of the VL53L0X
     timeOfFlight = new VL53L0X(address+1);
+
+
+    // Tell arduino what the the IR threashold is.
+    // Only used for indicator LED, since the threasholding is done on the pi side - see readInfraredNormalised() method below.
+    // If you comment out this line, the indicator LED on the sensor will show a PWM value corresponding to the IR reading.
+    setInfraredThreashold(INFRARED_SENSOR_DEFAULT_THREASHOLD);
 }
 
 // Returns a range reading in millimeters. Continuous mode should already be active, as it is set by the Arduino at boot.
-// the registers used here were found from the Arduino library.
+// the registers used here were found from the Arduino VL53L0 library.
 uint16_t SensorOrgan::readTimeOfFlight() {
 	
 	uint16_t timeout_start_ms = millis();
@@ -47,17 +53,20 @@ float SensorOrgan::readTimeOfFlightNormalised(){
 }
 
 //Reads the infrared sensor
-uint16_t SensorOrgan::readInfrared() {
+uint8_t SensorOrgan::readInfrared() {
 	write8To(REQUEST_INFRARED_REGISTER,0x00);
-    uint8_t first_byte = read8();
-    uint8_t second_byte = read8();
-	return (first_byte<<8) | second_byte;
+    return read8();
 }
 
 // return the time of flight as a value between 0 and 1
 float SensorOrgan::readInfraredNormalised(){
-    if (this->readInfrared() >= INFRARED_SENSOR_THREASHOLD) { return 1.0; }
+    if (this->readInfrared() > infraredSensorThreashold) { return 1.0; }
     else {return 0.0;}
+}
+
+void SensorOrgan::setInfraredThreashold(uint8_t new_value){
+    infraredSensorThreashold = new_value;
+    write8To(SET_INFRARED_THREASHOLD_REGISTER , new_value);
 }
 
 //Reads the infrared sensor without any filtering etc

@@ -1,6 +1,6 @@
 /**
         @file SensorOrgan.hpp
-        @brief Class declaration for SensorOrgan and I2CSwitch.
+        @brief Class declaration for SensorOrgan
         @author Mike Angus
 */
 
@@ -8,7 +8,7 @@
 #define SENSORORGAN_HPP
 
 #define NORMALISE_TIME_OF_FLIGHT_MAX 1000.0 //the range of TOF sensor that coresponds to a "1" input to the neural network
-#define INFRARED_SENSOR_THREASHOLD 100 // values over this for the IR sensor will be a "1" input, below a "0"
+#define INFRARED_SENSOR_DEFAULT_THREASHOLD 100 // values over this for the IR sensor will be a "1" input, below a "0"
 
 #include "Organ.hpp"
 //#include "VL53L0X.h" // not needed, as the Arduino does the settup of the VL53L0X
@@ -17,12 +17,12 @@
 #include <bitset>
 
 //the registers, these must match those defined in the Arduino firmware
-#define REQUEST_TIME_OF_FLIGHT_REGISTER 0x01
 #define REQUEST_INFRARED_REGISTER 0x02
 #define FLASH_INDICATOR_LED_REGISTER 0x03
 #define SET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x04 // set the i2c address of the VL53L0X sensor
 #define GET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x05 // return what the arduino thinks is the i2c address of the VL53L0X sensor
 #define REQUEST_INFRARED_RAW_VALUE_REGISTER 0x06 // return the raw IR value, without the filtering
+#define SET_INFRARED_THREASHOLD_REGISTER 0x07 // set the threashold for the binary value for IR sensor
 
 #define TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS 5
 #define MAXIMUM_RANGE_VALUE 2000
@@ -55,8 +55,12 @@ class SensorOrgan  : public Organ {
 
         //Public variables
         SensorOrgan(uint8_t address);
-        uint16_t readInfrared();
+        OrganType organType = SENSOR;
+        uint8_t infraredSensorThreashold = INFRARED_SENSOR_DEFAULT_THREASHOLD;
+
+        uint8_t readInfrared();
         float readInfraredNormalised();
+        void setInfraredThreashold(uint8_t new_value);
         uint16_t readInfraredRaw();
         uint16_t readTimeOfFlight();
         float readTimeOfFlightNormalised();
@@ -64,7 +68,6 @@ class SensorOrgan  : public Organ {
         void flashIndicatorLED(uint8_t numberOfFlashes);
         void setTimOfFlightI2CAddress(uint8_t newAddress);
 
-        OrganType organType = SENSOR;
 
 	private:
         VL53L0X* timeOfFlight;
