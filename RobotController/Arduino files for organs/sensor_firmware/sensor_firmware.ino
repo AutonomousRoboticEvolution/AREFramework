@@ -11,16 +11,16 @@
  *  0x91: get the previously set test register value
  *  
  *  The IR reading returned is the calculated using the following process:
- *  (1) take a new sample every SAMPLE_PERIOS_US, untill you have taken BUFFER_SIZE samples.
+ *  (1) take a new sample every SAMPLE_PERIOD_US, untill you have taken BUFFER_SIZE samples.
  *  (2) Apply a window of WINDOW_SIZE to the samples, and for each window find the maximum minus minimum value to get an estimate for the peak-to-trough value
  *  (3) Since interference will (probably) only ever increase this peak-to-trough value, take the minimum peak-to-trough value found over the entire sample.
  *  
- *  SAMPLE_PERIOS_US value should be chosen such that the samples are taken several times faster than the beacon flashing frequency. 
- *  The overall time that samples are taken over (i.e. SAMPLE_PERIOS_US*BUFFER_SIZE) should be long enough to avoid the TOF interference covering the entire sample,
+ *  SAMPLE_PERIOD_US value should be chosen such that the samples are taken several times faster than the beacon flashing frequency. 
+ *  The overall time that samples are taken over (i.e. SAMPLE_PERIOD_US*BUFFER_SIZE) should be long enough to avoid the TOF interference covering the entire sample,
  *  but this period dictates the update rate of IR sensor values so it should not be too long.
  *  Additionally, if BUFFER_SIZE is too big, the Arduino may run out of memory (the buffer is this many 16-bit values).
- *  WINDOW_SIZE should be chosen with reference to SAMPLE_PERIOS_US and the beacon flashing frequency (600Hz) so that the window contains one complete waveform of the beacon signal
- *  e.g., if SAMPLE_PERIOS_US = 167 microseconds that gives a sampling frequency of 6000Hz, which is 10 times faster than the beacon so the WINDOW_SIZE should be 10
+ *  WINDOW_SIZE should be chosen with reference to SAMPLE_PERIOD_US and the beacon flashing frequency (600Hz) so that the window contains one complete waveform of the beacon signal
+ *  e.g., if SAMPLE_PERIOD_US = 167 microseconds that gives a sampling frequency of 6000Hz, which is 10 times faster than the beacon so the WINDOW_SIZE should be 10
  * 
  * Author: Mike Angus, Matt Hale
 */
@@ -32,10 +32,13 @@ VL53L0X timeOfFlightSensor;
 #define SLAVE_ADDRESS 0x30 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 // debugging flags:
-#define SERIAL_DEBUG_PRINTING
+//#define SERIAL_DEBUG_PRINTING
+//#define SERIAL_DEBUG_TOF_SETUP
+//#define SERIAL_DEBUG_PRINT_IR_READING_VALUE // prints the computed IR reading (after all filtering etc) every time it is computed (~3 times per second)
+//#define SERIAL_DEBUG_DETAILED_IR_VALUES // prints the entire sample of raw values, and pauses ~2 seconds between each reading. Don't leave this on!
+
 
 // define register addresses this slave device provides
-//#define REQUEST_TIME_OF_FLIGHT_REGISTER 0x01 // depricated
 #define REQUEST_INFRARED_REGISTER 0x02
 #define FLASH_INDICATOR_LED_REGISTER 0x03
 #define SET_TIME_OF_FLIGHT_ADDRESS_REGISTER 0x04 // set the i2c address of the VL53L0X sensor
@@ -51,9 +54,9 @@ VL53L0X timeOfFlightSensor;
 #define PIN_I2CENABLE 15
 
 // define sensor filtering parameters
-#define BUFFER_SIZE 200
-#define SAMPLE_PERIOS_US 167// 167 microseconds -> 6000Hz
-#define WINDOW_SIZE 10
+#define BUFFER_SIZE 200 //200
+#define SAMPLE_PERIOD_US 167// 167 microseconds -> 6000Hz
+#define WINDOW_SIZE 10 // make this the beacon 
 
 //define other constants
 #define LED_FLASH_HALF_TIMEPERIOD 500 // the time between the LED coming on and going off (and vice versa) when flashes are requested, in milliseconds
@@ -97,7 +100,8 @@ void setup() {
   digitalWrite(PIN_I2CENABLE, HIGH); // close i2c to outside world
 
   Serial.begin(115200); //formerly 2000000
-  Serial.println("Sensor Organ Reporting");
+  Serial.print("Sensor Organ Reporting; my i2c address is 0x");
+  Serial.println(SLAVE_ADDRESS,HEX);
   
   // start i2c comms
   Wire.begin(SLAVE_ADDRESS);
@@ -107,14 +111,23 @@ void setup() {
   
   // set up the time of flight sensor:
   timeOfFlightSensor.setTimeout(500);
-  #ifdef SERIAL_DEBUG_PRINTING
+  #ifdef SERIAL_DEBUG_TOF_SETUP
     Serial.println("Setting up timeOfFlightSensor");
   #endif
   if (!timeOfFlightSensor.init())
   {
-    #ifdef SERIAL_DEBUG_PRINTING
-      Serial.println("Failed to detect and initialize sensor!");
-    #endif
+    // try again, but this time assume that the TOF has alread had its address changed (e.g. after Arduino browns out, but TOF sensor has not):
+    timeOfFlightSensor.setAddress(SLAVE_ADDRESS+1);
+      if (!timeOfFlightSensor.init())
+      { // now I'm out of ideas
+        #ifdef SERIAL_DEBUG_TOF_SETUP
+          Serial.println("Failed to detect and initialize VL53L0X sensor!");
+        #endif
+      }else{
+        #ifdef SERIAL_DEBUG_TOF_SETUP
+          Serial.println("VL53L0X sensor already had its new adress at initialization (OK)");
+        #endif
+      }
   }
 
   // set to "long range":
@@ -122,17 +135,12 @@ void setup() {
   timeOfFlightSensor.setVcselPulsePeriod(VL53L0X::VcselPeriodPreRange, 18);// increase laser pulse periods (defaults are 14 and 10 PCLKs)
   timeOfFlightSensor.setVcselPulsePeriod(VL53L0X::VcselPeriodFinalRange, 14);
 
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.println("Starting timeOfFlightSensor");
-  #endif
   
-  timeOfFlightSensor.startContinuous();
+  timeOfFlightSensor.startContinuous(80); // the input here is the time between readings in milliseconds. Set smaller to get more up-to-date TOF values, set bigger to reduce interference with IR sensors.
   timeOfFlightSensor.setAddress(SLAVE_ADDRESS+1);
   digitalWrite(PIN_I2CENABLE, LOW); // open i2c to outside world
 
-  #ifdef SERIAL_DEBUG_PRINTING
-    Serial.println("Starting");
-  #endif
+  Serial.println("Starting");
   
 } // end of setup()
 
@@ -142,7 +150,6 @@ void loop() {
 
   getBeaconLevel(); // updates reading
 
-  // housekeeping:
   
   // is it time to turn the LED on or off?
   unsigned long time_now=millis();
