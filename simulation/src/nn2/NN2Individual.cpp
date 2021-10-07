@@ -33,6 +33,12 @@ void NN2Individual::createController(){
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
+    else if(nn_type == st::nnType::FCP){
+        control.reset(new NN2Control<fcp_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+    }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;

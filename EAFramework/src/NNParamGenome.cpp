@@ -154,6 +154,7 @@ void NNParamGenome::crossover(const Genome::Ptr &partner, Genome::Ptr child1, Ge
 
 std::string NNParamGenome::to_string() const{
     std::stringstream sstr;
+    sstr << nbr_input << " " << nbr_hidden << " " << nbr_output << std::endl;
     sstr << weights.size() << std::endl;
     sstr << biases.size() << std::endl;
     for(double w : weights)
@@ -164,13 +165,19 @@ std::string NNParamGenome::to_string() const{
 }
 
 void NNParamGenome::from_string(const std::string &gen_str){
-    std::vector<std::string> split_str;
-    boost::split(split_str,gen_str,boost::is_any_of("\n"));
-    int nbr_weights = std::stoi(split_str[0]);
-    int nbr_bias = std::stoi(split_str[1]);
+    std::vector<std::string> split_str,split_str2;
+    boost::split(split_str,gen_str,boost::is_any_of("\n"),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
+    boost::split(split_str2,split_str[0],boost::is_any_of(" "));
+
+    nbr_input = std::stoi(split_str2[0]);
+    nbr_hidden = std::stoi(split_str2[1]);
+    nbr_output = std::stoi(split_str2[2]);
+
+    int nbr_weights = std::stoi(split_str[1]);
+    int nbr_bias = std::stoi(split_str[2]);
 
     weights.clear();
-    for(int i = 2; i < nbr_weights+2; i++)
+    for(int i = 3; i < nbr_weights+3; i++)
         weights.push_back(std::stod(split_str[i]));
 
     biases.clear();
@@ -181,24 +188,14 @@ void NNParamGenome::from_string(const std::string &gen_str){
 void NNParamGenome::from_file(const std::string &filename){
     std::ifstream logFileStream;
     logFileStream.open(filename);
-    std::string line;
-    std::getline(logFileStream,line);
-    int nbr_weights = std::stoi(line);
-    std::getline(logFileStream,line);
-    int nbr_bias = std::stoi(line);
 
-    weights.clear();
-    for(int i = 0; i < nbr_weights; i++){
-        std::getline(logFileStream,line);
-        weights.push_back(std::stod(line));
-    }
+    std::string gen_str = "",line;
+    while(std::getline(logFileStream,line))
+        gen_str = gen_str + line + "\n";
 
-    biases.clear();
-    for(int i = 0; i < nbr_bias; i++){
-        std::getline(logFileStream,line);
-        biases.push_back(std::stod(line));
-    }
+    from_string(gen_str);
 }
+
 
 void NNParamGenomeLog::saveLog(EA::Ptr &ea)
 {

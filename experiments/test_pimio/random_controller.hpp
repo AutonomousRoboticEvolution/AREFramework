@@ -5,7 +5,7 @@
 #include <boost/algorithm/string.hpp>
 #include "ARE/EA.h"
 #include "ARE/Settings.h"
-#include "physicalER/pi/pi_individual.hpp"
+#include "physicalER/pi_individual.hpp"
 
 namespace are{
 
@@ -21,6 +21,9 @@ public:
     void init_pop();
     void init_next_pop() override;
     void load_data_for_update() override;
+
+private:
+    NNParamGenome::Ptr makeRandomController(int numberOfInputs, int numberOfOutputs);
 };
 
 }//are

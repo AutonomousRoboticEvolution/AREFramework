@@ -9,23 +9,25 @@
 
 
 //#include <cstdlib> //for abs() function
-#include "I2CDevice.hpp"
+#include "Organ.hpp"
+#include <iostream> // for cout debugging
 
-//Register subaddresses for DRV8830 chip
-#define TARGET_POSTIION_REGISTER 0x10
-#define JOINT_MODE_REGISTER 0X11
+//Register addresses
+#define SERVO_ENABLE_REGISTER 0X10
+#define TARGET_POSITION_REGISTER 0x11
 #define MEASURED_POSITION_REGISTER 0x12
+#define MEASURED_CURRENT_REGISTER 0x13
+#define CURRENT_LIMIT_REGISTER 0x14
+#define LED_BRIGHTNESS_REGISTER 0x15
 
-//the options for JOINT_MODE_REGISTER
-#define SERVO_OFF 0x00
-#define SERVO_ON 0x01
-
+#define SERVO_OFF 0
+#define SERVO_ON 1
 
 /**
 
 	Controller class for the arduino-pico based servo controller in the joint organ
 */
-class JointOrgan  : protected I2CDevice {
+class JointOrgan  : public Organ {
 	public :
 		//Public variables
 		//Vars for state and target position
@@ -42,10 +44,19 @@ class JointOrgan  : protected I2CDevice {
 		JointOrgan(uint8_t address);
 
 		/**
-			@brief Target angle setting method. Will automatically active the servo
-			@param target angle is an unsigned 8-bit integer, linearly spaced over the possible range of approximately 180 degrees.
+            @brief Target angle setting method. Will automatically activate the servo
+            @param target angle is a signed value in degrees
 		*/
-		void setTargetAngle(uint8_t newTarget);
+        void setTargetAngle(int8_t newTarget);
+
+        /**
+            @brief Set the current limit value
+            @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
+            
+            NOTE: Must have a delay between using this function and further writes to I2C
+			I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
+        */
+        void setCurrentLimit(uint8_t tensOfMilliamps);
 
 		/**
 			@brief Turn the servo off so it should turn freely (and draw no power)
@@ -62,10 +73,16 @@ class JointOrgan  : protected I2CDevice {
 			@brief Read the current angle of the servo.
 			@return
 		*/
+        int8_t readMeasuredAngle();
 
-        int16_t readMeasuredAngle();
-		uint8_t readTestRegister(); // undocumented test register
 
+        /**
+            @brief Read the current draw.
+            @return
+        */
+        int8_t readMeasuredCurrent();
+
+        OrganType organType = JOINT;
 
 };
 

@@ -6,149 +6,69 @@
 
 #include "SensorOrgan.hpp"
 
-//I2CSwitch functions
-//Constructor
-I2CSwitch::I2CSwitch(uint8_t address) : I2CDevice(address) {
-	//Just uses the I2CDevice constructor
-}
-//Opens the bus
-void I2CSwitch::enableChannel() {
-	//Write '1' to bit [0] of control register to enable channel
-	//Send to device (no subaddress; write8 inherited from I2CDevice)
-	write8(0x01);
-}
-//Closes the bus
-void I2CSwitch::disableChannel() {
-	//Write '0' to bit [0] of control register to disable channel
-	//Send to device (no subaddress; write8 inherited from I2CDevice)
-	write8(0x00);
+
+// Time of flight sensor (aka VL53L0X) constructor
+VL53L0X::VL53L0X(uint8_t address) : I2CDevice(address){} // just call i2c device constructor
+
+//Main Sensor organ Constructor
+SensorOrgan::SensorOrgan(uint8_t address) : Organ(address){
+    // the VL53L0X is also an I2CDevice, and is always set to have the address one higher than the sensor organ Arduino
+    // The Arduino will hangle all the setup, init() and address change of the VL53L0X
+    timeOfFlight = new VL53L0X(address+1);
 }
 
-//SensorOrgan functions
-//Constructor; must call all sensors' constructors in the initialiser list
-SensorOrgan::SensorOrgan(uint8_t switchAddress) 
-	//Initialiser list for member sensors
-	: i2cSwitch(switchAddress), 
-	proximity(VCNL4040_ADDRESS),
-	ambientLight(VCNL4040_ADDRESS),
-	adcModule(ADC_MUDULE),
-	color(COLORSENSOR_ADDRESS),
-	tof(TOF_ADDRESS)
-{
-
-	//Set member variable address
-	this->address = switchAddress;
-}
-
-//*****************************PROXIMITY SENSOR******************
-
-//Initialises the proximity sensor
-void SensorOrgan::initProximity() {
-	i2cSwitch.enableChannel();
-	proximity.init();
-	i2cSwitch.disableChannel();
-}
-
-//Reads the proximity sensor
-uint16_t SensorOrgan::readProximity() {
-	//Enable the channel, read sensor, then close channel
-	i2cSwitch.enableChannel();
-	int reading = proximity.read();
-	i2cSwitch.disableChannel();
-
-	return reading;
-}
-
-//*****************************AMBIENT LIGHT SENSOR******************
-//Initialises the sensor
-void SensorOrgan::initAmbientLight() {
-	i2cSwitch.enableChannel();
-	ambientLight.init();
-	i2cSwitch.disableChannel();
-}
-
-//Reads the ambient light value
-uint16_t SensorOrgan::readAmbientLight() {
-	i2cSwitch.enableChannel();
-	uint16_t reading = ambientLight.readAmbient();
-	i2cSwitch.disableChannel();
-	return reading;
-}
-
-//Reads the white value
-uint16_t SensorOrgan::readWhite() {
-	i2cSwitch.enableChannel();
-	uint16_t reading = ambientLight.readWhite();
-	i2cSwitch.disableChannel();
-	return reading;
-}
-
-//***************ADC**************************
-//Initialises the ADC
-void SensorOrgan :: ADCinit()
-{
-	i2cSwitch.enableChannel();
-	adcModule.init();
-	i2cSwitch.disableChannel();
-}
-//Reads the ADC data
-uint16_t SensorOrgan :: ADCdata()
-{
-	i2cSwitch.enableChannel();
-	uint16_t data = adcModule.ADCread();
-	i2cSwitch.disableChannel();
-	return data;
-}
-
-
-//************color sensor********************
-//Initialises the color sensor
-void SensorOrgan :: ColorSensorinit()
-{
-	i2cSwitch.enableChannel();
-	color.init();
-	i2cSwitch.disableChannel();
-}
-//Read the color sensor data
-uint16_t SensorOrgan :: read_color_channel(uint8_t ch)
-{
-	i2cSwitch.enableChannel();
-	uint16_t color_values = color.readcolor(ch);
-	i2cSwitch.disableChannel();
-	return color_values;
+// Returns a range reading in millimeters. Continuous mode should already be active, as it is set by the Arduino at boot.
+// the registers used here were found from the Arduino library.
+uint16_t SensorOrgan::readTimeOfFlight() {
 	
+	uint16_t timeout_start_ms = millis();
+	while ((timeOfFlight->read8From(VL53L0X_RESULT_INTERRUPT_STATUS) & 0x07) == 0) {
+		if (TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS > 0 && ((uint16_t)(millis() - timeout_start_ms) > TIMEOUT_WHEN_RANGEFINDING_MILLISECONDS)) {
+            std::cout<<"ERROR: Timeout attempting to read the time-of-flight sensor"<<std::endl;
+        	timeOfFlight->write8To(VL53L0X_SYSTEM_INTERRUPT_CLEAR, 0x01);
+            return VALUE_TO_RETURN_ON_TIMEOUT;
+		}
+	}
+    // did not timeout :)
+    usleep(100000);
+	uint16_t first_byte=timeOfFlight->read8From(VL53L0X_RESULT_RANGE_STATUS + 10);
+	uint16_t second_byte=timeOfFlight->read8();
+	uint16_t range = first_byte<<8 | second_byte;
+//    std::cout<<"raw range: "<<range<<std::endl;
+	timeOfFlight->write8To(VL53L0X_SYSTEM_INTERRUPT_CLEAR, 0x01);
+    if (range>MAXIMUM_RANGE_VALUE) return MAXIMUM_RANGE_VALUE;
+    else return range;
+
 }
 
-//***************TOF**************************
-//Initialises the TOF
-void SensorOrgan :: initTOF(int iChan, int bLongRange)
-{
-	i2cSwitch.enableChannel();
-	tof.init(iChan, bLongRange);
-	i2cSwitch.disableChannel();
-}
-//Reads the TOF data
-int SensorOrgan :: readDistanceTOF()
-{
-	i2cSwitch.enableChannel();
-	uint16_t data = tof.readDistance();
-	i2cSwitch.disableChannel();
-	return data;
+
+//Reads the infrared sensor
+uint16_t SensorOrgan::readInfrared() {
+	write8To(REQUEST_INFRARED_REGISTER,0x00);
+    uint8_t first_byte = read8();
+    uint8_t second_byte = read8();
+	return (first_byte<<8) | second_byte;
 }
 
-//Caliberate the proximity sensor
-float SensorOrgan::calibratedProximityReading()
-{
-    float out[21] = {0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95,100};
-    float index[21] = {400000, 8000, 4000, 2000, 1200, 900, 600, 500, 400, 300, 250, 210, 190, 170, 150, 130, 110, 100, 90, 80,0};
-    float reading = static_cast<float>(this->readProximity());
-    float calibrateReading = 0; // = this->readProximity();
-    for(int8_t i = 0; i < 21; i++){
-        if (reading > index[i]){
-            calibrateReading = out[i-1] + (reading-index[i-1])*(out[i]-out[i-1])/(index[i]-index[i-1]);
-            break;
-        }
-    }
-
-    return calibrateReading/1000.0f;
+//Reads the infrared sensor without any filtering etc
+uint16_t SensorOrgan::readInfraredRaw() {
+	write8To(REQUEST_INFRARED_RAW_VALUE_REGISTER,0x00);
+    uint8_t first_byte = read8();
+    uint8_t second_byte = read8();
+    //int getOrganI2CAddress(){ return getI2CAddress();}
+	return (first_byte<<8) | second_byte;
 }
+
+void SensorOrgan::flashIndicatorLED(uint8_t numberOfFlashes) {
+	write8To(FLASH_INDICATOR_LED_REGISTER,numberOfFlashes);
+}
+
+// tells the arduino to change the i2c address of the VL53L0X
+void SensorOrgan::setTimOfFlightI2CAddress(uint8_t newAddress){
+    write8To(SET_TIME_OF_FLIGHT_ADDRESS_REGISTER, newAddress);
+}
+
+uint16_t SensorOrgan::getTimeOfFlightI2CAddress(){
+    return read8From(GET_TIME_OF_FLIGHT_ADDRESS_REGISTER);
+}
+

@@ -6,7 +6,7 @@
 
 import numpy as np
 import math, time, serial
-from helperFunctions import debugPrint, makeTransform, connect2USB
+from helperFunctions import debugPrint, makeTransformInputFormatted, connect2USB, makeTransform
 from robotComponents import Organ, Cable
 
 
@@ -21,6 +21,7 @@ class AssemblyFixture:
         self.HOME_BETWEEN_EVERY_MOVE = configData [ "HOME_BETWEEN_EVERY_MOVE" ]
         self.COMMUNICATION_TIMEOUT = configData [ "TIMEOUT_SECONDS" ]
         self.CORE_ORGAN_ATTACHMENT_Z_OFFSET = configData [ "CORE_ORGAN_ATTACHMENT_Z_OFFSET" ]
+        self.CLEAR_Z_HEIGHT =  configData ["CLEAR_Z_HEIGHT"]
 
         # originNoRotation is the position, in the Base frame, when the angle is zero
         self.originNoRotation = np.matrix ( configData [ "ORIGIN" ] )
@@ -29,6 +30,7 @@ class AssemblyFixture:
         self.positionSteps = 0
         self.messageToSend = " "
         self.lastSerialMessageReceived = ''
+        self.isEnabled = False
 
         # tries different USB ports until connected
         self.arduino = connect2USB (configData [ "EXPECTED_STARTUP_MESSAGE" ])
@@ -36,7 +38,7 @@ class AssemblyFixture:
         # settings for arduino serial comms:
         self.arduino.write_timeout = 1
 
-        #startup - find home position for stepper
+        #startup - enable motor and find home position for stepper
         if configData [ "FIND_HOME_AT_STARTUP" ]:
             self.homeStepperMotor ()
 
@@ -44,46 +46,51 @@ class AssemblyFixture:
     # send the AF to a demanded angular position. This will also update the returned value of AF.currentPosition
     def setPosition ( self, positionDemandRadians ):
         debugPrint ( "AF: going to position: " + str ( positionDemandRadians ) ,messageVerbosity= 1)
+        if not self.isEnabled:
+            self.enableStepperMotor()
         if self.HOME_BETWEEN_EVERY_MOVE:
             self.homeStepperMotor()
         self.messageToSend = str ( math.degrees ( positionDemandRadians ) )
-        self.currentPosition = self.originNoRotation * makeTransform ( [ 0, 0, 0, 0, 0, positionDemandRadians ] )
-        self.updateSerial ()
+        self.currentPosition = self.originNoRotation * makeTransformInputFormatted ([0, 0, 0, 0, 0, positionDemandRadians])
+        self._updateSerial ()
 
     def turnElectromagnetsOn ( self ):
         debugPrint ( "AF: I've been told to turn on the electromagnets." )
         self.messageToSend = "h"  # hold (h) robot
-        self.updateSerial ()
+        self._updateSerial ()
 
     def turnElectromagnetsOff ( self ):
         debugPrint ( "AF: I've been told to turn off the electromagnets." )
         self.messageToSend = "r"  # release (r) robot
-        self.updateSerial ()
+        self._updateSerial ()
 
     def enableStepperMotor ( self ):
         debugPrint ( "AF: I've been told to enable stepper motor." )
         self.messageToSend = "e"  # enable (e) stepper motor
-        self.updateSerial ()
+        self._updateSerial ()
+        self.isEnabled = True
 
     def disableStepperMotor ( self ):
-        debugPrint ( "AF: I've been told to unable stepper motor." )
+        debugPrint ( "AF: I've been told to disable stepper motor." )
         self.messageToSend = "o"  # unable (o) stepper motor
-        self.updateSerial ()
+        self._updateSerial ()
+        self.isEnabled = False
 
     def homeStepperMotor ( self ):
-        debugPrint ( "AF: I've been told to find origin." )
-        self.enableStepperMotor()
+        debugPrint ( "AF: I've been told to find origin.")
+        if not self.isEnabled:
+            self.enableStepperMotor()
         time.sleep(1)
         self.messageToSend = "f"  # find (f) origin
-        self.updateSerial ()
+        self._updateSerial ()
 
     def resetMemory ( self ):
         debugPrint ( "AF: Reset memory." )
-        self.messageToSend = "m"  # find (f) origin
-        self.updateSerial ()
+        self.messageToSend = "m"
+        self._updateSerial ()
 
-    def updateSerial ( self ):
-        self.sendMessage ()
+    def _updateSerial (self):
+        self._sendMessage ()
         if self.WAIT_FOR_OK_REPLY:
             in_string = str ( self.arduino.readline () )
             startOfSerialMessageTime = time.time ()
@@ -92,10 +99,11 @@ class AssemblyFixture:
                 if time.time () - startOfSerialMessageTime > self.COMMUNICATION_TIMEOUT:
                     raise serial.SerialException ( "AF communication timeout" )
 
-    def sendMessage ( self ):
-        debugPrint ( "Sending message: " + self.messageToSend )
+    #lower level function - do not call this directly
+    def _sendMessage (self):
+        debugPrint ( "Sending message: " + self.messageToSend ,messageVerbosity=3 )
         self.arduino.write ( self.messageToSend.encode () )
-        debugPrint ( "Sent" )
+        debugPrint ( "Sent" ,messageVerbosity=3 )
 
 ## Object that deals with a "bank", i.e. the storage place for organs and/or cables before they are put into a robot.
 class Bank:
@@ -105,8 +113,21 @@ class Bank:
 
         ## Bank.organsList is a list of all the organs currently in the bank. When an organ is removed (to put into a robot) is should be deleted from this list.
         self.organsList = [ ]
-        for thisOrgansMockBlueprintRow in configData["ORGAN_CONTENTS"]:
-            self.organsList.append ( Organ(thisOrgansMockBlueprintRow , dictionaryOfAllOrganTypes ))
+        for thisOrganDataRow in configData["ORGAN_CONTENTS"]:
+            self.organsList.append ( Organ(
+                organType=thisOrganDataRow[0],
+                positionTransform=makeTransform(
+                    x=thisOrganDataRow[ 1 ],
+                    y=thisOrganDataRow [ 2 ],
+                    z=thisOrganDataRow [ 3 ],
+                    rotX=thisOrganDataRow [ 4 ],
+                    rotY=thisOrganDataRow [ 5 ],
+                    rotZ=thisOrganDataRow [ 6 ]
+                ),
+                i2cAddress=thisOrganDataRow[7],
+                dictionaryOfAllOrganTypes=dictionaryOfAllOrganTypes,
+                isInBankFlag = True
+            ))
 
         ## Bank.cablesList is a list of all the cable currently in the bank. When an cable is removed (to put into a robot) is should be deleted from this list.
         self.cablesList = [ ]

@@ -79,8 +79,6 @@ public:
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     bool isEvaluated(){return isEval;}
     void set_isEvaluated(bool b){isEval = b;}
-    const settings::Property::Ptr &get_properties(){return properties;}
-    void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
@@ -99,16 +97,14 @@ public:
 protected:
     std::vector<double> outputs;
     std::vector<double> objectives;
-    Genome::Ptr morphGenome;
-    Genome::Ptr ctrlGenome;
-    Morphology::Ptr morphology;
-    Control::Ptr control;
-    Learner::Ptr learner;
+    Genome::Ptr morphGenome = nullptr;
+    Genome::Ptr ctrlGenome = nullptr;
+    Morphology::Ptr morphology = nullptr;
+    Control::Ptr control = nullptr;
+    Learner::Ptr learner = nullptr;
 
-    settings::ParametersMapPtr parameters;
-    settings::Property::Ptr properties;
-
-    misc::RandNum::Ptr randNum;
+    settings::ParametersMapPtr parameters = nullptr;
+    misc::RandNum::Ptr randNum = nullptr;
 
     bool isEval;
 

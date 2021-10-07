@@ -175,6 +175,11 @@ T getParameter(const ParametersMap &params,const std::string& name)
     return *(cast<T>(params.at(name)));
 }
 
+//TODO: define a tostring and fromstring for the parameters
+
+std::string toString(const ParametersMap& params);
+ParametersMap fromString(const std::string& str_params);
+
 /**
  * @brief Load the parameters from a file. No need to call it explicitly. It is called at the start of the plugin, either in v_repExtER or in ERClient.
  * @param parameter file in csv format
