@@ -24,6 +24,7 @@ int cppn_params::cppn::nb_outputs = 6;
 
 float cppn_params::evo_float::mutation_rate = 0.1f;
 
+
 void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
     int generation = ea->get_generation();
 
@@ -72,3 +73,19 @@ void ParentingLog::saveLog(EA::Ptr &ea){
     logFileStream.close();
 }
 
+void GraphVizLog::saveLog(EA::Ptr &ea){
+    std::ofstream logFileStream;
+    for(size_t i = 0; i < ea->get_population().size(); i++){
+        std::stringstream filename;
+        filename << "cppn_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
+                        ea->get_population()[i]->get_morph_genome()
+                        )->id() << ".dot";
+        if(!openOLogFile(logFileStream, filename.str()))
+            return;
+        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(
+                             ea->get_population()[i]->get_morph_genome()
+                             )->get_cppn();
+        cppn.write(logFileStream);
+        logFileStream.close();
+    }
+}

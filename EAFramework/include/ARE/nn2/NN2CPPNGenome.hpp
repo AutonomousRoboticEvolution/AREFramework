@@ -152,6 +152,7 @@ private:
     CartDesc morph_desc;
 };
 
+
 class NN2CPPNGenomeLog : public Logging
 {
 public:
@@ -175,6 +176,16 @@ public:
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& log_file){}
 };
+
+class GraphVizLog : public Logging
+{
+public:
+    GraphVizLog() : Logging(true){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& log_file){}
+};
+
+
 
 }//are
 
