@@ -49,6 +49,7 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
 };
 
 void M_NIPESIndividual::createMorphology(){
+    individual_id = morphGenome->id();
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
@@ -445,10 +446,8 @@ void M_NIPES::clean_learning_pool(){
             elt_to_remove.push_back(i);
         i++;
     }
-
     for(const int& i : elt_to_remove)
         learning_pool.erase(learning_pool.begin() + i);
-
 }
 
 

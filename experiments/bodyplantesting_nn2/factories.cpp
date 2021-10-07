@@ -36,11 +36,8 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::ParentingLog::Ptr parlog(new are::ParentingLog(par_file));
     logs.push_back(parlog);
 
-
     are::GraphVizLog::Ptr gvlog(new are::GraphVizLog);
     logs.push_back(gvlog);
-
-
 
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));

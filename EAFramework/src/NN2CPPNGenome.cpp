@@ -85,7 +85,7 @@ void GraphVizLog::saveLog(EA::Ptr &ea){
         nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(
                              ea->get_population()[i]->get_morph_genome()
                              )->get_cppn();
-        cppn.write(logFileStream);
+        cppn.write_dot(logFileStream);
         logFileStream.close();
     }
 }
