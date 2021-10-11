@@ -27,6 +27,7 @@ add_library(M_NIPES SHARED
    factories.cpp
    M_NIPES.cpp 
    cmaes_learner.cpp
+        obstacleAvoidance.cpp
    MNIPESLoggings.cpp
    obstacleAvoidance.cpp
     )
