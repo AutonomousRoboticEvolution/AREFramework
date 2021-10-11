@@ -54,7 +54,7 @@ VL53L0X timeOfFlightSensor;
 #define PIN_I2CENABLE 15
 
 // define sensor filtering parameters
-#define BUFFER_SIZE 200 //200
+#define BUFFER_SIZE 400 //200
 #define SAMPLE_PERIOD_US 167// 167 microseconds -> 6000Hz
 #define WINDOW_SIZE 10 // make this the beacon 
 
