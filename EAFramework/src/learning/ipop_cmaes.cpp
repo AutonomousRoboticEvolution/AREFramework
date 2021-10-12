@@ -34,37 +34,37 @@ bool IPOPCMAStrategy::reach_ftarget(){
 }
 
 bool IPOPCMAStrategy::pop_desc_stagnation(){
-   std::vector<Eigen::VectorXd> descriptors;
-   for (const auto& ind: _pop){
-       Eigen::VectorXd desc;
-       misc::stdvect_to_eigenvect(ind.descriptor,desc);
-       descriptors.push_back(desc);
-   }
+    std::vector<Eigen::VectorXd> descriptors;
+    for (const auto& ind: _pop){
+        Eigen::VectorXd desc;
+        misc::stdvect_to_eigenvect(ind.descriptor,desc);
+        descriptors.push_back(desc);
+    }
 
-   Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
-   for(Eigen::VectorXd desc : descriptors){
-       mean += desc;
-   }
-   mean = mean/static_cast<double>(descriptors.size());
+    Eigen::VectorXd mean = Eigen::VectorXd::Zero(descriptors[0].rows());
+    for(Eigen::VectorXd desc : descriptors){
+        mean += desc;
+    }
+    mean = mean/static_cast<double>(descriptors.size());
 
-   Eigen::VectorXd stddev = Eigen::VectorXd::Zero(descriptors[0].rows());
-   for(Eigen::VectorXd desc : descriptors)
-       stddev += (desc - mean).cwiseProduct(desc - mean);
+    Eigen::VectorXd stddev = Eigen::VectorXd::Zero(descriptors[0].rows());
+    for(Eigen::VectorXd desc : descriptors)
+        stddev += (desc - mean).cwiseProduct(desc - mean);
 
-   for(int i = 0; i < stddev.rows(); i++)
-       stddev(i) = sqrt(stddev(i)/static_cast<double>(descriptors.size() - 1));
+    for(int i = 0; i < stddev.rows(); i++)
+        stddev(i) = sqrt(stddev(i)/static_cast<double>(descriptors.size() - 1));
 
-   bool stop = true;
-   for(int i = 0; i < stddev.rows(); i++)
-       stop = stop && stddev(i) <= pop_stag_thres;
+    bool stop = true;
+    for(int i = 0; i < stddev.rows(); i++)
+        stop = stop && stddev(i) <= pop_stag_thres;
 
-   if(stop){
-       std::stringstream sstr;
-       sstr << "Stopping : standard deviation of the descriptor population is smaller than " << pop_stag_thres << " : " << stddev;
-       log_stopping_criterias.push_back(sstr.str());
-       cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
-   }
-   return stop;
+    if(stop){
+        std::stringstream sstr;
+        sstr << "Stopping : standard deviation of the descriptor population is smaller than " << pop_stag_thres << " : " << stddev;
+        log_stopping_criterias.push_back(sstr.str());
+        cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+    }
+    return stop;
 }
 
 bool IPOPCMAStrategy::pop_fit_stagnation(){
