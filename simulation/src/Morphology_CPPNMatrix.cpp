@@ -129,7 +129,7 @@ void Morphology_CPPNMatrix::create()
             // Create organs
             for(auto & i : organList){
                 if(i.getOrganType() != 0)
-                    setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
+                    setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     if(i.getOrganType() == 1)
