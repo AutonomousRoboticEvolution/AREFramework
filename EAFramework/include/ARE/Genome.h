@@ -20,7 +20,7 @@ public:
     typedef Genome::Ptr (Factory)(int, misc::RandNum::Ptr);
 
     Genome(int id = 0) : _id(id){}
-    Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id);
+    Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id = 0);
     Genome(const Genome& gen) :
         parameters(gen.parameters),
         properties(gen.properties),

@@ -42,9 +42,6 @@ public :
     void from_string(const std::string &str);
 
     // Setters and getters
-    NEAT::NeuralNetwork getGenome(){return nn;}
-
-    std::vector<bool> getManRes(){return testRes;}
     void setGenome();
 
     void setManRes();

@@ -65,8 +65,8 @@ public:
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
     }
-    NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
-        Genome(rn,param){
+    NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id = 0) :
+        Genome(rn,param,id){
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";

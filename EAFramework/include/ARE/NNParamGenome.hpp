@@ -83,8 +83,8 @@ public:
 
 
     NNParamGenome() : Genome() {}
-    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param) :
-        Genome(rn,param){
+    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param, int id = 0) :
+        Genome(rn,param,id){
     }
     NNParamGenome(const NNParamGenome &ngen) :
         Genome(ngen), weights(ngen.weights), biases(ngen.biases),
