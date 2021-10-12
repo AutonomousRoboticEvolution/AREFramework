@@ -2,6 +2,7 @@
 #define NN2CONTROL_H
 
 #include "ARE/Control.h"
+#include "NN2Settings.hpp"
 #include <eigen3/Eigen/Core>
 
 #include <boost/random.hpp>
@@ -10,8 +11,18 @@
 #include "nn2/mlp.hpp"
 #include "nn2/elman.hpp"
 #include "nn2/rnn.hpp"
+#include "nn2/fcp.hpp"
+
 
 namespace are {
+namespace control{
+using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
+using connection_t = nn2::Connection<double>;
+}
+using ffnn_t = nn2::Mlp<control::neuron_t,control::connection_t>;
+using elman_t = nn2::Elman<control::neuron_t,control::connection_t>;
+using rnn_t = nn2::Rnn<control::neuron_t,control::connection_t>;
+using fcp_t = nn2::Fcp<control::neuron_t,control::connection_t>;
 
 template<class nn_t>
 class NN2Control : public Control
@@ -32,7 +43,6 @@ public:
     }
 
     std::vector<double> update(const std::vector<double> &sensorValues){
-        bool useInternalBias = settings::getParameter<settings::Boolean>(parameters,"#UseInternalBias").value;
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
         boost::mt19937 rng(randomNum->getSeed());
         std::vector<double> inputs = sensorValues;
@@ -77,6 +87,18 @@ public:
 
 };
 
+inline void get_nbr_weights_biases(int nbr_inputs,int nbr_outputs, int nbr_hiddens, int nn_type, int &nbr_weights, int &nbr_biases){
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+}
 
 }
 
