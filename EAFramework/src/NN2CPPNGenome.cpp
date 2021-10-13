@@ -8,11 +8,12 @@ int static_id = 0;
 
 bool cppn_params::cppn::_mutate_connections = true;
 bool cppn_params::cppn::_mutate_neurons = true;
-float cppn_params::cppn::_rate_add_neuron = 0.2f;
+float cppn_params::cppn::_rate_add_neuron = 0.05f;
 float cppn_params::cppn::_rate_del_neuron = 0.05f;
-float cppn_params::cppn::_rate_add_conn = 0.5f;
-float cppn_params::cppn::_rate_del_conn = 0.02f;
-float cppn_params::cppn::_rate_change_conn = 0.1f;
+float cppn_params::cppn::_rate_add_conn = 0.05f;
+float cppn_params::cppn::_rate_del_conn = 0.05f;
+float cppn_params::cppn::_rate_change_conn = 0.05f;
+float cppn_params::cppn::_rate_crossover = 0.2f;
 
 size_t cppn_params::cppn::_min_nb_neurons = 20;
 size_t cppn_params::cppn::_max_nb_neurons = 100;

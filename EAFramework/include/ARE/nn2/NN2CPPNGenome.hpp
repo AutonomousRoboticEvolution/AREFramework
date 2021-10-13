@@ -20,6 +20,7 @@ struct cppn_params{
         static float _rate_add_conn;
         static float _rate_del_conn;
         static float _rate_change_conn;
+        static float _rate_crossover;
 
         static size_t _min_nb_neurons;
         static size_t _max_nb_neurons;
@@ -97,8 +98,12 @@ public:
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
-        *child1 = NN2CPPNGenome(cppn);
-        *child2 = NN2CPPNGenome(std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn());
+        are::nn2_cppn_t cppn_child1, cppn_child2;
+        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
+        cppn.crossover(cppn_partner,cppn_child1);
+        cppn_partner.crossover(cppn,cppn_child2);
+        *child1 = NN2CPPNGenome(cppn_child1);
+        *child2 = NN2CPPNGenome(cppn_child2);
         child1->set_parameters(parameters);
         child2->set_parameters(parameters);
         child1->set_randNum(randomNum);
