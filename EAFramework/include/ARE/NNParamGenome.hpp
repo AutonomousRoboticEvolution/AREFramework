@@ -83,12 +83,13 @@ public:
 
 
     NNParamGenome() : Genome() {}
-    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param) :
-        Genome(rn,param){
+    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param, int id = 0) :
+        Genome(rn,param,id){
     }
     NNParamGenome(const NNParamGenome &ngen) :
         Genome(ngen), weights(ngen.weights), biases(ngen.biases),
-        nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),nbr_hidden(ngen.nbr_hidden){}
+        nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),
+        nbr_hidden(ngen.nbr_hidden), nn_type(ngen.nn_type){}
 
     Genome::Ptr clone() const override {
         return std::make_shared<NNParamGenome>(*this);
@@ -103,18 +104,20 @@ public:
 
 
     void set_weights(const std::vector<double>& w){weights = w;}
-    const std::vector<double>& get_weights(){return weights;}
+    const std::vector<double>& get_weights() const {return weights;}
 
     void set_biases(const std::vector<double>& b){biases = b;}
-    const std::vector<double>& get_biases(){return biases;}
+    const std::vector<double>& get_biases() const {return biases;}
 
     void set_nbr_input(int ni){nbr_input = ni;}
     void set_nbr_output(int no){nbr_output = no;}
     void set_nbr_hidden(int nh){nbr_hidden = nh;}
+    void set_nn_type(int nnt){nn_type = nnt;}
 
-    int get_nbr_input(){return nbr_input;}
-    int get_nbr_output(){return nbr_output;}
-    int get_nbr_hidden(){return nbr_hidden;}
+    int get_nbr_input() const {return nbr_input;}
+    int get_nbr_output() const {return nbr_output;}
+    int get_nbr_hidden() const {return nbr_hidden;}
+    int get_nn_type() const {return nn_type;}
 
     std::vector<double> get_full_genome(){
         std::vector<double> genome = weights;
@@ -152,6 +155,8 @@ public:
         arch & nbr_input;
         arch & nbr_output;
         arch & nbr_hidden;
+        arch & nn_type;
+
     }
 
 private:
@@ -160,6 +165,7 @@ private:
     int nbr_input;
     int nbr_output;
     int nbr_hidden;
+    int nn_type;
 };
 
 class NNParamGenomeLog : public Logging

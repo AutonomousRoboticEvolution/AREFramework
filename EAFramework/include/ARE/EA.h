@@ -26,7 +26,7 @@ public:
 
     EA(){}
     EA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
-    //no copyable object
+    //non copyable object
 //    EA(const EA& ea) :
 //        settings(ea.settings),
 //        randomNum(ea.randomNum),

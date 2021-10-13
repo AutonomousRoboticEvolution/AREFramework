@@ -16,8 +16,7 @@ Individual::~Individual(){
 }
 
 void Individual::crossover(const Individual::Ptr &partner, Individual &child1, Individual &child2){
-    child1 = *partner;
-    child2 = *this;
+    morphGenome->crossover(partner->get_morph_genome(),child1.get_morph_genome(),child2.get_morph_genome());
 }
 
 std::string Individual::to_string()

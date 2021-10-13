@@ -16,8 +16,8 @@ public:
     typedef std::shared_ptr<const CPPNGenome> ConstPtr;
 
     CPPNGenome() : Genome(){}
-    CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
-        Genome(rn,param){}
+    CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id = 0) :
+        Genome(rn,param,id){}
     CPPNGenome(const NEAT::Genome &neat_gen) : neat_genome(neat_gen){}
     CPPNGenome(const CPPNGenome &gen) :
         Genome(gen),neat_genome(gen.neat_genome){}
