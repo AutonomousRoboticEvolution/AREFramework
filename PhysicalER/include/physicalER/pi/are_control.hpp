@@ -6,6 +6,7 @@
 #include <iostream>
 #include <vector>
 #include "physicalER/pi_individual.hpp"
+#include "physicalER/pi_communication.hpp"
 #include "MotorOrgan.hpp"
 #include "JointOrgan.hpp"
 #include "SensorOrgan.hpp"
@@ -28,7 +29,7 @@ public:
 
 private:
     phy::NN2Individual controller;
-    float _max_eval_time ; // millieconds
+    u_int32_t _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
 
     std::vector<Organ*> listOfOrgans; // a list of (pointers to) all the organ objects
@@ -38,6 +39,8 @@ private:
 
     bool debugDisplayOnPi=false; // Don't change here, set by defining #debugDisplayOnPi,bool,1 in the paramters file. Determines whether to show show input/output values in terminal.
     bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
+
+    std::ostringstream logs_to_send;
 
     // private functions:
 

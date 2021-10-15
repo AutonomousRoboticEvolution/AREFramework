@@ -32,9 +32,12 @@ void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t
  */
 void receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply);
 
+void send_string_no_reply(const std::string &str_mess, zmq::socket_t &socket);
+void receive_string_no_reply(std::string &str_mess, zmq::socket_t &socket);
+
 
 bool send_order(OrderType order, zmq::socket_t& publisher);
-void wait_for_message(std::string& str_mess, zmq::socket_t& subscriber);
+void receive_string_no_reply(std::string& str_mess, zmq::socket_t& subscriber);
 
 }//phy
 

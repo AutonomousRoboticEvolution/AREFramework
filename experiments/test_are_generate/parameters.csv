@@ -6,6 +6,9 @@
 #seed,int,-1
 
 #populationSize,int,10
+#NNType,int,2
+#UseInternalBias,bool,1
+#noiseLevel,double,0
 
 #archiveAddingProbability,double,0.4
 #noveltyThreshold,double,0.9
@@ -25,3 +28,21 @@
 #folderToLoad,string,/home/robofab/are-logs/test_are_generate/waiting_to_be_built
 #genToLoad,int,14
 #indToLoad,int,9
+
+#robotID,string,14_9
+#maxEvalTime,float,2
+#debugLEDsOnPi,bool,0
+#debugDisplayOnPi,bool,0
+
+#cameraPipe,string,http://192.168.2.248/img/video.mjpeg
+#ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
+#fitnessFile,string,fitnesses.csv
+#timeStep,float,0.1
+#arenaSize,double,2
+
+
+#referencePtX,int,173
+#referencePtY,int,173
+#pixelImageScale,int,347
+#nbrWaypoints,int,100
+

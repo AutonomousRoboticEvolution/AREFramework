@@ -39,7 +39,6 @@ uint16_t SensorOrgan::readTimeOfFlight() {
 		}
 	}
     // did not timeout :)
-    usleep(100000);
 	uint16_t first_byte=timeOfFlight->read8From(VL53L0X_RESULT_RANGE_STATUS + 10);
 	uint16_t second_byte=timeOfFlight->read8();
 	uint16_t range = first_byte<<8 | second_byte;
