@@ -8,14 +8,18 @@
 
 #define SLAVE_ADDRESS 0x60 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
+//Libraries
 #include <Wire.h>
 
-// This code should interface with Mike's driver code, and so mimics the register(s) used by the i2c motor driver (DRV8830):
-#define DRV_CONTROL_REG_ADDR 0x00
-#define DRV_FAULT_REG_ADDR 0x01 // not (yet?) implemented
-
+// i2c register addresses:
+#define DRV_CONTROL_REG_ADDR 0x00 // Mimics the DRV_CONTROL_REG register used by the i2c motor driver DRV8830, for historic reasons:
+//#define DRV_FAULT_REG_ADDR 0x01 // not implemented
 #define SET_TEST_VALUE_REGISTER 0x90 // save a given value
 #define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
+#define GET_MEASURED_VELOCITY_REGISTER 0x12
+#define GET_MEASURED_CURRENT_REGISTER 0x13
+#define SET_CURRENT_LIMIT_REGISTER 0x14
+
 
 // states defined by the 0th and 1st bits of a command signal
 #define STANDBY 0x0
@@ -35,38 +39,18 @@
 #define PIN_I2CENABLE 15
 #define PIN_INDICATOR_LED 9
 #define PIN_MOTOR_ENABLE 14
+#define SETI_PIN 6 //Current measurement
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of programmable resistor. Wire library uses 7 bit addressing throughout
 #define MIN_CURRENT_MA 45 //milliamps
 #define MAX_CURRENT_MA 990 //milliamps
 #define DEFAULT_CURRENT_LIMIT MAX_CURRENT_MA
+#define MAX_SETI_ANALOG_READING 950 //For reading the instantaneous current, determined by ADC reference voltage AREF, set by onboard resistor
 
 // define controller settings:
 #define LOOP_TIME_US 10000 // will set the controller update frequency; 10,000us -> 100Hz
 
-//Slew rate limiting parameter
-//Total output range is -255 to +255 (510 total), so e.g. a value of 10 here would take 51 timesteps to do a maximum end-end swing
-//For a loop time of 10ms this example would be 510ms
-//A rate of 125 of more is too fast (motor cuts out). 100 appears to be ok but is probably borderline.
-#define MAX_OUTPUT_SLEW_RATE 50 //Motor power demand output cannot change by more than this per timestep.
-
-int last_output_power = 0; //store last demanded power from motor for slew rate control
-
-// flags and global variables:
-bool is_enabled = false;
-bool new_control_register_value_received_flag = false;
-uint8_t raw_input_for_control_register;
-int motor_power;
-unsigned long loop_target_end_time;
-int motor_state; //will be either STANDBY, REVERSE, FORWARD or BRAKE defined above
-int demand_velocity;
-uint8_t input_buffer[2];
-float integral_value;
-int current_limit_in_milliamps;
-
-uint8_t test_register_value = 0;
-bool test_resgister_is_requested = false;
 
 // encoder global variables
 volatile int encoder_ticks_this_timestep;
@@ -77,13 +61,36 @@ volatile unsigned long time_of_last_but_one_tick=0;
 volatile int last_tick_direction = 0;
 float measured_velocity_ticks_per_timestep;
 
+// flags for updating settings
+volatile bool new_control_register_value_received_flag = false;
+volatile bool update_target_position_flag = false;
+volatile bool update_current_limit_flag = false;
+
+//I2C comms
+volatile uint8_t input_buffer[2];
+volatile uint8_t send_buffer;
+
+// global variables:
+bool is_enabled = false;
+uint8_t raw_input_for_control_register;
+uint8_t current_limit_setting;
+uint8_t measured_current;
+int motor_power;
+unsigned long loop_target_end_time;
+int motor_state; //will be either STANDBY, REVERSE, FORWARD or BRAKE defined above
+int demand_velocity;
+float integral_value;
+int current_limit_in_milliamps;
+int last_output_power = 0; //store last demanded power from motor for slew rate control
+uint8_t test_register_value = 0;
+
 #ifdef STEP_INPUT_TEST
-// data logging for step input test
-#define N_POINTS_TO_LOG 50
-int8_t data_log[N_POINTS_TO_LOG-1];
-int8_t data_log_inputs[N_POINTS_TO_LOG-1];
-bool logging_running=false;
-unsigned int i=0;
+  // data logging for step input test
+  #define N_POINTS_TO_LOG 50
+  int8_t data_log[N_POINTS_TO_LOG-1];
+  int8_t data_log_inputs[N_POINTS_TO_LOG-1];
+  bool logging_running=false;
+  unsigned int i=0;
 #endif
 
 
@@ -169,7 +176,16 @@ void loop(){
         loop_target_end_time = time_now+ LOOP_TIME_US;
     }
     measured_velocity_ticks_per_timestep = get_measured_velocity_from_encoder(); // this should happen as soon as possible after the delay
-
+  
+  // update measured current
+  measured_current = readMotorCurrent();
+  
+  // check for updated current limit:
+  if (update_current_limit_flag) {
+    setCurrentLimit(current_limit_setting);
+    update_current_limit_flag = false;
+  }
+  
   // check for new demand value:
   if(new_control_register_value_received_flag){
     new_control_register_value_received_flag=false;
@@ -178,7 +194,7 @@ void loop(){
     #endif
     interpret_control_register_value();
   }
-
+  
   int raw_motor_power_value;
   // depending on motor_state, decide what to do:
   if (motor_state == STANDBY){set_motor_power_value(0);}
@@ -209,48 +225,6 @@ void loop(){
         }
     #endif
 }
-
-// interrupt service routines - these are called when the encoder ticks:
-void A_rises(){
-    encoder_A_is_high=true;
-    if (encoder_B_is_high){increment_positive();}
-    else {increment_negative();}
-    attachInterrupt(PIN_ENCODER_A, A_falls, FALLING); // start waiting for the other ISR - only one can be active on any particular pin at a time
-}
-void A_falls(){
-    encoder_A_is_high=false;
-    if (encoder_B_is_high){increment_negative();}
-    else {increment_positive();}
-    attachInterrupt(PIN_ENCODER_A, A_rises, RISING); // start waiting for the other ISR - only one can be active on any particular pin at a time
-}
-void B_rises(){
-    encoder_B_is_high=true;
-    if (encoder_A_is_high){increment_negative();}
-    else {increment_positive();}
-    attachInterrupt(PIN_ENCODER_B, B_falls, FALLING); // start waiting for the other ISR - only one can be active on any particular pin at a time
-}
-void B_falls(){
-    encoder_B_is_high=false;
-    if (encoder_A_is_high){encoder_ticks_this_timestep ++;}
-    else {encoder_ticks_this_timestep --;}
-    attachInterrupt(PIN_ENCODER_B, B_rises, RISING); // start waiting for the other ISR - only one can be active on any particular pin at a time
-}
-
-
-// helper functions for incrementing/decrementing the encoder tracking:
-void increment_positive(){
-    last_tick_direction=1;
-    encoder_ticks_this_timestep ++;
-    time_of_last_but_one_tick = time_of_last_tick;
-    time_of_last_tick=micros();
-}
-void increment_negative(){
-    last_tick_direction=-1;
-    encoder_ticks_this_timestep --;
-    time_of_last_but_one_tick = time_of_last_tick;
-    time_of_last_tick=micros();
-}
-
 
 
 // from the raw 8-bit input value, extract the motor state and demand velocity values
@@ -320,9 +294,21 @@ void receiveData(int received_data_byte_count){
       break;
     
     case GET_TEST_VALUE_REGISTER:
-      test_resgister_is_requested = true;
+      send_buffer=test_register_value;
       break;
-  
+    
+    case SET_CURRENT_LIMIT_REGISTER:
+      current_limit_setting = input_buffer[1];
+      update_current_limit_flag=true;
+      break;
+    
+    case GET_MEASURED_CURRENT_REGISTER:
+      send_buffer=measured_current;
+      break;
+      
+    case GET_MEASURED_VELOCITY_REGISTER:
+      send_buffer=encoder_ticks_this_timestep;
+    
     default:
       #ifdef SERIAL_DEBUG_PRINTING
         Serial.print("Attempt to access unknown register: 0x");
@@ -334,134 +320,7 @@ void receiveData(int received_data_byte_count){
 
 // gets called whenever master wants to read a register:
 void sendData(){
-  if (test_resgister_is_requested){
-    test_resgister_is_requested=false;
-    Wire.write(test_register_value);
-    #ifdef SERIAL_DEBUG_PRINTING
-      Serial.print("test register value us requested, sent: 0x");
-      Serial.print(test_register_value,HEX);
-      Serial.print("\t= ");
-      Serial.println(test_register_value);
-    #endif
-    
-  }else{
-    #ifdef SERIAL_DEBUG_PRINTING
-      Serial.println("ERROR! in sendData, but no request flag is true");
-    #endif
-  }
-}
- 
-
-int get_measured_velocity_from_encoder(){
-    int temp_value = encoder_ticks_this_timestep;
-    encoder_ticks_this_timestep=encoder_ticks_this_timestep-temp_value;
-    return temp_value;
-}
-
-
-// controller parameters
-#define K_P 10.0
-#define K_I 0.5
-#define MAX_INTEGRAL_VALUE 150 // for anti-windup, the integral term will never have magnitude greater than this
-int sign(int number){
-    if (number==0){return 0;}
-    else if (number<0){return -1;}
-    else{ return 1;}
-}
-
-// will return the raw motor power value, in the range -255 to +255
-// both demand_velocity and measured_velocity are measured in ticks-per-timestep.
-int controller( int demand_velocity, int measured_velocity ){
-    // open-loop controller
-    float controller_value;    
-    controller_value = FF_controller(demand_velocity);
-
-    // compute new integral_value
-    integral_value += K_I* (demand_velocity-measured_velocity);
-    integral_value = constrain(integral_value,-MAX_INTEGRAL_VALUE,MAX_INTEGRAL_VALUE);
-
-    // add on proportional and integral components:
-    controller_value += K_P*(demand_velocity-measured_velocity) + integral_value;
-
-    if (abs(controller_value)>255){return sign(controller_value)*255;}
-    else {return int(controller_value);}
-}
-
-// will return the raw motor power value, in the range -255 to +255, using only the a lookup table to make a feedforward controller
-float FF_controller(int demand_velocity){
-int table[][2] = {{0, 0}, {40,8}, {80,23}, {120,29}, {240,35}};
-int x0, x1, y0, y1;
-for (int i = 0; i < 5; i++){ // loop through each of the "brackets" of the table
-  if ( abs(demand_velocity) <= table[i + 1][1]){ // we are in the right bracket
-    y0 = table[i][1];  //lower bound
-      y1 = table[i + 1][1]; //upper bound
-      x0 = table[i][0];
-      x1 = table[i + 1][0];
-      return sign(demand_velocity) * float(table[i][0] + ((table[i + 1][0] - table[i][0] ) * (float(abs(demand_velocity) - table[i][1]) / float(table[i + 1][1] - table[i][1])))); // linear interpolation
-      //                                  (x0          + ((x1              - x0          ) * (     (y                    - y0         ) /      (y1              - y0         ))));
-    }
-  }
-  // if we get here, demand must be greater than highest table value, so return max power
-  return sign(demand_velocity) * 240;
-}
-
-void set_motor_power_value(int target_power){
-
-    //Check the magnitude of the demanded change in output
-    int change_magnitude = absDiff(target_power, last_output_power);
-    int output_power_set;
-
-    //If target value is too far from previous value, constrain the magnitude of the change to restrict the slew rate
-    if (change_magnitude > MAX_OUTPUT_SLEW_RATE) {
-        //Add (or subtract, for negative the maximum increment from the last output power if demanded slew rate is too fast
-        output_power_set = (target_power > last_output_power) ? (last_output_power + MAX_OUTPUT_SLEW_RATE) : (last_output_power - MAX_OUTPUT_SLEW_RATE);
-    } else {
-        //Otherwise can go straight to the full target power
-        output_power_set = target_power;
-    }
-
-    //Set the motor output to the target value
-    if (output_power_set<0){
-        // negative
-        digitalWrite(PIN_MOTOR_DIR_PIN,LOW);
-        analogWrite(PIN_MOTOR_PWM_PIN,-output_power_set);
-    }
-    else if (output_power_set>0){
-        // positive
-        digitalWrite(PIN_MOTOR_DIR_PIN,HIGH);
-        analogWrite(PIN_MOTOR_PWM_PIN,output_power_set);
-    } else { //zero
-        digitalWrite(PIN_MOTOR_PWM_PIN,0);
-    }
-
-    //Update the global variable for the last output value
-    last_output_power = output_power_set;
-
-    //Display power on indicator LED
-    #ifdef INDICATOR_LED_SHOW_MOTOR_POWER
-        analogWrite(PIN_INDICATOR_LED, abs(output_power_set));
-    #endif
-}
-
-/*
-    absDiff
-    @brief Finds the absolute difference between two signed integers
-    @param val1 The first integer
-    @param val2 The second integer
-    @return The magnitude of the difference between the two integers
-*/
-int absDiff(int val1, int val2) {
-    //If val1 is greater than val2 (or equal)
-    //Both positive: v1-v2 = +ve
-    //Both negative but val1 smaller: v1-v2 = +ve
-    //Val1 positive and val2 negative: v1-v2 = +ve
-    if (val1 >= val2) {
-        return val1-val2;
-    } else {
-        //If val2 is greater than val1
-        //Same three possibilities as above, all give +ve results
-        return val2-val1;
-    }
+  Wire.write(send_buffer);
 }
 
 /*
@@ -534,4 +393,29 @@ void setCurrentLimit (uint8_t tens_of_milliamps) {
   Serial.print(current_limit_mA);
   Serial.println("mA");
   }
+}
+
+/*
+  readMotorCurrent
+  @brief Returns the instantaneous current draw of the motor.
+  @return Current in milliamps (mA)
+*/
+int readMotorCurrent() {
+  //Get analog reading from filtered SETI pin on current limiter chip
+  //This will be a value from 0 to MAX_SETI_ANALOG_READING
+  //Represents the proportion of the set current limit which is being used
+  int seti_reading = analogRead(SETI_PIN);
+
+  //Calculate value in milliamps and return it
+  float proportion_of_max = (float)seti_reading/MAX_SETI_ANALOG_READING;
+  int current_reading = (proportion_of_max * current_limit_in_milliamps);
+
+  //Debug info
+  if (DEBUG) {
+    Serial.print("Servo current: ");
+    Serial.print(current_reading, DEC);
+    Serial.println("mA");
+  }
+
+ return current_reading;
 }

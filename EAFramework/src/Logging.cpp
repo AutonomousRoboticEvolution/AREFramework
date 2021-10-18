@@ -38,6 +38,11 @@ void are::Logging::create_folder(const std::string &name){
         boost::filesystem::create_directory(name);
 }
 
+void are::Logging::saveStringToFile(std::string fileName, std::string data){
+    std::ofstream out(log_folder + "/" + fileName+".txt");
+    out << data;
+    out.close();
+}
 
 bool are::Logging::openOLogFile(std::ofstream &logFileStream){
     logFileStream.open(Logging::log_folder + std::string("/")  + logFile, std::ios::out | std::ios::ate | std::ios::app);
@@ -119,3 +124,4 @@ void are::EvalTimeLog::saveLog(EA::Ptr &ea){
 
     logFileStream.close();
 }
+

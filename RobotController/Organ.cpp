@@ -1,4 +1,6 @@
 #include "Organ.hpp"
+#include <stdio.h>
+#include <iostream>
 
 Organ::Organ(uint8_t address) : I2CDevice(address){
     //Just uses the I2CDevice constructor

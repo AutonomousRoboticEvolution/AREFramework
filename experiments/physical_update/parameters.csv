@@ -13,6 +13,8 @@
 #cameraHeight,double,200
 
 #maxEvalTime,float,50
+#timeStep,float,0.1
+#debugDisplayOnPi,bool,1
 #arenaSize,double,2
 
 #robotID,string,14_9
