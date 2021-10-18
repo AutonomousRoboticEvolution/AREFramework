@@ -39,7 +39,12 @@ void are::Logging::create_folder(const std::string &name){
 }
 
 void are::Logging::saveStringToFile(std::string fileName, std::string data){
-    std::ofstream out(log_folder + "/" + fileName+".txt");
+    std::ofstream out(log_folder + "/" + fileName);
+    if(!out)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + fileName << std::endl;
+        return;
+    }
     out << data;
     out.close();
 }
