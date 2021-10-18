@@ -204,7 +204,7 @@ bool ER::stop_evaluation(){
         nbrEval = 0;
     }
     ea->set_endEvalTime(hr_clock::now());
-    save_logs(false);
+        write_data();
 
 
     if(currentIndIndex >= ea->get_population().size())
@@ -220,11 +220,4 @@ bool ER::stop_evaluation(){
     return true;
 }
 
-void ER::save_logs(bool endOfGen)
-{
-    for(const auto &log : logs){
-        if(log->isEndOfGen() == endOfGen){
-            log->saveLog(ea);
-        }
-    }
-}
+

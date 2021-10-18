@@ -2,6 +2,7 @@
 #define CROSSBREEDING_HPP
 
 #include "EcosystemManager/hybrid_parent_pool.hpp"
+#include "ARE/Logging.h"
 
 namespace are {
 

@@ -71,9 +71,16 @@ target_include_directories(nn2_cppn_serial_to_dot PUBLIC
     "include" "/usr/include/eigen3" "../modules")
 target_link_libraries(nn2_cppn_serial_to_dot ARE ${Boost_LIBRARIES})
 
+#add_executable(cppns_similarity_comparison tools/cppns_similarity_comparison.cpp)
+#target_include_directories(cppns_similarity_comparison PUBLIC
+#    "include" "/usr/include/eigen3" "../modules")
+#target_link_libraries(cppns_similarity_comparison ARE ${Boost_LIBRARIES})
+
 install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
 install(TARGETS ARE DESTINATION lib)
 install(DIRECTORY . DESTINATION include/ARE FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+
+
 
 # tool to help remove the warnings when using GCC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")

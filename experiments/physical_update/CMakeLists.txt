@@ -17,7 +17,7 @@ set(INCLUDES
 
 add_library(physical_update SHARED 
    factories.cpp
-   realMaze.cpp
+   ../common/realMaze.cpp
    random_controller.cpp
     )
 

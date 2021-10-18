@@ -2,17 +2,18 @@
 
 void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt){
 
-    cv::Rect rect(240,70,346,346);
-    cv::Mat croppedRef(image,rect);
-    cv::Mat cropped;
-    croppedRef.copyTo(cropped);
+//    cv::Rect rect(240,70,346,346);
+//    cv::Mat croppedRef(image,rect);
+//    cv::Mat cropped;
+//    croppedRef.copyTo(cropped);
+
     cv::Mat hsv;
-    cv::cvtColor(cropped,hsv,cv::COLOR_BGR2HSV);
+    cv::cvtColor(image,hsv,cv::COLOR_BGR2HSV);
     cv::Mat mask;
     cv::inRange(hsv,colorMin,colorMax,mask);
 
     cv::Mat masked_image;
-    cv::bitwise_and(cropped,cropped,masked_image,mask);
+    cv::bitwise_and(image,image,masked_image,mask);
     cv::SimpleBlobDetector::Params params = cv::SimpleBlobDetector::Params();
     params.thresholdStep = 255;
     params.minRepeatability = 1;
@@ -35,25 +36,24 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
                 max_size = kp.size;
             }
         }
-        cv::Mat kp_image;
-        cv::drawKeypoints(mask,{keyPt},kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS); // just the main keypoint
-        cv::imshow("Blob",kp_image);
-        cv::waitKey(1);
+//        cv::Mat kp_image;
+//        cv::drawKeypoints(mask,{keyPt},kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS); // just the main keypoint
+//        cv::imshow("Blob",kp_image);
 
         std::cout<< keyPt.pt.x <<","<< keyPt.pt.y ; // main keypoint first
-        for(const cv::KeyPoint& kp : key_pts){ std::cout<<","<< kp.pt.x <<","<< kp.pt.y ;} // all the keypoints (in case the wrong one is picked up)
+//        for(const cv::KeyPoint& kp : key_pts){ std::cout<<","<< kp.pt.x <<","<< kp.pt.y ;} // all the keypoints (in case the wrong one is picked up)
         std::cout<<std::endl;
     }else{
         std::cout<< -999 <<","<< -999 <<std::endl; // no keypoints found
     }
 
 
-
     cv::Mat kp_image;
     cv::drawKeypoints(mask,key_pts,kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     cv::imshow("Blob",kp_image);
-    cv::imshow("frame", cropped);
-
+    cv::imshow("mask",masked_image);
+    cv::imshow("frame", image);
+    cv::waitKey(1);
 
 }
 

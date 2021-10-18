@@ -18,8 +18,8 @@ if is_picamera:
     camera.framerate = 32
     rawCapture = picamera.array.PiRGBArray(camera, size=camera.resolution)
 else:
-    
-    rawCapture = cv2.VideoCapture('http://192.168.2.248/img/video.mjpeg')
+    #rawCapture = cv2.VideoCapture("v4l2src device=/dev/video2 ! videoconvert ! appsink")
+    rawCapture = cv2.VideoCapture('tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink')
 
 # Allow the camera time to warm up
 time.sleep(0.1)

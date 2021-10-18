@@ -13,13 +13,13 @@ target_include_directories(AREImageProc PUBLIC
     "../EAFramework/include")
 target_link_libraries(AREImageProc ${OpenCV_LIBRARIES})
 
-add_executable(test_blob_tracking src/test_blob_tracking.cpp)
+add_executable(test_blob_tracking src/test_blob_tracking.cpp src/blob_tracking.cpp)
 target_include_directories(test_blob_tracking PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     "include"
     "../EAFramework/include/"
     )
-target_link_libraries(test_blob_tracking  AREImageProc ARE ${OpenCV_LIBRARIES})
+target_link_libraries(test_blob_tracking ARE ${OpenCV_LIBRARIES})
 
 
 install(TARGETS AREImageProc DESTINATION lib)

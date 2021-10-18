@@ -21,9 +21,10 @@ int main(int argc, char** argv)
     ifs.close();
     are::nn2_cppn_t cppn = cppn_gen.get_cppn();
     int i = 0;
-    BGL_FORALL_VERTICES_T(v, cppn.get_graph(), are::nn2_cppn_t::graph_t)
+    BGL_FORALL_VERTICES_T(v, cppn.get_graph(), are::nn2_cppn_t::graph_t){
                 cppn.get_graph()[v]._id = boost::lexical_cast<std::string>(i++);
-
+                std::cout << cppn.get_graph()[v]._id << " has a degree of " << degree(v,cppn.get_graph()) << std::endl;
+    }
 
     std::ofstream ofs(std::string(argv[1]) + std::string(".dot"));
     if(!ofs)

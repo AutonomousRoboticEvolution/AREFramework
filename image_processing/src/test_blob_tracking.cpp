@@ -25,8 +25,8 @@ int main(int argc, char** argv){
     video_capture = cv::VideoCapture(pipe);
 
 
-    colour_range.first = cv::Scalar(0,133,71);
-    colour_range.second = cv::Scalar(11,255,188);
+    colour_range.first = cv::Scalar(28,162,115);
+    colour_range.second = cv::Scalar(179,255,255);
 
     are::settings::ParametersMapPtr parameters(new are::settings::ParametersMap);
     parameters->emplace("#referencePtX",new are::settings::Integer(std::stoi(argv[2])));
@@ -54,6 +54,7 @@ int main(int argc, char** argv){
         }else{
             video_capture.read(image);
         }
+
 
         if (image.empty()) {
             std::cerr << "ERROR! the frame is empty\n";

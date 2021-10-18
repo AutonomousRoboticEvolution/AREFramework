@@ -2,7 +2,6 @@
 
 directory=$(dirname $(readlink -f $0))
 
-
 if [ $1 == 'generate' ]
 then
 	mv -f $directory/libsimExtER.so $directory/libsimExtER.old
@@ -17,6 +16,5 @@ else
 	echo "Error: first argument as to be generate or simulation"
 	exit 1
 fi
-
 
 $directory/coppeliaSim.sh "${@#* }"
