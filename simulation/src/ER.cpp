@@ -85,6 +85,12 @@ void ER::initIndividual(){
           currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
+
+    if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
+        std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
+        Logging::create_folder(image_repo);
+        robotScreenshot(currentInd->get_individual_id(),currentInd->get_generation(),image_repo);
+    }
 }
 
 void ER::handleSimulation()

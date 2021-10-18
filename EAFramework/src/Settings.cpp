@@ -8,7 +8,6 @@ settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<set
                 parameters.emplace("#experimentName",new settings::String("neuroEvolution"));
                 parameters.emplace("#expPluginName",new settings::String("/usr/local/lib/libneuroEvolution.so"));
                 parameters.emplace("#scenePath",new settings::String("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt"));
-                parameters.emplace("#robotPath",new settings::String("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE-puck.ttm"));
                 parameters.emplace("#repository",new settings::String("~/are-logs"));
                 parameters.emplace("#populationSize",new settings::Integer(50));
                 parameters.emplace("#maxEvalTime",new settings::Float(60));

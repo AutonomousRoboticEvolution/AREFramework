@@ -8,11 +8,11 @@ void PMEIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
-    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getNEATCPPN();
     morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
