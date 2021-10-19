@@ -4,7 +4,8 @@
 
 using namespace are::sim;
 // make a local copy of mazeEnv.cpp in the morphneuro experiments and leave the old one
-// (remove function load_target_positions (line 168-183) and line 102-107) unchanged
+// (remove function load_target_positions (line 168-183) and line 102-107) unchanged  
+//  mv .h, .c to morphneuro/ and remove these lines
 MazeEnv::MazeEnv()
 {
     target_position.resize(3);

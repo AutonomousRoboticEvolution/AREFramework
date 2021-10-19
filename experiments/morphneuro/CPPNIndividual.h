@@ -7,7 +7,7 @@
 #include "v_repLib.h"
 #include "eigen_boost_serialization.hpp"
 #include "NNControl.h"
-#include "simulatedER/mazeEnv.h"
+#include "mazeEnv.h"
 
 namespace are {
 
@@ -81,6 +81,7 @@ namespace are {
     protected:
         void createController() override;
         void createMorphology() override;
+        void createSubstrate();
 
         NEAT::NeuralNetwork nn_morph;
         NEAT::NeuralNetwork nn_contrl;
@@ -91,7 +92,7 @@ namespace are {
         std::vector<std::vector<float>> rawMat;
         std::vector<std::vector<float>> protoPhenotype;
         std::vector<double> final_position;
-
+        NEAT::Substrate substrate;
     };
 
 }//are

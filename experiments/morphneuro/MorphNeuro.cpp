@@ -2,7 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include "simulatedER/mazeEnv.h"
+#include "mazeEnv.h"
 #include "v_repLib.h"
 
 using namespace are;

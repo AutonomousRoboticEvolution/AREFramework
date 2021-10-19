@@ -269,7 +269,7 @@ void Morphology_CPPNMatrix::create()
                             setOrganOrientation(nn, organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
-                        int tempDummy = simCreateDummy(0.01, nullptr);
+                        int tempDummy = simCreateDummy(0.01, nullptr); 
                         float tempOri[3] = {0,0,0};
                         simSetObjectOrientation(tempDummy,organList.at(i).objectHandles[1],tempOri);
                         simGetObjectOrientation(tempDummy,-1,tempOri);

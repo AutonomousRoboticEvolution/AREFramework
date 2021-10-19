@@ -1,0 +1,6880 @@
+Loading the V-REP library...
+Done!
+Launching V-REP...
+
+V-REP PRO EDU V3.6.2. (rev. 0)
+Using the default Lua library.
+Add-on script 'vrepAddOnScript-addOnScriptDemo.lua' was loaded.
+Add-on script 'vrepAddOnScript-b0RemoteApiServer.lua' was loaded.
+Add-on script 'vrepAddOnScript_PyRep.lua' was loaded.
+Simulator launched.
+Plugin 'MeshCalc': loading...
+Plugin 'MeshCalc': load succeeded.
+Plugin 'Assimp': loading...
+Plugin 'Assimp': warning: replaced variable 'simAssimp'
+Plugin 'Assimp': load succeeded.
+Plugin 'BlueZero': loading...
+Error with plugin 'BlueZero': load failed (could not load). The plugin probably couldn't load dependency libraries. For additional infos, modify the script 'libLoadErrorCheck.sh', run it and inspect the output.
+Plugin 'BubbleRob': loading...
+Plugin 'BubbleRob': load succeeded.
+Plugin 'Bwf': loading...
+Plugin 'Bwf': load succeeded.
+Plugin 'CodeEditor': loading...
+CodeEditor: cannot load in headless mode
+Error with plugin 'CodeEditor': load failed (failed initialization).
+Plugin 'Collada': loading...
+V-REP runs in headless mode. Cannot start 'Collada' plugin.
+Error with plugin 'Collada': load failed (failed initialization).
+Plugin 'ConvexDecompose': loading...
+Plugin 'ConvexDecompose': load succeeded.
+Plugin 'CustomUI': loading...
+CustomUI: doesn't work in headless mode
+Error with plugin 'CustomUI': load failed (failed initialization).
+Plugin 'DynamicsBullet-2-78': loading...
+Plugin 'DynamicsBullet-2-78': load succeeded.
+Plugin 'DynamicsBullet-2-83': loading...
+Plugin 'DynamicsBullet-2-83': load succeeded.
+Plugin 'DynamicsNewton': loading...
+Plugin 'DynamicsNewton': load succeeded.
+Plugin 'DynamicsOde': loading...
+Plugin 'DynamicsOde': load succeeded.
+Plugin 'DynamicsVortex': loading...
+Plugin 'DynamicsVortex': load succeeded.
+Plugin 'ER': loading...
+---------------------------
+STARTING WITH ARE FRAMEWORK
+---------------------------
+Starting in local intance mode
+Parameters Loaded
+---------------------------------
+loading experiment : /usr/local/lib/libmorphNeuro.so
+---------------------------------
+seed set to 1
+ER initialize
+Seed set to 1634471280
+Plugin 'ER': load succeeded.
+Plugin 'ExternalRenderer': loading...
+Plugin 'ExternalRenderer': load succeeded.
+Plugin 'ICP': loading...
+Plugin 'ICP': warning: replaced variable 'simICP'
+Plugin 'ICP': load succeeded.
+Plugin 'Image': loading...
+Error with plugin 'Image': load failed (could not load). The plugin probably couldn't load dependency libraries. For additional infos, modify the script 'libLoadErrorCheck.sh', run it and inspect the output.
+Plugin 'K3': loading...
+Plugin 'K3': load succeeded.
+Plugin 'LuaCommander': loading...
+LuaCommander: cannot find the statusbar widget
+Error with plugin 'LuaCommander': load failed (failed initialization).
+Plugin 'LuaRemoteApiClient': loading...
+Plugin 'LuaRemoteApiClient': load succeeded.
+Plugin 'Mtb': loading...
+Plugin 'Mtb': load succeeded.
+Plugin 'OMPL': loading...
+Plugin 'OMPL': warning: replaced variable 'simOMPL'
+Plugin 'OMPL': load succeeded.
+Plugin 'OpenGL3Renderer': loading...
+Plugin 'OpenGL3Renderer': load succeeded.
+Plugin 'OpenMesh': loading...
+Plugin 'OpenMesh': load succeeded.
+Plugin 'Qhull': loading...
+Plugin 'Qhull': load succeeded.
+Plugin 'RRS1': loading...
+Plugin 'RRS1': load succeeded.
+Plugin 'ReflexxesTypeII': loading...
+Plugin 'ReflexxesTypeII': load succeeded.
+Plugin 'RemoteApi': loading...
+Starting a remote API server on port 19997
+Starting a remote API server on port 2001
+Plugin 'RemoteApi': load succeeded.
+Plugin 'RosInterface': loading...
+Error with plugin 'RosInterface': load failed (could not load). The plugin probably couldn't load dependency libraries. For additional infos, modify the script 'libLoadErrorCheck.sh', run it and inspect the output.
+Plugin 'SDF': loading...
+SDF: doesn't work in headless mode
+Error with plugin 'SDF': load failed (failed initialization).
+Plugin 'SurfaceReconstruction': loading...
+Plugin 'SurfaceReconstruction': warning: replaced variable 'simSurfRec'
+Plugin 'SurfaceReconstruction': load succeeded.
+Plugin 'Urdf': loading...
+V-REP runs in headless mode. Cannot start 'Urdf' plugin.
+Error with plugin 'Urdf': load failed (failed initialization).
+Plugin 'Vision': loading...
+Plugin 'Vision': load succeeded.
+Using the 'MeshCalc' plugin.
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.604098
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624383
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.659264
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.64816
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.625282
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625012
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625332
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.655499
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624746
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.624972
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628889
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625355
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.604978
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624738
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.546648
+0x55dcef618fc0
+-_- GENERATION _-_ 0 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.593057
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624512
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.665148
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.652458
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.621318
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.624916
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.62534
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.65697
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624974
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.62522
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.629846
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.62525
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.589226
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624998
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.542213
+0x55dcef618fc0
+-_- GENERATION _-_ 1 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.588086
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624507
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.708659
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.636962
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.626174
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625016
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625372
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.663899
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624779
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.624982
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628319
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.62533
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.601409
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.625449
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.614421
+0x55dcef618fc0
+-_- GENERATION _-_ 2 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.58054
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.62437
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.666211
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.646721
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.626271
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.624902
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625337
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.627066
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624994
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.625039
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628993
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625273
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.541396
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.625808
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.617974
+0x55dcef618fc0
+-_- GENERATION _-_ 3 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.61124
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624395
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.670816
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.69947
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.62566
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.624978
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625361
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.646512
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624973
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.625138
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.627698
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.62532
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.599256
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624679
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.616649
+0x55dcef618fc0
+-_- GENERATION _-_ 4 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.599643
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624369
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.672455
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.672013
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.628957
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625009
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625326
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.662105
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624964
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.624923
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.6284
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625344
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.599197
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.62406
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.616354
+0x55dcef618fc0
+-_- GENERATION _-_ 5 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.596555
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624431
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.688835
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.646008
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.621
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625321
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625332
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.659509
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624912
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.624876
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628483
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625299
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.568295
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624853
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.562752
+0x55dcef618fc0
+-_- GENERATION _-_ 6 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.602425
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624511
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.669817
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.628326
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.62579
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625031
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625322
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.635326
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.625327
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.625015
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628801
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625331
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.590016
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624677
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.560315
+0x55dcef618fc0
+-_- GENERATION _-_ 7 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.601467
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.62451
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.666103
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.680759
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.626098
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.624791
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625355
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.649245
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624971
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.624841
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.629509
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625292
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.616323
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624244
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.616712
+0x55dcef618fc0
+-_- GENERATION _-_ 8 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.595185
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624505
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.68756
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.662578
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.63187
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.625087
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625335
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.682118
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.62509
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.625092
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.628108
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625326
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.594192
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624418
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.607378
+0x55dcef618fc0
+-_- GENERATION _-_ 9 finished
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.23876
+SIMULATION ABOUT TO START
+individual 0 is evaluated
+fitnesses = 
+0.596898
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.04968
+SIMULATION ABOUT TO START
+individual 1 is evaluated
+fitnesses = 
+0.624394
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.78172
+SIMULATION ABOUT TO START
+individual 2 is evaluated
+fitnesses = 
+0.66017
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.02764
+SIMULATION ABOUT TO START
+individual 3 is evaluated
+fitnesses = 
+0.64277
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.64484
+SIMULATION ABOUT TO START
+individual 4 is evaluated
+fitnesses = 
+0.626169
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 5 is evaluated
+fitnesses = 
+0.624979
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (8 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.65752
+SIMULATION ABOUT TO START
+individual 6 is evaluated
+fitnesses = 
+0.625341
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 7 is evaluated
+fitnesses = 
+0.6465
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 8 is evaluated
+fitnesses = 
+0.624993
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 9 is evaluated
+fitnesses = 
+0.6254
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :0.8026
+SIMULATION ABOUT TO START
+individual 10 is evaluated
+fitnesses = 
+0.627475
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.39536
+SIMULATION ABOUT TO START
+individual 11 is evaluated
+fitnesses = 
+0.625273
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (7 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.01024
+SIMULATION ABOUT TO START
+individual 12 is evaluated
+fitnesses = 
+0.603489
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (5 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.84196
+SIMULATION ABOUT TO START
+individual 13 is evaluated
+fitnesses = 
+0.624431
+0x55dcef618fc0
+SIMULATION ENDED
+Initializing the Bullet physics engine in plugin 'DynamicsBullet_2_78'...
+Engine version: 2.78
+Plugin version: 10
+Initialization successful.
+Starting Simulation
+Initialize Environment
+Loaded scene : /data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+Objects in the scene : 
+DefaultCamera
+DefaultXViewCamera
+DefaultYViewCamera
+DefaultZViewCamera
+XYZCameraProxy
+DefaultNXViewCamera
+DefaultNYViewCamera
+DefaultNZViewCamera
+ResizableFloor_5_25
+ResizableFloor_5_25_element
+ResizableFloor_5_25_visibleElement
+DefaultLights
+DefaultLightA
+DefaultLightB
+DefaultLightC
+DefaultLightD
+Cuboid
+Cuboid0
+Cuboid1
+Cuboid2
+Wall_3
+Wall_2
+Wall_5
+Wall_6
+Computing the convex decomposition (HACD)...
+Done (6 clusters generated).
+Mass of the main frame (skeleton + head organ) :1.72596
+SIMULATION ABOUT TO START
+individual 14 is evaluated
+fitnesses = 
+0.601302
+0x55dcef618fc0
+-_- GENERATION _-_ 10 finished
+---------------------
+Evolution is Finished
+---------------------

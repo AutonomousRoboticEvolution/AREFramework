@@ -1,4 +1,4 @@
-#include "simulatedER/mazeEnv.h"
+#include "mazeEnv.h"
 #include "MorphNeuro.h"
 #include "ManLog.h"
 
