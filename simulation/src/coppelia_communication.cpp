@@ -6,6 +6,9 @@ using namespace are;
 
 // Coordination 2 real sensor value
 // x = [-400mm, -300mm, -200mm, -100mm, 0mm, 100mm, 200mm, 300mm, 400mm]
+// put the if-else in the readPassivIRSensors fucntion, only output 0 or 1
+// add Matt's measurement google document link in the comments
+// add bool parameter to choose real/simulated IR sensor to simulate the reality gap if IR (train simulated IR VS tested with look-up table)
 const double coord2value_map[17][9] = 
     {{0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 2.8, 3.3, 6.0, 0, 6.0, 3.3, 2.8, 0},     // y = -200mm
@@ -111,6 +114,7 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
 
         det = simReadProximitySensor(handle,pos,&obj_h,norm);
         float dist = norm_L2(pos[0],pos[1],pos[2]);
+
         if(det > 0){
 
             name = simGetObjectName(obj_h);

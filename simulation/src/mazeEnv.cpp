@@ -3,7 +3,8 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace are::sim;
-
+// make a local copy of mazeEnv.cpp in the morphneuro experiments and leave the old one
+// (remove function load_target_positions (line 168-183) and line 102-107) unchanged
 MazeEnv::MazeEnv()
 {
     target_position.resize(3);

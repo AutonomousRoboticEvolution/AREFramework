@@ -10,6 +10,7 @@
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
 
+// put the substrate code (line 343-447) into morphneuro experiments (CPPNIndividual?) to isolate this part
 using mc = are::morph_const;
 using namespace are::sim;
 
