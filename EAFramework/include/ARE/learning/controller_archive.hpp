@@ -33,6 +33,9 @@ struct ControllerArchive{
      */
     void reset_fitnesses();
 
+    std::string to_string() const;
+    void from_file(const std::string&);
+
     template<class archive_t>
     void serialize(archive_t &arch, const unsigned int v)
     {
