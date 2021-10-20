@@ -40,6 +40,14 @@ void ER::initialize(){
     ea = EAFactory(randNum, parameters);
     ea->init();
 
+    //Load list of robot's ids to be evaluated and ask user which one want to be evaluated.
+    repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+    current_id = choice_of_robot_to_evaluate(list_ids);
+    ea->setCurrentIndIndex(current_id);
+    //-
+
     if(!load_fct_exp_plugin<Logging::Factory>
             (loggingFactory,libhandler,"loggingFactory"))
         exit(1);
@@ -62,13 +70,6 @@ void ER::write_data(){
 bool ER::execute(){
 
     if(robot_state == READY){
-        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
-        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-
-        std::vector<int> list_ids;
-        load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
-        current_id = choice_of_robot_to_evaluate(list_ids);
-
         std::cout << "Press Enter when the robot is ready" << std::endl;
         std::cin.ignore();
         std::cin.ignore();
@@ -125,7 +126,7 @@ void ER::start_evaluation(){
     sstream2 << "tcp://" << pi_address << ":5555";
     request.connect (sstream1.str().c_str());
     subscriber.connect(sstream2.str().c_str());
-    subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
+    subscriber.set(zmq::sockopt::subscribe, "pi ");
 
     //send the parameters as a string
     std::string reply;
@@ -138,8 +139,8 @@ void ER::start_evaluation(){
     send_string(reply,list_of_organs,request);
     assert(reply == "organ_addresses_received");
 
-//    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
-   // send_string(reply,ctrl_gen,request);
+    std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
+    send_string(reply,ctrl_gen,request);
     assert(reply == "starting");
 }
 
@@ -195,7 +196,7 @@ bool ER::stop_evaluation(){
     nbrEval++;
 
 
-    std::vector<double> objectives = environment->fitnessFunction(currentInd);
+    std::vector<double> objectives = environment->fitnessFunction(currentInd); //currentInd should not be used
     if(verbose){
         std::cout << "fitnesses = " << std::endl;
         for(const double fitness : objectives)
@@ -207,8 +208,10 @@ bool ER::stop_evaluation(){
         nbrEval = 0;
     }
     ea->set_endEvalTime(hr_clock::now());
-        write_data();
+    write_data();
 
+    current_id = choice_of_robot_to_evaluate(list_ids);
+    ea->setCurrentIndIndex(current_id);
 
     return true;
 }

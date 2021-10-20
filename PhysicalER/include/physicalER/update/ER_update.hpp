@@ -83,6 +83,7 @@ private:
     ///Individual currently evaluated
     Individual::Ptr currentInd;
 
+    std::vector<int> list_ids;
     int current_id = 0;
     int nbrEval = 0;
 
