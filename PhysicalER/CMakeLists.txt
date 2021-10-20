@@ -17,7 +17,7 @@ else()
 
 file(GLOB SRC_UPDATE src/update/*)
 
-add_executable(are-update ${SRC_UPDATE} src/pi_communication.cpp src/pi_individual.cpp)
+add_executable(are-update ${SRC_UPDATE} src/pi_communication.cpp src/pi_individual.cpp src/io_helpers.cpp)
 target_include_directories(are-update PUBLIC
     # ${OpenCV_INCLUDE_DIRS}
     "include/"
