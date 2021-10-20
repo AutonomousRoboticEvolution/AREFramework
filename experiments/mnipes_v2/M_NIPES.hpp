@@ -175,6 +175,8 @@ public:
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
+    const ControllerArchive& get_controller_archive_obj() const {return controller_archive;}
+
 
     genome_t &find_gene(int id);
     learner_t &find_learner(int id);

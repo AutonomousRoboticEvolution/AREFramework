@@ -90,19 +90,7 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
         std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filename.str() << std::endl;
         return;
     }
-
-    for(size_t i = 0; i < static_cast<M_NIPES*>(ea.get())->get_controller_archive().size(); i++)
-    {
-        for(size_t j = 0; j < static_cast<M_NIPES*>(ea.get())->get_controller_archive()[i].size(); j++)
-        {
-            for(size_t k = 0; k < static_cast<M_NIPES*>(ea.get())->get_controller_archive()[i][j].size(); k++)
-            {
-                logFileStream << i << "," << j << "," << k << std::endl;
-                logFileStream << static_cast<M_NIPES*>(ea.get())->get_controller_archive()[i][j][k].first->to_string();
-                logFileStream << static_cast<M_NIPES*>(ea.get())->get_controller_archive()[i][j][k].second << std::endl;
-            }
-        }
-    }
+    logFileStream << static_cast<M_NIPES*>(ea.get())->get_controller_archive_obj().to_string();
     logFileStream.close();
 
 }
