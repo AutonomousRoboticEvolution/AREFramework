@@ -75,6 +75,27 @@ void phy::load_list_of_organs(const std::string &folder, const int& id, std::str
         list_of_organs.append(line+"\n");
 }
 
+void phy::load_nbr_organs(const std::string &folder, const int& id, int &wheels, int& joints, int& sensors){
+    std::stringstream filepath;
+    filepath << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
+    std::ifstream ifs(filepath.str());
+    if(!ifs){
+        std::cerr << "Could not open organs list file, was expecting it to be at: " << filepath.str() << std::endl;
+        return;
+    }
+
+    wheels = 0; joints = 0; sensors = 0;
+    for(std::string line; std::getline(ifs,line);){
+        if(std::stoi(line.substr(0,line.find(","))) == 1)
+            wheels++;
+        else if (std::stoi(line.substr(0,line.find(","))) == 2)
+            sensors++;
+        else if (std::stoi(line.substr(0,line.find(","))) == 3)
+            joints++;
+    }
+
+}
+
 int phy::choice_of_robot_to_evaluate(const std::vector<int> &ids)
 {
     std::cout << "Robots available for evaluation: " << std::endl;
