@@ -62,8 +62,17 @@ void ER::write_data(){
 bool ER::execute(){
 
     if(robot_state == READY){
+        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+
+        std::vector<int> list_ids;
+        load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+        current_id = choice_of_robot_to_evaluate(list_ids);
+
         std::cout << "Press Enter when the robot is ready" << std::endl;
         std::cin.ignore();
+        std::cin.ignore();
+
         start_evaluation();
         robot_state = BUSY;
     }
@@ -85,14 +94,11 @@ bool ER::execute(){
 }
 
 void ER::start_evaluation(){
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-    // get relevent paramters
-    std::string ctrlGenomeFolder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value;
-    std::string waitingToBeEvalutatedFolderPath = ctrlGenomeFolder + std::string("waiting_to_be_evaluated");
 
-    std::string robotID = settings::getParameter<settings::String>(parameters,"#robotID").value;
-    //std::string robotID = "AREpuck"; // TODO get this from user input based on those available in waiting_to_be_evaluated
-    if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<robotID<<"\n=====" << std::endl;
+    if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<current_id<<"\n=====" << std::endl;
 
     eval_t1 = std::chrono::steady_clock::now();
 
@@ -101,29 +107,17 @@ void ER::start_evaluation(){
         environment->init();
     }
 
-//    currentInd = ea->getIndividual(currentIndIndex);
-//    currentInd->init();
+    std::string pi_address, list_of_organs;
+    load_list_of_organs(repository + "/" + exp_name,current_id,pi_address,list_of_organs);
 
-
-    // find the organs list (should be in the waitingToBeEvalutatedFolderPath folder)
-    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
-    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
-
-    // get IP address of robot from the first line of the list_of_organs file
-    std::string firstLine;
-    std::getline(organListFileStream,firstLine); // get first line
-    std::string pi_address = firstLine.substr( firstLine.find(",")+1,firstLine.find("\n")-2) ; // the first line should be "0,[pi address]\n"
-    if (verbose) std::cout<< "pi IP address: "<< pi_address << std::endl;
-    std::string stringListOfOrgans;
-    for (std::string line; std::getline(organListFileStream, line); ) stringListOfOrgans.append(line+"\n");
     //std::cout<<"organ list: \n"<<stringListOfOrgans<<"=="<<std::endl;
 
-    // get the controller genome as string, from the genome file
-    std::ifstream controllerGenomeFileStream(waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
-    if(!controllerGenomeFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
-    std::string ctrl_gen;
-    for (std::string line; std::getline(controllerGenomeFileStream, line); )
-        ctrl_gen.append(line+"\n");
+//    // get the controller genome as string, from the genome file
+//    std::ifstream controllerGenomeFileStream(waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
+//    if(!controllerGenomeFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
+//    std::string ctrl_gen;
+//    for (std::string line; std::getline(controllerGenomeFileStream, line); )
+//        ctrl_gen.append(line+"\n");
 
     //start ZMQ
     std::stringstream sstream1,sstream2;
@@ -141,14 +135,12 @@ void ER::start_evaluation(){
     assert(reply == "parameters_received");
 
     //send the list of organ addresses
-    send_string(reply,stringListOfOrgans,request);
+    send_string(reply,list_of_organs,request);
     assert(reply == "organ_addresses_received");
 
 //    std::string ctrl_gen = currentInd->get_ctrl_genome()->to_string();
-    send_string(reply,ctrl_gen,request);
+   // send_string(reply,ctrl_gen,request);
     assert(reply == "starting");
-
-    ea->setCurrentIndIndex(currentIndIndex);
 }
 
 bool ER::update_evaluation(){
@@ -172,7 +164,7 @@ bool ER::update_evaluation(){
 bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-    if(verbose) std::cout << "individual " << currentIndIndex << " has finished evaluating" << std::endl;
+    if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
 
     // get any logs that the robot has gathered:
     bool getting_logs=true;
@@ -209,26 +201,15 @@ bool ER::stop_evaluation(){
         for(const double fitness : objectives)
             std::cout << fitness << std::endl;
     }
-    //ea->setObjectives(currentIndIndex,objectives);
+    ea->setObjectives(current_id,objectives);
 
     if(ea->update(environment)){
-        currentIndIndex++;
         nbrEval = 0;
     }
     ea->set_endEvalTime(hr_clock::now());
         write_data();
 
 
-    if(currentIndIndex >= ea->get_population().size())
-    {
-        if(verbose)
-        {
-            std::cout << "---------------------" << std::endl;
-            std::cout << "Update is Finished" << std::endl;
-            std::cout << "---------------------" << std::endl;
-        }
-        return false;
-    }
     return true;
 }
 
