@@ -38,8 +38,13 @@ void are::Logging::create_folder(const std::string &name){
         boost::filesystem::create_directory(name);
 }
 
-void are::Logging::saveStringToFile(std::string fileName, std::string data){
+void are::Logging::saveStringToFile(const std::string &fileName, const std::string &data){
     std::ofstream out(log_folder + "/" + fileName+".txt");
+    if(!out)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + fileName << std::endl;
+        return;
+    }
     out << data;
     out.close();
 }
