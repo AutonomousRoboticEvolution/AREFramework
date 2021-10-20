@@ -60,77 +60,36 @@ bool MNIPES::update(const Environment::Ptr &){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
-//    clean_learning_pool();
+    //If on the client or just sequential mode
+    //update learner
+    auto& learner = learners[currentIndIndex];
+    numberEvaluation++;
+    learner.update_pop_info(ind->getObjectives(),ind->descriptor());
+    learner.step();
 
-//    std::dynamic_pointer_cast<PMEIndividual>(ind)->set_final_position(env->get_final_position());
-//    std::dynamic_pointer_cast<PMEIndividual>(ind)->set_trajectory(env->get_trajectory());;
+    if(learner.is_learning_finish()){//learning is finished for this body plan
+        //Update Controller Archive
+        std::vector<double> weights;
+        std::vector<double> biases;
+        NNParamGenome best_ctrl_gen;
+        auto &best_controller = learner.get_best_solution();
+        int nbr_weights = learner.get_nbr_weights();
+        weights.insert(weights.begin(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+        biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+        best_ctrl_gen.set_weights(weights);
+        best_ctrl_gen.set_biases(biases);
+        //update the archive
+        if(use_ctrl_arch){
+            CartDesc morph_desc = learner.morph_genome.get_morph_desc();
+            controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+        }
+        //-
 
-    //If one the client or just sequential mode
-
-//    int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
-//    learner_t &learner = find_learner(morph_id);
-//    if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-//        learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
-//        int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
-//        int joint_nbr = learner.morph_genome.get_morph_desc().jointNumber;
-//        int sensor_nbr = learner.morph_genome.get_morph_desc().sensorNumber;
-//        if(wheel_nbr > 0 || joint_nbr > 0){
-//            init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
-//            init_new_ctrl_pop(learner);
-//        }else{
-//            genome_t new_gene(learner.morph_genome,NNParamGenome(),{0});
-//            gene_pool.push_back(new_gene);
-//            learner.ctrl_learner.to_be_erased();
-//        }
-//    }else{
-//        numberEvaluation++;
-//        //update learner
-//        learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor());
-//        bool is_ctrl_next_gen = learner.ctrl_learner.step();
-//        //-
-
-//        if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
-
-//            //Update Controller Archive
-//            std::vector<double> weights;
-//            std::vector<double> biases;
-//            NNParamGenome best_ctrl_gen;
-//            auto &best_controller = learner.ctrl_learner.get_best_solution();
-//            int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-//            weights.insert(weights.begin(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-//            biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
-//            best_ctrl_gen.set_weights(weights);
-//            best_ctrl_gen.set_biases(biases);
-//            //update the archive
-//            if(use_ctrl_arch){
-//                CartDesc morph_desc = learner.morph_genome.get_morph_desc();
-//                controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
-//            }
-//            //-
-
-//            //add new gene in gene_pool
-//            genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-//            gene_pool.push_back(new_gene);
-//            //-
-
-//            //remove learner from learning pool and remove oldest gene
-//            remove_oldest_gene();
-//            increment_age();
-//            //-
-
-//            //Perform selection and generate a new morph gene.
-//            if(gene_pool.size() >= pop_size){
-//                assert(gene_pool.size() == pop_size);
-//                reproduction();
-//                assert(learning_pool.size() == pop_size);
-//            }
-
-//        }else if(is_ctrl_next_gen){ //if the NIPES goes for a next gen
-//            init_new_ctrl_pop(learner);
-//        }
-//    }
-
-
+        //add new gene in gene_pool
+        genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
+        gene_pool.push_back(new_gene);
+        //-
+    }
     return true;
 }
 
@@ -176,7 +135,52 @@ void MNIPES::_survival(const phy::MorphGenomeInfoMap &morph_gen_info, std::vecto
             list_ids.insert(list_ids.end(),res.begin(),res.end());
         }
     }
+}
 
+void MNIPES::init_learner(int id){
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
+
+    int wheels, joints, sensors;
+    phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
+    int nn_inputs = sensors*2;
+    int nn_outputs = wheels + joints;
+    int nbr_weights, nbr_bias;
+
+    if(nn_type == settings::nnType::FFNN)
+        NN2Control<ffnn_t>::nbr_parameters(nn_inputs,nb_hidden,nn_outputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::RNN)
+        NN2Control<rnn_t>::nbr_parameters(nn_inputs,nb_hidden,nn_outputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN)
+        NN2Control<elman_t>::nbr_parameters(nn_inputs,nb_hidden,nn_outputs,nbr_weights,nbr_bias);
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
+    auto& ctrl_gen = ctrl_archive.archive[wheels][joints][sensors];
+    CMAESLearner learner(nbr_weights,nbr_bias,nn_inputs,nn_outputs);
+    if(ctrl_gen.first->get_weights().empty() && ctrl_gen.first->get_weights().empty())
+        learner.init();
+    else learner.init(ctrl_gen.first->get_full_genome());
+    learners.emplace(id,learner);
+}
+
+const Genome::Ptr &MNIPES::get_next_controller_genome(int id){
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
+
+    NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
+    auto nn_params = learners[id].update_ctrl(ctrl);
+    NNParamGenome::Ptr gen;
+    gen->set_weights(nn_params.first);
+    gen->set_biases(nn_params.second);
+    gen->set_nbr_hidden(nb_hidden);
+    gen->set_nn_type(nn_type);
+    gen->set_nbr_input(learners[id].get_nbr_inputs());
+    gen->set_nbr_output(learners[id].get_nbr_outputs());
+    return gen;
 }
 
 void MNIPES::load_data_for_generate(){
@@ -192,70 +196,30 @@ void MNIPES::load_data_for_generate(){
 }
 
 void MNIPES::write_data_for_generate(){
+    std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    phy::write_morph_blueprints<PMEIndividual>(repo + "/" + exp_name,population);
 
-    const auto& ind = population[currentIndIndex];
-    const auto& id = ids[currentIndIndex];
-    std::stringstream sst;
-    sst << "morph_desc_" << currentIndIndex;
-    std::ofstream ofs(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() , std::ios::out | std::ios::ate | std::ios::app);
-
-    if(!ofs)
-    {
-        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst.str() << std::endl;
-        return;
-    }
-
-    for(int j = 0; j < std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc().cols(); j++)
-        ofs << std::dynamic_pointer_cast<PMEIndividual>(ind)->get_morphDesc()(j) << ";";
-
-    // Export blueprint
-
-    std::stringstream sst_blueprint;
-    sst_blueprint << "blueprint_" << id.first << "_" << id.second << ".csv";
-    std::ofstream ofs_blueprint(Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() , std::ios::out | std::ios::ate | std::ios::app);
-    if(!ofs)
-    {
-        std::cerr << "unable to open : " << Logging::log_folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() << std::endl;
-        return;
-    }
-    std::vector<int> tempOrganTypes = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganTypes();
-    std::vector<std::vector<float>> tempOrganPos = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganPos();
-    std::vector<std::vector<float>> tempOrganOri = std::dynamic_pointer_cast<PMEIndividual>(ind)->getListOrganOri();
-    for (int i = 0; i < tempOrganTypes.size(); i++) {
-        ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
-                      << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
-                      << tempOrganPos.at(i).at(2) << ","
-                      << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
-                      << tempOrganOri.at(i).at(2) << ","
-                      << std::endl;
-    }
-
-    // Export mesh file
-
-    const auto **verticesMesh = new const simFloat *[2];
-    const auto **indicesMesh = new const simInt *[2];
-    auto *verticesSizesMesh = new simInt[2];
-    auto *indicesSizesMesh = new simInt[2];
-    verticesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().data();
-    verticesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListVertices().size();
-    indicesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().data();
-    indicesSizesMesh[0] = std::dynamic_pointer_cast<PMEIndividual>(ind)->getSkeletonListIndices().size();
-
-    std::stringstream filepath;
-    filepath << Logging::log_folder << "/waiting_to_be_built/mesh_" << id.first << "_" << id.second << ".stl";
-
-    //fileformat: the fileformat to export to:
-    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
-    simExportMesh(3, filepath.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
-
-    delete[] verticesMesh;
-    delete[] verticesSizesMesh;
-    delete[] indicesMesh;
-    delete[] indicesSizesMesh;
+    phy::write_morph_meshes<PMEIndividual>(repo + "/" + exp_name,population);
 }
 
 void MNIPES::load_data_for_update() {
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
+    //load ids to be evaluated
+    std::vector<int> list_ids;
+    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+
+    //TODO: load saved learners
+
+    //load controller archive
+    int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+    ctrl_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+    ctrl_archive.from_file(repository + "/" + exp_name + "/logs/controller_archive");
+
+    //create a first genome controller for the first robot chosen
+    init_learner(currentIndIndex);
 }
 
 void MNIPES::write_data_for_update(){

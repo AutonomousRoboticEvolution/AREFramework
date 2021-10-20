@@ -20,6 +20,7 @@ add_library(physical_melai SHARED
    factories.cpp
    ../common/realMaze.cpp
    mnipes.cpp
+   cmaes_learner.cpp
     )
 
 target_include_directories(physical_melai PUBLIC ${INCLUDES})

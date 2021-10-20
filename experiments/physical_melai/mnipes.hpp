@@ -11,10 +11,11 @@
 #include "ARE/CPPNGenome.h"
 #include "physicalER/pi_individual.hpp"
 #include "physicalER/io_helpers.hpp"
+#include "cmaes_learner.hpp"
+#include "ARE/learning/controller_archive.hpp"
 
 
 namespace are{
-
 
 class PMEIndividual : public phy::NN2Individual
 {
@@ -74,6 +75,8 @@ public:
     void init_next_pop() override;
     bool update(const Environment::Ptr &) override;
     void setObjectives(size_t current_id,const std::vector<double> &objs);
+    void init_learner(int id);
+    const Genome::Ptr &get_next_controller_genome(int id);
 
     void load_data_for_generate() override;
     void write_data_for_generate() override;
@@ -83,7 +86,8 @@ public:
 private:
     std::vector<std::pair<int,int>> ids;
     std::vector<NN2CPPNGenome> morph_genomes;
-    std::map<int,
+    std::map<int,CMAESLearner> learners;
+    ControllerArchive ctrl_archive;
 
     void _survival(const phy::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();
