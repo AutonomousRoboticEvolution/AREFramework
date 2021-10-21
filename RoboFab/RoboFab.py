@@ -40,9 +40,9 @@ class RoboFab_host:
 
         # set up / connect to printer(s), and an object for doing slicing
         if DO_PRINT_SKELETON or DO_CORE_ORGAN_INSERT:
-            self.printer0 = Printer( IPAddress = configurationData [ "network" ] [ "PRINTER0_IP_ADDRESS" ], config= configurationData [ "PRINTER_0" ] )
+            self.printer0 = Printer(IPAddress = configurationData [ "network" ] [ "PRINTER0_IP_ADDRESS" ], printerConfiguration= configurationData ["PRINTER_0"])
         else:
-            self.printer0 = Printer( IPAddress = None, config= configurationData [ "PRINTER_0" ] )
+            self.printer0 = Printer(IPAddress = None, printerConfiguration= configurationData ["PRINTER_0"])
 
 
         # Define the two gripper TCPs. This is a transform from the tool flange to the tip of each gripper
