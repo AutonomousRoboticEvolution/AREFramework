@@ -40,9 +40,9 @@ class RoboFab_host:
 
         # set up / connect to printer(s), and an object for doing slicing
         if DO_PRINT_SKELETON or DO_CORE_ORGAN_INSERT:
-            self.printer1 = Printer(IPAddress = configurationData [ "network" ] [ "PRINTER1_IP_ADDRESS" ] , config= configurationData [ "PRINTER_1" ])
+            self.printer0 = Printer( IPAddress = configurationData [ "network" ] [ "PRINTER0_IP_ADDRESS" ], config= configurationData [ "PRINTER_0" ] )
         else:
-            self.printer1 = Printer(IPAddress = None , config= configurationData [ "PRINTER_1" ])
+            self.printer0 = Printer( IPAddress = None, config= configurationData [ "PRINTER_0" ] )
 
 
         # Define the two gripper TCPs. This is a transform from the tool flange to the tip of each gripper
@@ -61,7 +61,7 @@ class RoboFab_host:
         debugPrint("Connected to UR5")
 
         # initialise a robot object (will be filled in setupRobotObject)
-        self.myRobot = Robot( origin=self.printer1.origin * self.printer1.skeletonPositionOnPrintbed )
+        self.myRobot = Robot( origin=self.printer0.origin * self.printer0.skeletonPositionOnPrintbed )
         self.robotID = None
 
         self.logDirectory = configurationData["logDirectory"]
@@ -116,11 +116,12 @@ class RoboFab_host:
         timer=Timer()
         timer.start()
         self.UR5.moveBetweenStations("home")
+        self.AF.homeStepperMotor ()  # need to re-home after a period being disabled, in case it moved. Will automatically enable if not already enabled.
 
         # do the slicing and printing
         if DO_PRINT_SKELETON:
             self.AF.disableStepperMotor() # prevent stepper wasting/energy getting hot during the printing
-            self.printer1.printARobot(self.robotID, FAKE_SLICE_ONLY=False)
+            self.printer0.printARobot( self.robotID, FAKE_SLICE_ONLY=False )
             self.AF.enableStepperMotor()
             self.AF.homeStepperMotor() # need to re-home after a period being disabled, in case it moved
         timer.add("Finished printing")
@@ -128,7 +129,7 @@ class RoboFab_host:
         # attach the FIRST organ only, i.e. the head organ (which MUST be the first row of the blueprint file).
         if DO_CORE_ORGAN_INSERT:
             debugPrint( "Core organ insert..." )
-            self.UR5.insertHeadOrgan ( bank=self.organBank, printer=self.printer1, robot=self.myRobot, gripperTCP=self.gripperTCP_A , assemblyFixture=self.AF)
+            self.UR5.insertHeadOrgan ( bank=self.organBank, printer=self.printer0, robot=self.myRobot, gripperTCP=self.gripperTCP_A, assemblyFixture=self.AF )
         else:
             self.myRobot.organInsertionTrackingList[0]=True # pretend we have done the core organ insert
             self.AF.turnElectromagnetsOn() # grip the robot
@@ -156,6 +157,8 @@ class RoboFab_host:
 
         if DO_EXPORT_ORGANS_LIST:
             self.save_log_files()
+
+        self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
     def save_log_files( self ):
         file = open ( "robot_build_file.txt", "w" )

@@ -285,7 +285,7 @@ if __name__ == "__main__":
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
 
-        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_1"])
+        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_0"])
         printer.createSTL(robot_ID)
         printer.slice("mesh"+robot_ID)
 
