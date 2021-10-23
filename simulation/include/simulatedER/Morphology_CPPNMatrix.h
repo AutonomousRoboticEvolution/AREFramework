@@ -49,6 +49,11 @@ public:
 
     void create() override;
     void createAtPosition(float,float,float) override;
+
+    void create_without_substrate();
+    void create_substrate();
+    void createAtPosition_without_substrate(float, float, float);
+
     void setPosition(float,float,float);
 
     /////////////////////////////

@@ -112,8 +112,13 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
         
         det = simReadProximitySensor(handle, pos, &obj_h, norm);
         float dist = norm_L2(pos[0],pos[1],pos[2]);
-        if (use_simulate_data == true){
-            if(det > 0){
+
+        if (use_simulate_data == false){
+            float true_sensor_value = get_true_sensor_value(pos[0], pos[1]);
+            if (true_sensor_value > 50) det = 1;  // force det to 1
+        }
+
+        if(det > 0){
                 name = simGetObjectName(obj_h);
                 float ref_euler[3];
                 if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
@@ -131,36 +136,8 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
                     sensorValues.push_back(1);
                 else sensorValues.push_back(0);
             }
-            else if(det <= 0)
-                sensorValues.push_back(0);
-        }
-        else{
-            float true_sensor_value = get_true_sensor_value(pos[0], pos[1]);
-            if (true_sensor_value > 50) det = 1;  // force det to 1
-
-            if (det > 0){
-                name = simGetObjectName(obj_h);
-                float ref_euler[3];
-                if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
-                float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
-                                static_cast<float>(std::asin(pos[0]/dist)),
-                                0};
-                simSetObjectOrientation(occlusion_detector,handle,euler);
-
-                occl = simReadProximitySensor(occlusion_detector, pos, &obj_h, norm);
-                if (occl > 0){
-                    occlusion = get_true_sensor_value(pos[0], pos[1]) > true_sensor_value; // distance reduce, seensor value increase
-                }else occlusion = false;
-
-                boost::split(splitted_name,name,boost::is_any_of("_"));
-                if(splitted_name[0] == "IRBeacon" && !occlusion)
-                    sensorValues.push_back(1);
-                else sensorValues.push_back(0);
-            }
-            else if (det<=0){
-                sensorValues.push_back(0);
-            }
-        }
+        else if(det <= 0)
+            sensorValues.push_back(0);
     }
 }
 
