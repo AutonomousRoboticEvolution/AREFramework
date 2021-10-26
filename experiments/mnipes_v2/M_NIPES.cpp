@@ -316,8 +316,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
                 int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-                weights.insert(weights.begin(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-                biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+                weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+                biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
                 best_ctrl_gen.set_weights(weights);
                 best_ctrl_gen.set_biases(biases);
                 //update the archive

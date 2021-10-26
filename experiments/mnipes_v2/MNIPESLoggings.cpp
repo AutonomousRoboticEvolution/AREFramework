@@ -7,9 +7,9 @@ using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
+    if(static_cast<M_NIPES*>(ea.get())->get_gene_pool().empty())
+        return;
     const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
-
-
     //Log the morph genome
     std::stringstream morph_filepath;
     morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();

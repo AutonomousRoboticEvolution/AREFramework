@@ -86,6 +86,7 @@ public:
 
     void update(double delta_time) override;
 
+
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}

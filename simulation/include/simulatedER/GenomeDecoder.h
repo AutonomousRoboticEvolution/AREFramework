@@ -10,7 +10,6 @@
 #include "ARE/nn2/NN2CPPNGenome.hpp"
 #include "ARE/morphology_descriptors.hpp"
 #include <vector>
-#include "ARE/morphology_descriptors.hpp"
 
 namespace are {
 
