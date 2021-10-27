@@ -5,7 +5,7 @@ namespace  st = settings;
 namespace fs = boost::filesystem;
 
 void phy::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap &morph_gen_info){
-    std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.yml"));
+    std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));
     std::ifstream ifs(genome_info_file);
     if(!ifs){
         std::cerr << "unable to open " << genome_info_file << std::endl;
@@ -135,4 +135,53 @@ int phy::choice_of_robot_to_evaluate(const std::vector<int> &ids)
     }
 
     return chosen_id;
+}
+
+void phy::write_morph_genomes(const std::string &folder, const std::vector<Individual::Ptr> &population){
+    int id = 0;
+    for(const auto& ind: population){
+        id = ind->get_morph_genome()->id();
+        std::stringstream filepath;
+        filepath << folder << "/waiting_to_be_built/morph_genome_" << id;
+        std::ofstream ofs(filepath.str());
+        if(!ofs)
+        {
+            std::cerr << "unable to open : " << filepath.str() << std::endl;
+            return;
+        }
+
+        ofs << ind->get_morph_genome()->to_string();
+        ofs.close();
+    }
+}
+
+
+void phy::add_morph_genome_to_gp(const std::string &folder, int id, const MorphGenomeInfo &morph_info){
+    //move morph genome from waiting_to_be_built to the genomes pool
+    std::stringstream origin, dest;
+    origin << folder << "/waiting_to_be_evaluated/morph_genome_" << id;
+    dest << folder << "/genomes_pool/morph_genome_" << id;
+    try{
+        fs::copy_file(origin.str(),dest.str());
+    }catch(const fs::filesystem_error &e){
+        std::cerr << "Error while trying to copy morph_genome_" << id << std::endl << e.what() << std::endl;
+        return;
+    }
+
+    if(!fs::remove(origin.str())){
+        std::cerr << "unable to delete the morph_genome id: " << id << std::endl;
+        return;
+    }
+
+    //update morph genomes info
+    std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));
+    std::ofstream ofs(genome_info_file, std::ios::out | std::ios::ate | std::ios::app);
+    if(!ofs){
+        std::cerr << "unable to open " << genome_info_file << std::endl;
+        return;
+    }
+    ofs << "morph_" << id << std::endl;
+    for(const auto& info: morph_info)
+        ofs << settings::toString(info.first,info.second);
+    ofs.close();
 }

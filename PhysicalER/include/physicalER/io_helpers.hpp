@@ -7,6 +7,7 @@
 //#include <filesystem> //if c++17
 #include "ARE/Settings.h"
 #include "ARE/misc/utilities.h"
+#include "ARE/Individual.h"
 #include <simLib.h>
 
 //namesapce fs = std::filesystem //if c++17
@@ -41,13 +42,12 @@ template<class Genome>
  * @param list_to_load
  * @param genomes
  */
-void load_morph_genomes(const std::string &folder, const MorphGenomeInfoMap& morph_gen_info,
-                        const std::vector<int> list_to_load, std::vector<Genome>& genomes){
+void load_morph_genomes(const std::string &folder,
+                        const std::vector<int> list_to_load, std::map<int,Genome>& genomes){
 
-    std::string genomes_pool_folder(folder + std::string("/genomes_pool"));
     std::string filepath, filename;
     std::list<std::string> split_str;
-    for(const auto &dirit : fs::directory_iterator(fs::path(genomes_pool_folder))){
+    for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
         filepath = dirit.path().string();
         misc::split_line(filepath,"/",split_str);
         filename = split_str.back();
@@ -68,7 +68,7 @@ void load_morph_genomes(const std::string &folder, const MorphGenomeInfoMap& mor
 
         Genome genome;
         genome.from_string(filepath);
-        genomes.push_back(genome);
+        genomes.emplace(id,genome);
     }
 
 }
@@ -98,46 +98,6 @@ void load_list_of_organs(const std::string &folder, const int &id, std::string &
 void load_nbr_organs(const std::string &folder, const int& id, int &wheels, int& joints, int& sensors);
 
 
-//template<class Genome>
-///**
-// * @brief load a controller genome corresponding to the id. if no controller exist a random one is created.
-// * @param folder of the database of the current experiment
-// * @param id of the robot to load its controller genome
-// * @param controller genome (return)
-// */
-//void load_ctrl_genome(const std::string &folder, const int &id, Genome& ctrl_genome){
-//    // check if a controller file already exists
-//    if (fs::exists(waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID)){
-//        std::cout<<"File ctrlGenome_"<<robotID<<" exists"<<std::endl;
-
-//    } else {
-//        // doesn't exist, so make a new random controller and save it as a file
-//        std::cout<<"WARNING the file "<<filename+" does not have an associated controller genome, so a random one is being created"<<std::endl;
-
-//        // determine number of inputs and outputs:
-//        std::string thisLine;
-//        std::ifstream temp_file_stream(filepath);
-//        int numberOfInputs=0;
-//        int numberOfOutputs=0;
-//        while( std::getline(temp_file_stream, thisLine,'\n') ){
-//            std::string organType = thisLine.substr(0, thisLine.find(","));
-//            if (organType=="0") {} //Head
-//            if (organType=="1") numberOfOutputs++ ; //wheel
-//            if (organType=="2") numberOfInputs+=2 ; //sensor
-//        }
-//        std::cout<<"numberOfInputs: "<<numberOfInputs<<std::endl;
-//        std::cout<<"numberOfOutputs: "<<numberOfOutputs<<std::endl;
-
-////                NNParamGenome::Ptr ctrl_gen = makeRandomController(numberOfInputs, numberOfOutputs);
-
-//        // now write to file
-////                std::ofstream fileOut(waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID);
-////                fileOut<<ctrl_gen->to_string();
-////                std::cout<<"new random controller genome written to "<<waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID<<std::endl;
-
-//    }
-//}
-
 /**
  * @brief choice_of_robot_to_evaluate
  * @param ids
@@ -147,11 +107,11 @@ int choice_of_robot_to_evaluate(const std::vector<int> &ids);
 
 template<class Ind>
 /**
- * @brief write in the database all the blueprints of a given population
+ * @brief write in the waiting_to_be_built folder all the blueprints of a given population
  * @param folder of the database
  * @param population
  */
-void write_morph_blueprints(const std::string& folder,const std::vector<std::shared_ptr<Ind>> &population){
+void write_morph_blueprints(const std::string& folder,const std::vector<Individual::Ptr> &population){
     int id = 0;
     for(const auto& ind: population){
         id = ind->get_morph_genome()->id();
@@ -165,9 +125,9 @@ void write_morph_blueprints(const std::string& folder,const std::vector<std::sha
             std::cerr << "unable to open : " << folder + std::string("/waiting_to_be_built/")  + sst_blueprint.str() << std::endl;
             return;
         }
-        std::vector<int> tempOrganTypes = ind->getListOrganTypes();
-        std::vector<std::vector<float>> tempOrganPos = ind->getListOrganPos();
-        std::vector<std::vector<float>> tempOrganOri = ind->getListOrganOri();
+        std::vector<int> tempOrganTypes = std::dynamic_pointer_cast<Ind>(ind)->getListOrganTypes();
+        std::vector<std::vector<float>> tempOrganPos = std::dynamic_pointer_cast<Ind>(ind)->getListOrganPos();
+        std::vector<std::vector<float>> tempOrganOri = std::dynamic_pointer_cast<Ind>(ind)->getListOrganOri();
         for (int i = 0; i < tempOrganTypes.size(); i++) {
             ofs << "0" << "," << tempOrganTypes.at(i) << ","
                           << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
@@ -181,8 +141,13 @@ void write_morph_blueprints(const std::string& folder,const std::vector<std::sha
 }
 
 template<class Ind>
-void write_morph_meshes(const std::string& folder, const std::vector<std::shared_ptr<Ind>> &population){
-
+/**
+ * @brief write in the waiting_to_be_built folder  all the skeleton meshes of a given population
+ * @param folder
+ * @param population
+ */
+void write_morph_meshes(const std::string& folder, const std::vector<Individual::Ptr> &population){
+    int id = 0;
     for(const auto& ind: population){
         id = ind->get_morph_genome()->id();
 
@@ -190,10 +155,10 @@ void write_morph_meshes(const std::string& folder, const std::vector<std::shared
         const auto **indicesMesh = new const simInt *[2];
         auto *verticesSizesMesh = new simInt[2];
         auto *indicesSizesMesh = new simInt[2];
-        verticesMesh[0] = ind->getSkeletonListVertices().data();
-        verticesSizesMesh[0] = ind->getSkeletonListVertices().size();
-        indicesMesh[0] = ind->getSkeletonListIndices().data();
-        indicesSizesMesh[0] = ind->getSkeletonListIndices().size();
+        verticesMesh[0] = std::dynamic_pointer_cast<Ind>(ind)->getSkeletonListVertices().data();
+        verticesSizesMesh[0] = std::dynamic_pointer_cast<Ind>(ind)->getSkeletonListVertices().size();
+        indicesMesh[0] = std::dynamic_pointer_cast<Ind>(ind)->getSkeletonListIndices().data();
+        indicesSizesMesh[0] = std::dynamic_pointer_cast<Ind>(ind)->getSkeletonListIndices().size();
 
         std::stringstream filepath;
         filepath << folder << "/waiting_to_be_built/mesh_" << id << ".stl";
@@ -208,6 +173,22 @@ void write_morph_meshes(const std::string& folder, const std::vector<std::shared
         delete[] indicesSizesMesh;
     }
 }
+
+/**
+ * @brief write in the waiting_to_be_built folder  all the morph genomes of a given population
+ * @param folder
+ * @param population
+ */
+void write_morph_genomes(const std::string &folder, const std::vector<Individual::Ptr> &population);
+
+/**
+ * @brief Adding a morph genome to the genome pool which consist in two actions:
+ *  - move a morph genome from the waiting_to_be_built folder to the genomes pool folder
+ *  - add entry in the morph genome info file
+ * @param folder of the current experiment
+ * @param id of the robot
+ */
+void add_morph_genome_to_gp(const std::string &folder,int id, const MorphGenomeInfo &morph_info);
 
 }//phy
 }//are
