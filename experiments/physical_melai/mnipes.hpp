@@ -24,7 +24,7 @@ public:
     typedef std::shared_ptr<const PMEIndividual> ConstPtr;
 
     PMEIndividual() : phy::NN2Individual(){}
-    PMEIndividual(const NN2CPPNGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen){
+    PMEIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen){
         this->morphGenome = morph_gen;
         this->ctrlGenome = ctrl_gen;
     }
@@ -73,8 +73,8 @@ public:
     MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
     void init_next_pop() override;
-    bool update(const Environment::Ptr &) override;
-    void setObjectives(size_t current_id,const std::vector<double> &objs);
+    bool update(const Environment::Ptr &env) override;
+    void setObjectives(size_t current_id,const std::vector<double> &objs){}
     void init_learner(int id);
     const Genome::Ptr &get_next_controller_genome(int id);
 
@@ -85,9 +85,11 @@ public:
 
 private:
     std::vector<std::pair<int,int>> ids;
-    std::vector<NN2CPPNGenome> morph_genomes;
+    std::map<int,NN2CPPNGenome> morph_genomes;
     std::map<int,CMAESLearner> learners;
+    std::map<int,std::vector<waypoint>> trajectories;
     ControllerArchive ctrl_archive;
+    phy::MorphGenomeInfoMap morph_genomes_info;
 
     void _survival(const phy::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();

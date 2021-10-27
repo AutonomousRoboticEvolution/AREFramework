@@ -31,40 +31,33 @@ void MNIPES::init(){
 void MNIPES::init_next_pop(){
 
     _reproduction();
-
-//    CPPNGenome::Ptr morph_gen;
-//    EmptyGenome::Ptr ctrl_gen;
-//    //load morphology genome
-//    for(size_t i = 0; i < morph_gen_files.size(); i++){
-//        NEAT::Genome neat_gen(morph_gen_files[i].c_str());
-//        morph_gen.reset(new CPPNGenome(neat_gen));
-//        morph_gen->set_randNum(randomNum);
-//        morph_gen->set_parameters(parameters);
-
-//        ctrl_gen.reset(new EmptyGenome);
-
-//        Individual::Ptr ind(new PMEIndividual(morph_gen,ctrl_gen));
-//        ind->set_parameters(parameters);
-//        ind->set_randNum(randomNum);
-//        population.push_back(ind);
-//    }
-//    ctrl_gen.reset();
-//    morph_gen.reset();
 }
 
-void MNIPES::setObjectives(size_t current_id, const std::vector<double> &objs){
 
-}
-
-bool MNIPES::update(const Environment::Ptr &){
+bool MNIPES::update(const Environment::Ptr &env){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    bool verbose = settings::getParameter<settings::Double>(parameters,"#verbose").value;
 
+    PMEIndividual::Ptr ind(new PMEIndividual);
+    auto objs = env->fitnessFunction(ind);
+    if(verbose){
+        std::cout << "fitnesses = " << std::endl;
+        for(const double fitness : objs)
+            std::cout << fitness << std::endl;
+    }
+
+    std::vector<double> final_pos = env->get_final_position();
+    Eigen::VectorXd desc(3);
+    desc << (final_pos[0]+arena_size/2.)/arena_size,
+            (final_pos[1]+arena_size/2.)/arena_size,
+            (final_pos[2]+arena_size/2.)/arena_size;
+    trajectories.emplace(currentIndIndex,env->get_trajectory());
     //If on the client or just sequential mode
     //update learner
     auto& learner = learners[currentIndIndex];
     numberEvaluation++;
-    learner.update_pop_info(ind->getObjectives(),ind->descriptor());
+    learner.update_pop_info(objs,desc);
     learner.step();
 
     if(learner.is_learning_finish()){//learning is finished for this body plan
@@ -80,14 +73,12 @@ bool MNIPES::update(const Environment::Ptr &){
         best_ctrl_gen.set_biases(biases);
         //update the archive
         if(use_ctrl_arch){
-            CartDesc morph_desc = learner.morph_genome.get_morph_desc();
-            controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+            std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+            std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+            int wheels,joints,sensors;
+            phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
+            ctrl_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,wheels,joints,sensors);
         }
-        //-
-
-        //add new gene in gene_pool
-        genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-        gene_pool.push_back(new_gene);
         //-
     }
     return true;
@@ -134,6 +125,63 @@ void MNIPES::_survival(const phy::MorphGenomeInfoMap &morph_gen_info, std::vecto
 
             list_ids.insert(list_ids.end(),res.begin(),res.end());
         }
+    }
+}
+
+void MNIPES::_reproduction(){
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    std::vector<int> ids;
+    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,ids);
+    int nbr_of_offsprings = pop_size - ids.size();
+
+    std::vector<int> genome_ids;
+    for(const auto &elt: morph_genomes_info)
+        genome_ids.push_back(elt.first);
+
+    for(int i = 0; i < nbr_of_offsprings; i++){
+        //Selection of 4 random parents
+        std::vector<int> random_indexes;
+        random_indexes.push_back(randomNum->randInt(0,pop_size - 1));
+        do{
+            int rand_idx = randomNum->randInt(0,pop_size - 1);
+            bool already_drawn = false;
+            for(const int& idx: random_indexes)
+                if(idx == rand_idx){
+                    already_drawn = true;
+                    break;
+                }
+            if(!already_drawn)
+                random_indexes.push_back(rand_idx);
+        }while(random_indexes.size() < 4);
+        //-
+
+        //Selection of best parents among the subset of 4
+        double best_fitness = 0;
+        int best_id = 0;
+        for(const int &i: random_indexes){
+            double fit = settings::cast<settings::Double>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
+            if(best_fitness < fit){
+                best_fitness = fit;
+                best_id = genome_ids[i];
+            }
+        }
+
+        NN2CPPNGenome new_morph_gene = morph_genomes[best_id];
+        new_morph_gene.mutate();
+        new_morph_gene.set_parameters(parameters);
+        new_morph_gene.set_randNum(randomNum);
+        //-
+
+        //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
+        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
+        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
+        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+        //-
     }
 }
 
@@ -191,7 +239,7 @@ void MNIPES::load_data_for_generate(){
     phy::load_morph_genomes_info(exp_folder,morph_gen_info);
     std::vector<int> list_to_load;
     _survival(morph_gen_info,list_to_load);
-    phy::load_morph_genomes<NN2CPPNGenome>(exp_folder,morph_gen_info,list_to_load,morph_genomes);
+    phy::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
 
 }
 
@@ -199,8 +247,8 @@ void MNIPES::write_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     phy::write_morph_blueprints<PMEIndividual>(repo + "/" + exp_name,population);
-
     phy::write_morph_meshes<PMEIndividual>(repo + "/" + exp_name,population);
+    phy::write_morph_genomes(repo + "/" + exp_name,population);
 }
 
 void MNIPES::load_data_for_update() {
@@ -223,5 +271,17 @@ void MNIPES::load_data_for_update() {
 }
 
 void MNIPES::write_data_for_update(){
-
+    //Go through the list of learners and fill the GP with the one for whom learning is finished
+    for(const auto &learner: learners){
+        if(!learner.second.is_learning_finish())
+            continue;
+        std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+        std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+        std::map<int,NN2CPPNGenome> gen;
+        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+        phy::MorphGenomeInfo morph_info;
+        morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
+        morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
+        phy::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
+    }
 }

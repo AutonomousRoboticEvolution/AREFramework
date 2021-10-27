@@ -1,7 +1,6 @@
-#experimentName,string,physical_melai
+#experimentName,string,physical_melai_test
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
-#instanceType,int,0
 #repository,string,/home/leni/are-logs/
 #seed,int,-1
 
