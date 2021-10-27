@@ -151,10 +151,13 @@ public:
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
 
+    int get_generation(){return generation;}
+
 private:
     std::vector<int> parents_ids;
     nn2_cppn_t cppn;
     CartDesc morph_desc;
+    int generation;
 };
 
 
