@@ -195,15 +195,6 @@ bool ER::stop_evaluation(){
 
     nbrEval++;
 
-
-    std::vector<double> objectives = environment->fitnessFunction(currentInd); //currentInd should not be used
-    if(verbose){
-        std::cout << "fitnesses = " << std::endl;
-        for(const double fitness : objectives)
-            std::cout << fitness << std::endl;
-    }
-    ea->setObjectives(current_id,objectives);
-
     if(ea->update(environment)){
         nbrEval = 0;
     }
