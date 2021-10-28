@@ -21,6 +21,7 @@ add_library(physical_melai SHARED
    ../common/realMaze.cpp
    mnipes.cpp
    cmaes_learner.cpp
+   ../../PhysicalER/src/io_helpers.cpp
     )
 
 target_include_directories(physical_melai PUBLIC ${INCLUDES})
