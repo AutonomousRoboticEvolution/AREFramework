@@ -69,13 +69,13 @@ SET(VREP_SRC
         $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
         )
 
-file(GLOB SRC_GENERATE src/generate/*)
+file(GLOB SRC_GENERATE src/generate/* src/io_helpers.cpp)
 
 if(VREP_FOUND)
     message("Using VREP is deprecated")
 elseif(COPPELIASIM_FOUND)
     SET(LIB_EXT simExtGenerate)
-    SET(PLUGIN_SRC ${SRC_GENERATE} src/pi_individual.cpp)
+    SET(PLUGIN_SRC ${SRC_GENERATE})
 endif()
 
 add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})

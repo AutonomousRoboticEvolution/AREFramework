@@ -19,6 +19,7 @@ void ER::initialize(){
     Logging::create_folder(repository + std::string("/") + exp_name);
     Logging::set_log_folder(repository + std::string("/") + exp_name);
     Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built/"));
+    Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_evaluated/"));
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;
@@ -28,10 +29,9 @@ void ER::initialize(){
 
     std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
 
-    if(!load_fct_exp_plugin<Environment::Factory>
-            (environmentFactory,libhandler,"environmentFactory"))
-        exit(1);
-    environment = environmentFactory(parameters);
+
+    environment = std::make_shared<are::DummyEnv>(are::DummyEnv());
+    environment->set_parameters(parameters);
     environment->set_randNum(randNum);
 
     if(!load_fct_exp_plugin<EA::Factory>

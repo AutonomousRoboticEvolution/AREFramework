@@ -14,14 +14,6 @@
 
 namespace are{
 
-class DummyEnv : public Environment
-{
-public:
-    void init() override {}
-    std::vector<double> fitnessFunction(const Individual::Ptr &ind) {return {0};}
-    void update_info(double time) override {}
-};
-
 class PMEIndividual : public Individual
 {
 public:
