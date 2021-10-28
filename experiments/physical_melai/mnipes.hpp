@@ -17,20 +17,20 @@
 
 namespace are{
 
-class PMEIndividual : public phy::NN2Individual
+class PMEIndividual : public Individual
 {
 public:
     typedef std::shared_ptr<PMEIndividual> Ptr;
     typedef std::shared_ptr<const PMEIndividual> ConstPtr;
 
-    PMEIndividual() : phy::NN2Individual(){}
+    PMEIndividual() : Individual(){}
     PMEIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen){
         this->morphGenome = morph_gen;
         this->ctrlGenome = ctrl_gen;
     }
 
     PMEIndividual(const PMEIndividual& ind) :
-        phy::NN2Individual(ind)
+        Individual(ind)
     {}
 
     Individual::Ptr clone() override
@@ -51,6 +51,7 @@ public:
 
 private:
     void createMorphology() override;
+    void createController() override{}
 
     nn2_cppn_t cppn;
     Eigen::VectorXd morphDesc;
@@ -72,7 +73,9 @@ public:
     MNIPES(){}
     MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     void init() override;
+    void init_random_pop();
     void init_next_pop() override;
+
     bool update(const Environment::Ptr &env) override;
     void setObjectives(size_t current_id,const std::vector<double> &objs){}
     void init_learner(int id);

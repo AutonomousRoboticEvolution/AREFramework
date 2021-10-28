@@ -3,23 +3,14 @@
 using namespace are;
 
 void PMEIndividual::createMorphology(){
-    NEAT::Genome gen =
-            std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-    NEAT::NeuralNetwork nn;
-    gen.BuildPhenotype(nn);
+    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
-    cppn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getNN2CPPN();
-    morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
-    testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-    listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
-    listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
-    listOrganOri = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganOriList();
-    skeletonListIndices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListIndices();
-    skeletonListVertices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListVertices();
+    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
 }
 
 
@@ -28,9 +19,31 @@ void MNIPES::init(){
 
 }
 
-void MNIPES::init_next_pop(){
+void MNIPES::init_random_pop(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    for(int i = 0; i < pop_size; i++){
+        //create a new morph genome with random structure and parameters
+        NN2CPPNGenome new_morph_gene;
+        new_morph_gene.random();
+        new_morph_gene.set_parameters(parameters);
+        new_morph_gene.set_randNum(randomNum);
+        //-
 
-    _reproduction();
+        //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
+        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
+        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
+        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }
+}
+
+void MNIPES::init_next_pop(){
+    if(morph_genomes_info.empty())
+        init_random_pop();
+    else
+        _reproduction();
 }
 
 
@@ -237,6 +250,10 @@ void MNIPES::load_data_for_generate(){
     phy::MorphGenomeInfoMap morph_gen_info;
     std::string exp_folder = repo + std::string("/") + exp_name;
     phy::load_morph_genomes_info(exp_folder,morph_gen_info);
+    //if morph genomes info is empty, then we are in a initialization situation.
+    if(morph_gen_info.empty())
+        return;
+
     std::vector<int> list_to_load;
     _survival(morph_gen_info,list_to_load);
     phy::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
