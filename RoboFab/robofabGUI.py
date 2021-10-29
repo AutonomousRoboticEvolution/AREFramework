@@ -104,9 +104,14 @@ class RobofabGUI:
                                             master=frame_startupUR5 )
         self.label_ur5Status = tk.Label( text="", master=frame_startupUR5 )
 
+        button_organBankManager = tk.Button(text="Organ Bank Manager", width=20, height=2,
+                                             command=self.organBankManager,
+                                             master=frame_startupUR5)
+
         # arrange withing ARE-generate frame:
         self.button_startupUR5.pack()
         self.label_ur5Status.pack()
+        button_organBankManager.pack()
 
         # start GUI:
         self.mainWindow.after(1, self.timedUpdateButtons())
@@ -309,6 +314,48 @@ class RobofabGUI:
                 robotID)
         else:
             self.label_printerStatus[printer_number]["text"] = "Generated blueprint for {}\nsuccess".format(robotID)
+
+    def organBankManager(self):
+        # if self.robofabObject is None:
+        #     print("UR5 not initialised, can't manage organ bank")
+        #     return 1
+
+        print("Manage organ bank...")
+
+        window_bankManager = tk.Tk()
+        frame = tk.Frame(master=window_bankManager, width=750, height=500)
+        tk.Button(master=window_bankManager, text="Close", command=window_bankManager.destroy).pack()
+        frame.pack()
+
+        self.listOfButtons_slots = []
+        for i, organ in enumerate(self.robofabObject.organBank.organsList):
+            text = organ.friendlyName.replace(" organ", "")
+            # add the address to the text:
+            try:
+                text = text + "\n"+hex(int(organ.I2CAddress))
+            except ValueError:
+                text = text+"\n"+organ.I2CAddress # I2CAddress is actually an IP address
+
+            colour = "green" if organ.isInBank else "red"
+
+            self.listOfButtons_slots.append(
+                tk.Button(master=frame, text=text, bg=colour,
+                          command=lambda i=i: self.handlerButtonBankSlot(i)
+                          )
+            )
+            xPosition=organ.positionTransformWithinBankOrRobot[0,3]*1500
+            yPosition=(0.4-organ.positionTransformWithinBankOrRobot[1,3])*1000
+            self.listOfButtons_slots[i].place(x=xPosition, y=yPosition)
+
+    def handlerButtonBankSlot(self,i):
+        print("Swapping state of "+self.robofabObject.organBank.organsList[i].organsList[i].friendlyName)
+
+        if self.robofabObject.organBank.organsList[i].organsList[i].isInBank:
+            self.robofabObject.organBank.organsList[i].organsList[i].friendlyName = False
+            self.listOfButtons_slots[i]["bg"] = "red"
+        else:
+            self.robofabObject.organBank.organsList[i].organsList[i].friendlyName = True
+            self.listOfButtons_slots[i]["bg"] = "green"
 
 
 def setIndividualToLoadInParametersFileForGenerate(filepath, robotID="0_0"):

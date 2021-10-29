@@ -141,10 +141,12 @@ class Bank:
     ## locate an organ of the desired type, remove it from organsList and return it
     def findAnOrgan ( self, desiredTypeID ):
         for i in range ( len ( self.organsList ) ):
-            if self.organsList [ i ].organType == desiredTypeID:  # bingo!
-                return self.organsList.pop ( i )
+            if self.organsList[i].organType == desiredTypeID and self.organsList[i].isInBank==True:  # bingo!
+                self.organsList[i].isInBank = False
+                return self.organsList[i]
         # not found
-        raise (RuntimeError ( "Bank does not contain an organ of type " + str ( desiredTypeID ) ))
+        return None
+        #raise (RuntimeError ( "Bank does not contain an organ of type " + str ( desiredTypeID ) ))
 
     ## locate a cable (they are all the same), remove it from organsList and return it
     def findACable ( self ):
@@ -152,5 +154,12 @@ class Bank:
             raise RuntimeError ( "No cables left in bank" )
         cableOut = self.cablesList.pop ()
         return cableOut
+
+    def countOrgansOfType(self, organType):
+        count = 0
+        for organ in self.organsList:
+            if organ.organType == organType and organ.isInBank:
+                count += 1
+        return count
 
 
