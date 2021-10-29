@@ -109,7 +109,7 @@ void CPPNIndividual::createMorphology()
 }
 
 void CPPNIndividual::createSubstrate(){
-    int mainHandle = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)-> getMainHandle();
+    int mainHandle = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMainHandle();
     std::vector<int> proxHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_proxHandles();
     std::vector<int> IRHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_IRHandles();
     std::vector<int> jointHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_jointHandles();
