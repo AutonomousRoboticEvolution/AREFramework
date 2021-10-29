@@ -13,12 +13,12 @@ float cppn_params::cppn::_rate_del_neuron = 0.05f;
 float cppn_params::cppn::_rate_add_conn = 0.05f;
 float cppn_params::cppn::_rate_del_conn = 0.05f;
 float cppn_params::cppn::_rate_change_conn = 0.05f;
-float cppn_params::cppn::_rate_crossover = 0.2f;
+float cppn_params::cppn::_rate_crossover = 0.5f;
 
-size_t cppn_params::cppn::_min_nb_neurons = 20;
-size_t cppn_params::cppn::_max_nb_neurons = 100;
-size_t cppn_params::cppn::_min_nb_conns = 100;
-size_t cppn_params::cppn::_max_nb_conns = 50000;
+size_t cppn_params::cppn::_min_nb_neurons = 0;
+size_t cppn_params::cppn::_max_nb_neurons = 5;
+size_t cppn_params::cppn::_min_nb_conns = 10;
+size_t cppn_params::cppn::_max_nb_conns = 100;
 
 int cppn_params::cppn::nb_inputs = 4;
 int cppn_params::cppn::nb_outputs = 6;
