@@ -112,7 +112,7 @@ public:
 
     //GETTERS & SETTERS
     void setCurrentIndIndex(int index){currentIndIndex = index;}
-    Individual::Ptr getIndividual(size_t index) const;
+    virtual Individual::Ptr getIndividual(size_t index) const;
     size_t getPopSize() const {return population.size();}
 
     const std::vector<Individual::Ptr> &get_population() const {return population;}

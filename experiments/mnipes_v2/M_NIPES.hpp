@@ -174,6 +174,10 @@ public:
     bool finish_eval(const Environment::Ptr &env) override;
     bool is_finish() override;
 
+    Individual::Ptr getIndividual(size_t index) const override{
+        return population[corr_indexes[index]];
+    }
+
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}

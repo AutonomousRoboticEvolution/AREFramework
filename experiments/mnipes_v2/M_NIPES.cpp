@@ -207,14 +207,15 @@ void M_NIPES::init(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
+        corr_indexes.push_back(0);
     }
 }
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
-    if(population[currentIndIndex]->get_ctrl_genome()->get_type() == "empty_genome")
+    if(population[corr_indexes[currentIndIndex]]->get_ctrl_genome()->get_type() == "empty_genome")
         return true;
 
-    int handle = std::dynamic_pointer_cast<CPPNMorph>(population[currentIndIndex]->get_morphology())->getMainHandle();
+    int handle = std::dynamic_pointer_cast<CPPNMorph>(population[corr_indexes[currentIndIndex]]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
 
@@ -280,15 +281,13 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
     clean_learning_pool();
 
-    Individual::Ptr ind;
+    Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        ind = population[currentIndIndex];
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());;
     }
     //If one the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        ind = population[corr_indexes[currentIndIndex]];
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
