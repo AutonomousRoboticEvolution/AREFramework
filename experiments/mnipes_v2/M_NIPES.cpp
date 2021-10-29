@@ -198,6 +198,7 @@ void M_NIPES::init(){
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
+            corr_indexes.push_back(i);
         }
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
@@ -279,13 +280,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
     clean_learning_pool();
 
-    Individual::Ptr ind = population[currentIndIndex];
+    Individual::Ptr ind;
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+        ind = population[currentIndIndex];
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());;
     }
     //If one the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+        ind = population[corr_indexes[currentIndIndex]];
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
@@ -348,6 +351,11 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 init_new_ctrl_pop(learner);
             }
         }
+        population.erase(population.begin() + corr_indexes[currentIndIndex]);
+        population.shrink_to_fit();
+        corr_indexes[currentIndIndex] = -1;
+        for(int i = currentIndIndex; i < corr_indexes.size(); i++)
+            corr_indexes[i]--;
     }
 
     return true;
@@ -392,6 +400,9 @@ void M_NIPES::reproduction(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
+        int i = corr_indexes.size() - 1;
+        while(corr_indexes[i] < 0) i--;
+        corr_indexes.push_back(corr_indexes[i]+1);
         //-
     }
 }
@@ -506,5 +517,8 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ind->set_randNum(randomNum);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         population.push_back(ind);
+        int i = corr_indexes.size() - 1;
+        while(corr_indexes[i] < 0) i--;
+        corr_indexes.push_back(corr_indexes[i]+1);
     }
 }

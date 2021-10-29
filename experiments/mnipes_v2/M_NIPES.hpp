@@ -133,6 +133,7 @@ private:
     void createMorphology() override;
     void createController() override;
 
+
     std::vector<bool> testRes;
     double manScore;
     std::vector<std::vector<std::vector<int>>> graphMatrix;
@@ -192,6 +193,7 @@ private:
     void clean_learning_pool();
     void reproduction();
 
+    std::vector<int> corr_indexes;
 
     fitness_fct_t fitness_fct;
 
