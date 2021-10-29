@@ -169,7 +169,8 @@ private:
     };
 
 public:
-    NEAT::Substrate get_substrate() { return substrate;};
+    NEAT::Substrate get_substrate() { return substrate;}
+    void set_substrate(NEAT::Substrate sub){substrate = sub;}
 
 private:
     NEAT::NeuralNetwork nn;

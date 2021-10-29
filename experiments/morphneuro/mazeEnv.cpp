@@ -13,9 +13,6 @@ MazeEnv::MazeEnv()
     name = "mazeEnv";
 
     // Definition of default values of the parameters.
-
-
-
     settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
     settings::defaults::parameters->emplace("#target_y",new settings::Double(0.));
     settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
@@ -25,6 +22,8 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    
+    load_target_positions();
 }
 
 void MazeEnv::init(){
@@ -97,6 +96,12 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
             f = 0;
         else if(f > 1) f = 1;
 
+    bool multi_target = settings::getParameter<settings::Boolean>(parameters,"#isMultiTarget").value;
+    if(multi_target){
+        current_target+=1;
+        if(current_target >= target_position_all.size())
+            current_target=0;
+    }
     return d;
 }
 
@@ -155,4 +160,20 @@ void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
             simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
         }
     }
+}
+
+void MazeEnv::load_target_positions(){
+//    double pos1,pos2,pos3;
+    std::vector<double> pos1;
+    std::vector<double> pos2;
+    std::vector<double> pos3;
+    pos1.resize(3);
+    pos2.resize(3);
+    pos3.resize(3);
+    pos1 = {0.75,0.75,0.12};
+    pos2 = {-0.75,0.75,0.12};
+    pos3 = {0.75,0.75,0.12};
+    target_position_all.push_back(pos1);
+    target_position_all.push_back(pos2);
+    target_position_all.push_back(pos3);
 }

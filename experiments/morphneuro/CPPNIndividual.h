@@ -81,6 +81,7 @@ namespace are {
     protected:
         void createController() override;
         void createMorphology() override;
+        void createSubstrate();
 
         NEAT::NeuralNetwork nn_morph;
         NEAT::NeuralNetwork nn_contrl;

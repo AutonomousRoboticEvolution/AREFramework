@@ -67,7 +67,7 @@ void CPPNIndividual::createMorphology()
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition_without_substrate(start_position[0],start_position[1],start_position[2]);
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
         setManRes();
@@ -88,7 +88,7 @@ void CPPNIndividual::createMorphology()
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition_without_substrate(start_position[0],start_position[1],start_position[2]);
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
         setManRes();
@@ -100,7 +100,7 @@ void CPPNIndividual::createMorphology()
         NEAT::NeuralNetwork nn;
         gen.BuildPhenotype(nn);
         std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition_without_substrate(start_position[0],start_position[1],start_position[2]);  //fixed position
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);  //fixed position
         setGenome();
         setMorphDesc();
         setManRes();
@@ -108,9 +108,127 @@ void CPPNIndividual::createMorphology()
 
 }
 
+void CPPNIndividual::createSubstrate(){
+    int mainHandle = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)-> getMainHandle();
+    std::vector<int> proxHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_proxHandles();
+    std::vector<int> IRHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_IRHandles();
+    std::vector<int> jointHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_jointHandles();
+    std::vector<int> wheelHandles = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_wheelHandles();
+
+    NEAT::Substrate substrate;
+
+    // set substrate
+    int substrate_hidden_num = settings::getParameter<settings::Integer>(parameters,"#substrate_hidden_num").value;
+    //substrate.m_input_coords.clear();
+    //substrate.m_hidden_coords.clear();
+    //substrate.m_output_coords.clear();
+    std::vector< std::vector<double> > substrate_input_layer;
+    for(int i = 0; i < proxHandles.size(); i++){
+        float pos[3];
+        std::vector<double> proxPos;
+        // local coordinate framework
+        simGetObjectPosition(proxHandles[i], mainHandle, pos);
+        proxPos.push_back(static_cast<double>(pos[0]));
+        proxPos.push_back(static_cast<double>(pos[1]));
+        proxPos.push_back(static_cast<double>(pos[2]));
+        substrate_input_layer.push_back(proxPos);
+    }
+
+    for(int i = 0; i < IRHandles.size(); i++){
+        float pos[3];
+        std::vector<double> proxPos;
+        // local coordinate framework
+        simGetObjectPosition(IRHandles[i], mainHandle, pos);
+        proxPos.push_back(static_cast<double>(pos[0]));
+        proxPos.push_back(static_cast<double>(pos[1]));
+        proxPos.push_back(static_cast<double>(pos[2]));
+        substrate_input_layer.push_back(proxPos);
+    }
+
+    std::vector<double> biasInSubstrate;
+    biasInSubstrate.push_back(0.5);
+    biasInSubstrate.push_back(0.5);
+    biasInSubstrate.push_back(0.5);
+    substrate_input_layer.push_back(biasInSubstrate);
+    substrate.m_input_coords = substrate_input_layer;
+
+    std::vector< std::vector<double> > substrate_output_layer;
+
+    for(int i = 0; i < wheelHandles.size(); i++){
+        float pos[3];
+        std::vector<double> jointPos;
+        // local coordinate framework
+        simGetObjectPosition(wheelHandles[i], mainHandle, pos);
+        jointPos.push_back(static_cast<double>(pos[0]));
+        jointPos.push_back(static_cast<double>(pos[1]));
+        jointPos.push_back(static_cast<double>(pos[2]));
+        substrate_output_layer.push_back(jointPos);
+    }
+
+    for(int i = 0; i < jointHandles.size(); i++){
+        float pos[3];
+        std::vector<double> jointPos;
+        // local coordinate framework
+        simGetObjectPosition(jointHandles[i], mainHandle, pos);
+        jointPos.push_back(static_cast<double>(pos[0]));
+        jointPos.push_back(static_cast<double>(pos[1]));
+        jointPos.push_back(static_cast<double>(pos[2]));
+        substrate_output_layer.push_back(jointPos);
+    }
+    substrate.m_output_coords = substrate_output_layer;
+
+    // todo: to generate the hidden neuron location(use bounding box)
+    std::vector< std::vector<double> > substrate_hidden_layer;
+    for(int i = 0; i < substrate_hidden_num; i++){
+        std::vector<double> vector;
+        double x = settings::getParameter<settings::Double>(parameters,"#hidden_x" + itos(i)).value;
+        double y = settings::getParameter<settings::Double>(parameters,"#hidden_y" + itos(i)).value;
+        double z = settings::getParameter<settings::Double>(parameters,"#hidden_z" + itos(i)).value;
+        vector.push_back(x);
+        vector.push_back(y);
+        vector.push_back(z);
+        substrate_hidden_layer.push_back(vector);
+    }
+    substrate.m_hidden_coords = substrate_hidden_layer;
+
+    bool isRNN = settings::getParameter<settings::Boolean>(parameters,"#isRNN").value;
+    if(isRNN){
+        substrate.m_allow_input_hidden_links = true;
+        substrate.m_allow_input_output_links = false;
+        substrate.m_allow_hidden_hidden_links = true;
+        substrate.m_allow_hidden_output_links = true;
+        substrate.m_allow_output_hidden_links = true;
+        substrate.m_allow_output_output_links = false;
+        substrate.m_allow_looped_hidden_links = true;
+        substrate.m_allow_looped_output_links = false;
+    }else{
+        substrate.m_allow_input_hidden_links = false;
+        substrate.m_allow_input_output_links = false;
+        substrate.m_allow_hidden_hidden_links = false;
+        substrate.m_allow_hidden_output_links = false;
+        substrate.m_allow_output_hidden_links = false;
+        substrate.m_allow_output_output_links = false;
+        substrate.m_allow_looped_hidden_links = false;
+        substrate.m_allow_looped_output_links = false;
+
+        substrate.m_allow_input_hidden_links = true; // connect input layer and hidden layer
+        substrate.m_allow_input_output_links = false;
+        substrate.m_allow_hidden_output_links = true; // connect hidden layer and output layer
+        substrate.m_allow_hidden_hidden_links = false;
+    }
+
+    substrate.m_query_weights_only = true;
+    substrate.m_with_distance = false;
+
+    substrate.m_hidden_nodes_activation = NEAT::SIGNED_SIGMOID;
+    substrate.m_output_nodes_activation = NEAT::SIGNED_SIGMOID;
+
+    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->set_substrate(substrate);
+}
+
 void CPPNIndividual::createController()
 {
-    std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->create_substrate();  // isolate the process of creating substrate
+    createSubstrate();
 
     bool loadBestIndividual = settings::getParameter<settings::Boolean>(parameters,"#loadBestIndividual").value;
     bool loadSpecificIndividual = settings::getParameter<settings::Boolean>(parameters,"#loadSpecificIndividual").value;

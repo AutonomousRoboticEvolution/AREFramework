@@ -340,6 +340,7 @@ void Morphology_CPPNMatrix::create()
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 
+    
     // set substrate
     int substrate_hidden_num = settings::getParameter<settings::Integer>(parameters,"#substrate_hidden_num").value;
     //substrate.m_input_coords.clear();
@@ -445,7 +446,7 @@ void Morphology_CPPNMatrix::create()
 
     substrate.m_hidden_nodes_activation = NEAT::SIGNED_SIGMOID;
     substrate.m_output_nodes_activation = NEAT::SIGNED_SIGMOID;
-
+    
 }
 
 
@@ -774,7 +775,6 @@ void Morphology_CPPNMatrix::create_without_substrate(){
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
-
 
 void Morphology_CPPNMatrix::create_substrate(){
     // set substrate
