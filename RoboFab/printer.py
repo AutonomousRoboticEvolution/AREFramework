@@ -288,7 +288,7 @@ if __name__ == "__main__":
 
         printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_0"])
         printer.createSTL(robot_ID)
-        printer.slice("mesh"+robot_ID)
+        printer.slice("mesh_"+robot_ID)
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
