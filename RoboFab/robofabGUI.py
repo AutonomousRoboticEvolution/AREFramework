@@ -104,14 +104,14 @@ class RobofabGUI:
                                             master=frame_startupUR5 )
         self.label_ur5Status = tk.Label( text="", master=frame_startupUR5 )
 
-        button_organBankManager = tk.Button(text="Organ Bank Manager", width=20, height=2,
+        self.button_organBankManager = tk.Button(text="Organ Bank Manager", width=20, height=2,
                                              command=self.organBankManager,
                                              master=frame_startupUR5)
 
         # arrange withing ARE-generate frame:
         self.button_startupUR5.pack()
         self.label_ur5Status.pack()
-        button_organBankManager.pack()
+        self.button_organBankManager.pack()
 
         # start GUI:
         self.mainWindow.after(1, self.timedUpdateButtons())
@@ -122,9 +122,7 @@ class RobofabGUI:
         self.mainWindow.after(100, self.timedUpdateButtons)
 
     def handlerButtonAssemble(self, printer_number):
-        if not self.printingDone [printer_number]:
-            self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nprinting not done"
-        elif self.robofabObject is None:
+        if self.robofabObject is None:
             self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nRoboFab not initialised"
         else:
             self.label_printerStatus[printer_number]["text"] = "*busy assembling*\n"
@@ -149,8 +147,11 @@ class RobofabGUI:
         # if UR5 not yet initialised, active button
         if self.robofabObject is None:
             self.button_startupUR5["bg"]="yellow"
+            self.button_organBankManager["bg"] = "grey"
         else:
             self.button_startupUR5["bg"]="green"
+            self.button_organBankManager["bg"] = "yellow"
+
 
 
         for i in range(NUMBER_OF_PRINTERS):
@@ -315,9 +316,10 @@ class RobofabGUI:
             self.label_printerStatus[printer_number]["text"] = "Generated blueprint for {}\nsuccess".format(robotID)
 
     def organBankManager(self):
-        # if self.robofabObject is None:
-        #     print("UR5 not initialised, can't manage organ bank")
-        #     return 1
+        if self.robofabObject is None:
+            print("UR5 not initialised, can't manage organ bank")
+            self.globalErrorText["text"]="UR5 not initialised, can't manage organ bank"
+            return 1
 
         print("Manage organ bank...")
 
@@ -347,13 +349,13 @@ class RobofabGUI:
             self.listOfButtons_slots[i].place(x=xPosition, y=yPosition)
 
     def handlerButtonBankSlot(self,i):
-        print("Swapping state of "+self.robofabObject.organBank.organsList[i].organsList[i].friendlyName)
+        print("Swapping state of "+self.robofabObject.organBank.organsList[i].friendlyName)
 
-        if self.robofabObject.organBank.organsList[i].organsList[i].isInBank:
-            self.robofabObject.organBank.organsList[i].organsList[i].friendlyName = False
+        if self.robofabObject.organBank.organsList[i].isInBank:
+            self.robofabObject.organBank.organsList[i].isInBank = False
             self.listOfButtons_slots[i]["bg"] = "red"
         else:
-            self.robofabObject.organBank.organsList[i].organsList[i].friendlyName = True
+            self.robofabObject.organBank.organsList[i].isInBank = True
             self.listOfButtons_slots[i]["bg"] = "green"
 
 
