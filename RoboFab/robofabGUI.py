@@ -98,13 +98,13 @@ class RobofabGUI:
         #  UR5 startup section:
         self.robofabObject = None
         frame_startupUR5 = tk.Frame(width=25, borderwidth=1, relief=tk.RAISED)
-        frame_startupUR5.grid(row=2, column=3)
+        frame_startupUR5.grid(row=2, column=NUMBER_OF_PRINTERS+1)
         self.button_startupUR5 = tk.Button( text="Initialise UR5", width=20, height=2,
                                             command=self.buttonHandlerStartUR5,
                                             master=frame_startupUR5 )
         self.label_ur5Status = tk.Label( text="", master=frame_startupUR5 )
 
-        # arrange withing ARE-generate frame:
+        # arrange withing UR5 frame:
         self.button_startupUR5.pack()
         self.label_ur5Status.pack()
 
@@ -171,7 +171,10 @@ class RobofabGUI:
                 #printing not in progress
 
                 # find colour for "select robot ID" button
-                if self.robotID_loaded[i] == self.entry_robotID[i].get():
+                if self.entry_robotID[i].get()=="":
+                    #  no text in input field
+                    self.button_printerLoadFile[i]["bg"] = "red"
+                elif self.robotID_loaded[i] == self.entry_robotID[i].get():
                     #  ID already loaded
                     self.button_printerLoadFile[i]["bg"] = "green"
                 elif "morphGenome_{}".format(self.entry_robotID[i].get()) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
@@ -200,14 +203,11 @@ class RobofabGUI:
                     self.button_initPrinter[i]["bg"] = "green"
 
                 # find colour for "slice" button:
-                if self.printerObjects[i] is None:
-                    # printer not initialised
-                    self.button_slice[i]["bg"] = "grey"
-                elif "mesh_{}.gcode".format ( self.robotID_loaded [ i ] ) in os.listdir ( "./gcode/"  ):
+                if "mesh_{}.gcode".format(self.robotID_loaded[i]) in os.listdir("./gcode/"):
                     # gcode is already done
-                    self.button_slice [ i ] [ "bg" ] = "green"
-                elif not "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-                    # haven't made the blueprint yet
+                    self.button_slice[i]["bg"] = "green"
+                elif not "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)) or not self.printerObjects[i] is None:
+                    # haven't made the blueprint yet or printer not initialised
                     self.button_slice[i]["bg"] = "grey"
                 else:
                     # blueprint exists but hasn't been sliced, so ready to go!
@@ -216,18 +216,18 @@ class RobofabGUI:
                 # find colour for print button:
                 if self.printingDone[i]:
                     self.button_print [ i ] [ "bg" ] = "green"
-                elif "mesh_{}.gcode".format ( self.robotID_loaded [ i ] ) in os.listdir ( "./gcode/"  ):
-                    # slicing done, ready to print
+                elif "mesh_{}.gcode".format ( self.robotID_loaded [ i ] ) in os.listdir ( "./gcode/"  ) and not self.printerObjects[i] is None:
+                    # slicing done and printer is connected
                     self.button_print [ i ] [ "bg" ] = "yellow"
                 else:
                     self.button_print [ i ] [ "bg" ] = "grey"
 
                 # find colour for assemble button:
-                if "list_of_organs_{}.csv".format ( self.entry_robotID [ i ].get () ) in os.listdir (
+                if "list_of_organs_addresses_{}.csv".format ( self.robotID_loaded[i]) in os.listdir (
                     "{}/waiting_to_be_evaluated".format ( self.logDirectory ) ):
                     # organs list already exists, so has been assembled
                     self.button_assemble [ i ] [ "bg" ] = "green"
-                elif self.printingDone[i]:
+                elif self.printingDone[i] and not self.robofabObject is None:
                     # printing done, so ready to do assembly (but not yet done):
                     self.button_assemble [ i ] [ "bg" ] = "yellow"
                 else:
@@ -253,7 +253,7 @@ class RobofabGUI:
         self.printerObjects[printer_number].createSTL(robot_ID)
         self.printerObjects[printer_number].slice("mesh_" + robot_ID)
 
-        self.label_printerStatus[printer_number]["text"] = "Slicing done"
+        self.label_printerStatus[printer_number]["text"] = "Slicing done\n"
 
     def handlerButtonPrinterInit( self, printer_number ):
         # check the status is acceptable:
@@ -261,15 +261,14 @@ class RobofabGUI:
             self.label_printerStatus[printer_number]["text"] = "Already initialised\n"
             print("Already initialised")
         else:
-            self.label_printerStatus[printer_number]["text"] = "*busy*\n"
+            self.label_printerStatus[printer_number]["text"] = "*trying to connect*\n"
             self.mainWindow.update()
             # setup printer object:
             IPAddress = self.configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)]
             try:
-                # self.printerObjects[printer_number] = Printer(IPAddress=IPAddress, config=configurationData["PRINTER_{}".format(printer_number)])
-                self.printerObjects[printer_number] = Printer(IPAddress=None, configurationData=configurationData,
-                                                              printer_number=printer_number)
-                print("Skipping printer connection")
+                self.printerObjects[printer_number] = Printer(IPAddress=IPAddress, configurationData=configurationData, printer_number=printer_number)
+                # self.printerObjects[printer_number] = Printer(IPAddress=None, configurationData=configurationData, printer_number=printer_number)
+                # print("Skipping printer connection")
             except Exception as inst:
                 self.globalErrorText = "Failed to initialise printer {} at {}".format(printer_number, IPAddress)
                 raise inst
@@ -285,7 +284,7 @@ class RobofabGUI:
 
         # change status:
         self.label_printerStatus[printer_number]["text"] = "Robot selected\n"
-        self.printingDone=False
+        self.printingDone[printer_number]=False
 
     def buttonHandlerRunGenerate(self, printer_number):
         # self.robotIDLoadedGenerate = self.entryIDForGenerate.get()  # get and save the new robot ID

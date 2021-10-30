@@ -8,9 +8,9 @@ from helperFunctions import makeTransformInputFormatted, makeTransformMillimeter
 import math
 import numpy as np
 
-LOG_FOLDER = "/home/matt/are-logs/test_are_generate"
-COPPELIASIM_FOLDER = "/home/matt/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04"
-SOFTWARE_PARAMETERS_FILE= "/home/matt/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
+COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
+SOFTWARE_PARAMETERS_FILE= "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
 def makeFile(location):
 

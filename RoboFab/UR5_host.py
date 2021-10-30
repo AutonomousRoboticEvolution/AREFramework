@@ -254,8 +254,8 @@ class UR5Robot:
                 self.UR5isConnected = False
                 self.isRunning=False
                 self.stopArm()
+                raise RuntimeError("Disconnected from UR arm")
                 break
-                # raise RuntimeError("Disconnected from UR arm")
 
 
     ## Pickup an organ and insert it
