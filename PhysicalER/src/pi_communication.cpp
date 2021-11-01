@@ -1,54 +1,47 @@
-#include "physicalER/pi_communication.hpp"
+#define MESSAGE_DEBUG_PRINTING false
 
+#include "physicalER/pi_communication.hpp"
 //using namespace are::phy;
 
-void are::phy::send_string(std::string& str_rpl, const std::string& str_msg,  zmq::socket_t& request){
-    zmq::message_t message(str_msg.size());
-    strcpy(static_cast<char*>(message.data()),str_msg.c_str());
-    request.send(message);
-    zmq::message_t reply;
-    request.recv(&reply);
-    str_rpl = static_cast<char*>(reply.data());
-    str_rpl.resize(reply.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
-    std::cout<<"Got reply of \""<<str_rpl<<"\" (length "<<str_rpl.size()<<")"<<std::endl;
+void are::phy::send_string(std::string& str_rpl, const std::string& str_msg,  zmq::socket_t& socket){
+    // send message:
+    send_string_no_reply(str_msg,socket);
+
+    // get reply:
+    receive_string_no_reply(str_rpl, socket);
 }
 
-void are::phy::receive_string(std::string& str_msg, const std::string& str_reply, zmq::socket_t& reply){
-    zmq::message_t reply_msg(str_reply.size());
-    strcpy(static_cast<char*>(reply_msg.data()),str_reply.c_str());
-    zmq::message_t message;
-    reply.recv(&message);
-    reply.send(reply_msg);
-    str_msg = static_cast<char*>(message.data());
-    str_msg.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
-    std::cout<<"Sending reply of \""<<static_cast<char*>(reply_msg.data())<<"\" (length "<<str_reply.size()<<")"<<std::endl;
+void are::phy::receive_string(std::string& str_msg, const std::string& str_reply, zmq::socket_t& socket){
+    // receive a message
+    receive_string_no_reply(str_msg, socket);
+
+    //send the reply
+    send_string_no_reply(str_reply, socket);
 }
 
-bool are::phy::send_order(OrderType order, zmq::socket_t& request){
+void are::phy::send_string_no_reply(const std::string &message_string, zmq::socket_t &socket){
+    std::string string_to_send;
 
-//TODO rewrite this function
-    //std::cout << "send order" << std::endl;
-
-    zmq::message_t order_msg(1);
-    int ord[1] = {static_cast<int>(order)};
-    memcpy(order_msg.data(),ord,1);
-
-    request.send(order_msg);
-    zmq::message_t reply;
-    request.recv(&reply);
-
-
-    if(strcmp(static_cast<char*>(reply.data()),"order recieved")!=0){
-        std::cerr << "Connection Lost to : Time Out" << std::endl;
-        return false;
+    if (message_string.substr(0,3)=="pi "){
+        string_to_send=message_string;
+    }else{// add "pi " prefix
+        string_to_send="pi "+message_string;
     }
-    else return true;
+
+    if(MESSAGE_DEBUG_PRINTING) std::cout<<"Sending \""<<string_to_send<<"\" which is length "<<string_to_send.size()<<std::endl;
+    socket.send( zmq::buffer( string_to_send ));
 }
 
-void are::phy::wait_for_message(std::string &str_mess, zmq::socket_t &subscriber){
-    //std::cout << "wait for message" << std::endl;
+void are::phy::receive_string_no_reply(std::string &message_string, zmq::socket_t &socket){
+    zmq::message_t message;
+    socket.recv(&message);
+    message_string = static_cast<char*>(message.data());
+    message_string.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
+    if(MESSAGE_DEBUG_PRINTING) std::cout<<"Received string \""<<message_string<<"\" which is length "<<message_string.size()<<std::endl;
 
-    zmq::message_t msg;
-    subscriber.recv(&msg);
-    str_mess = static_cast<char*>(msg.data());
+    // remove "pi " prefix:
+    if (message_string.substr(0,3)=="pi "){
+        message_string=message_string.substr(3,message_string.size());
+    }
+
 }

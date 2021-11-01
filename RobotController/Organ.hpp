@@ -19,6 +19,9 @@ enum OrganType {SENSOR, WHEEL, JOINT};
 class Organ : protected I2CDevice
 {
 public:
+
+    boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
+
     /**
             @brief Organ constructor.
             This simply calls the superclass constructor I2CDevice()

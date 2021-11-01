@@ -15,6 +15,9 @@ public:
     static void set_log_folder(const std::string&);
     static std::string log_folder;
 
+    // Takes an arbitrary string input and saves it as a new file in the log_folder:
+    static void saveStringToFile(std::string fileName, std::string data);
+
     typedef std::shared_ptr<Logging> Ptr;
     typedef std::shared_ptr<const Logging> ConstPtr;
     typedef void (Factory) (std::vector<Logging::Ptr>&,

@@ -9,6 +9,9 @@
 //Constructor
 MotorOrgan::MotorOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
+
+    // record organ type:
+    organType = WHEEL;
 }
 
 //Speed input is a signed 8-bit integer where -ve value denotes reverse direction
@@ -61,29 +64,22 @@ void MotorOrgan::standby() {
 	writeControlReg();
 }
 
-//Read the contents of the FAULT register
-/* FAULT REG BIT MEANINGS
-________________________________________
- CLEAR --- --- ILIMIT OTS UVLO OCP FAULT
-   7	  6   5     4    3    2   1    0
-
- CLEAR: Write '1' to this to clear fault reg
- ILIMIT: Current limit exceeded event
- OTS: Overtemperature shutdown
- UVLO: Undervoltage lockout
- OCP: Overcurrent protection
- FAULT: Set if any fault condition exists
-*/
-uint8_t MotorOrgan::readFaultReg() {
-	//Read and return the contents of the fault register
-	return read8From(DRV_FAULT_REG_ADDR);
+//NOTE: Must have a delay between using this function and further writes to I2C
+//I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
+void MotorOrgan::setCurrentLimit(uint8_t tensOfMilliamps){
+    write8To(CURRENT_LIMIT_REGISTER, tensOfMilliamps);
 }
 
-//Clear the contents of the FAULT register
-void MotorOrgan::clearFaultReg()  {
-	//Write '1' to bit [7] of the fault register to clear it
-	uint8_t clear = 0x80; //1000000
-	write8To(DRV_FAULT_REG_ADDR, clear);
+int8_t MotorOrgan::readMeasuredCurrent() {
+    return read8From(GET_MEASURED_CURRENT_REGISTER);
+}
+
+int8_t MotorOrgan::readMeasuredVelocity() {
+    return read8From(GET_MEASURED_VELOCITY_REGISTER);
+}
+
+float MotorOrgan::readMeasuredVelocityRPM() {
+    return float(this->readMeasuredVelocity())*CONVERT_ENCODER_TICKS_PER_TIMESTEP_TO_REV_PER_MINUTE;
 }
 
 /**PRIVATE FUNCTIONS ***/

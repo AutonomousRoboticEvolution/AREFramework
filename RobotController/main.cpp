@@ -16,6 +16,8 @@
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
 
+#define DO_JOINT_TORQUE_TEST false
+
 #define DO_JOINT_TEST false
 #define JOINT1_ADDRESS 0x09
 #define JOINT2_ADDRESS 0x08
@@ -24,9 +26,10 @@
 
 
 #define DO_WHEEL_TEST false
-#define WHEEL_ADDRESS 0x60
+#define WHEEL_ADDRESS 0x65
 
 #define DO_SENSOR_TEST false
+#define DO_MULTI_SENSOR_TEST false
 
 
 #define LED_DRIVER_ADDR 0x6A
@@ -61,6 +64,53 @@ void setup_sigint_catch()
 
 #include <bitset> // for displaying binary values
 
+bool wheel_torque_test_helper(MotorOrgan wheel,int value){
+    std::cout<< "Limit: "<<value*10<<"mA";
+
+    wheel.setCurrentLimit(value);
+    sleep(1);
+    wheel.setSpeed(20);
+    sleep(2);
+    
+    int speed=0;
+    int current=0;
+    for(int i=0;i<10;i++){
+        speed+= wheel.readMeasuredVelocity();
+        current+= wheel.readMeasuredCurrent();
+        usleep(20000);
+    }
+    wheel.standby();
+    std::cout<<", speed: "<<float(speed)/10.0 <<", current: "<<float(current)/10.0 <<std::endl;
+    if (speed>15){return true;}
+    else {return false;}
+}
+
+void wheel_torque_test(MotorOrgan wheel){
+    
+    int lower_bound=0;
+    int upper_bound=100;
+    bool found_value=false;
+
+    while(found_value==false){
+        
+        int new_test_value = lower_bound + (upper_bound-lower_bound)/2;
+        if ( wheel_torque_test_helper(wheel, new_test_value) ){
+            // passed
+            upper_bound=new_test_value;
+        }else{
+            // failed
+            lower_bound=new_test_value;
+        }
+        
+        if (upper_bound-lower_bound<=1) { found_value=true; }
+    }
+
+    std::cout<<"required torque is between "<<lower_bound*10<<" and "<<upper_bound*10<<" mA.";
+    
+
+}
+
+
 
 int main()
 {
@@ -68,7 +118,7 @@ int main()
 /************ Battery monitor testing ********************************************/
     BatteryMonitor batteryMonitor;
 //    batteryMonitor.setBatteryChargeRemaining(2000);
-//    batteryMonitor.testingDisplayBatteryLevels();
+    batteryMonitor.testingDisplayBatteryLevels();
 //    batteryMonitor.printAllPages();
 
 /************ Fan and daughter boards enable testing *********************************/
@@ -80,33 +130,51 @@ int main()
 /************ LEDs ********************************************/
     LedDriver ledDriver(0x6A); // <- the Led driver is always the same i2c address, it cannot be cahnged
     ledDriver.init();
-    //ledDriver.flash();
+    ledDriver.flash(BLUE, 1000000 ,20);
 
-/************ temp! ********************************************/
-std::list<Organ> listOfOrgans;
-listOfOrgans.push_back( SensorOrgan( 0x3A ) );
-listOfOrgans.push_back( MotorOrgan( WHEEL_ADDRESS ) );
 
-for (std::list<Organ>::iterator thisOrgan = listOfOrgans.begin(); thisOrgan != listOfOrgans.end(); ++thisOrgan){
-    if(thisOrgan->testConnection()){
-        std::cout<<"connection test successful"<<std::endl;
-        ledDriver.flash(GREEN);    
-    }else{
-        std::cout<<"connection test fail"<<std::endl;
-        ledDriver.flash(RED);    
-    }
+/************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
+if (DO_JOINT_TORQUE_TEST){
     
-    OrganType thisOrganType = thisOrgan->organType;
-    if (thisOrganType == WHEEL ){
-        std::cout<<"this is a sensor"<<std::endl;
-        std::cout<<thisOrgan-> <<std::endl;
-    }else{
-        std::cout<<"this is not a sensor"<<std::endl;    
+    int jointAddress = 0x09;
+
+    #define START_CURRENT 1000
+    #define CURRENT_STEP 50
+
+    std::cout<<"Doing the joint torque test for "<< jointAddress<<std::endl;
+    
+    // make joint
+    JointOrgan joint(jointAddress);
+    joint.setTargetAngleNormalised(1);
+    sleep(2);
+    
+    int currentLimit_mA = START_CURRENT-CURRENT_STEP;
+    bool has_failed = true;
+    while(has_failed){
+        //Set new current limit
+        currentLimit_mA+=CURRENT_STEP;
+        std::cout<<"Current limit: "<<currentLimit_mA<<"mA"<<std::endl;
+        joint.setCurrentLimit(currentLimit_mA/10);
+        sleep(1);
+
+        joint.setTargetAngleNormalised(-1);
+        sleep(2);
+        int measured_value = joint.readMeasuredAngle();
+        if (measured_value<-70){
+            has_failed=false;
+            std::cout<<"Success!"<<std::endl;
+            joint.setTargetAngleNormalised(1);
+        }else{
+            std::cout<<"Fail..."<<measured_value<<std::endl;
+            if(currentLimit_mA>=1200){
+                std::cout<<"Max torque, still failed"<<std::endl;
+                has_failed=false;
+            }
+            joint.setTargetAngleNormalised(1);
+            sleep(4);
+        }
     }
-
-    usleep(50000);
 }
-
 
 /************ joint test ********************************************/
 if (DO_JOINT_TEST){
@@ -165,28 +233,43 @@ for (int n=0; n<numRepetitions; ++n) {
 
 /************ Wheel test ********************************************/
 if (DO_WHEEL_TEST){
+    daughterBoards.turnOn(RIGHT);
+    std::cout<<"Testing wheel functionality"<<std::endl;
     MotorOrgan myWheel(WHEEL_ADDRESS);
-    if(myWheel.testConnection()){
-        std::cout<<"wheel connection successful"<<std::endl;
-        ledDriver.flash(GREEN);
-        
-        for(float speed=-1.0; speed<=1.0; speed+=0.25){
-            myWheel.setSpeedNormalised(speed);
-            std::cout<<"Set speed to: "<<speed<<std::endl;
-            sleep(1);
-        }
-        myWheel.standby();
-        
-    }else{
-        std::cout<<"wheel connection failed"<<std::endl;
-        ledDriver.flash(RED);
-    }
-
+    
+    
+    wheel_torque_test(myWheel);
+    
+    myWheel.standby();
+    //daughterBoards.turnOff();
     ledDriver.flash(BLUE);
 }
 
 /************ Sensor test ********************************************/
-if(DO_SENSOR_TEST){
+/************ Sensor test ********************************************/
+if (DO_SENSOR_TEST){
+
+    SensorOrgan mySensor(0x30);
+    daughterBoards.turnOn(LEFT);
+
+    std::cout<<std::endl;
+    
+    while(1){
+        std::cin.get();
+        int n_successes = 0;
+        /*for (int i=0;i<100;i++){
+            if (mySensor.readTimeOfFlight() < 1500){
+                n_successes++;
+            }
+            usleep(50000);
+        }
+        std::cout<<float(n_successes)<<"%"<<std::endl;
+        */
+        std::cout<<mySensor.readInfrared()<<std::endl;
+    }
+}
+
+if(DO_MULTI_SENSOR_TEST){
 
     std::list<SensorOrgan> listOfSensors;
     listOfSensors.push_back( SensorOrgan( 0x30 ) );
@@ -236,29 +319,9 @@ if(DO_SENSOR_TEST){
         //std::cout<<std::endl;
         std::cin.get();
     }
-    
-    
-    /*
-    #define n_distances_to_test 15
-    #define start_distance 100
-    #define gap_between_distances start_distance
-    #define n_repeats_per_distance 50
-    
-    SensorOrgan mySensor(0x36);
-    daughterBoards.turnOn(LEFT);
 
-    std::cout<<std::endl;
+    
 
-    for (int i_distance=0;i_distance<n_distances_to_test;i_distance++){
-        int this_distance=start_distance + i_distance*gap_between_distances;
-        std::cout<<this_distance<<",";
-        for (int i_repeat=0;i_repeat<n_repeats_per_distance;i_repeat++){
-            std::cout<<mySensor.readInfrared()<<",";
-            usleep(20000);
-        }
-        std::cin.get();
-    }
-    */
 }
 	
 

@@ -67,7 +67,8 @@ class Organ:
         dictionaryOfThisOrganType = dictionaryOfAllOrganTypes [ str( organType ) ]
 
         self.organType =dictionaryOfThisOrganType["organType"]
-        self.friendlyName = dictionaryOfThisOrganType["organType"]
+        self.isInBank = isInBankFlag
+        self.friendlyName = dictionaryOfThisOrganType["friendlyName"]
         self.forceModeTravelDistance = dictionaryOfThisOrganType["forceModeTravelDistance"]
         self.postInsertExtraPushDistance = dictionaryOfThisOrganType["postInsertExtraPushDistance"]
         self.pickupExtraPushDistance = dictionaryOfThisOrganType["pickupExtraPushDistance"]
@@ -153,6 +154,13 @@ class Robot:
         if all ( self.cableInsertionTrackingList ):  # check if all are now complete
             self.hasCablesNeedingInsertion = False
         return self.cablesList [ index ]
+
+    def countOrgansOfType(self, organType):
+        count = 0
+        for organ in self.organsList:
+            if organ.organType == organType:
+                count += 1
+        return count
 
 
 

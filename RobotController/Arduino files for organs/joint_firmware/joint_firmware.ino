@@ -132,9 +132,15 @@ void loop() {
     setCurrentLimit(current_limit_setting);
     update_current_limit_flag = false;
   }
+  
   if (update_target_position_flag) {
     setTargetPosition(target_position_setting);
     update_target_position_flag = false;
+  }
+  
+  if (update_led_brightness_flag){
+    update_led_brightness_flag=false;
+    setLED(led_brightness);
   }
 }
 

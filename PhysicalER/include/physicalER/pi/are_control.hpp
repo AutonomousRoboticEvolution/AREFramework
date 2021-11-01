@@ -1,15 +1,14 @@
 #ifndef ARE_CONTROL_HPP
 #define ARE_CONTROL_HPP
 
-#define DEBUGGING_INPUT_OUTPUT_DISPLAY true
 #define VERBOSE_DEBUG_PRINTING_AT_SETUP true
-
-#define INFRARED_SENSOR_THREASHOLD 100
 
 #include <iostream>
 #include <vector>
 #include "physicalER/pi_individual.hpp"
+#include "physicalER/pi_communication.hpp"
 #include "MotorOrgan.hpp"
+#include "JointOrgan.hpp"
 #include "SensorOrgan.hpp"
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
@@ -25,21 +24,49 @@ public:
 
     AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
-    void sendMotorCommands(std::vector<double> values);
-    void retrieveSensorValues(std::vector<double> &sensor_vals);
 
     int exec( zmq::socket_t& socket);
 
 private:
     phy::NN2Individual controller;
-    float _max_eval_time ; // millieconds
-    float _time_step = 1000; // milliseconds
+    u_int32_t _max_eval_time ; // millieconds
+    float _time_step ; // milliseconds
 
-    std::list<MotorOrgan> listOfWheels;
-    std::list<SensorOrgan> listOfSensors;
+    std::vector<Organ*> listOfOrgans; // a list of (pointers to) all the organ objects
 
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;
+
+    bool debugDisplayOnPi=false; // Don't change here, set by defining #debugDisplayOnPi,bool,1 in the paramters file. Determines whether to show show input/output values in terminal.
+    bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
+
+    std::ostringstream logs_to_send;
+
+    // private functions:
+
+    /**
+        @brief sendOutputOrganCommands takes the controller output and sends them to the wheels and joints
+        @param values a vector of the outputs as produced by (for example) the neural network.
+        Each value should generally be between -1.0 and 1.0
+    */
+    void sendOutputOrganCommands(std::vector<double> values);
+
+    /**
+        @brief retrieveSensorValues get the values from each of the robot's sensors
+        @param sensor_vals a vector of the inputs for the controller, to be populated.
+        Each value will generally be between 0.0 and 1.0
+    */
+    void retrieveSensorValues(std::vector<double> &sensor_vals);
+
+    /**
+     * @brief setLedDebugging sets the LEDs in the Head to show something about what is happening, to help a human to understand and debug problems
+     * The first LED brightness is set GREEN in proportion to the largest TOF sensor reading
+     * The second LED brightness is set RED in proportion to the closest IR value (brighter means closer)
+     * The third LED is set BLUE in proportion to the magnitude of the largest motor or joint output
+     * @param nn_inputs
+     * @param nn_outputs
+     */
+    void setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs);
 };
 
 }//pi

@@ -10,22 +10,23 @@ TIDY_UP_FILES = True
 ## The printer class is for running a 3D printer
 ## This includes the slicing of an stl and all communication with the Raspberry Pi which runs Octoprint
 class Printer:
-    def __init__(self, IPAddress, config):
+    def __init__(self, IPAddress, configurationData, printer_number=0):
         debugPrint("Creating a printer object")
+        printerConfiguration = configurationData["PRINTER_{}".format(printer_number)]
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
         self.openSCADDirectory = "./OpenSCAD/"
         # self.meshesNoClipsDirectory = "./meshes_no_clips/"
-        self.meshesNoClipsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
-        self.blueprintsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
+        self.meshesNoClipsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
+        self.blueprintsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
         self.meshesDirectory = "./meshes/"
 
         self.IPAddress=IPAddress # IP address of the Raspberry Pi running OctoPrint
-        self.origin = np.matrix ( config[ "ORIGIN" ])
+        self.origin = np.matrix (printerConfiguration["ORIGIN"])
         self.skeletonPositionOnPrintbed = makeTransformInputFormatted([0.150, 0.150, 0]) # default middle of bed, can be updated
         self.timeout=5 # timeout in seconds for api requests to octoPrint
-        self.defaultBedCooldownTemperature = config["BED_COOLDOWN_TEMPERATURE"]
+        self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
         self.apiKeyHeader = { 'X-Api-Key': 'b76fba867e5ee070caff864d953ed27b'}
@@ -285,9 +286,9 @@ if __name__ == "__main__":
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
 
-        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_1"])
+        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_0"])
         printer.createSTL(robot_ID)
-        printer.slice("mesh"+robot_ID)
+        printer.slice("mesh_"+robot_ID)
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
