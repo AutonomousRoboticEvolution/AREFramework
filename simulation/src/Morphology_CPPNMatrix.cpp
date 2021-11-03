@@ -38,13 +38,15 @@ void Morphology_CPPNMatrix::create()
     bool indVerResult = false;
     indVerResult = getIndicesVertices(decodedMesh);
     bool convexDecompositionSuccess = false;
+
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
+
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
                                         skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
-            std::cerr << "Importing mesh NOT succesful! " << __func__  << std::endl;
+            std::cerr << "Creating mesh NOT succesful! " << __func__  << std::endl;
         }
         std::ostringstream name;
         name.str("VoxelBone");
@@ -74,8 +76,28 @@ void Morphology_CPPNMatrix::create()
             // This will speed-up evolution. However...
             // For the morphognesis stage keep the number of triangles high (at least 1200) and low concavity (0.5)
             // This will make a more accurate representation of the skeleton.
+//            intParams[0]: HACD: the minimum number of clusters to be generated (e.g. 1)
+//            intParams[1]: HACD: the targeted number of triangles of the decimated mesh (e.g. 500)
+//            intParams[2]: HACD: the maximum number of vertices for each generated convex hull (e.g. 100)
+//            intParams[3]: HACD: the maximum number of iterations. Use 0 for the default value (i.e. 4).
+//            intParams[4]: reserved. Set to 0.
+//            intParams[5]: V-HACD: resolution (10000-64000000, 100000 is default).
+//            intParams[6]: V-HACD: depth (1-32, 20 is default).
+//            intParams[7]: V-HACD: plane downsampling (1-16, 4 is default).
+//            intParams[8]: V-HACD: convex hull downsampling (1-16, 4 is default).
+//            intParams[9]: V-HACD: max. number of vertices per convex hull (4-1024, 64 is default).
             int conDecIntPams[10] = {1, 100, 20, 1, 0, //HACD
                                               10000, 20, 4, 4, 64}; //V-HACD
+//            floatParams[0]: HACD: the maximum allowed concavity (e.g. 100.0)
+//            floatParams[1]: HACD: the maximum allowed distance to get convex clusters connected (e.g. 30)
+//            floatParams[2]: HACD: the threshold to detect small clusters. The threshold is expressed as a percentage of the total mesh surface (e.g. 0.25)
+//            floatParams[3]: reserved. Set to 0.0
+//            floatParams[4]: reserved. Set to 0.0
+//            floatParams[5]: V-HACD: concavity (0.0-1.0, 0.0025 is default).
+//            floatParams[6]: V-HACD: alpha (0.0-1.0, 0.05 is default).
+//            floatParams[7]: V-HACD: beta (0.0-1.0, 0.05 is default).
+//            floatParams[8]: V-HACD: gamma (0.0-1.0, 0.00125 is default).
+//            floatParams[9]: V-HACD: min. volume per convex hull (0.0-0.01, 0.0001 is default).
             float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
@@ -118,7 +140,8 @@ void Morphology_CPPNMatrix::create()
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
-            convexDecompositionSuccess = true;
+            if(convexHandle >= 0)
+                convexDecompositionSuccess = true;
         } catch (std::exception &e) {
             //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
             convexDecompositionSuccess = false;

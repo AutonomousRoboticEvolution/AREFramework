@@ -154,6 +154,7 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
     {
         assert(simulationState == BUSY);
         simulationState = CLEANUP;
+
         if(ER->is_finish()){
             ER->write_data();
             exit(0);

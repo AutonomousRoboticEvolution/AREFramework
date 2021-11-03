@@ -119,7 +119,7 @@ bool ER::updateSimulation()
 
     if(ea->get_population().size() > 0){
 
-        for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++ )
+        for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
             all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
