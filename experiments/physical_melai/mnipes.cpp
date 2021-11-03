@@ -208,6 +208,7 @@ void MNIPES::init_learner(int id){
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     int wheels, joints, sensors;
     phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
@@ -225,11 +226,15 @@ void MNIPES::init_learner(int id){
         std::cerr << "unknown type of neural network" << std::endl;
         return;
     }
-    auto& ctrl_gen = ctrl_archive.archive[wheels][joints][sensors];
     CMAESLearner learner(nbr_weights,nbr_bias,nn_inputs,nn_outputs);
-    if(ctrl_gen.first->get_weights().empty() && ctrl_gen.first->get_weights().empty())
-        learner.init();
-    else learner.init(ctrl_gen.first->get_full_genome());
+    learner.set_parameters(parameters);
+    learner.set_randNum(randomNum);
+    if(use_ctrl_arch){
+        auto& ctrl_gen = ctrl_archive.archive[wheels][joints][sensors];
+        if(ctrl_gen.first->get_weights().empty() && ctrl_gen.first->get_biases().empty())
+            learner.init();
+        else learner.init(ctrl_gen.first->get_full_genome());
+    } else learner.init();
     learners.emplace(id,learner);
 }
 
@@ -276,6 +281,7 @@ void MNIPES::write_data_for_generate(){
 void MNIPES::load_data_for_update() {
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     //load ids to be evaluated
     std::vector<int> list_ids;
@@ -284,10 +290,11 @@ void MNIPES::load_data_for_update() {
     //TODO: load saved learners
 
     //load controller archive
-    int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
-    ctrl_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
-    ctrl_archive.from_file(repository + "/" + exp_name + "/logs/controller_archive");
-
+    if(use_ctrl_arch){
+        int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
+        ctrl_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+        ctrl_archive.from_file(repository + "/" + exp_name + "/logs/controller_archive");
+    }
     //create a first genome controller for the first robot chosen
     init_learner(currentIndIndex);
 }
