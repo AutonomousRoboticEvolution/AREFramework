@@ -172,7 +172,7 @@ void MazeEnv::load_target_positions(){
     pos3.resize(3);
     pos1 = {0.75,0.75,0.12};
     pos2 = {-0.75,0.75,0.12};
-    pos3 = {0.75,0.75,0.12};
+    pos3 = {-0.75,-0.75,0.12};
     target_position_all.push_back(pos1);
     target_position_all.push_back(pos2);
     target_position_all.push_back(pos3);

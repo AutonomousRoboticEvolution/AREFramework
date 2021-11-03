@@ -1,15 +1,15 @@
 #experimentName,string,morphNeuro
-#expPluginName,string,/data/xukang/usr/lib/libmorphNeuro.so
+#expPluginName,string,/usr/local/lib/libmorphNeuro.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/data/xukang/Program/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
-#organsPath,string,/data/xukang/Project/evolutionary_robotics_framework/experiments/sim/
-#repository,string,/data/xukang/Project/evolutionary_robotics_framework/logs
+#vrepFolder,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
+#organsPath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/
+#repository,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/files
 #populationSize,int,2
 #maxEvalTime,float,10
 #numberOfGeneration,int,4
 
 
-#scenePath,string,/data/xukang/Project/evolutionary_robotics_framework/experiments/sim/escape_room_2.ttt
+#scenePath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
 #start_x,double,0
 #start_y,double,0
 #start_z,double,1
@@ -41,7 +41,7 @@
 
 
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0

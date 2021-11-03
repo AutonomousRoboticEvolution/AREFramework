@@ -1,10 +1,11 @@
 #include "simulatedER/mazeEnv.h"
 
+
 #include <boost/algorithm/string.hpp>
 
 using namespace are::sim;
 // make a local copy of mazeEnv.cpp in the morphneuro experiments and leave the old one
-// (remove function load_target_positions (line 168-183) and line 102-107) unchanged  
+// (remove function load_target_positions (line 168-183) and line 102-107) unchanged
 //  mv .h, .c to morphneuro/ and remove these lines
 MazeEnv::MazeEnv()
 {
@@ -22,6 +23,8 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+
+    load_target_positions();
 }
 
 void MazeEnv::init(){
@@ -46,8 +49,8 @@ void MazeEnv::init(){
         target_position = target_position_all[current_target];
     }else{
         target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-            settings::getParameter<settings::Double>(parameters,"#target_y").value,
-            settings::getParameter<settings::Double>(parameters,"#target_z").value};
+                           settings::getParameter<settings::Double>(parameters,"#target_y").value,
+                           settings::getParameter<settings::Double>(parameters,"#target_z").value};
     }
 
 
@@ -59,8 +62,8 @@ void MazeEnv::init(){
 
         simSetObjectName(beacon_handle,"IRBeacon_0");
         const float tPos[3] = {static_cast<float>(target_position[0]),
-                         static_cast<float>(target_position[1]),
-                         static_cast<float>(target_position[2])};
+                               static_cast<float>(target_position[1]),
+                               static_cast<float>(target_position[2])};
 
         if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
             std::cerr << "Set object position failed" << std::endl;
@@ -74,8 +77,6 @@ void MazeEnv::init(){
 
     std::vector<int> th;
     build_tiled_floor(th);
-
-
 }
 
 std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
@@ -96,6 +97,12 @@ std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
             f = 0;
         else if(f > 1) f = 1;
 
+    bool multi_target = settings::getParameter<settings::Boolean>(parameters,"#isMultiTarget").value;
+    if(multi_target){
+        current_target+=1;
+        if(current_target >= target_position_all.size())
+            current_target=0;
+    }
     return d;
 }
 
@@ -114,8 +121,8 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
         return 1;
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-1 ||
-            fabs(final_position[1] - wp.position[1]) > 1e-1 ||
-            fabs(final_position[2] - wp.position[2]) > 1e-1)
+       fabs(final_position[1] - wp.position[1]) > 1e-1 ||
+       fabs(final_position[2] - wp.position[2]) > 1e-1)
         move_counter++;
 
     final_position[0] = static_cast<double>(wp.position[0]);
@@ -154,4 +161,20 @@ void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
             simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
         }
     }
+}
+
+void MazeEnv::load_target_positions(){
+//    double pos1,pos2,pos3;
+    std::vector<double> pos1;
+    std::vector<double> pos2;
+    std::vector<double> pos3;
+    pos1.resize(3);
+    pos2.resize(3);
+    pos3.resize(3);
+    pos1 = {0.75,0.75,0.12};
+    pos2 = {-0.75,0.75,0.12};
+    pos3 = {-0.75,-0.75,0.12};
+    target_position_all.push_back(pos1);
+    target_position_all.push_back(pos2);
+    target_position_all.push_back(pos3);
 }

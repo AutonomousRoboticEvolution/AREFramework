@@ -1,5 +1,5 @@
 #include "CPPNIndividual.h"
-#include "mazeEnv.h"
+#include "simulatedER/mazeEnv.h"
 
 using namespace are;
 using namespace are::sim;
