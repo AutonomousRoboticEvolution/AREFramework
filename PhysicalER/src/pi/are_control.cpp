@@ -4,7 +4,7 @@ using namespace are::pi;
 
 AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
-    _max_eval_time = float( settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ) * 1000.0; // in milliseconds
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 

@@ -8,11 +8,9 @@
 #include "ARE/Settings.h"
 #include "ARE/misc/RandNum.h"
 using namespace are;
-
-
 //TODO implement other orders like abort
 
-using are_sett = are::setting;
+namespace are_sett = are::settings;
 
 int main(int argc, char** argv) {
     //*/  Prepare our context and socket
@@ -44,7 +42,7 @@ int main(int argc, char** argv) {
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply);
         ctrl_gen->from_string(str_ctrl);
-        std::cout<<"NN Genome as sting:\n"<<str_ctrl<<std::endl;
+        std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
         phy::NN2Individual ind(empy_gen,ctrl_gen);
         ind.set_parameters(parameters);
         ind.set_randNum(randomNumber);
