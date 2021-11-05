@@ -21,7 +21,6 @@ def makeFile(location):
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
-		CABLE_BANK_1_ORIGIN = (makeTransformInputFormatted([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90)]) * makeTransformInputFormatted([-0.002, -0.001, -0.005])).tolist()
 		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
@@ -34,13 +33,13 @@ def makeFile(location):
 
 
 	elif location == "YRK":
-		ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 - 0.0005 , math.radians(180), 0, 0]).tolist()  #  NEEDS UPDATING
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3912 , 0.0648 , 0.0810 , 0 , 0 , math.radians(-90)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformInputFormatted() .tolist()
-		PRINTER_2_ORIGIN = makeTransformInputFormatted() .tolist()
-		CABLE_BANK_1_ORIGIN = (makeTransformInputFormatted([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90)]) * makeTransformInputFormatted([-0.002, -0.001, -0.005])).tolist() #  NEEDS UPDATING
-		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.3723 , -0.1988 , -8.1 / 1000 , 0 , 0 , math.radians(90)]).tolist()
-		gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
+		ASSEMBLY_FIXTURE_ORIGIN =  makeTransformMillimetersDegrees(x=67.8, y=-710.9, z= 70.9, rotZ=90).tolist()  #  NEEDS UPDATING
+		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=536.0, y=-83.6, z=80.5, rotZ=-90) .tolist()
+		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees() .tolist()
+		PRINTER_2_ORIGIN = makeTransformMillimetersDegrees() .tolist()
+		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees(x=-373.3, y=-197.0, z=-7.8).tolist()
+		# gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
+		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.9, y=30.7, z=209.9, rotZ=181.94).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
 		A_open_position = 2100
@@ -219,15 +218,6 @@ def makeFile(location):
 		"PRINTER_2":{
 		"ORIGIN":PRINTER_2_ORIGIN,
         "BED_COOLDOWN_TEMPERATURE":30
-		},
-
-		"CABLE_BANK_1":{
-		"ORIGIN": CABLE_BANK_1_ORIGIN,
-		"CABLE_GRIP_POINT":  (makeTransformInputFormatted ([0, -0.005, 0.0065, -math.radians(180), 0, 0]) * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)])).tolist(),
-		# "CABLE_GRIP_POINT":  makeTransformInputFormatted ( [ 0, 0, 0.0055, -math.radians(180), 0,math.radians(-180) ] ).tolist(),
-		"CABLE_GRIPPER_OPEN_POWER":  0.75,
-		"CABLE_CONTENTS":cable_bank_cables_temp,
-		"ORGAN_CONTENTS":[] # no organs
 		},
 
 		"ORGAN_BANK_1":{
