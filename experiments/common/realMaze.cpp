@@ -41,7 +41,7 @@ std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
     };
     std::vector<double> d(1);
     d[0] = 1 - distance(current_position,target_position)/max_dist;
-
+    final_position = current_position;
     return d;
 }
 
@@ -92,8 +92,7 @@ void RealMaze::update_info(double time){
     }
 
 
-//    for(const auto &val : current_position)
-//        std::cout << val << ",";
-//    std::cout << key_pt.pt.x <<","<<key_pt.pt.y << std::endl;
+    for(const auto &val : current_position)
+        std::cout << val << ",";
 }
 
