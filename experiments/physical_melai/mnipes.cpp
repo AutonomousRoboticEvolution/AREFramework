@@ -56,7 +56,7 @@ void MNIPES::init_next_pop(){
 bool MNIPES::update(const Environment::Ptr &env){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    bool verbose = settings::getParameter<settings::Double>(parameters,"#verbose").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     PMEIndividual::Ptr ind(new PMEIndividual);
     auto objs = env->fitnessFunction(ind);
@@ -80,14 +80,16 @@ bool MNIPES::update(const Environment::Ptr &env){
     learner.step();
 
     if(learner.is_learning_finish()){//learning is finished for this body plan
+        if(verbose)
+            std::cout << "Learning is finished for robot " << currentIndIndex << std::endl;
         //Update Controller Archive
         std::vector<double> weights;
         std::vector<double> biases;
         NNParamGenome best_ctrl_gen;
         auto &best_controller = learner.get_best_solution();
         int nbr_weights = learner.get_nbr_weights();
-        weights.insert(weights.begin(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-        biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+        weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+        biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
         best_ctrl_gen.set_weights(weights);
         best_ctrl_gen.set_biases(biases);
         //update the archive
@@ -239,13 +241,13 @@ void MNIPES::init_learner(int id){
     learners.emplace(id,learner);
 }
 
-const Genome::Ptr &MNIPES::get_next_controller_genome(int id){
+const Genome::Ptr MNIPES::get_next_controller_genome(int id){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
 
     NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
     auto nn_params = learners[id].update_ctrl(ctrl);
-    NNParamGenome::Ptr gen;
+    NNParamGenome::Ptr gen(new NNParamGenome(randomNum,parameters));
     gen->set_weights(nn_params.first);
     gen->set_biases(nn_params.second);
     gen->set_nbr_hidden(nb_hidden);

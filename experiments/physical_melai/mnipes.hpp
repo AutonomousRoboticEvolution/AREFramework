@@ -79,7 +79,7 @@ public:
     bool update(const Environment::Ptr &env) override;
     void setObjectives(size_t current_id,const std::vector<double> &objs){}
     void init_learner(int id);
-    const Genome::Ptr &get_next_controller_genome(int id);
+    const Genome::Ptr get_next_controller_genome(int id);
 
     void load_data_for_generate() override;
     void write_data_for_generate() override;

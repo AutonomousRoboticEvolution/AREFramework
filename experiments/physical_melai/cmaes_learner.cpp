@@ -53,6 +53,53 @@ void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::
     current_nbr_ind--;
 }
 
+std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Control::Ptr &control){
+
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
+    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
+
+    int counter = _cma_strat->get_population().size();
+
+    std::vector<double> weights;
+    std::vector<double> bias;
+    int i = 0;
+    for(; i < _nbr_weights; i++){
+        double w = std::tanh(_population[counter](i)); // filtering to put values between -1 and 1
+        weights.push_back(w);
+    }
+    for(; i < _dimension; i++){
+        double b = std::tanh(_population[counter](i)); // filtering to put values between -1 and 1
+        bias.push_back(b);
+    }
+
+    if(nn_type == settings::nnType::FFNN){
+        control.reset(new NN2Control<ffnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(_rand_num);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
+    }
+    else if(nn_type == settings::nnType::ELMAN){
+        control.reset(new NN2Control<elman_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(_rand_num);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
+    }
+    else if(nn_type == settings::nnType::RNN){
+        control.reset(new NN2Control<rnn_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(_rand_num);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+    }
+    current_nbr_ind++;
+
+    return std::make_pair(weights,bias);
+
+}
+
 void CMAESLearner::iterate(){
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -137,7 +184,6 @@ bool CMAESLearner::step(){
 bool CMAESLearner::is_learning_finish() const{
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
     return current_nbr_ind == 0 && (_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50);
-
 }
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
