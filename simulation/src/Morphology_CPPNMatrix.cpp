@@ -28,7 +28,8 @@ void Morphology_CPPNMatrix::create()
     PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     // Decoding CPPN
     GenomeDecoder genomeDecoder;
-    genomeDecoder.genomeDecoder(nn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+    if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+    else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
 
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
@@ -41,7 +42,7 @@ void Morphology_CPPNMatrix::create()
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
-        generateOrgans(nn,skeletonSurfaceCoord);
+        generateOrgans(skeletonSurfaceCoord);
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
                                         skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
@@ -129,7 +130,7 @@ void Morphology_CPPNMatrix::create()
             // Create organs
             for(auto & i : organList){
                 if(i.getOrganType() != 0)
-                    setOrganOrientation(nn, i); // Along z-axis relative to the organ itself
+                    setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     if(i.getOrganType() == 1)
@@ -266,7 +267,7 @@ void Morphology_CPPNMatrix::create()
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
                         if(organ.getOrganType() !=0)
-                            setOrganOrientation(nn, organ); // Along z-axis relative to the organ itself
+                            setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
                         int tempDummy = simCreateDummy(0.01, nullptr); 
@@ -450,21 +451,27 @@ void Morphology_CPPNMatrix::createGripper()
     }
 }
 
-void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ &organ)
+void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
 {
-    // Vector used as input of the Neural Network (NN).
-    std::vector<double> input{0,0,0};
-    input[0] = static_cast<int>(std::round(organ.organPos[0]/morph_const::voxel_real_size));
-    input[1] = static_cast<int>(std::round(organ.organPos[1]/morph_const::voxel_real_size));
-    input[2] = static_cast<int>(std::round(organ.organPos[2]/morph_const::voxel_real_size));
-    input[2] -= morph_const::matrix_size/2;
-    // Set inputs to NN
-    cppn.Input(input);
-    // Activate NN
-    cppn.Activate();
+//    std::vector<double> input{0,0,0,0};
+//    std::vector<double> output;
+//    input[0] = static_cast<int>(std::round(organ.organPos[0]/mc::voxel_real_size));
+//    input[1] = static_cast<int>(std::round(organ.organPos[1]/mc::voxel_real_size));
+//    input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
+//    input[2] -= mc::matrix_size/2;
+//    if(use_neat){
+//        // Set inputs to NN
+//        cppn.Input(input);
+//        // Activate NN
+//        cppn.Activate();
+//        output = cppn.Output();
+//    }else{
+//        nn2_cppn.step(input);
+//        output = nn2_cppn.outf();
+//    }
     float rotZ;
     // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
-    /// \todo EB: This is temporal.
+    /// \todo EB: This is temporary.
     if(organ.getOrganType() == 1)
         rotZ = 0.0;
     if(organ.getOrganType() == 2)
@@ -472,10 +479,10 @@ void Morphology_CPPNMatrix::setOrganOrientation(NEAT::NeuralNetwork &cppn, Organ
     organ.organOri.at(2) = rotZ;
 }
 
-void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
+void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
-    float tempPos[3];
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
+    std::vector<double> output;
     int organType;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
         // Generate organs every two voxels.
@@ -484,11 +491,16 @@ void Morphology_CPPNMatrix::generateOrgans(NEAT::NeuralNetwork &cppn, std::vecto
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
             input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
             input[3] = static_cast<double>(sqrt(pow(skeletonSurfaceCoord[m][n].at(0),2)+pow(skeletonSurfaceCoord[m][n].at(1),2)+pow(skeletonSurfaceCoord[m][n].at(2),2)));
-            // Set inputs to NN
-            cppn.Input(input);
-            // Activate NN
-            cppn.Activate();
-            std::vector<double> output = cppn.Output();
+            if(use_neat){
+                // Set inputs to NN
+                cppn.Input(input);
+                // Activate NN
+                cppn.Activate();
+                output = cppn.Output();
+            }else{
+                nn2_cppn.step(input);
+                output = nn2_cppn.outf();
+            }
             // Is there an organ?
             organType = -1;
             int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();

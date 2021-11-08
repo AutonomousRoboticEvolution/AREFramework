@@ -122,7 +122,7 @@ If you would like to use CLion IDE with this project please follow the instructi
 
 You can launch experiments in two different ways : in local mode or in remote mode. The local mode is for launching sequential experiments only, it is meant to be a debug mode. The remote mode is for launching several simulator instances and thus launch an experiment in parallel.
 
-### Local Mode
+### Local Mode (If ONLY_SIMULATION = 1)
 
 ```
 cd v_rep_folder
@@ -131,16 +131,16 @@ cd v_rep_folder
 -h option is for headless, which means without a GUI. The parameters file is a csv file in which all the parameters of your experiment are written. You can find an example [here](https://bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework/src/restruct_refact/EvolutionVREP/experiments/hyperneat/parameters.csv).
 All the logs of your experiment are stored in a folder named after the name of your experiment (specified in the parameters file) and the date of its launch. This folder is itself in the repository folder you specified in the parameters file.
 
-### Remote Mode
+### Remote Mode (If ONLY_SIMULATION = 1)
 
 ```
 cd are_framework_folder/EvolutionVREP/Cluster
-python3 run_cluster.py N --vrep vrep_folder/vrep.sh --client are_framework_folder/EvolutionVREP/ERClient/ERClient --params /path/to/exp/parameters/file/parameters.csv --port_start PORT_START --xvbf (0|1)
+python3 run_cluster.py N --vrep vrep_folder/vrep.sh --client are_framework_folder/build/EvolutionVREP/ERClient/ERClient --params /path/to/exp/parameters/file/parameters.csv --port_start PORT-START --xvfb (0|1)
 ```
 N corresponds to the number of simulator instances you want to launch which should not be greater than the number of core. PORT_START will be the communication port of the first simulator instance, then PORT_START + 1 will the port for the second instance and so on.
 the --xvbf option is to be set at 1 if you launch your experiment through ssh. This script will launch N simulator instance and a client process which handles the experiment.
 
-Like in local mode, all the ogs of your experiment are stored in a folder named after the name of your experiment (specified in the parameters file) and the date of its launch. This folder is itself in the repository folder you specified in the parameters file.
+Like in local mode, all the logs of your experiment are stored in a folder named after the name of your experiment (specified in the parameters file) and the date of its launch. This folder is itself in the repository folder you specified in the parameters file.
 As well, you have log files corresponding to the outputs of the client and all the simulator instances stored where you launched your experiment. This files are named client_<date> for the client output and sim_<nb-instance>_<date>.
 
 ### Morphneuro Experiment Instruction
@@ -169,3 +169,11 @@ Modify parameters.csv to load different setups
 * islamarkian, Darwin or Lamarck
 * isRNN, whether RNN
 * isNovelty, whether to use novelty
+
+### Selecting the appropriate plug-in (If ONLY_SIMULATION = 0 and If ONLY_PHYSICAL = 0)
+
+```
+./are_sim.sh VARIABLE -h -g/path/to/exp/parameters/file/parameters.csv
+```
+
+VARIABLE can take only one of two values: *simulation* and *generate*. *Simulation* launches the normal plug-in to run experiments in simulation. *Generate* launches the plug-in to generate the blueprint and mesh file for the robot to be manufactured in the Robot Fabricator.  

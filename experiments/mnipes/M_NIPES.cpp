@@ -39,7 +39,7 @@ void M_NIPESIndividual::createMorphology(){
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNEATCPPN(nn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
@@ -122,7 +122,7 @@ void M_NIPESIndividual::update(double delta_time){
 
 void M_NIPESIndividual::setGenome()
 {
-    nn = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getNEATCPPN();
 }
 
 void M_NIPESIndividual::setMorphDesc()

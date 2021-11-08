@@ -26,7 +26,7 @@ void CPPNIndividual::createMorphology()
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
     setGenome();
     setMorphDesc();
@@ -40,7 +40,7 @@ void CPPNIndividual::createController()
 
 void CPPNIndividual::setGenome()
 {
-    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getGenome();
+    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getNEATCPPN();
 }
 
 void CPPNIndividual::setMorphDesc()

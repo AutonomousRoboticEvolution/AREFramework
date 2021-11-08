@@ -2,8 +2,9 @@
 
 using namespace are;
 
-Genome::Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param)
+Genome::Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id)
 {
+    _id = id;
     randomNum = rn;
     parameters = param;
 }

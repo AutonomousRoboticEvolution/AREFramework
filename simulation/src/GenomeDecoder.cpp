@@ -59,6 +59,53 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::
     }
 }
 
+void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn)
+{
+    std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
+    std::vector<double> outputs;
+    AREVoxel areVoxel;
+    // Generate voxel matrix
+    auto region = areMatrix.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                input[0] = static_cast<double>(x);
+                input[1] = static_cast<double>(y);
+                input[2] = static_cast<double>(z);
+                input[3] = static_cast<double>(sqrt(pow(x,2)+pow(y,2)+pow(z,2)));
+
+                // Activate NN
+                cppn.step(input);
+                outputs = cppn.outf();
+                // Take output from NN and store it.
+                areVoxel.bone = morph_const::empty_voxel;
+                areVoxel.wheel = morph_const::empty_voxel;
+                areVoxel.sensor = morph_const::empty_voxel;
+                areVoxel.joint = morph_const::empty_voxel;
+                areVoxel.caster = morph_const::empty_voxel;
+
+                if(outputs[1] > 0) {
+                    areVoxel.bone = morph_const::filled_voxel;
+                }
+                if(outputs[2] > 0){
+                    areVoxel.wheel = morph_const::filled_voxel;
+                }
+                if(outputs[3] > 0) {
+                    areVoxel.sensor = morph_const::filled_voxel;
+                }
+                if(outputs[4] > 0) { /// \todo EB WARNING! Verify the order
+                    areVoxel.caster = morph_const::filled_voxel;
+                }
+                if(outputs[5] > 0) { /// \todo EB WARNING! Verify the order
+                    areVoxel.joint = morph_const::filled_voxel;
+                }
+
+                areMatrix.setVoxel(x, y, z, areVoxel);
+            }
+        }
+    }
+}
+
 void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
 {
     AREVoxel areVoxel;
@@ -300,6 +347,20 @@ void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMat
 }
 
 void GenomeDecoder::genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
+                                 PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                                 std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
+                                 int &numSkeletonVoxels)
+{
+    decodeGenome(areMatrix, cppn);
+    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
+    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
+    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
+    skeletonRegionCounter(skeletonMatrix);
+    removeSkeletonRegions(skeletonMatrix);
+    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
+}
+
+void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
                                  int &numSkeletonVoxels)

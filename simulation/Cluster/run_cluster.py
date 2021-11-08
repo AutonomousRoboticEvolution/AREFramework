@@ -24,7 +24,7 @@ def run_server(args,rank: int):
     if(not args.xvfb) :
         return subprocess.Popen([#"gdb","--ex=r","--args",
             args.vrep,
-            '-h',
+            'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)
@@ -33,7 +33,7 @@ def run_server(args,rank: int):
         return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
          # "gdb","--ex=r","--args",
             args.vrep,
-            '-h',
+            'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile)

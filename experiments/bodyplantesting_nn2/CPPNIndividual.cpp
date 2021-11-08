@@ -2,43 +2,20 @@
 
 using namespace are;
 
-void CPPNIndividual::update(double delta_time)
-{
-    /// \todo EB: what is the highest number of outputs?
-    std::vector<double> inputs(20, 0.0);
-    std::vector<double> tempInputs = morphology->update();
 
-    // Dynamic inputs and outputs handeling
-    if(tempInputs.size() > 0){
-        for(int i = 0; i < tempInputs.size(); i++) {
-            inputs.at(i) = tempInputs[i];
-        }
-    }
-
-    std::vector<double> outputs = control->update(inputs);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->command(outputs);
-}
 
 void CPPNIndividual::createMorphology()
 {
-    NEAT::Genome gen =
-            std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-    NEAT::NeuralNetwork nn;
-    gen.BuildPhenotype(nn);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
+    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
-    setGenome();
     setMorphDesc();
     setManRes();
 }
 
-void CPPNIndividual::setGenome()
-{
-    nn = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getNEATCPPN();
-}
 
 void CPPNIndividual::setMorphDesc()
 {
@@ -59,8 +36,7 @@ std::string CPPNIndividual::to_string()
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
-    oarch.register_type<CPPNGenome>();
-    oarch.register_type<NNParamGenome>();
+    oarch.register_type<NN2CPPNGenome>();
     oarch << *this;
     return sstream.str();
 }
@@ -70,8 +46,7 @@ void CPPNIndividual::from_string(const std::string &str){
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
-    iarch.register_type<CPPNGenome>();
-    iarch.register_type<NNParamGenome>();
+    iarch.register_type<NN2CPPNGenome>();
     iarch >> *this;
 
     //set parameters and randNum to the genome as it is not contained in the serialisation
