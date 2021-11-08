@@ -3,7 +3,16 @@ cmake_minimum_required(VERSION 3.0)
 add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
 
 find_package(OpenCV REQUIRED)
-
+SET(VREP_SRC
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
+        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
+        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+        )
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
@@ -17,11 +26,13 @@ set(INCLUDES
     "../../modules/")
 
 add_library(physical_melai SHARED
+        ${VREP_SRC}
    factories.cpp
    ../common/realMaze.cpp
    mnipes.cpp
    cmaes_learner.cpp
    ../../PhysicalER/src/io_helpers.cpp
+
     )
 
 target_include_directories(physical_melai PUBLIC ${INCLUDES})

@@ -102,7 +102,6 @@ void Morphology_CPPNMatrix::create()
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-
             //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
             // The issue come from a mismatch between the mass computed by verp and the one expected.
             //Call this to compute the approximate moment of inertia and center of mass
