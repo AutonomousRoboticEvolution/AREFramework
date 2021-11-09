@@ -112,6 +112,9 @@ public:
         nn2_cppn = nn;
     }
 
+//    const NEAT::NeuralNetwork &getGenome() const{return nn;}
+//    void setGenome(NEAT::NeuralNetwork genome){nn=genome;}
+
     Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
     const CartDesc& getCastDesc() const {return indDesc.cartDesc;}
     int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}

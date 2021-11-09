@@ -66,7 +66,7 @@ void CPPNIndividual::createMorphology()
         NEAT::Genome neat_genome(tt); // load CPPN from the file
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
-        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
@@ -87,7 +87,7 @@ void CPPNIndividual::createMorphology()
         NEAT::Genome neat_genome(tt); // load CPPN from the file
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         neat_genome.BuildPhenotype(nn); //generate ANN
-        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);
         setGenome();
         setMorphDesc();
@@ -99,7 +99,7 @@ void CPPNIndividual::createMorphology()
         morphology.reset(new Morphology_CPPNMatrix(parameters));
         NEAT::NeuralNetwork nn;
         gen.BuildPhenotype(nn);
-        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setGenome(nn);
+        std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->setNEATCPPN(nn);
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(start_position[0],start_position[1],start_position[2]);  //fixed position
         setGenome();
         setMorphDesc();
@@ -296,7 +296,7 @@ void CPPNIndividual::createController()
 
 void CPPNIndividual::setGenome()
 {
-    nn_morph = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getGenome();
+    nn_morph = std::dynamic_pointer_cast<Morphology_CPPNMatrix>(morphology)->getNEATCPPN();//getGenome();
 }
 
 void CPPNIndividual::setMorphDesc()

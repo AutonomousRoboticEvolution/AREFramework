@@ -1,5 +1,5 @@
 #experimentName,string,morphNeuro
-#expPluginName,string,/usr/local/lib/libmorphNeuro.so
+#expPluginName,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/lib/libmorphNeuro.so
 #extSettingsClass,bool,0
 #vrepFolder,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
 #organsPath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/
