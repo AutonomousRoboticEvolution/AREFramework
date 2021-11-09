@@ -178,6 +178,12 @@ public:
         return population[corr_indexes[index]];
     }
 
+    void setObjectives(size_t indIndex, const std::vector<double> &objectives)
+    {
+        currentIndIndex = indIndex;
+        population[corr_indexes[indIndex]]->setObjectives(objectives);
+    }
+
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
