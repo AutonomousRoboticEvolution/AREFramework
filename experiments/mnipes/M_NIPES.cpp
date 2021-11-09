@@ -44,11 +44,6 @@ void M_NIPESIndividual::createMorphology(){
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber() == 0
-            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber() == 0;
-    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber() == 0;
-
-
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
 
     no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().jointNumber == 0
