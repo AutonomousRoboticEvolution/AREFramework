@@ -167,12 +167,17 @@ void Organ::createOrgan(int skeletonHandle)
     organChecked = true;
     /// \todo EB: It might be worth to have this as a separate parameters (?)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
+    std::string version = std::stoi(are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value);
+    if(version != "2" || version != "3"){
+        std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
+        version = "3";
+    }
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV3.ttm";
+        modelsPath += "C_HeadV" + version + ".ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV3.ttm";
+        modelsPath += "C_WheelV" + version + ".ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_SensorV3.ttm";
+        modelsPath += "C_SensorV" + version + ".ttm";
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster

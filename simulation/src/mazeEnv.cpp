@@ -18,6 +18,7 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#withTiles",new settings::Boolean(true));
 
 }
 
@@ -63,8 +64,12 @@ void MazeEnv::init(){
 
     trajectory.clear();
 
-    std::vector<int> th;
-    build_tiled_floor(th);
+    bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
+
+    if(with_tiles){
+        std::vector<int> th;
+        build_tiled_floor(th);
+    }
 
 
 }

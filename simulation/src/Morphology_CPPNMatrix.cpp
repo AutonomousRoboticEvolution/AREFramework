@@ -102,6 +102,8 @@ void Morphology_CPPNMatrix::create()
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
+           if(convexHandle >= 0)
+                convexDecompositionSuccess = true;
             //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
             // The issue come from a mismatch between the mass computed by verp and the one expected.
             //Call this to compute the approximate moment of inertia and center of mass
@@ -139,8 +141,7 @@ void Morphology_CPPNMatrix::create()
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
-            if(convexHandle >= 0)
-                convexDecompositionSuccess = true;
+
         } catch (std::exception &e) {
             //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
             convexDecompositionSuccess = false;
@@ -191,7 +192,7 @@ void Morphology_CPPNMatrix::create()
         robotManRes.noCollisions = false;
     }
     // Segmented robots
-    if((indVerResult || convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
+    else if((indVerResult && convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
         // Since the list of organ is going to increase, it's better to cap it to prevent accessing elements out of range.
         int originalSize = organList.size();
         for(int i = 0; i < originalSize; i++){
@@ -319,12 +320,12 @@ void Morphology_CPPNMatrix::create()
         }
     }
     // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+    else if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
-    if(indVerResult || convexDecompositionSuccess){
+    else if(indVerResult && convexDecompositionSuccess){
         for(auto & i : organList) {
             if(!i.isOrganChecked()) // Stop when the organs not checked or generated start.
                 break;
