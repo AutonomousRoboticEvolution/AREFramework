@@ -148,7 +148,7 @@ private:
     bool no_actuation = false;
     bool no_sensors = false;
 
-    double energy_cost;
+    double energy_cost = 0;
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;

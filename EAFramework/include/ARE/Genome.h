@@ -52,7 +52,7 @@ public:
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     const settings::Property::Ptr &get_properties(){return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
-    void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+    virtual void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     const std::string& get_type(){return type;}
     const int id() const {return _id;}
 
