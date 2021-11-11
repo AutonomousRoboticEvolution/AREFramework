@@ -72,6 +72,8 @@ public:
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
+        nn2::rgen_t::gen.seed(randomNum->getSeed());
+
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
         _id = static_id++;
@@ -152,6 +154,11 @@ public:
     int get_nb_connections(){return cppn.get_nb_connections();}
 
     int get_generation(){return generation;}
+
+    void set_randNum(const misc::RandNum::Ptr& rn) override{
+        randomNum = rn;
+        nn2::rgen_t::gen.seed(randomNum->getSeed());
+    }
 
 private:
     std::vector<int> parents_ids;

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ARE/Settings.h"
+#include "ARE/morphology_descriptors.hpp"
 
 #if defined (VREP)
 #include "v_repLib.h"
@@ -23,19 +24,6 @@ namespace sim{
 
 class Organ{
 private:
-
-    /// \todo EB: This shouldn't be here!
-    constexpr static const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
-    static const int VOXEL_MULTIPLIER = 22;
-    constexpr static const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
-    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
-    static const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
-    static const short int EMPTYVOXEL = 0;
-    static const short int FILLEDVOXEL = 255;
-    static const short int xHeadUpperLimit = 2;
-    static const short int xHeadLowerLimit = -2;
-    static const short int yHeadUpperLimit = 2;
-
     int organHandle;
     int organType;
     int connectorHandle;
