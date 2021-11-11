@@ -135,8 +135,6 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
-
 
     std::vector<double> weights;
     std::vector<double> bias;

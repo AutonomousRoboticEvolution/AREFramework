@@ -192,7 +192,7 @@ void Morphology_CPPNMatrix::create()
         robotManRes.noCollisions = false;
     }
     // Segmented robots
-    else if((indVerResult && convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
+    if((indVerResult && convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
         // Since the list of organ is going to increase, it's better to cap it to prevent accessing elements out of range.
         int originalSize = organList.size();
         for(int i = 0; i < originalSize; i++){
@@ -320,12 +320,12 @@ void Morphology_CPPNMatrix::create()
         }
     }
     // Export model
-    else if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
-    else if(indVerResult && convexDecompositionSuccess){
+    if(indVerResult && convexDecompositionSuccess){
         for(auto & i : organList) {
             if(!i.isOrganChecked()) // Stop when the organs not checked or generated start.
                 break;

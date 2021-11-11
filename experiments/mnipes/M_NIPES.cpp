@@ -103,11 +103,10 @@ void M_NIPESIndividual::createController(){
         std::dynamic_pointer_cast<CMAESLearner>(learner)->next_pop();
 
     }
-    if(rewards.empty()){
-        auto nn_params = std::dynamic_pointer_cast<CMAESLearner>(learner)->update_ctrl(control);
-        std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_weights(nn_params.first);
-        std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_biases(nn_params.second);
-    }
+    auto nn_params = std::dynamic_pointer_cast<CMAESLearner>(learner)->update_ctrl(control);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_weights(nn_params.first);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_biases(nn_params.second);
+
 }
 
 void M_NIPESIndividual::update(double delta_time){

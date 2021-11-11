@@ -73,21 +73,21 @@ float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
 
-    int obst_handle;
-    int coll;
-    for(int i = 0; i < 11; i++){
-        std::stringstream sstr;
-        sstr << "Obstacle_" << i;
-        obst_handle = simGetObjectHandle(sstr.str().c_str());
-        int nbr_handles;
-        int* handles = simGetObjectsInTree(morphHandle,sim_handle_all,0,&nbr_handles);
-        coll = simCheckCollision(morphHandle,obst_handle);
-        assert(coll >= 0);
-        for(int j = 0; j < nbr_handles; j++)
-            coll += simCheckCollision(handles[j],obst_handle);
-        if(coll > 0 && number_of_collisions < 64)
-            number_of_collisions+=1;
-    }
+//    int obst_handle;
+//    int coll;
+//    for(int i = 0; i < 11; i++){
+//        std::stringstream sstr;
+//        sstr << "Obstacle_" << i;
+//        obst_handle = simGetObjectHandle(sstr.str().c_str());
+//        int nbr_handles;
+//        int* handles = simGetObjectsInTree(morphHandle,sim_handle_all,0,&nbr_handles);
+//        coll = simCheckCollision(morphHandle,obst_handle);
+//        assert(coll >= 0);
+//        for(int j = 0; j < nbr_handles; j++)
+//            coll += simCheckCollision(handles[j],obst_handle);
+//        if(coll > 0 && number_of_collisions < 64)
+//            number_of_collisions+=1;
+//    }
 //    std::cout << wp.to_string() << std::endl;
 
     if(wp.is_nan())

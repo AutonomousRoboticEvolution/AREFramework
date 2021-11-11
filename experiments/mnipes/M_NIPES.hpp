@@ -70,15 +70,6 @@ public:
 
     void update(double delta_time) override;    
 
-    void add_reward(double reward){rewards.push_back(reward);}
-    void compute_fitness(){
-        double fitness = 0;
-        for(const auto &r : rewards)
-            fitness += r;
-        fitness /= static_cast<double>(rewards.size());
-        objectives[0] = fitness;
-    }
-
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
@@ -152,7 +143,6 @@ private:
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
-    std::vector<double> rewards;
 
     int nn_inputs;
     int nn_outputs;

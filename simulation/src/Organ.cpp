@@ -169,7 +169,7 @@ void Organ::createOrgan(int skeletonHandle)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
     int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
 
-    if(version != 2 || version != 3){
+    if(version != 2 && version != 3){
         std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
         version = 3;
     }
