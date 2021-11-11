@@ -39,6 +39,10 @@ void MazeEnv::init(){
         }
     }
 
+    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
+
     target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                        settings::getParameter<settings::Double>(parameters,"#target_y").value,
                        settings::getParameter<settings::Double>(parameters,"#target_z").value};

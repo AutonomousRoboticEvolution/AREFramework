@@ -38,6 +38,10 @@ void MultiTargetMaze::init(){
         }
     }
 
+    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
+
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
 
     if(withBeacon){

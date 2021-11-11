@@ -33,7 +33,9 @@ void ObstacleAvoidance::init(){
             i++;
         }
     }
-
+    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
     trajectory.clear();
 
     grid_zone = Eigen::MatrixXi::Zero(8,8);
@@ -47,7 +49,7 @@ void ObstacleAvoidance::init(){
 
 std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
    // if(number_of_collisions == 0)
-        return {static_cast<double>(grid_zone.sum())/64.f};
+    return {static_cast<double>(grid_zone.sum())/64.f};
     //return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
 }
 
