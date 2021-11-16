@@ -490,14 +490,9 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         nn2_cppn.step(input);
         output = nn2_cppn.outf();
     }
-    float rotZ;
-    // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
-    /// \todo EB: This is temporal.
-    if(organ.getOrganType() == 1)
-        rotZ = 0.0;
-    if(organ.getOrganType() == 2)
-        rotZ = M_PI_2;
-    organ.organOri.at(2) = rotZ;
+    float rot;
+    rot = output.at(0) * M_PI_4;
+    organ.organOri.push_back(rot);
 }
 
 void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
