@@ -6,7 +6,7 @@ std::vector<double> Morphology::update(){
     std::vector<double> sensorValues;
     bool use_simulate_data = settings::getParameter<settings::Boolean>(parameters, "#use_sim_sensor_data").value;
     readProximitySensors(proxHandles,sensorValues);
-    readPassivIRSensors(IRHandles,sensorValues, use_simulate_data);
+    readPassivIRSensors(IRHandles, sensorValues, use_simulate_data);
 
     return sensorValues;
 }

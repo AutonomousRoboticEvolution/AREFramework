@@ -1,15 +1,15 @@
 #experimentName,string,morphNeuro
-#expPluginName,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/lib/libmorphNeuro.so
+#expPluginName,string,/usr/local/lib/libmorphNeuro.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
-#organsPath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/
-#repository,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/files
+#vrepFolder,string,/opt/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
+#organsPath,string,/home/xukang/Project/Autonomous_Robotics_Envolutionary/evolutionary_robotics_framework/experiments/sim/
+#repository,string,/home/xukang/Project/Autonomous_Robotics_Envolutionary/evolutionary_robotics_framework/logs
 #populationSize,int,2
 #maxEvalTime,float,10
 #numberOfGeneration,int,4
 
 
-#scenePath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/escape_room.ttt
+#scenePath,string,/home/xukang/Project/Autonomous_Robotics_Envolutionary/evolutionary_robotics_framework/experiments/sim/ARE_hard_maze.ttt
 #start_x,double,0
 #start_y,double,0
 #start_z,double,1
