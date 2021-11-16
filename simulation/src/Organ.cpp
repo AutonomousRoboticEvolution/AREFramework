@@ -178,7 +178,7 @@ void Organ::createOrgan(int skeletonHandle)
     vers << version;
 
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV" + vers.str() + ".ttm";
+        modelsPath += "C_HeadV3.ttm";
     else if(organType == 1) // Wheels
         modelsPath += "C_WheelV" + vers.str() + ".ttm";
     else if(organType == 2) // Sensors

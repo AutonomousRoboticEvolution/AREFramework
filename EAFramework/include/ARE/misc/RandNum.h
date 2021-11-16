@@ -60,7 +60,7 @@ public:
 
     void setSeed(int seed); // sets the seed of the random number generator
 	int m_seed = 0;
-	int getSeed();
+	int getSeed() const;
     std::mt19937 gen;
 };
 
