@@ -158,7 +158,6 @@ void Visu::init(){
         }
     }
 
-
     Genome::Ptr morph_gen;
     Genome::Ptr ctrl_gen;
     //load morphology genome

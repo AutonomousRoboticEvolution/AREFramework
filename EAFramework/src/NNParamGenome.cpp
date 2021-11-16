@@ -182,7 +182,7 @@ void NNParamGenome::from_string(const std::string &gen_str){
         weights.push_back(std::stod(split_str[i]));
 
     biases.clear();
-    for(int i = nbr_weights; i < nbr_weights + nbr_bias; i++)
+    for(int i = nbr_weights + 3; i < nbr_weights + nbr_bias + 3; i++)
         biases.push_back(std::stod(split_str[i]));
 }
 

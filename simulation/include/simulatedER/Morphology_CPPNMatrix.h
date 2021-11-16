@@ -84,8 +84,6 @@ public:
      * @brief This method generates organs only in specific regions of the surface of the skeleton according to the cppn.
      */
     void generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
-
-
     /**
      * @brief This method generates the orientation of the organ accoriding to the "normal" of the surface
      * In reality, it takes the position of the last outer voxel. In other words, it generates orientations in

@@ -56,25 +56,18 @@ else()
 endif()
 
 add_library(ARE SHARED ${SOURCES})
-
 target_include_directories(ARE PUBLIC
     "include"
     "/usr/include/eigen3"
     "../modules"
     "${LIMBO_FOLDER}/src/"
 )
-
 target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})
 
 add_executable(nn2_cppn_serial_to_dot tools/nn2_cppn_serial_to_dot.cpp)
 target_include_directories(nn2_cppn_serial_to_dot PUBLIC
     "include" "/usr/include/eigen3" "../modules")
 target_link_libraries(nn2_cppn_serial_to_dot ARE ${Boost_LIBRARIES})
-
-#add_executable(cppns_similarity_comparison tools/cppns_similarity_comparison.cpp)
-#target_include_directories(cppns_similarity_comparison PUBLIC
-#    "include" "/usr/include/eigen3" "../modules")
-#target_link_libraries(cppns_similarity_comparison ARE ${Boost_LIBRARIES})
 
 install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
 install(TARGETS ARE DESTINATION lib)

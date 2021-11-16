@@ -83,12 +83,13 @@ public:
 
 
     NNParamGenome() : Genome() {}
-    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param) :
-        Genome(rn,param){
+    NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param, int id = 0) :
+        Genome(rn,param,id){
     }
     NNParamGenome(const NNParamGenome &ngen) :
         Genome(ngen), weights(ngen.weights), biases(ngen.biases),
-        nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),nbr_hidden(ngen.nbr_hidden), nn_type(ngen.nn_type){}
+        nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),
+        nbr_hidden(ngen.nbr_hidden), nn_type(ngen.nn_type){}
 
     Genome::Ptr clone() const override {
         return std::make_shared<NNParamGenome>(*this);
@@ -113,10 +114,10 @@ public:
     void set_nbr_hidden(int nh){nbr_hidden = nh;}
     void set_nn_type(int nnt){nn_type = nnt;}
 
-    int get_nbr_input(){return nbr_input;}
-    int get_nbr_output(){return nbr_output;}
-    int get_nbr_hidden(){return nbr_hidden;}
-    int get_nn_type(){return nn_type;}
+    int get_nbr_input() const {return nbr_input;}
+    int get_nbr_output() const {return nbr_output;}
+    int get_nbr_hidden() const {return nbr_hidden;}
+    int get_nn_type() const {return nn_type;}
 
     std::vector<double> get_full_genome(){
         std::vector<double> genome = weights;

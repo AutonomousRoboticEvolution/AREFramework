@@ -251,9 +251,9 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectOrientation(forceSensor, -1, tempOrganOri);
     simSetObjectOrientation(organHandle, -1, tempOrganOri);
     simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
-    // If the organ is not brain rotate along z-axis relative to the organ itself.
+    // If the organ is not brain rotate along x-axis relative to the organ itself.
     if(organType != 0){
-        tempOrganOri[0] = 0.0; tempOrganOri[1] = 0.0; tempOrganOri[2] = organOri.at(2);
+        tempOrganOri[0] = organOri.at(3); tempOrganOri[1] = 0.0; tempOrganOri[2] = 0.0;
         simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
         simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
     }

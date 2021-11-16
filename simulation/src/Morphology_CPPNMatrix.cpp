@@ -42,7 +42,6 @@ void Morphology_CPPNMatrix::create()
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
-
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
                                         skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
@@ -523,7 +522,6 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
             }
-
             // Is there an organ?
             organType = -1;
             int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();

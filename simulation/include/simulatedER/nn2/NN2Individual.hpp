@@ -16,9 +16,6 @@
 
 namespace are {
 
-
-
-
 namespace sim{
 
 

@@ -112,7 +112,7 @@ protected:
 
     bool isEval;
 
-    int individual_id; //TODO id system
+    int individual_id;
     int generation;
 
     int client_id;
