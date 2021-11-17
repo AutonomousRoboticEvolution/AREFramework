@@ -12,8 +12,9 @@ void BODYPLANTESTING::init()
     cppn_params::cppn::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
     cppn_params::cppn::_max_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#maxNbrNeurons").value;
     cppn_params::cppn::_min_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#minNbrNeurons").value;
-    cppn_params::cppn::_mutate_connections = settings::getParameter<settings::Boolean>(parameters,"#mutateConnections").value;
-    cppn_params::cppn::_mutate_neurons = settings::getParameter<settings::Boolean>(parameters,"#mutateNeurons").value;
+    cppn_params::cppn::_mutation_rate = settings::getParameter<settings::Float>(parameters,"#rateMutation").value;
+    cppn_params::cppn::_rate_mutate_conn = settings::getParameter<settings::Float>(parameters,"#rateMutateConnection").value;
+    cppn_params::cppn::_rate_mutate_neur = settings::getParameter<settings::Float>(parameters,"#rateMutateNeuron").value;
     cppn_params::cppn::_rate_add_conn = settings::getParameter<settings::Float>(parameters,"#rateAddConnection").value;
     cppn_params::cppn::_rate_del_conn = settings::getParameter<settings::Float>(parameters,"#rateDeleteConnection").value;
     cppn_params::cppn::_rate_change_conn = settings::getParameter<settings::Float>(parameters,"#rateChangeConnection").value;

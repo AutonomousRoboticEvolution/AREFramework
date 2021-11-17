@@ -6,12 +6,13 @@ std::mt19937 nn2::rgen_t::gen;
 
 int static_id = 0;
 
-bool cppn_params::cppn::_mutate_connections = true;
-bool cppn_params::cppn::_mutate_neurons = true;
-float cppn_params::cppn::_rate_add_neuron = 0.05f;
-float cppn_params::cppn::_rate_del_neuron = 0.05f;
-float cppn_params::cppn::_rate_add_conn = 0.05f;
-float cppn_params::cppn::_rate_del_conn = 0.05f;
+float cppn_params::cppn::_mutation_rate = 0.5f;
+float cppn_params::cppn::_rate_mutate_conn = 0.1f;
+float cppn_params::cppn::_rate_mutate_neur = 0.1f;
+float cppn_params::cppn::_rate_add_neuron = 0.1f;
+float cppn_params::cppn::_rate_del_neuron = 0.1f;
+float cppn_params::cppn::_rate_add_conn = 0.1f;
+float cppn_params::cppn::_rate_del_conn = 0.1f;
 float cppn_params::cppn::_rate_change_conn = 0.05f;
 float cppn_params::cppn::_rate_crossover = 0.5f;
 
