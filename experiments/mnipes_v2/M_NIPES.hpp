@@ -169,7 +169,8 @@ public:
         if(learning_pool.empty())
             reproduction();
     }
-    void init_next_pop() override{}
+    void init_morph_pop();
+    void init_next_pop() override;
     bool update(const Environment::Ptr &) override;
     bool finish_eval(const Environment::Ptr &env) override;
     bool is_finish() override;
