@@ -73,7 +73,6 @@ public:
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
-        nn2::rgen_t::gen.seed(randomNum->getSeed());
 
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){

@@ -7,6 +7,7 @@ void BODYPLANTESTING::init()
     nb_obj = 1;
     max_obj = {1};
     min_obj = {0};
+    nn2::rgen_t::gen.seed(randomNum->getSeed());
 
     cppn_params::cppn::_max_nb_conns = settings::getParameter<settings::Integer>(parameters,"#maxNbrConnections").value;
     cppn_params::cppn::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
