@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
 SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-set(VREP_FOLDER "/opt/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
 
 if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
