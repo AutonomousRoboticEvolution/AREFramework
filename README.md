@@ -167,24 +167,41 @@ nohup python3 /path to cluster/Cluster/run_cluster.py #cores --params /path to p
 Code instruction:
 
 Working procedure:
+
 1. Initiate population
+
 2. Epoch (evaluation, selection, mutation)
+
 3. Form new population
+
 repeat step 2-3 until evolution finish
 
 parameters.csv explanation
+
 * scenePath: load scene
+
 * isMultiTarget: Multi-target locations
+
 * isMulti: whether to generate multiple controllers for each morphology
+
 * isMultiRandom, use random generation
+
 * isMultiMutate, use mutation
+
 * eval_num, number of controllers
+
 * isDuaLoop, whether to use dual loop
+
 * issingleloop, whether to use sigle loop
+
 * inner_loop_num, learning generation
+
 * islamarkian, Darwin or Lamarck
+
 * isRNN, whether RNN
+
 * isNovelty, whether to use novelty
+
 * substrate_hidden_num, substrate settings
 
 ### Selecting the appropriate plug-in (If ONLY_SIMULATION = 0 and If ONLY_PHYSICAL = 0)
