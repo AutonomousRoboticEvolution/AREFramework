@@ -3,11 +3,9 @@
 
 #include <cmath>
 
-#if defined (VREP)
+
 #include "v_repLib.h"
-#elif defined (COPPELIASIM)
-#include "simLib.h"
-#endif
+
 
 #include "simulatedER/VirtualEnvironment.hpp"
 #include "ARE/Individual.h"
@@ -17,16 +15,16 @@ namespace are {
 
     namespace sim{
 
-        class MazeEnv : public VirtualEnvironment
+        class multiTarget : public VirtualEnvironment
         {
         public:
 
-            typedef std::shared_ptr<MazeEnv> Ptr;
-            typedef std::shared_ptr<const MazeEnv> ConstPtr;
+            typedef std::shared_ptr<multiTarget> Ptr;
+            typedef std::shared_ptr<const multiTarget> ConstPtr;
 
-            MazeEnv();
+            multiTarget();
 
-            ~MazeEnv(){}
+            ~multiTarget(){}
             void init() override;
 
             std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
@@ -36,11 +34,13 @@ namespace are {
             float timeCheck = 0.0;
 
             const std::vector<waypoint> &get_trajectory(){return trajectory;}
-
+            void load_target_positions();
             void build_tiled_floor(std::vector<int> &tiles_handles);
 
         private:
+            int current_target = 0;
             std::vector<double> target_position;
+            std::vector<std::vector<double>> target_position_all;
             int move_counter = 0;
         };
 

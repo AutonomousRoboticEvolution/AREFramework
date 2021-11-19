@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(ARE)
 #set(COPPELIASIM_FOLDER "/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
-set(VREP_FOLDER "/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
+#set(VREP_FOLDER "/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04")
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>")
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)

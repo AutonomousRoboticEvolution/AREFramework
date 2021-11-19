@@ -1,11 +1,11 @@
-#include "simulatedER/mazeEnv.h"
+#include "mazeEnv_multiTarget.h"
 #include "MorphNeuro.h"
 #include "ManLog.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::sim::MazeEnv);
+    are::Environment::Ptr env(new are::sim::multiTarget);
     env->set_parameters(param);
     return env;
 }

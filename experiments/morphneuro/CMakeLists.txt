@@ -17,7 +17,8 @@ add_library(morphNeuro SHARED
     CPPNIndividual.cpp
         ../common/NNControl.cpp
     factories.cpp
-    ManLog.cpp)
+    ManLog.cpp
+    mazeEnv_multiTarget.cpp)
 target_include_directories(morphNeuro PUBLIC
     "${VREP_FOLDER}/programming/include"
     "../common/"

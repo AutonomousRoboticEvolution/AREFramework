@@ -7,7 +7,7 @@
 #include "v_repLib.h"
 #include "eigen_boost_serialization.hpp"
 #include "NNControl.h"
-#include "simulatedER/mazeEnv.h"
+#include "mazeEnv_multiTarget.h"
 
 namespace are {
 
