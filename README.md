@@ -144,6 +144,13 @@ Like in local mode, all the logs of your experiment are stored in a folder named
 As well, you have log files corresponding to the outputs of the client and all the simulator instances stored where you launched your experiment. This files are named client_<date> for the client output and sim_<nb-instance>_<date>.
 
 ### Morphneuro Experiment Instruction
+Compilation
+```
+cmake  -DONLY_SIMULATION=1 -DLIMBO_FOLDER=/limbo-master -DVREP_FOLDER=/ ..
+make
+sudo make install
+```
+
 Experiment folder
 ```
 cd ./experiments/morphneuro
@@ -156,7 +163,16 @@ Run Cluster on server
 ```
 nohup python3 /path to cluster/Cluster/run_cluster.py #cores --params /path to parameter csv/parameters.csv --client /path to build/build/simulation/ERClient/are-client --vrep /path to vrep/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/vrep.sh --port-start #portD &
 ```
-Modify parameters.csv to load different setups
+
+Code instruction:
+
+Working procedure:
+1. Initiate population
+2. Epoch (evaluation, selection, mutation)
+3. Form new population
+repeat step 2-3 until evolution finish
+
+parameters.csv explanation
 * scenePath: load scene
 * isMultiTarget: Multi-target locations
 * isMulti: whether to generate multiple controllers for each morphology
@@ -169,6 +185,7 @@ Modify parameters.csv to load different setups
 * islamarkian, Darwin or Lamarck
 * isRNN, whether RNN
 * isNovelty, whether to use novelty
+* substrate_hidden_num, substrate settings
 
 ### Selecting the appropriate plug-in (If ONLY_SIMULATION = 0 and If ONLY_PHYSICAL = 0)
 
