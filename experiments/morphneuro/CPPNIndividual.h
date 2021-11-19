@@ -4,7 +4,13 @@
 #include "ARE/Individual.h"
 #include "ARE/CPPNGenome.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
+
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
+
 #include "eigen_boost_serialization.hpp"
 #include "NNControl.h"
 #include "mazeEnv_multiTarget.h"

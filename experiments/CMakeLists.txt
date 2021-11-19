@@ -1,4 +1,3 @@
-add_subdirectory(morphneuro)
 if(ONLY_PHYSICAL)
     if(WITH_NN2)
         add_subdirectory(physical_update)
@@ -30,6 +29,8 @@ elseif(ONLY_SIMULATION)
     add_subdirectory(lc_nsms)
     add_subdirectory(friction_estimation)
     add_subdirectory(bodyplantesting)
+    add_subdirectory(morphneuro)
+
 else()
 
     if(VREP_FOUND)
@@ -61,6 +62,7 @@ else()
     add_subdirectory(real_dummy)
     add_subdirectory(test_are_generate)
     add_subdirectory(bodyplantesting)
+    add_subdirectory(morphneuro)
 
 endif()
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

@@ -3,8 +3,11 @@
 #include <fstream>
 #include <string>
 #include "mazeEnv_multiTarget.h"
+#if defined (VREP)
 #include "v_repLib.h"
-
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 using namespace are;
 
 void MorphNeuro::init()

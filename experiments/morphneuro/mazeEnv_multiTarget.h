@@ -4,7 +4,11 @@
 #include <cmath>
 
 
+#if defined (VREP)
 #include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 
 
 #include "simulatedER/VirtualEnvironment.hpp"
@@ -13,38 +17,38 @@
 
 namespace are {
 
-    namespace sim{
+namespace sim{
 
-        class multiTarget : public VirtualEnvironment
-        {
-        public:
+class multiTarget : public VirtualEnvironment
+{
+public:
 
-            typedef std::shared_ptr<multiTarget> Ptr;
-            typedef std::shared_ptr<const multiTarget> ConstPtr;
+    typedef std::shared_ptr<multiTarget> Ptr;
+    typedef std::shared_ptr<const multiTarget> ConstPtr;
 
-            multiTarget();
+    multiTarget();
 
-            ~multiTarget(){}
-            void init() override;
+    ~multiTarget(){}
+    void init() override;
 
-            std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
-            float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
+    std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
+    float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
-            ///time point to check the status of the robot
-            float timeCheck = 0.0;
+    ///time point to check the status of the robot
+    float timeCheck = 0.0;
 
-            const std::vector<waypoint> &get_trajectory(){return trajectory;}
-            void load_target_positions();
-            void build_tiled_floor(std::vector<int> &tiles_handles);
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
+    void load_target_positions();
+    void build_tiled_floor(std::vector<int> &tiles_handles);
 
-        private:
-            int current_target = 0;
-            std::vector<double> target_position;
-            std::vector<std::vector<double>> target_position_all;
-            int move_counter = 0;
-        };
+private:
+    int current_target = 0;
+    std::vector<double> target_position;
+    std::vector<std::vector<double>> target_position_all;
+    int move_counter = 0;
+};
 
-    } //sim
+} //sim
 
 } //are
 

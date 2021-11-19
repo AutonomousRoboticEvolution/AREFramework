@@ -1,15 +1,13 @@
 #experimentName,string,morphNeuro
 #expPluginName,string,/usr/local/lib/libmorphNeuro.so
-#extSettingsClass,bool,0
-#vrepFolder,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04
-#organsPath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/
-#repository,string,/home/miller/Desktop/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/files
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#repository,string,/home/leni/are-logs/
 #populationSize,int,2
 #maxEvalTime,float,10
 #numberOfGeneration,int,4
 
 
-#scenePath,string,/home/miller/Desktop/ARE_Bitbucket/evolutionary_robotics_framework/experiments/sim/ARE_hard_maze.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_hard_maze.ttt
 #start_x,double,0
 #start_y,double,0
 #start_z,double,1
@@ -68,7 +66,7 @@
 
 #verbose,bool,1
 #loadBestIndividual,bool,0
-#showBestIndPath,string,/home/miller/Desktop/ARE_Data/paper_data/individual_genome/escape_room
+#showBestIndPath,string,/home/leni/are-logs
 
 
 #loadSpecificIndividual,bool,0
@@ -86,9 +84,6 @@
 #isCtrlBootstrapEvolution_2,bool,0
 #loadExperiment,string,/home/wei/Projects/ARE/evolutionary_robotics_framework/20200720_Morph_Genome/lc_nsms/
 #bootstrapFile,string,test.csv
-
-
-
 
 #substrate_hidden_num,int,4
 #hidden_x0,double,0.1

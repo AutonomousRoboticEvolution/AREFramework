@@ -11,14 +11,14 @@ SET(VREP_SRC
         $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
         )
 
-add_library(morphNeuro SHARED
+    add_library(morphNeuro SHARED
         ${VREP_SRC}
         MorphNeuro.cpp
-    CPPNIndividual.cpp
+        CPPNIndividual.cpp
         ../common/NNControl.cpp
-    factories.cpp
-    ManLog.cpp
-    mazeEnv_multiTarget.cpp)
+        factories.cpp
+        ManLog.cpp
+        mazeEnv_multiTarget.cpp)
 target_include_directories(morphNeuro PUBLIC
     "${VREP_FOLDER}/programming/include"
     "../common/"
