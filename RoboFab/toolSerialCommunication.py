@@ -30,7 +30,7 @@ class GripperHandler:
         self.sock = socket.socket()
         self.sock.settimeout(10)
 
-        debugPrint("attempting to connect...",messageVerbosity=2)
+        debugPrint("attempting to connect to gripper, at {} port {}...".format(UR5Address,gripperPort),messageVerbosity=2)
         self.sock.connect((UR5Address,gripperPort))
 
     ## quick helper function. Returns the input value is it is in the range between MIN_SERVO_VALUE and MAX_SERVO_VALUE, otherwise returns the relevant MIN or MAX value.

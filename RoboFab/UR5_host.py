@@ -503,7 +503,6 @@ class UR5Robot:
         AFDropoffPoint = assemblyFixture.currentPosition * organInRobot.positionTransformWithinBankOrRobot * makeTransformInputFormatted(
             [0, 0, -AFPostInsertExtraPushDistance])
         AFPreDropoffPoint = AFDropoffPoint * makeTransformInputFormatted([0, 0, AFVerticalClearanceForInsert])  # point back from (in organ frame) final position
-        AFPostDropoffPoint = changeCoordinateValue(AFDropoffPoint, "z", assemblyFixture.CLEAR_Z_HEIGHT) # linear move back up out of the way of robot
         AFPreForceModePoint = AFDropoffPoint * makeTransformInputFormatted(
             [0, 0, AFDistanceForCompliantMove + AFPostInsertExtraPushDistance])  # point back from final position from which to start force mode
 
@@ -530,7 +529,11 @@ class UR5Robot:
         self.setMoveSpeed(self.speedValueNormal)
         actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         self.setGripperPosition(organInRobot.gripperOpenPosition)
-        self.moveArm(AFPostDropoffPoint)  # back off
+        self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        # linear move up out of the way of robot :
+        self.moveArm(
+            changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)
+        )
 
 
         return organInRobot

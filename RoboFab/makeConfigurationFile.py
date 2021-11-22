@@ -70,13 +70,13 @@ def makeFile(location):
 		"coppeliasimFolder":COPPELIASIM_FOLDER,
 
 		"network":{
-			"COMPUTER_ADDRESS":"192.168.1.2",
-			"ROBOT_IP_ADDRESS":"192.168.1.4",
+			"COMPUTER_ADDRESS":"192.168.2.253", # the RoboFab PC (that runs this code)
+			"ROBOT_IP_ADDRESS":"192.168.2.252", # UR5
 			"PORT_FOR_UR5":30000,
 			"PORT_FOR_GRIPPER":54321,
 			"PRINTER0_IP_ADDRESS":"192.168.2.251",
-			"PRINTER1_IP_ADDRESS":"192.168.2.252",
-			"PRINTER2_IP_ADDRESS":"192.168.2.253"
+			"PRINTER1_IP_ADDRESS":"192.168.2.250",
+			"PRINTER2_IP_ADDRESS":"192.168.2.249"
 		},
 
 		"UR5":{
@@ -204,7 +204,7 @@ def makeFile(location):
 			"HOME_BETWEEN_EVERY_MOVE":False,
 			"CORE_ORGAN_ATTACHMENT_Z_OFFSET": 0/1000,
 			"EXPECTED_STARTUP_MESSAGE":"I am the Assembly Fixture",
-			"CLEAR_Z_HEIGHT": 0.42
+			"CLEAR_Z_HEIGHT": 0.42 # global coordinates z value which is guaranteed to be above all parts of the robot when it is on the assembly fixture
 		},
 
 		"PRINTER_0":{
