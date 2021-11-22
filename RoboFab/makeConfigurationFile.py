@@ -42,8 +42,8 @@ def makeFile(location):
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.9, y=30.7, z=209.9, rotZ=181.94).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
-		A_open_position = 2100
-		A_closed_position = 1220
+		A_open_position = 1800
+		A_closed_position = 1125
 		B_open_position = 2100
 		B_closed_position = 1350
 
@@ -70,8 +70,8 @@ def makeFile(location):
 		"coppeliasimFolder":COPPELIASIM_FOLDER,
 
 		"network":{
-			"COMPUTER_ADDRESS":"192.168.2.253",
-			"ROBOT_IP_ADDRESS":"192.168.2.252",
+			"COMPUTER_ADDRESS":"192.168.1.2",
+			"ROBOT_IP_ADDRESS":"192.168.1.4",
 			"PORT_FOR_UR5":30000,
 			"PORT_FOR_GRIPPER":54321,
 			"PRINTER0_IP_ADDRESS":"192.168.2.251",
