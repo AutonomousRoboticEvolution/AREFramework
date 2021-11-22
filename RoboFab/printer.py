@@ -280,13 +280,13 @@ class Printer:
 if __name__ == "__main__":
     import json
 
-    ID_list = [1203,1358,1457,1689,2062,2710,3134,4180,4340]
-    ID_list = [1689,2710]
+    # ID_list = [1203,1358,1457,1689,2062,2710,3134,4180,4340]
+    ID_list = ["14_9"]
     for ID_num in ID_list:
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
 
-        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_0"])
+        printer=Printer(None , json.load(open('configuration_BRL.json')))
         printer.createSTL(robot_ID)
         printer.slice("mesh_"+robot_ID)
 
