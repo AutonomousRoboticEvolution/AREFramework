@@ -21,7 +21,6 @@ def makeFile(location):
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
-		CABLE_BANK_1_ORIGIN = (makeTransformInputFormatted([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90)]) * makeTransformInputFormatted([-0.002, -0.001, -0.005])).tolist()
 		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
@@ -34,13 +33,13 @@ def makeFile(location):
 
 
 	elif location == "YRK":
-		ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 - 0.0005 , math.radians(180), 0, 0]).tolist()  #  NEEDS UPDATING
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3912 , 0.0648 , 0.0810 , 0 , 0 , math.radians(-90)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformInputFormatted() .tolist()
-		PRINTER_2_ORIGIN = makeTransformInputFormatted() .tolist()
-		CABLE_BANK_1_ORIGIN = (makeTransformInputFormatted([0.5912 , -0.0014 , 0.5168 , math.radians(60) , 0 , math.radians(-90)]) * makeTransformInputFormatted([-0.002, -0.001, -0.005])).tolist() #  NEEDS UPDATING
-		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.3723 , -0.1988 , -8.1 / 1000 , 0 , 0 , math.radians(90)]).tolist()
-		gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
+		ASSEMBLY_FIXTURE_ORIGIN =  makeTransformMillimetersDegrees(x=67.8, y=-710.9, z= 70.9, rotZ=90).tolist()  #  NEEDS UPDATING
+		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=536.0, y=-83.6, z=80.5, rotZ=-90) .tolist()
+		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees() .tolist()
+		PRINTER_2_ORIGIN = makeTransformMillimetersDegrees() .tolist()
+		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees(x=-373.3, y=-197.0, z=-7.8).tolist()
+		# gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
+		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.9, y=30.7, z=209.9, rotZ=181.94).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
 		A_open_position = 2100
@@ -221,27 +220,26 @@ def makeFile(location):
         "BED_COOLDOWN_TEMPERATURE":30
 		},
 
-		"CABLE_BANK_1":{
-		"ORIGIN": CABLE_BANK_1_ORIGIN,
-		"CABLE_GRIP_POINT":  (makeTransformInputFormatted ([0, -0.005, 0.0065, -math.radians(180), 0, 0]) * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)])).tolist(),
-		# "CABLE_GRIP_POINT":  makeTransformInputFormatted ( [ 0, 0, 0.0055, -math.radians(180), 0,math.radians(-180) ] ).tolist(),
-		"CABLE_GRIPPER_OPEN_POWER":  0.75,
-		"CABLE_CONTENTS":cable_bank_cables_temp,
-		"ORGAN_CONTENTS":[] # no organs
-		},
-
 		"ORGAN_BANK_1":{
 		"ORIGIN":ORGAN_BANK_1_ORIGIN,
 		"ORGAN_CONTENTS":[ # a list of lists, each sub-list represents an organ: [<organ type> , <x (m)> , <y (m)> , <z (m)> , <rx (radians)> , <ry (radians)> , <rz (radians)>, i2c or IP Address]
 			[0, 204.06/1000, 286.06/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
-			[1, 94.655/1000,  81.061/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x60)], # wheel 1
-			[1, 94.655/1000, 163.06/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x61)], # wheel 2
-			[1, 94.655/1000, 245.06/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x62)], # wheel 3
-			[1, 94.655/1000, 327.06/1000, 20/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x63)], # wheel 4
-			[2, 166.631/1000, 96.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x30)], # sensor 1
-			[2, 166.631/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor 2
-			[2, (166.631+60)/1000, 96.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x34)], # sensor 3
-			[2, (166.631+60)/1000, 148.061/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x36)], # sensor 4
+			[1, 2/1000,  46.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
+			[1, 94.811/1000,  81.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x61)], # wheel
+			[1, 2/1000,  (46.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
+			[1, 94.811/1000,  (81.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x63)], # wheel
+			[1, 2/1000,  (46.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
+			[1, 94.811/1000,  (81.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x65)], # wheel
+			[1, 2/1000,  (46.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
+			[1, 94.811/1000,  (81.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x67)], # wheel
+			[2, 164.631/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x30)], # sensor
+			[2, 164.631/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor
+			[2, 164.631/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x34)], # sensor
+			[2, 164.631/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x36)], # sensor
+			[2, 191.491/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
+			[2, 191.491/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
+			[2, 191.491/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
+			[2, 191.491/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
 			[3 , 154.56/1000, 33.66/1000, 17.5/1000, math.radians(180), 0, math.radians(90), ""], #castor
 			[4 , 300.061/1000, 74.881/1000 , 28.5/1000, 0, 0, math.radians(90), str(0x08)] #joint
 			],
