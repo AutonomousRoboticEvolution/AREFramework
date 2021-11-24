@@ -74,6 +74,14 @@ void BODYPLANTESTING::epoch(){
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
         ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
+        CartDesc ind_detailed_desc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(population[i]->get_morphology())->getCartDesc();
+
+        double organ_score = (ind_detailed_desc.sensorNumber > 0 ? 1 : 0) +
+                (ind_detailed_desc.wheelNumber > 0 ? 1 : 0) +
+                (ind_detailed_desc.casterNumber > 0 ? 1 : 0) +
+                (ind_detailed_desc.jointNumber > 0 ? 1 : 0);
+        organ_score /= 4.f;
+
         //Compute distances to find the k nearest neighbors of ind
         std::vector<size_t> pop_indexes;
         std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -82,7 +90,7 @@ void BODYPLANTESTING::epoch(){
         double ind_nov = Novelty::sparseness(distances);
 
         //set the objetives
-        std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+        std::vector<double> objectives = {ind_nov / 2.64 + organ_score}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
         std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
 
