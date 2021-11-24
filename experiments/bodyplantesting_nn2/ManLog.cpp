@@ -34,7 +34,7 @@ void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
     int generation = ea->get_generation();
     for(size_t ind = 0; ind < ea->get_population().size(); ind++){
         logFileStream << generation * ea->get_population().size() + ind << ",";
-        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getMorphDesc();
+        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getMorphDesc().getCartDesc();
         for(int j = 0; j < morphDesc.size(); j++){
             logFileStream << morphDesc(j) << ",";
         }

@@ -68,13 +68,13 @@ void BODYPLANTESTING::epoch(){
 
     std::vector<Eigen::VectorXd> pop_desc;
     for (size_t i = 0; i < population_size; i++) { // Body plans
-        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc());
+        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc());
     }
     //compute novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
-        CartDesc ind_detailed_desc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(population[i]->get_morphology())->getCartDesc();
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
+        CartDesc ind_detailed_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
 
         double organ_score = (ind_detailed_desc.sensorNumber > 0 ? 1 : 0) +
                 (ind_detailed_desc.wheelNumber > 0 ? 1 : 0) +
@@ -90,7 +90,7 @@ void BODYPLANTESTING::epoch(){
         double ind_nov = Novelty::sparseness(distances);
 
         //set the objetives
-        std::vector<double> objectives = {ind_nov / 2.64 + organ_score}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+        std::vector<double> objectives = {(ind_nov / 2.64 + organ_score)/2.f}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
         std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
 
@@ -98,7 +98,7 @@ void BODYPLANTESTING::epoch(){
     //update archive for novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();;
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
 
         double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getObjectives().back();
         Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
