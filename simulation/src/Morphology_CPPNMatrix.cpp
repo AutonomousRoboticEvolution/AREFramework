@@ -473,6 +473,8 @@ void Morphology_CPPNMatrix::createGripper()
 
 void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
 {
+    bool fixed_orientation = settings::getParameter<settings::Boolean>(parameters,"#organsFixedOrientation").value;
+
     // Vector used as input of the Neural Network (NN).
     std::vector<double> input{0,0,0,0};
     std::vector<double> output;
@@ -491,7 +493,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output = nn2_cppn.outf();
     }
     float rot;
-    rot = output.at(0) * M_PI_4;
+    rot = output.at(0)*0.174533; // 10 degrees limit
     organ.organOri.push_back(rot);
 }
 
