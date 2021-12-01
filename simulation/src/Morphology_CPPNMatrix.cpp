@@ -468,7 +468,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output = nn2_cppn.outf();
     }
     float rot;
-    rot = output.at(0) * M_PI_4;
+    rot = output.at(0) * 0.174533; // 10 degrees limit
     organ.organOri.push_back(rot);
 }
 
