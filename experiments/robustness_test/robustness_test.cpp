@@ -150,6 +150,8 @@ bool RobustnessTest::update(const Environment::Ptr & env){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<RobustInd>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<RobustInd>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance")
+            std::dynamic_pointer_cast<RobustInd>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
     }
 
     return true;
