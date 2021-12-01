@@ -451,30 +451,25 @@ void Morphology_CPPNMatrix::createGripper()
 
 void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
 {
-//    std::vector<double> input{0,0,0,0};
-//    std::vector<double> output;
-//    input[0] = static_cast<int>(std::round(organ.organPos[0]/mc::voxel_real_size));
-//    input[1] = static_cast<int>(std::round(organ.organPos[1]/mc::voxel_real_size));
-//    input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
-//    input[2] -= mc::matrix_size/2;
-//    if(use_neat){
-//        // Set inputs to NN
-//        cppn.Input(input);
-//        // Activate NN
-//        cppn.Activate();
-//        output = cppn.Output();
-//    }else{
-//        nn2_cppn.step(input);
-//        output = nn2_cppn.outf();
-//    }
-    float rotZ;
-    // rotZ = cppn.Output()[0] * M_2_PI - M_1_PI;
-    /// \todo EB: This is temporary.
-    if(organ.getOrganType() == 1)
-        rotZ = 0.0;
-    if(organ.getOrganType() == 2)
-        rotZ = M_PI_2;
-    organ.organOri.at(2) = rotZ;
+    std::vector<double> input{0,0,0,0};
+    std::vector<double> output;
+    input[0] = static_cast<int>(std::round(organ.organPos[0]/mc::voxel_real_size));
+    input[1] = static_cast<int>(std::round(organ.organPos[1]/mc::voxel_real_size));
+    input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
+    input[2] -= mc::matrix_size/2;
+    if(use_neat){
+        // Set inputs to NN
+        cppn.Input(input);
+        // Activate NN
+        cppn.Activate();
+        output = cppn.Output();
+    }else{
+        nn2_cppn.step(input);
+        output = nn2_cppn.outf();
+    }
+    float rot;
+    rot = output.at(0) * 0.174533; // 10 degrees limit
+    organ.organOri.push_back(rot);
 }
 
 void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
