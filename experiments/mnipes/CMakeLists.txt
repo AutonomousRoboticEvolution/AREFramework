@@ -28,7 +28,7 @@ add_library(M_NIPES SHARED
    M_NIPES.cpp 
    cmaes_learner.cpp
    MNIPESLoggings.cpp
-   obstacleAvoidance.cpp
+   ../common/obstacleAvoidance.cpp
     )
 target_include_directories(M_NIPES PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES ARE simulatedER cmaes tbb)

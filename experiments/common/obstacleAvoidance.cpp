@@ -41,8 +41,13 @@ void ObstacleAvoidance::init(){
     grid_zone = Eigen::MatrixXi::Zero(8,8);
     number_of_collisions = 0;
 
-    std::vector<int> th;
-    build_tiled_floor(th);
+
+    bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
+
+    if(with_tiles){
+        std::vector<int> th;
+        build_tiled_floor(th);
+    }
 
 
 }
@@ -140,5 +145,3 @@ void ObstacleAvoidance::build_tiled_floor(std::vector<int> &tiles_handles){
         }
     }
 }
-
-
