@@ -78,7 +78,7 @@ public:
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
     double get_energy_cost(){return energy_cost;}
     double get_sim_time(){return sim_time;}
-    void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
+    void set_ctrl_genome(const NNParamGenome::Ptr &gen);
 
     void setGenome();
 
