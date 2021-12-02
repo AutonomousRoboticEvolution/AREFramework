@@ -3,7 +3,9 @@ import os
 import subprocess
 import time
 import tkinter as tk
+import numpy as np
 
+from helperFunctions import convertTransformToPose
 from printer import Printer
 from RoboFab import RoboFab_host
 
@@ -21,6 +23,7 @@ class RobofabGUI:
 
         # start setup of main window:
         self.mainWindow = tk.Tk()
+        self.mainWindow.protocol("WM_DELETE_WINDOW", self.windowCloseHandler) # function windowCloseHandler() will be called when the GUI is closed
         label_title = tk.Label(text="RoboFab GUI", font='Helvetica 18 bold')
         label_title.grid(row=0, column=0, columnspan=4)
         self.label_globalErrors = tk.Label(fg="red")
@@ -117,6 +120,11 @@ class RobofabGUI:
         self.mainWindow.after(1, self.timedUpdateButtons())
         tk.mainloop()
 
+    def windowCloseHandler(self):
+        if not self.robofabObject is None:
+            self.robofabObject.disconnectAll()
+        self.mainWindow.destroy()
+
     def timedUpdateButtons(self):
         self.updateButtonColours()
         self.mainWindow.after(100, self.timedUpdateButtons)
@@ -124,12 +132,21 @@ class RobofabGUI:
     def handlerButtonAssemble(self, printer_number):
         if self.robofabObject is None:
             self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nRoboFab not initialised"
-        else:
-            self.label_printerStatus[printer_number]["text"] = "*busy assembling*\n"
-            self.mainWindow.update()
+        if self.printerObjects[printer_number] is None:
+            self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nPrinter not initialised"
 
+        else: # UR5 and printer are both initialised, so we can do the assembly
             self.robofabObject.setupRobotObject( robotID=self.robotID_loaded[printer_number], printer=self.printerObjects[printer_number])
-            self.robofabObject.buildRobot( printer=self.printerObjects[printer_number])
+            if self.robofabObject.checkBankHasEnoughOrgans():
+                self.label_printerStatus[printer_number]["text"] = "*busy assembling*\n"
+                self.mainWindow.update()
+                self.robofabObject.buildRobot( printer=self.printerObjects[printer_number]) # do the assembly
+                self.label_printerStatus[printer_number]["text"] = "Assembly done\n"
+                self.mainWindow.update()
+            else:
+                self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nBank missing organs"
+                print("Can't assemble, Bank missing organs")
+                self.mainWindow.update()
 
 
     def buttonHandlerStartUR5( self ):
@@ -138,7 +155,6 @@ class RobofabGUI:
             return
         else:
             self.robofabObject = RoboFab_host ( self.configurationData )
-
 
 
     def updateButtonColours( self ):
@@ -152,10 +168,7 @@ class RobofabGUI:
             self.button_startupUR5["bg"]="green"
             self.button_organBankManager["bg"] = "yellow"
 
-
-
         for i in range(NUMBER_OF_PRINTERS):
-
             # if the printer is currently printing, check if it's finished:
             if self.printingInProgress[i] == True:
                 if self.printerObjects[i].checkIfPrintingFinished():
@@ -173,8 +186,7 @@ class RobofabGUI:
                     self.button_slice[i]["bg"]="grey"
                     self.button_print[i]["bg"]="grey"
                     self.button_assemble[i]["bg"]="grey"
-            else:
-                #printing not in progress
+            else: #printing not in progress
 
                 # find colour for "select robot ID" button
                 if self.entry_robotID[i].get()=="":
@@ -321,35 +333,65 @@ class RobofabGUI:
             self.globalErrorText["text"]="UR5 not initialised, can't manage organ bank"
             return 1
 
-        print("Manage organ bank...")
+        # print("Manage organ bank...")
 
-        window_bankManager = tk.Tk()
-        frame = tk.Frame(master=window_bankManager, width=750, height=500)
-        tk.Button(master=window_bankManager, text="Close", command=window_bankManager.destroy).pack()
+        self.window_bankManager = tk.Tk()
+        frame = tk.Frame(master=self.window_bankManager, width=900, height=750)
+        tk.Button(master=self.window_bankManager, text="Update addresses and close", bg="yellow", command=self.updateI2CAddressesAndClose).pack()
         frame.pack()
 
         self.listOfButtons_slots = []
+        self.listOfTextboxes_slots = []
         for i, organ in enumerate(self.robofabObject.organBank.organsList):
             text = organ.friendlyName.replace(" organ", "")
-            # add the address to the text:
-            try:
-                text = text + "\n"+hex(int(organ.I2CAddress))
-            except ValueError:
-                text = text+"\n"+organ.I2CAddress # I2CAddress is actually an IP address
+            # # add the address to the text:
+            # try:
+            #     text = text + "\n"+hex(int(organ.I2CAddress))
+            # except ValueError:
+            #     text = text+"\n"+organ.I2CAddress # I2CAddress is actually an IP address
 
             colour = "green" if organ.isInBank else "red"
 
+            width=15 if organ.organType==0 else 10
+
             self.listOfButtons_slots.append(
-                tk.Button(master=frame, text=text, bg=colour,
+                tk.Button(master=frame, text=text, bg=colour, height = 1, width=width,
                           command=lambda i=i: self.handlerButtonBankSlot(i)
                           )
             )
-            xPosition=organ.positionTransformWithinBankOrRobot[0,3]*1500
-            yPosition=(0.4-organ.positionTransformWithinBankOrRobot[1,3])*1000
+            self.listOfTextboxes_slots.append(
+                tk.Entry(master=frame, width=width)
+            )
+            try: # if I2CAddress is a number, then display as hex
+                self.listOfTextboxes_slots[-1].insert(0, hex(int(organ.I2CAddress)))
+            except ValueError: # not a number, so display as string:
+                self.listOfTextboxes_slots[-1].insert(0,organ.I2CAddress)
+
+            if organ.transformOrganOriginToMaleCableSocket is None:
+                organ_plotting_position = organ.positionTransformWithinBankOrRobot
+            else:
+                organ_plotting_position = organ.positionTransformWithinBankOrRobot * organ.transformOrganOriginToMaleCableSocket
+            xPosition = organ_plotting_position[0,3]*1800
+            yPosition=(0.4 - organ_plotting_position[1,3])*1500
             self.listOfButtons_slots[i].place(x=xPosition, y=yPosition)
+            self.listOfTextboxes_slots[i].place(x=xPosition, y=yPosition+30)
+
+    def updateI2CAddressesAndClose(self):
+        for i, organ in enumerate(self.robofabObject.organBank.organsList):
+            # update organ's address with the value from textbox
+            input_text = self.listOfTextboxes_slots[i].get()
+            if input_text.startswith("0x"):
+                # is a hex value, so convert to a string of this value in decimal:
+                organ.I2CAddress = str( int(input_text,16) )
+            else:
+                # isn't a hex value, so just save the string as input:
+                organ.I2CAddress = input_text
+
+        self.saveOrganBankToFile()
+        self.window_bankManager.destroy() # close window
 
     def handlerButtonBankSlot(self,i):
-        print("Swapping state of "+self.robofabObject.organBank.organsList[i].friendlyName)
+        # print("Swapping state of "+self.robofabObject.organBank.organsList[i].friendlyName)
 
         if self.robofabObject.organBank.organsList[i].isInBank:
             self.robofabObject.organBank.organsList[i].isInBank = False
@@ -358,6 +400,23 @@ class RobofabGUI:
             self.robofabObject.organBank.organsList[i].isInBank = True
             self.listOfButtons_slots[i]["bg"] = "green"
 
+    def saveOrganBankToFile(self):
+        # creates a text file, with a line per organ, with each line in this format:
+        # [<organ type> , 16 values for position transform , <i2c or IP Address>, isInBank]
+
+        string_to_save=""
+        for organ in self.robofabObject.organBank.organsList:
+            if len(string_to_save)>0: string_to_save+="\n"
+            string_to_save += str(organ.organType) + ","
+            for i in range(4):
+                for j in range(4):
+                    string_to_save += str( organ.positionTransformWithinBankOrRobot[i,j] ) + ","
+
+            string_to_save+= organ.I2CAddress + ","
+            string_to_save+= str(organ.isInBank)
+
+        with open("organBankContents.txt","w") as outputFile:
+            outputFile.write(string_to_save)
 
 def setIndividualToLoadInParametersFileForGenerate(filepath, robotID="0_0"):
     genToLoad = robotID.split("_")[0]

@@ -200,7 +200,6 @@ def makeFile(location):
 			"TIMEOUT_SECONDS":60,
 			"WAIT_FOR_OK_REPLY":True,
 			"ORIGIN":ASSEMBLY_FIXTURE_ORIGIN,
-			"FIND_HOME_AT_STARTUP":True,
 			"HOME_BETWEEN_EVERY_MOVE":False,
 			"CORE_ORGAN_ATTACHMENT_Z_OFFSET": 0/1000,
 			"EXPECTED_STARTUP_MESSAGE":"I am the Assembly Fixture",
@@ -240,7 +239,7 @@ def makeFile(location):
 			[2, 191.491/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
 			[2, 191.491/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
 			[2, 191.491/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
-			[3 , 154.56/1000, 33.66/1000, 17.5/1000, math.radians(180), 0, math.radians(90), ""], #castor
+			# [3 , 154.56/1000, 33.66/1000, 17.5/1000, math.radians(180), 0, math.radians(90), ""], #castor
 			[4 , 300.061/1000, 74.881/1000 , 28.5/1000, 0, 0, math.radians(90), str(0x08)] #joint
 			],
 		"CABLE_CONTENTS":[] # no cables

@@ -66,14 +66,13 @@ class RoboFab_host:
         self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed )
 
         # open blueprint and parse basic organ data
-        debugPrint ( "making blueprintList list from the blueprint file: blueprint_" + robotID , messageVerbosity=1 )
+        debugPrint ( "Loading the blueprint file: blueprint_" + robotID , messageVerbosity=0 )
         blueprintList = []
         # with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
         with open ( '/home/robofab/are-logs/test_are_generate/waiting_to_be_built/blueprint_'+robotID+'.csv', newline='' ) as blueprintFile:
             blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
             for rowString in blueprintReader:
                 rowAsListOfStrings = rowString [ 0 ].split ( ',' )
-                print(rowAsListOfStrings[5:8])
                 #Reads the information about organs and converts to correct format
                 #i = 0,1 type & parent ID,  i = 2-4 position in m, i = 5-7 rotation in radians
                 blueprintRowToAppend: List[float] = [ int(float(i)) for i in rowAsListOfStrings[0:2] ] + \
@@ -87,7 +86,8 @@ class RoboFab_host:
         # define all the required organs and cables to the robot object:
         debugPrint( "Defining the organs" ,messageVerbosity=1)
         for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
-            debugPrint ( "adding an organ of type " + str( organ_raw_data[1 ] ) ,messageVerbosity=2)
+            print(self.dictionaryOfOrganTypes[str(organ_raw_data[1])])
+            debugPrint ( "adding an organ of type {} ({})".format(str( organ_raw_data[1] ) , self.dictionaryOfOrganTypes[str(organ_raw_data[1])]["friendlyName"]) ,messageVerbosity=2)
             self.myRobot.addOrgan (
                 makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
             )
@@ -103,6 +103,32 @@ class RoboFab_host:
                     i+=1
                     organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
                                              * self.myRobot.organsList[0].transformOrganOriginToCableSocket[i] # socket slot in Head, relative to robot origin
+
+    def checkBankHasEnoughOrgans(self):
+        # count the organs we need:
+        organs_in_robot = {}
+        for organ in self.myRobot.organsList:
+            if organ.organType in organs_in_robot:
+                organs_in_robot[organ.organType] += 1
+            else:
+                organs_in_robot[organ.organType] = 1
+
+        # count the organs we have in the bank:
+        organs_in_bank = self.organBank.countOrgansAvailable()
+
+        # determine if there is enough of every type
+        enoughOrgansAvailable=True
+        for organType in organs_in_robot:
+            if organType not in organs_in_bank: # this type of organ doesn't exist in the bank
+                enoughOrgansAvailable=False
+                debugPrint("Bank does not contain any organs of type {} (robot needs {})".format(organType,organs_in_robot[organType]))
+            else:
+                debugPrint("Organs type: {}, bank has: {}, robot needs {}".format(organType,organs_in_bank[organType],organs_in_robot[organType]))
+                if organs_in_robot[organType] > organs_in_bank[organType]: # this type of organ exists in the bank, but more are needed than are in the bank
+                    enoughOrgansAvailable=False
+                    debugPrint("Bank does not contain enough organs of type {} (bank has {}, robot needs {})".format(organType,organs_in_bank[organType],organs_in_robot[organType]))
+        return enoughOrgansAvailable
+
 
     ## physically construct the robot
     def buildRobot( self, printer:Printer ):

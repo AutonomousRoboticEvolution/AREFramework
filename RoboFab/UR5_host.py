@@ -254,7 +254,7 @@ class UR5Robot:
                 self.UR5isConnected = False
                 self.isRunning=False
                 self.stopArm()
-                raise RuntimeError("Disconnected from UR arm")
+                # raise RuntimeError("Disconnected from UR arm")
                 break
 
 
