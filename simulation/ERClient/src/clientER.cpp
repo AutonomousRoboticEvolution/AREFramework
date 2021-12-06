@@ -3,13 +3,16 @@
 using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
+    initialize();
 
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + port));
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
         if (new_slave->connect(5000)) {
             // new_slave->setState(SlaveConnection::State::FREE);
-            new_slave->getIntegerSignalStreaming("simulationState");
+           // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
+          //  new_slave->setIntegerSignal("clientState",IDLE);
+            new_slave->setStringSignal("log_folder",Logging::log_folder),
             serverInstances.push_back(std::move(new_slave));
 
         } else {
@@ -22,7 +25,6 @@ int ER::init(int nbrOfInst, int port){
     }
     currentIndVec.resize(serverInstances.size());
     currentIndexVec.resize(serverInstances.size());
-    initialize();
     return true;
 }
 
@@ -118,7 +120,6 @@ bool ER::updateSimulation()
     int state = IDLE;
 
     if(ea->get_population().size() > 0){
-
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
