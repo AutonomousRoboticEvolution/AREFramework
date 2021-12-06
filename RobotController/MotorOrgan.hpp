@@ -15,15 +15,19 @@
 // e.g. 36 ticks-per-timestep = 60.4rpm
 #define MAXIMUM_TARGET_VELOICTY 36
 
-//Register subaddresses for DRV8830 chip
+//Register subaddresses
 #define DRV_CONTROL_REG_ADDR 0x00
-#define DRV_FAULT_REG_ADDR 0x01
+#define GET_MEASURED_VELOCITY_REGISTER 0x12
+#define GET_MEASURED_CURRENT_REGISTER 0x13
+#define CURRENT_LIMIT_REGISTER 0x14
 
 //IN1 and IN2 states
 #define STANDBY 0x0
 #define REVERSE 0x1
 #define FORWARD 0x2
 #define BRAKE 0x3
+
+#define CONVERT_ENCODER_TICKS_PER_TIMESTEP_TO_REV_PER_MINUTE 1.677852349
 
 //CONTROL register fields
 // [7:2] motorSpeed bits
@@ -72,8 +76,6 @@ class MotorOrgan  : public Organ {
 		uint8_t currentState = STANDBY; ///< Motor state: STANDBY, REVERSE, FORWARD or BRAKE, defined in MotorOrgan.hpp
 		uint8_t currentSpeed = 0; ///< Magnitude of motor speed, unsigned 6 bit value, so 0-63 range. Direction is given by currentState
 
-        boardSelection daughterBoardToEnable = BOTH; // to store which daughterboard this organ is attached to, so must be enabled before use
-
 		//Public member functions
 		/**
 			@brief MotorOrgan constructor.
@@ -117,33 +119,32 @@ class MotorOrgan  : public Organ {
 		*/
 		void standby();
 
-		/**
-			@brief Read the contents of the fault register.
-			@return One byte containing the fault register bits, which indicate whether a
-			fault has occurred, and of what type. Further information in the datasheet.
-			\code
-			FAULT REGISTER BIT MEANINGS
-			________________________________________
-			 CLEAR --- --- ILIMIT OTS UVLO OCP FAULT
-			   7	6   5     4    3    2   1    0
+        /**
+            @brief Set the current limit value
+            @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
 
-			 CLEAR: Write '1' to this to clear fault reg
-			 ILIMIT: Current limit exceeded event
-			 OTS: Overtemperature shutdown
-			 UVLO: Undervoltage lockout
-			 OCP: Overcurrent protection
-			 FAULT: Any fault condition exists
-			\endcode
-		*/
-		uint8_t readFaultReg();
+            NOTE: Must have a delay between using this function and further writes to I2C
+            I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
+        */
+        void setCurrentLimit(uint8_t tensOfMilliamps);
 
-		/**
-			@brief Clear all the bits in the fault register.
-			This can be used to clear errors in the case of a fault which stops operation.
-		*/
-		void clearFaultReg();
+        /**
+            @brief Read the instantaneous current draw.
+            @return
+        */
+        int8_t readMeasuredCurrent();
 
-        OrganType organType = WHEEL;
+        /**
+            @brief Read the instantaneous rotational velocity of the wheel.
+            @return the measured veloicty, in encoder ticks per timestep
+        */
+        int8_t readMeasuredVelocity();
+
+        /**
+            @brief Read the instantaneous current draw.
+            @return the measured veloicty, in revolutions per minute
+        */
+        float readMeasuredVelocityRPM();
 
 
 	private :

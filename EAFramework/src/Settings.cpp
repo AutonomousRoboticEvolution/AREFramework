@@ -17,6 +17,7 @@ settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<set
                 parameters.emplace("#verbose",new settings::Boolean(0));
                 parameters.emplace("#instanceType",new settings::Integer(0));
                 parameters.emplace("#seed",new settings::Integer(-1));
+                parameters.emplace("#debugDisplayOnPi",new settings::Boolean(0));
                 return parameters;
             }());
 

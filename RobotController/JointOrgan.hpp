@@ -7,6 +7,9 @@
 #ifndef JOINTORGAN_HPP
 #define JOINTORGAN_HPP
 
+#define DEBUG_PRINT false
+
+#define MAX_MAGNITUDE_TARGET_ANGLE 80 // the maximum target position in degrees, where zero is straight, e.g. a value of 90 would give a total range of 180 degrees
 
 //#include <cstdlib> //for abs() function
 #include "Organ.hpp"
@@ -50,6 +53,18 @@ class JointOrgan  : public Organ {
         void setTargetAngle(int8_t newTarget);
 
         /**
+            @brief LED brightness setting method.
+            @param value for LED brightness, 0-255, will be the PWM value set by the arduino
+        */
+        void setLEDBrightness(int8_t newValue);
+        
+		/**
+            @brief Target angle setting method for input directly from the high level controller
+            @param target angle is a signed float between -1 and 1. This will correspond to angles from -MAX_MAGNITUDE_TARGET_ANGLE to MAX_MAGNITUDE_TARGET_ANGLE (i.e. plus/minus 80 degrees)
+		*/
+        void setTargetAngleNormalised(float newTargetNormalised);
+
+        /**
             @brief Set the current limit value
             @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
             
@@ -81,8 +96,6 @@ class JointOrgan  : public Organ {
             @return
         */
         int8_t readMeasuredCurrent();
-
-        OrganType organType = JOINT;
 
 };
 
