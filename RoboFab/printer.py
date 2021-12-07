@@ -29,7 +29,7 @@ class Printer:
         self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
-        self.apiKeyHeader = { 'X-Api-Key': '9B987FFCEE3540F796014AA3C96D2CE4'}
+        self.apiKeyHeader = { 'X-Api-Key': '{}'.format(printerConfiguration["API_KEY"])}
 
         if self.IPAddress is not None:
             self.connectOctoPrintToPrinter()

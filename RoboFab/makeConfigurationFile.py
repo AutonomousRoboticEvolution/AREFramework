@@ -8,9 +8,9 @@ from helperFunctions import makeTransformInputFormatted, makeTransformMillimeter
 import math
 import numpy as np
 
-LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
-COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
-SOFTWARE_PARAMETERS_FILE= "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+LOG_FOLDER = "/home/matt/are-logs/test_are_generate"
+COPPELIASIM_FOLDER = "/home/matt/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
+SOFTWARE_PARAMETERS_FILE= "/home/matt/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
 def makeFile(location):
 
@@ -21,6 +21,9 @@ def makeFile(location):
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
+		PRINTER_1_API_KEY = "change_me"
+		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
@@ -37,6 +40,9 @@ def makeFile(location):
 		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=536.0, y=-83.6, z=80.5, rotZ=-90) .tolist()
 		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees() .tolist()
 		PRINTER_2_ORIGIN = makeTransformMillimetersDegrees() .tolist()
+		PRINTER_0_API_KEY = "change_me"
+		PRINTER_1_API_KEY = "change_me"
+		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees(x=-373.3, y=-197.0, z=-7.8).tolist()
 		# gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.9, y=30.7, z=209.9, rotZ=181.94).tolist() # single gripper
@@ -208,15 +214,18 @@ def makeFile(location):
 
 		"PRINTER_0":{
 		"ORIGIN":PRINTER_0_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30
+        "BED_COOLDOWN_TEMPERATURE":30,
+		"API_KEY":PRINTER_0_API_KEY
 		},
 		"PRINTER_1":{
 		"ORIGIN":PRINTER_1_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30
+        "BED_COOLDOWN_TEMPERATURE":30,
+		"API_KEY":PRINTER_1_API_KEY
 		},
 		"PRINTER_2":{
 		"ORIGIN":PRINTER_2_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30
+        "BED_COOLDOWN_TEMPERATURE":30,
+		"API_KEY":PRINTER_2_API_KEY
 		},
 
 		"ORGAN_BANK_1":{
