@@ -323,7 +323,7 @@ void M_NIPES::init_morph_pop(){
         for(unsigned i = 0; i < pop_size; i++){
             if(start_from_exp){
                 std::stringstream sstr;
-                sstr << generation << "_" << i;
+                sstr << "_" + generation << "_" << i;
                 if(verbose)
                     std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
                 morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
@@ -486,12 +486,11 @@ bool M_NIPES::update(const Environment::Ptr& env){
 //}
 
 
-
 void M_NIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::cout << "Loading genome: " << genomeID << "!" << std::endl;
     std::stringstream filepath;
-    filepath << loadExperiment << "/morphGenome" << genomeID;
+    filepath << loadExperiment << "/morphGenome_" << genomeID;
     gen = NEAT::Genome(filepath.str().c_str());
 }
 
