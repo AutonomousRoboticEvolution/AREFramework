@@ -29,7 +29,7 @@ class Printer:
         self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
-        self.apiKeyHeader = { 'X-Api-Key': 'b76fba867e5ee070caff864d953ed27b'}
+        self.apiKeyHeader = { 'X-Api-Key': '9B987FFCEE3540F796014AA3C96D2CE4'}
 
         if self.IPAddress is not None:
             self.connectOctoPrintToPrinter()
@@ -130,6 +130,7 @@ class Printer:
     #returns a dictionary, with keys "bed_actual", "bed_target", "tool_actual" and "tool_target" and values as temperature in degC
     def getTemperatures(self):
         responseObject = requests.get("http://{}/api/printer".format(self.IPAddress), headers=self.apiKeyHeader, timeout=self.timeout)
+        print(responseObject, self.IPAddress)
         temperatures = {"bed_actual":responseObject.json()["temperature"]["bed"]["actual"],
                         "bed_target":responseObject.json()["temperature"]["bed"]["target"],
                         "tool_actual":responseObject.json()["temperature"]["tool0"]["actual"],
@@ -280,17 +281,17 @@ class Printer:
 if __name__ == "__main__":
     import json
 
-    # ID_list = [1203,1358,1457,1689,2062,2710,3134,4180,4340]
-    ID_list = ["14_9"]
+    '''
+    ID_list = [1203,1358,1457,1689,2062,2710,3134,4180,4340]
+    ID_list = [1689,2710]
     for ID_num in ID_list:
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
+    '''
+    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
 
-        printer=Printer(None , json.load(open('configuration_BRL.json')))
-        printer.createSTL(robot_ID)
-        printer.slice("mesh_"+robot_ID)
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
     #printer.printARobot("test3", FAKE_SLICE_ONLY=False)
-    # printer.coolBed(30)
+    printer.coolBed(30)
