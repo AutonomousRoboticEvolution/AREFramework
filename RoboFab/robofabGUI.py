@@ -376,6 +376,8 @@ class RobofabGUI:
             self.listOfButtons_slots[i].place(x=xPosition, y=yPosition)
             self.listOfTextboxes_slots[i].place(x=xPosition, y=yPosition+30)
 
+        self.window_bankManager.protocol("WM_DELETE_WINDOW", self.updateI2CAddressesAndClose) # function windowCloseHandler() will be called when the GUI is closed
+
     def updateI2CAddressesAndClose(self):
         for i, organ in enumerate(self.robofabObject.organBank.organsList):
             # update organ's address with the value from textbox
