@@ -1,6 +1,7 @@
 #ifndef M_NIPES_HPP
 #define M_NIPES_HPP
 
+#include <boost/filesystem.hpp>
 #include "ARE/CPPNGenome.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
@@ -17,6 +18,7 @@
 namespace are{
 
 using CPPNMorph = sim::Morphology_CPPNMatrix;
+namespace fs = boost::filesystem;
 
 typedef std::function<double(const CMAESLearner::Ptr&)> fitness_fct_t;
 

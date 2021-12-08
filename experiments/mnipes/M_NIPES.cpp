@@ -319,16 +319,26 @@ void M_NIPES::init_morph_pop(){
 
 
 
-    if(bootstrap_pop || start_from_exp){
+    if(start_from_exp){
+        std::string filename;
+        std::vector<std::string> split_str;
+        int i = 0;
+        for(const auto &dirit : fs::directory_iterator(fs::path(exp_folder))){
+            filename = dirit.path().string();
+            boost::split(split_str,filename,boost::is_any_of("/"));
+            boost::split(split_str,split_str.back(),boost::is_any_of("_"));
+            if(split_str[0] != "morphGenome")
+                continue;
+            if(verbose)
+                std::cout << "Load morphology genome : " << filename.c_str() << std::endl;
+            morph_gen = NEAT::Genome(filename.c_str());
+            morph_population->AccessGenomeByIndex(i) = morph_gen;
+            i++;
+        }
+    }
+    else if(bootstrap_pop){
         for(unsigned i = 0; i < pop_size; i++){
-            if(start_from_exp){
-                std::stringstream sstr;
-                sstr << "_" + generation << "_" << i;
-                if(verbose)
-                    std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
-                morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
-            }else if(bootstrap_pop)
-                loadNEATGenome(morphIDList[i],morph_gen);
+            loadNEATGenome(morphIDList[i],morph_gen);
             morph_population->AccessGenomeByIndex(i) = morph_gen;
         }
     }
@@ -583,6 +593,8 @@ void M_NIPES::loadControllerArchive(const std::string &file){
             state = 1;
         }else if(state == 1){
             std::stringstream sstr;
+            sstr << elt << std::endl;
+            std::getline(stream,elt);
             sstr << elt << std::endl;
             nbr_weights = std::stoi(elt);
             std::getline(stream,elt);
