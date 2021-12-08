@@ -8,20 +8,23 @@ from helperFunctions import makeTransformInputFormatted, makeTransformMillimeter
 import math
 import numpy as np
 
-LOG_FOLDER = "/home/matt/are-logs/test_are_generate"
-COPPELIASIM_FOLDER = "/home/matt/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
-SOFTWARE_PARAMETERS_FILE= "/home/matt/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+
 
 def makeFile(location):
 
 	# location specific variables:
 	if location == "BRL":
+
+		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
+		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
+		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
-		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
+		PRINTER_0_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_1_API_KEY = "change_me"
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
@@ -36,11 +39,16 @@ def makeFile(location):
 
 
 	elif location == "YRK":
+
+		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
+		COPPELIASIM_FOLDER = "/home/robofab/programs/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
+		SOFTWARE_PARAMETERS_FILE = "/home/robofab/programs/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+
 		ASSEMBLY_FIXTURE_ORIGIN =  makeTransformMillimetersDegrees(x=67.8, y=-710.9, z= 70.9, rotZ=90).tolist()  #  NEEDS UPDATING
 		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=536.0, y=-83.6, z=80.5, rotZ=-90) .tolist()
 		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees() .tolist()
 		PRINTER_2_ORIGIN = makeTransformMillimetersDegrees() .tolist()
-		PRINTER_0_API_KEY = "change_me"
+		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
 		PRINTER_1_API_KEY = "change_me"
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees(x=-373.3, y=-197.0, z=-7.8).tolist()
