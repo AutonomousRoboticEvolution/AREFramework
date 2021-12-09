@@ -14,6 +14,7 @@
 
 //DEBUG FLAG
 #define DEBUG 0
+#define HARDWARE_TEST 1
 
 //CALIBRATION CALCULATIONS
 #define DEG_PER_US 0.093011  //Approximately measured empirically based on a travel of ~173 degrees
@@ -35,9 +36,9 @@
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
 #define MIN_CURRENT_MA 330 //milliamps
 #define MAX_CURRENT_MA 1250 //milliamps
-#define DEFAULT_CURRENT_LIMIT MIN_CURRENT_MA
+#define DEFAULT_CURRENT_LIMIT 500
 
-#define MAX_SETI_ANALOG_READING 950 //Determined by ADC reference voltage AREF, set by onboard resistor
+#define MAX_SETI_ANALOG_READING 450 //Determined by ADC reference voltage AREF, set by onboard resistor
 
 //Servo position
 #define SERVO_POS_READING_MIN 30
@@ -49,11 +50,11 @@
 #include <Servo.h>
 
 //I/O pins
-#define INDICATOR_LED 9 //No PWM as conflicts with Servo library. Change to pin 6 for v1.2+ boards
+#define INDICATOR_LED 6 //This is pin 9 on v1.1 boards, which have no PWM for the LED as it conflicts with the Servo library.
 #define I2C_ENABLE 15
-#define SERVO_ENABLE 6 //change this to pin 7 for v1.2+ boards
+#define SERVO_ENABLE 7 //this is pin 6 on v1.1 boards
 #define SERVO_PWM 5
-#define SETI_PIN 6 //Current measurement
+#define SETI_PIN 6 //Current measurement pin (Analog pin 6)
 #define SERVO_POSITION_PIN A3
 
 //Register addresses
@@ -86,6 +87,10 @@ uint8_t led_brightness;
 volatile bool update_current_limit_flag = false;
 volatile bool update_target_position_flag = false;
 volatile bool update_led_brightness_flag = false;
+
+
+//Variables only used for testing
+bool rotationDirection = 0; //0 is -ve, 1 is +ve
 
 /*******SETUP**********************/
 void setup() {
@@ -127,6 +132,11 @@ void loop() {
   measured_position = readServoPosition();
   measured_current = readServoCurrent();
 
+  //Show current limit on the indicator LED
+  float currentProportionOfLimit = (float)measured_current/MAX_SETI_ANALOG_READING;
+  led_brightness = currentProportionOfLimit * 255; //Scale to AnalogOut range
+  update_led_brightness_flag = true;
+
   //Update settings
   if (update_current_limit_flag) {
     setCurrentLimit(current_limit_setting);
@@ -141,6 +151,38 @@ void loop() {
   if (update_led_brightness_flag){
     update_led_brightness_flag=false;
     setLED(led_brightness);
+  }
+
+  //HARDWARE TEST ROUTINE
+  if (HARDWARE_TEST) {
+    if(rotationDirection == 0) {
+      target_position_setting -= 1;
+      if(target_position_setting < MIN_SERVO_ANGLE) {
+        rotationDirection = 1;
+        extI2CEnable(true);
+        Serial.println("I2C to outside world enabled");
+      } else {
+        update_target_position_flag = true;
+      }
+    } else {
+      target_position_setting += 1;
+      if(target_position_setting > MAX_SERVO_ANGLE) {
+        rotationDirection = 0;
+        extI2CEnable(false);
+        Serial.println("I2C to outside world disabled");
+      } else {
+        update_target_position_flag = true;
+      }
+    }
+    Serial.print("Target position: ");
+    Serial.println(target_position_setting);
+    Serial.print("Current reading: ");
+    Serial.print(readServoCurrent());
+    Serial.print(" mA, raw: ");
+    Serial.println(analogRead(SETI_PIN));
+    Serial.print("Position: ");
+    Serial.println(readServoPosition());
+    delay(10);
   }
 }
 
