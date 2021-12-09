@@ -135,7 +135,9 @@ void ObstacleAvoidance::build_tiled_floor(std::vector<int> &tiles_handles){
             simSetObjectName(tiles_handles.back(),name.str().c_str());
             float height = -0.004;
             if(!flatFloor){
-                height = randNum->randFloat(-0.005,-0.001);
+                height = (i+j)%2 == 0 ? -0.004 : 0.006;
+
+//                height = randNum->randFloat(-0.005,-0.001);
             }
             float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
             simSetObjectPosition(tiles_handles.back(),-1,pos);
