@@ -8,14 +8,14 @@
 
 namespace are {
 
-class CPPNIndividual : public sim::NN2Individual
+class CPPNIndividual : public Individual
 {
 public :
-    CPPNIndividual() : NN2Individual(){}
-    CPPNIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
-            NN2Individual(morph_gen, ctrl_gen){}
+    CPPNIndividual() : Individual(){}
+    CPPNIndividual(const Genome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
+            Individual(morph_gen, ctrl_gen){}
     CPPNIndividual(const CPPNIndividual& ind):
-            NN2Individual(ind),
+            Individual(ind),
             nn(ind.nn),
             testRes(ind.testRes),
             morphDesc(ind.morphDesc),
@@ -32,7 +32,6 @@ public :
         arch & objectives;
         arch & ctrlGenome;
         arch & morphGenome;
-        arch & final_position;
         arch & nn_inputs;
         arch & nn_outputs;
 
@@ -65,6 +64,7 @@ public :
 
 protected:
     void createMorphology() override;
+    void createController() override{}
 
     NEAT::NeuralNetwork nn;
     std::vector<bool> testRes;

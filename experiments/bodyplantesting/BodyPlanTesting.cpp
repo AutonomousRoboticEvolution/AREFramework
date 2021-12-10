@@ -63,22 +63,14 @@ void BODYPLANTESTING::initPopulation()
 {
     const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int nbr_weights, nbr_biases;
-    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
-    std::vector<double> weights(nbr_weights);
-    std::vector<double> biases(nbr_biases);
+
     rng.Seed(randomNum->getSeed());
     // Morphology
     NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
     for (size_t i = 0; i < population_size; i++){ // Body plans
         for(int j = 0; j < num_eval; j++){ // Controllers
-            NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-            ctrl_gen->set_biases(biases);
-            ctrl_gen->set_weights(weights);
+            EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i )));
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
