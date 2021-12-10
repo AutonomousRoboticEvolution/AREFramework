@@ -33,13 +33,17 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
 
     rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        morphgenome->random();
+        if(cppn_fixed)
+            morphgenome->fixed_structure();
+        else
+            morphgenome->random();
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -49,7 +53,10 @@ void BODYPLANTESTING::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-            morphgenome->random();
+            if(cppn_fixed)
+                morphgenome->fixed_structure();
+            else
+                morphgenome->random();
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -76,11 +83,11 @@ void BODYPLANTESTING::epoch(){
         ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
         CartDesc ind_detailed_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
 
-        double organ_score = (ind_detailed_desc.sensorNumber > 0 ? 1 : 0) +
-                (ind_detailed_desc.wheelNumber > 0 ? 1 : 0) +
-                (ind_detailed_desc.casterNumber > 0 ? 1 : 0) +
-                (ind_detailed_desc.jointNumber > 0 ? 1 : 0);
-        organ_score /= 4.f;
+//        double organ_score = (ind_detailed_desc.sensorNumber > 0 ? 1 : 0) +
+//                (ind_detailed_desc.wheelNumber > 0 ? 1 : 0) +
+//                (ind_detailed_desc.casterNumber > 0 ? 1 : 0) +
+//                (ind_detailed_desc.jointNumber > 0 ? 1 : 0);
+//        organ_score /= 4.f;
 
         //Compute distances to find the k nearest neighbors of ind
         std::vector<size_t> pop_indexes;
@@ -90,7 +97,7 @@ void BODYPLANTESTING::epoch(){
         double ind_nov = Novelty::sparseness(distances);
 
         //set the objetives
-        std::vector<double> objectives = {(ind_nov / 2.64 + organ_score)/2.f}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+        std::vector<double> objectives = {ind_nov / 2.64 /*+ organ_score)/2.f*/}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
         std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
 

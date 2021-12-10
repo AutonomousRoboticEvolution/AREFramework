@@ -1,6 +1,7 @@
 #include "ARE/nn2/NN2CPPNGenome.hpp"
 
 using namespace are;
+using namespace nn2_cppn;
 
 std::mt19937 nn2::rgen_t::gen;
 
@@ -46,7 +47,6 @@ void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
 }
 
 void NbrConnNeurLog::saveLog(EA::Ptr &ea){
-    int generation = ea->get_generation();
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream,logFile))
         return;
@@ -61,7 +61,6 @@ void NbrConnNeurLog::saveLog(EA::Ptr &ea){
 }
 
 void ParentingLog::saveLog(EA::Ptr &ea){
-    int generation = ea->get_generation();
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream,logFile))
         return;

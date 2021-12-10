@@ -91,6 +91,10 @@ public:
         cppn.init();
     }
 
+    void fixed_structure(){
+        cppn.build_fixed_structure();
+    }
+
     void random(){
         cppn.random();
     }
@@ -167,6 +171,7 @@ private:
     int generation;
 };
 
+namespace nn2_cppn {
 
 class NN2CPPNGenomeLog : public Logging
 {
@@ -200,8 +205,7 @@ public:
     void loadLog(const std::string& log_file){}
 };
 
-
-
+}//nn2_cppn
 }//are
 
 #endif //NN2CPPNGENOME_HPP
