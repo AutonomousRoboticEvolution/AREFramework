@@ -288,10 +288,16 @@ if __name__ == "__main__":
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
     '''
-    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
+
+    ## to print a hand-made stl file using the same settings as an automated mesh file:
+    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json')),0)
+    printer.slice("testpart")
+    printer.uploadGCodeToOctoPrint("gcode/testpart")
+    printer.printFileOnOctoprint("testpart")
+    printer.coolBed(30)
 
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
     #printer.printARobot("test3", FAKE_SLICE_ONLY=False)
-    printer.coolBed(30)
+    # printer.coolBed(30)

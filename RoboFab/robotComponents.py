@@ -88,7 +88,10 @@ class Organ:
         self.AssemblyFixtureRotationOffsetFudgeAngle = 0
         self.actualDropoffPosition = None # optionally used to store the actual position the arm moves to when inserting the organ, which may be different due to use of force mode. This might be useful when we come back to the organ later.
 
-        self.transformOrganOriginToMaleCableSocket = dictionaryOfThisOrganType["transformOrganOriginToMaleCableSocket"]
+        if dictionaryOfThisOrganType["transformOrganOriginToMaleCableSocket"] is None:
+            self.transformOrganOriginToMaleCableSocket = None
+        else:
+            self.transformOrganOriginToMaleCableSocket = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToMaleCableSocket"] )
         self.cableDestination = makeTransform() # used when the cable is contained in the organ
 
         # compute assembly fixture position to be used (zero if Head organ, otherwise call helper function defined above)

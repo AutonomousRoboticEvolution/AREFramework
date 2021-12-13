@@ -86,7 +86,6 @@ class RoboFab_host:
         # define all the required organs and cables to the robot object:
         debugPrint( "Defining the organs" ,messageVerbosity=1)
         for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
-            print(self.dictionaryOfOrganTypes[str(organ_raw_data[1])])
             debugPrint ( "adding an organ of type {} ({})".format(str( organ_raw_data[1] ) , self.dictionaryOfOrganTypes[str(organ_raw_data[1])]["friendlyName"]) ,messageVerbosity=2)
             self.myRobot.addOrgan (
                 makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
