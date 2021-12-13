@@ -9,7 +9,7 @@
 
 #define DEBUG 0
 
-#define SERVO_ENABLE 6 //change this to pin 7 for v1.2+ boards
+#define SERVO_ENABLE 7 //change this to pin 6 for v1.1 boards
 #define SERVO_PWM 5
 #define SERVO_POSITION_PIN A3
 #define I2C_ENABLE 15
