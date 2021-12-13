@@ -60,7 +60,7 @@ public :
     Eigen::VectorXd descriptor();
 
 
-    void update(double delta_time) override;
+    void update(double) override{}
 
 protected:
     void createMorphology() override;

@@ -214,17 +214,5 @@ std::vector<int> BODYPLANTESTING::listInds()
 
 bool BODYPLANTESTING::update(const Environment::Ptr& env)
 {
-//    for(const auto& ind : population) {
-//        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
-//                std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
-//    }
-//    endEvalTime = hr_clock::now();
-//    numberEvaluation++;
-//
-    if(simulator_side){
-        Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
-    }
     return true;
 }

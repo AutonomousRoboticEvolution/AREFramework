@@ -2,23 +2,6 @@
 
 using namespace are;
 
-void CPPNIndividual::update(double delta_time)
-{
-    /// \todo EB: what is the highest number of outputs?
-    std::vector<double> inputs(20, 0.0);
-    std::vector<double> tempInputs = morphology->update();
-
-    // Dynamic inputs and outputs handeling
-    if(tempInputs.size() > 0){
-        for(int i = 0; i < tempInputs.size(); i++) {
-            inputs.at(i) = tempInputs[i];
-        }
-    }
-
-    std::vector<double> outputs = control->update(inputs);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->command(outputs);
-}
-
 void CPPNIndividual::createMorphology()
 {
     NEAT::Genome gen =
