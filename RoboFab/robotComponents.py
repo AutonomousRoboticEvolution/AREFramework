@@ -75,10 +75,12 @@ class Organ:
         # self.gripPosition = np.matrix( dictionaryOfThisOrganType["gripPosition"] )
         self.transformOrganOriginToGripper = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToGripper"] )
         self.transformOrganOriginToClipCentre = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToClipCentre"] )
-        if dictionaryOfThisOrganType["transformOrganOriginToCableSocket"] is None:
-            self.transformOrganOriginToCableSocket = None
+        if dictionaryOfThisOrganType["transformOrganOriginToFemaleCableSocket"] is None: # this is a list of the female TRRS sockets (e.g. the 8 on the Head)
+            self.transformOrganOriginToFemaleCableSocket = None
+            self.femaleTRRSSocketsUsedList = None
         else:
-            self.transformOrganOriginToCableSocket = [np.matrix(x) for x in dictionaryOfThisOrganType["transformOrganOriginToCableSocket"] ]
+            self.transformOrganOriginToFemaleCableSocket = [np.matrix(x) for x in dictionaryOfThisOrganType["transformOrganOriginToFemaleCableSocket"]]
+            self.femaleTRRSSocketsUsedList = [False]*len(self.transformOrganOriginToFemaleCableSocket)
         self.useForceMode :bool = dictionaryOfThisOrganType["USE_FORCE_MODE"]
         self.I2CAddress = i2cAddress
         self.positionTransformWithinBankOrRobot = positionTransform

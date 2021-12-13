@@ -101,7 +101,7 @@ class RoboFab_host:
                 if organ.transformOrganOriginToMaleCableSocket is not None:
                     i+=1
                     organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
-                                             * self.myRobot.organsList[0].transformOrganOriginToCableSocket[i] # socket slot in Head, relative to robot origin
+                                             * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[i] # socket slot in Head, relative to robot origin
 
     def checkBankHasEnoughOrgans(self):
         # count the organs we need:

@@ -221,6 +221,7 @@ def findDisplacementBetweenTransforms(transformA, transformB=None):
     outputDictionary["delta_x"] = transformA[0,3] - transformB[0,3]
     outputDictionary["delta_y"] = transformA[1,3] - transformB[1,3]
     outputDictionary["delta_z"] = transformA[2,3] - transformB[2,3]
+    outputDictionary["magnitude"] = np.linalg.norm( [ outputDictionary["delta_x"], outputDictionary["delta_y"], outputDictionary["delta_z"]] )
 
     outputDictionary["direction_about_z"] = -math.atan2(outputDictionary["delta_x"],outputDictionary["delta_y"])
 

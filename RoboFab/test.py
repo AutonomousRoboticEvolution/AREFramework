@@ -9,6 +9,7 @@ import csv
 from numpy.linalg import inv
 
 import matplotlib.pyplot as plt
+import random
 
 makeConfigurationFile(location="BRL")  # <--- change this depending on if you're in York or BRL
 configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
@@ -16,6 +17,21 @@ configurationData = json.load(open('configuration_BRL.json'))  # <--- change thi
 printer_number=0
 # printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=0 )
 printer=Printer( None, configurationData, printer_number=0 )
+
+def makeRandomBlueprint(filename):
+    with open("/home/robofab/are-logs/test_are_generate/waiting_to_be_built/blueprint_{}.csv".format(filename), 'w') as f:
+        f.write("0,0,0,0,0.0054,0,0,0,") # Head line
+
+        n_organs= random.randrange(1,9)
+        for i in range(n_organs):
+            type=random.choice([1,2,4])
+            keep_this_set=False
+            while not keep_this_set:
+                x_pos = -0.2 + 0.4*random.random()
+                y_pos = -0.2 + 0.4*random.random()
+                if abs(x_pos)>0.07 or abs(y_pos)>0.07: keep_this_set=True
+            print("{}, {}".format(x_pos,y_pos))
+            f.write("\n0,{},{},{},0.0198007,0,-1.5708,3.1415,".format(type,x_pos,y_pos))
 
 class Tester:
     def __init__(self,configurationData, robotID):
@@ -45,24 +61,63 @@ class Tester:
                 makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
             )
 
-    def determineCableDestinations(self):
+    def determineCableDestinations_original(self):
         i = -1
         for organ in self.myRobot.organsList:
             if organ.transformOrganOriginToMaleCableSocket is not None:
                 i += 1
                 organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
-                                         * self.myRobot.organsList[0].transformOrganOriginToCableSocket[i]  # socket slot in Head, relative to robot origin
+                                         * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[i]  # socket slot in Head, relative to robot origin
 
-    def drawCables(self):
+    def determineCableDestinations_closest(self):
+        headOrigin = self.myRobot.organsList[0].positionTransformWithinBankOrRobot
+
+        allFinished=False
+        while not allFinished:
+            for organ in self.myRobot.organsList:
+                allFinished=True # will be re-set to False if any organ gets modified this time through
+                if organ.transformOrganOriginToMaleCableSocket is not None: # if this organ has a cable to consider (if not ignore it)
+                    if np.allclose(organ.cableDestination, makeTransform()): # and if we haven't yet sorted this organ's cable, which we can tell because cableDestination hasn't been modified from its starting value
+                        allFinished=False # since there is at least one organ needing assignment, we are not done yet
+
+                        # let's find the closest socket to this organ, and set the cable destination to be that socket:
+                        minDistance=999
+                        closestSocketFound=-1 # the index in the sockets list self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket
+                        for socketNumber,candidateSocketLocation in enumerate(self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket):
+                            if self.myRobot.organsList[0].femaleTRRSSocketsUsedList[socketNumber] == False: # only check this socket if it hasn't already been used
+                                distance = findDisplacementBetweenTransforms(organ.positionTransformWithinBankOrRobot * organ.transformOrganOriginToMaleCableSocket, # where the cable comes from in this organ
+                                                                  headOrigin * candidateSocketLocation)["magnitude"]
+                                if distance<minDistance:
+                                    minDistance=distance
+                                    closestSocketFound=socketNumber
+
+                        assert (closestSocketFound != -1) # check we have found a socket for this cable
+
+                        print("Closest socket found was {} at a distance of {}".format(closestSocketFound,minDistance))
+                        organ.cableDestination = headOrigin * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[closestSocketFound]
+                        self.myRobot.organsList[0].femaleTRRSSocketsUsedList[closestSocketFound] = True # mark that socket (in the Head) as having been used already
+
+
+
+    def clearCables(self):
         for organ in self.myRobot.organsList:
+            if organ.transformOrganOriginToMaleCableSocket is not None:
+                organ.cableDestination = makeTransform()
+
+    def drawCables(self,axesHandles,i_plot,title=""):
+        # set actuve subplot:
+        plt.sca(axesHandles[i_plot])
+
+        for i,organ in enumerate(self.myRobot.organsList):
             x= ( organ.positionTransformWithinBankOrRobot * inv( organ.transformOrganOriginToClipCentre ) )[0,3]
             y= ( organ.positionTransformWithinBankOrRobot * inv( organ.transformOrganOriginToClipCentre ) )[1,3]
-            print("{}: x: {}, y: {}".format( organ.friendlyName,x,y ))
+            # print("{}: x: {}, y: {}".format( organ.friendlyName,x,y ))
 
-            plt.plot(x, y, "bo")
-            plt.plot(organ.positionTransformWithinBankOrRobot[0,3] , organ.positionTransformWithinBankOrRobot[1,3],"go") # clip
-            plt.plot([x,organ.positionTransformWithinBankOrRobot[0,3]] , [y,organ.positionTransformWithinBankOrRobot[1,3]],"g--") # clip
-            plt.text(x, y + 0.005, organ.friendlyName, color="b", ha='center')
+            if not organ.friendlyName.startswith("Head"):
+                plt.plot(x, y, "bo")
+                plt.plot(organ.positionTransformWithinBankOrRobot[0,3] , organ.positionTransformWithinBankOrRobot[1,3],"go") # clip
+                plt.plot([x,organ.positionTransformWithinBankOrRobot[0,3]] , [y,organ.positionTransformWithinBankOrRobot[1,3]],"g--") # clip
+                plt.text(x, y + 0.005, "{}:{}".format(i,organ.friendlyName), color="b", ha='center')
 
             if organ.transformOrganOriginToMaleCableSocket is not None:
                 plt.plot( # line for cable
@@ -74,20 +129,34 @@ class Tester:
         # square around Head:
         head_size = 0.085 / 2
         plt.plot([-head_size, head_size, head_size, -head_size, -head_size], [-head_size, -head_size, head_size, head_size, -head_size], "r-")
+        # empty sockets:
+        for i,socket in enumerate(self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket):
+            if self.myRobot.organsList[0].femaleTRRSSocketsUsedList[i] == False:
+                plt.plot(socket[0,3], socket[1,3], "kx")
 
-        plt.gcf().set_size_inches(8, 8)
-        plt.xlim([-0.2, 0.2])
-        plt.ylim([-0.2, 0.2])
+        plt.gcf().set_size_inches(16, 8)
+        plt.xlim([-0.25, 0.25])
+        plt.ylim([-0.25, 0.25])
         plt.xlabel("x")
         plt.ylabel("y")
-        plt.draw()
+        plt.title(title)
 
 
-filename="test1"
+filename="randomTest"
+
+makeRandomBlueprint(filename)
+
+fig, axesHandles = plt.subplots(1, 2) # n_rows, n_columns
 
 tester=Tester(configurationData, robotID=filename)
-tester.determineCableDestinations()
-tester.drawCables()
+
+tester.determineCableDestinations_original()
+tester.drawCables(axesHandles,0,"in blueprint order")
+
+tester.clearCables()
+tester.determineCableDestinations_closest()
+tester.drawCables(axesHandles,1,"closest, assigned in blueprint order")
+
 
 # printer.createSTL(filename)
 

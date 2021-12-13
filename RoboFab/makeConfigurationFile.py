@@ -139,7 +139,7 @@ def makeFile(location):
 				# "transformOrganOriginToGripper": np.linalg.inv(makeTransformInputFormatted ( [ 0, 0, 72 / 1000, 0, math.radians ( 180 ), math.radians(180) ] ) ).tolist(), # Head v0.1
 				"transformOrganOriginToGripper": np.linalg.inv(makeTransformMillimetersDegrees (z=85 , rotX=180 )).tolist(), # Head v0.2
 				"transformOrganOriginToClipCentre": makeTransformInputFormatted().tolist(),
-				"transformOrganOriginToCableSocket": [
+				"transformOrganOriginToFemaleCableSocket": [
 					(makeTransformMillimetersDegrees(x=-24 , y=-34.67 , z=107.49 , rotX=180,rotZ=180)).tolist (),
 					(makeTransformMillimetersDegrees(x=-8 , y=-34.67 , z=107.49 , rotX=180,rotZ=180)).tolist (),
 					(makeTransformMillimetersDegrees(x=8 , y=-34.67 , z=107.49 , rotX=180,rotZ=180)).tolist (),
@@ -162,7 +162,7 @@ def makeFile(location):
                  "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=56, z=4.5, rotX=0, rotY=90, rotZ=90).tolist(),
                  "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=0, y=-19.338, z=-8, rotX=90, rotY=0, rotZ=0).tolist(),
                  "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=35, z=34.4, rotX=180, rotY=0, rotZ=0).tolist(),
-                "transformOrganOriginToCableSocket": None, # female socket(s)
+                "transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				"gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.45,
 				"USE_FORCE_MODE":True
@@ -175,7 +175,7 @@ def makeFile(location):
                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=42.57, z=-7.7, rotX=0, rotY=90, rotZ=90).tolist(),
                 "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=-6, y=0, z=-9.579, rotX=180, rotY=0, rotZ=90).tolist(),
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=21.57, z=22.2, rotX=180, rotY=0, rotZ=0).tolist(),
-				"transformOrganOriginToCableSocket": None, # female socket(s)
+				"transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				 "gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.6,
 				"USE_FORCE_MODE":True,
@@ -188,7 +188,7 @@ def makeFile(location):
                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=47.741, z=-30, rotX=0, rotY=90, rotZ=90).tolist(),
                 "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-35.238, rotX=180, rotY=0, rotZ=0).tolist(),
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=8, y=12.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
-				"transformOrganOriginToCableSocket": None,  # female socket(s)
+				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.292, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
 				"gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.5,
 				"USE_FORCE_MODE":True
