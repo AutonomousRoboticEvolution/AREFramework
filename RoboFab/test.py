@@ -1,4 +1,7 @@
 from typing import List
+
+from matplotlib.backends.backend_pdf import PdfPages
+
 from RoboFab import RoboFab_host
 from helperFunctions import *
 from makeConfigurationFile import makeFile as makeConfigurationFile
@@ -23,15 +26,28 @@ def makeRandomBlueprint(filename):
         f.write("0,0,0,0,0.0054,0,0,0,") # Head line
 
         n_organs= random.randrange(1,9)
+        jointCount=0
         for i in range(n_organs):
-            type=random.choice([1,2,4])
+            if jointCount<4:
+                type=random.choice([1,2,4])
+            else:
+                type=random.choice([1,2])
+            if type==4: jointCount+=1
             keep_this_set=False
             while not keep_this_set:
                 x_pos = -0.2 + 0.4*random.random()
                 y_pos = -0.2 + 0.4*random.random()
                 if abs(x_pos)>0.07 or abs(y_pos)>0.07: keep_this_set=True
-            print("{}, {}".format(x_pos,y_pos))
             f.write("\n0,{},{},{},0.0198007,0,-1.5708,3.1415,".format(type,x_pos,y_pos))
+
+# The TRRS sockets on the Head are (electrically) in pairs.
+# The list "transformOrganOriginToFemaleCableSocket" is defined in order so that each pair are listed next to each other, e.g. 0&1 are a pair, 2&3 are a pair etc.
+# Given the index of a socket, this function will return the index of the paired socket
+def returnPartnerIndex(index):
+    if index%2==0: # is even
+        return index+1
+    else: # is odd
+        return index-1
 
 class Tester:
     def __init__(self,configurationData, robotID):
@@ -69,40 +85,94 @@ class Tester:
                 organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
                                          * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[i]  # socket slot in Head, relative to robot origin
 
-    def determineCableDestinations_closest(self):
+    def connectToClosestSocket(self,organ):
+        headOrigin = self.myRobot.organsList[0].positionTransformWithinBankOrRobot
+        if organ.transformOrganOriginToMaleCableSocket is not None:  # if this organ has a cable to consider (if not ignore it)
+            if np.allclose(organ.cableDestination, makeTransform()):  # and if we haven't yet sorted this organ's cable, which we can tell because cableDestination hasn't been modified from its starting value
+
+                # let's find the closest socket to this organ, and set the cable destination to be that socket:
+                minDistance = 999
+                closestSocketFound = -1  # the index in the sockets list self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket
+                for socketNumber, candidateSocketLocation in enumerate(self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket):
+                    if self.myRobot.organsList[0].femaleTRRSSocketsUsedList[socketNumber] == False:  # only check this socket if it hasn't already been used
+                        # print("partner used: {}".format(self.myRobot.organsList[0].femaleTRRSSocketsUsedList[returnPartnerIndex(socketNumber)] ))
+
+                        #if this is a joint, only check this socket it it's partner hasn't been used yet
+                        if (not organ.friendlyName.upper().startswith("JOINT")) or self.myRobot.organsList[0].femaleTRRSSocketsUsedList[returnPartnerIndex(socketNumber)] == False:
+                            distance = findDisplacementBetweenTransforms(organ.positionTransformWithinBankOrRobot * inv(organ.transformOrganOriginToClipCentre) * organ.transformOrganOriginToMaleCableSocket,  # where the cable comes from in this organ
+                                                                         headOrigin * candidateSocketLocation)["magnitude"]
+                            if distance < minDistance:
+                                minDistance = distance
+                                closestSocketFound = socketNumber
+                assert (closestSocketFound != -1)  # check we have found a socket for this cable
+                # print("socketNumber: {}".format(closestSocketFound))
+
+                # print("Closest socket found was {} at a distance of {}".format(closestSocketFound,minDistance))
+                organ.cableDestination = headOrigin * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[closestSocketFound]
+                self.myRobot.organsList[0].femaleTRRSSocketsUsedList[closestSocketFound] = True  # mark that socket (in the Head) as having been used already
+
+    def determineCableDestinations_outerIn(self):
+        debugPrint("Allocating sockets for the organs with cables...",0)
         headOrigin = self.myRobot.organsList[0].positionTransformWithinBankOrRobot
 
-        allFinished=False
-        while not allFinished:
-            for organ in self.myRobot.organsList:
-                allFinished=True # will be re-set to False if any organ gets modified this time through
-                if organ.transformOrganOriginToMaleCableSocket is not None: # if this organ has a cable to consider (if not ignore it)
-                    if np.allclose(organ.cableDestination, makeTransform()): # and if we haven't yet sorted this organ's cable, which we can tell because cableDestination hasn't been modified from its starting value
-                        allFinished=False # since there is at least one organ needing assignment, we are not done yet
+        indexesOfJoints = [ i for i,o in enumerate(self.myRobot.organsList) if o.friendlyName.upper().startswith("JOINT")] # get a list of index values of self.myRobot.organsList that refer to joints
+        # sort this list in order of the absolute x coordinate of each organ's male TRRS socket:
+        indexesOfJoints = [indexesOfJoints[i] for i in np.argsort( [
+            -abs(( o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[0,3]) # <== this is the function by which the organ allocation order will be sorted (negative, so we start with the biggest rather than smallest)
+            for o in [self.myRobot.organsList[j] for j in indexesOfJoints] ]) ]
 
-                        # let's find the closest socket to this organ, and set the cable destination to be that socket:
-                        minDistance=999
-                        closestSocketFound=-1 # the index in the sockets list self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket
-                        for socketNumber,candidateSocketLocation in enumerate(self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket):
-                            if self.myRobot.organsList[0].femaleTRRSSocketsUsedList[socketNumber] == False: # only check this socket if it hasn't already been used
-                                distance = findDisplacementBetweenTransforms(organ.positionTransformWithinBankOrRobot * organ.transformOrganOriginToMaleCableSocket, # where the cable comes from in this organ
-                                                                  headOrigin * candidateSocketLocation)["magnitude"]
-                                if distance<minDistance:
-                                    minDistance=distance
-                                    closestSocketFound=socketNumber
+        # now do the equivalent to find the order to consider all the other organs which have cables that need routing
+        indexesOfOtherOrgans = [i for i,o in enumerate(self.myRobot.organsList) if  o.transformOrganOriginToMaleCableSocket is not None and i not in indexesOfJoints]
+        indexesOfOtherOrgans = [indexesOfOtherOrgans[i] for i in np.argsort([
+            -abs((o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[0, 3])  # <== this is the function by which the organ allocation order will be sorted (negative, so we start with the biggest rather than smallest)
+            for i, o in enumerate([self.myRobot.organsList[j] for j in indexesOfOtherOrgans])])]
 
-                        assert (closestSocketFound != -1) # check we have found a socket for this cable
+        debugPrint("Indexes of Joints: {}\nIndexes of others: {}".format(indexesOfJoints,indexesOfOtherOrgans),1)
+        assert (len(indexesOfJoints) <= 4)  # we cannot have more than 4 joints, because we only have 4 pairs of sockets (and are enforcing each joint is on a different pair)
 
-                        print("Closest socket found was {} at a distance of {}".format(closestSocketFound,minDistance))
-                        organ.cableDestination = headOrigin * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[closestSocketFound]
-                        self.myRobot.organsList[0].femaleTRRSSocketsUsedList[closestSocketFound] = True # mark that socket (in the Head) as having been used already
+        # do the connections in the order determined above:
+        for index in indexesOfJoints:
+            self.connectToClosestSocket(self.myRobot.organsList[index])
+        for index in indexesOfOtherOrgans:
+            self.connectToClosestSocket(self.myRobot.organsList[index])
 
+
+    def determineCableDestinations_byAngle(self):
+        debugPrint("Allocating sockets for the organs with cables...",0)
+        headOrigin = self.myRobot.organsList[0].positionTransformWithinBankOrRobot
+
+        indexesOfJoints = [ i for i,o in enumerate(self.myRobot.organsList) if o.friendlyName.upper().startswith("JOINT")] # get a list of index values of self.myRobot.organsList that refer to joints
+        # sort this list in order of the absolute x coordinate of each organ's male TRRS socket:
+        indexesOfJoints = [indexesOfJoints[i] for i in np.argsort( [
+            abs( math.atan( (o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[1,3] /
+                              (o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[0, 3]
+                   )) # <== this is the function by which the organ allocation order will be sorted
+            for o in [self.myRobot.organsList[j] for j in indexesOfJoints] ]) ]
+
+        # now do the equivalent to find the order to consider all the other organs which have cables that need routing
+        indexesOfOtherOrgans = [i for i,o in enumerate(self.myRobot.organsList) if  o.transformOrganOriginToMaleCableSocket is not None and i not in indexesOfJoints]
+        indexesOfOtherOrgans = [indexesOfOtherOrgans[i] for i in np.argsort([
+            abs( math.atan( (o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[1,3] /
+                              (o.positionTransformWithinBankOrRobot * inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[0, 3]
+                   )) # <== this is the function by which the organ allocation order will be sorted
+            for i, o in enumerate([self.myRobot.organsList[j] for j in indexesOfOtherOrgans])])]
+
+        debugPrint("Indexes of Joints: {}\nIndexes of others: {}".format(indexesOfJoints,indexesOfOtherOrgans),1)
+        assert (len(indexesOfJoints) <= 4)  # we cannot have more than 4 joints, because we only have 4 pairs of sockets (and are enforcing each joint is on a different pair)
+
+        # do the connections in the order determined above:
+        for index in indexesOfJoints:
+            self.connectToClosestSocket(self.myRobot.organsList[index])
+        for index in indexesOfOtherOrgans:
+            self.connectToClosestSocket(self.myRobot.organsList[index])
 
 
     def clearCables(self):
         for organ in self.myRobot.organsList:
             if organ.transformOrganOriginToMaleCableSocket is not None:
                 organ.cableDestination = makeTransform()
+        self.myRobot.organsList[0].femaleTRRSSocketsUsedList=[False]*len(self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket)
+
 
     def drawCables(self,axesHandles,i_plot,title=""):
         # set actuve subplot:
@@ -134,7 +204,7 @@ class Tester:
             if self.myRobot.organsList[0].femaleTRRSSocketsUsedList[i] == False:
                 plt.plot(socket[0,3], socket[1,3], "kx")
 
-        plt.gcf().set_size_inches(16, 8)
+        plt.gcf().set_size_inches(20, 20/3)
         plt.xlim([-0.25, 0.25])
         plt.ylim([-0.25, 0.25])
         plt.xlabel("x")
@@ -144,20 +214,33 @@ class Tester:
 
 filename="randomTest"
 
-makeRandomBlueprint(filename)
+# setup pdf output:
+pdf = PdfPages("./random_blueprints_cables.pdf")
 
-fig, axesHandles = plt.subplots(1, 2) # n_rows, n_columns
+for i in range(100):
 
-tester=Tester(configurationData, robotID=filename)
+    makeRandomBlueprint(filename)
 
-tester.determineCableDestinations_original()
-tester.drawCables(axesHandles,0,"in blueprint order")
+    fig, axesHandles = plt.subplots(1, 3) # n_rows, n_columns
+    tester=Tester(configurationData, robotID=filename)
 
-tester.clearCables()
-tester.determineCableDestinations_closest()
-tester.drawCables(axesHandles,1,"closest, assigned in blueprint order")
+    tester.determineCableDestinations_original()
+    tester.drawCables(axesHandles,0,"in blueprint order")
 
 
-# printer.createSTL(filename)
+    tester.clearCables()
+    tester.determineCableDestinations_outerIn()
+    tester.drawCables(axesHandles,1,"closest, assigned by abs(x)")
 
-plt.show()
+
+    tester.clearCables()
+    tester.determineCableDestinations_byAngle()
+    tester.drawCables(axesHandles,2,"closest, assigned by abs(atan(y/x))")
+
+
+    # printer.createSTL(filename)
+
+    pdf.savefig(fig)
+
+pdf.close()
+# plt.show()
