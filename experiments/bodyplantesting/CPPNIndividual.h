@@ -30,11 +30,9 @@ public :
     void serialize(archive &arch, const unsigned int v)
     {
         arch & objectives;
-        arch & ctrlGenome;
         arch & morphGenome;
         arch & nn_inputs;
         arch & nn_outputs;
-
     }
     // Serialization
     std::string to_string();
