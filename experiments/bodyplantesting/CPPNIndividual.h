@@ -18,9 +18,7 @@ public :
             Individual(ind),
             nn(ind.nn),
             testRes(ind.testRes),
-            morphDesc(ind.morphDesc),
-            nn_inputs(ind.nn_inputs),
-            nn_outputs(ind.nn_outputs)
+            morphDesc(ind.morphDesc)
     {}
     Individual::Ptr clone() override{
         return std::make_shared<CPPNIndividual>(*this);
