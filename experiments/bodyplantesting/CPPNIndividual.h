@@ -31,8 +31,6 @@ public :
     {
         arch & objectives;
         arch & morphGenome;
-        arch & nn_inputs;
-        arch & nn_outputs;
     }
     // Serialization
     std::string to_string();
@@ -50,8 +48,6 @@ public :
     void setMorphDesc();
     void setGraphMatrix();
     void setSymDesc();
-    void set_nn_inputs(int nni){nn_inputs = nni;}
-    void set_nn_outputs(int nno){nn_outputs = nno;}
     /// Getters for descritors
     Eigen::VectorXd getMorphDesc(){return morphDesc;}
 
@@ -70,10 +66,6 @@ protected:
     /// Descritors
     Eigen::VectorXd morphDesc;
 
-private:
-
-    int nn_inputs;
-    int nn_outputs;
 };
 
 }//are

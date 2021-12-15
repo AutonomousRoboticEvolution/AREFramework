@@ -61,7 +61,6 @@ void BODYPLANTESTING::init()
 
 void BODYPLANTESTING::initPopulation()
 {
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
     rng.Seed(randomNum->getSeed());
@@ -69,14 +68,13 @@ void BODYPLANTESTING::initPopulation()
     NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
     for (size_t i = 0; i < population_size; i++){ // Body plans
-        for(int j = 0; j < num_eval; j++){ // Controllers
-            EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-            CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i )));
-            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
-            ind->set_parameters(parameters);
-            ind->set_randNum(randomNum);
-            population.push_back(ind);
-        }
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i )));
+        CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+
     }
 }
 
