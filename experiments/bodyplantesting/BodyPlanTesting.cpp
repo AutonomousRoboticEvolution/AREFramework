@@ -113,19 +113,15 @@ void BODYPLANTESTING::epoch(){
             Eigen::VectorXd ind_desc;
             ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();;
 
-            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i ))->getObjectives().back();
+            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /** MultiNEAT **/
-    int indCounter = 0; /// \todo EB: There must be a better way to do this!
     for (size_t i = 0; i < population_size; i++) {
         morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i)->getObjectives().back());
     }
-//    for(const auto& ind : population){
-//        morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
-//        indCounter++;
-//    }
+
     morph_population->Epoch();
 }
 
