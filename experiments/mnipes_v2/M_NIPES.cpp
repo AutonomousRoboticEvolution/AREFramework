@@ -309,6 +309,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
+
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
             learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
             int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
@@ -529,7 +530,7 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
 
     for(const auto &wb : new_ctrl_pop){
         NN2CPPNGenome::Ptr morph_gen(new NN2CPPNGenome(learner.morph_genome));
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters));
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters,morph_gen->id()));
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
