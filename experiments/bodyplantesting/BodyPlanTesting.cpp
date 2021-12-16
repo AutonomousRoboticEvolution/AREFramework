@@ -142,8 +142,6 @@ void BODYPLANTESTING::init_next_pop(){
     for (size_t i = 0; i < population_size; i++) // Body plans
     {
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-        ctrl_gen->set_biases(biases);
-        ctrl_gen->set_weights(weights);
         CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
