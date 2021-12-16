@@ -69,7 +69,7 @@ class RoboFab_host:
         debugPrint ( "Loading the blueprint file: blueprint_" + robotID , messageVerbosity=0 )
         blueprintList = []
         # with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
-        with open ( '/home/robofab/are-logs/test_are_generate/waiting_to_be_built/blueprint_'+robotID+'.csv', newline='' ) as blueprintFile:
+        with open ( '{}/waiting_to_be_built/blueprint_'.format(self.logDirectory)+robotID+'.csv', newline='' ) as blueprintFile:
             blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
             for rowString in blueprintReader:
                 rowAsListOfStrings = rowString [ 0 ].split ( ',' )
