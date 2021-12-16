@@ -119,5 +119,4 @@ endif()
 install(TARGETS are-update DESTINATION bin)
 install(DIRECTORY . DESTINATION include/PhysicalER FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
-#install(TARGETS are-generate are-update DESTINATION bin)
 endif()

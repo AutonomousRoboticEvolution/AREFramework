@@ -3,6 +3,7 @@
 
 #include "ARE/Environment.h"
 #include "image_processing/blob_tracking.hpp"
+#include <chrono>
 
 
 namespace are {

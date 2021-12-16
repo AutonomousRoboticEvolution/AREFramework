@@ -176,6 +176,7 @@ void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std
         std::pair<std::string,std::string> file_pair;
         file_pair.first = elt.second;
         file_pair.second = ctrl_files[elt.first];
+        std::cout << file_pair.first << "," << file_pair.second << std::endl;
         list_gen_files.push_back(file_pair);
     }
 }

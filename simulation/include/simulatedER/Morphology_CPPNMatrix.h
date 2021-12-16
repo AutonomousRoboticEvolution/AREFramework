@@ -11,7 +11,6 @@
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 #include "eigen3/Eigen/Core"
-#include "ARE/morphology_descriptors.hpp"
 #include "simulatedER/Blueprint.h"
 
 

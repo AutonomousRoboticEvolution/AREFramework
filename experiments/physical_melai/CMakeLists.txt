@@ -3,16 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
 
 find_package(OpenCV REQUIRED)
-SET(VREP_SRC
-        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
-        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
-        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
-        $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
-        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
-        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
-        $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
-        )
+
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
@@ -20,24 +11,33 @@ set(INCLUDES
     "../../EAFramework/include"
     "../../PhysicalER/include"
     "../../simulation/include"
-    "../../PhysicalER/image_processing/include"
+    "../../image_processing/include"
     "../common/"
     "/usr/include/eigen3"
     "../../modules/")
 
-add_library(physical_melai SHARED
-        ${VREP_SRC}
+
+add_library(physical_melai_generate SHARED
    factories.cpp
-   ../common/realMaze.cpp
    mnipes.cpp
    cmaes_learner.cpp
    ../../PhysicalER/src/io_helpers.cpp
+   )
 
-    )
 
-target_include_directories(physical_melai PUBLIC ${INCLUDES})
-target_link_libraries(physical_melai ${OpenCV_LIBRARIES} ARE AREImageProc simulatedER)
+target_include_directories(physical_melai_generate PUBLIC ${INCLUDES})
+target_link_libraries(physical_melai_generate ARE  ${OpenCV_LIBRARIES}  simulatedER)
 
-install(TARGETS physical_melai DESTINATION lib)
+add_library(physical_melai_update SHARED
+   factories.cpp
+   mnipes.cpp
+   cmaes_learner.cpp
+   ../../PhysicalER/src/io_helpers.cpp
+   )
+target_compile_definitions(physical_melai_update PUBLIC UPDATE)
+target_include_directories(physical_melai_update PUBLIC ${INCLUDES})
+target_link_libraries(physical_melai_update ARE  ${OpenCV_LIBRARIES} AREImageProc simulatedER)
+
+install(TARGETS physical_melai_generate physical_melai_update DESTINATION lib)
 install(DIRECTORY . DESTINATION include/physical_melai FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

@@ -13,7 +13,6 @@
 #include "physicalER/io_helpers.hpp"
 #include "cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
-#include "simLib.h"
 
 namespace are{
 
@@ -38,9 +37,6 @@ public:
 
     void update(double delta_time) override {}
 
-    void create_morphology(){
-        createMorphology();
-    }
 
     const Eigen::VectorXd &get_morphDesc() const {return morphDesc;}
     const std::vector<int> &getListOrganTypes() const {return listOrganTypes;}

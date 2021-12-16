@@ -26,7 +26,10 @@ void ER::initialize(){
 
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
+    std::vector<std::string> split_str;
+    misc::split_line(exp_plugin_name,".",split_str);
+
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + "_update.so");
 
     if(!load_fct_exp_plugin<Environment::Factory>
             (environmentFactory,libhandler,"environmentFactory"))

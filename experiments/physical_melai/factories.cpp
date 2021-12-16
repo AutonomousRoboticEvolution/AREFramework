@@ -1,16 +1,16 @@
-#include "realMaze.hpp"
+#include "image_processing/realMaze.hpp"
 #include "mnipes.hpp"
 #include "ARE/Logging.h"
 
-
+#ifdef UPDATE
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::RealMaze);
+    are::Environment::Ptr env(new are::RealMaze());
     env->set_parameters(param);
     return env;
 }
-
+#endif
 
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
