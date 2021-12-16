@@ -79,7 +79,6 @@ void BODYPLANTESTING::initPopulation()
 }
 
 void BODYPLANTESTING::epoch(){
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -89,12 +88,12 @@ void BODYPLANTESTING::epoch(){
 
         std::vector<Eigen::VectorXd> pop_desc;
         for (size_t i = 0; i < population_size; i++) { // Body plans
-            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc());
+            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc());
         }
         //compute novelty score
         for (size_t i = 0; i < population_size; i++) { // Body plans
             Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();
             //Compute distances to find the k nearest neighbors of ind
             std::vector<size_t> pop_indexes;
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -104,24 +103,24 @@ void BODYPLANTESTING::epoch(){
 
             //set the objetives
             std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
-            for (size_t j = 0; j < num_eval; j++) { // Body plans
-                std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval + j))->setObjectives(objectives);
-            }
+// Body plans
+            std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->setObjectives(objectives);
+
 
         }
         //update archive for novelty score
         for (size_t i = 0; i < population_size; i++) { // Body plans
             Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();;
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();;
 
-            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getObjectives().back();
+            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i ))->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /** MultiNEAT **/
     int indCounter = 0; /// \todo EB: There must be a better way to do this!
     for (size_t i = 0; i < population_size; i++) {
-        morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i * num_eval)->getObjectives().back());
+        morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i)->getObjectives().back());
     }
 //    for(const auto& ind : population){
 //        morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
