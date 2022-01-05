@@ -63,7 +63,7 @@ class RoboFab_host:
     def setupRobotObject(self, robotID:str, printer:Printer):
 
         self.robotID = robotID
-        self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed )
+        self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed, ID=robotID )
 
         # open blueprint and parse basic organ data
         debugPrint ( "Loading the blueprint file: blueprint_" + robotID , messageVerbosity=0 )
@@ -91,17 +91,10 @@ class RoboFab_host:
                 makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
             )
 
-        # information on where the cables need to go - currently manually defined.
+        # information on where the cables need to go
         # each organ that has a cable to connect (so organ.transformOrganOriginToMaleCableSocket is not None) needs to have a point defined where this will be put, called organ.cableDestination
-        # todo: need to automatically compute which Head slot each organ should be attached to
-        if DO_ORGAN_INSERTIONS:
-            debugPrint ( "manually defining some cables" ,messageVerbosity=1 )
-            i=-1
-            for organ in self.myRobot.organsList:
-                if organ.transformOrganOriginToMaleCableSocket is not None:
-                    i+=1
-                    organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
-                                             * self.myRobot.organsList[0].transformOrganOriginToFemaleCableSocket[i] # socket slot in Head, relative to robot origin
+        self.myRobot.determineCableDestinations()
+        self.myRobot.drawRobot(self.logDirectory)
 
     def checkBankHasEnoughOrgans(self):
         # count the organs we need:
@@ -141,7 +134,6 @@ class RoboFab_host:
             debugPrint( "Core organ insert..." )
             self.UR5.insertHeadOrgan ( bank=self.organBank, printer=printer, robot=self.myRobot, gripperTCP=self.gripperTCP_A, assemblyFixture=self.AF )
         else:
-            self.myRobot.organInsertionTrackingList[0]=True # pretend we have done the core organ insert
             self.AF.turnElectromagnetsOn() # grip the robot
         self.myRobot.origin = self.AF.currentPosition # update the origin position of the robot now that it is on the assembly fixture
         timer.add("Finished Head Insert")
@@ -150,11 +142,11 @@ class RoboFab_host:
         # attach each organ in turn
         if DO_ORGAN_INSERTIONS:
             debugPrint( "Doing organ insertions" )
-            while self.myRobot.hasOrgansNeedingInsertion:
+            while not all ( [x.hasBeenInserted for x in self.myRobot.organsByLimbList[0]] ) :
                 nextOrganFromRobot = self.myRobot.getNextOrganToInsert()
-                if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None:
+                if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
                     thisOrgan = self.UR5.insertOrganWithoutCable(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
-                else:
+                else: # has a cable that needs connecting to Head
                     thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A )
         else:
             debugPrint( "Organ insertions skipped" )

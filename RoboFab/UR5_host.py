@@ -387,6 +387,7 @@ class UR5Robot:
         postBedRemovalSidewaysClearance = 0.1 # after pulling the skeleton off the bed, we should move horizontally out to avoid the skeleton hitting the frame of the printer
 
         organInRobot = robot.getNextOrganToInsert()  ## get the next (i.e. first) organ which needs to be inserted
+        organInRobot.hasBeenInserted=True
         if not(organInRobot.organType == 0):
             raise Exception("Was expecting the Head organ. The insertHeadOrgan function has either been called erroneously, or the first organ in the organList in robot is not the Head.")
 

@@ -92,7 +92,7 @@ class Printer:
         debugPrint("This might take a while...", messageVerbosity=1)
         completed = subprocess.run(terminalCommand, cwd=self.openSCADDirectory, shell=True)
         if completed.returncode != 0:
-            raise RuntimeError("OpenSCAD terminal command failed")
+            raise RuntimeError("OpenSCAD terminal command failed\n{}".format(terminalCommand))
 
         # copy the resulting mesh (with clips) into the meshes folder
         if os.path.isfile("{}mesh_{}.stl".format(self.meshesDirectory, ID_number)):
