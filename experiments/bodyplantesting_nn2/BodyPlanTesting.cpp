@@ -68,6 +68,7 @@ void BODYPLANTESTING::initPopulation()
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
     /** NOVELTY **/
     if(Novelty::k_value >= population.size())
         Novelty::k_value = population.size()/2;
@@ -81,13 +82,10 @@ void BODYPLANTESTING::epoch(){
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
         ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
-        CartDesc ind_detailed_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
 
-//        double organ_score = (ind_detailed_desc.sensorNumber > 0 ? 1 : 0) +
-//                (ind_detailed_desc.wheelNumber > 0 ? 1 : 0) +
-//                (ind_detailed_desc.casterNumber > 0 ? 1 : 0) +
-//                (ind_detailed_desc.jointNumber > 0 ? 1 : 0);
-//        organ_score /= 4.f;
+        if(only_organ)
+            ind_desc = ind_desc.block<4,1>(4,0);
+
 
         //Compute distances to find the k nearest neighbors of ind
         std::vector<size_t> pop_indexes;
