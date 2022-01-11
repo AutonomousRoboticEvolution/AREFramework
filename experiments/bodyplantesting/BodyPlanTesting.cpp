@@ -20,8 +20,8 @@ void BODYPLANTESTING::init()
     params.MutateRemLinkProb = 0.02;
     params.RecurrentProb = 0.0;
     params.OverallMutationRate = 0.15;
-    params.MutateAddLinkProb = 0.08;
-    params.MutateAddNeuronProb = 0.01;
+    params.MutateAddLinkProb = 0.1;
+    params.MutateAddNeuronProb = 0.1;
     params.MutateWeightsProb = 0.90;
     params.MaxWeight = 8.0;
     params.WeightMutationMaxPower = 0.2;
@@ -36,7 +36,6 @@ void BODYPLANTESTING::init()
 
     // Crossover
     params.SurvivalRate = 0.01;
-    params.CrossoverRate = 0.01;
     params.CrossoverRate = 0.01;
     params.InterspeciesCrossoverRate = 0.01;
 
@@ -80,6 +79,8 @@ void BODYPLANTESTING::initPopulation()
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
+
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
         if(Novelty::k_value >= population.size())
@@ -94,6 +95,8 @@ void BODYPLANTESTING::epoch(){
         for (size_t i = 0; i < population_size; i++) { // Body plans
             Eigen::VectorXd ind_desc;
             ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();
+            if(only_organ)
+                ind_desc = ind_desc.block<4,1>(4,0);
             //Compute distances to find the k nearest neighbors of ind
             std::vector<size_t> pop_indexes;
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -113,19 +116,15 @@ void BODYPLANTESTING::epoch(){
             Eigen::VectorXd ind_desc;
             ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();;
 
-            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i ))->getObjectives().back();
+            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /** MultiNEAT **/
-    int indCounter = 0; /// \todo EB: There must be a better way to do this!
     for (size_t i = 0; i < population_size; i++) {
         morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i)->getObjectives().back());
     }
-//    for(const auto& ind : population){
-//        morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
-//        indCounter++;
-//    }
+
     morph_population->Epoch();
 }
 
