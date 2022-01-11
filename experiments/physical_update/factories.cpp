@@ -1,4 +1,4 @@
-#include "realMaze.hpp"
+#include "image_processing/realMaze.hpp"
 #include "random_controller.hpp"
 #include "ARE/Logging.h"
 #include "ARE/NNParamGenome.hpp"

@@ -10,6 +10,7 @@
 #include "ARE/misc/RandNum.h"
 #include "physicalER/pi_communication.hpp"
 #include "physicalER/pi_individual.hpp"
+#include "physicalER/io_helpers.hpp"
 
 namespace are {
 namespace phy {
@@ -82,7 +83,8 @@ private:
     ///Individual currently evaluated
     Individual::Ptr currentInd;
 
-    size_t currentIndIndex = 0;
+    std::vector<int> list_ids;
+    int current_id = 0;
     int nbrEval = 0;
 
     bool isEnvInit = false;

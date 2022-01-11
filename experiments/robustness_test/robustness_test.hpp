@@ -10,7 +10,7 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/CPPNGenome.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
-
+#include "obstacleAvoidance.hpp"
 
 
 namespace are {
@@ -36,6 +36,7 @@ public:
     const std::vector<double>& get_final_position(){return final_position;}
     void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
 
     std::string to_string() override;
     void from_string(const std::string &str) override;
@@ -55,6 +56,7 @@ private:
     void createController() override;
     std::vector<double> final_position;
     std::vector<waypoint> trajectory;
+    Eigen::MatrixXi visited_zones;
 };
 
 class RobustnessTest : public EA

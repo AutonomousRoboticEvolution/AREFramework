@@ -1,7 +1,7 @@
 #experimentName,string,physical_update
 #expPluginName,string,/usr/local/lib/libphysical_update.so
 #verbose,bool,1
-#repository,string,/home/robofab/are-logs
+#repository,string,/home/leni/are-logs
 #seed,int,-1
 
 #cameraPipe,string,http://192.168.2.248/img/video.mjpeg
@@ -17,8 +17,8 @@
 #debugDisplayOnPi,bool,1
 #arenaSize,double,2
 
-#ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
 #robotID,string,14_9
+#ctrlGenomeFolder,string,/home/leni/are-logs/physical_update/
 #fitnessFile,string,fitnesses.csv
 
 #target_x,double,0

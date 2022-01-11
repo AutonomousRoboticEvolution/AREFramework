@@ -4,11 +4,10 @@
 #instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
-#seed,int,6
-
-#scenePath,string,/home/edgar/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#organsPath,string,/home/edgar/evolutionary_robotics_framework/experiments/sim/
-#repository,string,/home/edgar/are-logs
+#seed,int,-1
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/amphitheatre.ttt
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#repository,string,/home/leni/are-logs
 
 #loadExperiment,string,/home/leni/git/genomes/20200929/traitDescriptor/lc_nsms_6_7_14-45-54-4706-2402252332/
 #loadPrevExperiment,bool,0
@@ -32,6 +31,7 @@
 #energyCostFile,string,energy_cost.csv
 #simTimeFile,string,sim_time.csv
 
+#envType,int,0
 #arenaSize,double,2.
 #target_x,double,0.0
 #target_y,double,0.5
@@ -71,7 +71,7 @@
 #noveltyDecrement,double,0.05
 
 #nbrWaypoints,int,10
-#populationStagnationThreshold,float,0.05
+#populationStagnationThreshold,float,1.
 #withBeacon,bool,1
 #energyBudget,double,100
 

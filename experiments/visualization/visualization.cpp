@@ -27,6 +27,8 @@ void VisuInd::createMorphology(){
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
     }
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
+
+
 //    float pos[3];
 //    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
 }
@@ -130,7 +132,6 @@ void Visu::init(){
         }
     }
 
-
     std::vector<std::string> morph_gen_files;
     if(load_all_morph_gen){
         std::string filename;
@@ -150,8 +151,7 @@ void Visu::init(){
                 sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << i;
                 morph_gen_files.push_back(sstr2.str());
             }
-        }else
-        {
+        }else{
             std::stringstream sstr2;
             sstr2 << folder_to_load << "/morphGenome_" << generation << "_" << indIdx;
             morph_gen_files.push_back(sstr2.str());

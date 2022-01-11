@@ -156,7 +156,6 @@ public:
         arch & nbr_output;
         arch & nbr_hidden;
         arch & nn_type;
-
     }
 
 private:

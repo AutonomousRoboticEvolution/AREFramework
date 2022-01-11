@@ -126,7 +126,6 @@ settings::ParametersMap settings::fromString(const std::string &str_params){
 
     std::istringstream istr(str_params.c_str());
 
-
     std::string line;
     std::list<std::string> values;
     std::vector<std::string> param;

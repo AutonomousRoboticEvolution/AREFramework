@@ -7,9 +7,9 @@
 
 #include "PolyVox/RawVolume.h"
 #include <multineat/Substrate.h>
-#include <vector>
-#include "ARE/morphology_descriptors.hpp"
 #include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "ARE/morphology_descriptors.hpp"
+#include <vector>
 
 namespace are {
 
@@ -39,6 +39,7 @@ public:
     void genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
+
     /**
      * @brief Runs all the steps to decode the genome.
      * @param cppn - Body plan genome
@@ -48,10 +49,11 @@ public:
      * @param numSkeletonVoxels - Keeps track of the number of voxels (for descriptor purposes).
      */
     void genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
-                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+                      std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
 
     /**
-     * @brief Reads the genome and creates the regions for each organ.
+     * @brief Reads the cppn from MultiNEAT and creates the regions for each organ.
      * @param areMatrix - All regions for each organ.
      * @param cppn - Body plan genome
      */

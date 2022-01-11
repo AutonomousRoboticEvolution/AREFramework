@@ -44,12 +44,12 @@ void M_NIPESIndividual::createMorphology(){
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber() == 0
-            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber() == 0;
-    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber() == 0;
-
-
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
+
+    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().jointNumber == 0
+            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().wheelNumber == 0;
+    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().sensorNumber == 0;
+
     float pos[3];
     simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
     setGenome();
@@ -103,10 +103,13 @@ void M_NIPESIndividual::createController(){
         std::dynamic_pointer_cast<CMAESLearner>(learner)->next_pop();
 
     }
-
     auto nn_params = std::dynamic_pointer_cast<CMAESLearner>(learner)->update_ctrl(control);
     std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_weights(nn_params.first);
     std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_biases(nn_params.second);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_input(nn_inputs);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_output(nn_outputs);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_hidden(nb_hidden);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nn_type(nn_type);
 }
 
 void M_NIPESIndividual::update(double delta_time){
@@ -240,6 +243,15 @@ void M_NIPES::init(){
 
 }
 
+void M_NIPESIndividual::set_ctrl_genome(const NNParamGenome::Ptr &gen){
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_biases(gen->get_biases());
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_weights(gen->get_weights());
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_hidden(gen->get_nbr_hidden());
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_input(gen->get_nbr_input());
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nbr_output(gen->get_nbr_output());
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->set_nn_type(gen->get_nn_type());
+}
+
 void M_NIPES::init_morph_pop(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
@@ -307,16 +319,26 @@ void M_NIPES::init_morph_pop(){
 
 
 
-    if(bootstrap_pop || start_from_exp){
+    if(start_from_exp){
+        std::string filename;
+        std::vector<std::string> split_str;
+        int i = 0;
+        for(const auto &dirit : fs::directory_iterator(fs::path(exp_folder))){
+            filename = dirit.path().string();
+            boost::split(split_str,filename,boost::is_any_of("/"));
+            boost::split(split_str,split_str.back(),boost::is_any_of("_"));
+            if(split_str[0] != "morphGenome")
+                continue;
+            if(verbose)
+                std::cout << "Load morphology genome : " << filename.c_str() << std::endl;
+            morph_gen = NEAT::Genome(filename.c_str());
+            morph_population->AccessGenomeByIndex(i) = morph_gen;
+            i++;
+        }
+    }
+    else if(bootstrap_pop){
         for(unsigned i = 0; i < pop_size; i++){
-            if(start_from_exp){
-                std::stringstream sstr;
-                sstr << generation << "_" << i;
-                if(verbose)
-                    std::cout << "Load morphology genome : " << exp_folder + std::string("/") + "morphGenome" + sstr.str() << std::endl;
-                morph_gen = NEAT::Genome((exp_folder + std::string("/") + "morphGenome" + sstr.str()).c_str());
-            }else if(bootstrap_pop)
-                loadNEATGenome(morphIDList[i],morph_gen);
+            loadNEATGenome(morphIDList[i],morph_gen);
             morph_population->AccessGenomeByIndex(i) = morph_gen;
         }
     }
@@ -358,6 +380,11 @@ void M_NIPES::epoch(){
             biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
             best_gen.set_weights(weights);
             best_gen.set_biases(biases);
+            best_gen.set_nbr_hidden(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden());
+            best_gen.set_nbr_input(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input());
+            best_gen.set_nbr_output(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output());
+            best_gen.set_nn_type(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type());
+
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_genome(std::make_shared<NNParamGenome>(best_gen)); //put best genome back in the ind for log
             //update the archive
             const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
@@ -421,6 +448,7 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
+
         if(!std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_actuated()){
             auto obj = ind->getObjectives();
             obj[0] = 0;
@@ -451,6 +479,7 @@ bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
     return true;
 }
 
+
 bool M_NIPES::update(const Environment::Ptr& env){
     if(simulator_side){
         if(env->get_name() == "mazeEnv")
@@ -466,11 +495,12 @@ bool M_NIPES::update(const Environment::Ptr& env){
 //    return (numberEvaluation >= maxNbrEval || _is_finish || );
 //}
 
+
 void M_NIPES::loadNEATGenome(short int genomeID, NEAT::Genome &gen){
     std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
     std::cout << "Loading genome: " << genomeID << "!" << std::endl;
     std::stringstream filepath;
-    filepath << loadExperiment << "/morphGenome" << genomeID;
+    filepath << loadExperiment << "/morphGenome_" << genomeID;
     gen = NEAT::Genome(filepath.str().c_str());
 }
 
@@ -563,6 +593,8 @@ void M_NIPES::loadControllerArchive(const std::string &file){
             state = 1;
         }else if(state == 1){
             std::stringstream sstr;
+            sstr << elt << std::endl;
+            std::getline(stream,elt);
             sstr << elt << std::endl;
             nbr_weights = std::stoi(elt);
             std::getline(stream,elt);

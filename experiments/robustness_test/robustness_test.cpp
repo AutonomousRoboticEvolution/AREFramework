@@ -150,6 +150,8 @@ bool RobustnessTest::update(const Environment::Ptr & env){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<RobustInd>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<RobustInd>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance")
+            std::dynamic_pointer_cast<RobustInd>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
     }
 
     return true;
@@ -174,6 +176,7 @@ void RobustnessTest::load_gen_files(list_files_pair_t &list_gen_files, const std
         std::pair<std::string,std::string> file_pair;
         file_pair.first = elt.second;
         file_pair.second = ctrl_files[elt.first];
+        std::cout << file_pair.first << "," << file_pair.second << std::endl;
         list_gen_files.push_back(file_pair);
     }
 }

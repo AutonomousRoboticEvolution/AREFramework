@@ -58,7 +58,7 @@ public :
     void setGraphMatrix();
     void setSymDesc();
     /// Getters for descritors
-    Eigen::VectorXd getMorphDesc(){return morphDesc;}
+    CartDesc getMorphDesc(){return morphDesc;}
 
     Eigen::VectorXd descriptor();
 
@@ -69,8 +69,7 @@ protected:
     std::vector<bool> testRes;
 
     /// Descritors
-    Eigen::VectorXd morphDesc;
-
+    CartDesc morphDesc;
 };
 
 }//are

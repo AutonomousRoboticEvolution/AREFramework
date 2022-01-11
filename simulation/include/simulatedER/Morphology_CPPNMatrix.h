@@ -1,6 +1,8 @@
 #ifndef Morphology_CPPNMatrix_H
 #define Morphology_CPPNMatrix_H
 
+#include "ARE/morphology_descriptors.hpp"
+
 #include "simulatedER/Morphology.h"
 #include "simulatedER/Organ.h"
 #include "simulatedER/GenomeDecoder.h"
@@ -9,8 +11,8 @@
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
 #include "eigen3/Eigen/Core"
-#include "ARE/morphology_descriptors.hpp"
 #include "simulatedER/Blueprint.h"
+
 
 #include "math.h"
 
@@ -109,14 +111,15 @@ public:
         nn2_cppn = nn;
     }
 
-    Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
-    const CartDesc& getCastDesc() const {return indDesc.cartDesc;}
-    int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
-    int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
-    int get_sensorNumber() const {return indDesc.cartDesc.sensorNumber;}
-    std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();}
-    std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();}
-    std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
+    /// Getters for descriptors.
+    Eigen::VectorXd getMorphDesc(){return indDesc.cartDesc.getCartDesc();}
+    const CartDesc& getCartDesc(){return indDesc.cartDesc;}
+    int get_wheelNumber(){return indDesc.cartDesc.wheelNumber;}
+    int get_jointNumber(){return indDesc.cartDesc.jointNumber;}
+    int get_sensorNumber(){return indDesc.cartDesc.sensorNumber;}
+    std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();};
+    std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();};
+    std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();};
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
@@ -169,7 +172,6 @@ private:
             cartDesc.robotHeight = abs(maxZ - minZ);
         }
     };
-
 
     bool use_neat=true;
     NEAT::NeuralNetwork cppn;

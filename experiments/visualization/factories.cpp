@@ -1,4 +1,5 @@
 #include "simulatedER/mazeEnv.h"
+#include "emptyEnv.hpp"
 #include "visualization.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory

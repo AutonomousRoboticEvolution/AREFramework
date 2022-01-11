@@ -29,7 +29,6 @@ void Morphology_CPPNMatrix::create()
     GenomeDecoder genomeDecoder;
     if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
     else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
@@ -39,13 +38,14 @@ void Morphology_CPPNMatrix::create()
     bool indVerResult = false;
     indVerResult = getIndicesVertices(decodedMesh);
     bool convexDecompositionSuccess = false;
+
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
                                         skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
-            std::cerr << "Importing mesh NOT succesful! " << __func__  << std::endl;
+            std::cerr << "Creating mesh NOT succesful! " << __func__  << std::endl;
         }
         std::ostringstream name;
         name.str("VoxelBone");
@@ -68,20 +68,41 @@ void Morphology_CPPNMatrix::create()
             // EB: V-HACD is not a good idea. It crashes randomly. This is an issue with the library itself.
             // http://forum.coppeliarobotics.com/viewtopic.php?f=5&t=8024
             // Convex decomposition parameters
-            // EB: Warning, the more triangles are used the more accurate would me the final representation. However,
+            // EB: Warning, the more triangles are used the more accurate would be the final representation. However,
             // This make the decomposition process slower and more important the likelihood of the decomposition to
             // crash higher. To prevent this I decided to decrease the maximum concavity as mush as possible.
             // EB: IMPORTANT! for the pre-morphogensis stage keep the number of triangles low (100) and high concavity (100).
             // This will speed-up evolution. However...
             // For the morphognesis stage keep the number of triangles high (at least 1200) and low concavity (0.5)
             // This will make a more accurate representation of the skeleton.
+//            intParams[0]: HACD: the minimum number of clusters to be generated (e.g. 1)
+//            intParams[1]: HACD: the targeted number of triangles of the decimated mesh (e.g. 500)
+//            intParams[2]: HACD: the maximum number of vertices for each generated convex hull (e.g. 100)
+//            intParams[3]: HACD: the maximum number of iterations. Use 0 for the default value (i.e. 4).
+//            intParams[4]: reserved. Set to 0.
+//            intParams[5]: V-HACD: resolution (10000-64000000, 100000 is default).
+//            intParams[6]: V-HACD: depth (1-32, 20 is default).
+//            intParams[7]: V-HACD: plane downsampling (1-16, 4 is default).
+//            intParams[8]: V-HACD: convex hull downsampling (1-16, 4 is default).
+//            intParams[9]: V-HACD: max. number of vertices per convex hull (4-1024, 64 is default).
             int conDecIntPams[10] = {1, 100, 20, 1, 0, //HACD
                                               10000, 20, 4, 4, 64}; //V-HACD
+//            floatParams[0]: HACD: the maximum allowed concavity (e.g. 100.0)
+//            floatParams[1]: HACD: the maximum allowed distance to get convex clusters connected (e.g. 30)
+//            floatParams[2]: HACD: the threshold to detect small clusters. The threshold is expressed as a percentage of the total mesh surface (e.g. 0.25)
+//            floatParams[3]: reserved. Set to 0.0
+//            floatParams[4]: reserved. Set to 0.0
+//            floatParams[5]: V-HACD: concavity (0.0-1.0, 0.0025 is default).
+//            floatParams[6]: V-HACD: alpha (0.0-1.0, 0.05 is default).
+//            floatParams[7]: V-HACD: beta (0.0-1.0, 0.05 is default).
+//            floatParams[8]: V-HACD: gamma (0.0-1.0, 0.00125 is default).
+//            floatParams[9]: V-HACD: min. volume per convex hull (0.0-0.01, 0.0001 is default).
             float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-
+           if(convexHandle >= 0)
+                convexDecompositionSuccess = true;
             //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
             // The issue come from a mismatch between the mass computed by verp and the one expected.
             //Call this to compute the approximate moment of inertia and center of mass
@@ -119,7 +140,7 @@ void Morphology_CPPNMatrix::create()
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
             simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
-            convexDecompositionSuccess = true;
+
         } catch (std::exception &e) {
             //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
             convexDecompositionSuccess = false;
@@ -170,7 +191,7 @@ void Morphology_CPPNMatrix::create()
         robotManRes.noCollisions = false;
     }
     // Segmented robots
-    if((indVerResult || convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
+    if((indVerResult && convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
         // Since the list of organ is going to increase, it's better to cap it to prevent accessing elements out of range.
         int originalSize = organList.size();
         for(int i = 0; i < originalSize; i++){
@@ -265,6 +286,7 @@ void Morphology_CPPNMatrix::create()
                         std::vector<float> tempOriVector(3);
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
+
                         if(organ.getOrganType() !=0)
                             setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
@@ -302,7 +324,7 @@ void Morphology_CPPNMatrix::create()
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
-    if(indVerResult || convexDecompositionSuccess){
+    if(indVerResult && convexDecompositionSuccess){
         for(auto & i : organList) {
             if(!i.isOrganChecked()) // Stop when the organs not checked or generated start.
                 break;
@@ -451,6 +473,7 @@ void Morphology_CPPNMatrix::createGripper()
 
 void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
 {
+    // Vector used as input of the Neural Network (NN).
     std::vector<double> input{0,0,0,0};
     std::vector<double> output;
     input[0] = static_cast<int>(std::round(organ.organPos[0]/mc::voxel_real_size));
@@ -468,7 +491,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output = nn2_cppn.outf();
     }
     float rot;
-    rot = output.at(0) * 0.174533; // 10 degrees limit
+    rot = output.at(0)*0.174533; // 10 degrees limit
     organ.organOri.push_back(rot);
 }
 

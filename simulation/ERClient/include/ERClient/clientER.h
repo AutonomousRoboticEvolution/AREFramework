@@ -49,6 +49,7 @@ public:
 
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
+    int population_size = 0;
     int loadingTrials = 3;
     bool sim_init = false;
     std::vector<Individual::Ptr> currentIndVec;

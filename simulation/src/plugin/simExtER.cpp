@@ -148,6 +148,8 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         seed = rd();
         are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));
     }
+
+
     are::misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
@@ -163,6 +165,8 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     {
         int signal[1] = { 0 };
         simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
+
+
     }
     //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
 
@@ -267,7 +271,11 @@ void localMessageHandler(int message){
 }
 
 void clientMessageHandler(int message){
-
+    int length;
+    simChar* log_folder;
+    log_folder = simGetStringSignal("log_folder",&length);
+    if(log_folder != nullptr)
+        are::Logging::log_folder = log_folder;
     if(message == sim_message_eventcallback_modelloaded)
         return;
 

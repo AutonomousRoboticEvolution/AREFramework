@@ -16,6 +16,7 @@ add_library(robustnessTest SHARED
     ${VREP_SRC}
     robustness_test.cpp
     factories.cpp
+    ../common/obstacleAvoidance.cpp
     )
 target_include_directories(robustnessTest PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

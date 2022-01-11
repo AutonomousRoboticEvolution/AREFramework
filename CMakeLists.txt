@@ -43,6 +43,7 @@ else()
     add_subdirectory(simulation)
     add_subdirectory(image_processing)
     add_subdirectory(PhysicalER)
+    add_subdirectory(EcosystemManager)
     add_subdirectory(experiments)
 endif()
 

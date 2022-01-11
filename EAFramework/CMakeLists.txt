@@ -73,6 +73,8 @@ install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
 install(TARGETS ARE DESTINATION lib)
 install(DIRECTORY . DESTINATION include/ARE FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
+
+
 # tool to help remove the warnings when using GCC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 

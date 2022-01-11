@@ -13,23 +13,6 @@ target_link_libraries(are-pi-server piARE zmq  ${Boost_LIBRARIES} wiringPi)
 else()
 #find_package(OpenCV REQUIRED)
 
-#Compilation of update
-
-file(GLOB SRC_UPDATE src/update/*)
-
-add_executable(are-update ${SRC_UPDATE} src/pi_communication.cpp src/pi_individual.cpp)
-target_include_directories(are-update PUBLIC
-    # ${OpenCV_INCLUDE_DIRS}
-    "include/"
-     "../EAFramework/include")
-target_link_libraries(are-update ARE dlibxx dl zmq)
-
-SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
-
-#Compilation of generate
-
-# CoppeliaSim stuff
-
 if (NOT VREP_FOLDER AND NOT COPPELIASIM_FOLDER)
     message(FATAL_ERROR "VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 elseif(COPPELIASIM_FOLDER)
@@ -56,6 +39,26 @@ elseif(VREP_FOLDER)
 else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
+
+#Compilation of update
+
+file(GLOB SRC_UPDATE src/update/*)
+
+add_executable(are-update ${SRC_UPDATE} ${VREP_SRC} src/pi_communication.cpp src/pi_individual.cpp src/io_helpers.cpp)
+target_include_directories(are-update PUBLIC
+    # ${OpenCV_INCLUDE_DIRS}
+    "include/"
+     "../EAFramework/include"
+     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>)
+target_link_libraries(are-update ARE dlibxx dl zmq)
+
+SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+
+#Compilation of generate
+
+# CoppeliaSim stuff
+
+
 find_package(PolyVox REQUIRED)
 find_package(MultiNEAT REQUIRED)
 
@@ -66,13 +69,13 @@ SET(VREP_SRC
         $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
         )
 
-file(GLOB SRC_GENERATE src/generate/*)
+file(GLOB SRC_GENERATE src/generate/* src/io_helpers.cpp)
 
 if(VREP_FOUND)
     message("Using VREP is deprecated")
 elseif(COPPELIASIM_FOUND)
     SET(LIB_EXT simExtGenerate)
-    SET(PLUGIN_SRC ${SRC_GENERATE} src/pi_individual.cpp)
+    SET(PLUGIN_SRC ${SRC_GENERATE})
 endif()
 
 add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
@@ -116,5 +119,4 @@ endif()
 install(TARGETS are-update DESTINATION bin)
 install(DIRECTORY . DESTINATION include/PhysicalER FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
-#install(TARGETS are-generate are-update DESTINATION bin)
 endif()

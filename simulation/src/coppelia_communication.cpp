@@ -18,6 +18,7 @@ void sim::readProximitySensors(const std::vector<int> handles, std::vector<doubl
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
         else if(det <= 0) sensorValues.push_back(0);
+
     }
 }
 

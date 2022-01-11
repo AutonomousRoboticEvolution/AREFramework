@@ -7,18 +7,21 @@ void BODYPLANTESTING::init()
     nb_obj = 1;
     max_obj = {1};
     min_obj = {0};
+    nn2::rgen_t::gen.seed(randomNum->getSeed());
 
     cppn_params::cppn::_max_nb_conns = settings::getParameter<settings::Integer>(parameters,"#maxNbrConnections").value;
     cppn_params::cppn::_min_nb_conns = settings::getParameter<settings::Integer>(parameters,"#minNbrConnections").value;
     cppn_params::cppn::_max_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#maxNbrNeurons").value;
     cppn_params::cppn::_min_nb_neurons = settings::getParameter<settings::Integer>(parameters,"#minNbrNeurons").value;
-    cppn_params::cppn::_mutate_connections = settings::getParameter<settings::Boolean>(parameters,"#mutateConnections").value;
-    cppn_params::cppn::_mutate_neurons = settings::getParameter<settings::Boolean>(parameters,"#mutateNeurons").value;
+    cppn_params::cppn::_mutation_rate = settings::getParameter<settings::Float>(parameters,"#rateMutation").value;
+    cppn_params::cppn::_rate_mutate_conn = settings::getParameter<settings::Float>(parameters,"#rateMutateConnection").value;
+    cppn_params::cppn::_rate_mutate_neur = settings::getParameter<settings::Float>(parameters,"#rateMutateNeuron").value;
     cppn_params::cppn::_rate_add_conn = settings::getParameter<settings::Float>(parameters,"#rateAddConnection").value;
     cppn_params::cppn::_rate_del_conn = settings::getParameter<settings::Float>(parameters,"#rateDeleteConnection").value;
     cppn_params::cppn::_rate_change_conn = settings::getParameter<settings::Float>(parameters,"#rateChangeConnection").value;
     cppn_params::cppn::_rate_add_neuron = settings::getParameter<settings::Float>(parameters,"#rateAddNeuron").value;
     cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
+    cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
 
     initPopulation();
@@ -30,13 +33,17 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
 
     rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        morphgenome->random();
+        if(cppn_fixed)
+            morphgenome->fixed_structure();
+        else
+            morphgenome->random();
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -46,7 +53,10 @@ void BODYPLANTESTING::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-            morphgenome->random();
+            if(cppn_fixed)
+                morphgenome->fixed_structure();
+            else
+                morphgenome->random();
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -58,6 +68,7 @@ void BODYPLANTESTING::initPopulation()
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
     /** NOVELTY **/
     if(Novelty::k_value >= population.size())
         Novelty::k_value = population.size()/2;
@@ -65,12 +76,17 @@ void BODYPLANTESTING::epoch(){
 
     std::vector<Eigen::VectorXd> pop_desc;
     for (size_t i = 0; i < population_size; i++) { // Body plans
-        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc());
+        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc());
     }
     //compute novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
+
+        if(only_organ)
+            ind_desc = ind_desc.block<4,1>(4,0);
+
+
         //Compute distances to find the k nearest neighbors of ind
         std::vector<size_t> pop_indexes;
         std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -79,7 +95,7 @@ void BODYPLANTESTING::epoch(){
         double ind_nov = Novelty::sparseness(distances);
 
         //set the objetives
-        std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+        std::vector<double> objectives = {ind_nov / 2.64 /*+ organ_score)/2.f*/}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
         std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
 
@@ -87,7 +103,7 @@ void BODYPLANTESTING::epoch(){
     //update archive for novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc();;
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
 
         double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getObjectives().back();
         Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);

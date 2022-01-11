@@ -20,8 +20,8 @@ void BODYPLANTESTING::init()
     params.MutateRemLinkProb = 0.02;
     params.RecurrentProb = 0.0;
     params.OverallMutationRate = 0.15;
-    params.MutateAddLinkProb = 0.08;
-    params.MutateAddNeuronProb = 0.01;
+    params.MutateAddLinkProb = 0.1;
+    params.MutateAddNeuronProb = 0.1;
     params.MutateWeightsProb = 0.90;
     params.MaxWeight = 8.0;
     params.WeightMutationMaxPower = 0.2;
@@ -36,7 +36,6 @@ void BODYPLANTESTING::init()
 
     // Crossover
     params.SurvivalRate = 0.01;
-    params.CrossoverRate = 0.01;
     params.CrossoverRate = 0.01;
     params.InterspeciesCrossoverRate = 0.01;
 
@@ -61,36 +60,27 @@ void BODYPLANTESTING::init()
 
 void BODYPLANTESTING::initPopulation()
 {
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int nbr_weights, nbr_biases;
-    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
-    std::vector<double> weights(nbr_weights);
-    std::vector<double> biases(nbr_biases);
+
     rng.Seed(randomNum->getSeed());
     // Morphology
     NEAT::Genome morph_genome(0, 5, 10, 6, false, NEAT::SIGNED_SIGMOID, NEAT::SIGNED_SIGMOID, 0, params, 10);
     morph_population = std::make_unique<NEAT::Population>(morph_genome, params, true, 1.0, randomNum->getSeed());
     for (size_t i = 0; i < population_size; i++){ // Body plans
-        for(int j = 0; j < num_eval; j++){ // Controllers
-            NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-            ctrl_gen->set_biases(biases);
-            ctrl_gen->set_weights(weights);
-            CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i )));
-            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
-            ind->set_parameters(parameters);
-            ind->set_randNum(randomNum);
-            population.push_back(ind);
-        }
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i )));
+        CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+
     }
 }
 
 void BODYPLANTESTING::epoch(){
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
+
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
         if(Novelty::k_value >= population.size())
@@ -99,12 +89,14 @@ void BODYPLANTESTING::epoch(){
 
         std::vector<Eigen::VectorXd> pop_desc;
         for (size_t i = 0; i < population_size; i++) { // Body plans
-            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc());
+            pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc());
         }
         //compute novelty score
         for (size_t i = 0; i < population_size; i++) { // Body plans
             Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();
+            if(only_organ)
+                ind_desc = ind_desc.block<4,1>(4,0);
             //Compute distances to find the k nearest neighbors of ind
             std::vector<size_t> pop_indexes;
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
@@ -114,29 +106,25 @@ void BODYPLANTESTING::epoch(){
 
             //set the objetives
             std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
-            for (size_t j = 0; j < num_eval; j++) { // Body plans
-                std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval + j))->setObjectives(objectives);
-            }
+// Body plans
+            std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->setObjectives(objectives);
+
 
         }
         //update archive for novelty score
         for (size_t i = 0; i < population_size; i++) { // Body plans
             Eigen::VectorXd ind_desc;
-            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getMorphDesc();;
+            ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();;
 
-            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i * num_eval))->getObjectives().back();
+            double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getObjectives().back();
             Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /** MultiNEAT **/
-    int indCounter = 0; /// \todo EB: There must be a better way to do this!
     for (size_t i = 0; i < population_size; i++) {
-        morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i * num_eval)->getObjectives().back());
+        morph_population->AccessGenomeByIndex(i).SetFitness(population.at(i)->getObjectives().back());
     }
-//    for(const auto& ind : population){
-//        morph_population->AccessGenomeByIndex(indCounter).SetFitness(ind->getObjectives().back());
-//        indCounter++;
-//    }
+
     morph_population->Epoch();
 }
 
@@ -146,29 +134,19 @@ void BODYPLANTESTING::setObjectives(size_t indIdx, const std::vector<double> &ob
 }
 
 void BODYPLANTESTING::init_next_pop(){
-    const int num_eval = settings::getParameter<settings::Integer>(parameters,"#numberEvaluations").value;
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int nbr_weights, nbr_biases;
-    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
-    std::vector<double> weights(nbr_weights);
-    std::vector<double> biases(nbr_biases);
+
     population.clear();
     rng.Seed(randomNum->getSeed());
     for (size_t i = 0; i < population_size; i++) // Body plans
     {
-        for(int j = 0; j < num_eval; j++){ // Controllers
-            NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-            ctrl_gen->set_biases(biases);
-            ctrl_gen->set_weights(weights);
-            CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
-            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
-            ind->set_parameters(parameters);
-            ind->set_randNum(randomNum);
-            population.push_back(ind);
-        }
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        CPPNGenome::Ptr morphgenome(new CPPNGenome(morph_population->AccessGenomeByIndex(i)));
+        CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+
     }
 }
 
@@ -222,17 +200,5 @@ std::vector<int> BODYPLANTESTING::listInds()
 
 bool BODYPLANTESTING::update(const Environment::Ptr& env)
 {
-//    for(const auto& ind : population) {
-//        std::dynamic_pointer_cast<NN2Individual>(ind)->set_final_position(
-//                std::dynamic_pointer_cast<MazeEnv>(env)->get_final_position());
-//    }
-//    endEvalTime = hr_clock::now();
-//    numberEvaluation++;
-//
-    if(simulator_side){
-        Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
-    }
     return true;
 }

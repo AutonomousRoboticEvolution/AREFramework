@@ -64,8 +64,15 @@ void ER::startOfSimulation()
     // Get images?
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
-        Logging::create_folder(image_repo);
-        robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+        bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
+        if(images_in_logs){
+            Logging::create_folder(Logging::log_folder + "/" + image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+        }
+        else{
+            Logging::create_folder(image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+        }
     }
     ea->setCurrentIndIndex(currentIndIndex);
 }
@@ -85,11 +92,17 @@ void ER::initIndividual(){
           currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
-
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
-        Logging::create_folder(image_repo);
-        robotScreenshot(currentInd->get_individual_id(),currentInd->get_generation(),image_repo);
+        bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
+        if(images_in_logs){
+            Logging::create_folder(Logging::log_folder + "/" + image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+        }
+        else{
+            Logging::create_folder(image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+        }
     }
 }
 
@@ -161,7 +174,6 @@ void ER::endOfSimulation()
                 std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
-
         }
         if(ea->is_finish()){
             if(verbose)

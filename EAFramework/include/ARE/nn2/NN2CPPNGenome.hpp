@@ -13,13 +13,15 @@ namespace are {
 
 struct cppn_params{
     struct cppn{
-        static bool _mutate_connections;
-        static bool _mutate_neurons;
+        static float _mutation_rate;
+        static float _rate_mutate_conn;
+        static float _rate_mutate_neur;
         static float _rate_add_neuron;
         static float _rate_del_neuron;
         static float _rate_add_conn;
         static float _rate_del_conn;
         static float _rate_change_conn;
+        static float _rate_crossover;
 
         static size_t _min_nb_neurons;
         static size_t _max_nb_neurons;
@@ -65,12 +67,13 @@ public:
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
     }
-    NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id = 0) :
-        Genome(rn,param,id){
+    NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
+        Genome(rn,param){
         _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
+
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
         _id = static_id++;
@@ -88,6 +91,10 @@ public:
         cppn.init();
     }
 
+    void fixed_structure(){
+        cppn.build_fixed_structure();
+    }
+
     void random(){
         cppn.random();
     }
@@ -97,8 +104,12 @@ public:
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
-        *child1 = NN2CPPNGenome(cppn);
-        *child2 = NN2CPPNGenome(std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn());
+        are::nn2_cppn_t cppn_child1, cppn_child2;
+        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
+        cppn.crossover(cppn_partner,cppn_child1);
+        cppn_partner.crossover(cppn,cppn_child2);
+        *child1 = NN2CPPNGenome(cppn_child1);
+        *child2 = NN2CPPNGenome(cppn_child2);
         child1->set_parameters(parameters);
         child2->set_parameters(parameters);
         child1->set_randNum(randomNum);
@@ -146,12 +157,21 @@ public:
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
 
+    int get_generation(){return generation;}
+
+    void set_randNum(const misc::RandNum::Ptr& rn) override{
+        randomNum = rn;
+        nn2::rgen_t::gen.seed(randomNum->getSeed());
+    }
+
 private:
     std::vector<int> parents_ids;
     nn2_cppn_t cppn;
     CartDesc morph_desc;
+    int generation;
 };
 
+namespace nn2_cppn {
 
 class NN2CPPNGenomeLog : public Logging
 {
@@ -185,10 +205,8 @@ public:
     void loadLog(const std::string& log_file){}
 };
 
-
-
+}//nn2_cppn
 }//are
 
 #endif //NN2CPPNGENOME_HPP
-
 

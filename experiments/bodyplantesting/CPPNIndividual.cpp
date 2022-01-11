@@ -2,23 +2,6 @@
 
 using namespace are;
 
-void CPPNIndividual::update(double delta_time)
-{
-    /// \todo EB: what is the highest number of outputs?
-    std::vector<double> inputs(20, 0.0);
-    std::vector<double> tempInputs = morphology->update();
-
-    // Dynamic inputs and outputs handeling
-    if(tempInputs.size() > 0){
-        for(int i = 0; i < tempInputs.size(); i++) {
-            inputs.at(i) = tempInputs[i];
-        }
-    }
-
-    std::vector<double> outputs = control->update(inputs);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->command(outputs);
-}
-
 void CPPNIndividual::createMorphology()
 {
     NEAT::Genome gen =
@@ -60,7 +43,6 @@ std::string CPPNIndividual::to_string()
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
     oarch.register_type<CPPNGenome>();
-    oarch.register_type<NNParamGenome>();
     oarch << *this;
     return sstream.str();
 }
@@ -71,7 +53,6 @@ void CPPNIndividual::from_string(const std::string &str){
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
     iarch.register_type<CPPNGenome>();
-    iarch.register_type<NNParamGenome>();
     iarch >> *this;
 
     //set parameters and randNum to the genome as it is not contained in the serialisation
