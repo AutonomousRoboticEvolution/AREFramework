@@ -50,8 +50,6 @@ G1 Z20 E-5 X-20 Y-20 F3000                ; lift up and retract even more filame
 G1 E6                                     ; re-prime extruder
 M117 Cooling please wait                  ; progress indicator message on LCD
 G90                                       ; absolute positioning
-G1 Y0 F3000                               ; move to cooling position
-M190 R45.0 ; wait for bed to cool down to removal temp
 G1 Y303 F3000                             ; present finished print
 M140 S0; keep temperature or cool downs
 M77					  ; stop GLCD timer
