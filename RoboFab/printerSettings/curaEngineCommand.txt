@@ -51,7 +51,6 @@ G1 E6                                     ; re-prime extruder
 M117 Cooling please wait                  ; progress indicator message on LCD
 G90                                       ; absolute positioning
 G1 Y303 F3000                             ; present finished print
-M140 S0; keep temperature or cool downs
 M77					  ; stop GLCD timer
 M84                                       ; disable steppers
 G90                                       ; absolute positioning
