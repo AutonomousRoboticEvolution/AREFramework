@@ -15,6 +15,7 @@
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
+#include "Camera.hpp"
 
 #define DO_JOINT_TORQUE_TEST false
 
@@ -110,7 +111,11 @@ void wheel_torque_test(MotorOrgan wheel){
 
 }
 
-
+void cameraTest(){
+    Camera cam;
+    cam.setTagsToLookFor({14});
+    cam.presenceDetect();
+}
 
 int main()
 {
@@ -132,6 +137,7 @@ int main()
     ledDriver.init();
     ledDriver.flash(BLUE, 1000000 ,20);
 
+    cameraTest();
 
 /************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
 if (DO_JOINT_TORQUE_TEST){

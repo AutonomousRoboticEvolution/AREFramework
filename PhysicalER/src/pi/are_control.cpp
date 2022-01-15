@@ -8,6 +8,10 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
+    // initilise the camera
+    cameraInputToNN = true; // TODO: make this a parameter?
+    camera.setTagsToLookFor({14}); // TODO: make this a parameter?
+
     // need to turn on the daughter boards
     daughterBoards->init();
     daughterBoards->turnOn();
@@ -125,6 +129,15 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     // loop through each sensor and get it's time-of-flight value, then loop through again for the IR values
     sensor_vals.clear();
     sensor_vals = {};
+
+    // binary camera input
+    if (cameraInputToNN){
+        if (camera.presenceDetect()) {
+            sensor_vals.push_back(1);        
+        }else{
+            sensor_vals.push_back(0);        
+        }
+    }
 
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == SENSOR) {
