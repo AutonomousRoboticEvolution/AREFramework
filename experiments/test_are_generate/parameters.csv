@@ -1,8 +1,9 @@
-#experimentName,string,test_are_generate
-#expPluginName,string,/usr/local/lib/libtest_are_generate.so
+#experimentName,string,test_are
+#expPluginName,string,/usr/local/lib/libtest_are.so
 #verbose,bool,1
 #instanceType,int,0
-#repository,string,/home/robofab/are-logs
+
+#repository,string,/home/matt/are-logs
 #seed,int,-1
 
 #populationSize,int,10
@@ -15,7 +16,8 @@
 
 #init_x,float,0
 #init_y,float,0
-#organsPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/
+#organsPath,string,/home/matt/evolutionary_robotics_framework/experiments/sim/
+
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -25,17 +27,17 @@
 #isExportModel,bool,0
 #reloadController,bool,0
 
-#folderToLoad,string,/home/robofab/are-logs/test_are_generate/waiting_to_be_built
-#genToLoad,int,14
-#indToLoad,int,9
+#folderToLoad,string,/home/matt/are-logs/test_are_generate/waiting_to_be_built
+#genToLoad,int,4
+#indToLoad,int,0
 
-#robotID,string,14_9
+#robotID,string,4_0
 #maxEvalTime,float,2
 #debugLEDsOnPi,bool,0
 #debugDisplayOnPi,bool,0
 
 #cameraPipe,string,http://192.168.2.248/img/video.mjpeg
-#ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
+#ctrlGenomeFolder,string,/home/matt/are-logs/test_are_generate/
 #fitnessFile,string,fitnesses.csv
 #timeStep,float,0.1
 #arenaSize,double,2
