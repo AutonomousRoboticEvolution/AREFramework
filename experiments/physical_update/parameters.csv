@@ -1,10 +1,10 @@
 #experimentName,string,physical_update
 #expPluginName,string,/usr/local/lib/libphysical_update.so
 #verbose,bool,1
-#repository,string,/home/robofab/are-logs
+#repository,string,/home/matt/are-logs
 #seed,int,-1
 
-#cameraPipe,string,http://192.168.2.248/img/video.mjpeg
+#cameraPipe,string,tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink
 #focalDistance,double,20
 #principlePoint_x,double,2
 #principlePoint_y,double,2
@@ -12,13 +12,14 @@
 #aspectRatio_y,double,1
 #cameraHeight,double,200
 
-#maxEvalTime,float,50
+#maxEvalTime,float,30
 #timeStep,float,0.1
 #debugDisplayOnPi,bool,1
+#debugLEDsOnPi,bool,1
 #arenaSize,double,2
 
-#ctrlGenomeFolder,string,/home/robofab/are-logs/test_are_generate/
-#robotID,string,14_9
+#ctrlGenomeFolder,string,/home/matt/are-logs/physical_update/
+#robotID,string,4_0
 #fitnessFile,string,fitnesses.csv
 
 #target_x,double,0
@@ -31,7 +32,7 @@
 #noiseLevel,double,0.0
 #UseInternalBias,bool,1
 
-#referencePtX,int,173
-#referencePtY,int,173
-#pixelImageScale,int,347
+#referencePtX,int,600
+#referencePtY,int,545
+#pixelImageScale,int,5
 #nbrWaypoints,int,100

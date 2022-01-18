@@ -2,7 +2,7 @@
 //#include <opencv2/imgcodecs.hpp> // imwrite/imread
 #include <wiringPi.h> //for timing functions
 
-#define debugPrinting true
+#define debugPrinting false
 #include <iostream>
 
 Camera::Camera() {
