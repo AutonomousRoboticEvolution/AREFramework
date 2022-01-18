@@ -162,6 +162,7 @@ class RoboFab_host:
         # file.write ( "ID:{}\n".format(self.robotID) )
         for organ in self.myRobot.organsList:
             file.write ( "{},{}\n".format(organ.organType, organ.I2CAddress) )
+            # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
         file.close ()
 
         # move build log specified log folder, and now that it is build delete the blueprint :
