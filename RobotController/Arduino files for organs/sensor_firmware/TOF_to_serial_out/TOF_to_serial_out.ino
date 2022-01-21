@@ -12,12 +12,14 @@ VL53L0X sensor;
 
 void setup()
 {
-  Serial.begin(250000);
+  Serial.begin(9600);
   Wire.begin();
   delay(1000); 
   sensor.setTimeout(500);
-  if( !sensor.init()){
-    Serial.println("Failed to detect and initialize time of flight sensor! :(");
+  while (!sensor.init())
+  {
+    Serial.println("Failed to detect and initialize sensor!");
+    //while (1) {}
   }
 
   // Start continuous back-to-back mode (take readings as

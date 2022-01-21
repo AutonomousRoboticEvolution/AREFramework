@@ -1,5 +1,5 @@
 #include "I2CDevice.hpp"
-#define DEBUG_PRINT false
+#define DEBUG_PRINT true
 
 //devAddress must be the 7-bit version, omitting the R/W bit (LSB)
 I2CDevice::I2CDevice(uint8_t address) {

@@ -12,6 +12,7 @@
 #include "SensorOrgan.hpp"
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
+#include "Camera.hpp"
 #include <zmq.hpp>
 #include <wiringPi.h> //for timing functions
 
@@ -32,11 +33,14 @@ private:
     u_int32_t _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
 
+    Camera camera; // the camera object
+
     std::vector<Organ*> listOfOrgans; // a list of (pointers to) all the organ objects
 
     std::shared_ptr<DaughterBoards> daughterBoards;
     std::shared_ptr<LedDriver> ledDriver;
 
+    bool cameraInputToNN;
     bool debugDisplayOnPi=false; // Don't change here, set by defining #debugDisplayOnPi,bool,1 in the paramters file. Determines whether to show show input/output values in terminal.
     bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
 

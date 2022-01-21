@@ -157,6 +157,8 @@ void setup(){
     //Start serial and report existence
     Serial.begin(115200); // for debugging only
     Serial.println("I am a wheel organ...");
+    Serial.print("My i2c address is 0x");
+    Serial.println(SLAVE_ADDRESS,HEX);
 }
 
 void loop(){

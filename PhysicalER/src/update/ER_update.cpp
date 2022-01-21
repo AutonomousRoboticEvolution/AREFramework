@@ -106,8 +106,8 @@ void ER::start_evaluation(){
 
 
     // find the organs list (should be in the waitingToBeEvalutatedFolderPath folder)
-    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
-    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
+    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
+    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
 
     // get IP address of robot from the first line of the list_of_organs file
     std::string firstLine;

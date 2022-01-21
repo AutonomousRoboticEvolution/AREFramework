@@ -32,6 +32,15 @@ int main(int argc, char** argv) {
 
     std::string str_ctrl, str_organs_list, str_param;
 
+//    // temp!
+//    #include <wiringPi.h> //for timing functions
+//    Camera camera;
+//    while(1){
+//        camera.setTagsToLookFor({14});
+//        camera.presenceDetect();
+//        delay(100);
+//    }
+
     while(1){
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply);
