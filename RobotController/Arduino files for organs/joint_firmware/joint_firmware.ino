@@ -5,15 +5,16 @@
 */
 
 //I2C ADDRESS
-#define SLAVE_ADDRESS 0x0A // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x0B // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
-#define CALIB_CENTRE_POSITION_US 1450
-#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 110
-#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 872
+#define CALIB_CENTRE_POSITION_US 1440
+#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 123
+#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 887
 
 //DEBUG FLAG
 #define DEBUG 0
+#define HARDWARE_TEST 0
 
 //CALIBRATION CALCULATIONS
 #define DEG_PER_US 0.093011  //Approximately measured empirically based on a travel of ~173 degrees
@@ -29,15 +30,14 @@
 #define LOWER_PWM_RANGE_US (NOMINAL_PWM_CENTRE_US - NOMINAL_PWM_MIN_US + CENTRE_OFFSET_US)
 #define MAX_SERVO_ANGLE (LOWER_PWM_RANGE_US * DEG_PER_US)
 #define MIN_SERVO_ANGLE -(UPPER_PWM_RANGE_US * DEG_PER_US)
-//NOTE TO SELF: can use map() to map servo angles to encoder values
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
 #define MIN_CURRENT_MA 330 //milliamps
 #define MAX_CURRENT_MA 1250 //milliamps
-#define DEFAULT_CURRENT_LIMIT MIN_CURRENT_MA
+#define DEFAULT_CURRENT_LIMIT 500
 
-#define MAX_SETI_ANALOG_READING 950 //Determined by ADC reference voltage AREF, set by onboard resistor
+#define MAX_SETI_ANALOG_READING 450 //Determined by ADC reference voltage AREF, set by onboard resistor
 
 //Servo position
 #define SERVO_POS_READING_MIN 30
@@ -49,11 +49,11 @@
 #include <Servo.h>
 
 //I/O pins
-#define INDICATOR_LED 9 //No PWM as conflicts with Servo library. Change to pin 6 for v1.2+ boards
+#define INDICATOR_LED 6 //This is pin 9 on v1.1 boards, which have no PWM for the LED as it conflicts with the Servo library.
 #define I2C_ENABLE 15
-#define SERVO_ENABLE 6 //change this to pin 7 for v1.2+ boards
+#define SERVO_ENABLE 7 //this is pin 6 on v1.1 boards
 #define SERVO_PWM 5
-#define SETI_PIN 6 //Current measurement
+#define SETI_PIN 6 //Current measurement pin (Analog pin 6)
 #define SERVO_POSITION_PIN A3
 
 //Register addresses
@@ -63,6 +63,8 @@
 #define MEASURED_CURRENT_REGISTER 0x13
 #define CURRENT_LIMIT_REGISTER 0x14
 #define LED_BRIGHTNESS_REGISTER 0x15
+#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
+#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
 //I2C comms
 volatile uint8_t input_buffer[2];
@@ -87,6 +89,11 @@ volatile bool update_current_limit_flag = false;
 volatile bool update_target_position_flag = false;
 volatile bool update_led_brightness_flag = false;
 
+
+//Variables only used for testing
+bool rotationDirection = 0; //0 is -ve, 1 is +ve
+uint8_t test_register_value = 0; //For organ presence detection
+
 /*******SETUP**********************/
 void setup() {
   //Pins setup
@@ -101,8 +108,6 @@ void setup() {
   //Open serial port for debugging
   Serial.begin(115200);
   Serial.println("Joint Organ Reporting");
-  Serial.print("My address is 0x");
-  Serial.println(SLAVE_ADDRESS,HEX);
 
   //Init I2C bus (internal only at this point)
   Wire.begin(SLAVE_ADDRESS);
@@ -129,6 +134,11 @@ void loop() {
   measured_position = readServoPosition();
   measured_current = readServoCurrent();
 
+  //Show current limit on the indicator LED
+  float currentProportionOfLimit = (float)measured_current/MAX_SETI_ANALOG_READING;
+  led_brightness = currentProportionOfLimit * 255; //Scale to AnalogOut range
+  update_led_brightness_flag = true;
+
   //Update settings
   if (update_current_limit_flag) {
     setCurrentLimit(current_limit_setting);
@@ -143,6 +153,38 @@ void loop() {
   if (update_led_brightness_flag){
     update_led_brightness_flag=false;
     setLED(led_brightness);
+  }
+
+  //HARDWARE TEST ROUTINE
+  if (HARDWARE_TEST) {
+    if(rotationDirection == 0) {
+      target_position_setting -= 1;
+      if(target_position_setting < MIN_SERVO_ANGLE) {
+        rotationDirection = 1;
+        extI2CEnable(true);
+        Serial.println("I2C to outside world enabled");
+      } else {
+        update_target_position_flag = true;
+      }
+    } else {
+      target_position_setting += 1;
+      if(target_position_setting > MAX_SERVO_ANGLE) {
+        rotationDirection = 0;
+        extI2CEnable(false);
+        Serial.println("I2C to outside world disabled");
+      } else {
+        update_target_position_flag = true;
+      }
+    }
+    Serial.print("Target position: ");
+    Serial.println(target_position_setting);
+    Serial.print("Current reading: ");
+    Serial.print(readServoCurrent());
+    Serial.print(" mA, raw: ");
+    Serial.println(analogRead(SETI_PIN));
+    Serial.print("Position: ");
+    Serial.println(readServoPosition());
+    delay(10);
   }
 }
 
@@ -370,6 +412,13 @@ void receiveData(int received_data_byte_count){
       send_buffer = measured_position; //Update send buffer with most recent reading
       break;
 
+    case SET_TEST_VALUE_REGISTER:
+      test_register_value = input_buffer[1];
+      break;
+    
+    case GET_TEST_VALUE_REGISTER:
+      send_buffer=test_register_value;
+      break;
     default:
       Serial.print("Attempt to access unknown register: 0x");
       Serial.println(input_buffer[0], HEX);
