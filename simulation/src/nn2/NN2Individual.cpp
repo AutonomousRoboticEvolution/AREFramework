@@ -9,6 +9,7 @@ void NN2Individual::createController(){
     int nb_input = st::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
     int nb_hidden = st::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     int nb_output = st::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+    std::vector<int> joint_subs = st::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
@@ -39,8 +40,14 @@ void NN2Individual::createController(){
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
+    else if(nn_type == st::nnType::ELMAN_CPG){
+        control.reset(new NN2Control<elman_cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+    }
     else {
-        std::cerr << "unknown type of neural network" << std::endl;
+        std::cerr << "ERROR: unknown type of neural network" << std::endl;
         return;
     }
 
@@ -55,7 +62,7 @@ void NN2Individual::createMorphology(){
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    std::dynamic_pointer_cast<Morphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_x,init_y,init_z);
 }
 
 void NN2Individual::update(double delta_time){
