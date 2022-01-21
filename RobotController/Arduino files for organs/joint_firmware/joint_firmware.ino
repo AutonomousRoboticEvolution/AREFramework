@@ -108,6 +108,8 @@ void setup() {
   //Open serial port for debugging
   Serial.begin(115200);
   Serial.println("Joint Organ Reporting");
+  Serial.print("My i2c address is 0x");
+  Serial.println(SLAVE_ADDRESS,HEX);
 
   //Init I2C bus (internal only at this point)
   Wire.begin(SLAVE_ADDRESS);
