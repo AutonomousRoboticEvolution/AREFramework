@@ -3,6 +3,7 @@
 /blueprints/
 /controllers/
 /gcode/
+organBankContents.txt
 
 /.idea/
 /__pycache__/

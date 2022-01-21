@@ -12,7 +12,7 @@
 #archiveAddingProbability,double,0.4
 #noveltyThreshold,double,0.9
 
-#cameraPipe,string,tcpclientsrc host=192.168.2.248 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink
+#cameraPipe,string,http://192.168.2.248/img/video.mjpeg
 #init_x,float,0
 #init_y,float,0
 #init_z,float,0.12
@@ -53,5 +53,7 @@
 #isSegmentedRobot,bool,1
 #isExportModel,bool,0
 #reloadController,bool,0
+
+#organsVersion,int,3
 
 

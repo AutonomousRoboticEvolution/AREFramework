@@ -254,8 +254,8 @@ class UR5Robot:
                 self.UR5isConnected = False
                 self.isRunning=False
                 self.stopArm()
-                break
                 # raise RuntimeError("Disconnected from UR arm")
+                break
 
 
     ## Pickup an organ and insert it
@@ -295,7 +295,9 @@ class UR5Robot:
         originPosition = assemblyFixture.currentPosition * makeTransform( rotZ= organInRobot.AssemblyFixtureRotationOffsetFudgeAngle)
 
         # first we need to find a suitable organ in the bank.
-        organFromBank = bank.findAnOrgan ( organInRobot.organType )
+        organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
         organInRobot.I2CAddress = organFromBank.I2CAddress   # transfer over the i2c address
 
         # compute all relevant locations. The "prePickup" and "preDropoff" are so the end effector approaches from the right direction.
@@ -402,6 +404,10 @@ class UR5Robot:
 
         # first we need to find a suitable organ in the bank.
         organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
+
+
         organInRobot.I2CAddress = organFromBank.I2CAddress  # since this is the Head, this is actually the IP address not at I2C address
         print("IP address: {}".format(organInRobot.I2CAddress))
 
@@ -497,7 +503,6 @@ class UR5Robot:
         AFDropoffPoint = assemblyFixture.currentPosition * organInRobot.positionTransformWithinBankOrRobot * makeTransformInputFormatted(
             [0, 0, -AFPostInsertExtraPushDistance])
         AFPreDropoffPoint = AFDropoffPoint * makeTransformInputFormatted([0, 0, AFVerticalClearanceForInsert])  # point back from (in organ frame) final position
-        AFPostDropoffPoint = changeCoordinateValue(AFDropoffPoint, "z", assemblyFixture.CLEAR_Z_HEIGHT) # linear move back up out of the way of robot
         AFPreForceModePoint = AFDropoffPoint * makeTransformInputFormatted(
             [0, 0, AFDistanceForCompliantMove + AFPostInsertExtraPushDistance])  # point back from final position from which to start force mode
 
@@ -524,7 +529,11 @@ class UR5Robot:
         self.setMoveSpeed(self.speedValueNormal)
         actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         self.setGripperPosition(organInRobot.gripperOpenPosition)
-        self.moveArm(AFPostDropoffPoint)  # back off
+        self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        # linear move up out of the way of robot :
+        self.moveArm(
+            changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)
+        )
 
 
         return organInRobot
@@ -559,6 +568,8 @@ class UR5Robot:
 
         # first we need to find a suitable organ in the bank.
         organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
         organInRobot.I2CAddress = organFromBank.I2CAddress   # transfer over the i2c address
 
 

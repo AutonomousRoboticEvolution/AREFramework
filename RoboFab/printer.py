@@ -10,25 +10,26 @@ TIDY_UP_FILES = True
 ## The printer class is for running a 3D printer
 ## This includes the slicing of an stl and all communication with the Raspberry Pi which runs Octoprint
 class Printer:
-    def __init__(self, IPAddress, config):
+    def __init__(self, IPAddress, configurationData, printer_number=0):
         debugPrint("Creating a printer object")
+        printerConfiguration = configurationData["PRINTER_{}".format(printer_number)]
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
         self.openSCADDirectory = "./OpenSCAD/"
         # self.meshesNoClipsDirectory = "./meshes_no_clips/"
-        self.meshesNoClipsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
-        self.blueprintsDirectory = "/home/robofab/are-logs/test_are_generate/waiting_to_be_built/"
+        self.meshesNoClipsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
+        self.blueprintsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
         self.meshesDirectory = "./meshes/"
 
         self.IPAddress=IPAddress # IP address of the Raspberry Pi running OctoPrint
-        self.origin = np.matrix ( config[ "ORIGIN" ])
+        self.origin = np.matrix (printerConfiguration["ORIGIN"])
         self.skeletonPositionOnPrintbed = makeTransformInputFormatted([0.150, 0.150, 0]) # default middle of bed, can be updated
         self.timeout=5 # timeout in seconds for api requests to octoPrint
-        self.defaultBedCooldownTemperature = config["BED_COOLDOWN_TEMPERATURE"]
+        self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
-        self.apiKeyHeader = { 'X-Api-Key': 'b76fba867e5ee070caff864d953ed27b'}
+        self.apiKeyHeader = { 'X-Api-Key': '{}'.format(printerConfiguration["API_KEY"])}
 
         if self.IPAddress is not None:
             self.connectOctoPrintToPrinter()
@@ -129,6 +130,7 @@ class Printer:
     #returns a dictionary, with keys "bed_actual", "bed_target", "tool_actual" and "tool_target" and values as temperature in degC
     def getTemperatures(self):
         responseObject = requests.get("http://{}/api/printer".format(self.IPAddress), headers=self.apiKeyHeader, timeout=self.timeout)
+        print(responseObject, self.IPAddress)
         temperatures = {"bed_actual":responseObject.json()["temperature"]["bed"]["actual"],
                         "bed_target":responseObject.json()["temperature"]["bed"]["target"],
                         "tool_actual":responseObject.json()["temperature"]["tool0"]["actual"],
@@ -279,17 +281,17 @@ class Printer:
 if __name__ == "__main__":
     import json
 
+    '''
     ID_list = [1203,1358,1457,1689,2062,2710,3134,4180,4340]
     ID_list = [1689,2710]
     for ID_num in ID_list:
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
+    '''
+    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
 
-        printer=Printer(None , json.load(open('configuration_BRL.json'))["PRINTER_1"])
-        printer.createSTL(robot_ID)
-        printer.slice("mesh"+robot_ID)
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
     #printer.printARobot("test3", FAKE_SLICE_ONLY=False)
-    # printer.coolBed(30)
+    printer.coolBed(30)
