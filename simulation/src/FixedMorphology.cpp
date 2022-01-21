@@ -79,20 +79,20 @@ void FixedMorphology::create()
 void FixedMorphology::loadModel(){
     std::cout << "load model" << std::endl;
 
-    std::string path_arepuck_m = settings::getParameter<settings::String>(parameters,"#robotPath").value;
-    int arepuckHandle = simLoadModel(path_arepuck_m.c_str());
+    std::string path = settings::getParameter<settings::String>(parameters,"#robotPath").value;
+    int handle = simLoadModel(path.c_str());
 
     //sim::loadModel(instance_type,path_epuck_m.c_str(),client_id);
-    if(arepuckHandle == -1)
+    if(handle == -1)
     {
-        std::cerr << "unable to load arepuck model" << std::endl;
+        std::cerr << "unable to load robot model" << std::endl;
         simChar* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
         exit(1);
     }
 
-    mainHandle = arepuckHandle;
+    mainHandle = handle;
 }
 
 
