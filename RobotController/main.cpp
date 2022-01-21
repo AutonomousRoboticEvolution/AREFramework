@@ -65,6 +65,38 @@ void setup_sigint_catch()
 
 #include <bitset> // for displaying binary values
 
+void turtle_wiggle(DaughterBoards daughterBoards){
+
+    daughterBoards.turnOn(RIGHT);
+    JointOrgan left_shoudler(0x08);
+    JointOrgan left_elbow(0x09);
+    JointOrgan right_shoudler(0x0a);
+    JointOrgan right_elbow(0x0b);
+
+    std::cout<<"doing test connections..."<<std::endl;
+    std::cout<<"0x08: "<<left_shoudler.testConnection()<<std::endl;
+    std::cout<<"0x09: "<<left_elbow.testConnection()<<std::endl;
+
+    delay(1);
+    left_shoudler.setTargetAngleNormalised(0.5);
+    left_elbow.setTargetAngleNormalised(0.5);
+    right_shoudler.setTargetAngleNormalised(0.5);
+    right_elbow.setTargetAngleNormalised(0.5);
+
+    delay(1);
+    left_shoudler.setTargetAngleNormalised(0.2);
+    left_elbow.setTargetAngleNormalised(0.5);
+    right_shoudler.setTargetAngleNormalised(0.2);
+    right_elbow.setTargetAngleNormalised(0.5);
+
+    delay(1);
+    left_shoudler.setTargetAngleNormalised(0.2);
+    left_elbow.setTargetAngleNormalised(0.5);
+    right_shoudler.setTargetAngleNormalised(0.2);
+    right_elbow.setTargetAngleNormalised(0.5);
+
+}
+
 bool wheel_torque_test_helper(MotorOrgan wheel,int value){
     std::cout<< "Limit: "<<value*10<<"mA";
 
@@ -138,6 +170,8 @@ int main()
     ledDriver.flash(BLUE, 1000000 ,20);
 
     cameraTest();
+
+    turtle_wiggle(daughterBoards);
 
 /************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
 if (DO_JOINT_TORQUE_TEST){
