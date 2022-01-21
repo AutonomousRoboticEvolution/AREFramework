@@ -23,6 +23,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
+        // NOTE! the string of the address value in the string (from the list_of_organs file) is in decimal, e.g. 0x63 = "99"
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
         switch (stoi(organType)) {
         case 0: //head
