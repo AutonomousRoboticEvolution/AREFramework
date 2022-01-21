@@ -15,7 +15,7 @@
 #include "MotorOrgan.hpp"
 #include "BrainOrgan.hpp"
 #include "JointOrgan.hpp"
-#include "Camera.hpp"
+#include "Camera.hpp" 
 
 #define DO_JOINT_TORQUE_TEST false
 
@@ -65,37 +65,79 @@ void setup_sigint_catch()
 
 #include <bitset> // for displaying binary values
 
-void turtle_wiggle(DaughterBoards daughterBoards){
+void turtle_wiggle(DaughterBoards daughterBoards, LedDriver ledDriver){
 
     daughterBoards.turnOn(RIGHT);
-    JointOrgan left_shoudler(0x08);
-    JointOrgan left_elbow(0x09);
+    JointOrgan left_shoudler(0x09);
+    JointOrgan left_elbow(0x08);
     JointOrgan right_shoudler(0x0a);
     JointOrgan right_elbow(0x0b);
 
     std::cout<<"doing test connections..."<<std::endl;
-    std::cout<<"0x08: "<<left_shoudler.testConnection()<<std::endl;
-    std::cout<<"0x09: "<<left_elbow.testConnection()<<std::endl;
+    std::cout<<"0x08: "<<left_elbow.testConnection()<<std::endl;
+    std::cout<<"0x09: "<<left_shoudler.testConnection()<<std::endl;
+    std::cout<<"0x0A: "<<right_shoudler.testConnection()<<std::endl;
+    std::cout<<"0x0B: "<<right_elbow.testConnection()<<std::endl;
+    
+    delay(100);
+    left_shoudler.setCurrentLimit(55);
+    delay(100);
+    right_shoudler.setCurrentLimit(55);
+    delay(100);
+    left_elbow.setCurrentLimit(90);
+    delay(100);
+    right_elbow.setCurrentLimit(90);
+    delay(100);
 
-    delay(1);
-    left_shoudler.setTargetAngleNormalised(0.5);
-    left_elbow.setTargetAngleNormalised(0.5);
-    right_shoudler.setTargetAngleNormalised(0.5);
-    right_elbow.setTargetAngleNormalised(0.5);
+    left_shoudler.setServoOn();
+    right_shoudler.setServoOn();
+    left_elbow.setServoOn();
+    right_elbow.setServoOn();
 
-    delay(1);
-    left_shoudler.setTargetAngleNormalised(0.2);
-    left_elbow.setTargetAngleNormalised(0.5);
-    right_shoudler.setTargetAngleNormalised(0.2);
-    right_elbow.setTargetAngleNormalised(0.5);
+    delay(1000);
+    ledDriver.flash(BLUE, 100000 ,20);
+    left_shoudler.setTargetAngleNormalised(0);
+    right_shoudler.setTargetAngleNormalised(0);
+    left_elbow.setTargetAngleNormalised(0);
+    right_elbow.setTargetAngleNormalised(0);
 
-    delay(1);
-    left_shoudler.setTargetAngleNormalised(0.2);
-    left_elbow.setTargetAngleNormalised(0.5);
-    right_shoudler.setTargetAngleNormalised(0.2);
-    right_elbow.setTargetAngleNormalised(0.5);
+    for (int i=0; i<10;i++){
+        
+        delay(1000);
+        ledDriver.flash(BLUE, 100000 ,20);
+        left_shoudler.setTargetAngleNormalised(0);
+        right_shoudler.setTargetAngleNormalised(0);
+        left_elbow.setTargetAngleNormalised(0.5);
+        right_elbow.setTargetAngleNormalised(0.5);
 
+        delay(1000);
+        ledDriver.flash(BLUE, 100000 ,20);
+        left_shoudler.setTargetAngleNormalised(0.9);
+        right_shoudler.setTargetAngleNormalised(0.9);
+        left_elbow.setTargetAngleNormalised(0.5);
+        right_elbow.setTargetAngleNormalised(0.5);
+
+        delay(1000);
+        ledDriver.flash(BLUE, 100000 ,20);
+        left_shoudler.setTargetAngleNormalised(0.5);
+        right_shoudler.setTargetAngleNormalised(0.5);
+        left_elbow.setTargetAngleNormalised(-0.5);
+        right_elbow.setTargetAngleNormalised(-0.5);
+
+        delay(1000);
+        ledDriver.flash(BLUE, 100000 ,20);
+        left_shoudler.setTargetAngleNormalised(-0.5);
+        right_shoudler.setTargetAngleNormalised(-0.5);
+        left_elbow.setTargetAngleNormalised(-0.5);
+        right_elbow.setTargetAngleNormalised(-0.5);
+    }
 }
+
+void cameraTest(){ 
+    Camera cam; 
+    cam.setTagsToLookFor({14}); 
+    cam.presenceDetect(); 
+} 
 
 bool wheel_torque_test_helper(MotorOrgan wheel,int value){
     std::cout<< "Limit: "<<value*10<<"mA";
@@ -143,11 +185,7 @@ void wheel_torque_test(MotorOrgan wheel){
 
 }
 
-void cameraTest(){
-    Camera cam;
-    cam.setTagsToLookFor({14});
-    cam.presenceDetect();
-}
+
 
 int main()
 {
@@ -169,9 +207,12 @@ int main()
     ledDriver.init();
     ledDriver.flash(BLUE, 1000000 ,20);
 
-    cameraTest();
 
-    turtle_wiggle(daughterBoards);
+    turtle_wiggle(daughterBoards,ledDriver);
+
+/************ camera test for seeing aruco tags **************************************/
+//cameraTest()
+
 
 /************ program for testing the torque of the joint - just move back and forth, having set the current limit ********************************************/
 if (DO_JOINT_TORQUE_TEST){
