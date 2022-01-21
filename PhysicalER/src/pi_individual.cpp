@@ -7,7 +7,7 @@ namespace st = are::settings;
 void NN2Individual::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
-    nn_type = st::getParameter<st::Integer>(parameters,"#NNType").value;
+    nn_type = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nn_type();
     nb_input = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
     nb_hidden = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_hidden();
     nb_output = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();

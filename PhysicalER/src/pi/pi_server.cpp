@@ -34,15 +34,16 @@ int main(int argc, char** argv) {
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply);
         std::cout<<"Parameters received:\n"<<str_param<<std::endl;
-        parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
+    	parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
         //receive organ addresses list
         phy::receive_string(str_organs_list,"organ_addresses_received",reply);
         std::cout<<"Organs list received: \n"<<str_organs_list<<std::endl;
+        
 
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply);
-        ctrl_gen->from_string(str_ctrl);
         std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
+	    ctrl_gen->from_string(str_ctrl);
         phy::NN2Individual ind(empy_gen,ctrl_gen);
         ind.set_parameters(parameters);
         ind.set_randNum(randomNumber);
