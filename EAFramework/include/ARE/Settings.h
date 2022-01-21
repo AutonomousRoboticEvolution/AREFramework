@@ -26,6 +26,7 @@ public:
     typedef std::shared_ptr<const Type> ConstPtr;
     virtual void fromString(const std::string& str) = 0;
     std::string name;
+
 };
 
 class Boolean : public Type
@@ -35,6 +36,10 @@ public:
     Boolean(bool b) : value(b){name = "bool";}
     bool value = false;
     void fromString(const std::string& str){value = std::stoi(str);}
+    friend std::ostream & operator << (std::ostream &out, const Boolean &s){
+        out << s.value;
+        return out;
+    }
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -50,6 +55,10 @@ public:
     Integer(int i) : value(i) {name = "int";}
     int value = 0;
     void fromString(const std::string& str){value = std::stoi(str);}
+    friend std::ostream & operator << (std::ostream &out, const Integer &s){
+        out << s.value;
+        return out;
+    }
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -65,6 +74,10 @@ public:
     Float(float f) : value(f) {name = "float";}
     float value = 0.0;
     void fromString(const std::string& str){value = std::stof(str);}
+    friend std::ostream & operator << (std::ostream &out, const Float &s){
+        out << s.value;
+        return out;
+    }
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -81,6 +94,10 @@ public:
     Double(double d) : value(d) {name = "double";}
     double value = 0.0;
     void fromString(const std::string& str){value = std::stod(str);}
+    friend std::ostream & operator << (std::ostream &out, const Double &s){
+        out << s.value;
+        return out;
+    }
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -96,6 +113,10 @@ public:
     String(std::string s) : value(s) {name = "string";}
     std::string value = "";
     void fromString(const std::string& str){value = str;}
+    friend std::ostream & operator << (std::ostream &out, const String &s){
+        out << s.value;
+        return out;
+    }
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -105,7 +126,106 @@ public:
 };
 
 
+template<typename T>
+class Sequence : public Type
+{
+public:
+    Sequence(){name = "sequence";}
+    Sequence(std::vector<T> s) : value(s) {name = "sequence";}
+    std::vector<T> value;
+    void fromString(const std::string& str){
+        std::cerr << "no implementation for this type of sequence." << std::endl;
+    }
+    friend std::ostream & operator << (std::ostream &out, const Sequence &s){
+        for(const auto& val: s.value){
+            out << val << ";";
+        }
+        return out;
+    }
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
+};
 
+template<>
+class Sequence<int> : public Type
+{
+public:
+    Sequence(){name = "sequence_int";}
+    Sequence(std::vector<int> s) : value(s) {name = "sequence_int";}
+    std::vector<int> value;
+    void fromString(const std::string& str){
+        std::vector<std::string> split_str;
+        misc::split_line(str,";",split_str);
+        for(const auto& s: split_str) value.push_back(std::stoi(s));
+    }
+    friend std::ostream & operator << (std::ostream &out, const Sequence &s){
+        for(const auto& val: s.value){
+            out << val << ";";
+        }
+        return out;
+    }
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
+};
+template<>
+class Sequence<float> : public Type
+{
+public:
+    Sequence(){name = "sequence_float";}
+    Sequence(std::vector<float> s) : value(s) {name = "sequence_float";}
+    std::vector<float> value;
+    void fromString(const std::string& str){
+        std::vector<std::string> split_str;
+        misc::split_line(str,";",split_str);
+        for(const auto& s: split_str) value.push_back(std::stof(s));
+    }
+    friend std::ostream & operator << (std::ostream &out, const Sequence &s){
+        for(const auto& val: s.value){
+            out << val << ";";
+        }
+        return out;
+    }
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
+};
+
+template<>
+class Sequence<double> : public Type
+{
+public:
+    Sequence(){name = "sequence_double";}
+    Sequence(std::vector<double> s) : value(s) {name = "sequence_double";}
+    std::vector<double> value;
+    void fromString(const std::string& str){
+        std::vector<std::string> split_str;
+        misc::split_line(str,";",split_str);
+        for(const auto& s: split_str) value.push_back(std::stod(s));
+    }
+    friend std::ostream & operator << (std::ostream &out, const Sequence &s){
+        for(const auto& val: s.value){
+            out << val << ";";
+        }
+        return out;
+    }
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
+};
 
 Type::Ptr buildType(const std::string &name);
 
@@ -155,7 +275,7 @@ T getParameter(const ParametersMapPtr &params,const std::string& name)
             return T();
         }
         T res = *(cast<T>(defaults::parameters->at(name)));
-        std::cerr << "Using default value : " << res.value << std::endl;
+        std::cerr << "Using default value : " << res << std::endl;
         return res;
     }
     return *(cast<T>(params->at(name)));
@@ -172,7 +292,7 @@ T getParameter(const ParametersMap &params,const std::string& name)
             return T();
         }
         T res = *(cast<T>(defaults::parameters->at(name)));
-        std::cerr << "Using default value : " << res.value << std::endl;
+        std::cerr << "Using default value : " << res << std::endl;
         return res;
     }
     return *(cast<T>(params.at(name)));
