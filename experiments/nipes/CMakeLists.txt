@@ -32,7 +32,7 @@ add_library(NIPES SHARED
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
-    simulatedER cmaes tbb)
+    simulatedER cmaes)
 
 add_executable(nipes_test nipes_test.cpp)
 target_include_directories(nipes_test PUBLIC ${INCLUDES})
