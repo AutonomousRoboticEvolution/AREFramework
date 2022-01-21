@@ -5,7 +5,7 @@
 */
 
 //I2C ADDRESS
-#define SLAVE_ADDRESS 0x08 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x0A // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
 #define CALIB_CENTRE_POSITION_US 1450
@@ -101,6 +101,8 @@ void setup() {
   //Open serial port for debugging
   Serial.begin(115200);
   Serial.println("Joint Organ Reporting");
+  Serial.print("My address is 0x");
+  Serial.println(SLAVE_ADDRESS,HEX);
 
   //Init I2C bus (internal only at this point)
   Wire.begin(SLAVE_ADDRESS);
