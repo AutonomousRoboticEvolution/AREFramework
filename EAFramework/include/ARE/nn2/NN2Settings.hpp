@@ -9,8 +9,8 @@ typedef enum nnType{
     FFNN = 0,
     RNN = 1,
     ELMAN = 2,
-    FCP = 3,
-    CPG = 4
+    ELMAN_CPG = 3,
+    FCP = 4
 } nnType;
 
 }

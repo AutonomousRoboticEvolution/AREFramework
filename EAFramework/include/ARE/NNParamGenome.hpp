@@ -161,10 +161,10 @@ public:
 private:
     std::vector<double> weights;
     std::vector<double> biases;
-    int nbr_input;
-    int nbr_output;
-    int nbr_hidden;
-    int nn_type;
+    int nbr_input=0;
+    int nbr_output=0;
+    int nbr_hidden=0;
+    int nn_type=0;
 };
 
 class NNParamGenomeLog : public Logging
