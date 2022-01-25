@@ -42,3 +42,4 @@ simulation/.idea/
 
 simulation/Cluster/__pycache__/
 
+*.autosave

@@ -106,8 +106,8 @@ void ER::start_evaluation(){
 
 
     // find the organs list (should be in the waitingToBeEvalutatedFolderPath folder)
-    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
-    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_addresses_"+robotID+".csv");
+    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
+    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
 
     // get IP address of robot from the first line of the list_of_organs file
     std::string firstLine;
@@ -116,7 +116,7 @@ void ER::start_evaluation(){
     if (verbose) std::cout<< "pi IP address: "<< pi_address << std::endl;
     std::string stringListOfOrgans;
     for (std::string line; std::getline(organListFileStream, line); ) stringListOfOrgans.append(line+"\n");
-    std::cout<<"organ list: \n"<<stringListOfOrgans<<"=="<<std::endl;
+    //std::cout<<"organ list: \n"<<stringListOfOrgans<<"=="<<std::endl;
 
     // get the controller genome as string, from the genome file
     std::ifstream controllerGenomeFileStream(waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
@@ -128,16 +128,14 @@ void ER::start_evaluation(){
     std::stringstream sstream1,sstream2;
     sstream1 << "tcp://" << pi_address << ":5556";
     sstream2 << "tcp://" << pi_address << ":5555";
-//    request = zmq::socket_t(context, ZMQ_REQ);
     request.connect (sstream1.str().c_str());
-//    subscriber = zmq::socket_t(context,ZMQ_SUB);
     subscriber.connect(sstream2.str().c_str());
-    subscriber.setsockopt(ZMQ_SUBSCRIBE,"pi ",3);
+    subscriber.set(zmq::sockopt::subscribe, "pi ");
 
     //send the parameters as a string
     std::string reply;
     std::string param = settings::toString(*parameters.get());
-    std::cout<<"params : \n"<<param<<std::endl;
+    //std::cout<<"params : \n"<<param<<std::endl;
     send_string(reply,param,request);
     assert(reply == "parameters_received");
 
@@ -153,7 +151,7 @@ void ER::start_evaluation(){
 }
 
 bool ER::update_evaluation(){
-    float eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
+    //float eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
 
     using namespace std::chrono;
 
@@ -164,20 +162,33 @@ bool ER::update_evaluation(){
     //currentInd->update(eval_duration.count());
     environment->update_info(current_time);
 
-    std::string message;
-    wait_for_message(message,subscriber);
-    message.erase(0,message.find(" ")+1);
-    //std::cout << message << std::endl;
-
-    return  /*eval_time <= eval_duration.count() ||*/ message=="finish";
+    std::string message_string;
+    receive_string_no_reply(message_string,subscriber);
+    return message_string=="finish";
 
 }
 
 bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
-    if(verbose)
-        std::cout << "individual " << currentIndIndex << " is evaluated" << std::endl;
+    if(verbose) std::cout << "individual " << currentIndIndex << " has finished evaluating" << std::endl;
+
+    // get any logs that the robot has gathered:
+    bool getting_logs=true;
+    while(getting_logs){
+        // get message:
+        std::string message;
+        receive_string_no_reply(message,subscriber);
+
+
+        // if message is "finshed_logs", then we continue
+        if (message=="finished_logs"){
+            getting_logs=false;
+        }else{ // otherwise, this is a log packet
+            std::cout << "got a log:\n" << message << std::endl;
+            Logging::saveStringToFile( "log_file" , message );
+        }
+    }
 
 
     std::string str;

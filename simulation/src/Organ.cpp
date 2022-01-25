@@ -52,7 +52,7 @@ void Organ::isOrganGoodOrientation()
     float diffPosZ;
     diffPosZ = connectorPos[2] - organPos[2];
     /// \todo EB: remove this hard-coded value
-    organGoodOrientation = (diffPosZ > -0.015) && (diffPosZ < 0.015);  // Is organ pointing downwards?
+    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
 }
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
@@ -167,12 +167,21 @@ void Organ::createOrgan(int skeletonHandle)
     organChecked = true;
     /// \todo EB: It might be worth to have this as a separate parameters (?)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
+    int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
+
+    if(version != 2 && version != 3){
+        std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
+        version = 3;
+    }
+    std::stringstream vers;
+    vers << version;
+
     if(organType == 0) // Brain
         modelsPath += "C_HeadV3.ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV3.ttm";
+        modelsPath += "C_WheelV" + vers.str() + ".ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_SensorV2.ttm";
+        modelsPath += "C_SensorV" + vers.str() + ".ttm";
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster
@@ -241,9 +250,9 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectOrientation(forceSensor, -1, tempOrganOri);
     simSetObjectOrientation(organHandle, -1, tempOrganOri);
     simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
-    // If the organ is not brain rotate along z-axis relative to the organ itself.
+    // If the organ is not brain rotate along x-axis relative to the organ itself.
     if(organType != 0){
-        tempOrganOri[0] = 0.0; tempOrganOri[1] = 0.0; tempOrganOri[2] = organOri.at(2);
+        tempOrganOri[0] = organOri.at(3); tempOrganOri[1] = 0.0; tempOrganOri[2] = 0.0;
         simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
         simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
     }
