@@ -64,7 +64,7 @@ void increment_negative(){
 
 int get_measured_velocity_from_encoder(){
     int temp_value = encoder_ticks_this_timestep;
-    encoder_ticks_this_timestep=encoder_ticks_this_timestep-temp_value; // should generally reset to zero unless there happens to have been a tick since the last line
+    encoder_ticks_this_timestep=encoder_ticks_this_timestep-temp_value;
     return temp_value;
 //    float temp_value = (1.0/30) * 1000000.0/ (time_of_last_tick-time_of_last_but_one_tick) * last_tick_direction;
 //    last_tick_direction=0;

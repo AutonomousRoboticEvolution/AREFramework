@@ -5,16 +5,16 @@
 */
 
 //I2C ADDRESS
-#define SLAVE_ADDRESS 0x08 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x0B // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
-#define CALIB_CENTRE_POSITION_US 1450
-#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 110
-#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 872
+#define CALIB_CENTRE_POSITION_US 1440
+#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE 123
+#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE 887
 
 //DEBUG FLAG
 #define DEBUG 0
-#define HARDWARE_TEST 1
+#define HARDWARE_TEST 0
 
 //CALIBRATION CALCULATIONS
 #define DEG_PER_US 0.093011  //Approximately measured empirically based on a travel of ~173 degrees
@@ -30,7 +30,6 @@
 #define LOWER_PWM_RANGE_US (NOMINAL_PWM_CENTRE_US - NOMINAL_PWM_MIN_US + CENTRE_OFFSET_US)
 #define MAX_SERVO_ANGLE (LOWER_PWM_RANGE_US * DEG_PER_US)
 #define MIN_SERVO_ANGLE -(UPPER_PWM_RANGE_US * DEG_PER_US)
-//NOTE TO SELF: can use map() to map servo angles to encoder values
 
 //CURRENT LIMITER DEFAULTS
 #define DIG_POT_ADDRESS 0x2E //7-bit address of device. Wire library uses 7 bit addressing throughout
@@ -64,6 +63,8 @@
 #define MEASURED_CURRENT_REGISTER 0x13
 #define CURRENT_LIMIT_REGISTER 0x14
 #define LED_BRIGHTNESS_REGISTER 0x15
+#define SET_TEST_VALUE_REGISTER 0x90 // save a given value
+#define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
 //I2C comms
 volatile uint8_t input_buffer[2];
@@ -92,6 +93,8 @@ volatile bool update_led_brightness_flag = false;
 //Variables only used for testing
 bool rotationDirection = 0; //0 is -ve, 1 is +ve
 
+uint8_t test_register_value = 0; //For organ presence detection
+
 /*******SETUP**********************/
 void setup() {
   //Pins setup
@@ -106,6 +109,8 @@ void setup() {
   //Open serial port for debugging
   Serial.begin(115200);
   Serial.println("Joint Organ Reporting");
+  Serial.print("My i2c address is 0x");
+  Serial.println(SLAVE_ADDRESS,HEX);
 
   //Init I2C bus (internal only at this point)
   Wire.begin(SLAVE_ADDRESS);
@@ -410,6 +415,13 @@ void receiveData(int received_data_byte_count){
       send_buffer = measured_position; //Update send buffer with most recent reading
       break;
 
+    case SET_TEST_VALUE_REGISTER:
+      test_register_value = input_buffer[1];
+      break;
+    
+    case GET_TEST_VALUE_REGISTER:
+      send_buffer=test_register_value;
+      break;
     default:
       Serial.print("Attempt to access unknown register: 0x");
       Serial.println(input_buffer[0], HEX);

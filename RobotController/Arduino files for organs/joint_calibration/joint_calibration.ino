@@ -85,7 +85,7 @@ void setup() {
   Serial.println("Type microsecond values to test. 600 and 2400 are reasonable endpoint estimations");
   Serial.println("Type 'e' to see the encoder reading at the current position");
   Serial.println("Type 'c' to move the horn to the set centre position");  
-  Serial.println("Calibration step 1: Type 'l' to find upper/lower limits and centre the servo");
+  Serial.println("Calibration step 1: Type 'k' to find upper/lower limits and centre the servo");
   Serial.println("Calibration step 2: Place the horn on the servo, in straightest available spline position");
   Serial.println("Calibration step 3: Use '[' and ']' to fine-adjust the position until the horn is straight");
   Serial.println("Calibration step 4: Type 'p' to print out the calibration parameters to be copied into the firmware.");
@@ -107,8 +107,8 @@ while(Serial.available()) {
       Serial.println(encoderReading);
       break;
 
-    //'l' to find end limits and centre the servo
-    case 'l' :
+    //'k' to find end limits and centre the servo
+    case 'k' :
       //Find lower angle limit
       //This also updates the global min encoder value variable
       Serial.println("Finding lower angle limit...");

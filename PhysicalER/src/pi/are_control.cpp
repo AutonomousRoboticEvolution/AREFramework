@@ -8,6 +8,10 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
+    // initilise the camera
+    cameraInputToNN = true; // TODO: make this a parameter?
+    camera.setTagsToLookFor({14,42}); // TODO: make this a parameter?
+
     // need to turn on the daughter boards
     daughterBoards->init();
     daughterBoards->turnOn();
@@ -83,9 +87,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     }
     // get the Head LEDs ready for the debugging outputs, if necessary
     if (settings::getParameter<settings::Boolean>(parameters,"#debugLEDsOnPi").value){
-        ledDriver->setColour(RGB0,GREEN);
-        ledDriver->setColour(RGB1,RED);
-        ledDriver->setColour(RGB2,BLUE);
+        debugLEDsOnPi=true;
     }
 }
 
@@ -142,6 +144,15 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         }
     }
 
+    // binary camera input
+    if (cameraInputToNN){
+        if (camera.presenceDetect()) {
+            sensor_vals.push_back(1);
+        }else{
+            sensor_vals.push_back(0);
+        }
+    }
+
     if(debugDisplayOnPi){
         // debugging: display sensor values as bars:
         for(int i=0;i<sensor_vals.size();i++){
@@ -152,7 +163,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
             }
             std::cout<<"|";
         }
-        std::cout<<"-----|";
+        std::cout<<"-----|"; // block between the input and output values to aid readability
     }
 
     // append input values to log data, as a string:
@@ -160,36 +171,12 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
 }
 
 void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
-
-    double lowest_IR_value=0.0;
-    double highest_TOF_value=0.0;
-    double highest_output_value=0.0;
-    int number_of_sensors = nn_inputs.size()/2;
-
-    // find the highest values for each type of sensor, and the largest magnitude output, and set the LED outputs in proportion
-    // TOF sensor values
-    for (int i=0; i<number_of_sensors;i++){
-        if (nn_inputs[i] > highest_TOF_value) highest_TOF_value=nn_inputs[i];
+    // compute brightness between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
+    if (nn_inputs.back()>0){ // camera reading is the last NN input
+        ledDriver->setAllTo(GREEN,200);
+    }else{
+        ledDriver->setAllTo(OFF,0);
     }
-
-    // IR sensor values
-    for (int i=number_of_sensors; i<number_of_sensors*2;i++){
-        if (nn_inputs[i] > lowest_IR_value) lowest_IR_value=nn_inputs[i];
-    }
-
-    // output values
-    for (int i=0; i<nn_outputs.size();i++){
-        if ( abs(nn_outputs[i]) > highest_output_value) lowest_IR_value=abs(nn_outputs[i]);
-    }
-
-    // get brightnesses between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
-    int brightness_IR = 10+lowest_IR_value*90;
-    int brightness_TOF = 10+(1.0-lowest_IR_value)*90;
-    int brightness_outputs = 10 + highest_TOF_value*90;
-
-    ledDriver->setBrightness(RGB0, brightness_TOF); // red
-    ledDriver->setBrightness(RGB1, brightness_IR); // green
-    ledDriver->setBrightness(RGB2, brightness_outputs); // blue
 }
 
 int AREControl::exec(zmq::socket_t& socket){
