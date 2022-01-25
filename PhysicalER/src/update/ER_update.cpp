@@ -111,28 +111,9 @@ void ER::start_evaluation(){
         environment->init();
     }
 
+    // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
     load_list_of_organs(repository + "/" + exp_name,current_id,pi_address,list_of_organs);
-
-    // find the organs list (should be in the waitingToBeEvalutatedFolderPath folder)
-    std::ifstream organListFileStream(waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
-    if(!organListFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/list_of_organs_"+robotID+".csv");
-
-    // get IP address of robot from the first line of the list_of_organs file
-    std::string firstLine;
-    std::getline(organListFileStream,firstLine); // get first line
-    std::string pi_address = firstLine.substr( firstLine.find(",")+1,firstLine.find("\n")-2) ; // the first line should be "0,[pi address]\n"
-    if (verbose) std::cout<< "pi IP address: "<< pi_address << std::endl;
-    std::string stringListOfOrgans;
-    for (std::string line; std::getline(organListFileStream, line); ) stringListOfOrgans.append(line+"\n");
-    //std::cout<<"organ list: \n"<<stringListOfOrgans<<"=="<<std::endl;
-
-//    // get the controller genome as string, from the genome file
-//    std::ifstream controllerGenomeFileStream(waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
-//    if(!controllerGenomeFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
-//    std::string ctrl_gen;
-//    for (std::string line; std::getline(controllerGenomeFileStream, line); )
-//        ctrl_gen.append(line+"\n");
 
     //start ZMQ
     std::stringstream sstream1,sstream2;
