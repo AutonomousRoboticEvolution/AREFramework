@@ -65,6 +65,11 @@ public:
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
+    std::vector<int> get_jointHandles(){return jointHandles;}
+    std::vector<int> get_proxHandles(){return proxHandles;}
+    std::vector<int> get_IRHandles(){return IRHandles;}
+    std::vector<int> get_wheelHandles(){return wheelHandles;}
+
 protected:
     int mainHandle;
 

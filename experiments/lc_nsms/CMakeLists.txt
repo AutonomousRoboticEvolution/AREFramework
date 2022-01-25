@@ -21,8 +21,6 @@ add_library(lc_nsms SHARED
     factories.cpp
     ManLog.cpp)
 
-
-
 target_include_directories(lc_nsms PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>

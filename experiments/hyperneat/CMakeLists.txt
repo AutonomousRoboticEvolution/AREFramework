@@ -11,7 +11,6 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
     )
 
-
 add_library(hyperneat SHARED
     ${VREP_SRC}
     ../common/NNControl.cpp

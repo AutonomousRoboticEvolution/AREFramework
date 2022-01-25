@@ -33,7 +33,7 @@ void readProximitySensors(const std::vector<int> handles, std::vector<double> &s
  * @param Handles of the passive IR sensors
  * @param (Output) sensor values
  */
-void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues);
+void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues, bool use_simulate_data=true);
 
 
 /**
