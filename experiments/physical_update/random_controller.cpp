@@ -48,7 +48,8 @@ void RandomController::init_pop(){
 
 void RandomController::load_data_for_update(){
 
-    std::string waiting_to_be_evaluated_folder = settings::getParameter<settings::String>(parameters,"#ctrlGenomeFolder").value + "waiting_to_be_evaluated/";
+    std::string waiting_to_be_evaluated_folder = settings::getParameter<settings::String>(parameters,"#experimentName").value + "waiting_to_be_evaluated/";
+    std::string verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     // loop through all list_of_organs files, and if a coresponding controller genome file does not exist, generate a random one
     std::string filepath, filename;
@@ -65,7 +66,14 @@ void RandomController::load_data_for_update(){
 
             // check if a conroller file already exists
             if (fs::exists(waiting_to_be_evaluated_folder+"ctrl_genome_"+robotID)){
-                std::cout<<"file ctrl_genome_"<<robotID<<" already exists"<<std::endl;
+                if(verbose)
+                    std::cout<<"file ctrl_genome_"<<robotID<<" already exists"<<std::endl;
+                // get the controller genome as string, from the genome file
+                std::ifstream controllerGenomeFileStream(waiting_to_be_evaluated_folder+"/ctrl_genome_"+robotID);
+                if(!controllerGenomeFileStream.is_open()) throw std::runtime_error("Could not open organs list file, was expecting it to be at: "+waitingToBeEvalutatedFolderPath+"/ctrl_genome_"+robotID);
+                std::string ctrl_gen;
+                for (std::string line; std::getline(controllerGenomeFileStream, line); )
+                    ctrl_gen.append(line+"\n");
             } else {
                 // doesn't exist, so make a new random controller and save it as a file
                 std::cout<<"WARNING the file "<<filename+" does not have an associated controller genome, so a random one is being created"<<std::endl;
@@ -94,6 +102,10 @@ void RandomController::load_data_for_update(){
             }
         }
     }
+}
+
+void RandomController::load_data_for_update(){
+
 }
 
 void RandomController::write_data_for_update(){
