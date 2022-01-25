@@ -224,7 +224,7 @@ class RobofabGUI:
                 if "mesh_{}.gcode".format(self.robotID_loaded[i]) in os.listdir("./gcode/"):
                     # gcode is already done
                     self.button_slice[i]["bg"] = "green"
-                elif not "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)) or not self.printerObjects[i] is None:
+                elif not "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)) or self.printerObjects[i] is None:
                     # haven't made the blueprint yet or printer not initialised
                     self.button_slice[i]["bg"] = "grey"
                 else:
