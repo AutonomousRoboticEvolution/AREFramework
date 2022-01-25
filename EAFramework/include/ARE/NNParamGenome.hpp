@@ -143,7 +143,6 @@ public:
      */
     std::string to_string() const override;
     void from_string(const std::string & gen_str) override;
-    void from_file(const std::string &filename);
 
     friend class boost::serialization::access;
     template <class archive>

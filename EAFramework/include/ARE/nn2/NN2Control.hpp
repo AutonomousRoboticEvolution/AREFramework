@@ -16,14 +16,6 @@
 
 
 namespace are {
-namespace control{
-using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
-using connection_t = nn2::Connection<double>;
-}
-using ffnn_t = nn2::Mlp<control::neuron_t,control::connection_t>;
-using elman_t = nn2::Elman<control::neuron_t,control::connection_t>;
-using rnn_t = nn2::Rnn<control::neuron_t,control::connection_t>;
-using fcp_t = nn2::Fcp<control::neuron_t,control::connection_t>;
 
 namespace control{
 using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;

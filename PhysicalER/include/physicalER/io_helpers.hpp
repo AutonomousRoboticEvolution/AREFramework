@@ -87,6 +87,8 @@ void load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &robot_
  */
 void load_list_of_organs(const std::string &folder, const int &id, std::string &ip_address, std::string &list_of_organs);
 
+void load_controller_genome(const std::string &folder, const int &id, const Genome::Ptr& genome);
+
 /**
  * @brief load the number of each organs type of a particular list_of_organs file
  * @param folder of the current experiment

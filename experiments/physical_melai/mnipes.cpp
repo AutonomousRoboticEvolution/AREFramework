@@ -72,7 +72,6 @@ bool MNIPES::update(const Environment::Ptr &env){
             (final_pos[1]+arena_size/2.)/arena_size,
             (final_pos[2]+arena_size/2.)/arena_size;
     trajectories.emplace(currentIndIndex,env->get_trajectory());
-    //If on the client or just sequential mode
     //update learner
     auto& learner = learners[currentIndIndex];
     numberEvaluation++;
@@ -286,9 +285,9 @@ void MNIPES::load_data_for_update() {
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
-    //load ids to be evaluated
-    std::vector<int> list_ids;
-    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+//TO REMOVE    //load ids to be evaluated
+//    std::vector<int> list_ids;
+//    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
 
     //TODO: load saved learners
 

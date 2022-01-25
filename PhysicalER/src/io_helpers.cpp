@@ -57,6 +57,7 @@ void phy::load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &r
     }
 }
 
+
 void phy::load_list_of_organs(const std::string &folder, const int& id, std::string &pi_address, std::string &list_of_organs){
 
     std::stringstream filepath;
@@ -73,6 +74,12 @@ void phy::load_list_of_organs(const std::string &folder, const int& id, std::str
     //if (verbose) std::cout<< "pi IP address: "<< pi_address << std::endl;
     for (std::string line; std::getline(ifs, line); )
         list_of_organs.append(line+"\n");
+}
+
+void phy::load_controller_genome(const std::string &folder, const int &id, const Genome::Ptr &genome){
+    std::stringstream filepath;
+    filepath << folder << "/waiting_to_be_evaluated/ctrl_genome_" << id;
+    genome->from_file(filepath.str());
 }
 
 void phy::load_nbr_organs(const std::string &folder, const int& id, int &wheels, int& joints, int& sensors){
