@@ -16,7 +16,6 @@
 
 
 namespace are {
-
 namespace control{
 using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
 using connection_t = nn2::Connection<double>;
@@ -98,8 +97,6 @@ public:
         nbr_biases = nn.get_nb_neurons();
     }
 
-
-
     nn_t nn;
 
 };
@@ -117,6 +114,6 @@ inline void get_nbr_weights_biases(int nbr_inputs,int nbr_outputs, int nbr_hidde
     }
 }
 
-}
+}//are
 
 #endif //NN2CONTROL_H

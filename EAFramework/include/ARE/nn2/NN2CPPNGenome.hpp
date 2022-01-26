@@ -13,6 +13,9 @@ namespace are {
 
 struct cppn_params{
     struct cppn{
+        static int _mutation_type;
+        static bool _mutate_connections;
+        static bool _mutate_neurons;
         static float _mutation_rate;
         static float _rate_mutate_conn;
         static float _rate_mutate_neur;
