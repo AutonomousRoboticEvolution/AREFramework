@@ -5,7 +5,6 @@
     specifies seed and repository.
 */
 
-#pragma once
 #ifndef V_REPEXTER_H
 #define V_REPEXTER_H
 

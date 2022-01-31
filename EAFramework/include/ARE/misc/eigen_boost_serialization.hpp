@@ -28,6 +28,17 @@ THE SOFTWARE.
 #include <boost/serialization/split_free.hpp>
 #include <boost/serialization/vector.hpp>
 
+//Workaround for c++17
+namespace boost { namespace serialization {
+   struct U;  // forward-declaration for Bug 1676
+} } // boost::serialization
+
+namespace Eigen { namespace internal {
+  // Workaround for bug 1676
+  template<>
+  struct traits<boost::serialization::U> {enum {Flags=0};};
+} }
+
 namespace boost{namespace serialization{
     template <class Archive, typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
         void save(Archive & ar, const Eigen::Matrix<_Scalar,_Rows,_Cols,_Options,_MaxRows,_MaxCols> & m, const unsigned int version) {

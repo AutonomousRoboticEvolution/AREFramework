@@ -1,20 +1,32 @@
 #!/bin/bash
 
 directory=$(dirname $(readlink -f $0))
+sim="v_rep"
 
-if [ $1 == 'generate' ]
+if [[ $directory =~ CoppeliaSim.* ]]
+then 
+	sim="sim"
+fi
+
+if [[ $1 == 'generate' ]]
 then
-	mv -f $directory/libsimExtER.so $directory/libsimExtER.old
-	mv -f $directory/libsimExtGenerate.old $directory/libsimExtGenerate.so
-	rm -f $directory/libsimExtGenerate.old
-elif [ $1 == 'simulation' ]
+	mv -f $directory/lib$sim'ExtER.so' $directory/lib$sim'ExtER.old'
+	mv -f $directory/lib$sim'ExtGenerate.old' $directory/lib$sim'ExtGenerate.so'
+	rm -f $directory/lib$sim'ExtGenerate.old'
+elif [[ $1 == 'simulation' ]]
 then
-	mv -f $directory/libsimExtGenerate.so $directory/libsimExtGenerate.old
-	mv -f $directory/libsimExtER.old $directory/libsimExtER.so
-	rm -f $directory/libsimExtER.old
+	mv -f $directory/lib$sim'ExtGenerate.so' $directory/lib$sim'ExtGenerate.old'
+	mv -f $directory/lib$sim'ExtER.old' $directory/lib$sim'ExtER.so'
+	rm -f $directory/lib$sim'ExtER.old'
 else
 	echo "Error: first argument as to be generate or simulation"
 	exit 1
 fi
 
-$directory/coppeliaSim.sh "${@#* }"
+if [ $sim == sim ]
+then
+	$directory/coppeliaSim.sh "${@#* }"
+else
+	$directory/vrep.sh "${@#* }"
+fi
+

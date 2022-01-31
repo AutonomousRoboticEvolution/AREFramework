@@ -3,8 +3,11 @@
 
 #include <chrono>
 
+#if defined (VREP)
+#include "v_repLib.h"
+#elif defined (COPPELIASIM)
 #include "simLib.h"
-
+#endif
 #include "ARE/Settings.h"
 #include "ARE/EA.h"
 #include "ARE/Logging.h"

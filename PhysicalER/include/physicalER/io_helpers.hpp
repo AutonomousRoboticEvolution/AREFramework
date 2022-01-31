@@ -8,7 +8,11 @@
 #include "ARE/Settings.h"
 #include "ARE/misc/utilities.h"
 #include "ARE/Individual.h"
-#include <simLib.h>
+#if defined (VREP)
+#include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
 
 //namesapce fs = std::filesystem //if c++17
 namespace fs = boost::filesystem;

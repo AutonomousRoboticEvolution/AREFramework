@@ -49,6 +49,8 @@ namespace are_c = are::client;
 #define CONCAT(x,y,z) x y z
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
+#define PLUGIN_NAME "ER"
+
 static LIBRARY simLib;
 
 ///save time log

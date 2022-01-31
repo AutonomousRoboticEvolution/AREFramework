@@ -9,9 +9,9 @@ void sim::readProximitySensors(const std::vector<int> handles, std::vector<doubl
             [](float x, float y, float z) -> double
     {return std::sqrt(x*x + y*y + z*z);};
 
-    float pos[4], norm[3];
-    int obj_h;
-    int det;
+    float pos[4]={0,0,0,0}, norm[3]={0,0,0};
+    int obj_h=0;
+    int det=0;
     for (size_t i = 0; i < handles.size(); i++)
     {
         det = simReadProximitySensor(handles[i],pos,&obj_h,norm);
@@ -29,9 +29,9 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
 
     int occlusion_detector;
 
-    float pos[4], norm[3];
-    int obj_h;
-    int det,occl;
+    float pos[4]={0,0,0,0}, norm[3]={0,0,0};
+    int obj_h=0;
+    int det=0,occl=0;
     std::string name;
     std::vector<std::string> splitted_name;
     bool occlusion = false;
@@ -43,7 +43,6 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
         if(det > 0){
 
             name = simGetObjectName(obj_h);
-            float ref_euler[3];
             if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
             float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
                               static_cast<float>(std::asin(pos[0]/dist)),
