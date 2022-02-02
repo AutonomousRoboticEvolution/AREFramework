@@ -24,7 +24,10 @@ class AREControl{
 public:
 
     AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
-
+    ~AREControl(){
+        for(auto &o: listOfOrgans)
+            delete o;
+    }
 
     int exec( zmq::socket_t& socket);
 
