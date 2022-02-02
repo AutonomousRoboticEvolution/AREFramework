@@ -10,6 +10,7 @@
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
 
+// put the substrate code (line 343-447) into morphneuro experiments (CPPNIndividual?) to isolate this part
 using mc = are::morph_const;
 using namespace are::sim;
 
@@ -291,7 +292,7 @@ void Morphology_CPPNMatrix::create()
                             setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
-                        int tempDummy = simCreateDummy(0.01, nullptr);
+                        int tempDummy = simCreateDummy(0.01, nullptr); 
                         float tempOri[3] = {0,0,0};
                         simSetObjectOrientation(tempDummy,organList.at(i).objectHandles[1],tempOri);
                         simGetObjectOrientation(tempDummy,-1,tempOri);
@@ -361,6 +362,7 @@ void Morphology_CPPNMatrix::create()
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+
 }
 
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)

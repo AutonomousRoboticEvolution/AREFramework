@@ -143,6 +143,67 @@ the --xvbf option is to be set at 1 if you launch your experiment through ssh. T
 Like in local mode, all the logs of your experiment are stored in a folder named after the name of your experiment (specified in the parameters file) and the date of its launch. This folder is itself in the repository folder you specified in the parameters file.
 As well, you have log files corresponding to the outputs of the client and all the simulator instances stored where you launched your experiment. This files are named client_<date> for the client output and sim_<nb-instance>_<date>.
 
+### Morphneuro Experiment Instruction
+Compilation
+```
+cmake  -DONLY_SIMULATION=1 -DLIMBO_FOLDER=/limbo-master -DVREP_FOLDER=/ ..
+make
+sudo make install
+```
+
+Experiment folder
+```
+cd ./experiments/morphneuro
+```
+Run morphneuro
+```
+./vrep.sh -g/path to parameter csv/parameters.csv
+```
+Run Cluster on server
+```
+nohup python3 /path to cluster/Cluster/run_cluster.py #cores --params /path to parameter csv/parameters.csv --client /path to build/build/simulation/ERClient/are-client --vrep /path to vrep/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/vrep.sh --port-start #portD &
+```
+
+Code instruction:
+
+Working procedure:
+
+1. Initiate population
+
+2. Epoch (evaluation, selection, mutation)
+
+3. Form new population
+
+repeat step 2-3 until evolution finish
+
+parameters.csv explanation
+
+* scenePath: load scene
+
+* isMultiTarget: Multi-target locations
+
+* isMulti: whether to generate multiple controllers for each morphology
+
+* isMultiRandom, use random generation
+
+* isMultiMutate, use mutation
+
+* eval_num, number of controllers
+
+* isDuaLoop, whether to use dual loop
+
+* issingleloop, whether to use sigle loop
+
+* inner_loop_num, learning generation
+
+* islamarkian, Darwin or Lamarck
+
+* isRNN, whether RNN
+
+* isNovelty, whether to use novelty
+
+* substrate_hidden_num, substrate settings
+
 ### Selecting the appropriate plug-in (If ONLY_SIMULATION = 0 and If ONLY_PHYSICAL = 0)
 
 ```

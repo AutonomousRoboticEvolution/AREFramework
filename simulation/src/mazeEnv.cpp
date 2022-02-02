@@ -55,8 +55,8 @@ void MazeEnv::init(){
 
         simSetObjectName(beacon_handle,"IRBeacon_0");
         const float tPos[3] = {static_cast<float>(target_position[0]),
-                         static_cast<float>(target_position[1]),
-                         static_cast<float>(target_position[2])};
+                               static_cast<float>(target_position[1]),
+                               static_cast<float>(target_position[2])};
 
         if(simSetObjectPosition(beacon_handle,-1,tPos) < 0){
             std::cerr << "Set object position failed" << std::endl;
@@ -113,8 +113,8 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
         return 1;
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-1 ||
-            fabs(final_position[1] - wp.position[1]) > 1e-1 ||
-            fabs(final_position[2] - wp.position[2]) > 1e-1)
+       fabs(final_position[1] - wp.position[1]) > 1e-1 ||
+       fabs(final_position[2] - wp.position[2]) > 1e-1)
         move_counter++;
 
     final_position[0] = static_cast<double>(wp.position[0]);

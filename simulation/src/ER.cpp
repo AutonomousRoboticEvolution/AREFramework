@@ -157,6 +157,7 @@ void ER::endOfSimulation()
                     std::cout << fitness << std::endl;
             }
             ea->setObjectives(currentIndIndex,objectives);
+            std::cout << environment << std::endl;
             if(ea->update(environment)){
                 currentIndIndex++;
                 nbrEval = 0;
