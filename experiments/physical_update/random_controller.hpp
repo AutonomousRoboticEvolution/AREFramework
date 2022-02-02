@@ -27,9 +27,9 @@ public:
     virtual const Genome::Ptr get_next_controller_genome(int id);
 
 private:
-    const NNParamGenome::Ptr &make_random_ctrl(int wheels, int joints, int sensors);
-    std::vector<std::string> ids;
-    std::vector<std::vector<waypoint>> trajectories;
+    void make_random_ctrl(int wheels, int joints, int sensors,const NNParamGenome::Ptr &);
+    int current_id;
+    std::vector<waypoint> trajectory;
 };
 
 }//are

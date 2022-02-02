@@ -4,23 +4,26 @@ using namespace are;
 namespace fs = boost::filesystem;
 
 bool RandomController::update(const Environment::Ptr &env){
-    trajectories.push_back(env->get_trajectory());
+    trajectory = env->get_trajectory();
 }
 
 const Genome::Ptr RandomController::get_next_controller_genome(int id){
-    std::string waiting_to_be_evaluated_folder = settings::getParameter<settings::String>(parameters,"#experimentName").value + "/waiting_to_be_evaluated/";
+    std::string experiment_folder = settings::getParameter<settings::String>(parameters,"#repository").value + "/" +
+            settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    std::string waiting_to_be_evaluated_folder = experiment_folder + "/waiting_to_be_evaluated/";
     std::stringstream genome_file;
     genome_file << waiting_to_be_evaluated_folder << "ctrl_genome_" << id;
     if(fs::exists(genome_file.str())){
         NNParamGenome::Ptr gen(new NNParamGenome);
-        phy::load_controller_genome(waiting_to_be_evaluated_folder,id,gen);
+        phy::load_controller_genome(experiment_folder,id,gen);
         return gen;
     }else{ //generate a random controller
-        std::cout<<"Robot of id " << id <<  "does not have an associated controller genome, so a random one is being created"<<std::endl;
+        std::cout<<"Robot of id " << id <<  " does not have an associated controller genome, so a random one is being created"<<std::endl;
 
         int wheel=0, joint=0, sensor=0;
-        phy::load_nbr_organs(waiting_to_be_evaluated_folder,id,wheel,joint,sensor);
-        NNParamGenome::Ptr ctrl_gen = make_random_ctrl(wheel,joint,sensor);
+        phy::load_nbr_organs(experiment_folder,id,wheel,joint,sensor);
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        make_random_ctrl(wheel,joint,sensor,ctrl_gen);
         return ctrl_gen;
     }
 }
@@ -31,25 +34,24 @@ void RandomController::load_data_for_update(){
 }
 
 void RandomController::write_data_for_update(){
-    for(int i=0; i < trajectories.size(); i++){
-        std::stringstream filepath;
-        filepath << "/traj_" << ids[i];
+    std::stringstream filepath;
+    filepath << "/traj_" << current_id;
 
-        std::ofstream logFileStream(Logging::log_folder + std::string("/")  + filepath.str(), std::ios::out | std::ios::ate | std::ios::app);
+    std::ofstream logFileStream(Logging::log_folder + std::string("/")  + filepath.str(), std::ios::out | std::ios::ate | std::ios::app);
 
-        if(!logFileStream)
-        {
-            std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filepath.str() << std::endl;
-            return;
-        }
-
-        for(const are::waypoint& wp: trajectories[i])
-            logFileStream << wp.to_string() << std::endl;
-        logFileStream.close();
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filepath.str() << std::endl;
+        return;
     }
+
+    for(const are::waypoint& wp: trajectory)
+        logFileStream << wp.to_string() << std::endl;
+    logFileStream.close();
+
 }
 
-const NNParamGenome::Ptr &RandomController::make_random_ctrl(int wheels, int joints, int sensors){
+void RandomController::make_random_ctrl(int wheels, int joints, int sensors, const NNParamGenome::Ptr &ctrl_gen){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
@@ -67,7 +69,7 @@ const NNParamGenome::Ptr &RandomController::make_random_ctrl(int wheels, int joi
         NN2Control<phy::fcp_t>::nbr_parameters(nbr_inputs,nb_hidden,nbr_outputs,nbr_weights,nbr_bias);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
-        return nullptr;
+        return;
     }
 
     std::vector<double> weights(nbr_weights);
@@ -75,16 +77,12 @@ const NNParamGenome::Ptr &RandomController::make_random_ctrl(int wheels, int joi
     weights = randomNum->randVectd(-max_weight,max_weight,nbr_weights);
     biases  = randomNum->randVectd(-max_weight,max_weight,nbr_bias);
 
-
-    NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
     ctrl_gen->set_weights(weights);
     ctrl_gen->set_biases(biases);
     ctrl_gen->set_nn_type(nn_type);
     ctrl_gen->set_nbr_input(nbr_inputs);
     ctrl_gen->set_nbr_hidden(nb_hidden);
     ctrl_gen->set_nbr_output(nbr_outputs);
-
-    return ctrl_gen;
 }
 
 
