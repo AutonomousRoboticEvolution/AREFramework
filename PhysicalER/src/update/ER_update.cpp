@@ -29,7 +29,7 @@ void ER::initialize(){
     std::vector<std::string> split_str;
     misc::split_line(exp_plugin_name,".",split_str);
 
-    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + "_update.so");
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + ".so");
 
     if(!load_fct_exp_plugin<Environment::Factory>
             (environmentFactory,libhandler,"environmentFactory"))
@@ -135,6 +135,7 @@ void ER::start_evaluation(){
     assert(reply == "organ_addresses_received");
 
     std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
+    std::cout << ctrl_gen << std::endl;
     send_string(reply,ctrl_gen,request);
     assert(reply == "starting");
 }

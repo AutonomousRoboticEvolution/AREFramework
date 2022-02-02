@@ -28,7 +28,7 @@ void ER::initialize(){
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
     std::vector<std::string> split_str;
     misc::split_line(exp_plugin_name,".",split_str);
-    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + "_generate.so");
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + ".so");
 
 
     environment = std::make_shared<are::DummyEnv>(are::DummyEnv());
