@@ -32,27 +32,10 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::
                 cppn.Activate();
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-                areVoxel.wheel = morph_const::empty_voxel;
-                areVoxel.sensor = morph_const::empty_voxel;
-                areVoxel.joint = morph_const::empty_voxel;
-                areVoxel.caster = morph_const::empty_voxel;
 
                 if(cppn.Output()[1] > 0) {
                     areVoxel.bone = morph_const::filled_voxel;
                 }
-                if(cppn.Output()[2] > 0){
-                    areVoxel.wheel = morph_const::filled_voxel;
-                }
-                if(cppn.Output()[3] > 0) {
-                    areVoxel.sensor = morph_const::filled_voxel;
-                }
-                if(cppn.Output()[4] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.caster = morph_const::filled_voxel;
-                }
-                if(cppn.Output()[5] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.joint = morph_const::filled_voxel;
-                }
-
                 areMatrix.setVoxel(x, y, z, areVoxel);
             }
         }
@@ -79,27 +62,10 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                 outputs = cppn.outf();
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-                areVoxel.wheel = morph_const::empty_voxel;
-                areVoxel.sensor = morph_const::empty_voxel;
-                areVoxel.joint = morph_const::empty_voxel;
-                areVoxel.caster = morph_const::empty_voxel;
 
                 if(outputs[1] > 0) {
                     areVoxel.bone = morph_const::filled_voxel;
                 }
-                if(outputs[2] > 0){
-                    areVoxel.wheel = morph_const::filled_voxel;
-                }
-                if(outputs[3] > 0) {
-                    areVoxel.sensor = morph_const::filled_voxel;
-                }
-                if(outputs[4] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.caster = morph_const::filled_voxel;
-                }
-                if(outputs[5] > 0) { /// \todo EB WARNING! Verify the order
-                    areVoxel.joint = morph_const::filled_voxel;
-                }
-
                 areMatrix.setVoxel(x, y, z, areVoxel);
             }
         }
@@ -269,10 +235,7 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
             if (!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == morph_const::filled_voxel) {
                 exploreSkeleton(skeletonMatrix, visitedVoxels, posX, posY, posZ + dz, surfaceCounter, skeletonSurfaceCoord);
             }
-            else if(!visitedVoxels.getVoxel(posX, posY, posZ + dz) && voxel == morph_const::empty_voxel) {
-                std::vector<int> newCoord{posX, posY, posZ, 0, 0, dz};
-                skeletonSurfaceCoord[surfaceCounter-1].push_back(newCoord);
-            }
+            /// EB: Organ pointing upwards or downwards (z-axis) are not allowed by the RoboFab.
         }
     }
     for (int dy = -1; dy <= 1; dy+=1) {

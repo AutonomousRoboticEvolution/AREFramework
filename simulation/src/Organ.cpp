@@ -13,7 +13,6 @@
 /// \todo EB: Do i need this?
 using namespace are::sim;
 //namespace cop = coppelia;
-using mc = are::morph_const;
 
 
 
@@ -48,13 +47,13 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     }
 }
 
-void Organ::isOrganGoodOrientation()
-{
-    float diffPosZ;
-    diffPosZ = connectorPos[2] - organPos[2];
-    /// \todo EB: remove this hard-coded value
-    organGoodOrientation = (diffPosZ > -0.015) && (diffPosZ < 0.015); // Is organ pointing downwards?
-}
+//void Organ::isOrganGoodOrientation()
+//{
+//    float diffPosZ;
+//    diffPosZ = connectorPos[2] - organPos[2];
+//    /// \todo EB: remove this hard-coded value
+//    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
+//}
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
 {
@@ -116,20 +115,20 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
 void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // Transform organPos from m to voxels
-    int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));
-    int yPos = static_cast<int>(std::round(organPos[1]/mc::voxel_real_size));
-    int zPos = static_cast<int>(std::round(organPos[2]/mc::voxel_real_size));
-    zPos -= mc::matrix_size/2.;
+    int xPos = static_cast<int>(std::round(organPos[0]/VOXEL_REAL_SIZE));
+    int yPos = static_cast<int>(std::round(organPos[1]/VOXEL_REAL_SIZE));
+    int zPos = static_cast<int>(std::round(organPos[2]/VOXEL_REAL_SIZE));
+    zPos -= MATRIX_HALF_SIZE;
     uint8_t voxelValue;
     voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
-    if(voxelValue == mc::filled_voxel) {// Organ centre point inside of skeleton
+    if(voxelValue == FILLEDVOXEL) {// Organ centre point inside of skeleton
         organInsideSkeleton = true;
         return;
     }
-    else if(voxelValue == mc::empty_voxel) {
+    else if(voxelValue == EMPTYVOXEL) {
         /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
-        if(xPos <= mc::xHeadUpperLimit && xPos >= mc::xHeadLowerLimit &&
-           yPos <= mc::yHeadUpperLimit && yPos >= mc::yHeadLowerLimit) {
+        if(xPos <= xHeadUpperLimit && xPos >= xHeadLowerLimit &&
+           yPos <= yHeadUpperLimit && yPos >= xHeadLowerLimit) {
             organInsideSkeleton = true;
             return;
         }
@@ -145,14 +144,13 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
-    isOrganGoodOrientation();
     isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
 void Organ::repressOrgan()
 {
-    if(organInsideSkeleton || organColliding || !organGoodOrientation || !organGripperAccess){
+    if(organInsideSkeleton || organColliding || !organGripperAccess){
         simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(graphicConnectorHandle);

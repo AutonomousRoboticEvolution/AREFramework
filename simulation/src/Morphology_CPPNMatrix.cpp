@@ -10,8 +10,6 @@
 #define ISCLUSTER 0
 #define ISROBOTSTATIC 0
 
-// put the substrate code (line 343-447) into morphneuro experiments (CPPNIndividual?) to isolate this part
-using mc = are::morph_const;
 using namespace are::sim;
 
 void Morphology_CPPNMatrix::create()
@@ -30,6 +28,7 @@ void Morphology_CPPNMatrix::create()
     GenomeDecoder genomeDecoder;
     if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
     else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
     auto decodedMesh = PolyVox::decodeMesh(mesh);
@@ -39,7 +38,6 @@ void Morphology_CPPNMatrix::create()
     bool indVerResult = false;
     indVerResult = getIndicesVertices(decodedMesh);
     bool convexDecompositionSuccess = false;
-
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
@@ -69,7 +67,7 @@ void Morphology_CPPNMatrix::create()
             // EB: V-HACD is not a good idea. It crashes randomly. This is an issue with the library itself.
             // http://forum.coppeliarobotics.com/viewtopic.php?f=5&t=8024
             // Convex decomposition parameters
-            // EB: Warning, the more triangles are used the more accurate would be the final representation. However,
+            // EB: Warning, the more triangles are used the more accurate would me the final representation. However,
             // This make the decomposition process slower and more important the likelihood of the decomposition to
             // crash higher. To prevent this I decided to decrease the maximum concavity as mush as possible.
             // EB: IMPORTANT! for the pre-morphogensis stage keep the number of triangles low (100) and high concavity (100).
@@ -287,12 +285,11 @@ void Morphology_CPPNMatrix::create()
                         std::vector<float> tempOriVector(3);
                         generateOrientations(organCoord[j][0], organCoord[j][1], organCoord[j][2], tempOriVector);
                         Organ organ(organTypeList.at(j), tempPosVector, tempOriVector, parameters);
-
                         if(organ.getOrganType() !=0)
                             setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
-                        int tempDummy = simCreateDummy(0.01, nullptr); 
+                        int tempDummy = simCreateDummy(0.01, nullptr);
                         float tempOri[3] = {0,0,0};
                         simSetObjectOrientation(tempDummy,organList.at(i).objectHandles[1],tempOri);
                         simGetObjectOrientation(tempDummy,-1,tempOri);
@@ -311,7 +308,6 @@ void Morphology_CPPNMatrix::create()
                         else if(organ.getOrganType() == 4)
                             organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
 
-                        organ.organGoodOrientation = true; // Ignore orientation as these organs always have good orientations.
                         organ.repressOrgan();
                         organList.push_back(organ);
                     }
@@ -325,44 +321,19 @@ void Morphology_CPPNMatrix::create()
         exportRobotModel(loadInd);
     }
     // Get info from body plan for body plan descriptors or logging.
-    if(indVerResult && convexDecompositionSuccess){
-        for(auto & i : organList) {
-            if(!i.isOrganChecked()) // Stop when the organs not checked or generated start.
-                break;
-            int voxelPosX = static_cast<int>(std::round(i.connectorPos[0]/mc::voxel_real_size));
-            int voxelPosY = static_cast<int>(std::round(i.connectorPos[1]/mc::voxel_real_size));
-            int voxelPosZ = static_cast<int>(std::round(i.connectorPos[2]/mc::voxel_real_size));
-            int matPosX, matPosY, matPosZ;
-            matPosX = voxelPosX + mc::matrix_size/2;
-            matPosY = voxelPosY + mc::matrix_size/2;
-            matPosZ = voxelPosZ + mc::matrix_size/2;
-
-            if(matPosX > mc::matrix_size)
-                matPosX = mc::matrix_size-1;
-            if(matPosX < 0)
-                matPosX = 0;
-            if(matPosY > mc::matrix_size)
-                matPosY = mc::matrix_size-1;
-            if(matPosY < 0)
-                matPosY = 0;
-            if(matPosZ > mc::matrix_size)
-                matPosZ = mc::matrix_size-1;
-            if(matPosZ < 0)
-                matPosZ = 0;
-
-        }
+    if(indVerResult || convexDecompositionSuccess){
         indDesc.getRobotDimensions(organList);
         indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
         indDesc.countOrgans(organList);
+        indDesc.getOrganPositions(organList);
     }
     destroyGripper();
     blueprint.createBlueprint(organList);
-    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
+    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
-
 }
 
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
@@ -493,7 +464,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output = nn2_cppn.outf();
     }
     float rot;
-    rot = output.at(0)*0.174533; // 10 degrees limit
+    rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
 }
 
@@ -521,7 +492,22 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
             }
             // Is there an organ?
             organType = -1;
-            int maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
+            int maxIndex = -1;
+            bool isSingleOutput = settings::getParameter<settings::Boolean>(parameters,"#isSingleOutput").value;
+            if(isSingleOutput){
+                if(-1.0 < output.at(2) && output.at(2) < -0.5)
+                    maxIndex = 2;
+                if(-0.5 < output.at(2) && output.at(2) < 0.0)
+                    maxIndex = 3;
+                if(0.0 < output.at(2) && output.at(2) < 0.5)
+                    maxIndex = 4;
+                if(0.5 < output.at(2) && output.at(2) < 1.0)
+                    maxIndex = 5;
+            }
+            else{
+                maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
+            }
+
             if(maxIndex == 2){ // Wheel
                 // These if statements should be always true but they are here for debugging.
                 if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
@@ -581,9 +567,6 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
         if(i.getOrganType() != 0){
             if (i.organColliding || i.organInsideSkeleton)
                 robotManRes.noCollisions = false;
-            if (!i.organGoodOrientation)
-                robotManRes.noBadOrientations = false;
-            // is gripper colliding?
             if (!i.organGripperAccess)
                 robotManRes.isGripperAccess = false;
         }
