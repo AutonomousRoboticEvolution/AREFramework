@@ -16,7 +16,6 @@ using namespace are::sim;
 using mc = are::morph_const;
 
 
-
 void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
 {
     int8_t collisionResult;
@@ -48,13 +47,13 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     }
 }
 
-void Organ::isOrganGoodOrientation()
-{
-    float diffPosZ;
-    diffPosZ = connectorPos[2] - organPos[2];
-    /// \todo EB: remove this hard-coded value
-    organGoodOrientation = (diffPosZ > -0.015) && (diffPosZ < 0.015); // Is organ pointing downwards?
-}
+//void Organ::isOrganGoodOrientation()
+//{
+//    float diffPosZ;
+//    diffPosZ = connectorPos[2] - organPos[2];
+//    /// \todo EB: remove this hard-coded value
+//    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
+//}
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
 {
@@ -145,14 +144,13 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
-    isOrganGoodOrientation();
     isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
 void Organ::repressOrgan()
 {
-    if(organInsideSkeleton || organColliding || !organGoodOrientation || !organGripperAccess){
+    if(organInsideSkeleton || organColliding || !organGripperAccess){
         simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(graphicConnectorHandle);
@@ -170,7 +168,7 @@ void Organ::createOrgan(int skeletonHandle)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
     int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
 
-    if(version != 2 && version != 3){
+    if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
         std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
         version = 3;
     }
@@ -178,7 +176,7 @@ void Organ::createOrgan(int skeletonHandle)
     vers << version;
 
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV3.ttm";
+        modelsPath += "C_HeadV4.ttm";
     else if(organType == 1) // Wheels
         modelsPath += "C_WheelV" + vers.str() + ".ttm";
     else if(organType == 2) // Sensors

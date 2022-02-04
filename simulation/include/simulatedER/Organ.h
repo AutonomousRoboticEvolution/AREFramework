@@ -44,7 +44,6 @@ public:
     /// \todo EB: This can be easily moved to private if RobotManRes is deleted.
     bool organInsideSkeleton;
     bool organColliding;
-    bool organGoodOrientation;
     bool organGripperAccess;
 
     Organ(int oT, std::vector<float> oP, std::vector<float> oO, const are::settings::ParametersMapPtr &param){
@@ -53,7 +52,7 @@ public:
         organPos = oP;
         organOri = oO;
         connectorPos.clear();  connectorOri.clear();
-        organInsideSkeleton = false; organColliding = false; organGoodOrientation = true;
+        organInsideSkeleton = false; organColliding = false;
         organGripperAccess = true; organRemoved = false; organChecked = false;
         objectHandles.clear();
         parameters = param;
@@ -82,10 +81,6 @@ public:
      * @param organList - All organs to compare to.
      */
     void IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
-    /**
-     * @brief This test check if the organ has a good orientation
-     */
-    void isOrganGoodOrientation();
     /**
      * @brief This test checks if the gripper connecting the organ is colliding with anything.
      * @param gripperHandle - Handle of the gripper

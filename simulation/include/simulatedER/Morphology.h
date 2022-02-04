@@ -32,7 +32,7 @@ public:
         wheelHandles(morph.wheelHandles),
         proxHandles(morph.proxHandles),
         IRHandles(morph.IRHandles),
-        cameraHandle(morph.cameraHandle)
+        camera_handle(morph.camera_handle)
     {}
     virtual ~Morphology()
     {
@@ -78,7 +78,7 @@ protected:
     std::vector<int> proxHandles;
     std::vector<int> IRHandles;
     std::vector<int> wheelHandles;
-    int cameraHandle;
+    int camera_handle;
 
     int client_id;
 
