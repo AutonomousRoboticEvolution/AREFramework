@@ -60,9 +60,9 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
 void image_proc::pixel_to_world_frame(const cv::KeyPoint &point, std::vector<double> &position, const are::settings::ParametersMapPtr& parameters){
     int reference_pt_x =  are::settings::getParameter<are::settings::Integer>(parameters,"#referencePtX").value;
     int reference_pt_y =  are::settings::getParameter<are::settings::Integer>(parameters,"#referencePtY").value;
-    int pixel_image_scale = are::settings::getParameter<are::settings::Integer>(parameters,"#pixelImageScale").value;
+    int scale = are::settings::getParameter<are::settings::Integer>(parameters,"#pixelImageScale").value;
 
-    int scale = pixel_image_scale/2.;
+//    int scale = pixel_image_scale/2.;
 
     position.resize(2);
     position[0] = (point.pt.x - reference_pt_x)/scale;
