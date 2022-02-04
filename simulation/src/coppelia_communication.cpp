@@ -124,18 +124,6 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
         }
 
         if(det > 0){
-                name = simGetObjectName(obj_h);
-                float ref_euler[3];
-                if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
-                float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
-                                static_cast<float>(std::asin(pos[0]/dist)),
-                                0};
-                simSetObjectOrientation(occlusion_detector,handle,euler);
-                occl = simReadProximitySensor(occlusion_detector,pos,&obj_h,norm);
-                if(occl > 0){
-                    occlusion = norm_L2(pos[0],pos[1],pos[2]) < dist;
-                }else occlusion = false;
-
             name = simGetObjectName(obj_h);
             if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
             float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
