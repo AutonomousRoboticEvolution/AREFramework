@@ -64,9 +64,9 @@ public:
         arch & objectives;
         arch & ctrlGenome;
         arch & final_position;
-        arch & energy_cost;
+      //  arch & energy_cost;
         arch & trajectory;
-        arch & sim_time;
+      //  arch & sim_time;
     }
 
     //GETTERS & SETTERS
