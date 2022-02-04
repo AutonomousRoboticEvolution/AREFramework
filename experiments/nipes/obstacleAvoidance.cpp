@@ -39,8 +39,8 @@ void ObstacleAvoidance::init(){
     grid_zone = Eigen::MatrixXi::Zero(8,8);
     number_of_collisions = 0;
 
-    std::vector<int> th;
-    build_tiled_floor(th);
+  //  std::vector<int> th(0,64);
+  //  build_tiled_floor(th);
 
 
 }

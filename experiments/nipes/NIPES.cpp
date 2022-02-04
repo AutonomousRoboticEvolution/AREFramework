@@ -85,7 +85,6 @@ void NIPES::init(){
     std::vector<double> biases(nbr_bias);
 
     for(int u = 0; u < pop_size; u++){
-
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)

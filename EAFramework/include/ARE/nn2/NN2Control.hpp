@@ -46,6 +46,7 @@ public:
 
     std::vector<double> update(const std::vector<double> &sensorValues){
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
+        float evalTime = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
         boost::mt19937 rng(randomNum->getSeed());
         std::vector<double> inputs = sensorValues;
         if(noiselvl > 0.0){
@@ -54,7 +55,7 @@ public:
                 sv = normal(rng);
             }
         }
-        nn.step(inputs);
+        nn.step(inputs,evalTime);
         std::vector<double> output = nn.outf();
 
         if(noiselvl > 0.0){
