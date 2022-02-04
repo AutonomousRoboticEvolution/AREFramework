@@ -113,7 +113,7 @@ public:
 
     Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
     Eigen::VectorXd getOrganPosDesc() const {return indDesc.organDesc.getCartDesc();}
-    const CartDesc& getCastDesc() const {return indDesc.cartDesc;}
+    const CartDesc& getCartDesc() const {return indDesc.cartDesc;}
     int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
     int get_sensorNumber() const {return indDesc.cartDesc.sensorNumber;}

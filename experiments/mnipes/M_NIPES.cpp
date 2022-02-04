@@ -46,9 +46,9 @@ void M_NIPESIndividual::createMorphology(){
 
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
 
-    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCastDesc().jointNumber == 0
-            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCastDesc().wheelNumber == 0;
-    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCastDesc().sensorNumber == 0;
+    no_actuation = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().jointNumber == 0
+            && std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().wheelNumber == 0;
+    no_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getCartDesc().sensorNumber == 0;
 
     float pos[3];
     simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
