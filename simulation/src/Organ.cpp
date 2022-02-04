@@ -13,7 +13,7 @@
 /// \todo EB: Do i need this?
 using namespace are::sim;
 //namespace cop = coppelia;
-
+using mc = are::morph_const;
 
 
 void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
@@ -115,20 +115,20 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
 void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // Transform organPos from m to voxels
-    int xPos = static_cast<int>(std::round(organPos[0]/VOXEL_REAL_SIZE));
-    int yPos = static_cast<int>(std::round(organPos[1]/VOXEL_REAL_SIZE));
-    int zPos = static_cast<int>(std::round(organPos[2]/VOXEL_REAL_SIZE));
-    zPos -= MATRIX_HALF_SIZE;
+    int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));
+    int yPos = static_cast<int>(std::round(organPos[1]/mc::voxel_real_size));
+    int zPos = static_cast<int>(std::round(organPos[2]/mc::voxel_real_size));
+    zPos -= mc::matrix_size/2.;
     uint8_t voxelValue;
     voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
-    if(voxelValue == FILLEDVOXEL) {// Organ centre point inside of skeleton
+    if(voxelValue == mc::filled_voxel) {// Organ centre point inside of skeleton
         organInsideSkeleton = true;
         return;
     }
-    else if(voxelValue == EMPTYVOXEL) {
+    else if(voxelValue == mc::empty_voxel) {
         /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
-        if(xPos <= xHeadUpperLimit && xPos >= xHeadLowerLimit &&
-           yPos <= yHeadUpperLimit && yPos >= xHeadLowerLimit) {
+        if(xPos <= mc::xHeadUpperLimit && xPos >= mc::xHeadLowerLimit &&
+           yPos <= mc::yHeadUpperLimit && yPos >= mc::yHeadLowerLimit) {
             organInsideSkeleton = true;
             return;
         }
@@ -168,7 +168,7 @@ void Organ::createOrgan(int skeletonHandle)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
     int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
 
-    if(version != 2 && version != 3){
+    if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
         std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
         version = 3;
     }
@@ -176,7 +176,7 @@ void Organ::createOrgan(int skeletonHandle)
     vers << version;
 
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV3.ttm";
+        modelsPath += "C_HeadV4.ttm";
     else if(organType == 1) // Wheels
         modelsPath += "C_WheelV" + vers.str() + ".ttm";
     else if(organType == 2) // Sensors

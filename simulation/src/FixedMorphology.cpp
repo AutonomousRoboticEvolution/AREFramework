@@ -49,7 +49,7 @@ NEAT::Substrate subtrates::epuck([]() -> NEAT::Substrate {
 
 void FixedMorphology::create()
 {
-    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles);
+    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose){
         std::cout << "Number of Proximity Sensors : " << proxHandles.size() << std::endl;

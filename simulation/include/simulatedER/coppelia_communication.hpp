@@ -35,6 +35,13 @@ void readProximitySensors(const std::vector<int> handles, std::vector<double> &s
  */
 void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues, bool use_simulate_data=true);
 
+/**
+ * @brief read the values of the proximity sensors corresponding to the distance to the nearest object detected
+ * @param Handles of the passive IR sensors
+ * @param (Output) sensor values
+ */
+void readCamera(const int camera_handle, std::vector<double> &sensorValues);
+
 
 /**
  * @brief Retrieve the handles of all of the organs of the robot under the main handle
@@ -45,7 +52,7 @@ void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &se
  * @param (Output) list of the handles of the joints
  */
 void retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, std::vector<int> &IRHandles,
-                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles);
+                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles, int &camera_handle);
 
 
 /**
