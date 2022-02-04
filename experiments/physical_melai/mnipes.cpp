@@ -211,6 +211,11 @@ void MNIPES::init_learner(int id){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
+
+
+    //TODO: load saved learners
+
 
     int wheels, joints, sensors;
     phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
@@ -231,12 +236,22 @@ void MNIPES::init_learner(int id){
     CMAESLearner learner(nbr_weights,nbr_bias,nn_inputs,nn_outputs);
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
-    if(use_ctrl_arch){
-        auto& ctrl_gen = ctrl_archive.archive[wheels][joints][sensors];
-        if(ctrl_gen.first->get_weights().empty() && ctrl_gen.first->get_biases().empty())
+
+    if(!load_existing_ctrls || use_ctrl_arch)
+        learner.init();
+    else{
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        if(load_existing_ctrls)// load existing controllers
+            phy::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
+        else if(use_ctrl_arch)// load from controller archive
+            ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
+        else learner.init();
+
+        if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
             learner.init();
-        else learner.init(ctrl_gen.first->get_full_genome());
-    } else learner.init();
+        else learner.init(ctrl_gen->get_full_genome());
+    }
+
     learners.emplace(id,learner);
 }
 
@@ -285,11 +300,7 @@ void MNIPES::load_data_for_update() {
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
-//TO REMOVE    //load ids to be evaluated
-//    std::vector<int> list_ids;
-//    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
 
-    //TODO: load saved learners
 
     //load controller archive
     if(use_ctrl_arch){
