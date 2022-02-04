@@ -2,7 +2,6 @@
 #include "mnipes.hpp"
 #include "ARE/Logging.h"
 
-#ifdef UPDATE
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
@@ -10,7 +9,6 @@ extern "C" are::Environment::Ptr environmentFactory
     env->set_parameters(param);
     return env;
 }
-#endif
 
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
