@@ -16,17 +16,20 @@ void phy::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap 
     std::vector<std::string> split_str;
     int id = 0;
     MorphGenomeInfo mgi;
+    bool first = true;
     while(std::getline(ifs,line)){
         misc::split_line(line,",",split_str);
 
         if(split_str.empty())
             continue;
         if(split_str.size() == 1){
-
+            if(!first){
+                morph_gen_info.emplace(id,mgi);
+                mgi.clear();
+            }else first = false;
             misc::split_line(line,"_",split_str);
             id = std::stoi(split_str.back());
-            morph_gen_info.emplace(id,mgi);
-            mgi.clear();
+
             continue;
         }
         if(split_str.size() != 3)
@@ -35,6 +38,7 @@ void phy::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap 
         val->fromString(split_str[2]);
         mgi.emplace(split_str[0],val);
     }
+    morph_gen_info.emplace(id,mgi);
 }
 
 void phy::load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &robot_ids){
