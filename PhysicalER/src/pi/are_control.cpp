@@ -10,7 +10,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 
     // initilise the camera
     // If this is true, the camera input (binary on/off) will be used the first input to the neural network controller:
-    cameraInputToNN =  settings::getParameter<settings::Bool>(parameters,"#useArucoAsInput").value;
+    cameraInputToNN =  settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
     // This is the parameter which determines which of the arcuo tags trigger the camera:
     camera.setTagsToLookFor( settings::getParameter<settings::Sequence<int>>(parameters,"#arucoTagsToDetect").value );
 
