@@ -1,5 +1,23 @@
 #include "image_processing/blob_tracking.hpp"
 
+void image_proc::aruco_detection(const cv::Mat& image){
+
+    // make empty variables to fill
+    std::vector<int> markerIds; // the list of aruco tags in the image
+    std::vector<std::vector<cv::Point2f>> markerCorners , rejectedCandidates; // details of where in the image the tags are
+
+    cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+    cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_50);
+
+    // do the aruco detection
+    cv::aruco::detectMarkers(image, dictionary, markerCorners, markerIds, parameters, rejectedCandidates);
+
+    // draw the image with markers on
+    cv::Mat outputImage = image.clone();
+    cv::aruco::drawDetectedMarkers(outputImage, markerCorners, markerIds);
+    cv::imshow("out", outputImage);
+}
+
 void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt){
 
 //    cv::Rect rect(240,70,346,346);
