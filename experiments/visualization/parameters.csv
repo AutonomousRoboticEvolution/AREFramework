@@ -1,13 +1,13 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#folderToLoad,string,/home/leni/are-logs/mnipes_arena_multi_tcds/wa/mnipes_13_6_8-57-50-458-1831229511/
-#genToLoad,int,14
-#indToLoad,int,-1
+#scenePath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
+#folderToLoad,string,/home/robofab/Downloads/robotsMatt/robot0/
+#genToLoad,int,10
+#indToLoad,int,0
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
 #populationSize,int,25
-#repository,string,/home/leni/are-logs
+#repository,string,/home/robofab/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -31,14 +31,14 @@
 #WeightReplacementMaxPower,float,1.0
 #MaxWeight,float,10.0
 #NNType,int,2
-#NbrHiddenNeurones,int,8
+#NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
 #genType,int,2
 #withBeacon,bool,1
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,0
+#emptyCtrlGenome,bool,1
 #loadAllMorphGenome,bool,0
 #isNEATGenome,bool,1
 
@@ -47,11 +47,12 @@
 #isJoint,bool,1
 #isCaster,bool,1
 #isExportModel,bool,0
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#organsPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/
 #isSegmentedRobot,bool,1
+#organsVersion,int,6
 
 #reloadController,bool,1
-#isScreenshotEnable,bool,1
+#isScreenshotEnable,bool,0
 #imageRepository,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/images/
 #nbrWaypoints,int,2
 

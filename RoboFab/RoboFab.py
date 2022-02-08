@@ -183,8 +183,13 @@ class RoboFab_host:
         print("{}/waiting_to_be_evaluated".format ( self.logDirectory ))
         print("{}/blueprint_archive".format(self.logDirectory))
         os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
-        shutil.move ( "robot_build_file.txt","{}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
+        # move the list_of_organs_addresses to the right folder:
+        shutil.move ( "robot_build_file.txt","{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) )
         print("Saved list of organs as: {}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
+        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
+        shutil.move ( "{}/waiting_to_be_built/morph_genome_{}","{}/waiting_to_be_evaluated/morph_genome_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
+        shutil.move ( "{}/waiting_to_be_built/blueprint_{}","{}/logs/blueprint_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
+        shutil.move("{}/waiting_to_be_built/mesh_{}", "{}/logs/mesh_{}".format(self.logDirectory, self.robotID, self.logDirectory, self.robotID))
 
         ## move the blueprint to the archive folder
         # os.makedirs("{}/blueprint_archive".format(self.logDirectory), exist_ok=True) # create the folder if it doesn't already exists

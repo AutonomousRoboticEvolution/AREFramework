@@ -5,9 +5,7 @@ using namespace are;
 RealEnvironment::RealEnvironment(): Environment(){
     current_position.resize(2);
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_y",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
+    settings::defaults::parameters->emplace("#target",new settings::Sequence<double>({0.,0.,0.12}));
 }
 
 void RealEnvironment::init(){
@@ -20,13 +18,14 @@ void RealEnvironment::init(){
      if(verbose) std::cout<<"usingIPCamera: "<<usingIPCamera<<std::endl;
      video_capture = cv::VideoCapture(pipe);
 
+     grid_zone = Eigen::MatrixXi::Zero(8,8);
 
      colour_range.first = cv::Scalar(40,100,170);
      colour_range.second = cv::Scalar(179,255,255);
 
 
-     target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-                        settings::getParameter<settings::Double>(parameters,"#target_y").value};
+     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
+
 }
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
@@ -37,7 +36,7 @@ std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind)
     else if(env_type == 1)
         return fit_exploration();
 
-    std::cerr << "Unknown type of environment type :" << env_type << std::endl;
+    std::cerr << "Unknown type of environment type : " << env_type << std::endl;
     return {0};
 
 }

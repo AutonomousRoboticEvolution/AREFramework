@@ -237,7 +237,7 @@ void MNIPES::init_learner(int id){
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
 
-    if(!load_existing_ctrls || use_ctrl_arch)
+    if(!load_existing_ctrls && !use_ctrl_arch)
         learner.init();
     else{
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
@@ -319,10 +319,11 @@ void MNIPES::write_data_for_update(){
             continue;
         std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
         std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-        std::map<int,NN2CPPNGenome> gen;
-        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+        //TODO Why?
+//        std::map<int,NN2CPPNGenome> gen;
+//        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
         phy::MorphGenomeInfo morph_info;
-        morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
+        //morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
         phy::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
