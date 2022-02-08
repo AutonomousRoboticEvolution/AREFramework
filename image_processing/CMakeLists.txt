@@ -6,7 +6,7 @@ find_package(OpenCV REQUIRED)
 
 add_library(AREImageProc SHARED 
          src/blob_tracking.cpp
-         src/realMaze.cpp)
+         src/real_environment.cpp)
 
 target_include_directories(AREImageProc PUBLIC
     ${OpenCV_INCLUDE_DIRS}

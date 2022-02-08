@@ -41,67 +41,11 @@ void sim::readProximitySensors(const std::vector<int> handles, std::vector<doubl
     }
 }
 
-void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues, bool use_simulate_data){
+void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues){
     std::function<float(float, float, float)> norm_L2 =
             [](float x, float y, float z) -> float
     {return std::sqrt(x*x + y*y + z*z);};
 
-    // map the simulation data to true sensor data
-    std::function<double(float, float)> get_true_sensor_value = [](float x, float y) -> double{
-        int locate_x = round(x * 1000 / 100);       // get the nearest point in true sensor data table and serve as central point
-        int locate_y = round(y * 1000 / 100);
-        float offset_x = x * 1000 / 100 - locate_x; // calculate the offset of the current point w.r.t. the central point
-        float offset_y = y * 1000 / 100 - locate_y;
-        int axis_x = locate_x + 4;                  // transform the x to the corresponding idx in the map above ([-4, 4] -> [0, 8])
-        int axis_y = locate_y;                      // transform the y
-        float sensor_value;
-
-        if (axis_x < 1 || axis_x > 7 || axis_y < 1 || axis_y > 10){
-            sensor_value = 0.0;                     // if the location out of the map, just set the value 0.0
-        }
-        else{
-            float base_value = coord2value_map[axis_y][axis_x];
-            float offset_value;
-            if (offset_x < -0.16 && offset_y > 0.16){
-                // if the location is in the left-down direction, linearly change the data between the central point and the left-down point
-                offset_value = (coord2value_map[axis_y+1][axis_x-1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            else if (offset_x >= -0.16 && offset_x <= 0.16 && offset_y > 0.16){
-                // if the location is in the down direction, linearly change the data between the central point and the down point
-                offset_value = (coord2value_map[axis_y+1][axis_x] - coord2value_map[axis_y][axis_x]) * (offset_y / 1.0);
-            }
-            else if (offset_x > 0.16 && offset_y > 0.16){
-                // if the location is in the right-down direction, linearly change the data between the central point and the right-down point
-                offset_value = (coord2value_map[axis_y+1][axis_x+1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            else if (offset_x > 0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // if the location is in the right direction, linearly change the data between the central point and the right point
-                offset_value = (coord2value_map[axis_y][axis_x+1] - coord2value_map[axis_y][axis_x]) * (offset_x / 1.0);
-            }
-            else if (offset_x <= 0.16 && offset_x >= -0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // in the central region of the central point
-                offset_value = 0;
-            }
-            else if (offset_x < -0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // if the location is in the left direction, linearly change the data between the central point and the left point
-                offset_value = (coord2value_map[axis_y][axis_x-1] - coord2value_map[axis_y][axis_x]) * (offset_x / 1.0);
-            }
-            else if (offset_x > 0.16 && offset_y < -0.16){
-                // right-up direction
-                offset_value = (coord2value_map[axis_y-1][axis_x+1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            else if (offset_x <= 0.16 && offset_x >= -0.16 && offset_y < -0.16){
-                // up direction
-                offset_value = (coord2value_map[axis_y-1][axis_x] - coord2value_map[axis_y][axis_x]) * (offset_y / 1.0);
-            }
-            else{
-                // up-left direction
-                offset_value = (coord2value_map[axis_y-1][axis_x-1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            sensor_value = base_value + offset_value;
-        }
-        return sensor_value;
-    };
 
     int occlusion_detector;
 
@@ -117,11 +61,6 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
 
         det = simReadProximitySensor(handle, pos, &obj_h, norm);
         float dist = norm_L2(pos[0],pos[1],pos[2]);
-
-        if (use_simulate_data == false){
-            float true_sensor_value = get_true_sensor_value(pos[0], pos[1]);
-            if (true_sensor_value > 50) det = 1;  // force det to 1
-        }
 
         if(det > 0){
             name = simGetObjectName(obj_h);

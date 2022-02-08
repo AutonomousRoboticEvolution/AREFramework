@@ -99,64 +99,18 @@ bool are::Logging::openILogFile(std::ifstream &logFileStream, const std::string 
 }
 
 void are::FitnessLog::saveLog(are::EA::Ptr &ea)
-{/*
+{
     int generation = ea->get_generation();
 
     std::ofstream savePopFile;
     if(!openOLogFile(savePopFile))
         return;
 
-    savePopFile << generation << ",";
+    savePopFile << generation << "," << ea->get_population().size() << "," << ea->get_population()[0]->getObjectives().size() << ",";
     for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << ea->get_population()[i]->getObjectives()[0] << ",";
-    }
-
-    savePopFile << std::endl;
-    savePopFile.close();*/
-    int populationSize = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
-    std::string repository = settings::getParameter<settings::String>(ea->get_parameters(),"#repository").value;
-    int generation = ea->get_generation();
-
-    std::ofstream savePopFile;
-    //savePopFile.open(repository + std::string("/") + logFile, std::ios::out | std::ios::ate | std::ios::app);
-    savePopFile.open(are::Logging::log_folder + '/' + logFile, std::ios::out | std::ios::ate | std::ios::app);
-
-    if(!savePopFile)
-    {
-        std::cerr << "unable to open : " << logFile << std::endl;
-        return;
-    }
-    savePopFile << "generation " << generation << ": ,";
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        //savePopFile << " ind " << i << ": " << ea->get_population()[i]->getObjectives().back() << ",";
-        savePopFile << " ind " << i << ": " << ea->get_population()[i]->getObjectives()[0] << ",";
-    }
-    float avgFitness = 0;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        //avgFitness += ea->get_population()[i]->getObjectives().back();
-        avgFitness += ea->get_population()[i]->getObjectives()[0];
-    }
-    avgFitness = avgFitness / ea->get_population().size();
-    savePopFile << "avg: ," << avgFitness << ",";
-    int bestInd = 0;
-    float bestFitness = 0;
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        //if (bestFitness < ea->get_population()[i]->getObjectives().back()) {
-        //    bestFitness = ea->get_population()[i]->getObjectives().back();
-        //    bestInd = i;
-        //}
-        if (bestFitness < ea->get_population()[i]->getObjectives()[0]) {
-            bestFitness = ea->get_population()[i]->getObjectives()[0];
-            bestInd = i;
+        for (const double& obj : ea->get_population()[i]->getObjectives()) {
+            savePopFile << obj << ",";
         }
-
-    }
-    //savePopFile << "ind: ," << ea->get_population()[bestInd]->get_individual_id() << ",";
-    savePopFile << "ind: ," << generation * populationSize + bestInd << ",";
-    savePopFile << "fitness: ," << bestFitness << ",";
-    savePopFile << "individuals: ,";
-    for (size_t i = 0; i < ea->get_population().size(); i++) {
-        savePopFile << generation * populationSize + i << ",";
     }
     savePopFile << std::endl;
     savePopFile.close();

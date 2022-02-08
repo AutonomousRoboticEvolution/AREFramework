@@ -48,7 +48,9 @@ elseif(WITH_NN2)
             "src/*"
             "src/misc/*" 
             "src/nn2/*"
-            "src/learning/ipop_cmaes.cpp")
+            "src/learning/ipop_cmaes.cpp"
+            "src/learning/controller_archive.cpp"
+            )
 else()
     FILE(GLOB SOURCES    
             "src/*"

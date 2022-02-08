@@ -1,4 +1,4 @@
-#include "image_processing/realMaze.hpp"
+#include "image_processing/real_environment.hpp"
 #include "random_controller.hpp"
 #include "ARE/Logging.h"
 #include "ARE/NNParamGenome.hpp"
@@ -8,7 +8,7 @@
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::RealMaze);
+    are::Environment::Ptr env(new are::RealEnvironment);
     env->set_parameters(param);
     return env;
 }

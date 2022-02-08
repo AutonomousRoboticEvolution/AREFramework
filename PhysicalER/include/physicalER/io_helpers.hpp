@@ -20,6 +20,8 @@ namespace fs = boost::filesystem;
 namespace are {
 namespace phy {
 
+
+
 /**
  * @brief Map of information about a particular morphological genome with the name of the info as key
  */
@@ -30,6 +32,13 @@ typedef std::map<std::string, are::settings::Type::ConstPtr> MorphGenomeInfo;
  */
 typedef std::map<int,std::map<std::string, are::settings::Type::ConstPtr>> MorphGenomeInfoMap;
 
+/**
+ * @brief move_file
+ * @param origin
+ * @param dest
+ * @return
+ */
+bool move_file(const std::string& origin, const std::string& dest);
 
 /**
  * @brief load the information of all the morpholigical genomes from
