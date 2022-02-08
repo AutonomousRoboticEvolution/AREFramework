@@ -28,7 +28,6 @@ public:
 
 private:
     void make_random_ctrl(int wheels, int joints, int sensors,const NNParamGenome::Ptr &);
-    int current_id;
     std::vector<waypoint> trajectory;
 };
 

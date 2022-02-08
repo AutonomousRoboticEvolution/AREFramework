@@ -35,7 +35,7 @@ void RandomController::load_data_for_update(){
 
 void RandomController::write_data_for_update(){
     std::stringstream filepath;
-    filepath << "/traj_" << current_id;
+    filepath << "/traj_" << currentIndIndex;
 
     std::ofstream logFileStream(Logging::log_folder + std::string("/")  + filepath.str(), std::ios::out | std::ios::ate | std::ios::app);
 
