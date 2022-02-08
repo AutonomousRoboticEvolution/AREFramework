@@ -1,8 +1,8 @@
-#include "image_processing/realMaze.hpp"
+#include "image_processing/real_environment.hpp"
 
 using namespace are;
 
-RealMaze::RealMaze(): Environment(){
+RealEnvironment::RealEnvironment(): Environment(){
     current_position.resize(2);
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
@@ -10,7 +10,7 @@ RealMaze::RealMaze(): Environment(){
     settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
 }
 
-void RealMaze::init(){
+void RealEnvironment::init(){
 
      std::string pipe = settings::getParameter<settings::String>(parameters,"#cameraPipe").value;
      bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
@@ -21,22 +21,34 @@ void RealMaze::init(){
      video_capture = cv::VideoCapture(pipe);
 
 
-     colour_range.first = cv::Scalar(0,133,71);
-     colour_range.second = cv::Scalar(11,255,188);
+     colour_range.first = cv::Scalar(40,100,170);
+     colour_range.second = cv::Scalar(179,255,255);
 
 
      target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                         settings::getParameter<settings::Double>(parameters,"#target_y").value};
 }
 
-std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
+std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
+    int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
 
+    if(env_type == 0)
+        return fit_targeted_locomotion();
+    else if(env_type == 1)
+        return fit_exploration();
+
+    std::cerr << "Unknown type of environment type :" << env_type << std::endl;
+    return {0};
+
+}
+
+std::vector<double> RealEnvironment::fit_targeted_locomotion(){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     double max_dist = sqrt(2*arena_size*arena_size);
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                (a[1] - b[1])*(a[1] - b[1]));
+            (a[1] - b[1])*(a[1] - b[1]));
     };
     std::vector<double> d(1);
     d[0] = 1 - distance(current_position,target_position)/max_dist;
@@ -44,7 +56,11 @@ std::vector<double> RealMaze::fitnessFunction(const Individual::Ptr &ind){
     return d;
 }
 
-void RealMaze::update_info(double time){
+std::vector<double> RealEnvironment::fit_exploration(){
+    return {static_cast<double>(grid_zone.sum())/64.f};
+}
+
+void RealEnvironment::update_info(double time){
 
     cv::Mat image;
     if (usingIPCamera==true){
@@ -74,6 +90,9 @@ void RealMaze::update_info(double time){
     image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
     image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
 
+    std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
+    grid_zone(indexes.first,indexes.second) = 1;
+
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
 
@@ -95,3 +114,15 @@ void RealMaze::update_info(double time){
         std::cout << val << ",";
 }
 
+
+std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::vector<double> &pos){
+    std::pair<int,int> indexes;
+
+    indexes.first = std::trunc(pos[0]/0.25 + 4);
+    indexes.second = std::trunc(pos[1]/0.25 + 4);
+    if(indexes.first == 8)
+        indexes.first = 7;
+    if(indexes.second == 8)
+        indexes.second = 7;
+    return indexes;
+}
