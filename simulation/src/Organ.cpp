@@ -255,9 +255,10 @@ void Organ::createOrgan(int skeletonHandle)
         simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
         simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
     }
-
     /// \todo EB: These two lines work but I don't understand why with the previous method no.
     simGetObjectOrientation(organHandle, -1, tempOrganOri);
+
+    organOri.at(0) = tempOrganOri[0]; organOri.at(1) = tempOrganOri[1]; organOri.at(2) = tempOrganOri[2];
     simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
     // Set parents
     simSetObjectParent(forceSensor,skeletonHandle,1);
