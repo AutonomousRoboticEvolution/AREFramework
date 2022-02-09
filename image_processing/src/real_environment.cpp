@@ -4,6 +4,7 @@ using namespace are;
 
 RealEnvironment::RealEnvironment(): Environment(){
     current_position.resize(2);
+    beacon_position.resize(2);
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#target",new settings::Sequence<double>({0.,0.,0.12}));
 }
@@ -35,6 +36,8 @@ std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind)
         return fit_targeted_locomotion();
     else if(env_type == 1)
         return fit_exploration();
+    else if(env_type == 2)
+        return fit_foraging();
 
     std::cerr << "Unknown type of environment type : " << env_type << std::endl;
     return {0};
@@ -57,6 +60,29 @@ std::vector<double> RealEnvironment::fit_targeted_locomotion(){
 
 std::vector<double> RealEnvironment::fit_exploration(){
     return {static_cast<double>(grid_zone.sum())/64.f};
+}
+
+std::vector<double> RealEnvironment::fit_foraging(){
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    double max_dist = sqrt(2*arena_size*arena_size);
+    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
+    {
+        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                (a[1] - b[1])*(a[1] - b[1]) +
+                (a[2] - b[2])*(a[2] - b[2]));
+    };
+    std::vector<double> d(1);
+    // Distance between beacon and target
+    //d[0] = 1 - distance(final_position,target_position)/max_dist;
+    d[0] = 1 - ((distance(current_position,target_position)/max_dist) *
+                + (distance(beacon_position,target_position)/max_dist)) * 0.5;
+
+    for(double& f : d)
+        if(std::isnan(f) || std::isinf(f) || f < 0)
+            f = 0;
+        else if(f > 1) f = 1;
+
+    return d;
 }
 
 void RealEnvironment::update_info(double time){

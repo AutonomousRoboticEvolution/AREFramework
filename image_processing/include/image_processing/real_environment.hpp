@@ -21,13 +21,13 @@ public:
 
     std::vector<double> fit_targeted_locomotion();
     std::vector<double> fit_exploration();
+    std::vector<double> fit_foraging();
 
 
 private:
-
-
     std::vector<double> current_position;
     std::vector<double> target_position;
+    std::vector<double> beacon_position;
     Eigen::MatrixXi grid_zone;
 
     cv::VideoCapture video_capture;
