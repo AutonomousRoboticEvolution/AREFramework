@@ -21,8 +21,10 @@ void RealEnvironment::init(){
 
      grid_zone = Eigen::MatrixXi::Zero(8,8);
 
-     colour_range.first = cv::Scalar(40,100,170);
-     colour_range.second = cv::Scalar(179,255,255);
+
+     std::vector<int> colour_bnd = settings::getParameter<settings::Sequence<int>>(parameters,"#colourBoundaries").value;
+     colour_range.first = cv::Scalar(colour_bnd[0],colour_bnd[2],colour_bnd[4]);
+     colour_range.second = cv::Scalar(colour_bnd[1],colour_bnd[3],colour_bnd[5]);
 
 
      target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
@@ -86,7 +88,7 @@ std::vector<double> RealEnvironment::fit_foraging(){
 }
 
 void RealEnvironment::update_info(double time){
-
+    std::vector<int> crop_rect = settings::getParameter<settings::Sequence<int>>(parameters,"#cropRectangle").value;
     cv::Mat image;
     if (usingIPCamera==true){
         // this is a rather hacky method to flush the buffer created when using an IP camera.
@@ -109,10 +111,13 @@ void RealEnvironment::update_info(double time){
 
     if (image.empty()) {
         std::cerr << "ERROR! the frame is empty\n";
+        return;
     }
 
     cv::KeyPoint key_pt(0,0,0);
-    image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
+    image_proc::blob_detection(image,colour_range.first,colour_range.second,crop_rect,key_pt);
+    if(key_pt.pt.x == -999 || key_pt.pt.y == -999)
+        return;
     image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
 
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
@@ -134,6 +139,7 @@ void RealEnvironment::update_info(double time){
         trajectory.push_back(wp);
     }
 
+    final_position = current_position;
 
     for(const auto &val : current_position)
         std::cout << val << ",";

@@ -14,7 +14,7 @@ namespace image_proc {
  * @param colorMax
  * @param keyPts
  */
-void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt);
+void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, const std::vector<int> &crop_rect, cv::KeyPoint& keyPt);
 
 void aruco_detection(const cv::Mat& image);
 

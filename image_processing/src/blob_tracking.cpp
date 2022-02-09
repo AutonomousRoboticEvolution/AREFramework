@@ -18,20 +18,28 @@ void image_proc::aruco_detection(const cv::Mat& image){
     cv::imshow("out", outputImage);
 }
 
-void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt){
+void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, const std::vector<int> &crop_rect, cv::KeyPoint& keyPt){
 
-//    cv::Rect rect(240,70,346,346);
-//    cv::Mat croppedRef(image,rect);
-//    cv::Mat cropped;
-//    croppedRef.copyTo(cropped);
+
+    cv::Mat cropped;
+
+    if(crop_rect[0] >= 0)
+    {
+        cv::Rect rect(crop_rect[0],
+                crop_rect[1],
+                crop_rect[2],
+                crop_rect[3]);
+        cv::Mat croppedRef(image,rect);
+        croppedRef.copyTo(cropped);
+    }else cropped = image;
 
     cv::Mat hsv;
-    cv::cvtColor(image,hsv,cv::COLOR_BGR2HSV);
+    cv::cvtColor(cropped,hsv,cv::COLOR_BGR2HSV);
     cv::Mat mask;
     cv::inRange(hsv,colorMin,colorMax,mask);
 
     cv::Mat masked_image;
-    cv::bitwise_and(image,image,masked_image,mask);
+    cv::bitwise_and(cropped,cropped,masked_image,mask);
     cv::SimpleBlobDetector::Params params = cv::SimpleBlobDetector::Params();
     params.thresholdStep = 255;
     params.minRepeatability = 1;
@@ -62,6 +70,8 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
 //        for(const cv::KeyPoint& kp : key_pts){ std::cout<<","<< kp.pt.x <<","<< kp.pt.y ;} // all the keypoints (in case the wrong one is picked up)
         std::cout<<std::endl;
     }else{
+        keyPt.pt.x = -999;
+        keyPt.pt.y = -999;
         std::cout<< -999 <<","<< -999 <<std::endl; // no keypoints found
     }
 
@@ -69,22 +79,25 @@ void image_proc::blob_detection(const cv::Mat& image, const cv::Scalar& colorMin
     cv::Mat kp_image;
     cv::drawKeypoints(mask,key_pts,kp_image,cv::Scalar(0,0,255),cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS);
     cv::imshow("Blob",kp_image);
-    cv::imshow("mask",masked_image);
-    cv::imshow("frame", image);
+    //cv::imshow("mask",masked_image);
+    cv::imshow("frame", cropped);
     cv::waitKey(1);
 
 }
 
 void image_proc::pixel_to_world_frame(const cv::KeyPoint &point, std::vector<double> &position, const are::settings::ParametersMapPtr& parameters){
-    int reference_pt_x =  are::settings::getParameter<are::settings::Integer>(parameters,"#referencePtX").value;
-    int reference_pt_y =  are::settings::getParameter<are::settings::Integer>(parameters,"#referencePtY").value;
+    std::vector<int> reference_pt =  are::settings::getParameter<are::settings::Sequence<int>>(parameters,"#referencePt").value;
     int scale = are::settings::getParameter<are::settings::Integer>(parameters,"#pixelImageScale").value;
-
+    std::vector<int> crop_rect = are::settings::getParameter<are::settings::Sequence<int>>(parameters,"#cropRectangle").value;
+    if(crop_rect[0] >= 0){
+        reference_pt[0] = reference_pt[0] - crop_rect[0];
+        reference_pt[1] = reference_pt[1] - crop_rect[1];
+    }
 //    int scale = pixel_image_scale/2.;
 
     position.resize(2);
-    position[0] = (point.pt.x - reference_pt_x)/scale;
-    position[1] = -(point.pt.y - reference_pt_y)/scale;
+    position[0] = (point.pt.x - reference_pt[0])/scale;
+    position[1] = -(point.pt.y - reference_pt[1])/scale;
 }
 
 void image_proc::topdown_camera_pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters){
