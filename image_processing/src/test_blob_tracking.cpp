@@ -60,12 +60,16 @@ int main(int argc, char** argv){
             std::cerr << "ERROR! the frame is empty\n";
         }
 
+        // blob detection:
         cv::KeyPoint key_pt(0,0,0);
         image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
         image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
         for(const auto &val : current_position)
             std::cout << val << ",";
         std::cout << std::endl;
+
+        // aruco testing:
+        image_proc::aruco_detection(image);
     }
     return 0;
 }
