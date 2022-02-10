@@ -15,7 +15,7 @@ def makeFile(location):
 	# location specific variables:
 	if location == "BRL":
 
-		LOG_FOLDER = "/home/robofab/are-logs/physical_melai_test/"
+		LOG_FOLDER = "/home/robofab/are-logs/hardware_test/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 

@@ -184,7 +184,7 @@ void Organ::createOrgan(int skeletonHandle)
     else if(organType == 3) // Joints
         modelsPath += "C_Joint.ttm";
     else if(organType == 4) // Caster
-        modelsPath+= "C_Caster.ttm";
+        modelsPath+= "C_CasterV6.ttm";
     else
         assert(false);
 
@@ -234,8 +234,10 @@ void Organ::createOrgan(int skeletonHandle)
         tempConnectorPos[2] = organPos[2] + 0.02;
     }else if(organType == 3) // Joints
         tempConnectorPos[2] = tempOrganPos[2] + 0.035;
-    else if(organType == 4)  // Caster
+    else if(organType == 4) {  // Caster
+        tempConnectorPos[0] = tempOrganPos[0] - 0.01;
         tempConnectorPos[2] = tempOrganPos[2] + 0.02;
+    }
     else
         assert(false);
 

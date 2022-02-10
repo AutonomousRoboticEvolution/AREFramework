@@ -196,12 +196,12 @@ void phy::add_morph_genome_to_gp(const std::string &folder, int id, const MorphG
     if(!move_file(ctrl_ori.str(),ctrl_dest.str()))
         return;
 
-    std::stringstream list_of_organs;
-    list_of_organs << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
-    if(!fs::remove(list_of_organs.str())){
-        std::cerr << "Unable to remove " << list_of_organs.str() << std::endl;
+    std::stringstream loo_ori,loo_dest;
+    loo_ori << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
+    loo_dest << folder << "/logs/list_of_organs_" << id << ".csv";
+    if(!move_file(loo_ori.str(),loo_dest.str()))
         return;
-    }
+
 
     //update morph genomes info
     std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));

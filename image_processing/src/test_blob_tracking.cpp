@@ -25,12 +25,12 @@ int main(int argc, char** argv){
     video_capture = cv::VideoCapture(pipe);
 
 
-    colour_range.first = cv::Scalar(28,162,115);
-    colour_range.second = cv::Scalar(179,255,255);
+    colour_range.first = cv::Scalar(0,100,100);
+    colour_range.second = cv::Scalar(10,255,255);
 
     are::settings::ParametersMapPtr parameters(new are::settings::ParametersMap);
-    parameters->emplace("#referencePtX",new are::settings::Integer(std::stoi(argv[2])));
-    parameters->emplace("#referencePtY",new are::settings::Integer(std::stoi(argv[3])));
+    parameters->emplace("#referencePt",new are::settings::Sequence<int>({std::stoi(argv[2]),std::stoi(argv[3])}));
+    parameters->emplace("#cropRectangle",new are::settings::Sequence<int>({240,70,346,346}));
     parameters->emplace("#pixelImageScale",new are::settings::Integer(std::stoi(argv[4])));
 
 
@@ -60,12 +60,17 @@ int main(int argc, char** argv){
             std::cerr << "ERROR! the frame is empty\n";
         }
 
+        // blob detection:
+        std::vector<int> crop_rect = {240,70,346,346};
         cv::KeyPoint key_pt(0,0,0);
-        image_proc::blob_detection(image,colour_range.first,colour_range.second,key_pt);
+        image_proc::blob_detection(image,colour_range.first,colour_range.second,crop_rect,key_pt);
         image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
         for(const auto &val : current_position)
             std::cout << val << ",";
         std::cout << std::endl;
+
+        // aruco testing:
+        image_proc::aruco_detection(image);
     }
     return 0;
 }
