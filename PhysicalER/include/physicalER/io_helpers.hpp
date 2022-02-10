@@ -56,7 +56,7 @@ template<class Genome>
  * @param genomes
  */
 void load_morph_genomes(const std::string &folder,
-                        const std::vector<int> list_to_load, std::map<int,Genome>& genomes){
+                        const std::vector<int> &list_to_load, std::map<int,Genome>& genomes){
 
     std::string filepath, filename;
     std::list<std::string> split_str;

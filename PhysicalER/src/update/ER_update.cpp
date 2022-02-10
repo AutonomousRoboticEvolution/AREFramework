@@ -69,7 +69,14 @@ void ER::write_data(){
     ea->write_data_for_update();
 }
 
-
+void ER::save_logs(bool eog)
+{
+    for(const auto &log : logs){
+        if(log->isEndOfGen() == eog){
+            log->saveLog(ea);
+        }
+    }
+}
 bool ER::execute(){
 
     if(robot_state == READY){
@@ -196,6 +203,7 @@ bool ER::stop_evaluation(){
     }
     ea->set_endEvalTime(hr_clock::now());
     write_data();
+    save_logs();
 
     current_id = choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);
