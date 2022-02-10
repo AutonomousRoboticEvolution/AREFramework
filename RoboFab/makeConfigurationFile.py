@@ -157,7 +157,7 @@ def makeFile(location):
 			1: { "organType": 1,
 				"friendlyName": "Wheel organ",
 				"forceModeTravelDistance": 30 / 1000,
-				"postInsertExtraPushDistance": 4.0 / 1000,
+				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000, # positive value will make it hold further onto organ
                  "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=56, z=4.5, rotX=0, rotY=90, rotZ=90).tolist(),
                  "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=0, y=-19.338, z=-8, rotX=90, rotY=0, rotZ=0).tolist(),
@@ -180,7 +180,20 @@ def makeFile(location):
 				"gripperClosedFraction": 0.6,
 				"USE_FORCE_MODE":True,
 				 },
-			3: {"organType": 3,
+			3: {"organType": 3, # minimally tested!
+				"friendlyName": "Joint organ",
+				"forceModeTravelDistance": 30 / 1000,
+				"postInsertExtraPushDistance": 2.0 / 1000,
+				"pickupExtraPushDistance": 0 / 1000,
+                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=11.3, z=15, rotX=0, rotY=-90, rotZ=0).tolist(),
+                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=2, z=29.779, rotX=0, rotY=0, rotZ=0).tolist(),
+                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=-9, y=-5, z=-14.5, rotX=0, rotY=0, rotZ=0).tolist(),
+				"transformOrganOriginToCableSocket": None,  # female socket(s)
+				"gripperOpeningFraction": 0.0,
+				"gripperClosedFraction": 0.5,
+				"USE_FORCE_MODE":True
+				 },
+			4: {"organType": 4,
 				"friendlyName": "Castor organ",
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
@@ -193,19 +206,6 @@ def makeFile(location):
 				"gripperClosedFraction": 0.8,
 				"USE_FORCE_MODE":True,
 				"transformOrganOriginToMaleCableSocket": None
-				 },
-			4: {"organType": 4, # minimally tested!
-				"friendlyName": "Joint organ",
-				"forceModeTravelDistance": 30 / 1000,
-				"postInsertExtraPushDistance": 1.0 / 1000,
-				"pickupExtraPushDistance": 0 / 1000,
-                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=11.3, z=15, rotX=0, rotY=-90, rotZ=0).tolist(),
-                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=2, z=29.779, rotX=0, rotY=0, rotZ=0).tolist(),
-                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=-9, y=-5, z=-14.5, rotX=0, rotY=0, rotZ=0).tolist(),
-				"transformOrganOriginToCableSocket": None,  # female socket(s)
-				"gripperOpeningFraction": 0.0,
-				"gripperClosedFraction": 0.5,
-				"USE_FORCE_MODE":True
 				 }
 		},
 
