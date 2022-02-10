@@ -27,8 +27,8 @@
 #isExportModel,bool,0
 #reloadController,bool,0
 
-#folderToLoad,string,/home/robofab/Downloads/robotsMatt/robot1/
-#genToLoad,int,9
+#folderToLoad,string,/home/robofab/are-logs/hardware_test/waiting_to_be_built/
+#genToLoad,int,5
 #indToLoad,int,0
 
 #robotID,string,9

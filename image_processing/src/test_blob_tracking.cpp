@@ -15,7 +15,7 @@ int main(int argc, char** argv){
 
     cv::VideoCapture video_capture;
     std::pair<cv::Scalar,cv::Scalar> colour_range;
-    std::vector<double> current_position;
+    std::vector<double> current_position(2);
 
     std::string pipe = argv[1];
 
@@ -32,6 +32,7 @@ int main(int argc, char** argv){
     parameters->emplace("#referencePt",new are::settings::Sequence<int>({std::stoi(argv[2]),std::stoi(argv[3])}));
     parameters->emplace("#cropRectangle",new are::settings::Sequence<int>({240,70,346,346}));
     parameters->emplace("#pixelImageScale",new are::settings::Integer(std::stoi(argv[4])));
+
 
 
     cv::Mat image;
@@ -64,13 +65,19 @@ int main(int argc, char** argv){
         std::vector<int> crop_rect = {240,70,346,346};
         cv::KeyPoint key_pt(0,0,0);
         image_proc::blob_detection(image,colour_range.first,colour_range.second,crop_rect,key_pt);
-        image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
-        for(const auto &val : current_position)
+        image_proc::keypoint_pixel_to_world_frame(key_pt,current_position,parameters);
+        for(const auto &val : current_position){
             std::cout << val << ",";
+        }
         std::cout << std::endl;
 
         // aruco testing:
-        image_proc::aruco_detection(image);
+//        std::cout<<"doing aruco test"<<std::endl;
+//        std::vector<int> marker_ids;
+//        std::vector<cv::Point2f> marker_centre_points;
+//        image_proc::aruco_detection(image, marker_ids, marker_centre_points);
+        cv::Point2f barrel_position = image_proc::track_a_barrel(image, parameters);
+        std::cout<<"barrel position: "<<barrel_position<<std::endl;
     }
     return 0;
 }

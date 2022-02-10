@@ -118,7 +118,8 @@ void RealEnvironment::update_info(double time){
     image_proc::blob_detection(image,colour_range.first,colour_range.second,crop_rect,key_pt);
     if(key_pt.pt.x == -999 || key_pt.pt.y == -999)
         return;
-    image_proc::pixel_to_world_frame(key_pt,current_position,parameters);
+    image_proc::keypoint_pixel_to_world_frame(key_pt,current_position,parameters);
+
 
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
     grid_zone(indexes.first,indexes.second) = 1;
