@@ -14,9 +14,29 @@ namespace image_proc {
  * @param colorMax
  * @param keyPts
  */
-void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, cv::KeyPoint& keyPt);
+void blob_detection(const cv::Mat& image, const cv::Scalar& colorMin, const cv::Scalar& colorMax, const std::vector<int> &crop_rect, cv::KeyPoint& keyPt);
 
-void aruco_detection(const cv::Mat& image);
+/**
+ * @brief from an image (from the overhead camera), will return the barrel position in the world frame, in meters(?)
+ * @param image
+ * @param barrel_position
+ */
+cv::Point2f track_a_barrel(const cv::Mat& image, const are::settings::ParametersMapPtr &parameters);
+
+/**
+ * @brief from an image (from the overhead camera), will return the IDs of all the visible markers, and their positions in pixels
+ * @param image
+ * @param marker_ids: the visible marker IDs
+ * @param marker_centre_points: the positions of the centre of the markers in pixels
+ */
+void aruco_detection(const cv::Mat& image, std::vector<int>& marker_ids , std::vector<cv::Point2f>& marker_centre_points);
+
+/**
+ * @brief image_proc::convert_pixel_to_world_frame
+ * @param pixel_position: the position in pixels, as a openCV 2D point (cv::Point2f)
+ * @return the position in world frame, as a openCV 2D point (cv::Point2f)
+ */
+cv::Point2f convert_pixel_to_world_frame(cv::Point2f pixel_position,  const are::settings::ParametersMapPtr& parameters);
 
 /**
  * @brief pixel_to_world_frame
@@ -24,7 +44,7 @@ void aruco_detection(const cv::Mat& image);
  * @param position
  * @param parameters
  */
-void pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
+void keypoint_pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
 
 
 /**
@@ -42,8 +62,7 @@ void pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &positio
  * @param point
  * @param position
  */
-void topdown_camera_pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
-
+//void topdown_camera_pixel_to_world_frame(const cv::KeyPoint &point,std::vector<double> &position, const are::settings::ParametersMapPtr& parameters);
 
 }
 

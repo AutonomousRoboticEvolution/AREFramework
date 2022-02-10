@@ -8,6 +8,11 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
+    // battery voltage check
+    batteryMonitor.init();
+    uint16_t measuredBatteryVoltage = batteryMonitor.measureBatteryVoltage(); // measured in cV
+    std::cout<<"Measured battery voltage = "<< float(measuredBatteryVoltage)/100.<<" V"<<std::endl;
+
     // initilise the camera
     // If this is true, the camera input (binary on/off) will be used the first input to the neural network controller:
     cameraInputToNN =  settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
