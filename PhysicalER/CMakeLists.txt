@@ -5,7 +5,7 @@ if(RASPBERRY)
     include_directories( ${OpenCV_INCLUDE_DIRS} )
 
     file(GLOB SRC src/pi/* src/pi_communication.cpp src/pi_individual.cpp)
-    set(CTRL_SRC ../RobotController/I2CDevice.cpp ../RobotController/Organ.cpp ../RobotController/JointOrgan.cpp ../RobotController/MotorOrgan.cpp ../RobotController/SensorOrgan.cpp ../RobotController/DaughterBoards.cpp ../RobotController/LedDriver.cpp ../RobotController/Camera.cpp)
+    set(CTRL_SRC ../RobotController/I2CDevice.cpp ../RobotController/Organ.cpp ../RobotController/JointOrgan.cpp ../RobotController/MotorOrgan.cpp ../RobotController/SensorOrgan.cpp ../RobotController/DaughterBoards.cpp ../RobotController/LedDriver.cpp ../RobotController/Camera.cpp ../RobotController/BatteryMonitor.cpp)
     add_executable(are-pi-server ${SRC} ${CTRL_SRC})
     target_include_directories(are-pi-server PUBLIC
         "include"
