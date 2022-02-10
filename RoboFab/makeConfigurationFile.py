@@ -198,9 +198,8 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-				 # "gripPosition": makeTransformInputFormatted ([ 5.89 / 1000, 29.06 / 1000, 15.37 / 1000, 0, math.radians ( 180 ), math.radians ( 90 ) ] ).tolist(),
-				"transformOrganOriginToGripper": (makeTransformInputFormatted([0, 0, 7.79 / 1000 , 0, 0, math.radians(90)])).tolist(),
-				"transformOrganOriginToClipCentre": makeTransformInputFormatted([0, 0, 12.62 / 1000 , math.radians(180), 0, 0]).tolist(),
+				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=18.312,rotX=180)).tolist(),
+				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=16,z=20.1,rotX=0,rotY=180,rotZ=90).tolist(),
 				"transformOrganOriginToCableSocket": None,  # female socket(s)
 				"gripperOpeningFraction": 0.6,
 				"gripperClosedFraction": 0.8,
@@ -256,8 +255,10 @@ def makeFile(location):
 			[2, 191.491/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
 			[2, 191.491/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
 			[2, 191.491/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
-			# [3 , 154.56/1000, 33.66/1000, 17.5/1000, math.radians(180), 0, math.radians(90), ""], #castor
-			[4 , 300.061/1000, 74.881/1000 , 28.5/1000, 0, 0, math.radians(90), str(0x08)] #joint
+			[4 , 300/1000, 60/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
+			[4 , 300/1000, 95/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
+			[4 , 300/1000, 130/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
+			[4 , 300/1000, 165/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)] #castor
 			],
 		"CABLE_CONTENTS":[] # no cables
 		}
