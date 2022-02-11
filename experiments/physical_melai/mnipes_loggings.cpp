@@ -6,8 +6,9 @@ using namespace are;
 void RobotInfoLog::saveLog(EA::Ptr &ea)
 {
     int id = static_cast<MNIPES*>(ea.get())->get_currentID();
+    int eval = static_cast<MNIPES*>(ea.get())->get_numberEvaluation();
     std::stringstream sstr;
-    sstr << "robot_infos_" << id;
+    sstr << "robot_infos_" << id << "_" << eval;
     std::ofstream ifs;
     if(!openOLogFile(ifs,sstr.str())){
         std::cerr << "Unable to open file : " << sstr.str() << std::endl;
