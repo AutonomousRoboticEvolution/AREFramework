@@ -59,10 +59,10 @@ bool MNIPES::update(const Environment::Ptr &env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     PMEIndividual::Ptr ind(new PMEIndividual);
-    auto objs = env->fitnessFunction(ind);
+    objectives = env->fitnessFunction(ind);
     if(verbose){
         std::cout << "fitnesses = " << std::endl;
-        for(const double fitness : objs)
+        for(const double fitness : objectives)
             std::cout << fitness << std::endl;
     }
 
@@ -71,11 +71,13 @@ bool MNIPES::update(const Environment::Ptr &env){
     desc << (final_pos[0]+arena_size/2.)/arena_size,
             (final_pos[1]+arena_size/2.)/arena_size,
             (final_pos[2]+arena_size/2.)/arena_size;
-    trajectories.emplace(currentIndIndex,env->get_trajectory());
+    trajectory = env->get_trajectory();
+
+
     //update learner
     auto& learner = learners[currentIndIndex];
     numberEvaluation++;
-    learner.update_pop_info(objs,desc);
+    learner.update_pop_info(objectives,desc);
     learner.step();
 
     if(learner.is_learning_finish()){//learning is finished for this body plan
@@ -190,6 +192,7 @@ void MNIPES::_reproduction(){
 
         NN2CPPNGenome new_morph_gene = morph_genomes[best_id];
         new_morph_gene.mutate();
+        new_morph_gene.incr_generation();
         new_morph_gene.set_parameters(parameters);
         new_morph_gene.set_randNum(randomNum);
         //-
@@ -215,8 +218,6 @@ void MNIPES::init_learner(int id){
 
 
     //TODO: load saved learners
-
-
     int wheels, joints, sensors;
     phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
     int nn_inputs = sensors*2;
@@ -256,9 +257,11 @@ void MNIPES::init_learner(int id){
 }
 
 const Genome::Ptr MNIPES::get_next_controller_genome(int id){
+    population.clear();
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
 
+    //** Create Controller to send to robot
     NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
     auto nn_params = learners[id].update_ctrl(ctrl);
     NNParamGenome::Ptr gen(new NNParamGenome(randomNum,parameters));
@@ -268,6 +271,15 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
     gen->set_nn_type(nn_type);
     gen->set_nbr_input(learners[id].get_nbr_inputs());
     gen->set_nbr_output(learners[id].get_nbr_outputs());
+    //*/
+    //** Create individual only for logging
+    EmptyGenome::Ptr empty_gen(new EmptyGenome);
+    PMEIndividual::Ptr ind(new PMEIndividual(empty_gen,gen));
+    ind->set_parameters(parameters);
+    ind->set_randNum(randomNum);
+    population.push_back(ind);
+    //*/
+
     return gen;
 }
 
@@ -300,8 +312,6 @@ void MNIPES::load_data_for_update() {
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
-
-
     //load controller archive
     if(use_ctrl_arch){
         int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
@@ -319,11 +329,11 @@ void MNIPES::write_data_for_update(){
             continue;
         std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
         std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-        //TODO Why?
-//        std::map<int,NN2CPPNGenome> gen;
-//        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+
+        std::map<int,NN2CPPNGenome> gen;
+        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
         phy::MorphGenomeInfo morph_info;
-        //morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
+        morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
         phy::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }

@@ -23,7 +23,7 @@ public:
     typedef std::shared_ptr<const PMEIndividual> ConstPtr;
 
     PMEIndividual() : Individual(){}
-    PMEIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen){
+    PMEIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen){
         this->morphGenome = morph_gen;
         this->ctrlGenome = ctrl_gen;
     }
@@ -82,11 +82,16 @@ public:
     void load_data_for_update() override;
     void write_data_for_update() override;
 
+    int get_currentID(){return currentIndIndex;}
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
+    std::vector<double> get_objectives(){return objectives;}
+
 private:
     std::vector<std::pair<int,int>> ids;
     std::map<int,NN2CPPNGenome> morph_genomes;
     std::map<int,CMAESLearner> learners;
-    std::map<int,std::vector<waypoint>> trajectories;
+    std::vector<waypoint> trajectory;
+    std::vector<double> objectives;
     ControllerArchive ctrl_archive;
     phy::MorphGenomeInfoMap morph_genomes_info;
 
