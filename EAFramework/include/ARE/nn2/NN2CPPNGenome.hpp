@@ -161,6 +161,7 @@ public:
     int get_nb_connections(){return cppn.get_nb_connections();}
 
     int get_generation(){return generation;}
+    void incr_generation(){generation++;}
 
     void set_randNum(const misc::RandNum::Ptr& rn) override{
         randomNum = rn;
