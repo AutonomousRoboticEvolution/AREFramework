@@ -22,7 +22,7 @@ typedef enum OrderType{
  * @param message
  * @param communication socket of request type (ZMQ_REQ)
  */
-void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t& request);
+void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t& request, const std::string &);
 
 /**
  * @brief receive a string message and send a reply
@@ -30,14 +30,12 @@ void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t
  * @param reply
  * @param communication socket of reply type (ZMQ_REP)
  */
-void receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply);
+void receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply, const std::string &);
 
 void send_string_no_reply(const std::string &str_mess, zmq::socket_t &socket);
-void receive_string_no_reply(std::string &str_mess, zmq::socket_t &socket);
+void receive_string_no_reply(std::string &str_mess, zmq::socket_t &socket,const std::string &topic);
 
 
-bool send_order(OrderType order, zmq::socket_t& publisher);
-void receive_string_no_reply(std::string& str_mess, zmq::socket_t& subscriber);
 
 }//phy
 

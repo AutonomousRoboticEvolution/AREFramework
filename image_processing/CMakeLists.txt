@@ -11,16 +11,27 @@ add_library(AREImageProc SHARED
 target_include_directories(AREImageProc PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     "include"
-    "../EAFramework/include")
+    "../EAFramework/include"
+    "../PhysicalER/include")
 target_link_libraries(AREImageProc ARE ${OpenCV_LIBRARIES})
 
-add_executable(test_blob_tracking src/test_blob_tracking.cpp src/blob_tracking.cpp)
-target_include_directories(test_blob_tracking PUBLIC
+#add_executable(test_blob_tracking src/test_blob_tracking.cpp src/blob_tracking.cpp)
+#target_include_directories(test_blob_tracking PUBLIC
+#    ${OpenCV_INCLUDE_DIRS}
+#    "include"
+#    "../EAFramework/include/"
+#    )
+#target_link_libraries(test_blob_tracking ARE ${OpenCV_LIBRARIES})
+
+
+
+add_executable(test_camera_subscriber src/test_camera_subscriber.cpp)
+target_include_directories(test_camera_subscriber PUBLIC
     ${OpenCV_INCLUDE_DIRS}
     "include"
     "../EAFramework/include/"
     )
-target_link_libraries(test_blob_tracking ARE ${OpenCV_LIBRARIES})
+target_link_libraries(test_camera_subscriber zmq)
 
 
 install(TARGETS AREImageProc DESTINATION lib)

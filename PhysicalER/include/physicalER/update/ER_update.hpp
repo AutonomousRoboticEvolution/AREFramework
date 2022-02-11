@@ -32,7 +32,7 @@ public:
 
     ER(): context(1),
         request(context, ZMQ_REQ),
-    subscriber(context, ZMQ_SUB){}
+        subscriber(context, ZMQ_SUB){}
     virtual ~ER(){
         if(parameters.get())
             parameters.reset();
@@ -108,6 +108,7 @@ private:
     zmq::context_t context;
     zmq::socket_t subscriber;
     zmq::socket_t request;
+
 
 };
 

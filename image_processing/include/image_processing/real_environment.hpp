@@ -1,6 +1,7 @@
 #ifndef REAL_ENVIRONMENT_HPP
 #define REAL_ENVIRONMENT_HPP
 
+#include "physicalER/pi_communication.hpp"
 #include "ARE/Environment.h"
 #include "image_processing/blob_tracking.hpp"
 #include <chrono>
@@ -23,7 +24,6 @@ public:
     std::vector<double> fit_exploration();
     std::vector<double> fit_foraging();
 
-
 private:
     std::vector<double> current_position;
     std::vector<double> target_position;
@@ -34,6 +34,11 @@ private:
     std::pair<cv::Scalar,cv::Scalar> colour_range;
 
     bool usingIPCamera;
+
+    zmq::context_t context;
+    zmq::socket_t robot_pos_subs;
+    zmq::socket_t tags_pos_subs;
+
 };
 
 } //are

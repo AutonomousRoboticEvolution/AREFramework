@@ -134,16 +134,16 @@ void ER::start_evaluation(){
     std::string reply;
     std::string param = settings::toString(*parameters.get());
     //std::cout<<"params : \n"<<param<<std::endl;
-    send_string(reply,param,request);
+    send_string(reply,param,request,"pi ");
     assert(reply == "parameters_received");
 
     //send the list of organ addresses
-    send_string(reply,list_of_organs,request);
+    send_string(reply,list_of_organs,request,"pi ");
     assert(reply == "organ_addresses_received");
 
     std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
     std::cout << ctrl_gen << std::endl;
-    send_string(reply,ctrl_gen,request);
+    send_string(reply,ctrl_gen,request,"pi ");
     assert(reply == "starting");
 }
 
@@ -160,7 +160,7 @@ bool ER::update_evaluation(){
     environment->update_info(current_time);
 
     std::string message_string;
-    receive_string_no_reply(message_string,subscriber);
+    receive_string_no_reply(message_string,subscriber,"pi ");
     return message_string=="finish";
 
 }
@@ -175,7 +175,7 @@ bool ER::stop_evaluation(){
     while(getting_logs){
         // get message:
         std::string message;
-        receive_string_no_reply(message,subscriber);
+        receive_string_no_reply(message,subscriber,"pi ");
 
 
         // if message is "finshed_logs", then we continue

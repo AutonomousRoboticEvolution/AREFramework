@@ -1,19 +1,19 @@
-#define MESSAGE_DEBUG_PRINTING false
+#define MESSAGE_DEBUG_PRINTING true
 
 #include "physicalER/pi_communication.hpp"
 //using namespace are::phy;
 
-void are::phy::send_string(std::string& str_rpl, const std::string& str_msg,  zmq::socket_t& socket){
+void are::phy::send_string(std::string& str_rpl, const std::string& str_msg,  zmq::socket_t& socket,const std::string &topic){
     // send message:
     send_string_no_reply(str_msg,socket);
 
     // get reply:
-    receive_string_no_reply(str_rpl, socket);
+    receive_string_no_reply(str_rpl, socket,topic);
 }
 
-void are::phy::receive_string(std::string& str_msg, const std::string& str_reply, zmq::socket_t& socket){
+void are::phy::receive_string(std::string& str_msg, const std::string& str_reply, zmq::socket_t& socket,const std::string &topic){
     // receive a message
-    receive_string_no_reply(str_msg, socket);
+    receive_string_no_reply(str_msg, socket,topic);
 
     //send the reply
     send_string_no_reply(str_reply, socket);
@@ -32,7 +32,7 @@ void are::phy::send_string_no_reply(const std::string &message_string, zmq::sock
     socket.send( zmq::buffer( string_to_send ));
 }
 
-void are::phy::receive_string_no_reply(std::string &message_string, zmq::socket_t &socket){
+void are::phy::receive_string_no_reply(std::string &message_string, zmq::socket_t &socket, const std::string &topic){
     zmq::message_t message;
     socket.recv(&message);
     message_string = static_cast<char*>(message.data());
@@ -40,8 +40,8 @@ void are::phy::receive_string_no_reply(std::string &message_string, zmq::socket_
     if(MESSAGE_DEBUG_PRINTING) std::cout<<"Received string \""<<message_string<<"\" which is length "<<message_string.size()<<std::endl;
 
     // remove "pi " prefix:
-    if (message_string.substr(0,3)=="pi "){
-        message_string=message_string.substr(3,message_string.size());
+    if (message_string.substr(0,topic.size())==topic){
+        message_string=message_string.substr(topic.size(),message_string.size());
     }
 
 }

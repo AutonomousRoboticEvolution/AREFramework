@@ -2,7 +2,11 @@
 
 using namespace are;
 
-RealEnvironment::RealEnvironment(): Environment(){
+RealEnvironment::RealEnvironment():
+    Environment(),
+    robot_pos_subs(context, ZMQ_SUB),
+    tags_pos_subs(context, ZMQ_SUB){
+
     current_position.resize(2);
     beacon_position.resize(2);
     // Definition of default values of the parameters.
@@ -12,15 +16,15 @@ RealEnvironment::RealEnvironment(): Environment(){
 void RealEnvironment::init(){
 
      std::string pipe = settings::getParameter<settings::String>(parameters,"#cameraPipe").value;
-     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-     if(verbose)
-         std::cout << "camera pipe: " << pipe << std::endl;
-     usingIPCamera = pipe.substr(0,4).compare("http") == 0; // if the pipe starts "http", we're using an IP camera. This is important later because the buffer needs flushing on each update
-     if(verbose) std::cout<<"usingIPCamera: "<<usingIPCamera<<std::endl;
-     video_capture = cv::VideoCapture(pipe);
+
+     //** Subscribers to camera topics
+     robot_pos_subs.connect(pipe);
+     robot_pos_subs.set(zmq::sockopt::subscribe, "Robot:");
+     tags_pos_subs.connect(pipe);
+     tags_pos_subs.set(zmq::sockopt::subscribe, "Tags:");
+     //*/
 
      grid_zone = Eigen::MatrixXi::Zero(8,8);
-
 
      std::vector<int> colour_bnd = settings::getParameter<settings::Sequence<int>>(parameters,"#colourBoundaries").value;
      colour_range.first = cv::Scalar(colour_bnd[0],colour_bnd[2],colour_bnd[4]);
@@ -88,38 +92,19 @@ std::vector<double> RealEnvironment::fit_foraging(){
 }
 
 void RealEnvironment::update_info(double time){
-    std::vector<int> crop_rect = settings::getParameter<settings::Sequence<int>>(parameters,"#cropRectangle").value;
-    cv::Mat image;
-    if (usingIPCamera==true){
-        // this is a rather hacky method to flush the buffer created when using an IP camera.
-        // We time how long it takes to get a frame - if it was very quick, it probably came from the buffer, so we discard it and get another frame.
-        // This only works because we are requesting frames at a slower rate than they are created.
-        // inspired by answers.opencv.org/question/29957/highguivideocapture-buffer-introducing-lag/?answer=38217#post-id-38217/
-        int framesWithDelayCount = 0;
-        while (framesWithDelayCount < 1)
-        {
-            auto time_before = std::chrono::system_clock::now();
-            video_capture.grab();
-            auto time_after = std::chrono::system_clock::now();
-            std::chrono::duration<double> elapsedTime = time_after-time_before;
-            if(elapsedTime > std::chrono::milliseconds(3)) framesWithDelayCount++;
-        }
-        video_capture.retrieve(image);
-    }else{
-        video_capture.read(image);
-    }
+    std::string robot_position;
+    phy::receive_string_no_reply(robot_position,robot_pos_subs,"Robot:");
 
-    if (image.empty()) {
-        std::cerr << "ERROR! the frame is empty\n";
+    std::stringstream sstr(robot_position);
+    cv::Point2f pixel_coord;
+    std::string topic;
+    char par1,par2,comma;
+    sstr >> topic >> par1 >> pixel_coord.x >> comma >> pixel_coord.y >> par2;
+    std::cout << "From topic " << topic << " position " << pixel_coord << std::endl;
+    if(pixel_coord.x == -999 || pixel_coord.y == -999)
         return;
-    }
-
-    cv::KeyPoint key_pt(0,0,0);
-    image_proc::blob_detection(image,colour_range.first,colour_range.second,crop_rect,key_pt);
-    if(key_pt.pt.x == -999 || key_pt.pt.y == -999)
-        return;
-    image_proc::keypoint_pixel_to_world_frame(key_pt,current_position,parameters);
-
+    cv::Point2f world_coord = image_proc::convert_pixel_to_world_frame(pixel_coord,parameters);
+    current_position = {world_coord.x,world_coord.y};
 
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
     grid_zone(indexes.first,indexes.second) = 1;
