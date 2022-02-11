@@ -4,7 +4,7 @@ using namespace are;
 
 RealEnvironment::RealEnvironment():
     Environment(),
-    robot_pos_subs(context, ZMQ_SUB),
+    robot_pos_subs(context, ZMQ_REQ),
     tags_pos_subs(context, ZMQ_SUB){
 
     current_position.resize(2);
@@ -93,7 +93,7 @@ std::vector<double> RealEnvironment::fit_foraging(){
 
 void RealEnvironment::update_info(double time){
     std::string robot_position;
-    phy::receive_string_no_reply(robot_position,robot_pos_subs,"Robot:");
+    phy::send_string(robot_position,"Robot:position",robot_pos_subs,"Robot:");
 
     std::stringstream sstr(robot_position);
     cv::Point2f pixel_coord;

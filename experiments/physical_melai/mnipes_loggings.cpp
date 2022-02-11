@@ -8,13 +8,13 @@ void RobotInfoLog::saveLog(EA::Ptr &ea)
     int id = static_cast<MNIPES*>(ea.get())->get_currentID();
     int eval = static_cast<MNIPES*>(ea.get())->get_numberEvaluation();
     std::stringstream sstr;
-    sstr << "robot_infos_" << id << "_" << eval;
+    sstr << "robot_infos_" << id;
     std::ofstream ifs;
     if(!openOLogFile(ifs,sstr.str())){
         std::cerr << "Unable to open file : " << sstr.str() << std::endl;
         return;
     }
-
+    ifs << "evaluation_" << eval;
     ifs << "fitnesses;";
     for(double& obj: static_cast<MNIPES*>(ea.get())->get_objectives())
         ifs << obj << ";";
