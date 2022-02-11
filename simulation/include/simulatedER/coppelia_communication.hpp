@@ -14,10 +14,15 @@
 #include "simLib.h"
 #endif
 
-
-
 namespace are {
 
+    typedef struct lookup_table {
+// look up table for sensor reading from "20.40.025 (raw) data for organ calibrations"
+// range from 0-1m in the z direction and 0-0.3m in the x direction
+        static int coord2value_map[11][4];
+//threshold for passive IR
+        static int threshold;
+    }lookup_table;
 namespace sim {
 
 
