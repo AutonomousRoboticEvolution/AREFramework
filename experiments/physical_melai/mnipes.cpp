@@ -215,12 +215,18 @@ void MNIPES::init_learner(int id){
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
+    bool useArucoAsInput = settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
 
 
     //TODO: load saved learners
     int wheels, joints, sensors;
     phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
-    int nn_inputs = sensors*2;
+    int nn_inputs;
+    if (useArucoAsInput){
+        nn_inputs = sensors*2 + 1;
+    }else{
+        nn_inputs = sensors*2;
+    }
     int nn_outputs = wheels + joints;
     int nbr_weights, nbr_bias;
 
