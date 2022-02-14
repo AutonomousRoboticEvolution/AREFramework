@@ -182,7 +182,7 @@ bool ER::stop_evaluation(){
         if (message=="finished_logs"){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
-            std::cout << "got a log:\n" << message << std::endl;
+            //std::cout << "got a log" << message << std::endl;
             Logging::saveStringToFile( "log_file" , message );
         }
     }
