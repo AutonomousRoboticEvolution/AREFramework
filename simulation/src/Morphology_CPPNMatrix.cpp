@@ -416,14 +416,13 @@ void Morphology_CPPNMatrix::createGripper()
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
-    std::string gripperWheelPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
-    gripperWheelPath += "C_GripperW.ttm";
+    std::string models_path = settings::getParameter<settings::String>(parameters,"#modelsPath").value;
+    std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
     tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
     assert(tempGripperHandle != -1);
     gripperHandles.push_back(tempGripperHandle);
     tempGripperHandle = -1;
-    std::string gripperSensorPath = settings::getParameter<settings::String>(parameters,"#organsPath").value;
-    gripperSensorPath += "C_GripperS.ttm";
+    std::string gripperSensorPath = models_path + "/utils/gripper_s.ttm";
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
     gripperHandles.push_back(tempGripperHandle);

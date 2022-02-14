@@ -165,7 +165,7 @@ void Organ::createOrgan(int skeletonHandle)
 {
     organChecked = true;
     /// \todo EB: It might be worth to have this as a separate parameters (?)
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
+    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
     int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
 
     if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
@@ -176,15 +176,15 @@ void Organ::createOrgan(int skeletonHandle)
     vers << version;
 
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV4.ttm";
+        modelsPath += "/organs/head.ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV" + vers.str() + ".ttm";
+        modelsPath += "/organs/wheel.ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_SensorV" + vers.str() + ".ttm";
+        modelsPath += "/organs/sensor.ttm";
     else if(organType == 3) // Joints
-        modelsPath += "C_Joint.ttm";
+        modelsPath += "/organs/joint.ttm";
     else if(organType == 4) // Caster
-        modelsPath+= "C_CasterV6.ttm";
+        modelsPath+= "/organs/caster.ttm";
     else
         assert(false);
 
@@ -329,8 +329,8 @@ void Organ::createMaleConnector(int skeletonHandle)
     tempConnectorOrientation[1] = connectorOri.at(1);
     tempConnectorOrientation[2] = connectorOri.at(2);
 
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
-    modelsPath += "C_MaleConnectorV2.ttm";
+    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    modelsPath += "utils/male_connector.ttm";
 
     tempConnectorHandle = simLoadModel(modelsPath.c_str());
     assert(tempConnectorHandle != -1);
