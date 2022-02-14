@@ -330,7 +330,7 @@ void Organ::createMaleConnector(int skeletonHandle)
     tempConnectorOrientation[2] = connectorOri.at(2);
 
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    modelsPath += "utils/male_connector.ttm";
+    modelsPath += "utils/male_connector_visual.ttm";
 
     tempConnectorHandle = simLoadModel(modelsPath.c_str());
     assert(tempConnectorHandle != -1);
