@@ -6,7 +6,6 @@
 #include "eigen3/Eigen/Core"
 #include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
-#include <limbo/init/lhs.hpp>
 
 
 namespace are {
@@ -31,9 +30,7 @@ public:
 
 private:
     std::unique_ptr<NEAT::Population> morph_population;
-
     NEAT::Parameters params;
-
     std::vector<Eigen::VectorXd> archive;
 
 protected:

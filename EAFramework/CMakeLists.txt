@@ -37,13 +37,8 @@ else()
     find_package(MultiNEAT REQUIRED)
     message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 
-if(WITH_NN2 AND LIMBO_FOLDER)
-    FILE(GLOB SOURCES 
-            "src/*"
-            "src/misc/*" 
-            "src/nn2/*"
-            "src/learning/*")
-elseif(WITH_NN2)
+
+if(WITH_NN2)
     FILE(GLOB SOURCES 
             "src/*"
             "src/misc/*" 
@@ -62,7 +57,6 @@ target_include_directories(ARE PUBLIC
     "include"
     "/usr/include/eigen3"
     "../modules"
-    "${LIMBO_FOLDER}/src/"
 )
 target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})
 

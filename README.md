@@ -26,7 +26,6 @@ Dependencies for learning
 
 * LIBCMAES - [link](https://github.com/beniz/libcmaes)
 * NN2 (please put this code in modules) - [link](https://github.com/LeniLeGoff/nn2)
-* Limbo (cmake -DLIMBO_FOLDER=/limbo_folder/) .. - [link](https://github.com/resibots/limbo)
 
 ## Installation
 
@@ -146,7 +145,7 @@ As well, you have log files corresponding to the outputs of the client and all t
 ### Morphneuro Experiment Instruction
 Compilation
 ```
-cmake  -DONLY_SIMULATION=1 -DLIMBO_FOLDER=/limbo-master -DVREP_FOLDER=/ ..
+cmake  -DONLY_SIMULATION=1 -DVREP_FOLDER=/ ..
 make
 sudo make install
 ```
