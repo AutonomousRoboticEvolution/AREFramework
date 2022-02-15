@@ -4,13 +4,20 @@ using namespace are::pi;
 
 AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
-    _max_eval_time = float( settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ) * 1000.0; // in milliseconds
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
+    // battery voltage check
+    batteryMonitor.init();
+    uint16_t measuredBatteryVoltage = batteryMonitor.measureBatteryVoltage(); // measured in cV
+    std::cout<<"Measured battery voltage = "<< float(measuredBatteryVoltage)/100.<<" V"<<std::endl;
+
     // initilise the camera
-    cameraInputToNN = true; // TODO: make this a parameter?
-    camera.setTagsToLookFor({14,42}); // TODO: make this a parameter?
+    // If this is true, the camera input (binary on/off) will be used the first input to the neural network controller:
+    cameraInputToNN =  settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
+    // This is the parameter which determines which of the arcuo tags trigger the camera:
+    camera.setTagsToLookFor( settings::getParameter<settings::Sequence<int>>(parameters,"#arucoTagsToDetect").value );
 
     // need to turn on the daughter boards
     daughterBoards->init();
@@ -27,6 +34,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
+        // NOTE! the string of the address value in the string (from the list_of_organs file) is in decimal, e.g. 0x63 = "99"
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
         switch (stoi(organType)) {
         case 0: //head

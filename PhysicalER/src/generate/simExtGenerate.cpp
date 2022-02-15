@@ -140,13 +140,14 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
     if (message == sim_message_eventcallback_simulationabouttostart)
     {
         assert(simulationState == STARTING);
-        simulationState = BUSY;
         ER->manufacturability_test();
+        simulationState = BUSY;
     }
     //Runing Simulation
     else if (message == sim_message_eventcallback_modulehandle)
     {
         assert(simulationState == BUSY);
+
         simStopSimulation();
     }
     // SIMULATION ENDED
@@ -154,8 +155,11 @@ SIM_DLLEXPORT void* simMessage(int message, int* auxiliaryData, void* customData
     {
         assert(simulationState == BUSY);
         simulationState = CLEANUP;
-        ER->write_data();
-        if(ER->is_finish()) exit(0);
+
+        if(ER->is_finish()){
+            ER->write_data();
+            exit(0);
+        }
     }
 
     if (simulationState == CLEANUP) {

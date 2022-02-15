@@ -38,6 +38,7 @@ void NIPES::init(){
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
     const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
     int nbr_weights, nbr_bias;
     if(nn_type == settings::nnType::FFNN)
@@ -46,6 +47,9 @@ void NIPES::init(){
         NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN_CPG){
+        NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+    }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -81,7 +85,6 @@ void NIPES::init(){
     std::vector<double> biases(nbr_bias);
 
     for(int u = 0; u < pop_size; u++){
-
         for(int v = 0; v < nbr_weights; v++)
             weights[v] = init_samples(v,u);
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)

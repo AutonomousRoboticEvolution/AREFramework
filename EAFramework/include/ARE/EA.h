@@ -112,7 +112,7 @@ public:
 
     //GETTERS & SETTERS
     void setCurrentIndIndex(int index){currentIndIndex = index;}
-    Individual::Ptr getIndividual(size_t index) const;
+    virtual Individual::Ptr getIndividual(size_t index) const;
     size_t getPopSize() const {return population.size();}
 
     const std::vector<Individual::Ptr> &get_population() const {return population;}
@@ -134,15 +134,16 @@ public:
     void set_endEvalTime(const hr_clock::time_point& t){endEvalTime = t;}
     void set_simulator_side(bool ss){simulator_side = ss;}
 
+    virtual const Genome::Ptr get_next_controller_genome(int id){} //method for the physical side
+
 protected:
     /// This method initilizes a population of genomes
-    virtual void evaluation(){}  // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
-    virtual void selection(){}  	// selection operator
-    virtual void replacement(){}		// replacement operator
-    virtual void mutation(){}		// mutation operator
-    virtual void crossover(){}      //crossover
-    virtual void end(){}				// last call to the EA, when simulation stops
-
+    virtual void evaluation(){} // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
+    virtual void selection(){}  // selection operator
+    virtual void replacement(){}// replacement operator
+    virtual void mutation(){}   // mutation operator
+    virtual void crossover(){}  // crossover
+    virtual void end(){}		// last call to the EA, when simulation stops
 
     std::vector<Individual::Ptr> population;
     ///set the environment type, evolution type...

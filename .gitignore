@@ -42,4 +42,10 @@ simulation/.idea/
 
 simulation/Cluster/__pycache__/
 
+wiki/
 *.autosave
+
+
+RoboFab/organBankContents.txt
+
+RoboFab/Tracking_system/__pycache__/

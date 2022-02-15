@@ -12,9 +12,7 @@ RandNum::RandNum(int seed)
 }
 
 
-RandNum::~RandNum()
-{
-}
+RandNum::~RandNum(){}
 
 double RandNum::randDouble(double lower, double upper) {
     std::uniform_real_distribution<> dist(lower,upper);
@@ -33,7 +31,8 @@ int RandNum::randInt(int lower, int upper) {
 
 std::vector<double> RandNum::randVectd(double lower, double upper, int size){
     std::vector<double> res;
-    for(int i = 0; i < size; i++)
+    res.reserve(size);
+for(int i = 0; i < size; i++)
         res.push_back(randDouble(lower,upper));
     return res;
 }
@@ -50,7 +49,7 @@ void RandNum::setSeed(int seed) {
 	std::cout << "Seed set to " << seed << std::endl;
 }
 
-int RandNum::getSeed()
+int RandNum::getSeed() const
 {
         return m_seed;
 }

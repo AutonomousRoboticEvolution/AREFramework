@@ -19,7 +19,7 @@ void CPPNIndividual::createMorphology()
 
 void CPPNIndividual::setMorphDesc()
 {
-    morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
+    morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc();
 }
 
 void CPPNIndividual::setManRes()
@@ -28,7 +28,7 @@ void CPPNIndividual::setManRes()
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
-    return morphDesc;
+    return morphDesc.getCartDesc();
 }
 
 std::string CPPNIndividual::to_string()

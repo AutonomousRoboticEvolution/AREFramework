@@ -55,19 +55,3 @@ void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
     logFileStream.close();
 }
 
-void PositionsLog::saveLog(EA::Ptr &ea)
-{
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-    int generation = ea->get_generation();
-    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-        logFileStream << generation * ea->get_population().size() + ind << ",";
-        std::vector<double> final_position = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->get_final_position();
-        for(int j = 0; j < final_position.size(); j++){
-            logFileStream << final_position.at(j) << ",";
-        }
-        logFileStream << std::endl;
-    }
-    logFileStream.close();
-}

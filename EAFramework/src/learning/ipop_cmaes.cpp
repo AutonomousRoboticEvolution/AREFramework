@@ -3,18 +3,18 @@
 using namespace are;
 
 std::map<int,std::string> IPOPCMAStrategy::scriterias = {{cma::CONT,"OK"},
-                                                           {cma::AUTOMAXITER,"The automatically set maximal number of iterations per run has been reached"},
-                                                           {cma::TOLHISTFUN,"[Success] The optimization has converged"},
-                                                           {cma::EQUALFUNVALS,"[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function"},
-                                                           {cma::TOLX,"[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)"},
-                                                           {cma::TOLUPSIGMA,"[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization."},
-                                                           {cma::STAGNATION,"[Partial Success] Median of newest values is not smaller than the median of older values"},
-                                                           {cma::CONDITIONCOV,"[Error] The covariance matrix's condition numfber exceeds 1e14. Check out the formulation of your problem"},
-                                                           {cma::NOEFFECTAXIS,"[Partial Success] Mean remains constant along search axes"},
-                                                           {cma::NOEFFECTCOOR,"[Partial Success] Mean remains constant in coordinates"},
-                                                           {cma::MAXFEVALS,"The maximum number of function evaluations allowed for optimization has been reached"},
-                                                           {cma::MAXITER,"The maximum number of iterations specified for optimization has been reached"},
-                                                           {cma::FTARGET,"[Success] The objective function target value has been reached"}};
+                                                         {cma::AUTOMAXITER,"The automatically set maximal number of iterations per run has been reached"},
+                                                         {cma::TOLHISTFUN,"[Success] The optimization has converged"},
+                                                         {cma::EQUALFUNVALS,"[Partial Success] The objective function values are the same over too many iterations, check the formulation of your objective function"},
+                                                         {cma::TOLX,"[Partial Success] All components of covariance matrix are very small (e.g. < 1e-12)"},
+                                                         {cma::TOLUPSIGMA,"[Error] Mismatch between step size increase and decrease of all eigenvalues in covariance matrix. Try to restart the optimization."},
+                                                         {cma::STAGNATION,"[Partial Success] Median of newest values is not smaller than the median of older values"},
+                                                         {cma::CONDITIONCOV,"[Error] The covariance matrix's condition numfber exceeds 1e14. Check out the formulation of your problem"},
+                                                         {cma::NOEFFECTAXIS,"[Partial Success] Mean remains constant along search axes"},
+                                                         {cma::NOEFFECTCOOR,"[Partial Success] Mean remains constant in coordinates"},
+                                                         {cma::MAXFEVALS,"The maximum number of function evaluations allowed for optimization has been reached"},
+                                                         {cma::MAXITER,"The maximum number of iterations specified for optimization has been reached"},
+                                                         {cma::FTARGET,"[Success] The objective function target value has been reached"}};
 
 bool IPOPCMAStrategy::reach_ftarget(){
     cma::LOG_IF(cma::INFO,!_parameters.quiet()) << "Best fitness : "  << best_fitnesses.back() << std::endl;
@@ -70,9 +70,7 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
 bool IPOPCMAStrategy::pop_fit_stagnation(){
     std::vector<double> fvalues;
     for(const auto& ind : _pop)
-       fvalues.push_back(ind.objectives[0]);
-
-
+        fvalues.push_back(ind.objectives[0]);
 
     double mean=0.0;
     for(double fv : fvalues)

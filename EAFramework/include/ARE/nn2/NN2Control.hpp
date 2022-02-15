@@ -12,6 +12,7 @@
 #include "nn2/elman.hpp"
 #include "nn2/rnn.hpp"
 #include "nn2/fcp.hpp"
+#include "nn2/elman_cpg.hpp"
 
 
 namespace are {
@@ -23,6 +24,7 @@ using ffnn_t = nn2::Mlp<control::neuron_t,control::connection_t>;
 using elman_t = nn2::Elman<control::neuron_t,control::connection_t>;
 using rnn_t = nn2::Rnn<control::neuron_t,control::connection_t>;
 using fcp_t = nn2::Fcp<control::neuron_t,control::connection_t>;
+using elman_cpg_t = nn2::ElmanCPG<control::neuron_t,control::connection_t>;
 
 template<class nn_t>
 class NN2Control : public Control
@@ -44,6 +46,7 @@ public:
 
     std::vector<double> update(const std::vector<double> &sensorValues){
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
+        float evalTime = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
         boost::mt19937 rng(randomNum->getSeed());
         std::vector<double> inputs = sensorValues;
         if(noiselvl > 0.0){
@@ -52,8 +55,7 @@ public:
                 sv = normal(rng);
             }
         }
-
-        nn.step(inputs);
+        nn.step(inputs,evalTime);
         std::vector<double> output = nn.outf();
 
         if(noiselvl > 0.0){
@@ -69,8 +71,15 @@ public:
 
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
-    void init_nn(int nb_input, int nb_hidden, int nb_output,std::vector<double> weights, std::vector<double> biases){
+    void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases){
         nn = nn_t(nb_input,nb_hidden,nb_output);
+        nn.set_all_weights(weights);
+        nn.set_all_biases(biases);
+        nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        nn.init();
+    }
+    void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
+        nn = nn_t(nb_input,nb_hidden,nb_output, joint_subs);
         nn.set_all_weights(weights);
         nn.set_all_biases(biases);
         nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
@@ -79,6 +88,12 @@ public:
 
     static void nbr_parameters(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases){
         nn_t nn(nb_input,nb_hidden,nb_output);
+        nbr_weights = nn.get_nb_connections();
+        nbr_biases = nn.get_nb_neurons();
+    }
+
+    static void nbr_parameters_cpg(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases, const std::vector<int> &joint_subs){
+        nn_t nn(nb_input,nb_hidden,nb_output,joint_subs);
         nbr_weights = nn.get_nb_connections();
         nbr_biases = nn.get_nb_neurons();
     }
@@ -100,6 +115,6 @@ inline void get_nbr_weights_biases(int nbr_inputs,int nbr_outputs, int nbr_hidde
     }
 }
 
-}
+}//are
 
 #endif //NN2CONTROL_H

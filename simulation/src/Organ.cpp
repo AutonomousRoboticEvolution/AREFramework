@@ -13,7 +13,7 @@
 /// \todo EB: Do i need this?
 using namespace are::sim;
 //namespace cop = coppelia;
-
+using mc = are::morph_const;
 
 
 void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
@@ -47,13 +47,13 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     }
 }
 
-void Organ::isOrganGoodOrientation()
-{
-    float diffPosZ;
-    diffPosZ = connectorPos[2] - organPos[2];
-    /// \todo EB: remove this hard-coded value
-    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
-}
+//void Organ::isOrganGoodOrientation()
+//{
+//    float diffPosZ;
+//    diffPosZ = connectorPos[2] - organPos[2];
+//    /// \todo EB: remove this hard-coded value
+//    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
+//}
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
 {
@@ -115,20 +115,20 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
 void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // Transform organPos from m to voxels
-    int xPos = static_cast<int>(std::round(organPos[0]/VOXEL_REAL_SIZE));
-    int yPos = static_cast<int>(std::round(organPos[1]/VOXEL_REAL_SIZE));
-    int zPos = static_cast<int>(std::round(organPos[2]/VOXEL_REAL_SIZE));
-    zPos -= MATRIX_HALF_SIZE;
+    int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));
+    int yPos = static_cast<int>(std::round(organPos[1]/mc::voxel_real_size));
+    int zPos = static_cast<int>(std::round(organPos[2]/mc::voxel_real_size));
+    zPos -= mc::matrix_size/2.;
     uint8_t voxelValue;
     voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
-    if(voxelValue == FILLEDVOXEL) {// Organ centre point inside of skeleton
+    if(voxelValue == mc::filled_voxel) {// Organ centre point inside of skeleton
         organInsideSkeleton = true;
         return;
     }
-    else if(voxelValue == EMPTYVOXEL) {
+    else if(voxelValue == mc::empty_voxel) {
         /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
-        if(xPos <= xHeadUpperLimit && xPos >= xHeadLowerLimit &&
-           yPos <= yHeadUpperLimit && yPos >= xHeadLowerLimit) {
+        if(xPos <= mc::xHeadUpperLimit && xPos >= mc::xHeadLowerLimit &&
+           yPos <= mc::yHeadUpperLimit && yPos >= mc::yHeadLowerLimit) {
             organInsideSkeleton = true;
             return;
         }
@@ -144,14 +144,13 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
-    isOrganGoodOrientation();
     isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
 void Organ::repressOrgan()
 {
-    if(organInsideSkeleton || organColliding || !organGoodOrientation || !organGripperAccess){
+    if(organInsideSkeleton || organColliding || !organGripperAccess){
         simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(graphicConnectorHandle);
@@ -166,10 +165,10 @@ void Organ::createOrgan(int skeletonHandle)
 {
     organChecked = true;
     /// \todo EB: It might be worth to have this as a separate parameters (?)
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
+    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
     int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
 
-    if(version != 2 && version != 3){
+    if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
         std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
         version = 3;
     }
@@ -177,15 +176,15 @@ void Organ::createOrgan(int skeletonHandle)
     vers << version;
 
     if(organType == 0) // Brain
-        modelsPath += "C_HeadV3.ttm";
+        modelsPath += "/organs/head.ttm";
     else if(organType == 1) // Wheels
-        modelsPath += "C_WheelV" + vers.str() + ".ttm";
+        modelsPath += "/organs/wheel.ttm";
     else if(organType == 2) // Sensors
-        modelsPath += "C_SensorV" + vers.str() + ".ttm";
+        modelsPath += "/organs/sensor.ttm";
     else if(organType == 3) // Joints
-        modelsPath += "C_Joint.ttm";
+        modelsPath += "/organs/joint.ttm";
     else if(organType == 4) // Caster
-        modelsPath+= "C_Caster.ttm";
+        modelsPath+= "/organs/caster.ttm";
     else
         assert(false);
 
@@ -235,8 +234,10 @@ void Organ::createOrgan(int skeletonHandle)
         tempConnectorPos[2] = organPos[2] + 0.02;
     }else if(organType == 3) // Joints
         tempConnectorPos[2] = tempOrganPos[2] + 0.035;
-    else if(organType == 4)  // Caster
+    else if(organType == 4) {  // Caster
+        tempConnectorPos[0] = tempOrganPos[0] - 0.01;
         tempConnectorPos[2] = tempOrganPos[2] + 0.02;
+    }
     else
         assert(false);
 
@@ -256,9 +257,10 @@ void Organ::createOrgan(int skeletonHandle)
         simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
         simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
     }
-
     /// \todo EB: These two lines work but I don't understand why with the previous method no.
     simGetObjectOrientation(organHandle, -1, tempOrganOri);
+
+    organOri.at(0) = tempOrganOri[0]; organOri.at(1) = tempOrganOri[1]; organOri.at(2) = tempOrganOri[2];
     simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
     // Set parents
     simSetObjectParent(forceSensor,skeletonHandle,1);
@@ -327,8 +329,8 @@ void Organ::createMaleConnector(int skeletonHandle)
     tempConnectorOrientation[1] = connectorOri.at(1);
     tempConnectorOrientation[2] = connectorOri.at(2);
 
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#organsPath").value;
-    modelsPath += "C_MaleConnectorV2.ttm";
+    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    modelsPath += "utils/male_connector_visual.ttm";
 
     tempConnectorHandle = simLoadModel(modelsPath.c_str());
     assert(tempConnectorHandle != -1);

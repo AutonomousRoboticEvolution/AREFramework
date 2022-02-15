@@ -10,14 +10,13 @@ set(INCLUDES
     ${OpenCV_INCLUDE_DIRS}
     "../../EAFramework/include"
     "../../PhysicalER/include"
-    "../../PhysicalER/image_processing/include"
+    "../../image_processing/include"
     "../common/"
     "/usr/include/eigen3"
     "../../modules/")
 
-add_library(physical_update SHARED 
+add_library(physical_update SHARED
    factories.cpp
-   realMaze.cpp
    random_controller.cpp
     )
 

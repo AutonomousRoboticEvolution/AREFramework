@@ -143,7 +143,6 @@ public:
      */
     std::string to_string() const override;
     void from_string(const std::string & gen_str) override;
-    void from_file(const std::string &filename);
 
     friend class boost::serialization::access;
     template <class archive>
@@ -156,16 +155,15 @@ public:
         arch & nbr_output;
         arch & nbr_hidden;
         arch & nn_type;
-
     }
 
 private:
     std::vector<double> weights;
     std::vector<double> biases;
-    int nbr_input;
-    int nbr_output;
-    int nbr_hidden;
-    int nn_type;
+    int nbr_input=0;
+    int nbr_output=0;
+    int nbr_hidden=0;
+    int nn_type=0;
 };
 
 class NNParamGenomeLog : public Logging

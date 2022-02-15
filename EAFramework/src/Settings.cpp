@@ -35,6 +35,12 @@ settings::Type::Ptr settings::buildType(const std::string &name)
         return std::make_shared<settings::Double>(Double());
     else if(name == "string")
         return std::make_shared<settings::String>(String());
+    else if(name == "sequence_int")
+        return std::make_shared<settings::Sequence<int>>(Sequence<int>());
+    else if(name == "sequence_float")
+        return std::make_shared<settings::Sequence<float>>(Sequence<float>());
+    else if(name == "sequence_double")
+        return std::make_shared<settings::Sequence<double>>(Sequence<double>());
     else
     {
         std::cerr << "[ARE error] unknown parameter type : " << name << std::endl;
@@ -79,19 +85,28 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
 std::string settings::toString(const std::string &name, const settings::Type::ConstPtr& elt){
     std::stringstream sstr;
     if(elt->name == "bool"){
-        sstr << name << ",bool," << settings::cast<settings::Boolean>(elt)->value << std::endl;
+        sstr << name << ",bool," << *(settings::cast<settings::Boolean>(elt)).get() << std::endl;
     }
     else if(elt->name == "int"){
-        sstr << name << ",int," << settings::cast<settings::Integer>(elt)->value << std::endl;
+        sstr << name << ",int," << *(settings::cast<settings::Integer>(elt)).get() << std::endl;
     }
     else if(elt->name == "float"){
-        sstr << name << ",float," << settings::cast<settings::Float>(elt)->value << std::endl;
+        sstr << name << ",float," << *(settings::cast<settings::Float>(elt)).get() << std::endl;
     }
     else if(elt->name == "double"){
-        sstr << name << ",double," << settings::cast<settings::Double>(elt)->value << std::endl;
+        sstr << name << ",double," << *(settings::cast<settings::Double>(elt)).get() << std::endl;
     }
     else if(elt->name == "string"){
-        sstr << name << ",string," << settings::cast<settings::String>(elt)->value << std::endl;
+        sstr << name << ",string," << *(settings::cast<settings::String>(elt)).get() << std::endl;
+    }
+    else if(elt->name == "sequence_int"){
+        sstr << name << ",sequence_int," << *(settings::cast<settings::Sequence<int>>(elt)).get() << std::endl;
+    }
+    else if(elt->name == "sequence_int"){
+        sstr << name << ",sequence_float," << *(settings::cast<settings::Sequence<float>>(elt)).get() << std::endl;
+    }
+    else if(elt->name == "sequence_double"){
+        sstr << name << ",sequence_double," << *(settings::cast<settings::Sequence<double>>(elt)).get() << std::endl;
     }
     return sstr.str();
 }
@@ -125,7 +140,6 @@ settings::ParametersMap settings::fromString(const std::string &str_params){
     settings::ParametersMap parameters;
 
     std::istringstream istr(str_params.c_str());
-
 
     std::string line;
     std::list<std::string> values;

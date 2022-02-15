@@ -25,18 +25,18 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::FitnessLog::Ptr fitlog(new are::FitnessLog(fit_log_file));
     logs.push_back(fitlog);
 
-    are::NN2CPPNGenomeLog::Ptr genlog(new are::NN2CPPNGenomeLog);
+    are::nn2_cppn::NN2CPPNGenomeLog::Ptr genlog(new are::nn2_cppn::NN2CPPNGenomeLog);
     logs.push_back(genlog);
 
     std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
-    are::NbrConnNeurLog::Ptr ncnlog(new are::NbrConnNeurLog(ncn_file));
+    are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog(new are::nn2_cppn::NbrConnNeurLog(ncn_file));
     logs.push_back(ncnlog);
 
     std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
-    are::ParentingLog::Ptr parlog(new are::ParentingLog(par_file));
+    are::nn2_cppn::ParentingLog::Ptr parlog(new are::nn2_cppn::ParentingLog(par_file));
     logs.push_back(parlog);
 
-    are::GraphVizLog::Ptr gvlog(new are::GraphVizLog);
+    are::nn2_cppn::GraphVizLog::Ptr gvlog(new are::nn2_cppn::GraphVizLog);
     logs.push_back(gvlog);
 
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;

@@ -61,7 +61,6 @@ struct CartDesc
         return cartDesc;
     }
 
-
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -73,6 +72,29 @@ struct CartDesc
         arch & sensorNumber;
         arch & casterNumber;
         arch & jointNumber;
+    }
+};
+
+struct OrganPositionDesc
+{
+    int organ_matrix[morph_const::matrix_size][morph_const::matrix_size][morph_const::matrix_size] = {{{0}}};
+    Eigen::VectorXd getCartDesc() const{
+        Eigen::VectorXd organ_position_descriptor(morph_const::matrix_size*morph_const::matrix_size*morph_const::matrix_size);
+        int counter = 0;
+        for(int k = 0; k < morph_const::matrix_size; k++){
+            for(int j = 0; j < morph_const::matrix_size; j++) {
+                for(int i = 0; i < morph_const::matrix_size; i++) {
+                    organ_position_descriptor(counter) = organ_matrix[i][j][k];
+                    counter++;
+                }
+            }
+        }
+        return organ_position_descriptor;
+    }
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & organ_matrix;
     }
 };
 

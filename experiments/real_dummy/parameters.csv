@@ -1,4 +1,0 @@
-#experimentName,string,real_dummy
-#expPluginName,string,/usr/local/lib/libreal_dummy.so
-#verbose,bool,1
-#repository,string,/home/xukang/Project/Autonomous_Robotics_Envolutionary/evolutionary_robotics_framework/logs

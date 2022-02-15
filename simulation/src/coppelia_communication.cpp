@@ -1,152 +1,164 @@
 #include <sstream>
 #include "simulatedER/coppelia_communication.hpp"
-#include <cmath>
 
 using namespace are;
 
-// Coordination 2 real sensor value
-// x = [-400mm, -300mm, -200mm, -100mm, 0mm, 100mm, 200mm, 300mm, 400mm]
-const double coord2value_map[12][9] = 
-    {{0, 0, 0, 0, 0, 0, 0, 0, 0},                           // y = 0mm
-    {0, 27.15, 159.45, 255, 255, 255, 159.45, 27.15, 0},    // y = 100mm
-    {0, 87.05, 185.35, 255, 255, 255, 185.35, 87.05, 0},    // y = 200mm
-    {0, 69.95, 120.1, 255, 255, 255, 120.1, 69.95, 0},      // y = 300mm
-    {0, 50.25, 116.5, 255, 255, 255, 116.5, 50.25, 0},
-    {0, 48.25, 134.6, 236.2, 255, 236.2, 134.6, 48.25, 0},
-    {0, 60.75, 140.10, 248.3, 234.4, 248.3, 140.1, 60.75, 0},
-    {0, 46.65, 116.3, 185.3, 287, 185.3, 116.3, 46.65, 0},
-    {0, 54.1, 90.65, 124.4, 126.4, 124.4, 90.65, 54.1, 0},  // y = 800mm
-    {0, 49.35, 79.9, 105.6, 100.7, 105.6, 79.9, 49.35, 0},  // y = 900mm
-    {0, 48.8, 67.5, 87.1, 101.5, 87.1, 67.5, 48.8, 0},      // y = 1000mm
-    {0, 0, 0, 0, 0, 0, 0, 0, 0}};                           // y = 1100mm
+// look up table for sensor reading from "20.40.025 (raw) data for organ calibrations"
+// range from 0-1m in the z direction and 0-0.3m in the x direction
+int lookup_table::coord2value_map[11][4] =
+        {{255,233,35,10},
+         {176,255,159,27},
+         {255,255,185,87},
+         {255,255,120,70},
+         {255,255,117,50},
+         {255,236,135,48},
+         {234,248,140,61},
+         {187,185,116,47},
+         {126,124,91,54},
+         {101,106,80,49},
+         {102,87,68,49}};
+
+//threshold for passive IR
+int lookup_table::threshold = 100;
 
 
 void sim::readProximitySensors(const std::vector<int> handles, std::vector<double> &sensorValues){
+    // reads proximity sensor returning its distance to the pushback function
 
+    // function for euclidean distance
     std::function<double(float, float, float)> norm_L2 =
             [](float x, float y, float z) -> double
     {return std::sqrt(x*x + y*y + z*z);};
-
+    
+    // variables for proximity sensor function
     float pos[4], norm[3];
-    int obj_h;
+    int detected_object_handle;
     int det;
+    // for all proximity sensors reads there vaule
     for (size_t i = 0; i < handles.size(); i++)
     {
-        det = simReadProximitySensor(handles[i],pos,&obj_h,norm);
-        if(det > 0){
+        det = simReadProximitySensor(handles[i],pos,&detected_object_handle,norm);
+        if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
-        }
         else if(det <= 0) sensorValues.push_back(0);
     }
 }
 
-void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues, bool use_simulate_data){
+void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues){
+    // reads passive IR sensor taking into account object that block the view
+
+    // function for euclidean distance
+    std::function<float(float, float, float)> norm_L2 =
+            [](float x, float y, float z) -> float { return std::sqrt(x * x + y * y + z * z); };
+
+    int occlusion_detector;
+
+    // variables for proximity sensor function
+    float norm[3];
+    float position_occlusion[4];
+    float position_passive[4];
+    int detected_object_handle;
+    int det, occl;
+    std::string name;
+    std::vector<std::string> splitted_name;
+    bool occlusion = false;
+
+    for (int handle: handles) {
+
+        occlusion_detector = simGetObjectChild(handle, 0);
+        det = simReadProximitySensor(handle, position_passive, &detected_object_handle, norm);
+        // calculates distance to object
+        float dist = norm_L2(position_passive[0], position_passive[1], position_passive[2]);
+        // Did the sensor detected something?
+        if (det > 0) {
+            name = simGetObjectName(detected_object_handle);
+            float ref_euler[3];
+            if (position_passive[0] == 0) position_passive[1] += 1e-3; // small inaccuracy in case of x = 0;
+            float euler[3] = {static_cast<float>(std::atan2(position_passive[2], position_passive[1]) - M_PI / 2.f),
+                              static_cast<float>(std::asin(position_passive[0] / dist)),
+                              0};
+            // Rotates the
+            simSetObjectOrientation(occlusion_detector, handle, euler);
+            occl = simReadProximitySensor(occlusion_detector, position_occlusion, &detected_object_handle, norm);
+            // Checks occlusion exists and is closer than the beacon
+            if (occl > 0) {
+                occlusion = norm_L2(position_occlusion[0], position_occlusion[1], position_occlusion[2]) < dist;
+            } else occlusion = false;
+            boost::split(splitted_name, name, boost::is_any_of("_"));
+
+            // Only detects IR beacon
+            if (splitted_name[0] == "IRBeacon" && !occlusion) {
+
+                //corrects to center of beacon as 5cm further away
+                float x_pos = sqrt(position_passive[1] * position_passive[1] + position_passive[0] * position_passive[0]);
+                float angle = atan2(x_pos, position_passive[2]);
+                float r = std::sqrt(position_passive[2] * position_passive[2] + x_pos * x_pos);
+                r = r + 0.05;//adds radius of beacon
+                x_pos = r * std::sin(angle);
+                float z_pos = r * std::cos(angle);
+                // Calculate z and x coordinate in demimeters
+                int int_z = round(z_pos * 10.);
+                int int_x = round(x_pos * 10.);
+                int IR_reading = 0;
+                // Error check for bad values
+                if (int_z < 11 && int_x < 4 && int_z >= 0)
+                    IR_reading = lookup_table::coord2value_map[int_z][int_x];
+                // For high reading return true value
+                if (IR_reading >= lookup_table::threshold) {
+                    sensorValues.push_back(1);
+                } else sensorValues.push_back(0);
+
+            } else // Beacon not found
+                sensorValues.push_back(0);
+
+        } else if (det <= 0) // Nothing found
+            sensorValues.push_back(0);
+
+    }
+}
+
+void sim::readCamera(const int camera_handle, std::vector<double> &sensorValues){
     std::function<float(float, float, float)> norm_L2 =
             [](float x, float y, float z) -> float
-    {return std::sqrt(x*x + y*y + z*z);};
-
-    // map the simulation data to true sensor data
-    std::function<double(float, float)> get_true_sensor_value = [](float x, float y) -> double{
-        int locate_x = round(x * 1000 / 100);       // get the nearest point in true sensor data table and serve as central point
-        int locate_y = round(y * 1000 / 100);   
-        float offset_x = x * 1000 / 100 - locate_x; // calculate the offset of the current point w.r.t. the central point
-        float offset_y = y * 1000 / 100 - locate_y;
-        int axis_x = locate_x + 4;                  // transform the x to the corresponding idx in the map above ([-4, 4] -> [0, 8])
-        int axis_y = locate_y;                      // transform the y 
-        float sensor_value;
-
-        if (axis_x < 1 || axis_x > 7 || axis_y < 1 || axis_y > 10){
-            sensor_value = 0.0;                     // if the location out of the map, just set the value 0.0                
-        }
-        else{
-            float base_value = coord2value_map[axis_y][axis_x];
-            float offset_value;
-            if (offset_x < -0.16 && offset_y > 0.16){
-                // if the location is in the left-down direction, linearly change the data between the central point and the left-down point
-                offset_value = (coord2value_map[axis_y+1][axis_x-1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));     
-            }
-            else if (offset_x >= -0.16 && offset_x <= 0.16 && offset_y > 0.16){
-                // if the location is in the down direction, linearly change the data between the central point and the down point
-                offset_value = (coord2value_map[axis_y+1][axis_x] - coord2value_map[axis_y][axis_x]) * (offset_y / 1.0);
-            }
-            else if (offset_x > 0.16 && offset_y > 0.16){
-                // if the location is in the right-down direction, linearly change the data between the central point and the right-down point
-                offset_value = (coord2value_map[axis_y+1][axis_x+1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            else if (offset_x > 0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // if the location is in the right direction, linearly change the data between the central point and the right point
-                offset_value = (coord2value_map[axis_y][axis_x+1] - coord2value_map[axis_y][axis_x]) * (offset_x / 1.0);
-            }
-            else if (offset_x <= 0.16 && offset_x >= -0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // in the central region of the central point
-                offset_value = 0;
-            }
-            else if (offset_x < -0.16 && offset_y <= 0.16 && offset_y >= -0.16){
-                // if the location is in the left direction, linearly change the data between the central point and the left point
-                offset_value = (coord2value_map[axis_y][axis_x-1] - coord2value_map[axis_y][axis_x]) * (offset_x / 1.0);
-            }
-            else if (offset_x > 0.16 && offset_y < -0.16){
-                // right-up direction
-                offset_value = (coord2value_map[axis_y-1][axis_x+1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            else if (offset_x <= 0.16 && offset_x >= -0.16 && offset_y < -0.16){
-                // up direction
-                offset_value = (coord2value_map[axis_y-1][axis_x] - coord2value_map[axis_y][axis_x]) * (offset_y / 1.0);
-            }
-            else{
-                // up-left direction
-                offset_value = (coord2value_map[axis_y-1][axis_x-1] - coord2value_map[axis_y][axis_x]) * (std::sqrt(offset_x*offset_x + offset_y*offset_y) / std::sqrt(2));
-            }
-            sensor_value = base_value + offset_value;
-        }
-        return sensor_value;
-    };
+            {return std::sqrt(x*x + y*y + z*z);};
 
     int occlusion_detector;
 
     float pos[4], norm[3];
-    int obj_h;
+    int detected_object_handle;
     int det,occl;
     std::string name;
     std::vector<std::string> splitted_name;
     bool occlusion = false;
 
-    for (int handle : handles) {
-        occlusion_detector = simGetObjectChild(handle,0);
-        
-        det = simReadProximitySensor(handle, pos, &obj_h, norm);
-        float dist = norm_L2(pos[0],pos[1],pos[2]);
+    occlusion_detector = simGetObjectChild(camera_handle,0);
+    det = simReadProximitySensor(camera_handle,pos,&detected_object_handle,norm);
+    float dist = norm_L2(pos[0],pos[1],pos[2]);
+    if(det > 0){
 
-        if (use_simulate_data == false){
-            float true_sensor_value = get_true_sensor_value(pos[0], pos[1]);
-            if (true_sensor_value > 50) det = 1;  // force det to 1
-        }
+        name = simGetObjectName(detected_object_handle);
+        float ref_euler[3];
+        if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
+        float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
+                          static_cast<float>(std::asin(pos[0]/dist)),
+                          0};
+        simSetObjectOrientation(occlusion_detector,camera_handle,euler);
+        occl = simReadProximitySensor(occlusion_detector,pos,&detected_object_handle,norm);
+        if(occl > 0){
+            occlusion = norm_L2(pos[0],pos[1],pos[2]) < dist;
+        }else occlusion = false;
 
-        if(det > 0){
-                name = simGetObjectName(obj_h);
-                float ref_euler[3];
-                if(pos[0] == 0) pos[1]+=1e-3; // small inaccuracy in case of x = 0;
-                float euler[3] = {static_cast<float>(std::atan2(pos[2],pos[1]) - M_PI/2.f),
-                                static_cast<float>(std::asin(pos[0]/dist)),
-                                0};
-                simSetObjectOrientation(occlusion_detector,handle,euler);
-                occl = simReadProximitySensor(occlusion_detector,pos,&obj_h,norm);
-                if(occl > 0){
-                    occlusion = norm_L2(pos[0],pos[1],pos[2]) < dist;
-                }else occlusion = false;
-
-                boost::split(splitted_name,name,boost::is_any_of("_"));
-                if(splitted_name[0] == "IRBeacon" && !occlusion)
-                    sensorValues.push_back(1);
-                else sensorValues.push_back(0);
-            }
-        else if(det <= 0)
-            sensorValues.push_back(0);
+        boost::split(splitted_name,name,boost::is_any_of("_"));
+        if(splitted_name[0] == "Target" && !occlusion)
+            sensorValues.push_back(1);
+        else sensorValues.push_back(0);
     }
+    else if(det <= 0)
+        sensorValues.push_back(0);
 }
 
 void sim::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, std::vector<int> &IRHandles,
-                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles){
+                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles, int &camera_handle){
 
     int nbrObj = 0;
     int* handles = nullptr;
@@ -161,6 +173,8 @@ void sim::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, st
             proxHandles.push_back(handles[i]);
         else if(splitted_name[0] == "passivIR")
             IRHandles.push_back(handles[i]);
+        else if(splitted_name[0] == "camera")
+            camera_handle = handles[i];
     }
 
     handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);

@@ -18,6 +18,7 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#withTiles",new settings::Boolean(true));
 
 }
 
@@ -37,6 +38,10 @@ void MazeEnv::init(){
             i++;
         }
     }
+
+    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
+                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
 
     target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                        settings::getParameter<settings::Double>(parameters,"#target_y").value,
@@ -63,8 +68,12 @@ void MazeEnv::init(){
 
     trajectory.clear();
 
-    std::vector<int> th;
-    build_tiled_floor(th);
+    bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
+
+    if(with_tiles){
+        std::vector<int> th;
+        build_tiled_floor(th);
+    }
 
 
 }
@@ -133,7 +142,8 @@ void MazeEnv::build_tiled_floor(std::vector<int> &tiles_handles){
             simSetObjectName(tiles_handles.back(),name.str().c_str());
             float height = -0.004;
             if(!flatFloor){
-                height = randNum->randFloat(-0.005,-0.001);
+                height = (i+j)%2 == 0 ? -0.004 : 0.006;
+//                height = randNum->randFloat(-0.05,-0.01);
             }
             float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
             simSetObjectPosition(tiles_handles.back(),-1,pos);

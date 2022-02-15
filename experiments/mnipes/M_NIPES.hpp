@@ -1,9 +1,11 @@
 #ifndef M_NIPES_HPP
 #define M_NIPES_HPP
 
+#include <boost/filesystem.hpp>
 #include "ARE/CPPNGenome.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
+#include "ARE/learning/controller_archive.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/nn2/NN2Control.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -16,6 +18,7 @@
 namespace are{
 
 using CPPNMorph = sim::Morphology_CPPNMatrix;
+namespace fs = boost::filesystem;
 
 typedef std::function<double(const CMAESLearner::Ptr&)> fitness_fct_t;
 
@@ -67,7 +70,7 @@ public:
         return std::make_shared<M_NIPESIndividual>(*this);
     }
 
-    void update(double delta_time) override;
+    void update(double delta_time) override;    
 
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
@@ -77,7 +80,7 @@ public:
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
     double get_energy_cost(){return energy_cost;}
     double get_sim_time(){return sim_time;}
-    void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
+    void set_ctrl_genome(const NNParamGenome::Ptr &gen);
 
     void setGenome();
 
@@ -98,9 +101,9 @@ public:
         arch & morphGenome;
         arch & ctrlGenome;
         arch & final_position;
-        arch & energy_cost;
+//        arch & energy_cost;
         arch & trajectory;
-        arch & sim_time;
+//        arch & sim_time;
         arch & nn_inputs;
         arch & nn_outputs;
         arch & controller_archive;
@@ -138,7 +141,7 @@ private:
     bool no_actuation = false;
     bool no_sensors = false;
 
-    double energy_cost;
+    double energy_cost = 0;
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
@@ -181,6 +184,8 @@ public:
     void set_controller_archive(const ControllerArchive::controller_archive_t archive){
         controller_archive.archive = archive;
     }
+
+
 
 private:
     typedef struct morph_desc_t{

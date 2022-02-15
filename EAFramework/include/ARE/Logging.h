@@ -16,7 +16,7 @@ public:
     static std::string log_folder;
 
     // Takes an arbitrary string input and saves it as a new file in the log_folder:
-    static void saveStringToFile(std::string fileName, std::string data);
+    static void saveStringToFile(const std::string &fileName, const std::string &data);
 
     typedef std::shared_ptr<Logging> Ptr;
     typedef std::shared_ptr<const Logging> ConstPtr;
@@ -31,7 +31,6 @@ public:
 
     virtual void saveLog(EA::Ptr& ea) = 0;
     virtual void loadLog(const std::string &file = std::string()) = 0;
-
     bool openOLogFile(std::ofstream&);
     bool openILogFile(std::ifstream&);
 
@@ -60,7 +59,7 @@ public:
 class EvalTimeLog : public Logging
 {
 public:
-    EvalTimeLog(const std::string &file) : Logging(file,false){} //Logging at the end of the generation
+    EvalTimeLog(const std::string &file) : Logging(file,false){}
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& logFile){}
 };

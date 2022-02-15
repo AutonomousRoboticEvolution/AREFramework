@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ARE/Settings.h"
+#include "ARE/morphology_descriptors.hpp"
 
 #if defined (VREP)
 #include "v_repLib.h"
@@ -23,19 +24,6 @@ namespace sim{
 
 class Organ{
 private:
-
-    /// \todo EB: This shouldn't be here!
-    constexpr static const float VOXEL_SIZE = 0.0009; //m³ - 0.9mm³
-    static const int VOXEL_MULTIPLIER = 22;
-    constexpr static const float VOXEL_REAL_SIZE = VOXEL_SIZE * static_cast<float>(VOXEL_MULTIPLIER);
-    static const int MATRIX_SIZE = (264 / VOXEL_MULTIPLIER);
-    static const int MATRIX_HALF_SIZE = MATRIX_SIZE / 2;
-    static const short int EMPTYVOXEL = 0;
-    static const short int FILLEDVOXEL = 255;
-    static const short int xHeadUpperLimit = 2;
-    static const short int xHeadLowerLimit = -2;
-    static const short int yHeadUpperLimit = 2;
-
     int organHandle;
     int organType;
     int connectorHandle;
@@ -56,7 +44,6 @@ public:
     /// \todo EB: This can be easily moved to private if RobotManRes is deleted.
     bool organInsideSkeleton;
     bool organColliding;
-    bool organGoodOrientation;
     bool organGripperAccess;
 
     Organ(int oT, std::vector<float> oP, std::vector<float> oO, const are::settings::ParametersMapPtr &param){
@@ -65,7 +52,7 @@ public:
         organPos = oP;
         organOri = oO;
         connectorPos.clear();  connectorOri.clear();
-        organInsideSkeleton = false; organColliding = false; organGoodOrientation = true;
+        organInsideSkeleton = false; organColliding = false;
         organGripperAccess = true; organRemoved = false; organChecked = false;
         objectHandles.clear();
         parameters = param;
@@ -94,10 +81,6 @@ public:
      * @param organList - All organs to compare to.
      */
     void IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
-    /**
-     * @brief This test check if the organ has a good orientation
-     */
-    void isOrganGoodOrientation();
     /**
      * @brief This test checks if the gripper connecting the organ is colliding with anything.
      * @param gripperHandle - Handle of the gripper

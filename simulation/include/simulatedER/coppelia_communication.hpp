@@ -14,10 +14,15 @@
 #include "simLib.h"
 #endif
 
-
-
 namespace are {
 
+    typedef struct lookup_table {
+// look up table for sensor reading from "20.40.025 (raw) data for organ calibrations"
+// range from 0-1m in the z direction and 0-0.3m in the x direction
+        static int coord2value_map[11][4];
+//threshold for passive IR
+        static int threshold;
+    }lookup_table;
 namespace sim {
 
 
@@ -33,7 +38,14 @@ void readProximitySensors(const std::vector<int> handles, std::vector<double> &s
  * @param Handles of the passive IR sensors
  * @param (Output) sensor values
  */
-void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues, bool use_simulate_data=true);
+void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &sensorValues);
+
+/**
+ * @brief read the values of the proximity sensors corresponding to the distance to the nearest object detected
+ * @param Handles of the passive IR sensors
+ * @param (Output) sensor values
+ */
+void readCamera(const int camera_handle, std::vector<double> &sensorValues);
 
 
 /**
@@ -45,7 +57,7 @@ void readPassivIRSensors(const std::vector<int> handles, std::vector<double> &se
  * @param (Output) list of the handles of the joints
  */
 void retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, std::vector<int> &IRHandles,
-                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles);
+                          std::vector<int> &wheelHandles, std::vector<int> &jointHandles, int &camera_handle);
 
 
 /**

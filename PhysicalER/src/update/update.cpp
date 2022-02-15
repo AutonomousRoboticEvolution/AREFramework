@@ -16,7 +16,5 @@ int main(int argc, char** argv){
     er->initialize();
     er->load_data();
     while(er->execute()) usleep(500);
-    er->write_data();
-//    er->save_logs();
     return 0;
 }

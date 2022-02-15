@@ -86,6 +86,14 @@ protected:
     std::vector<double> final_position;
 };
 
+class DummyEnv : public Environment
+{
+public:
+    void init() override {}
+    std::vector<double> fitnessFunction(const Individual::Ptr &ind) {return {0};}
+    void update_info(double time) override {}
+};
+
 }//are
 
 #endif //ENVIRONMENT_H

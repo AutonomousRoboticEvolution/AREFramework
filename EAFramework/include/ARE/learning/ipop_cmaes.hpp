@@ -114,6 +114,8 @@ public:
 
     std::vector<std::string> log_stopping_criterias;
 
+    const std::string& to_string(){}//TO DO
+    void from_string(const std::string&){}//TO DO
 
 
 private:

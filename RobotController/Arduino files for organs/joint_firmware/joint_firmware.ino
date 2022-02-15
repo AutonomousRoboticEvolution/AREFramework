@@ -92,6 +92,7 @@ volatile bool update_led_brightness_flag = false;
 
 //Variables only used for testing
 bool rotationDirection = 0; //0 is -ve, 1 is +ve
+
 uint8_t test_register_value = 0; //For organ presence detection
 
 /*******SETUP**********************/

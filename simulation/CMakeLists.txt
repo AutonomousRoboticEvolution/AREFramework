@@ -9,20 +9,25 @@ elseif(COPPELIASIM_FOLDER)
     SET(COPPELIASIM_FOUND ON CACHE BOOL "" FORCE) #CACHE BOOL "" FORCE option allows this variable to be accessed in other CMakeLists of the project
     SET(VREP_FOUND OFF CACHE BOOL "" FORCE)
     add_definitions(-DCOPPELIASIM)
-    if (WIN32)
-        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
-        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.exe")
-    elseif(APPLE)
-        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/")
-        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/coppeliaSim")
-    else()
-        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
-        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.sh")
+    if(NOT LIBPLUGIN_DIR)
+         set(LIBPLUGIN_DIR ${COPPELIASIM_FOLDER}/programming/libPlugin)
     endif()
+    list(APPEND CMAKE_MODULE_PATH ${LIBPLUGIN_DIR}/cmake)
+    find_package(CoppeliaSim 4.3.0.0 REQUIRED)
+#    if (WIN32)
+#        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+#        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.exe")
+#    elseif(APPLE)
+#        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/")
+#        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.app/Contents/MacOS/coppeliaSim")
+#    else()
+#        set(VREP_LIB_FOLDER "${COPPELIASIM_FOLDER}")
+#        set(VREP_EXE        "${COPPELIASIM_FOLDER}/coppeliaSim.sh")
+#    endif()
 
-    if(NOT EXISTS ${VREP_EXE})
-        message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
-    endif()
+#    if(NOT EXISTS ${VREP_EXE})
+#        message(FATAL_ERROR "COPPELIASIM_FOLDER not configure properly: \"${VREP_EXE}\"not found")
+#    endif()
 elseif(VREP_FOLDER)
     message("Using VREP is deprecated")
     message("VREP FOUND!")
@@ -49,7 +54,6 @@ endif()
 find_package(PolyVox REQUIRED)
 find_package(MultiNEAT REQUIRED)
 
-
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
@@ -59,7 +63,7 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
-    )
+)
 
 if(WITH_NN2)
     FILE(GLOB SRC src/* src/nn2/*)
@@ -70,20 +74,24 @@ endif()
 add_library(simulatedER SHARED ${VREP_SRC} ${SRC})
 target_include_directories(simulatedER PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+#    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_INCLUDE_DIR}>
     "include"
     "ERClient/include"
     "../EAFramework/include"
+)
+
+target_compile_definitions(simulatedER PUBLIC
+    "NON_MATLAB_PARSING"
+    "MAX_EXT_API_CONNECTIONS=255"
 )
 target_link_libraries(simulatedER
     dlibxx dl rt  MultiNEAT::MultiNEAT
     ${Boost_LIBRARIES} tbb cmaes
     ARE
     )
-target_compile_definitions(simulatedER PUBLIC
-    "NON_MATLAB_PARSING"
-    "MAX_EXT_API_CONNECTIONS=255"
-)
+
+
 set_target_properties(simulatedER PROPERTIES
     CXX_STANDARD 14
 #    COMPILE_FLAGS "-w"
@@ -91,7 +99,6 @@ set_target_properties(simulatedER PROPERTIES
 )
 
 if(VREP_FOUND)
-    message("Using VREP is deprecated")
     SET(LIB_EXT v_repExtER)
     SET(PLUGIN_SRC src/plugin/v_repExtER.cpp)
 elseif(COPPELIASIM_FOUND)
@@ -107,7 +114,7 @@ target_include_directories(${LIB_EXT} PUBLIC
     "include"
     "ERClient/include"
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_INCLUDE_DIR}>
 )
 
 
@@ -121,12 +128,12 @@ target_compile_definitions(${LIB_EXT} PUBLIC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 
 
-set_target_properties(${LIB_EXT} PROPERTIES
-    CXX_STANDARD 14
-##    COMPILE_FLAGS "-w"
-    POSITION_INDEPENDENT_CODE ON
-)
-
+#set_target_properties(${LIB_EXT} PROPERTIES
+#    CXX_STANDARD 14
+###    COMPILE_FLAGS "-w"
+#    POSITION_INDEPENDENT_CODE ON
+#)
+#message("${COPPELIASIM_LIBRARIES}")
 target_link_libraries(${LIB_EXT}
     dlibxx dl #rt
     ${Boost_LIBRARIES}

@@ -37,18 +37,15 @@ else()
     find_package(MultiNEAT REQUIRED)
     message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 
-if(WITH_NN2 AND LIMBO_FOLDER)
+
+if(WITH_NN2)
     FILE(GLOB SOURCES 
             "src/*"
             "src/misc/*" 
             "src/nn2/*"
-            "src/learning/*")
-elseif(WITH_NN2)
-    FILE(GLOB SOURCES 
-            "src/*"
-            "src/misc/*" 
-            "src/nn2/*"
-            "src/learning/ipop_cmaes.cpp")
+            "src/learning/ipop_cmaes.cpp"
+            "src/learning/controller_archive.cpp"
+            )
 else()
     FILE(GLOB SOURCES    
             "src/*"
@@ -60,7 +57,6 @@ target_include_directories(ARE PUBLIC
     "include"
     "/usr/include/eigen3"
     "../modules"
-    "${LIMBO_FOLDER}/src/"
 )
 target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})
 
@@ -72,6 +68,8 @@ target_link_libraries(nn2_cppn_serial_to_dot ARE ${Boost_LIBRARIES})
 install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
 install(TARGETS ARE DESTINATION lib)
 install(DIRECTORY . DESTINATION include/ARE FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+
+
 
 # tool to help remove the warnings when using GCC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")

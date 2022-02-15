@@ -10,6 +10,7 @@
 #include "MotorOrgan.hpp"
 #include "JointOrgan.hpp"
 #include "SensorOrgan.hpp"
+#include "BatteryMonitor.hpp"
 #include "DaughterBoards.hpp"
 #include "LedDriver.hpp"
 #include "Camera.hpp"
@@ -24,7 +25,10 @@ class AREControl{
 public:
 
     AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
-
+    ~AREControl(){
+        for(auto &o: listOfOrgans)
+            delete o;
+    }
 
     int exec( zmq::socket_t& socket);
 
@@ -33,6 +37,7 @@ private:
     u_int32_t _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
 
+    BatteryMonitor batteryMonitor; // the battery monitor object
     Camera camera; // the camera object
 
     std::vector<Organ*> listOfOrgans; // a list of (pointers to) all the organ objects
