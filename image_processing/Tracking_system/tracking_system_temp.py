@@ -26,7 +26,9 @@ class TrackingSystem:
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
 
-        
+        # start the threaded process that gets and interprets images:
+        threading.Thread(target=self.threaded_updater).start()  # starting in thread allows update of the camera at a higher frequency than zmq messages are sent
+
     @staticmethod
     # input pixels should be in the cropped image
     # input should be: [x, y]
@@ -66,14 +68,6 @@ class TrackingSystem:
         else:
             keypoints = detector.detect(mask)
 
-        #displays mask and blobs
-        if self.show_frames:
-            kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            cv2.imshow("Holy Mask",mask)
-            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
-            cv2.imshow("Blob",kp_image)
-
         #finds biggest keypoint
         if len(keypoints) >0 :
             robotkp = keypoints[0]
@@ -107,12 +101,6 @@ class TrackingSystem:
                 [x_pos, y_pos] = self.convert_pixels_to_world_frame( [ x_pos_pixels, y_pos_pixels])
 
                 tag_list += [[ids[i][0], x_pos, y_pos]]
-
-        #displays tags
-        if self.show_frames:
-            frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
-            cv2.imshow("Frame", frame_markers)
-
         # returns list
         return tag_list
 
@@ -125,39 +113,48 @@ class TrackingSystem:
            return  input_image
 
 
-    def camera_updater(self):
+    def threaded_updater(self):
         print("Tracking started")
-        vid = cv2.VideoCapture(pipe) # pipe is set in tracking_parameters.py
+        if pipe:
+            vid = cv2.VideoCapture(pipe) # pipe is set in tracking_parameters.py
 
-        # main loop for tracking system
-        while (1):
-            self.frame_return_success, uncropped_image = vid.read()
+            # main loop for tracking system
+            while (1):
+                self.frame_return_success, uncropped_image = vid.read()
 
-            if self.frame_return_success:
-                image = self.crop_image(uncropped_image)
-                # gets robot location
-                self.robot = self.robot_location(image, brainMin, brainMax)
+                if self.frame_return_success:
+                    image = self.crop_image(uncropped_image)
+                    # gets robot location
+                    self.robot = self.robot_location(image, brainMin, brainMax)
 
-                # gets tag locations and sends them
-                self.aruco_tags = self.aruco_locations(image)
+                    # gets tag locations and sends them
+                    self.aruco_tags = self.aruco_locations(image)
+                else:
+                    warnings.warn("OpenCV read() failed")
+        else:
+            import picamera
+            import picamera.array
+            camera = picamera.PiCamera()
+            camera.resolution = (640, 480)
+            camera.framerate = 32
+            rawCapture = picamera.array.PiRGBArray(camera, size=camera.resolution)
+            for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
+                image = frame.array
+                self.frame_return_success, uncropped_image = vid.read()
 
-                if self.show_frames:
-                    cv2.imshow("Image", image )
-                    cv2.imshow("Cropped", self.crop_image(image) )
-                cv2.waitKey(1)
-            else:
-                warnings.warn("OpenCV read() failed")
+                if self.frame_return_success:
+                    image = self.crop_image(uncropped_image)
+                    # gets robot location
+                    self.robot = self.robot_location(image, brainMin, brainMax)
+
+                    # gets tag locations and sends them
+                    self.aruco_tags = self.aruco_locations(image)
+                else:
+                    warnings.warn("OpenCV read() failed")
+
             
+    def main(self):
 
-        if self.show_frames:
-                vid = cv2.VideoCapture(pipe)
-                success, image = vid.read()
-                if success:
-                    cv2.imshow("Image", image )
-                    cv2.imshow("Cropped", self.crop_image(image) )
-            
-
-    def zmq_updater(self):
         #main loop waiting for a zmq message
         print("Starting main loop for zmq messages")
         while(1):
@@ -187,15 +184,14 @@ class TrackingSystem:
             else:
                 warnings.warn("Got an unrecognised message: {}".format(message))
 
-    def main(self):
-        
-        # start the threaded process that gets and interprets images:
-        threading.Thread(target=self.zmq_updater).start()  # starting in thread allows update of the camera at a higher frequency than zmq messages are sent
-
-        self.camera_updater()
-
-       
-            
+            ## for debugging only
+            if self.show_frames:
+                vid = cv2.VideoCapture(pipe)
+                success, image = vid.read()
+                if success:
+                    cv2.imshow("Image", image )
+                    cv2.imshow("Cropped", self.crop_image(image) )
+                    cv2.waitKey(1)
 
         print("Tracking stopped")
 
