@@ -126,10 +126,10 @@ class TrackingSystem:
 
 
     def camera_updater(self):
-        print("Tracking started")
         vid = cv2.VideoCapture(pipe) # pipe is set in tracking_parameters.py
 
-        # main loop for tracking system
+        print("Tracking loop started")
+        # loop for tracking system
         while (1):
             self.frame_return_success, uncropped_image = vid.read()
 
@@ -149,17 +149,9 @@ class TrackingSystem:
                 warnings.warn("OpenCV read() failed")
             
 
-        if self.show_frames:
-                vid = cv2.VideoCapture(pipe)
-                success, image = vid.read()
-                if success:
-                    cv2.imshow("Image", image )
-                    cv2.imshow("Cropped", self.crop_image(image) )
-            
-
     def zmq_updater(self):
         #main loop waiting for a zmq message
-        print("Starting main loop for zmq messages")
+        print("Starting loop for zmq messages")
         while(1):
             # short sleep
             # time.sleep(1/1000)
@@ -191,11 +183,7 @@ class TrackingSystem:
         
         # start the threaded process that gets and interprets images:
         threading.Thread(target=self.zmq_updater).start()  # starting in thread allows update of the camera at a higher frequency than zmq messages are sent
-
         self.camera_updater()
-
-       
-            
 
         print("Tracking stopped")
 
