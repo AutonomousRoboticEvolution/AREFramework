@@ -64,9 +64,8 @@ public:
     void createOrgan(int skeletonHandle);
     /**
      * @brief Creates the male connect just for visualization.
-     * @param skeletonHandle - parent skeleton
      */
-    void createMaleConnector(int skeletonHandle);
+    void createMaleConnector();
     /**
      * @brief This method applies all the manufacturability tests.
      * @param skeletonMatrix - Skeleton of the main body
