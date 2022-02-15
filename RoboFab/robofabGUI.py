@@ -38,7 +38,7 @@ class RobofabGUI:
         self.button_slice = []
         self.button_print = []
         self.button_assemble = []
-        self.button_generate = []
+        # self.button_generate = []
         self.label_robotID = []
         self.entry_robotID = []
         self.robotID_loaded = []
@@ -73,9 +73,9 @@ class RobofabGUI:
             self.button_assemble.append(
                 tk.Button(text="Assemble", width=20, height=2, command=lambda i=i: self.handlerButtonAssemble(i),
                           master=printer_frame[i]))
-            self.button_generate.append(
-                tk.Button(text="Run are-generate", width=20, height=2, command=lambda i=i: self.buttonHandlerRunGenerate(i),
-                          master=printer_frame[i]))
+            # self.button_generate.append(
+            #     tk.Button(text="Run are-generate", width=20, height=2, command=lambda i=i: self.buttonHandlerRunGenerate(i),
+            #               master=printer_frame[i]))
 
             printer_frame[i].grid(row=2, column=i)  # arrange this frame in the overall window
             # pack frame:
@@ -84,7 +84,7 @@ class RobofabGUI:
             self.label_robotID[i].pack()
             self.entry_robotID[i].pack()
             self.button_printerLoadFile[i].pack()
-            self.button_generate[i].pack()
+            # self.button_generate[i].pack()
             self.button_initPrinter[i].pack()
             self.button_slice[i].pack()
             self.button_print[i].pack()
@@ -111,7 +111,7 @@ class RobofabGUI:
                                              command=self.organBankManager,
                                              master=frame_startupUR5)
 
-        # arrange withing ARE-generate frame:
+        # arrange withing UR5 startup section frame:
         self.button_startupUR5.pack()
         self.label_ur5Status.pack()
         self.button_organBankManager.pack()
@@ -181,7 +181,7 @@ class RobofabGUI:
                 else:
                     # printing is still ongoing, grey out all buttons:
                     self.button_printerLoadFile[i]["bg"]="grey"
-                    self.button_generate[i]["bg"]="grey"
+                    # self.button_generate[i]["bg"]="grey"
                     self.button_initPrinter[i]["bg"]="grey"
                     self.button_slice[i]["bg"]="grey"
                     self.button_print[i]["bg"]="grey"
@@ -202,15 +202,15 @@ class RobofabGUI:
                     #  the selected robot ID does not exist in the waiting_to_be_built folder
                     self.button_printerLoadFile[i]["bg"] = "red"
 
-                # find colour for are-generate button:
-                if "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-                    # have made the blueprint already
-                    self.button_generate[i]["bg"] = "green"
-                elif "morphGenome_{}".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-                    # no blueprint, but there is a morphGenome, so this button needs pressing:
-                    self.button_generate[i]["bg"] = "yellow"
-                else:
-                    self.button_generate[i]["bg"] = "grey"
+                # # find colour for are-generate button:
+                # if "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
+                #     # have made the blueprint already
+                #     self.button_generate[i]["bg"] = "green"
+                # elif "morphGenome_{}".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
+                #     # no blueprint, but there is a morphGenome, so this button needs pressing:
+                #     self.button_generate[i]["bg"] = "yellow"
+                # else:
+                #     self.button_generate[i]["bg"] = "grey"
 
                 # find colour for init printer button:
                 if self.printerObjects[i] is None:
@@ -304,6 +304,7 @@ class RobofabGUI:
         self.label_printerStatus[printer_number]["text"] = "Robot selected\n"
         self.printingDone[printer_number]=False
 
+    # NO LONGER USED ("generate" button removed)
     def buttonHandlerRunGenerate(self, printer_number):
         # self.robotIDLoadedGenerate = self.entryIDForGenerate.get()  # get and save the new robot ID
         # self.entryIDForGenerate.delete(0, tk.END)  # clear the text input
@@ -420,6 +421,7 @@ class RobofabGUI:
         with open("organBankContents.txt","w") as outputFile:
             outputFile.write(string_to_save)
 
+# NO LONGER USED ("generate" button removed)
 def setIndividualToLoadInParametersFileForGenerate(filepath, robotID="0_0"):
     genToLoad = robotID.split("_")[0]
     indToLoad = robotID.split("_")[1]
@@ -440,7 +442,7 @@ def setIndividualToLoadInParametersFileForGenerate(filepath, robotID="0_0"):
     with open(filepath, "w") as file:
         file.write(string_to_write)
 
-
+# NO LONGER USED ("generate" button removed)
 def runAreGenerate(coppeliasimFolder, parametersFilepath):
     print("Trying to run ARE-generate...")
     terminalCommand = "./are_sim.sh generate -h -g{}".format(parametersFilepath)
