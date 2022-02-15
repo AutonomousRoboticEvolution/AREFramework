@@ -238,6 +238,7 @@ class Robot:
                 organ.cableDestination = makeTransform()
         self.organsList[0].femaleTRRSSocketsUsedList=[False]*len(self.organsList[0].transformOrganOriginToFemaleCableSocket)
 
+    # creates a pdf that shows what organs the robot has; their layout; their i2c addresses
     def drawRobot(self,saveDirectory):
         for i,organ in enumerate(self.organsList):
             x= ( organ.positionTransformWithinBankOrRobot * np.linalg.inv( organ.transformOrganOriginToClipCentre ) )[0,3]

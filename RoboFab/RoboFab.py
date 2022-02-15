@@ -96,6 +96,7 @@ class RoboFab_host:
         self.myRobot.determineCableDestinations()
         self.myRobot.drawRobot(self.logDirectory)
 
+    # returns true if the bank has enough organs to provide all those required by the loaded robot
     def checkBankHasEnoughOrgans(self):
         # count the organs we need:
         organs_in_robot = {}
@@ -159,32 +160,29 @@ class RoboFab_host:
 
         if DO_EXPORT_ORGANS_LIST:
             self.save_log_files()
+            self.myRobot.self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
     def save_log_files( self ):
-        file = open ( "robot_build_file.txt", "w" )
-        # file.write ( "ID:{}\n".format(self.robotID) )
+        # write list_of_organs file
+        os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
+        file = open ( "{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) , "w" )
         for organ in self.myRobot.organsList:
             file.write ( "{},{}\n".format(organ.organType, organ.I2CAddress) )
             # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
         file.close ()
 
-        # move build log specified log folder, and now that it is build delete the blueprint :
-        print("{}/waiting_to_be_evaluated".format ( self.logDirectory ))
-        print("{}/blueprint_archive".format(self.logDirectory))
-        os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
-        # move the list_of_organs_addresses to the right folder:
-        shutil.move ( "robot_build_file.txt","{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) )
-        print("Saved list of organs as: {}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
-        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
-        shutil.move ( "{}/waiting_to_be_built/morph_genome_{}","{}/waiting_to_be_evaluated/morph_genome_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
-        shutil.move ( "{}/waiting_to_be_built/blueprint_{}","{}/logs/blueprint_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
-        shutil.move("{}/waiting_to_be_built/mesh_{}", "{}/logs/mesh_{}".format(self.logDirectory, self.robotID, self.logDirectory, self.robotID))
+        # move the blueprint and mesh files to "archive" folder
+        os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
+        from_folder = "{}/waiting_to_be_evaluated/".format ( self.logDirectory )
+        to_folder = "{}/blueprint_archive/".format ( self.logDirectory )
+        shutil.move ("{}blueprint_{}.csv".format(from_folder,self.robotID), "{}blueprint_{}.csv".format(to_folder,self.robotID) )
+        shutil.move ("{}mesh_{}.stl".format(from_folder,self.robotID), "{}mesh_{}.csv".format(to_folder,self.robotID) )
 
-        ## move the blueprint to the archive folder
-        # os.makedirs("{}/blueprint_archive".format(self.logDirectory), exist_ok=True) # create the folder if it doesn't already exists
-        # shutil.move ( "{}/waiting_to_be_built/blueprint{}.csv".format(self.logDirectory,self.robotID), "{}/blueprint_archive/blueprint{}.csv".format(self.logDirectory,self.robotID))
+        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
+        shutil.move ( "{}/waiting_to_be_built/morph_genome_{}".format ( self.logDirectory, self.robotID ),
+                      "{}/waiting_to_be_evaluated/morph_genome_{}".format ( self.logDirectory, self.robotID ) )
 
     def temp_limb_demo(self):
         ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology
