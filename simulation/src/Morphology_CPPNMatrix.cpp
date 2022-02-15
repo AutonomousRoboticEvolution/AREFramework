@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 using namespace are::sim;
 
@@ -328,6 +328,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.getOrganPositions(organList);
     }
     destroyGripper();
+    destroy_physical_connectors();
     blueprint.createBlueprint(organList);
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
@@ -566,6 +567,15 @@ void Morphology_CPPNMatrix::destroyGripper()
 {
     for(auto & i : gripperHandles) {
         simRemoveModel(i);
+    }
+}
+
+void Morphology_CPPNMatrix::destroy_physical_connectors()
+{
+    for (std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++) {
+        if (!it->isOrganRemoved() && it->isOrganChecked()) {
+            simRemoveModel(it->get_graphical_connector_handle());
+        }
     }
 }
 

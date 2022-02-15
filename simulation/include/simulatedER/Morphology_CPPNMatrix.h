@@ -76,6 +76,10 @@ public:
      */
     void destroyGripper();
     /**
+     * @brief Removes all physical connector created with createTemporalConnector
+     */
+    void destroy_physical_connectors();
+    /**
      * @brief This method tests that robot as a whole.
      */
     void testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix);

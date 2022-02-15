@@ -8,7 +8,7 @@
 #include "simLib.h"
 #endif
 
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 /// \todo EB: Do i need this?
 using namespace are::sim;
@@ -18,16 +18,7 @@ using mc = are::morph_const;
 void Organ::createOrgan(int skeletonHandle)
 {
     organChecked = true;
-    /// \todo EB: It might be worth to have this as a separate parameters (?)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
-
-    if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
-        std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
-        version = 3;
-    }
-    std::stringstream vers;
-    vers << version;
 
     if(organType == 0) // Brain
         modelsPath += "/organs/head.ttm";
@@ -183,7 +174,8 @@ void Organ::createMaleConnector()
     tempConnectorOrientation[2] = connectorOri.at(2);
 
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    modelsPath += "utils/male_connector_visual.ttm";
+    //modelsPath += "utils/male_connector_visual.ttm";
+    modelsPath += "utils/male_connector_physics.ttm";
 
     tempConnectorHandle = simLoadModel(modelsPath.c_str());
     assert(tempConnectorHandle != -1);
@@ -204,7 +196,7 @@ void Organ::createMaleConnector()
     simSetObjectOrientation(tempConnectorHandle, tempConnectorHandle, tempConnectorOrientation);
 
     simSetObjectParent(tempConnectorHandle, organHandle, 1);
-    graphicConnectorHandle = tempConnectorHandle;
+    physics_connector_handle = tempConnectorHandle;
 }
 
 void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
@@ -220,7 +212,7 @@ void Organ::repressOrgan()
     if(organInsideSkeleton || organColliding || !organGripperAccess){
         simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
-        simRemoveModel(graphicConnectorHandle);
+        simRemoveModel(physics_connector_handle);
         organRemoved = true;
     }
     else{
@@ -256,6 +248,22 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
                 }
             }
         }
+    }
+    // Check connector collision
+//    for (int oH : objectHandles) {
+        for (auto &organComp : organList) {
+            if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
+                continue;
+            if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
+                continue;
+            //for (auto &i : organComp.objectHandles) {
+            collisionResult = simCheckCollision(physics_connector_handle, organComp.get_graphical_connector_handle());
+            if (collisionResult == 1) { // Collision detected!
+                organColliding = true;
+                return;
+            }
+            //}
+//        }
     }
 }
 

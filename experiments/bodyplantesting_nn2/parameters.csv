@@ -1,15 +1,15 @@
 #experimentName,string,bodyplantesting_nn2
-#expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
+#expPluginName,string,/home/edgar/vrep/lib/libbodyplantesting_nn2.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#vrepFolder,string,/home/edgar/vrep/
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,100
 #maxEvalTime,float,1
-#numberOfGeneration,int,25
-#repository,string,/home/leni/are-logs/
+#numberOfGeneration,int,50
+#repository,string,/home/edgar/are-logs
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
@@ -34,10 +34,11 @@
 #isCaster,bool,1
 
 #isBootstrapEvolution,bool,0
-#loadExperiment,string,/home/leni/are-logs/
+#loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
 #isScreenshotEnable,bool,1
+#imagesInLogFolder,bool,1
 
 #kValue,int,15
 #noveltyThreshold,double,0.1
@@ -53,10 +54,10 @@
 #init_y,float,0.0
 #init_z,float,0.2
 
-#seed,int,-1
+#seed,int,1
 #reloadController,bool,0
 #withBeacon,bool,0
-#imageRepository,string,/home/leni/are-logs/images/
+#imageRepository,string,/home/edgar/are-logs/images/
 
 #maxNbrConnections,int,500
 #minNbrConnections,int,10
