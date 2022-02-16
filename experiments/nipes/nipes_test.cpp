@@ -19,8 +19,10 @@ inline double sphere(std::vector<double> X){
 }
 
 
-int main()
+int main(int argc, char** argv)
 {
+
+
 
     are_set::ParametersMap parameters;
     parameters.emplace("#populationSize",new are_set::Integer(10));
@@ -52,6 +54,15 @@ int main()
 
     are::NIPES nipes(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     nipes.init();
+
+    if(argc > 1){
+        std::ifstream ifs(argv[1]);
+        std::stringstream sstream;
+        sstream << ifs.rdbuf();
+        nipes.get_cmaStrategy()->from_string(sstream.str());
+        nipes.init_next_pop();
+    }
+
     std::vector<are::Individual::Ptr> pop;
     int gen_size = std::dynamic_pointer_cast<are::NNParamGenome>(nipes.get_population()[0]->get_ctrl_genome())->get_full_genome().size();
     std::vector<double> zeros(0,gen_size);
@@ -94,6 +105,11 @@ int main()
         nipes.epoch();
         nipes.init_next_pop();
     }
+
+    std::string saved_learner = nipes.get_cmaStrategy()->to_string();
+    std::ofstream ofs("learner");
+    ofs << saved_learner;
+    ofs.close();
 
     std::cout << "Solution found : "  << best_fit << " for target value : "  << rastrigin(10,zeros) << " in " << eval << " evaluations" << std::endl;
 

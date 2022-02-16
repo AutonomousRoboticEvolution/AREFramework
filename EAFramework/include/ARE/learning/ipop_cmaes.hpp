@@ -2,6 +2,7 @@
 #define IPOP_CMAES_HPP
 
 #include <memory>
+#include <sstream>
 #include <libcmaes/cmaes.h>
 #include <ARE/Individual.h>
 #include <ARE/NNParamGenome.hpp>
@@ -114,8 +115,17 @@ public:
 
     std::vector<std::string> log_stopping_criterias;
 
-    const std::string& to_string(){}//TO DO
-    void from_string(const std::string&){}//TO DO
+    std::string to_string();
+    void from_string(const std::string&);
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & _solutions;
+        arch & _parameters;
+        arch & novelty_ratio;
+        arch & number_of_eval;
+    }
 
 
 private:

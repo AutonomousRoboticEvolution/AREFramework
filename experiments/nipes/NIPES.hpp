@@ -70,6 +70,10 @@ public:
         return res;
     }
     const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
+    void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
+
+    const IPOPCMAStrategy::Ptr &get_cmaStrategy(){return cmaStrategy;}
+    void set_cmaStrategy(const IPOPCMAStrategy::Ptr& cmas){cmaStrategy = cmas;}
 
 protected:
     IPOPCMAStrategy::Ptr cmaStrategy;

@@ -277,3 +277,13 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     return  dist < fTarget;
 }
 
+void NIPES::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
+    int idx = cmaStrategy->get_population().size();
+    IPOPCMAStrategy::individual_t ind;
+    ind.genome = std::dynamic_pointer_cast<NNParamGenome>(population[idx]->get_ctrl_genome())->get_full_genome();
+    ind.objectives = obj;
+    ind.descriptor.resize(desc.rows());
+    for(int i = 0; i < desc.rows(); i++)
+        ind.descriptor[i] = desc(i);
+    cmaStrategy->add_individual(ind);
+}
