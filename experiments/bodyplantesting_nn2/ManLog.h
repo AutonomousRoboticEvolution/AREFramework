@@ -36,6 +36,14 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class SkeletonMatrixLog : public Logging
+{
+public:
+    SkeletonMatrixLog(const std::string &file) : Logging(file, false){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
 }//are
 
 #endif //ER_MANLOG_H

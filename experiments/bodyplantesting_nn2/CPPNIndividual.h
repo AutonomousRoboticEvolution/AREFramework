@@ -59,7 +59,8 @@ public :
     void setSymDesc();
     /// Getters for descritors
     CartDesc getMorphDesc(){return morphDesc;}
-
+    std::vector<std::vector<std::vector<double>>> get_skeleton_matrix(){return skeleton_matrix;};
+    void set_skeleton_matrix();
     Eigen::VectorXd descriptor();
 
 protected:
@@ -70,6 +71,7 @@ protected:
 
     /// Descritors
     CartDesc morphDesc;
+    std::vector<std::vector<std::vector<double>>> skeleton_matrix;
 };
 
 }//are

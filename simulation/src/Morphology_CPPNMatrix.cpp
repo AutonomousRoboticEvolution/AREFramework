@@ -719,3 +719,28 @@ void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vecto
                   << y << " " << z << std::endl;
     }
 }
+
+void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
+{
+    std::vector<double> input{0,0,0,0};
+    std::vector<double> output;
+    std::vector<double> temp_1d_skeleton_matrix;
+    std::vector<std::vector<double>> temp_2d_skeleton_matrix;
+    for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1){
+        for(int j = -mc::matrix_size/2 + 1; j < mc::matrix_size/2; j += 1){
+            for(int k = -mc::matrix_size/2 + 1; k < mc::matrix_size/2; k += 1){
+                input[0] = static_cast<double>(i);
+                input[1] = static_cast<double>(j);
+                input[2] = static_cast<double>(k);
+                input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
+                nn2_cppn.step(input);
+                output = nn2_cppn.outf();
+                temp_1d_skeleton_matrix.push_back(output.at(0));
+            }
+            temp_2d_skeleton_matrix.push_back(temp_1d_skeleton_matrix);
+            temp_1d_skeleton_matrix.clear();
+        }
+        skeleton_matrix.push_back(temp_2d_skeleton_matrix);
+        temp_2d_skeleton_matrix.clear();
+    }
+}

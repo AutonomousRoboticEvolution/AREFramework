@@ -98,6 +98,10 @@ public:
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
     void exportRobotModel(int indNum);
+    /**
+     * @brief Retrieve matrices
+     */
+    void retrieve_matrices_from_cppn();
 
     ///////////////////////////////
     ///// Setters and getters /////
@@ -126,6 +130,7 @@ public:
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
+    const std::vector<std::vector<std::vector<double>>> &get_skeleton_matrix() const {return skeleton_matrix;};
 
 private:
     ///////////////////////
@@ -225,6 +230,13 @@ private:
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     NEAT::Substrate substrate;
+
+    std::vector<std::vector<std::vector<double>>> skeleton_matrix;
+    std::vector<std::vector<std::vector<double>>> angle_matrix;
+    std::vector<std::vector<std::vector<double>>> wheel_matrix;
+    std::vector<std::vector<std::vector<double>>> sensor_matrix;
+    std::vector<std::vector<std::vector<double>>> caster_matrix;
+    std::vector<std::vector<std::vector<double>>> joint_matrix;
 };
 
 }//sim

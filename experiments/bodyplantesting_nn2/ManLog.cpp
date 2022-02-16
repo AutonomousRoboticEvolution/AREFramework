@@ -42,3 +42,34 @@ void morphDescCartWHDLog::saveLog(EA::Ptr &ea)
     }
     logFileStream.close();
 }
+
+void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
+{
+    std::ofstream logFileStream;
+    for(size_t i = 0; i < ea->get_population().size(); i++){
+        std::stringstream filename;
+        filename << "morph_genome_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
+                ea->get_population()[i]->get_morph_genome()
+        )->id();
+        if(!openOLogFile(logFileStream, filename.str()))
+            return;
+        logFileStream << std::dynamic_pointer_cast<NN2CPPNGenome>(
+                ea->get_population()[i]->get_morph_genome()
+        )->to_string();
+        logFileStream.close();
+    }
+
+//    std::ofstream logFileStream;
+//    if(!openOLogFile(logFileStream))
+//        return;
+//    int generation = ea->get_generation();
+//    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
+//        logFileStream << generation * ea->get_population().size() + ind << ",";
+//        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getMorphDesc().getCartDesc();
+//        for(int j = 0; j < morphDesc.size(); j++){
+//            logFileStream << morphDesc(j) << ",";
+//        }
+//        logFileStream << std::endl;
+//    }
+//    logFileStream.close();
+}

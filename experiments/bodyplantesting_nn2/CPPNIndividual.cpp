@@ -14,6 +14,7 @@ void CPPNIndividual::createMorphology()
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
     setMorphDesc();
     setManRes();
+    set_skeleton_matrix();
 }
 
 
@@ -25,6 +26,11 @@ void CPPNIndividual::setMorphDesc()
 void CPPNIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
+}
+
+void CPPNIndividual::set_skeleton_matrix()
+{
+    skeleton_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_skeleton_matrix();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
