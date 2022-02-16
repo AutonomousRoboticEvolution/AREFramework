@@ -24,7 +24,6 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     daughterBoards->turnOn();
 
     // each organ needs to be initiated with its i2c address, obtained from stringListOfOrgans
-
     std::string thisLine;
     std::stringstream temp_string_stream(stringListOfOrgans);
     if(VERBOSE_DEBUG_PRINTING_AT_SETUP){
@@ -79,6 +78,15 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
                 if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"WARNING cannot find organ on either daughter board"<<std::endl;
                 thisOrgan->daughterBoardToEnable=NONE;
             }
+        }
+    }
+
+    // initialise each organ in turn, e.g. setting current limits
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType == WHEEL) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
+            thisWheel->setCurrentLimit(17); // in 10s of milliAmps
         }
     }
 
