@@ -8,11 +8,6 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
-    // battery voltage check
-    batteryMonitor.init();
-    uint16_t measuredBatteryVoltage = batteryMonitor.measureBatteryVoltage(); // measured in cV
-    std::cout<<"Measured battery voltage = "<< float(measuredBatteryVoltage)/100.<<" V"<<std::endl;
-
     // initilise the camera
     // If this is true, the camera input (binary on/off) will be used the first input to the neural network controller:
     cameraInputToNN =  settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
@@ -90,10 +85,23 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         }
     }
 
-    // initialise the Head LEDs and flash green to show ready
+    // initialise the Head LEDs
     ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be changed
     ledDriver->init();
-    ledDriver->flash();
+
+    // battery voltage check
+    batteryMonitor.init();
+    uint16_t measuredBatteryVoltage = batteryMonitor.measureBatteryVoltage(); // measured in cV
+    std::cout<<"Measured battery voltage = "<< float(measuredBatteryVoltage)/100.<<" V"<<std::endl;
+    if(measuredBatteryVoltage < 580){
+        std::cout<<"#########################\n";
+        std::cout<<"#######  WARNING  #######\n";
+        std::cout<<"####  BATTERY: "<<float(measuredBatteryVoltage)/100.<<"V ####\n";
+        std::cout<<"#########################"<<std::endl;
+        ledDriver->flash(RED,1000000,30); // Red for 1 second
+    }else{
+        ledDriver->flash(GREEN); // flash green to show ready
+    }
 
 
     // set debug printing flag - this prints a representation of the inputs and outputs to terminal
