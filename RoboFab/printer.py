@@ -27,6 +27,7 @@ class Printer:
         self.skeletonPositionOnPrintbed = makeTransformInputFormatted([0.150, 0.150, 0]) # default middle of bed, can be updated
         self.timeout=5 # timeout in seconds for api requests to octoPrint
         self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
+        self.print_time_estimate_seconds=-1
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
         self.apiKeyHeader = { 'X-Api-Key': '{}'.format(printerConfiguration["API_KEY"])}
@@ -232,7 +233,7 @@ class Printer:
         output = str( subprocess.check_output (terminalCommand, cwd="./printerSettings",shell=True, stderr=subprocess.STDOUT) )
         # extract some meta-data, i.e. the estimated print time and filamanet used
         print_time_location_in_output = output.find("Print time: ")
-        print_time_estimate_seconds=int(output[print_time_location_in_output +12 : output.find("\\n",print_time_location_in_output)])
+        self.print_time_estimate_seconds=int(output[print_time_location_in_output +12 : output.find("\\n",print_time_location_in_output)])
         filament_used_location_in_output = output.find("Filament: ")
         filament_used_estimate_seconds=int(output[filament_used_location_in_output +10 : output.find("\\n",filament_used_location_in_output)])
 

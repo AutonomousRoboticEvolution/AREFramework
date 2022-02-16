@@ -3,7 +3,8 @@ import os
 import subprocess
 import time
 import tkinter as tk
-import numpy as np
+import numpy as n
+import datetime
 
 from helperFunctions import convertTransformToPose
 from printer import Printer
@@ -253,13 +254,15 @@ class RobofabGUI:
 
 
     def handlerButtonPrint(self, printer_number):
-        self.label_printerStatus[printer_number]["text"] = "*busy setting print*\n"
+        self.label_printerStatus[printer_number]["text"] = "*setting print*\n"
         self.mainWindow.update()
 
         filename = "mesh_{}".format(self.robotID_loaded[printer_number])
         self.printerObjects[printer_number].uploadGCodeToOctoPrint("gcode/{}".format(filename))
         self.printerObjects[printer_number].printFileOnOctoprint(filename)
-        self.label_printerStatus[printer_number]["text"] = "Printing in progress"
+        # work out and show the estimated finishing time
+        estimated_finish_time = datetime.datetime.now() + datetime.timedelta(seconds= self.printerObjects[printer_number].print_time_estimate_seconds )
+        self.label_printerStatus [ printer_number ] [ "text" ] = "Printing, estimated finish:\n".format(estimated_finish_time.strftime("%H:%M:%S"))
         self.printingInProgress [printer_number] = True
 
     def handlerButtonSlice(self, printer_number):
