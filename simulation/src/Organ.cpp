@@ -27,7 +27,8 @@ void Organ::createOrgan(int skeletonHandle)
     else if(organType == 2) // Sensors
         modelsPath += "/organs/sensor.ttm";
     else if(organType == 3) // Joints
-        modelsPath += "/organs/joint.ttm";
+        modelsPath += "/organs/joint_v0.ttm";
+//        modelsPath += "/organs/joint_v1.ttm";
     else if(organType == 4) // Caster
         modelsPath+= "/organs/caster.ttm";
     else
