@@ -57,10 +57,15 @@ public :
     void setMorphDesc();
     void setGraphMatrix();
     void setSymDesc();
+    void set_matrices();
     /// Getters for descritors
     CartDesc getMorphDesc(){return morphDesc;}
+    std::vector<std::vector<std::vector<double>>> get_angle_matrix(){return angle_matrix;};
     std::vector<std::vector<std::vector<double>>> get_skeleton_matrix(){return skeleton_matrix;};
-    void set_skeleton_matrix();
+    std::vector<std::vector<std::vector<double>>> get_wheel_matrix(){return wheel_matrix;};
+    std::vector<std::vector<std::vector<double>>> get_sensor_matrix(){return sensor_matrix;};
+    std::vector<std::vector<std::vector<double>>> get_joint_matrix(){return joint_matrix;};
+    std::vector<std::vector<std::vector<double>>> get_caster_matrix(){return caster_matrix;};
     Eigen::VectorXd descriptor();
 
 protected:
@@ -72,6 +77,11 @@ protected:
     /// Descritors
     CartDesc morphDesc;
     std::vector<std::vector<std::vector<double>>> skeleton_matrix;
+    std::vector<std::vector<std::vector<double>>> angle_matrix;
+    std::vector<std::vector<std::vector<double>>> wheel_matrix;
+    std::vector<std::vector<std::vector<double>>> sensor_matrix;
+    std::vector<std::vector<std::vector<double>>> caster_matrix;
+    std::vector<std::vector<std::vector<double>>> joint_matrix;
 };
 
 }//are

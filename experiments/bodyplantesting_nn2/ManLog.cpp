@@ -48,17 +48,73 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;
-        std::vector<std::vector<std::vector<double>>> skeleton_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_skeleton_matrix();
-        filename << "skeleton_matrix_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
+        filename << "matrices_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
                 ea->get_population()[i]->get_morph_genome()
         )->id();
         if(!openOLogFile(logFileStream, filename.str()))
             return;
-        logFileStream << "Skeleton:" << ",";
-        for(int i = 0; i < skeleton_matrix.size(); i++){
-            for(int j = 0; j < skeleton_matrix.at(0).size(); j++){
-                for(int z = 0; z < skeleton_matrix.at(0).at(0).size(); z++){
-                    logFileStream << skeleton_matrix.at(i).at(j).at(z) << ",";
+        std::vector<std::vector<std::vector<double>>> temp_matrix;
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_angle_matrix();
+        logFileStream << "Angle:" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
+        temp_matrix.clear();
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_skeleton_matrix();
+        logFileStream << "Skeleton" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
+        temp_matrix.clear();
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_wheel_matrix();
+        logFileStream << "Wheel" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
+        temp_matrix.clear();
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_sensor_matrix();
+        logFileStream << "Sensor" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
+        temp_matrix.clear();
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_joint_matrix();
+        logFileStream << "Joint" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
+        temp_matrix.clear();
+        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_caster_matrix();
+        logFileStream << "Caster:" << ",";
+        for(int i = 0; i < temp_matrix.size(); i++){
+            for(int j = 0; j < temp_matrix.at(0).size(); j++){
+                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
+                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
                 }
             }
         }
