@@ -89,11 +89,15 @@ std::vector<double> RealEnvironment::fit_foraging(){
 
 void RealEnvironment::update_info(double time){
 
+    bool robot_seen=false;
+    bool barrel_seen=false;
+
     // update position of robot
     std::string robot_position_string;
     phy::send_string(robot_position_string,"position",zmq_requester_socket,"Robot:");
 
     if(robot_position_string != "None"){ // tracking found a robot position, else the robot wasn't seen, so we will not update the current_position variable
+        robot_seen=true;
         // parse the string, expected format is [x, y]
         boost::erase_all(robot_position_string, "[");
         boost::erase_all(robot_position_string, "]");
@@ -128,6 +132,7 @@ void RealEnvironment::update_info(double time){
             // tag ID number is this_tag_string_split[0]
             if ( std::stoi(this_tag_string_split[0]) == tag_number_of_barrel){
                 // this is the correct tag, so save the location
+                barrel_seen=true;
                 beacon_position = { std::stod( this_tag_string_split[1] ),std::stod( this_tag_string_split[2])};
             }
         }
@@ -153,10 +158,14 @@ void RealEnvironment::update_info(double time){
         trajectory.push_back(wp);
     }
 
+    // keep count of the number of frames:
+    total_number_of_frames++;
+    if (robot_seen) number_of_frames_where_robot_was_seen++;
+    if (barrel_seen) number_of_frames_where_barrel_was_seen++;
+
     final_position = current_position;
 
 }
-
 
 std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::vector<double> &pos){
     std::pair<int,int> indexes;

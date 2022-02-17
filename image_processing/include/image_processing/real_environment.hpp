@@ -25,6 +25,11 @@ public:
     std::vector<double> fit_exploration();
     std::vector<double> fit_foraging();
 
+    // some infomation about how successful the tracking was
+    int total_number_of_frames=0;
+    int number_of_frames_where_robot_was_seen=0;
+    int number_of_frames_where_barrel_was_seen=0;
+
 private:
     std::vector<double> current_position;
     std::vector<double> target_position;

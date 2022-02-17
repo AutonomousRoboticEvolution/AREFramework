@@ -187,6 +187,17 @@ bool ER::stop_evaluation(){
         }
     }
 
+    // display the fitness that will be calculated
+    const Individual::Ptr ind;
+    std::vector<double> objectives = environment->fitnessFunction(ind);
+    std::cout << "Estimated fitness:";
+    for(const double fitness : objectives)
+        std::cout << fitness << "\t";
+    std::cout<<std::endl;
+
+//    static_cast<are::Environment::Ptr>
+    dynamic_cast<RealEnvironment::RealEnvironment>(environment);
+    std::cout<<environment.number_of_frames_where_robot_was_seen<<std::endl;
 
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
