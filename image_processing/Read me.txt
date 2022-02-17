@@ -1,0 +1,9 @@
+Pi command; raspivid -t 0 -h 720 -w 1080 -fps 25 -hf -b 2000000 -o - | gst-launch-0.10 -v fdsrc ! h264parse !  rtph264pay config-interval=1 pt=96 ! gdppay ! tcpserversink host=YOUR_RPI_IP_ADDRESS port=5000
+
+View feed: gst-launch-0.10 -v tcpclientsrc host=192.168.2.248 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! autovideosink sync=false
+
+
+robofab@robofab:~/programs/evolutionary_robotics_framework/build/image_processing$ ./test_blob_tracking "tcpclientsrc host=192.168.2.248 port=5000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink" 300 300 4
+
+Had to change to gstreamer0.10 as opencv3 which is what is on ubuntu18 has that
+

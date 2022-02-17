@@ -32,7 +32,7 @@ void send_string(std::string& str_rpl, const std::string& str_msg, zmq::socket_t
  */
 void receive_string(std::string& str_msg, const std::string& str_req, zmq::socket_t& reply, const std::string &);
 
-void send_string_no_reply(const std::string &str_mess, zmq::socket_t &socket);
+void send_string_no_reply(const std::string &str_mess, zmq::socket_t &socket,const std::string& topic);
 void receive_string_no_reply(std::string &str_mess, zmq::socket_t &socket,const std::string &topic);
 
 

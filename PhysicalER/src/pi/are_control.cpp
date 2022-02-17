@@ -145,6 +145,9 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
         }
         std::cout<<std::endl;
     }
+
+    // add to log:
+    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
@@ -232,7 +235,7 @@ int AREControl::exec(zmq::socket_t& socket){
         if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}
 
         // the are-update running on the PC expects to get a message on every timestep:
-        are::phy::send_string_no_reply("pi busy",socket);
+        are::phy::send_string_no_reply("busy",socket,"pi ");
 
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
@@ -258,16 +261,17 @@ int AREControl::exec(zmq::socket_t& socket){
             thisWheel->standby();
         }
     }
+    ledDriver->flash(BLUE);
     daughterBoards->turnOff();
 
 
     // send finished message
-    are::phy::send_string_no_reply("pi finish",socket);
+    are::phy::send_string_no_reply("finish",socket,"pi ");
 
 
     // send log data
-    are::phy::send_string_no_reply( logs_to_send.str() ,socket);
-    are::phy::send_string_no_reply("pi finished_logs",socket);
+    are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
+    are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 
     return 0;
 }
