@@ -118,6 +118,8 @@ public:
     std::string to_string();
     void from_string(const std::string&);
 
+    std::string print_info();
+
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {

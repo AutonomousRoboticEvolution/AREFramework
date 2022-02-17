@@ -60,6 +60,7 @@ int main(int argc, char** argv)
         std::stringstream sstream;
         sstream << ifs.rdbuf();
         nipes.get_cmaStrategy()->from_string(sstream.str());
+        std::cout << nipes.get_cmaStrategy()->print_info() << std::endl;
         nipes.init_next_pop();
     }
 
@@ -105,6 +106,8 @@ int main(int argc, char** argv)
         nipes.epoch();
         nipes.init_next_pop();
     }
+
+    std::cout << nipes.get_cmaStrategy()->print_info() << std::endl;
 
     std::string saved_learner = nipes.get_cmaStrategy()->to_string();
     std::ofstream ofs("learner");

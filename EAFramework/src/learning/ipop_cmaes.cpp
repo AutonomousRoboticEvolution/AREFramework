@@ -218,3 +218,14 @@ void IPOPCMAStrategy::from_string(const std::string & str){
     iarch.register_type<libcmaes::RankedCandidate>();
     iarch >> *this;
 }
+
+std::string IPOPCMAStrategy::print_info(){
+    std::stringstream sstr;
+    sstr << "INFO - CMA-ES" <<
+            " / dim = " << _parameters.dim() <<
+            " / lambda = " << _parameters.lambda() <<
+            " / sigma0 = " << _solutions.sigma() <<
+            " / novelty_ratio = " << novelty_ratio;
+
+    return sstr.str();
+}
