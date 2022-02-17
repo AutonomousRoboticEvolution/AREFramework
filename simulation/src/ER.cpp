@@ -66,8 +66,8 @@ void ER::startOfSimulation()
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
-            Logging::create_folder(Logging::log_folder);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder);
+            Logging::create_folder(Logging::log_folder + "/" + image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
@@ -89,15 +89,15 @@ void ER::initIndividual(){
     mess.resize(length);
     currentInd = ea->getIndividual(0);
     if(nbrEval == 0)
-          currentInd->from_string(mess);
+        currentInd->from_string(mess);
     currentInd->init();
     evalIsFinish = false;
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
-            Logging::create_folder(Logging::log_folder);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder);
+            Logging::create_folder(Logging::log_folder + "/" + image_repo);
+            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
@@ -130,8 +130,8 @@ void ER::handleSimulation()
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
 
     if (simulationTime >
-            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
-            ea->finish_eval(environment)) {
+        settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
+        ea->finish_eval(environment)) {
         simStopSimulation();
     }
 }

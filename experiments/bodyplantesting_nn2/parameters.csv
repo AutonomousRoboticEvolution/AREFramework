@@ -4,7 +4,7 @@
 #vrepFolder,string,/home/ebb505/ARE_Project/vrep/
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,100
+#populationSize,int,12
 #maxEvalTime,float,1
 #numberOfGeneration,int,50
 #repository,string,/home/ebb505/ARE_Project/are-logs
@@ -57,7 +57,7 @@
 #seed,int,1
 #reloadController,bool,0
 #withBeacon,bool,0
-#imageRepository,string,/home/edgar/are-logs/images/
+#imageRepository,string,images/
 
 #maxNbrConnections,int,500
 #minNbrConnections,int,10

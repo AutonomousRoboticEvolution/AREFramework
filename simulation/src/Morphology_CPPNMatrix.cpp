@@ -330,6 +330,7 @@ void Morphology_CPPNMatrix::create()
     destroyGripper();
     destroy_physical_connectors();
     blueprint.createBlueprint(organList);
+    retrieve_matrices_from_cppn();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!

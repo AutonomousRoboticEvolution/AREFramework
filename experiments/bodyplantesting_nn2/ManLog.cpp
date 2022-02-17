@@ -48,28 +48,21 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;
-        filename << "morph_genome_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
+        std::vector<std::vector<std::vector<double>>> skeleton_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_skeleton_matrix();
+        filename << "skeleton_matrix_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
                 ea->get_population()[i]->get_morph_genome()
         )->id();
         if(!openOLogFile(logFileStream, filename.str()))
             return;
-        logFileStream << std::dynamic_pointer_cast<NN2CPPNGenome>(
-                ea->get_population()[i]->get_morph_genome()
-        )->to_string();
+        logFileStream << "Skeleton:" << ",";
+        for(int i = 0; i < skeleton_matrix.size(); i++){
+            for(int j = 0; j < skeleton_matrix.at(0).size(); j++){
+                for(int z = 0; z < skeleton_matrix.at(0).at(0).size(); z++){
+                    logFileStream << skeleton_matrix.at(i).at(j).at(z) << ",";
+                }
+            }
+        }
+        logFileStream << std::endl;
         logFileStream.close();
     }
-
-//    std::ofstream logFileStream;
-//    if(!openOLogFile(logFileStream))
-//        return;
-//    int generation = ea->get_generation();
-//    for(size_t ind = 0; ind < ea->get_population().size(); ind++){
-//        logFileStream << generation * ea->get_population().size() + ind << ",";
-//        Eigen::VectorXd morphDesc = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(ind))->getMorphDesc().getCartDesc();
-//        for(int j = 0; j < morphDesc.size(); j++){
-//            logFileStream << morphDesc(j) << ",";
-//        }
-//        logFileStream << std::endl;
-//    }
-//    logFileStream.close();
 }
