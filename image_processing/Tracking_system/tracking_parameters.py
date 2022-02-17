@@ -20,7 +20,7 @@ aruco_parameters = aruco.DetectorParameters_create()
 
 zmq_port_number= "5557"
 
-location = "bristol"
+location = "york"
 
 #location specific parameters
 if location == "bristol":
@@ -37,3 +37,14 @@ if location == "bristol":
 
     #crop parameters
     crop_rectangle = [200,75,380,380]
+
+elif location == "york":
+    pipe = 0
+
+    brainMin = (171,120,75)
+    brainMax = (179,255,255)
+    
+    centre_reference = (340,300) #not calibrated
+    pixel_scale = 100 #nc
+
+    crop_rectangle = [-1]
