@@ -7,14 +7,14 @@ import threading
 import warnings
 
 #must define location before importing parameters
-location = "bristol"
+
 from tracking_parameters import *
 
 class TrackingSystem:
 
     def __init__(self):
         # set parameters
-        self.show_frames = False
+        self.show_frames = True
 
         #set up zmq
         context = zmq.Context()
@@ -59,7 +59,7 @@ class TrackingSystem:
         detector = cv2.SimpleBlobDetector_create(blob_detection_parameters)
 
         #fills holes in mask to improve blob detection
-        fix_mask = True
+        fix_mask = False
         if fix_mask:
             fixed_mask = self.fillHoles(mask)
             keypoints = detector.detect(fixed_mask)

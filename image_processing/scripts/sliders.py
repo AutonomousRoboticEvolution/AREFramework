@@ -9,14 +9,9 @@ import time
 import cv2
 
 # Initialise the camera and create a reference to it
-is_picamera = False
+is_picamera = True
 if is_picamera:
-    import picamera
-    import picamera.array
-    camera = picamera.PiCamera()
-    camera.resolution = (640, 480)
-    camera.framerate = 32
-    rawCapture = picamera.array.PiRGBArray(camera, size=camera.resolution)
+    rawCapture = cv2.VideoCapture(0)
 else:
     #rawCapture = cv2.VideoCapture("v4l2src device=/dev/video2 ! videoconvert ! appsink")
     rawCapture = cv2.VideoCapture('http://192.168.2.248/img/video.mjpeg')
@@ -81,14 +76,11 @@ def sliders_do(image):
         return
 
 # Capture frames from the camera
-if is_picamera:
-    for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
-        image = frame.array
-        sliders_do(image)
-else:
-    while(1):
-        ret,image = rawCapture.read()
-        sliders_do(image)
+
+
+while(1):
+    ret,image = rawCapture.read()
+    sliders_do(image)
 
 
     
