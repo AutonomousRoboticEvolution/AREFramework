@@ -328,6 +328,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.getOrganPositions(organList);
     }
     destroyGripper();
+    destroy_physical_connectors();
     blueprint.createBlueprint(organList);
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
@@ -474,7 +475,7 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     int organType;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
         // Generate organs every two voxels.
-        for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=5) { /// \todo EB: Define this constant elsewhere!
+        for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
             input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
@@ -566,6 +567,15 @@ void Morphology_CPPNMatrix::destroyGripper()
 {
     for(auto & i : gripperHandles) {
         simRemoveModel(i);
+    }
+}
+
+void Morphology_CPPNMatrix::destroy_physical_connectors()
+{
+    for (std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++) {
+        if (!it->isOrganRemoved() && it->isOrganChecked()) {
+            simRemoveModel(it->get_graphical_connector_handle());
+        }
     }
 }
 
