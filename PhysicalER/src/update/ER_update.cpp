@@ -195,9 +195,16 @@ bool ER::stop_evaluation(){
         std::cout << fitness << "\t";
     std::cout<<std::endl;
 
-//    static_cast<are::Environment::Ptr>
-    dynamic_cast<RealEnvironment::RealEnvironment>(environment);
-    std::cout<<environment.number_of_frames_where_robot_was_seen<<std::endl;
+    // display some infomation about how well the tracking worked
+    std::cout<<"Saw the robot in ";
+    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_robot_was_seen;
+    std::cout<<"frames (out of ";
+    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
+    std::cout<<"}\nSaw the barrel in ";
+    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_barrel_was_seen;
+    std::cout<<"frames (out of ";
+    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
+    std::cout<<")"<<std::endl;
 
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;

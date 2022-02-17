@@ -64,11 +64,12 @@ else()
 
     file(GLOB SRC_UPDATE src/update/*)
 
-    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/pi_individual.cpp src/io_helpers.cpp)
+    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/pi_individual.cpp src/io_helpers.cpp ../image_processing/src/real_environment.cpp)
     target_include_directories(are-update PUBLIC
         # ${OpenCV_INCLUDE_DIRS}
         "include/"
         "../EAFramework/include"
+        "../image_processing/include"
         $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
         $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
         )
