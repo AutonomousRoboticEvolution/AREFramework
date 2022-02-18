@@ -21,10 +21,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     // each organ needs to be initiated with its i2c address, obtained from stringListOfOrgans
     std::string thisLine;
     std::stringstream temp_string_stream(stringListOfOrgans);
-    if(VERBOSE_DEBUG_PRINTING_AT_SETUP){
-        std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
-        std::cout<< "starting main loop:"<< std::endl;
-    }
+    if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
 
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
@@ -37,14 +34,17 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         case 1: //wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            number_of_wheels++;
             break;
         case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
+            number_of_sensors++;
             break;
         case 3: //joint
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a joint, address: "<<addressValue<<std::endl;
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
+            number_of_joints++;
             break;
         case 4: //caster
             //do nothing
@@ -112,6 +112,8 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     if (settings::getParameter<settings::Boolean>(parameters,"#debugLEDsOnPi").value){
         debugLEDsOnPi=true;
     }
+
+    if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<< "starting main loop:"<< std::endl;
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
@@ -124,12 +126,14 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
+            logs_to_send<< std::string(thisWheel->readMeasuredCurrent()*10) <<","; //add current to log
             i++;
         }
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             thisJoint->setTargetAngleNormalised(values[i]);
+            logs_to_send<< std::string(thisJoint->readMeasuredCurrent()*10) <<","; //add current to log
             i++;
         }
     }
@@ -215,9 +219,14 @@ int AREControl::exec(zmq::socket_t& socket){
     uint32_t start_time = millis();
     uint32_t this_loop_start_time = start_time;
 
-    logs_to_send<<"time (ms), NN inputs";
+    // make the first line of the log file, a list of headers for the data to follow:
+    logs_to_send<<"time (ms),";
+    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
+    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+
     while(this_loop_start_time-start_time <= _max_eval_time){
-        // start a new line of log file
+        // start a new line of log file, and add current time
         logs_to_send<<"\n"<<this_loop_start_time-start_time<<",";
 
         // get sensor readings

@@ -50,6 +50,9 @@ private:
     bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
 
     std::ostringstream logs_to_send;
+    int number_of_sensors=0;
+    int number_of_wheels=0;
+    int number_of_joints=0;
 
     // private functions:
 
