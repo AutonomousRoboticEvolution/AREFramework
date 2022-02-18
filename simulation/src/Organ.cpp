@@ -118,14 +118,14 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         tempOrganPos[2] = 0.0;
     else if(organType == 1) // Wheels
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     else if(organType == 2) { // Sensors
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     }else if(organType == 3) // Joints
-        tempOrganPos[2] = -0.045;
+        tempOrganPos[2] = -0.05;
     else if(organType == 4) { // Caster
         tempOrganPos[0] = 0.01;
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     } else
         assert(false);
 
@@ -163,7 +163,8 @@ void Organ::createMaleConnector()
 {
     float tempConnectorPosition[3];
     float tempConnectorOrientation[3];
-    int tempConnectorHandle;
+    int temp_physics_connector_handle;
+    int temp_visual_connector_handle = -1;
 
     tempConnectorPosition[0] = connectorPos.at(0);
     tempConnectorPosition[1] = connectorPos.at(1);
@@ -173,15 +174,20 @@ void Organ::createMaleConnector()
     tempConnectorOrientation[1] = connectorOri.at(1);
     tempConnectorOrientation[2] = connectorOri.at(2);
 
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    //modelsPath += "utils/male_connector_visual.ttm";
-    modelsPath += "utils/male_connector_physics.ttm";
+    std::string physics_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    std::string visual_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    visual_path += "utils/male_connector_visual.ttm";
+    physics_path += "utils/male_connector_physics.ttm";
 
-    tempConnectorHandle = simLoadModel(modelsPath.c_str());
-    assert(tempConnectorHandle != -1);
+    temp_physics_connector_handle = simLoadModel(physics_path.c_str());
+    assert(temp_physics_connector_handle != -1);
+    temp_visual_connector_handle = simLoadModel(visual_path.c_str());
+    assert(temp_visual_connector_handle != -1);
 
-    simSetObjectPosition(tempConnectorHandle, -1, tempConnectorPosition);
-    simSetObjectOrientation(tempConnectorHandle, -1, tempConnectorOrientation);
+    simSetObjectPosition(temp_physics_connector_handle, -1, tempConnectorPosition);
+    simSetObjectOrientation(temp_physics_connector_handle, -1, tempConnectorOrientation);
+    simSetObjectPosition(temp_visual_connector_handle, -1, tempConnectorPosition);
+    simSetObjectOrientation(temp_visual_connector_handle, -1, tempConnectorOrientation);
 
     /// \todo EB: We need to find a better way align origins of connectors and connectors! This distance only applies for the second male conenctor
     tempConnectorPosition[0] = 0.00;
@@ -192,11 +198,15 @@ void Organ::createMaleConnector()
     tempConnectorOrientation[1] = 0.0;
     tempConnectorOrientation[2] = 0.0;
 
-    simSetObjectPosition(tempConnectorHandle, tempConnectorHandle, tempConnectorPosition);
-    simSetObjectOrientation(tempConnectorHandle, tempConnectorHandle, tempConnectorOrientation);
+    simSetObjectPosition(temp_visual_connector_handle, temp_visual_connector_handle, tempConnectorPosition);
+    simSetObjectOrientation(temp_visual_connector_handle, temp_visual_connector_handle, tempConnectorOrientation);
+    simSetObjectParent(temp_visual_connector_handle, organHandle, 1);
 
-    simSetObjectParent(tempConnectorHandle, organHandle, 1);
-    physics_connector_handle = tempConnectorHandle;
+    simSetObjectPosition(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorPosition);
+    simSetObjectOrientation(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorOrientation);
+    simSetObjectParent(temp_physics_connector_handle, organHandle, 1);
+
+    physics_connector_handle = temp_physics_connector_handle;
 }
 
 void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
@@ -288,13 +298,13 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     gripperPosition[1] = 0.0;
     /// \todo EB: This offset should be somewhere else or constant.
     if(organType == 1) // Wheels
-        gripperPosition[2] = -0.13;
+        gripperPosition[2] = -0.25;
     else if(organType == 2) // Sensors
-        gripperPosition[2] = -0.15;
+        gripperPosition[2] = -0.24;
     else if(organType == 3) // Joints
-        gripperPosition[2] = -0.195;
+        gripperPosition[2] = -0.26;
     else if(organType == 4) // Caster
-        gripperPosition[2] = -0.1;
+        gripperPosition[2] = -0.26;
     else
         assert(false);
 
@@ -319,6 +329,14 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
                 return;
         }
     }
+    // Check collision with skeleton.
+    for (int skeletonHandle : skeletonHandles) {
+        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
+        if (collisionResult == 1) { // Collision detected!
+            return;
+        }
+    }
+
     organGripperAccess = true;
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     simSetObjectPosition(gripperHandle, -1, gripperPosition);
