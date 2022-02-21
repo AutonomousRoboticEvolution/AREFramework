@@ -102,6 +102,12 @@ public:
      * @brief Retrieve matrices
      */
     void retrieve_matrices_from_cppn();
+    /**
+     * Returns the organ for the specific input organ coordinate.
+     * @param input - coordinate
+     * @return Organ type
+     */
+    int get_organ_from_cppn(std::vector<double> input);
 
     ///////////////////////////////
     ///// Setters and getters /////
