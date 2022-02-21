@@ -3,8 +3,9 @@
 
 #include "physicalER/pi_communication.hpp"
 #include "ARE/Environment.h"
-#include "image_processing/blob_tracking.hpp"
+#include <zmq.hpp>
 #include <chrono>
+#include <boost/algorithm/string.hpp> // useful for parsing the received messages
 
 
 namespace are {
@@ -28,14 +29,14 @@ private:
     std::vector<double> current_position;
     std::vector<double> target_position;
     std::vector<double> beacon_position;
+    const int grid_zone_size = 8;
     Eigen::MatrixXi grid_zone;
-
-    cv::VideoCapture video_capture;
-    std::pair<cv::Scalar,cv::Scalar> colour_range;
 
     bool usingIPCamera;
 
+    // zmq stuff for getting messages from python camera program
     zmq::context_t context;
+    zmq::socket_t zmq_requester_socket;
     zmq::socket_t robot_pos_subs;
     zmq::socket_t tags_pos_subs;
 

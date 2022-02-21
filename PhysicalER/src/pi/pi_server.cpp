@@ -56,16 +56,16 @@ int main(int argc, char** argv) {
 
     while(1){
         //receive parameters
-        phy::receive_string(str_param,"parameters_received",reply);
+        phy::receive_string(str_param,"parameters_received",reply,"pi ");
         std::cout<<"Parameters received:\n"<<str_param<<std::endl;
     	parameters = std::make_shared<settings::ParametersMap>(settings::fromString(str_param));
         //receive organ addresses list
-        phy::receive_string(str_organs_list,"organ_addresses_received",reply);
+        phy::receive_string(str_organs_list,"organ_addresses_received",reply,"pi ");
         std::cout<<"Organs list received: \n"<<str_organs_list<<std::endl;
         
 
         // this generates the neural network controller ind
-        phy::receive_string(str_ctrl,"starting",reply);
+        phy::receive_string(str_ctrl,"starting",reply,"pi ");
         std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
 	    ctrl_gen->from_string(str_ctrl);
         phy::NN2Individual ind(empy_gen,ctrl_gen);
