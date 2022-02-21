@@ -71,7 +71,7 @@ class UR5Robot:
     # This will do a joni-space move between the pre-defined home positions for each station (defined as joint values in the config file)
     # The input should be a string, the name of the station to move to, as defined in the config file
     def moveBetweenStations( self , stationToMoveTo="home" ):
-        debugPrint("moving from station "+str(self.currentStation)+" to station "+str(stationToMoveTo))
+        debugPrint("moving from station "+str(self.currentStation)+" to station "+str(stationToMoveTo),messageVerbosity=1)
 
         currentStationCrouched =  [self.HOME_POSITIONS[self.currentStation][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[self.currentStation][5]]
         destinationStationCrouched =  [self.HOME_POSITIONS[stationToMoveTo][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[stationToMoveTo][5]]
@@ -386,7 +386,7 @@ class UR5Robot:
         BedPullUpDistance = 30/1000
         postBedRemovalSidewaysClearance = 0.1 # after pulling the skeleton off the bed, we should move horizontally out to avoid the skeleton hitting the frame of the printer
 
-        organInRobot = robot.getNextOrganToInsert()  ## get the next (i.e. first) organ which needs to be inserted
+        organInRobot = robot.organsList[0]  ## get the Head, which is always first object in organsList
         organInRobot.hasBeenInserted=True
         if not(organInRobot.organType == 0):
             raise Exception("Was expecting the Head organ. The insertHeadOrgan function has either been called erroneously, or the first organ in the organList in robot is not the Head.")
@@ -459,7 +459,6 @@ class UR5Robot:
 
         # dropoff:
         self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) )  # TCP for insertion is centre of clip
-        self.setMoveSpeed(self.speedValueSlow)  # slow
         # debugPrint("move to abovePreDropoffPoint", messageVerbosity=2)
         # self.moveArmLinearInJointSpace(abovePreDropoffPoint)  # above dropoff
         # self.moveArm ( PreDropoffPoint )  # above dropoff

@@ -83,7 +83,7 @@ class RoboFab_host:
         debugPrint( 'organ locations are: ' + str( blueprintList ) ,messageVerbosity=1 )
 
 
-        # define all the required organs and cables to the robot object:
+        # define all the required organs to the robot object:
         debugPrint( "Defining the organs" ,messageVerbosity=1)
         for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
             debugPrint ( "adding an organ of type {} ({})".format(str( organ_raw_data[1] ) , self.dictionaryOfOrganTypes[str(organ_raw_data[1])]["friendlyName"]) ,messageVerbosity=2)
@@ -93,6 +93,7 @@ class RoboFab_host:
 
         # information on where the cables need to go
         # each organ that has a cable to connect (so organ.transformOrganOriginToMaleCableSocket is not None) needs to have a point defined where this will be put, called organ.cableDestination
+        self.myRobot.createLimbList()
         self.myRobot.determineCableDestinations()
         self.myRobot.drawRobot(self.logDirectory)
 
@@ -160,7 +161,7 @@ class RoboFab_host:
 
         if DO_EXPORT_ORGANS_LIST:
             self.save_log_files()
-            self.myRobot.self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
+            self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
@@ -175,14 +176,20 @@ class RoboFab_host:
 
         # move the blueprint and mesh files to "archive" folder
         os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
-        from_folder = "{}/waiting_to_be_evaluated/".format ( self.logDirectory )
-        to_folder = "{}/blueprint_archive/".format ( self.logDirectory )
-        shutil.move ("{}blueprint_{}.csv".format(from_folder,self.robotID), "{}blueprint_{}.csv".format(to_folder,self.robotID) )
-        shutil.move ("{}mesh_{}.stl".format(from_folder,self.robotID), "{}mesh_{}.csv".format(to_folder,self.robotID) )
+        blueprint_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","blueprint_{}.csv".format(self.robotID))
+        mesh_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","mesh_{}.stl".format(self.robotID))
+        blueprint_new_path = os.path.join(self.logDirectory,"blueprint_archive","blueprint_{}.csv".format(self.robotID))
+        mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))
+        if os.path.exists(blueprint_new_path): os.remove(blueprint_new_path) # delete it if it already exists to avoid errors
+        if os.path.exists(mesh_new_path): os.remove(mesh_new_path) # delete it if it already exists to avoid errors
+        shutil.move(blueprint_old_path, blueprint_new_path)
+        shutil.move(mesh_old_path, mesh_new_path)
 
         # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
-        shutil.move ( "{}/waiting_to_be_built/morph_genome_{}".format ( self.logDirectory, self.robotID ),
-                      "{}/waiting_to_be_evaluated/morph_genome_{}".format ( self.logDirectory, self.robotID ) )
+        genome_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","morph_genome_{}".format(self.robotID))
+        genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
+        if os.path.exists(genome_new_path): os.remove(genome_new_path)
+        shutil.move ( genome_old_path, genome_new_path)
 
     def temp_limb_demo(self):
         ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology

@@ -3,6 +3,8 @@
 
 
 import math
+import os
+
 from helperFunctions import makeTransform, makeTransformInputFormatted, debugPrint, findAngleBetweenTransforms, \
     makeTransformMillimetersDegrees, findDisplacementBetweenTransforms
 from typing import List
@@ -47,7 +49,11 @@ class Organ:
             # print(gripper_TCP)
 
             # rotate the AF such that the wrist of the UR5 is off to the side
-            wrist_position = self.positionTransformWithinBankOrRobot * np.linalg.inv(self.transformOrganOriginToClipCentre) * self.transformOrganOriginToMaleCableSocket * np.linalg.inv(gripper_TCP) *makeTransformMillimetersDegrees(z=-300)
+            if self.transformOrganOriginToMaleCableSocket is None:
+                wrist_position = self.positionTransformWithinBankOrRobot * np.linalg.inv(self.transformOrganOriginToClipCentre) * self.transformOrganOriginToGripper * np.linalg.inv(gripper_TCP) *makeTransformMillimetersDegrees(z=-300)
+            else:
+                cableOriginToGripper = makeTransformMillimetersDegrees(y=3, z=-3)
+                wrist_position = self.positionTransformWithinBankOrRobot * np.linalg.inv(self.transformOrganOriginToClipCentre) * self.transformOrganOriginToMaleCableSocket * cableOriginToGripper * np.linalg.inv(gripper_TCP) *makeTransformMillimetersDegrees(z=-300)
             x = wrist_position[0, 3]
             y = wrist_position[1, 3]
             return math.atan2(x, y) + math.radians(-15)
@@ -159,7 +165,7 @@ class Robot:
         index = [x.hasBeenInserted for x in self.organsByLimbList[0]].index(False) # find the first organ attached to main skeleton that hasn't yet been inserted
         self.organsByLimbList[0][ index ].hasBeenInserted = True
         #if all ( [x.hasBeenInserted for x in self.organsByLimbList[0]] ):  # check if all are now complete
-        debugPrint("Inserting organ {} (a {}) out of {} attached to main skeleton".format(index, self.organsByLimbList[0][index].friendlyName ,len(self.organsByLimbList[0])),messageVerbosity=0)
+        debugPrint("Inserting organ {} (a {}) out of {} attached to main skeleton".format(index+1, self.organsByLimbList[0][index].friendlyName ,len(self.organsByLimbList[0])),messageVerbosity=0)
         return self.organsByLimbList[0][ index ]
 
     def countOrgansOfType(self, organType):
@@ -249,8 +255,8 @@ class Robot:
                 plt.plot(x, y, "bo")
                 plt.plot(organ.positionTransformWithinBankOrRobot[0,3] , organ.positionTransformWithinBankOrRobot[1,3],"go") # clip
                 plt.plot([x,organ.positionTransformWithinBankOrRobot[0,3]] , [y,organ.positionTransformWithinBankOrRobot[1,3]],"g--") # clip
-                plt.text(x, y + 0.005, "{}:{}".format(i,organ.friendlyName), color="b", ha='center')
-                plt.text(x, y - 0.005, "{}".format(organ.I2CAddress), color="b", ha='center')
+                plt.text(x, y + 0.012, "{}:{}".format(i,organ.friendlyName), color="b", ha='center', va='center')
+                plt.text(x, y - 0.012, "0x{:02X}".format(int(organ.I2CAddress)), color="b", ha='center', va='center')
 
                 if organ.transformOrganOriginToMaleCableSocket is not None: # has a cable to draw
                     plt.plot( # line for cable
@@ -275,7 +281,9 @@ class Robot:
         plt.title("Robot ID: {}".format(self.ID))
 
         # save as pdf
-        pdf = PdfPages ( "{}/waiting_to_be_evaluated/plan_{}".format(saveDirectory,self.ID) )
+        filepath = "{}/waiting_to_be_evaluated/plan_{}".format(saveDirectory,self.ID)
+        if os.path.exists("{}.pdf".format(filepath)): os.remove("{}.pdf".format(filepath))  # delete it if it already exists to avoid errors
+        pdf = PdfPages ( filepath )
         pdf.savefig ( plt.gcf() )
         pdf.close ()
 

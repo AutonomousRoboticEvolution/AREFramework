@@ -262,7 +262,12 @@ class RobofabGUI:
         self.printerObjects[printer_number].printFileOnOctoprint(filename)
         # work out and show the estimated finishing time
         estimated_finish_time = datetime.datetime.now() + datetime.timedelta(seconds= self.printerObjects[printer_number].print_time_estimate_seconds )
-        self.label_printerStatus [ printer_number ] [ "text" ] = "Printing, estimated finish:\n".format(estimated_finish_time.strftime("%H:%M:%S"))
+        if self.printerObjects[printer_number].print_time_estimate_seconds>0:
+            self.label_printerStatus [ printer_number ] [ "text" ] = "Printing, estimated finish:\n{}".format(estimated_finish_time.strftime("%H:%M:%S"))
+            print("Printing, estimated finish:\n{}".format(estimated_finish_time.strftime("%H:%M:%S")))
+        else:
+            self.label_printerStatus [ printer_number ] [ "text" ] = "Printing, estimated finish:\ntime unknown"
+            print("Printing, estimated finish:\ntime unknown")
         self.printingInProgress [printer_number] = True
 
     def handlerButtonSlice(self, printer_number):

@@ -200,7 +200,7 @@ def makeFile(location):
 				"pickupExtraPushDistance": 0 / 1000,
 				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=18.312,rotX=180)).tolist(),
 				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=16,z=20.1,rotX=0,rotY=180,rotZ=90).tolist(),
-				"transformOrganOriginToCableSocket": None,  # female socket(s)
+				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
 				"gripperOpeningFraction": 0.6,
 				"gripperClosedFraction": 0.8,
 				"USE_FORCE_MODE":True,
