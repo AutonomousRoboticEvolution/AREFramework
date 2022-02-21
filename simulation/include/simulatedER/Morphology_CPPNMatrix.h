@@ -98,6 +98,12 @@ public:
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
     void exportRobotModel(int indNum);
+    /**
+     * Returns the organ for the specific input organ coordinate.
+     * @param input - coordinate
+     * @return Organ type
+     */
+    int get_organ_from_cppn(std::vector<double> input);
 
     ///////////////////////////////
     ///// Setters and getters /////
