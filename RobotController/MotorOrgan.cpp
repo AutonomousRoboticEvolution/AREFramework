@@ -64,14 +64,19 @@ void MotorOrgan::standby() {
 	writeControlReg();
 }
 
-//NOTE: Must have a delay between using this function and further writes to I2C
+//NOTE: Must have a delay between using this function and further writes to I2C, therefore this function includes a sleep of 100ms.
 //I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
 void MotorOrgan::setCurrentLimit(uint8_t tensOfMilliamps){
     write8To(CURRENT_LIMIT_REGISTER, tensOfMilliamps);
+    usleep(100000);
 }
 
 int8_t MotorOrgan::readMeasuredCurrent() {
-    return read8From(GET_MEASURED_CURRENT_REGISTER);
+    // Matt: I'm not sure why, but the wheel will sometimes (inconsistantly) stop responding after a read8From request for the current value.
+    //       It seems to be fixed by instead doing separate writ8() and read() commands. I don't know why, but it seems to work...
+    write8(GET_MEASURED_CURRENT_REGISTER);
+    return read8();
+//    return read8From(GET_MEASURED_CURRENT_REGISTER);
 }
 
 int8_t MotorOrgan::readMeasuredVelocity() {

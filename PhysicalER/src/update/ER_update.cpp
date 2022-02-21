@@ -117,6 +117,10 @@ void ER::start_evaluation(){
         isEnvInit=true;
         environment->init();
     }
+    // reset frames counters
+    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_robot_was_seen = 0;
+    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_barrel_was_seen = 0;
+    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames = 0;
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
@@ -198,11 +202,11 @@ bool ER::stop_evaluation(){
     // display some infomation about how well the tracking worked
     std::cout<<"Saw the robot in ";
     std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_robot_was_seen;
-    std::cout<<"frames (out of ";
+    std::cout<<" frames (out of ";
     std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
     std::cout<<"}\nSaw the barrel in ";
     std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_barrel_was_seen;
-    std::cout<<"frames (out of ";
+    std::cout<<" frames (out of ";
     std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
     std::cout<<")"<<std::endl;
 

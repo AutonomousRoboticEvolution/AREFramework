@@ -126,14 +126,14 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
-            logs_to_send<< std::string(thisWheel->readMeasuredCurrent()*10) <<","; //add current to log
+            logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
             i++;
         }
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             thisJoint->setTargetAngleNormalised(values[i]);
-            logs_to_send<< std::string(thisJoint->readMeasuredCurrent()*10) <<","; //add current to log
+            logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++;
         }
     }

@@ -4,6 +4,7 @@
 #define VERBOSE_DEBUG_PRINTING_AT_SETUP true
 
 #include <iostream>
+#include <sstream>
 #include <vector>
 #include "physicalER/pi_individual.hpp"
 #include "physicalER/pi_communication.hpp"

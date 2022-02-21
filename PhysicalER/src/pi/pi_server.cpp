@@ -30,30 +30,6 @@ int main(int argc, char** argv) {
 
     std::string str_ctrl, str_organs_list, str_param;
 
-    // temp!
-    /*
-    Camera camera;
-    std::cout<<"set tags..."<<std::endl;
-    camera.setTagsToLookFor({10,1});
-    std::cout<<"starting..."<<std::endl;
-    LedDriver leds(0x6A);
-    leds.init();
-    std::cout<<"testing camera..."<<std::endl;
-    std::cout<<"set tags..."<<std::endl;
-    camera.setTagsToLookFor({42});
-    std::cout<<"starting..."<<std::endl;
-    while(1){
-        if (camera.presenceDetect()){
-            std::cout<<"y"<<std::endl;
-            leds.setAllTo(GREEN,200);
-        }else{
-            std::cout<<"n"<<std::endl;
-            leds.setAllTo(OFF,200);
-        }
-        delay(100);
-    }
-    */
-
     while(1){
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply,"pi ");
