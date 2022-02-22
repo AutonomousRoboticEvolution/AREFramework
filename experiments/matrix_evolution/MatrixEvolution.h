@@ -24,6 +24,7 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     bool update(const Environment::Ptr&);
     void load_robot_matrix();
+    void mutate_matrix();
 
     NEAT::Genome loadInd(short int genomeID);
     std::vector<int> listInds();
@@ -36,6 +37,7 @@ private:
     std::vector<Eigen::VectorXd> archive;
 
     std::vector<std::vector<double>> matrix_4d;
+    std::vector<std::vector<std::vector<double>>> matrix_4d_population;
 
 protected:
     NEAT::RNG rng;

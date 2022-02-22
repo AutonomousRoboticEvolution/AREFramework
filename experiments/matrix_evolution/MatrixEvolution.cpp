@@ -27,6 +27,7 @@ void MATRIXEVOLUTION::init()
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
     load_robot_matrix();
+    mutate_matrix();
     initPopulation();
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
@@ -201,4 +202,21 @@ void MATRIXEVOLUTION::load_robot_matrix()
     }
     // Close file
     myFile.close();
+}
+
+void MATRIXEVOLUTION::mutate_matrix()
+{
+    std::uniform_real_distribution<double> distribution(-0.1,0.1);
+    std::default_random_engine generator;
+    double temp_variable;
+    for(int i = 0; i < matrix_4d.size(); i++){
+        for(int j = 0; j < matrix_4d.at(0).size(); j++){
+            temp_variable = matrix_4d.at(i).at(j) * distribution(generator) + matrix_4d.at(i).at(j);
+            if(temp_variable < -1.0)
+                temp_variable = -1.0;
+            else if(temp_variable > 1.0)
+                temp_variable = 1.0;
+            matrix_4d.at(i).at(j) = temp_variable;
+        }
+    }
 }

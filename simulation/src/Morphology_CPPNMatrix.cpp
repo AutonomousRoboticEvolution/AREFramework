@@ -323,7 +323,8 @@ void Morphology_CPPNMatrix::create()
     destroyGripper();
     destroy_physical_connectors();
     blueprint.createBlueprint(organList);
-    retrieve_matrices_from_cppn();
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value)
+        retrieve_matrices_from_cppn();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -462,6 +463,8 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         int pos_x = input.at(0) + 5;
         int pos_y = input.at(1) + 5;
         int pos_z = input.at(2) + 5;
+        // If no thereshold it crashes for joints because the coordinates is out boundaries
+        if(pos_x > 10) pos_x = 10; if(pos_y > 10) pos_y = 10; if(pos_z > 10) pos_z = 10;
         int pos_in_vector = pos_x * 121 + pos_y * 11 + pos_z;
         output.push_back(matrix_4d.at(0).at(pos_in_vector));
 
