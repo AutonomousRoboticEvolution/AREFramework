@@ -55,7 +55,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
             return;
         std::vector<std::vector<std::vector<double>>> temp_matrix;
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_angle_matrix();
-        logFileStream << "angle" << ",";
+        logFileStream << "Angle:" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
@@ -66,7 +66,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         logFileStream << std::endl;
         temp_matrix.clear();
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_skeleton_matrix();
-        logFileStream << "skeleton" << ",";
+        logFileStream << "Skeleton" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
@@ -77,7 +77,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         logFileStream << std::endl;
         temp_matrix.clear();
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_wheel_matrix();
-        logFileStream << "wheel" << ",";
+        logFileStream << "Wheel" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
@@ -88,7 +88,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         logFileStream << std::endl;
         temp_matrix.clear();
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_sensor_matrix();
-        logFileStream << "sensor" << ",";
+        logFileStream << "Sensor" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
@@ -99,7 +99,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         logFileStream << std::endl;
         temp_matrix.clear();
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_joint_matrix();
-        logFileStream << "joint" << ",";
+        logFileStream << "Joint" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
@@ -110,7 +110,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         logFileStream << std::endl;
         temp_matrix.clear();
         temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_caster_matrix();
-        logFileStream << "caster" << ",";
+        logFileStream << "Caster:" << ",";
         for(int i = 0; i < temp_matrix.size(); i++){
             for(int j = 0; j < temp_matrix.at(0).size(); j++){
                 for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
