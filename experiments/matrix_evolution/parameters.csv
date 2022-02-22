@@ -32,6 +32,7 @@
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
+#isCPPNGenome,bool,0
 
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
@@ -71,4 +72,4 @@
 #CPPNParametersMutationRate,float,0.1
 
 #genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_21_1_17-34-35-5844-2682957526/
-#genomeID,string,matrices_1
+#genomeID,string,matrices_0
