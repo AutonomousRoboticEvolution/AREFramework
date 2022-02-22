@@ -252,7 +252,7 @@ void Morphology_CPPNMatrix::create()
 
                 // Generate organs
                 const auto CHILDORGANNUMBER = 4;
-                int organCoord[CHILDORGANNUMBER][3] {{0,0,2},{0,-1,0},{-1,0,0},{2,0,0}};
+                double organCoord[CHILDORGANNUMBER][3] {{0,0,2},{0,-1,0},{-1,0,0},{2,0,0}};
 
                 // SimGroupShapes changes the orientation of the shape this verifies that the organ generation is consistent.
                 if(abs(orientation[0]) < 0.01)
@@ -261,19 +261,8 @@ void Morphology_CPPNMatrix::create()
                 std::vector<int> organTypeList(CHILDORGANNUMBER,-1);
                 // Check each side of the child skeleton
                 for(int j = 0; j < CHILDORGANNUMBER; j++){
-                    if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).wheel == mc::filled_voxel){
-                        organTypeList.at(j) = 1;
-                        break;
-                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).sensor == mc::filled_voxel){
-                        organTypeList.at(j) = 2;
-                        break;
-                    } else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).joint == mc::filled_voxel){
-                        organTypeList.at(j) = 3;
-                        break;
-                    }  else if(areMatrix.getVoxel(organCoord[j][0],organCoord[j][1],organCoord[j][2]).caster == mc::filled_voxel){
-                        organTypeList.at(j) = 4;
-                        break;
-                    }
+                    std::vector<double> temp_vector{organCoord[j][0],organCoord[j][1],organCoord[j][2],sqrt(pow(organCoord[j][0],2)+pow(organCoord[j][1],2)+pow(organCoord[j][2],2))};
+                    organTypeList.at(j) = get_organ_from_cppn(temp_vector);
                 }
 
                 for(int j = 0; j < CHILDORGANNUMBER; j++){
@@ -328,6 +317,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.getOrganPositions(organList);
     }
     destroyGripper();
+    destroy_physical_connectors();
     blueprint.createBlueprint(organList);
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
@@ -471,51 +461,17 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
 {
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
     std::vector<double> output;
-    int organType;
+    int organ_type;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
         // Generate organs every two voxels.
-        for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=5) { /// \todo EB: Define this constant elsewhere!
+        for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
             input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
             input[3] = static_cast<double>(sqrt(pow(skeletonSurfaceCoord[m][n].at(0),2)+pow(skeletonSurfaceCoord[m][n].at(1),2)+pow(skeletonSurfaceCoord[m][n].at(2),2)));
-            if(use_neat){
-                // Set inputs to NN
-                cppn.Input(input);
-                // Activate NN
-                cppn.Activate();
-                output = cppn.Output();
-            }else{
-                nn2_cppn.step(input);
-                output = nn2_cppn.outf();
-            }
-            // Is there an organ?
-            organType = -1;
-            int maxIndex = -1;
-            maxIndex = std::max_element(output.begin()+2, output.end()) - output.begin();
-
-            if(maxIndex == 2){ // Wheel
-                // These if statements should be always true but they are here for debugging.
-                if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
-                    organType = 1;
-            }
-            else if(maxIndex == 3) { // Sensor
-                if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
-                    organType = 2;
-            }
-            else if(maxIndex == 4) { // Joint
-                if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
-                    organType = 3;
-            }
-            else if(maxIndex == 5) { // Caster
-                if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
-                    organType = 4;
-            } else{
-                std::cerr << "We shouldn't be here: " << __func__ << " maxIndex: " << maxIndex << std::endl;
-                assert(false);
-            }
+            organ_type = get_organ_from_cppn(input);
             // Create organ if any
-            if(organType > 0){
+            if(organ_type > 0){
                 std::vector<float> tempPosVector(3);
                 tempPosVector.at(0) = static_cast<float>(input[0] * mc::voxel_real_size);
                 tempPosVector.at(1) = static_cast<float>(input[1] * mc::voxel_real_size);
@@ -523,7 +479,7 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                 tempPosVector.at(2) += mc::matrix_size/2 * mc::voxel_real_size;
                 std::vector<float> tempOriVector(3);
                 generateOrientations(skeletonSurfaceCoord[m][n].at(3), skeletonSurfaceCoord[m][n].at(4), skeletonSurfaceCoord[m][n].at(5), tempOriVector);
-                Organ organ(organType, tempPosVector, tempOriVector, parameters);
+                Organ organ(organ_type, tempPosVector, tempOriVector, parameters);
                 organList.push_back(organ);
             }
         }
@@ -569,142 +525,140 @@ void Morphology_CPPNMatrix::destroyGripper()
     }
 }
 
+void Morphology_CPPNMatrix::destroy_physical_connectors()
+{
+    for (std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++) {
+        if (!it->isOrganRemoved() && it->isOrganChecked()) {
+            simRemoveModel(it->get_graphical_connector_handle());
+        }
+    }
+}
+
+int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
+{
+    int organ_type = -1;
+    std::vector<double> output;
+    if(use_neat){
+        // Set inputs to NN
+        cppn.Input(input);
+        // Activate NN
+        cppn.Activate();
+        output = cppn.Output();
+    }else{
+        nn2_cppn.step(input);
+        output = nn2_cppn.outf();
+    }
+    // Is there an organ?
+    organ_type = -1;
+    int max_element = -1;
+    max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
+
+    if(max_element == 2){ // Wheel
+        // These if statements should be always true but they are here for debugging.
+        if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
+            organ_type = 1;
+    }
+    else if(max_element == 3) { // Sensor
+        if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
+            organ_type = 2;
+    }
+    else if(max_element == 4) { // Joint
+        if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
+            organ_type = 3;
+    }
+    else if(max_element == 5) { // Caster
+        if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
+            organ_type = 4;
+    } else{
+        std::cerr << "We shouldn't be here: " << __func__ << " max_element: " << max_element << std::endl;
+        assert(false);
+    }
+    return organ_type;
+}
+
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
+    /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
     if ((x < 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261;
-        orientation.at(1) = +0.5235;
-        orientation.at(2) = +2.1861;
+        orientation.at(0) = -2.5261; orientation.at(1) = +0.5235; orientation.at(2) = +2.1861;
     }
     else if ((x < 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = +3.1415;
-        orientation.at(1) = +0.7853;
-        orientation.at(2) = -3.1415;
+        orientation.at(0) = +3.1415; orientation.at(1) = +0.7853; orientation.at(2) = -3.1415;
     }
     else if ((x < 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5261;
-        orientation.at(1) = +0.6981;
-        orientation.at(2) = -2.1862;
+        orientation.at(0) = +2.5261; orientation.at(1) = +0.6981; orientation.at(2) = -2.1862;
     }
     else if ((x == 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.3561;
-        orientation.at(1) = +0.5960;
-        orientation.at(2) = +1.5707;
+        orientation.at(0) = -2.3561; orientation.at(1) = +0.5960; orientation.at(2) = +1.5707;
     }
     else if ((x == 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415;
-        orientation.at(1) = +0.000;
-        orientation.at(2) = +0.0000;
+        orientation.at(0) = -3.1415; orientation.at(1) = +0.000; orientation.at(2) = +0.0000;
     }
     else if ((x == 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.3561;
-        orientation.at(1) = +0.0000;
-        orientation.at(2) = -1.5708;
+        orientation.at(0) = +2.3561; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
     }
     else if ((x > 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261;
-        orientation.at(1) = -0.5236;
-        orientation.at(2) = +0.9552;
+        orientation.at(0) = -2.5261; orientation.at(1) = -0.5236; orientation.at(2) = +0.9552;
     }
     else if ((x > 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415;
-        orientation.at(1) = -0.7854;
-        orientation.at(2) = +0.0000;
+        orientation.at(0) = -3.1415; orientation.at(1) = -0.7854; orientation.at(2) = +0.0000;
     }
     else if ((x > 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5132;
-        orientation.at(1) = -0.5235;
-        orientation.at(2) = -0.9552;
+        orientation.at(0) = +2.5132; orientation.at(1) = -0.5235; orientation.at(2) = -0.9552;
     }
     else if ((x < 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708;
-        orientation.at(1) = +0.7853;
-        orientation.at(2) = +1.5707;
+        orientation.at(0) = -1.5708; orientation.at(1) = +0.7853; orientation.at(2) = +1.5707;
     }
     else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0000;
-        orientation.at(1) = +1.5707;
-        orientation.at(2) = +0.0000;
+        orientation.at(0) = +0.0000; orientation.at(1) = +1.5707; orientation.at(2) = +0.0000;
     }
     else if ((x < 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707;
-        orientation.at(1) = +0.7853;
-        orientation.at(2) = -1.5708;
+        orientation.at(0) = +1.5707; orientation.at(1) = +0.7853; orientation.at(2) = -1.5708;
     }
     else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708;
-        orientation.at(1) = +0.0000;
-        orientation.at(2) = +1.5708;
+        orientation.at(0) = -1.5708; orientation.at(1) = +0.0000; orientation.at(2) = +1.5708;
     }
     else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707;
-        orientation.at(1) = +0.0000;
-        orientation.at(2) = -1.5708;
+        orientation.at(0) = +1.5707; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
     }
     else if ((x > 0) && (y < 0) && (z == 0)) {
-        orientation.at(0) = +1.5707;
-        orientation.at(1) = -0.7854;
-        orientation.at(2) = +1.5708;
+        orientation.at(0) = +1.5707; orientation.at(1) = -0.7854; orientation.at(2) = +1.5708;
     }
     else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0000;
-        orientation.at(1) = -1.5708;
-        orientation.at(2) = +3.1415;
+        orientation.at(0) = +0.0000; orientation.at(1) = -1.5708; orientation.at(2) = +3.1415;
     }
     else if ((x > 0) && (y > 0) && (z == 0)) {
-        orientation.at(0) = +1.5708;
-        orientation.at(1) = -0.7854;
-        orientation.at(2) = -1.5708;
+        orientation.at(0) = +1.5708; orientation.at(1) = -0.7854; orientation.at(2) = -1.5708;
     }
     else if ((x < 0) && (y < 0) && (z < 0)) {
-        orientation.at(0) = -0.6154;
-        orientation.at(1) = +0.5235;
-        orientation.at(2) = +0.9552;
+        orientation.at(0) = -0.6154; orientation.at(1) = +0.5235; orientation.at(2) = +0.9552;
     }
     else if ((x < 0) && (y == 0) && (z < 0)) {
-        orientation.at(0) = +0.0000;
-        orientation.at(1) = +0.78563;
-        orientation.at(2) = +0.0000;
+        orientation.at(0) = +0.0000; orientation.at(1) = +0.78563; orientation.at(2) = +0.0000;
     }
     else if ((x < 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.6154;
-        orientation.at(1) = +0.5235;
-        orientation.at(2) = -0.9552;
+        orientation.at(0) = +0.6154; orientation.at(1) = +0.5235; orientation.at(2) = -0.9552;
     }
     else if ((x == 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.7851;
-        orientation.at(1) = +0.5235;
-        orientation.at(2) = +1.5708;
+        orientation.at(0) = -0.7851; orientation.at(1) = +0.5235; orientation.at(2) = +1.5708;
     }
     else  if ((x == 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000;
-        orientation.at(1) = +0.0000;
-        orientation.at(2) = +0.0000;
+        orientation.at(0) = +0.0000; orientation.at(1) = +0.0000; orientation.at(2) = +0.0000;
     }
     else if ((x == 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.7853;
-        orientation.at(1) = +0.0000;
-        orientation.at(2) = -1.5708;
+        orientation.at(0) = +0.7853; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
     }
     else if ((x > 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.6154;
-        orientation.at(1) = -0.5236;
-        orientation.at(2) = +2.1861;
+        orientation.at(0) = -0.6154; orientation.at(1) = -0.5236; orientation.at(2) = +2.1861;
     }
     else if ((x > 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000;
-        orientation.at(1) = -0.7854;
-        orientation.at(2) = -3.1415;
+        orientation.at(0) = +0.0000; orientation.at(1) = -0.7854; orientation.at(2) = -3.1415;
     }
     else if ((x > 0) && (y > 0) && (z < 0)) {
-        orientation.at(0) = +0.6154;
-        orientation.at(1) = -0.5236;
-        orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
     }
     else {
-        orientation.at(0) = +0.6154;
-        orientation.at(1) = -0.5236;
-        orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }
