@@ -67,5 +67,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::SimTimeLog<are::sim::NN2Individual>::Ptr stlog(new are::SimTimeLog<are::sim::NN2Individual>(st_log_file));
     logs.push_back(stlog);
 
+    are::CMAESStateLog<are::NIPES>::Ptr cstlog(new are::CMAESStateLog<are::NIPES>);
+    logs.push_back(cstlog);
 }
 

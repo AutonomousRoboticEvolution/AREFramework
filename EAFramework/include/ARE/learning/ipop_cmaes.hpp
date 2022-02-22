@@ -49,6 +49,8 @@ public:
     typedef std::shared_ptr<IPOPCMAStrategy> Ptr;
     typedef std::shared_ptr<const IPOPCMAStrategy> ConstPtr;
 
+    IPOPCMAStrategy(){}
+
     IPOPCMAStrategy(cma::FitFunc func,cma::CMAParameters<geno_pheno_t> &parameters)
         :ipop_cmaes_t(func,parameters)
     {
@@ -97,7 +99,7 @@ public:
         ipop_cmaes_t::lambda_inc();
     }
 
-    double learning_progress();
+    double learning_progress(){/*TODO*/}
 
     void add_individual(const individual_t &ind){_pop.push_back(ind);}
     void set_population(const std::vector<Individual::Ptr>& pop);
@@ -117,6 +119,7 @@ public:
 
     std::string to_string();
     void from_string(const std::string&);
+    void from_file(const std::string&);
 
     std::string print_info();
 
@@ -127,8 +130,12 @@ public:
         arch & _parameters;
         arch & novelty_ratio;
         arch & number_of_eval;
+        arch & _niter;
+        arch & _nevals;
+
     }
 
+    int nbr_iter() const{return _niter;}
 
 private:
     std::vector<individual_t> _pop;
@@ -151,7 +158,25 @@ private:
 
 };
 
+template<class ea_t>
+class CMAESStateLog : public Logging
+{
+public:
+    CMAESStateLog() : Logging(){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea){
+        int gen = ea->get_generation();
+        std::stringstream filename;
+        filename << "cmaes_state_" << gen;
+        std::ofstream ofs;
+        if(!openOLogFile(ofs,filename.str()))
+            return;
+        const IPOPCMAStrategy::Ptr &ipop_cma = static_cast<ea_t*>(ea.get())->get_cma_strat();
 
+        ofs << ipop_cma->to_string();
+        ofs.close();
+    }
+    void loadLog(const std::string& logFile){}
+};
 
 }//are
 

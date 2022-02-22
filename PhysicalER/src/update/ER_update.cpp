@@ -71,11 +71,8 @@ void ER::write_data(){
 
 void ER::save_logs(bool eog)
 {
-    for(const auto &log : logs){
-        if(log->isEndOfGen() == eog){
-            log->saveLog(ea);
-        }
-    }
+    for(const auto &log : logs)
+        log->saveLog(ea);
 }
 bool ER::execute(){
 
@@ -187,6 +184,14 @@ bool ER::stop_evaluation(){
         }
     }
 
+    if(verbose){
+        Individual::Ptr ind;
+        auto objectives = environment->fitnessFunction(ind);
+        std::cout << "fitnesses = " << std::endl;
+        for(const double fitness : objectives)
+            std::cout << fitness << std::endl;
+
+    }
 
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
@@ -197,13 +202,13 @@ bool ER::stop_evaluation(){
     }
 
     nbrEval++;
-
     if(ea->update(environment)){
         nbrEval = 0;
     }
     ea->set_endEvalTime(hr_clock::now());
     write_data();
     save_logs();
+
 
     current_id = choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);

@@ -7,6 +7,7 @@
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/misc/RandNum.h"
+#include "ARE/misc/eigen_boost_serialization.hpp"
 
 namespace are {
 
@@ -70,6 +71,20 @@ public:
         arch & boost::serialization::base_object<Learner>(*this);
         arch & _archive;
         arch & _best_solution;
+        arch & _cma_strat;
+        arch & _nn_inputs;
+        arch & _nn_outputs;
+        arch & _nbr_biases;
+        arch & _nbr_weights;
+        arch & _nbr_eval;
+        arch & _generation;
+        arch & _is_finish;
+        arch & _novelty_archive;
+        arch & _population;
+        arch & _best_solution;
+        arch & nbr_dropped_eval;
+        arch & current_nbr_ind;
+        //arch & initialized;
     }
 
     std::string archive_to_string() const;
@@ -89,6 +104,15 @@ public:
     int get_nbr_outputs() const{return _nn_outputs;}
     int get_nbr_weights() const{return _nbr_weights;}
     int get_nbr_biases() const{return _nbr_biases;}
+
+    int nbr_iter() const{return _generation;}
+    int nbr_eval() const{return _nbr_eval;}
+
+    std::string print_info() const{return _cma_strat->print_info();}
+
+    std::string to_string() const;
+    void from_string(const std::string&);
+    void from_file(const std::string&);
 
 protected:
     void next_pop();

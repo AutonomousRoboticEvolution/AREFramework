@@ -57,7 +57,6 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
-    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
 
     int counter = _cma_strat->get_population().size();
 
@@ -156,7 +155,6 @@ void CMAESLearner::iterate(){
 void CMAESLearner::next_pop(){
     int pop_size = _cma_strat->get_parameters().lambda();
     _archive.emplace(_generation,_cma_strat->get_population());
-    _generation++;
     dMat new_samples = _cma_strat->ask();
     _population.clear();
     for(int i = 0; i < pop_size; i++)
@@ -169,6 +167,8 @@ bool CMAESLearner::step(){
     _nbr_eval++;
     if(_cma_strat->get_population().size() < _population.size())
         return false;
+
+    _generation++;
 
 //    if(is_learning_finish())
 //        return true;
@@ -223,4 +223,41 @@ std::string CMAESLearner::archive_to_string() const{
         }
     }
     return sstr.str();
+}
+
+std::string CMAESLearner::to_string() const{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    oarch.register_type<libcmaes::RankedCandidate>();
+    oarch.register_type<IPOPCMAStrategy>();
+    oarch.register_type<CMAESLearner>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void CMAESLearner::from_string(const std::string & str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    iarch.register_type<libcmaes::RankedCandidate>();
+    iarch.register_type<IPOPCMAStrategy>();
+    iarch.register_type<CMAESLearner>();
+    iarch >> *this;
+}
+
+void CMAESLearner::from_file(const std::string & filename){
+    std::ifstream ifs(filename);
+    if(!ifs){
+        std::cerr << "unable to open : " << filename << std::endl;
+        return;
+    }
+    boost::archive::text_iarchive iarch(ifs);
+    iarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    iarch.register_type<libcmaes::RankedCandidate>();
+    iarch.register_type<IPOPCMAStrategy>();
+    iarch.register_type<CMAESLearner>();
+    iarch >> *this;
+    ifs.close();
 }

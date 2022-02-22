@@ -48,21 +48,27 @@ int main(int argc, char** argv)
     parameters.emplace("#withRestart",new are_set::Boolean(true));
     parameters.emplace("#incrPop",new are_set::Boolean(true));
 
+
     std::random_device rd;
     int seed = rd();
     are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
+    if(argc > 1){
+        parameters.emplace("#startFromExistingLearner",new are_set::Boolean(true));
+        parameters.emplace("#learnerFile",new are_set::String(argv[1]));
+    }else parameters.emplace("#startFromExistingLearner",new are_set::Boolean(false));
 
     are::NIPES nipes(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     nipes.init();
+    std::cout << nipes.get_cma_strat()->print_info() << std::endl;
 
-    if(argc > 1){
-        std::ifstream ifs(argv[1]);
-        std::stringstream sstream;
-        sstream << ifs.rdbuf();
-        nipes.get_cmaStrategy()->from_string(sstream.str());
-        std::cout << nipes.get_cmaStrategy()->print_info() << std::endl;
-        nipes.init_next_pop();
-    }
+//    if(argc > 1){
+//        std::ifstream ifs(argv[1]);
+//        std::stringstream sstream;
+//        sstream << ifs.rdbuf();
+//        nipes.get_cmaStrategy()->from_string(sstream.str());
+//        std::cout << nipes.get_cmaStrategy()->print_info() << std::endl;
+//        nipes.init_next_pop();
+//    }
 
     std::vector<are::Individual::Ptr> pop;
     int gen_size = std::dynamic_pointer_cast<are::NNParamGenome>(nipes.get_population()[0]->get_ctrl_genome())->get_full_genome().size();
@@ -107,9 +113,9 @@ int main(int argc, char** argv)
         nipes.init_next_pop();
     }
 
-    std::cout << nipes.get_cmaStrategy()->print_info() << std::endl;
+    std::cout << nipes.get_cma_strat()->print_info() << std::endl;
 
-    std::string saved_learner = nipes.get_cmaStrategy()->to_string();
+    std::string saved_learner = nipes.get_cma_strat()->to_string();
     std::ofstream ofs("learner");
     ofs << saved_learner;
     ofs.close();

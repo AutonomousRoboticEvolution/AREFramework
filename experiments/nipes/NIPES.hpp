@@ -50,7 +50,7 @@ public:
     NIPES() : EA(){}
     NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~NIPES(){
-        cmaStrategy.reset();
+        _cma_strat.reset();
     }
 
     void init() override;
@@ -63,20 +63,20 @@ public:
     bool is_finish() override;
     bool finish_eval(const Environment::Ptr& env) override;
 
-    bool restarted(){return !cmaStrategy->log_stopping_criterias.empty();}
+    bool restarted(){return !_cma_strat->log_stopping_criterias.empty();}
     std::string pop_stopping_criterias(){
-        std::string res = cmaStrategy->log_stopping_criterias.back();
-        cmaStrategy->log_stopping_criterias.pop_back();
+        std::string res = _cma_strat->log_stopping_criterias.back();
+        _cma_strat->log_stopping_criterias.pop_back();
         return res;
     }
     const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
     void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
 
-    const IPOPCMAStrategy::Ptr &get_cmaStrategy(){return cmaStrategy;}
-    void set_cmaStrategy(const IPOPCMAStrategy::Ptr& cmas){cmaStrategy = cmas;}
+    const IPOPCMAStrategy::Ptr &get_cma_strat(){return _cma_strat;}
+    void set_cma_strat(const IPOPCMAStrategy::Ptr& cmas){_cma_strat = cmas;}
 
 protected:
-    IPOPCMAStrategy::Ptr cmaStrategy;
+    IPOPCMAStrategy::Ptr _cma_strat;
     cma::CMASolutions best_run;
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
