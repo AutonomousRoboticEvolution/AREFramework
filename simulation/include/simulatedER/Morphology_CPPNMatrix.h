@@ -136,12 +136,7 @@ public:
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
-    const std::vector<std::vector<std::vector<double>>> &get_angle_matrix() const {return angle_matrix;};
-    const std::vector<std::vector<std::vector<double>>> &get_skeleton_matrix() const {return skeleton_matrix;};
-    const std::vector<std::vector<std::vector<double>>> &get_wheel_matrix() const {return wheel_matrix;};
-    const std::vector<std::vector<std::vector<double>>> &get_sensor_matrix() const {return sensor_matrix;};
-    const std::vector<std::vector<std::vector<double>>> &get_joint_matrix() const {return joint_matrix;};
-    const std::vector<std::vector<std::vector<double>>> &get_caster_matrix() const {return caster_matrix;};
+    const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;};
 
 private:
     ///////////////////////
@@ -242,12 +237,7 @@ private:
     std::vector<int> skeletonListIndices;
     NEAT::Substrate substrate;
 
-    std::vector<std::vector<std::vector<double>>> skeleton_matrix;
-    std::vector<std::vector<std::vector<double>>> angle_matrix;
-    std::vector<std::vector<std::vector<double>>> wheel_matrix;
-    std::vector<std::vector<std::vector<double>>> sensor_matrix;
-    std::vector<std::vector<std::vector<double>>> caster_matrix;
-    std::vector<std::vector<std::vector<double>>> joint_matrix;
+    std::vector<std::vector<double>> matrix_4d;
 };
 
 }//sim

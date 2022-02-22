@@ -539,18 +539,7 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
 {
     std::vector<double> input{0,0,0,0};
     std::vector<double> output;
-    std::vector<double> temp_1d_angle_matrix;
-    std::vector<double> temp_1d_skeleton_matrix;
-    std::vector<double> temp_1d_wheel_matrix;
-    std::vector<double> temp_1d_sensor_matrix;
-    std::vector<double> temp_1d_joint_matrix;
-    std::vector<double> temp_1d_caster_matrix;
-    std::vector<std::vector<double>> temp_2d_angle_matrix;
-    std::vector<std::vector<double>> temp_2d_skeleton_matrix;
-    std::vector<std::vector<double>> temp_2d_wheel_matrix;
-    std::vector<std::vector<double>> temp_2d_sensor_matrix;
-    std::vector<std::vector<double>> temp_2d_joint_matrix;
-    std::vector<std::vector<double>> temp_2d_caster_matrix;
+    matrix_4d.resize(6);
     for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1){
         for(int j = -mc::matrix_size/2 + 1; j < mc::matrix_size/2; j += 1){
             for(int k = -mc::matrix_size/2 + 1; k < mc::matrix_size/2; k += 1){
@@ -560,26 +549,14 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
-                temp_1d_angle_matrix.push_back(output.at(0));
-                temp_1d_skeleton_matrix.push_back(output.at(1));
-                temp_1d_wheel_matrix.push_back(output.at(2));
-                temp_1d_sensor_matrix.push_back(output.at(3));
-                temp_1d_joint_matrix.push_back(output.at(4));
-                temp_1d_caster_matrix.push_back(output.at(5));
+                matrix_4d.at(0).push_back(output.at(0));
+                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(2).push_back(output.at(2));
+                matrix_4d.at(3).push_back(output.at(3));
+                matrix_4d.at(4).push_back(output.at(4));
+                matrix_4d.at(5).push_back(output.at(5));
             }
-            temp_2d_angle_matrix.push_back(temp_1d_angle_matrix); temp_1d_angle_matrix.clear();
-            temp_2d_skeleton_matrix.push_back(temp_1d_skeleton_matrix); temp_1d_skeleton_matrix.clear();
-            temp_2d_wheel_matrix.push_back(temp_1d_wheel_matrix); temp_1d_wheel_matrix.clear();
-            temp_2d_sensor_matrix.push_back(temp_1d_sensor_matrix); temp_1d_sensor_matrix.clear();
-            temp_2d_joint_matrix.push_back(temp_1d_joint_matrix); temp_1d_joint_matrix.clear();
-            temp_2d_caster_matrix.push_back(temp_1d_caster_matrix); temp_1d_caster_matrix.clear();
         }
-        angle_matrix.push_back(temp_2d_angle_matrix); temp_2d_angle_matrix.clear();
-        skeleton_matrix.push_back(temp_2d_skeleton_matrix); temp_2d_skeleton_matrix.clear();
-        wheel_matrix.push_back(temp_2d_wheel_matrix); temp_2d_wheel_matrix.clear();
-        sensor_matrix.push_back(temp_2d_sensor_matrix); temp_2d_sensor_matrix.clear();
-        joint_matrix.push_back(temp_2d_joint_matrix); temp_2d_joint_matrix.clear();
-        caster_matrix.push_back(temp_2d_caster_matrix); temp_2d_caster_matrix.clear();
     }
 }
 

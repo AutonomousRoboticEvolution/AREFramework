@@ -35,12 +35,7 @@ private:
 
     std::vector<Eigen::VectorXd> archive;
 
-    std::vector<std::vector<std::vector<double>>> robot_skeleton_matrix;
-    std::vector<std::vector<std::vector<double>>> robot_angle_matrix;
-    std::vector<std::vector<std::vector<double>>> robot_wheel_matrix;
-    std::vector<std::vector<std::vector<double>>> robot_sensor_matrix;
-    std::vector<std::vector<std::vector<double>>> robot_caster_matrix;
-    std::vector<std::vector<std::vector<double>>> robot_joint_matrix;
+    std::vector<std::vector<double>> matrix_4d;
 
 protected:
     NEAT::RNG rng;

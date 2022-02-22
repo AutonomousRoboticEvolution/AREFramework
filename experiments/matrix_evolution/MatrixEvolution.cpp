@@ -185,58 +185,18 @@ void MATRIXEVOLUTION::load_robot_matrix()
     if(!myFile.is_open()) throw std::runtime_error("Could not open file");
     std::string line;
     std::vector<std::string> split_str;
-    std::vector<double> temp_vector_1D;
-    std::vector<std::vector<double>> temp_vector_2D;
+    int output_counter = 0;
+    matrix_4d.resize(6);
     while(std::getline(myFile, line)){
         // Create a stringstream of the current line
         std::stringstream ss(line);
         // Keep track of the current column index
-        int cell_counter = 1;
         boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
-        for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1) {
-            for (int j = -mc::matrix_size / 2 + 1; j < mc::matrix_size / 2; j += 1) {
-                for (int k = -mc::matrix_size / 2 + 1; k < mc::matrix_size / 2; k += 1) {
-                    temp_vector_1D.push_back(std::stod(split_str.at(cell_counter)));
-                    cell_counter++;
-                }
-                temp_vector_2D.push_back(temp_vector_1D);
-                temp_vector_1D.clear();
-            }
-            if(split_str.at(0).compare("angle") == 0)
-                robot_angle_matrix.push_back(temp_vector_2D);
-            else if(split_str.at(0).compare("skeleton") == 0)
-                robot_angle_matrix.push_back(temp_vector_2D);
-            else if(split_str.at(0).compare("wheel") == 0)
-                robot_skeleton_matrix.push_back(temp_vector_2D);
-            else if(split_str.at(0).compare("sensor") == 0)
-                robot_sensor_matrix.push_back(temp_vector_2D);
-            else if(split_str.at(0).compare("joint") == 0)
-                robot_joint_matrix.push_back(temp_vector_2D);
-            else if(split_str.at(0).compare("caster") == 0)
-                robot_caster_matrix.push_back(temp_vector_2D);
-            temp_vector_2D.clear();
+        for(int i = 1; i < split_str.size()-1; i++){
+            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
         }
+        output_counter++;
     }
     // Close file
     myFile.close();
-
-//    std::vector<std::string> split_str,split_str2;
-//    boost::split(split_str,gen_str,boost::is_any_of("\n"),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
-//    boost::split(split_str2,split_str[0],boost::is_any_of(" "));
-//
-//    nn_type = std::stoi(split_str2[0]);
-//    nbr_input = std::stoi(split_str2[1]);
-//    nbr_hidden = std::stoi(split_str2[2]);
-//    nbr_output = std::stoi(split_str2[3]);
-//
-//    int nbr_weights = std::stoi(split_str[1]);
-//    int nbr_bias = std::stoi(split_str[2]);
-//
-//    weights.clear();
-//    for(int i = 3; i < nbr_weights+3; i++)
-//        weights.push_back(std::stod(split_str[i]));
-//
-//    biases.clear();
-//    for(int i = nbr_weights + 3; i < nbr_weights + nbr_bias + 3; i++)
-//        biases.push_back(std::stod(split_str[i]));
 }

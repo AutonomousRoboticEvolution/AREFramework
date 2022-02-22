@@ -14,7 +14,7 @@ void CPPNIndividual::createMorphology()
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
     setMorphDesc();
     setManRes();
-    set_matrices();
+    set_4d_matrix();
 }
 
 
@@ -28,14 +28,9 @@ void CPPNIndividual::setManRes()
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
 }
 
-void CPPNIndividual::set_matrices()
+void CPPNIndividual::set_4d_matrix()
 {
-    angle_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_angle_matrix();
-    skeleton_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_skeleton_matrix();
-    wheel_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_wheel_matrix();
-    sensor_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_sensor_matrix();
-    joint_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_joint_matrix();
-    caster_matrix = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_caster_matrix();
+    matrix_4d = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_matrix_4d();
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){

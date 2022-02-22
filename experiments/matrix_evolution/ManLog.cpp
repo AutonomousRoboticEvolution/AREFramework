@@ -53,70 +53,35 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
         )->id();
         if(!openOLogFile(logFileStream, filename.str()))
             return;
-        std::vector<std::vector<std::vector<double>>> temp_matrix;
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_angle_matrix();
-        logFileStream << "Angle:" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        std::vector<std::vector<double>> matrix_4d = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_matrix_4d();
+        logFileStream << "angle" << ",";
+        for(int i = 0; i < matrix_4d.at(0).size(); i++){
+            logFileStream << matrix_4d.at(0).at(i) << ",";
         }
         logFileStream << std::endl;
-        temp_matrix.clear();
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_skeleton_matrix();
-        logFileStream << "Skeleton" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        logFileStream << "skeleton" << ",";
+        for(int i = 0; i < matrix_4d.at(1).size(); i++){
+            logFileStream << matrix_4d.at(1).at(i) << ",";
         }
         logFileStream << std::endl;
-        temp_matrix.clear();
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_wheel_matrix();
-        logFileStream << "Wheel" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        logFileStream << "wheel" << ",";
+        for(int i = 0; i < matrix_4d.at(2).size(); i++){
+            logFileStream << matrix_4d.at(2).at(i) << ",";
         }
         logFileStream << std::endl;
-        temp_matrix.clear();
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_sensor_matrix();
-        logFileStream << "Sensor" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        logFileStream << "sensor" << ",";
+        for(int i = 0; i < matrix_4d.at(3).size(); i++){
+            logFileStream << matrix_4d.at(3).at(i) << ",";
         }
         logFileStream << std::endl;
-        temp_matrix.clear();
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_joint_matrix();
-        logFileStream << "Joint" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        logFileStream << "joint" << ",";
+        for(int i = 0; i < matrix_4d.at(4).size(); i++){
+            logFileStream << matrix_4d.at(4).at(i) << ",";
         }
         logFileStream << std::endl;
-        temp_matrix.clear();
-        temp_matrix = std::dynamic_pointer_cast<CPPNIndividual>(ea->getIndividual(i))->get_caster_matrix();
-        logFileStream << "Caster:" << ",";
-        for(int i = 0; i < temp_matrix.size(); i++){
-            for(int j = 0; j < temp_matrix.at(0).size(); j++){
-                for(int z = 0; z < temp_matrix.at(0).at(0).size(); z++){
-                    logFileStream << temp_matrix.at(i).at(j).at(z) << ",";
-                }
-            }
+        logFileStream << "caster" << ",";
+        for(int i = 0; i < matrix_4d.at(5).size(); i++){
+            logFileStream << matrix_4d.at(5).at(i) << ",";
         }
         logFileStream << std::endl;
         logFileStream.close();
