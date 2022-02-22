@@ -125,6 +125,8 @@ public:
         nn2_cppn = nn;
     }
 
+    void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
+
     Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
     Eigen::VectorXd getOrganPosDesc() const {return indDesc.organDesc.getCartDesc();}
     const CartDesc& getCartDesc() const {return indDesc.cartDesc;}

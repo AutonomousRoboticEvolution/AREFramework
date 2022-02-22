@@ -70,5 +70,5 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 
-#genomePool,string,/home/ebb505/ARE_Project/are-logs/edgar_dev/2/bodyplantesting_nn2_18_1_11-56-50-817-2028844681/
-#genomeID,string,matrices_0
+#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_21_1_17-34-35-5844-2682957526/
+#genomeID,string,matrices_1
