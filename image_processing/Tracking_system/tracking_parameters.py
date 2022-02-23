@@ -18,6 +18,9 @@ blob_detection_parameters.minInertiaRatio = 0.01
 aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
 aruco_parameters = aruco.DetectorParameters_create()
 
+resolution_width = -1 # 1920 # set negative to leave as the default for your camera
+resolution_height = -1 # 1080 # set negative to leave as the default for your camera
+
 zmq_port_number= "5557"
 
 with open('location.txt') as f:
