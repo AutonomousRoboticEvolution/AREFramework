@@ -41,6 +41,8 @@ struct cppn_params{
         static constexpr nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
         static constexpr float eta_m = 15.f;
         static constexpr float eta_c = 15.f;
+        static constexpr float min = -1;
+        static constexpr float max = 1;
     };
 };
 
