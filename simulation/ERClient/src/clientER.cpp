@@ -3,6 +3,9 @@
 using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
+
+
+
     initialize();
 
     for (int i = 0; i < nbrOfInst; i++) {
@@ -81,10 +84,42 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
-    currentIndexVec[slaveIndex] = indToEval.front();
-    if(!indToEval.empty())
+    if(indToEval.empty())
+        return;
+
+    int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
+    if(eval_order == EvalOrder::FIFO){
+        //First in first out
+        currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
+        currentIndexVec[slaveIndex] = indToEval.back();
+        indToEval.erase(indToEval.begin()+indToEval.size());
+    }
+    else if(eval_order == EvalOrder::FILO){
+        //First in last out
+        currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
+        currentIndexVec[slaveIndex] = indToEval.front();
         indToEval.erase(indToEval.begin());
+    }
+    else if(eval_order == EvalOrder::RANDOM){
+        //Random pick
+        int rand_idx = 0;
+        auto is_in = [&]() -> bool {
+                bool res = false;
+                for(const auto& idx: currentIndexVec)
+                    res = res || idx == indToEval[rand_idx];
+        };
+        do
+           rand_idx = randNum->randInt(0,indToEval.size()-1);
+        while(is_in());
+        int index = indToEval[rand_idx];
+        currentIndVec[slaveIndex] = ea->getIndividual(index);
+        currentIndexVec[slaveIndex] = index;
+        indToEval.erase(indToEval.begin()+rand_idx);
+        indToEval.shrink_to_fit();
+
+
+    }
+
 }
 
 void ER::endOfSimulation(int slaveIndex){

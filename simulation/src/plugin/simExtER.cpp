@@ -116,6 +116,8 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
+    are_sett::defaults::parameters->emplace("#evaluationOrder",new are_sett::Integer(1)); //Default first in last out
+
 
     simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
