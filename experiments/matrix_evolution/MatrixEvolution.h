@@ -36,8 +36,8 @@ private:
 
     std::vector<Eigen::VectorXd> archive;
 
-    std::vector<std::vector<double>> matrix_4d;
-    std::vector<std::vector<std::vector<double>>> matrix_4d_population;
+    std::vector<std::vector<double>> parent_matrix_4d;
+    std::vector<std::vector<double>> child_matrix_4d;
 
 protected:
     NEAT::RNG rng;

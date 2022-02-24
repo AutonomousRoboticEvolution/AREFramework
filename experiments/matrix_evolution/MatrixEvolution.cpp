@@ -27,7 +27,6 @@ void MATRIXEVOLUTION::init()
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
     load_robot_matrix();
-    mutate_matrix();
     initPopulation();
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
@@ -44,7 +43,8 @@ void MATRIXEVOLUTION::initPopulation()
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        morphgenome->set_matrix_4d(matrix_4d);
+        mutate_matrix();
+        morphgenome->set_matrix_4d(child_matrix_4d);
         if(cppn_fixed)
             morphgenome->fixed_structure();
         else
@@ -58,7 +58,8 @@ void MATRIXEVOLUTION::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-            morphgenome->set_matrix_4d(matrix_4d);
+            mutate_matrix();
+            morphgenome->set_matrix_4d(child_matrix_4d);
             if(cppn_fixed)
                 morphgenome->fixed_structure();
             else
@@ -189,34 +190,38 @@ void MATRIXEVOLUTION::load_robot_matrix()
     std::string line;
     std::vector<std::string> split_str;
     int output_counter = 0;
-    matrix_4d.resize(6);
+    parent_matrix_4d.resize(6);
     while(std::getline(myFile, line)){
         // Create a stringstream of the current line
         std::stringstream ss(line);
         // Keep track of the current column index
         boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
         for(int i = 1; i < split_str.size()-1; i++){
-            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
+            parent_matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
         }
         output_counter++;
     }
     // Close file
     myFile.close();
+    child_matrix_4d = parent_matrix_4d;
 }
 
 void MATRIXEVOLUTION::mutate_matrix()
 {
-    std::uniform_real_distribution<double> distribution(-0.1,0.1);
-    std::default_random_engine generator;
+    float mutation_rate = settings::getParameter<settings::Float>(parameters,"#mutationRate").value;
+    float uniform_distribution_parameter = settings::getParameter<settings::Float>(parameters,"#uniformDistributionParameter").value;
     double temp_variable;
-    for(int i = 0; i < matrix_4d.size(); i++){
-        for(int j = 0; j < matrix_4d.at(0).size(); j++){
-            temp_variable = matrix_4d.at(i).at(j) * distribution(generator) + matrix_4d.at(i).at(j);
-            if(temp_variable < -1.0)
-                temp_variable = -1.0;
-            else if(temp_variable > 1.0)
-                temp_variable = 1.0;
-            matrix_4d.at(i).at(j) = temp_variable;
+    for(int i = 0; i < parent_matrix_4d.size(); i++){
+        for(int j = 0; j < parent_matrix_4d.at(0).size(); j++){
+            if(std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen) > mutation_rate) {
+                double rand_number = std::uniform_real_distribution<>(-uniform_distribution_parameter,uniform_distribution_parameter)(nn2::rgen_t::gen);
+                temp_variable = parent_matrix_4d.at(i).at(j) * rand_number  + parent_matrix_4d.at(i).at(j);
+                if (temp_variable < -1.0)
+                    temp_variable = -1.0;
+                else if (temp_variable > 1.0)
+                    temp_variable = 1.0;
+                child_matrix_4d.at(i).at(j) = temp_variable;
+            }
         }
     }
 }

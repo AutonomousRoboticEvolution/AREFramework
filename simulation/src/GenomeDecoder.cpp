@@ -62,7 +62,6 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                 outputs = cppn.outf();
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-
                 if(outputs[1] > 0) {
                     areVoxel.bone = morph_const::filled_voxel;
                 }
