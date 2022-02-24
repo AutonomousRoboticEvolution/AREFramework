@@ -239,6 +239,7 @@ void MNIPES::init_learner(int id){
 
     //Load an existing learner
     if(boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
+        learner.init();
         learner.from_file(Logging::log_folder + "/" + learner_file);
         std::cout << learner.print_info() << std::endl;
     }
