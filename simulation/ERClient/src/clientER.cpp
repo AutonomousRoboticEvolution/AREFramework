@@ -89,35 +89,25 @@ void ER::startOfSimulation(int slaveIndex){
 
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
     if(eval_order == EvalOrder::FIFO){
-        //First in first out
+        //First in Last out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
         currentIndexVec[slaveIndex] = indToEval.back();
         indToEval.erase(indToEval.begin()+indToEval.size());
     }
     else if(eval_order == EvalOrder::FILO){
-        //First in last out
+        //First in First out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
         currentIndexVec[slaveIndex] = indToEval.front();
         indToEval.erase(indToEval.begin());
     }
     else if(eval_order == EvalOrder::RANDOM){
         //Random pick
-        int rand_idx = 0;
-        auto is_in = [&]() -> bool {
-                bool res = false;
-                for(const auto& idx: currentIndexVec)
-                    res = res || idx == indToEval[rand_idx];
-        };
-        do
-           rand_idx = randNum->randInt(0,indToEval.size()-1);
-        while(is_in());
+        int rand_idx = randNum->randInt(0,indToEval.size()-1);
         int index = indToEval[rand_idx];
         currentIndVec[slaveIndex] = ea->getIndividual(index);
         currentIndexVec[slaveIndex] = index;
         indToEval.erase(indToEval.begin()+rand_idx);
         indToEval.shrink_to_fit();
-
-
     }
 
 }
@@ -136,10 +126,10 @@ void ER::endOfSimulation(int slaveIndex){
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
     ea->update(environment);
-    if(population_size < ea->get_population().size() && !ea->is_finish()){
-        for(int i = population_size; i < ea->get_population().size(); i++)
+    if(population_size < ea->get_pop_size() && !ea->is_finish()){
+        for(int i = population_size; i < ea->get_pop_size(); i++)
             indToEval.push_back(i);
-        population_size = ea->get_population().size();
+        population_size = ea->get_pop_size();
     }
 
     //        if(evalIsFinish)

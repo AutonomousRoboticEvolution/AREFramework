@@ -132,7 +132,6 @@ public:
         arch & number_of_eval;
         arch & _niter;
         arch & _nevals;
-
     }
 
     int nbr_iter() const{return _niter;}

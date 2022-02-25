@@ -190,6 +190,7 @@ public:
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
     const ControllerArchive& get_controller_archive_obj() const {return controller_archive;}
 
+    size_t get_pop_size() const override {return corr_indexes.size();}
 
     genome_t &find_gene(int id);
     learner_t &find_learner(int id);
