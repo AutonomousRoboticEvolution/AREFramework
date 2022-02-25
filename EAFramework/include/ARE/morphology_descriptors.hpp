@@ -18,9 +18,9 @@ struct morphology_constants{
     static constexpr int voxel_multiplier = 22;
     static constexpr float voxel_real_size = 0.0198;//voxel_size * voxel_multiplier;
     static constexpr int matrix_size = 12; //264 / voxel_multiplier;
+    static constexpr int real_matrix_size = 11; // Polivox generates a matrix with one voxel lower.
     static constexpr float shape_scale_value = 0.0198;//voxel_real_size; // results into 23.76x23.76x23.76 cm³ - in reality is 28x28x25 cm³
-    static constexpr int voxels_number = 1728;//matrix_size*matrix_size*matrix_size;
-    static constexpr float matrix_size_m = 0.2376; //matrix_size * voxel_real_size;
+    static constexpr int voxels_number = 1331;//real_matrix_size*real_matrix_size*real_matrix_size;
     static constexpr short int empty_voxel=0;
     static constexpr short int filled_voxel=255;
 
@@ -77,13 +77,13 @@ struct CartDesc
 
 struct OrganPositionDesc
 {
-    int organ_matrix[morph_const::matrix_size-1][morph_const::matrix_size-1][morph_const::matrix_size-1] = {{{0}}};
+    int organ_matrix[morph_const::real_matrix_size][morph_const::real_matrix_size][morph_const::real_matrix_size] = {{{0}}};
     Eigen::VectorXd getCartDesc() const{
-        Eigen::VectorXd organ_position_descriptor((morph_const::matrix_size-1)*(morph_const::matrix_size-1)*(morph_const::matrix_size-1));
+        Eigen::VectorXd organ_position_descriptor((morph_const::real_matrix_size)*(morph_const::real_matrix_size)*(morph_const::real_matrix_size));
         int counter = 0;
-        for(int k = 0; k < morph_const::matrix_size-1; k++){
-            for(int j = 0; j < morph_const::matrix_size-1; j++) {
-                for(int i = 0; i < morph_const::matrix_size-1; i++) {
+        for(int k = 0; k < morph_const::real_matrix_size; k++){
+            for(int j = 0; j < morph_const::real_matrix_size; j++) {
+                for(int i = 0; i < morph_const::real_matrix_size; i++) {
                     organ_position_descriptor(counter) = organ_matrix[i][j][k];
                     counter++;
                 }

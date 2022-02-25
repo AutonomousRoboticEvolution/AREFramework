@@ -195,22 +195,19 @@ private:
                     int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
                     int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
                     int matPosX, matPosY, matPosZ;
-//                    matPosX = voxelPosX + (mc::matrix_size-1) / 2;
-//                    matPosY = voxelPosY + (mc::matrix_size-1) / 2;
-//                    matPosZ = voxelPosZ + (mc::matrix_size-1) / 2;
                     matPosX = voxelPosX;
                     matPosY = voxelPosY;
                     matPosZ = voxelPosZ;
-                    if (matPosX > mc::matrix_size)
-                        matPosX = mc::matrix_size - 1;
+                    if (matPosX > mc::real_matrix_size)
+                        matPosX = mc::real_matrix_size;
                     if (matPosX < 0)
                         matPosX = 0;
-                    if (matPosY > mc::matrix_size)
-                        matPosY = mc::matrix_size - 1;
+                    if (matPosY > mc::real_matrix_size)
+                        matPosY = mc::real_matrix_size;
                     if (matPosY < 0)
                         matPosY = 0;
-                    if (matPosZ > mc::matrix_size)
-                        matPosZ = mc::matrix_size - 1;
+                    if (matPosZ > mc::real_matrix_size)
+                        matPosZ = mc::real_matrix_size;
                     if (matPosZ < 0)
                         matPosZ = 0;
                     organDesc.organ_matrix[matPosX][matPosY][matPosZ] = it->getOrganType();
