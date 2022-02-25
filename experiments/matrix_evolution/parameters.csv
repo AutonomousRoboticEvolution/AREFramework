@@ -5,7 +5,7 @@
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,40
-#maxEvalTime,float,1
+#maxEvalTime,float,30
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
@@ -70,8 +70,8 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 
-#mutationRate,float,0.0
-#uniformDistributionParameter,float,1.0
+#mutationRate,float,0.1
+#uniformDistributionParameter,float,0.1
 #isCPPNGenome,bool,0
-#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_24_1_14-1-44-4885-2980259932/
+#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_25_1_10-7-31-1842-1791373573/
 #genomeID,string,matrices_0
