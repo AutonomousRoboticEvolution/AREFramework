@@ -77,13 +77,13 @@ struct CartDesc
 
 struct OrganPositionDesc
 {
-    int organ_matrix[morph_const::matrix_size][morph_const::matrix_size][morph_const::matrix_size] = {{{0}}};
+    int organ_matrix[morph_const::matrix_size-1][morph_const::matrix_size-1][morph_const::matrix_size-1] = {{{0}}};
     Eigen::VectorXd getCartDesc() const{
-        Eigen::VectorXd organ_position_descriptor(morph_const::matrix_size*morph_const::matrix_size*morph_const::matrix_size);
+        Eigen::VectorXd organ_position_descriptor((morph_const::matrix_size-1)*(morph_const::matrix_size-1)*(morph_const::matrix_size-1));
         int counter = 0;
-        for(int k = 0; k < morph_const::matrix_size; k++){
-            for(int j = 0; j < morph_const::matrix_size; j++) {
-                for(int i = 0; i < morph_const::matrix_size; i++) {
+        for(int k = 0; k < morph_const::matrix_size-1; k++){
+            for(int j = 0; j < morph_const::matrix_size-1; j++) {
+                for(int i = 0; i < morph_const::matrix_size-1; i++) {
                     organ_position_descriptor(counter) = organ_matrix[i][j][k];
                     counter++;
                 }

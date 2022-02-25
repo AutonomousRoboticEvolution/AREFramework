@@ -6,7 +6,7 @@
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,4
 #maxEvalTime,float,1
-#numberOfGeneration,int,50
+#numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
 #instanceType,int,0
@@ -20,6 +20,7 @@
 
 #fitnessFile,string,fitnesses.csv
 #mdCartWdhFile,string,MD_Cart_WDH.csv
+#organPositionDescFile,string,organ_pos_desc.csv
 #positionsFile,string,final_positions.csv
 #testsFile,string,tests.csv
 #nbrConnNeuFile,string,nbr_conn_neu.csv

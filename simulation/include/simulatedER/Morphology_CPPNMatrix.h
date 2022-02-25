@@ -195,10 +195,12 @@ private:
                     int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
                     int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
                     int matPosX, matPosY, matPosZ;
-                    matPosX = voxelPosX + mc::matrix_size / 2;
-                    matPosY = voxelPosY + mc::matrix_size / 2;
-                    matPosZ = voxelPosZ + mc::matrix_size / 2;
-
+//                    matPosX = voxelPosX + (mc::matrix_size-1) / 2;
+//                    matPosY = voxelPosY + (mc::matrix_size-1) / 2;
+//                    matPosZ = voxelPosZ + (mc::matrix_size-1) / 2;
+                    matPosX = voxelPosX;
+                    matPosY = voxelPosY;
+                    matPosZ = voxelPosZ;
                     if (matPosX > mc::matrix_size)
                         matPosX = mc::matrix_size - 1;
                     if (matPosX < 0)
