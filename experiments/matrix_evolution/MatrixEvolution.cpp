@@ -26,7 +26,13 @@ void MATRIXEVOLUTION::init()
     cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
-    load_robot_matrix();
+    std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
+    std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
+    std::string temp_string = genome_pool + genome_id;
+    first_parent_matrix_4d = load_robot_matrix(temp_string);
+    genome_id = settings::getParameter<settings::String>(parameters,"#secondParentID").value;
+    temp_string = genome_pool + genome_id;
+    second_parent_matrix_4d = load_robot_matrix(temp_string);
     initPopulation();
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
@@ -43,7 +49,7 @@ void MATRIXEVOLUTION::initPopulation()
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        mutate_matrix();
+        child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
         morphgenome->set_matrix_4d(child_matrix_4d);
         if(cppn_fixed)
             morphgenome->fixed_structure();
@@ -58,7 +64,7 @@ void MATRIXEVOLUTION::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-            mutate_matrix();
+            child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
             morphgenome->set_matrix_4d(child_matrix_4d);
             if(cppn_fixed)
                 morphgenome->fixed_structure();
@@ -179,43 +185,41 @@ bool MATRIXEVOLUTION::update(const Environment::Ptr& env)
     return true;
 }
 
-void MATRIXEVOLUTION::load_robot_matrix()
+std::vector<std::vector<double>> MATRIXEVOLUTION::load_robot_matrix(std::string filepath)
 {
-    std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
-    std::string genome_id = settings::getParameter<settings::String>(parameters,"#genomeID").value;
-
+    std::vector<std::vector<double>> matrix_4d;
     // Create an input filestream
-    std::ifstream myFile(genome_pool+genome_id);
+    std::ifstream myFile(filepath);
     if(!myFile.is_open()) throw std::runtime_error("Could not open file");
     std::string line;
     std::vector<std::string> split_str;
     int output_counter = 0;
-    parent_matrix_4d.resize(6);
+    matrix_4d.resize(6);
     while(std::getline(myFile, line)){
         // Create a stringstream of the current line
         std::stringstream ss(line);
         // Keep track of the current column index
         boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
         for(int i = 1; i < split_str.size()-1; i++){
-            parent_matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
+            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
         }
         output_counter++;
     }
     // Close file
     myFile.close();
-    child_matrix_4d = parent_matrix_4d;
+    return matrix_4d;
 }
 
-void MATRIXEVOLUTION::mutate_matrix()
+std::vector<std::vector<double>> MATRIXEVOLUTION::mutate_matrix(std::vector<std::vector<double>> matrix_4d)
 {
     float mutation_rate = settings::getParameter<settings::Float>(parameters,"#mutationRate").value;
-    float uniform_distribution_parameter = settings::getParameter<settings::Float>(parameters,"#uniformDistributionParameter").value;
-    double temp_variable;
-    for(int i = 0; i < parent_matrix_4d.size(); i++){
-        for(int j = 0; j < parent_matrix_4d.at(0).size(); j++){
+    float mutation_parameter = settings::getParameter<settings::Float>(parameters,"#mutationParameter").value;
+    for(int i = 0; i < first_parent_matrix_4d.size(); i++){
+        for(int j = 0; j < first_parent_matrix_4d.at(0).size(); j++){
             if(std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen) < mutation_rate) {
                 // Uniform distribution
-//                double rand_number = std::uniform_real_distribution<>(-uniform_distribution_parameter,uniform_distribution_parameter)(nn2::rgen_t::gen);
+//                double temp_variable;
+//                double rand_number = std::uniform_real_distribution<>(-mutation_parameter,mutation_parameter)(nn2::rgen_t::gen);
 //                temp_variable = rand_number  + parent_matrix_4d.at(i).at(j);
 //                if (temp_variable < -1.0)
 //                    temp_variable = -1.0;
@@ -223,7 +227,7 @@ void MATRIXEVOLUTION::mutate_matrix()
 //                    temp_variable = 1.0;
 //                child_matrix_4d.at(i).at(j) = temp_variable;
                 // Polynomial mutation
-                const float eta_m = 0.1;
+                const float eta_m = mutation_parameter;
                 assert(eta_m != -1.0f);
                 float ri = std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen);
                 float delta_i = ri < 0.5 ?
@@ -231,13 +235,14 @@ void MATRIXEVOLUTION::mutate_matrix()
                                 1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
                 assert(!std::isnan(delta_i));
                 assert(!std::isinf(delta_i));
-                float temp_variable = parent_matrix_4d.at(i).at(j) + delta_i;
+                float temp_variable = matrix_4d.at(i).at(j) + delta_i;
                 if (temp_variable < -1.0)
                     temp_variable = -1.0;
                 else if (temp_variable > 1.0)
                     temp_variable = 1.0;
-                child_matrix_4d.at(i).at(j) = temp_variable;
+                matrix_4d.at(i).at(j) = temp_variable;
             }
         }
     }
+    return matrix_4d;
 }

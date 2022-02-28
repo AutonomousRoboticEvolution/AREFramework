@@ -4,7 +4,7 @@
 #vrepFolder,string,/home/ebb505/ARE_Project/vrep/
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,12
+#populationSize,int,20
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
@@ -72,7 +72,8 @@
 #CPPNParametersMutationRate,float,0.1
 
 #mutationRate,float,0.1
-#uniformDistributionParameter,float,0.1
+#mutationParameter,float,0.1
 #isCPPNGenome,bool,0
 #genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_28_1_10-48-53-3193-1114281519/
-#genomeID,string,matrices_0
+#firstParentID,string,matrices_0
+#secondParentID,string,matrices_1
