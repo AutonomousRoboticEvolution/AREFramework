@@ -76,4 +76,4 @@
 #isCPPNGenome,bool,0
 #genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_28_1_10-48-53-3193-1114281519/
 #firstParentID,string,matrices_0
-#secondParentID,string,matrices_1
+#secondParentID,string,matrices_5

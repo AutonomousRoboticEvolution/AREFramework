@@ -49,7 +49,8 @@ void MATRIXEVOLUTION::initPopulation()
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-        child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+//        child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+        child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
         morphgenome->set_matrix_4d(child_matrix_4d);
         if(cppn_fixed)
             morphgenome->fixed_structure();
@@ -64,7 +65,8 @@ void MATRIXEVOLUTION::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-            child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+//            child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+            child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
             morphgenome->set_matrix_4d(child_matrix_4d);
             if(cppn_fixed)
                 morphgenome->fixed_structure();
@@ -245,4 +247,16 @@ std::vector<std::vector<double>> MATRIXEVOLUTION::mutate_matrix(std::vector<std:
         }
     }
     return matrix_4d;
+}
+
+std::vector<std::vector<double>> MATRIXEVOLUTION::crossover_matrix(std::vector<std::vector<double>> first_parent_4d,std::vector<std::vector<double>> second_parent_4d)
+{
+    std::vector<std::vector<double>> child_matrix_4d;
+    child_matrix_4d = first_parent_4d;
+    for(int i = 0; i < first_parent_4d.size(); i++){
+        for(int j = 0; j < first_parent_4d.at(0).size(); j++){
+            child_matrix_4d.at(i).at(j) = (first_parent_4d.at(i).at(j) + second_parent_4d.at(i).at(j))/2;
+        }
+    }
+    return child_matrix_4d;
 }

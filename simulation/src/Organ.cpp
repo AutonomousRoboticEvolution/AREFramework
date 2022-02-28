@@ -329,13 +329,6 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
                 return;
         }
     }
-    // Check collision with skeleton.
-    for (int skeletonHandle : skeletonHandles) {
-        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
-        if (collisionResult == 1) { // Collision detected!
-            return;
-        }
-    }
 
     organGripperAccess = true;
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
