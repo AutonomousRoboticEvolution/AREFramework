@@ -53,7 +53,7 @@ public:
         organOri = oO;
         connectorPos.clear();  connectorOri.clear();
         organInsideSkeleton = false; organColliding = false;
-        organGripperAccess = true; organRemoved = false; organChecked = false;
+        organGripperAccess = false; organRemoved = false; organChecked = false;
         objectHandles.clear();
         parameters = param;
     }
