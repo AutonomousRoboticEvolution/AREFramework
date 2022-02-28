@@ -215,26 +215,28 @@ void MATRIXEVOLUTION::mutate_matrix()
         for(int j = 0; j < parent_matrix_4d.at(0).size(); j++){
             if(std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen) < mutation_rate) {
                 // Uniform distribution
-                double rand_number = std::uniform_real_distribution<>(-uniform_distribution_parameter,uniform_distribution_parameter)(nn2::rgen_t::gen);
-                temp_variable = rand_number  + parent_matrix_4d.at(i).at(j);
+//                double rand_number = std::uniform_real_distribution<>(-uniform_distribution_parameter,uniform_distribution_parameter)(nn2::rgen_t::gen);
+//                temp_variable = rand_number  + parent_matrix_4d.at(i).at(j);
+//                if (temp_variable < -1.0)
+//                    temp_variable = -1.0;
+//                else if (temp_variable > 1.0)
+//                    temp_variable = 1.0;
+//                child_matrix_4d.at(i).at(j) = temp_variable;
+                // Polynomial mutation
+                const float eta_m = 0.1;
+                assert(eta_m != -1.0f);
+                float ri = std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen);
+                float delta_i = ri < 0.5 ?
+                                pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
+                                1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
+                assert(!std::isnan(delta_i));
+                assert(!std::isinf(delta_i));
+                float temp_variable = parent_matrix_4d.at(i).at(j) + delta_i;
                 if (temp_variable < -1.0)
                     temp_variable = -1.0;
                 else if (temp_variable > 1.0)
                     temp_variable = 1.0;
                 child_matrix_4d.at(i).at(j) = temp_variable;
-                // Polynomial mutation
-//                const float eta_m = 0.1;
-//                assert(eta_m != -1.0f);
-//                float ri = std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen);
-//                float delta_i = ri < 0.5 ?
-//                                pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
-//                                1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
-//                assert(!std::isnan(delta_i));
-//                assert(!std::isinf(delta_i));
-//                float temp_variable = parent_matrix_4d.at(i).at(j) + delta_i;
-//                if(temp_variable < 0) temp_variable = 0.0;
-//                else if(temp_variable > 1) temp_variable = 1.0;
-//                child_matrix_4d.at(i).at(j) = temp_variable;
             }
         }
     }

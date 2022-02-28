@@ -4,7 +4,7 @@
 #vrepFolder,string,/home/ebb505/ARE_Project/vrep/
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,12
+#populationSize,int,20
 #maxEvalTime,float,1
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
