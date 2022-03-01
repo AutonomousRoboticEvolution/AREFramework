@@ -247,7 +247,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
     if(drop_eval) {
         nbr_dropped_eval++;
-        std::dynamic_pointer_cast<CMAESLearner>(population[currentIndIndex]->get_learner())->set_nbr_dropped_eval(nbr_dropped_eval);
+        std::dynamic_pointer_cast<CMAESLearner>(population[currentIndIndex])->set_nbr_dropped_eval(nbr_dropped_eval);
     }
     std::vector<double> target = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
                                   settings::getParameter<settings::Double>(parameters,"#target_y").value,
@@ -315,7 +315,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
-
+        learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
             learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
             int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;

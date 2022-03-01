@@ -116,6 +116,7 @@ public:
 //        arch & sim_time;
         arch & controller_archive;
         arch & morphDesc;
+        arch & nbr_dropped_eval;
     }
 
     std::string to_string() override;
@@ -128,6 +129,9 @@ public:
 
     bool is_actuated(){return !no_actuation;}
     bool has_sensor(){return !no_sensors;}
+
+    void set_nbr_dropped_eval(int nde){nbr_dropped_eval = nde;}
+    int get_nbr_dropped_eval(){return nbr_dropped_eval;}
 
 private:
     void createMorphology() override;
@@ -148,6 +152,7 @@ private:
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
+    int nbr_dropped_eval = 0;
 
     ControllerArchive controller_archive;
 };
