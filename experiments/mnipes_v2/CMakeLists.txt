@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
+add_definitions(-DEIGEN3_ENABLED)
 
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
