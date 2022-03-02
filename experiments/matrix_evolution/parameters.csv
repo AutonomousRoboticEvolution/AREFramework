@@ -71,9 +71,9 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 
-#mutationRate,float,0.1
-#mutationParameter,float,0.1
+#mutationRate,float,1.0
+#mutationParameter,float,0.2
 #isCPPNGenome,bool,0
 #genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_28_1_16-0-47-7153-2071997428/
 #firstParentID,string,matrices_0
-#secondParentID,string,matrices_5
+#secondParentID,string,matrices_1
