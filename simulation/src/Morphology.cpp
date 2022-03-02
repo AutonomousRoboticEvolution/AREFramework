@@ -11,8 +11,7 @@ std::vector<double> Morphology::update(){
 }
 
 void Morphology::command(const std::vector<double> &ctrl_com){
-    assert(ctrl_com.size() == jointHandles.size() + wheelHandles.size());
-
+    assert(ctrl_com.size() == wheelHandles.size() + jointHandles.size());
     if(ctrl_com.empty())
         return;
     

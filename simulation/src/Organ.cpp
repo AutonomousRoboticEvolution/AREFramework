@@ -176,8 +176,8 @@ void Organ::createMaleConnector()
 
     std::string physics_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
     std::string visual_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    visual_path += "utils/male_connector_visual.ttm";
-    physics_path += "utils/male_connector_physics.ttm";
+    visual_path += "/utils/male_connector_visual.ttm";
+    physics_path += "/utils/male_connector_physics.ttm";
 
     temp_physics_connector_handle = simLoadModel(physics_path.c_str());
     assert(temp_physics_connector_handle != -1);
