@@ -26,13 +26,24 @@ void MATRIXEVOLUTION::init()
     cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
+
+    int operation_mode = settings::getParameter<settings::Integer>(parameters,"#operationMode").value;
     std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
-    std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
-    std::string temp_string = genome_pool + genome_id;
-    first_parent_matrix_4d = load_robot_matrix(temp_string);
-    genome_id = settings::getParameter<settings::String>(parameters,"#secondParentID").value;
-    temp_string = genome_pool + genome_id;
-    second_parent_matrix_4d = load_robot_matrix(temp_string);
+    if(operation_mode == 0 || operation_mode == 1){ // Simply load or mutation
+        std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
+        std::string temp_string = genome_pool + genome_id;
+        first_parent_matrix_4d = load_robot_matrix(temp_string);
+    } else if(operation_mode == 2){ // Crossover
+        std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
+        std::string temp_string = genome_pool + genome_id;
+        first_parent_matrix_4d = load_robot_matrix(temp_string);
+        genome_id = settings::getParameter<settings::String>(parameters,"#secondParentID").value;
+        temp_string = genome_pool + genome_id;
+        second_parent_matrix_4d = load_robot_matrix(temp_string);
+    } else{
+        std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
+        assert(false);
+    }
     initPopulation();
 
     Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
@@ -66,9 +77,17 @@ void MATRIXEVOLUTION::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-//            child_matrix_4d = first_parent_matrix_4d;
-            child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
-//            child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
+            int operation_mode = settings::getParameter<settings::Integer>(parameters,"#operationMode").value;
+            if(operation_mode == 0) // No changes
+                child_matrix_4d = first_parent_matrix_4d;
+            else if(operation_mode == 1) // Mutation
+                child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+            else if(operation_mode == 2) // Crossover
+                child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
+            else{
+                std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
+                assert(false);
+            }
             morphgenome->set_matrix_4d(child_matrix_4d);
             if(cppn_fixed)
                 morphgenome->fixed_structure();
@@ -212,6 +231,31 @@ std::vector<std::vector<double>> MATRIXEVOLUTION::load_robot_matrix(std::string 
     // Close file
     myFile.close();
     return matrix_4d;
+}
+
+void MATRIXEVOLUTION::load_list_robot_matrix(std::string filepath)
+{
+//    std::vector<std::vector<double>> matrix_4d;
+//    // Create an input filestream
+//    std::ifstream myFile(filepath);
+//    if(!myFile.is_open()) throw std::runtime_error("Could not open file");
+//    std::string line;
+//    std::vector<std::string> split_str;
+//    int output_counter = 0;
+//    matrix_4d.resize(6);
+//    while(std::getline(myFile, line)){
+//        // Create a stringstream of the current line
+//        std::stringstream ss(line);
+//        // Keep track of the current column index
+//        boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
+//        for(int i = 1; i < split_str.size()-1; i++){
+//            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
+//        }
+//        output_counter++;
+//    }
+//    // Close file
+//    myFile.close();
+//    return matrix_4d;
 }
 
 std::vector<std::vector<double>> MATRIXEVOLUTION::mutate_matrix(std::vector<std::vector<double>> matrix_4d)

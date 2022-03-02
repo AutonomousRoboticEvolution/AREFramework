@@ -24,6 +24,7 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     bool update(const Environment::Ptr&);
     std::vector<std::vector<double>> load_robot_matrix(std::string filepath);
+    void load_list_robot_matrix(std::string filepath);
     std::vector<std::vector<double>> mutate_matrix(std::vector<std::vector<double>> matrix_4d);
     std::vector<std::vector<double>> crossover_matrix(std::vector<std::vector<double>> first_parent_4d,std::vector<std::vector<double>> second_parent_4d);
 
@@ -39,6 +40,9 @@ private:
 
     std::vector<std::vector<double>> first_parent_matrix_4d;
     std::vector<std::vector<double>> second_parent_matrix_4d;
+
+    std::vector<std::vector<double>> list_parents_matrix_4d;
+
     std::vector<std::vector<double>> child_matrix_4d;
 
 protected:
