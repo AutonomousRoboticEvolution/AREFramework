@@ -53,10 +53,8 @@ void M_NIPESIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
-    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
     if(ctrlGenome->get_type() != "empty_genome")
        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().getCartDesc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc());
     
@@ -249,9 +247,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         nbr_dropped_eval++;
         std::dynamic_pointer_cast<CMAESLearner>(population[currentIndIndex])->set_nbr_dropped_eval(nbr_dropped_eval);
     }
-    std::vector<double> target = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-                                  settings::getParameter<settings::Double>(parameters,"#target_y").value,
-                                  settings::getParameter<settings::Double>(parameters,"#target_z").value};
+    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 
     float tPos[3];
     tPos[0] = static_cast<float>(target[0]);
