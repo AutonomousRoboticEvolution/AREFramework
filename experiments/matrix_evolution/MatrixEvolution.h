@@ -41,7 +41,7 @@ private:
     std::vector<std::vector<double>> first_parent_matrix_4d;
     std::vector<std::vector<double>> second_parent_matrix_4d;
 
-    std::vector<std::vector<double>> list_parents_matrix_4d;
+    std::vector<std::vector<std::vector<double>>> list_parents_matrix_4d;
 
     std::vector<std::vector<double>> child_matrix_4d;
 

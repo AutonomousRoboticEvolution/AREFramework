@@ -29,7 +29,7 @@ void MATRIXEVOLUTION::init()
 
     int operation_mode = settings::getParameter<settings::Integer>(parameters,"#operationMode").value;
     std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
-    if(operation_mode == 0 || operation_mode == 1){ // Simply load or mutation
+    if(operation_mode == 0 || operation_mode == 1){ // Simply load or mutation - single robot
         std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
         std::string temp_string = genome_pool + genome_id;
         first_parent_matrix_4d = load_robot_matrix(temp_string);
@@ -40,6 +40,8 @@ void MATRIXEVOLUTION::init()
         genome_id = settings::getParameter<settings::String>(parameters,"#secondParentID").value;
         temp_string = genome_pool + genome_id;
         second_parent_matrix_4d = load_robot_matrix(temp_string);
+    } else if(operation_mode == 3) { // List of robots
+        load_list_robot_matrix(genome_pool);
     } else{
         std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
         assert(false);
@@ -78,12 +80,14 @@ void MATRIXEVOLUTION::initPopulation()
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
             int operation_mode = settings::getParameter<settings::Integer>(parameters,"#operationMode").value;
-            if(operation_mode == 0) // No changes
+            if(operation_mode == 0) // No changes - single robot
                 child_matrix_4d = first_parent_matrix_4d;
-            else if(operation_mode == 1) // Mutation
+            else if(operation_mode == 1) // Mutation - single robot
                 child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
             else if(operation_mode == 2) // Crossover
                 child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
+            else if(operation_mode == 3) // No changes - set robots
+                child_matrix_4d = list_parents_matrix_4d.at(i);
             else{
                 std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
                 assert(false);
@@ -235,27 +239,32 @@ std::vector<std::vector<double>> MATRIXEVOLUTION::load_robot_matrix(std::string 
 
 void MATRIXEVOLUTION::load_list_robot_matrix(std::string filepath)
 {
-//    std::vector<std::vector<double>> matrix_4d;
-//    // Create an input filestream
-//    std::ifstream myFile(filepath);
-//    if(!myFile.is_open()) throw std::runtime_error("Could not open file");
-//    std::string line;
-//    std::vector<std::string> split_str;
-//    int output_counter = 0;
-//    matrix_4d.resize(6);
-//    while(std::getline(myFile, line)){
-//        // Create a stringstream of the current line
-//        std::stringstream ss(line);
-//        // Keep track of the current column index
-//        boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
-//        for(int i = 1; i < split_str.size()-1; i++){
-//            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
-//        }
-//        output_counter++;
-//    }
-//    // Close file
-//    myFile.close();
-//    return matrix_4d;
+    int robots_number = settings::getParameter<settings::Integer>(parameters,"#robotsNumber").value;
+    std::vector<std::vector<double>> robot_matrix_4d;
+    for(int i = 0; i < robots_number; i++){
+        std::string robot_filepath = filepath + "matrices_" + std::to_string(i);
+        robot_matrix_4d.clear();
+        robot_matrix_4d.resize(6);
+        // Create an input filestream
+        std::ifstream myFile(robot_filepath);
+        if(!myFile.is_open()) throw std::runtime_error("Could not open file");
+        std::string line;
+        std::vector<std::string> split_str;
+        int output_counter = 0;
+        while(std::getline(myFile, line)){
+            // Create a stringstream of the current line
+            std::stringstream ss(line);
+            // Keep track of the current column index
+            boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
+            for(int i = 1; i < split_str.size()-1; i++){
+                robot_matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
+            }
+            output_counter++;
+        }
+        // Close file
+        myFile.close();
+        list_parents_matrix_4d.push_back(robot_matrix_4d);
+    }
 }
 
 std::vector<std::vector<double>> MATRIXEVOLUTION::mutate_matrix(std::vector<std::vector<double>> matrix_4d)

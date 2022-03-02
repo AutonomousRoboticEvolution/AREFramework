@@ -71,11 +71,16 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 
-#operationMode,int,2
+#isCPPNGenome,bool,0
+#operationMode,int,0
+#robotsNumber,int,20
+#evaluationsNumber,int,20
+
 #mutationType,int,0
 #mutationRate,float,0.1
 #mutationParameter,float,0.01
-#isCPPNGenome,bool,0
+
 #genomePool,string,/home/edgar/are-logs/bodyplantesting_nn2_1_2_17-16-48-8952-2501931872/
-#firstParentID,string,matrices_7
-#secondParentID,string,matrices_8
+
+#firstParentID,string,matrices_2
+#secondParentID,string,matrices_1
