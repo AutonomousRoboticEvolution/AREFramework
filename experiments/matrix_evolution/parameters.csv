@@ -71,6 +71,7 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 
+#mutationType,int,2
 #mutationRate,float,1.0
 #mutationParameter,float,0.2
 #isCPPNGenome,bool,0
