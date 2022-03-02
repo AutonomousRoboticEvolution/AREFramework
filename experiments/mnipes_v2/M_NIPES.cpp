@@ -56,7 +56,7 @@ void M_NIPESIndividual::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
     if(ctrlGenome->get_type() != "empty_genome")
-       assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().getCartDesc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc());
+       assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     
 		      
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
@@ -206,6 +206,7 @@ void M_NIPES::init_morph_pop(){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
         morphgenome->random();
+
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
