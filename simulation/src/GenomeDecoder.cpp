@@ -33,7 +33,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
 
-                if(cppn.Output()[1] > 0) {
+                if(cppn.Output()[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
                     areVoxel.bone = morph_const::filled_voxel;
                 }
                 areMatrix.setVoxel(x, y, z, areVoxel);
@@ -62,7 +62,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                 outputs = cppn.outf();
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-                if(outputs[1] > 0) {
+                if(outputs[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
                     areVoxel.bone = morph_const::filled_voxel;
                 }
                 areMatrix.setVoxel(x, y, z, areVoxel);
@@ -82,7 +82,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, std::v
             for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-                if(matrix_4d.at(1).at(cell_counter) > 0.) {
+                if(matrix_4d.at(1).at(cell_counter) > 0.00001) { // Sometimes values are very close to zero and these causes problems.
                     areVoxel.bone = morph_const::filled_voxel;
                 }
                 areMatrix.setVoxel(x, y, z, areVoxel);
