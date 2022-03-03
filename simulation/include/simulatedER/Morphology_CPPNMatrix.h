@@ -195,9 +195,9 @@ private:
                     int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
                     int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
                     int matPosX, matPosY, matPosZ;
-                    matPosX = voxelPosX;
-                    matPosY = voxelPosY;
-                    matPosZ = voxelPosZ;
+                    matPosX = voxelPosX + 5;
+                    matPosY = voxelPosY + 5;
+                    matPosZ = voxelPosZ - 1; // The connector is slightly up and when rounding it increases one voxel.
                     if (matPosX > mc::real_matrix_size)
                         matPosX = mc::real_matrix_size;
                     if (matPosX < 0)
@@ -212,6 +212,19 @@ private:
                         matPosZ = 0;
                     organDesc.organ_matrix[matPosX][matPosY][matPosZ] = it->getOrganType();
                 }
+            }
+        }
+        void setSkeletonVoxels(std::vector<std::vector<double>> matrix_4d){
+            int counter = 0;
+            for(int i = 0; i < matrix_4d.at(1).size(); i++){
+                int pos_z = counter;
+                int pos_y = std::floor(i/11);
+                int pos_x = std::floor(i/121);
+                if(matrix_4d.at(1).at(i) > 0.00001)
+                    organDesc.organ_matrix[pos_x][pos_y][pos_z] = 5;
+                counter++;
+                if(counter > 11)
+                    counter = 0;
             }
         }
     };
