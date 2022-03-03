@@ -169,7 +169,7 @@ void Morphology_CPPNMatrix::create()
                 /// Cap the number of organs.
                 short int goodOrganCounter = 0;
                 for(auto & j : organList){
-                    if(!j.isOrganRemoved() && j.isOrganChecked() && j.getOrganType() != 4)
+                    if(!j.isOrganRemoved() && j.isOrganChecked())
                         goodOrganCounter++;
 
                 }
