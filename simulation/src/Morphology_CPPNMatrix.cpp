@@ -320,7 +320,6 @@ void Morphology_CPPNMatrix::create()
         indDesc.getRobotDimensions(organList);
         indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
         indDesc.countOrgans(organList);
-//        indDesc.setSkeletonVoxels(matrix_4d);
         indDesc.getOrganPositions(organList);
     }
     blueprint.createBlueprint(organList);

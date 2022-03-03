@@ -214,19 +214,6 @@ private:
                 }
             }
         }
-        void setSkeletonVoxels(std::vector<std::vector<double>> matrix_4d){
-            int counter = 0;
-            for(int i = 0; i < matrix_4d.at(1).size(); i++){
-                int pos_z = counter;
-                int pos_y = std::floor(i/11);
-                int pos_x = std::floor(i/121);
-                if(matrix_4d.at(1).at(i) > 0.00001)
-                    organDesc.organ_matrix[pos_x][pos_y][pos_z] = 5;
-                counter++;
-                if(counter > 11)
-                    counter = 0;
-            }
-        }
     };
 
 public:
