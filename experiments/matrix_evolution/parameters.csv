@@ -78,9 +78,9 @@
 
 #mutationType,int,0
 #mutationRate,float,0.1
-#mutationParameter,float,0.01
+#mutationParameter,float,0.1
 
-#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_3_2_11-33-24-4877-3519768307/
+#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_3_2_17-2-36-6025-3599266212/
 
 #firstParentID,string,matrices_1
 #secondParentID,string,matrices_1

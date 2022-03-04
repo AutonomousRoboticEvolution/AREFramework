@@ -10,6 +10,8 @@ def getDirectories(repository):
     # r=root, d=directories, f = files
     for r, d, f in os.walk(repository):
         for folder in d:
+            if(folder == "images"):
+               continue
             temp_folder = folder.split("_")
             FOLDERS_NAMES.append(temp_folder[1])
             FOLDERS.append(os.path.join(r, folder))

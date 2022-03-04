@@ -76,7 +76,9 @@ void MATRIXEVOLUTION::initPopulation()
         population.push_back(ind);
     }else{
         const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-        for (size_t i = 0; i < population_size; i++){ // Body plans
+        const int evaluations_number = settings::getParameter<settings::Integer>(parameters,"#evaluationsNumber").value;
+        for (size_t i = 0; i < population_size*evaluations_number; i++){ // Body plans
+            int counter = floor(i / evaluations_number);
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
             int operation_mode = settings::getParameter<settings::Integer>(parameters,"#operationMode").value;
@@ -87,7 +89,8 @@ void MATRIXEVOLUTION::initPopulation()
             else if(operation_mode == 2) // Crossover
                 child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
             else if(operation_mode == 3) // No changes - set robots
-                child_matrix_4d = list_parents_matrix_4d.at(i);
+                child_matrix_4d = mutate_matrix(list_parents_matrix_4d.at(counter));
+                //child_matrix_4d = list_parents_matrix_4d.at(i);
             else{
                 std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
                 assert(false);
