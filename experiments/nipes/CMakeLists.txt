@@ -28,7 +28,7 @@ add_library(NIPES SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
-    obstacleAvoidance.cpp
+    ../common/obstacleAvoidance.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
