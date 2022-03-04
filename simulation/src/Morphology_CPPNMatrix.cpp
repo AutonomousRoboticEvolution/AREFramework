@@ -442,6 +442,7 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
     input[1] = static_cast<int>(std::round(organ.organPos[1]/mc::voxel_real_size));
     input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
     input[2] -= mc::matrix_size/2;
+    input[3] = static_cast<double>(sqrt(pow(input[0],2)+pow(input[1],2)+pow(input[2],2)));
     if(use_neat){
         // Set inputs to NN
         cppn.Input(input);
