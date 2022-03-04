@@ -82,6 +82,11 @@ public:
         return ipop_cmaes_t::ask();
     }
 
+    void init_esolver(){
+        _esolver.setMean(_solutions.xmean());
+        _esolver.setCovar(_solutions.cov());
+    }
+
     void eval(const dMat &candidates = dMat(0,0),
               const dMat &phenocandidates=dMat(0,0));
 
@@ -132,6 +137,7 @@ public:
         arch & number_of_eval;
         arch & _niter;
         arch & _nevals;
+        arch & _pop;
     }
 
     int nbr_iter() const{return _niter;}

@@ -6,7 +6,7 @@ using namespace are;
 void RobotInfoLog::saveLog(EA::Ptr &ea)
 {
     int id = static_cast<MNIPES*>(ea.get())->get_currentID();
-    int eval = static_cast<MNIPES*>(ea.get())->get_numberEvaluation();
+    int eval = static_cast<MNIPES*>(ea.get())->get_learners().at(id).nbr_eval();
     std::stringstream sstr;
     sstr << "robot_infos_" << id;
     std::ofstream ifs;

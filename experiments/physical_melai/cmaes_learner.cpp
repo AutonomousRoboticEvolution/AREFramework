@@ -245,6 +245,7 @@ void CMAESLearner::from_string(const std::string & str){
     iarch.register_type<IPOPCMAStrategy>();
     iarch.register_type<CMAESLearner>();
     iarch >> *this;
+    _cma_strat->init_esolver();
 }
 
 void CMAESLearner::from_file(const std::string & filename){
@@ -260,4 +261,5 @@ void CMAESLearner::from_file(const std::string & filename){
     iarch.register_type<CMAESLearner>();
     iarch >> *this;
     ifs.close();
+    _cma_strat->init_esolver();
 }
