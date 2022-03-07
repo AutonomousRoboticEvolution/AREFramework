@@ -5,7 +5,7 @@
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,20
-#maxEvalTime,float,30
+#maxEvalTime,float,1
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
@@ -78,7 +78,7 @@
 
 #mutationType,int,0
 #mutationRate,float,0.1
-#mutationParameter,float,0.1
+#mutationParameter,float,0.5
 
 #genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_3_2_17-2-36-6025-3599266212/
 
