@@ -17,17 +17,13 @@ void CPPNIndividual::createMorphology()
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
-    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
-    auto morph_desc_1 = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
-    for(int i = 0; i < nbr_rep-1; i++){
-        morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
-        auto morph_desc_2 = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMorphDesc();
-        assert(round(morph_desc_1*1000) == round(morph_desc_2*1000));
-//        morph_desc_1.morph_desc_2;
-    }
+
+    if(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().defined())
+        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+
     setMorphDesc();
     setManRes();
 }
