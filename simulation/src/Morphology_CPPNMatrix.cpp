@@ -453,6 +453,8 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         nn2_cppn.step(input);
         output = nn2_cppn.outf();
     }
+    for(const auto& o: output)
+        assert(!std::isnan(o));
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
@@ -549,6 +551,8 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
         nn2_cppn.step(input);
         output = nn2_cppn.outf();
     }
+    for(const auto& o: output)
+        assert(!std::isnan(o));
     // Is there an organ?
     organ_type = -1;
     int max_element = -1;
