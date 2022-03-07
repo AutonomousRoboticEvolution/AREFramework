@@ -149,6 +149,7 @@ public:
         arch & cppn;
         arch & morph_desc;
         arch & parents_ids;
+        arch & generation;
     }
 
     const CartDesc& get_morph_desc() const {return morph_desc;}
