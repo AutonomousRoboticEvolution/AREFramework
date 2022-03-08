@@ -388,7 +388,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
-    while(learning_pool.size() <= pop_size){ //create offspring until refilling entirely the learning pool
+    while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
         std::vector<int> random_indexes;
         random_indexes.push_back(randomNum->randInt(0,gene_pool.size()-1));
