@@ -94,13 +94,18 @@ void CMAESLearner::iterate(){
     bool stop = _cma_strat->stop();
     _is_finish = _cma_strat->have_reached_ftarget();
     if(stop){
+        bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
         bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
         bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
         if(withRestart && stop){
             if(verbose)
                 std::cout << "Restart !" << std::endl;
 
-            _cma_strat->lambda_inc();
+            if(incrPop){
+                int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
+                if(_cma_strat->get_parameters().lambda() < max_pop_size)
+                    _cma_strat->lambda_inc();
+            }
             _cma_strat->reset_search_state();
         }
     }
