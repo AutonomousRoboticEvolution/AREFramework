@@ -5,7 +5,7 @@
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,20
-#maxEvalTime,float,1
+#maxEvalTime,float,30
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
@@ -29,10 +29,10 @@
 #jointControllerType,int,2
 
 #isSegmentedRobot,bool,0
-#isWheel,bool,1
-#isSensor,bool,1
+#isWheel,bool,0
+#isSensor,bool,0
 #isJoint,bool,1
-#isCaster,bool,1
+#isCaster,bool,0
 
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
@@ -72,3 +72,4 @@
 #CPPNParametersMutationRate,float,0.1
 
 #isCPPNGenome,bool,1
+#isLeg,bool,1

@@ -84,3 +84,4 @@
 
 #firstParentID,string,matrices_1
 #secondParentID,string,matrices_1
+#isLeg,bool,1
