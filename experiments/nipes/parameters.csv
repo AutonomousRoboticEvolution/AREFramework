@@ -1,13 +1,13 @@
 #experimentName,string,nipes
-#expPluginName,string,/usr/local/lib/libNIPES.so
+#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libNIPES.so
 #envType,int,1
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/obstacles_2.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE-ant_trio.ttm
-#modelPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
-#repository,string,/home/leni/are-logs
+#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#robotPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/robots/model0.ttm
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/ebb505/ARE_Project/are-logs
 
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 
@@ -38,9 +38,9 @@
 
 #MaxWeight,float,1.0
 
-#NNType,int,3
-#NbrInputNeurones,int,4
-#NbrOutputNeurones,int,6
+#NNType,int,2
+#NbrInputNeurones,int,0
+#NbrOutputNeurones,int,12
 #NbrHiddenNeurones,int,6
 #jointSubs,sequence_int,-1;-1;-1;0;1;2
 

@@ -37,7 +37,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 

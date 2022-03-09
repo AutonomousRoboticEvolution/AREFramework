@@ -8,7 +8,7 @@
 #include "simLib.h"
 #endif
 
-#define ISROBOTSTATIC 1
+#define ISROBOTSTATIC 0
 
 /// \todo EB: Do i need this?
 using namespace are::sim;

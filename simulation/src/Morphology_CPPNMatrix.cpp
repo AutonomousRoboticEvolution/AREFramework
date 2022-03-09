@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 1
+#define ISROBOTSTATIC 0
 
 using namespace are::sim;
 
@@ -308,11 +308,6 @@ void Morphology_CPPNMatrix::create()
             }
         }
     }
-    // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportRobotModel(loadInd);
-    }
     if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value)
         retrieve_matrices_from_cppn();
     // Get info from body plan for body plan descriptors or logging.
@@ -325,6 +320,11 @@ void Morphology_CPPNMatrix::create()
     blueprint.createBlueprint(organList);
     destroyGripper();
     destroy_physical_connectors();
+    // Export model
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
+        exportRobotModel(loadInd);
+    }
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
