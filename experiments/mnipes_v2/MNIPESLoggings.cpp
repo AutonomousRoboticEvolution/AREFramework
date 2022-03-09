@@ -29,6 +29,23 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         std::ofstream cofstr(ctrl_filepath.str());
         cofstr << genome.ctrl_genome.to_string();
         cofstr.close();
+
+        //If there is a ctrl genome there are a trajectory and a behavioural descriptor
+        //Log Trajectory
+        std::stringstream traj_filepath;
+        traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id();
+        std::ofstream tofs(traj_filepath.str());
+        for(const auto &wp: genome.trajectory)
+            tofs << wp.to_string() << std::endl;
+        tofs.close();
+
+        //Log descriptor
+        std::stringstream desc_filepath;
+        desc_filepath << Logging::log_folder << "/descriptors";
+        std::ofstream dofs(desc_filepath.str(),std::ios::out | std::ios::ate | std::ios::app);
+        dofs << genome.morph_genome.id() << std::endl;
+        dofs << genome.behavioral_descriptor << std::endl;
+        dofs.close();
     }
     //-
 
