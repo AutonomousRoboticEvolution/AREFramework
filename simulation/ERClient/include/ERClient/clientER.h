@@ -27,7 +27,8 @@ namespace client {
 enum EvalOrder{
     FIFO = 0,
     FILO,
-    RANDOM
+    RANDOM,
+    FIFO_RANDOM
 };
 
 
