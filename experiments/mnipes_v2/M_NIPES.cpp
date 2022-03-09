@@ -367,13 +367,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
 
                 //Perform survival and selection and generate a new morph gene.
-                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").values; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
+                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").value; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
                 if(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro)){
                     //remove oldest gene and increase age
-                    remove_oldest_gene();
+                    while(gene_pool.size() > pop_size)
+                        remove_oldest_gene();
                     increment_age();
                     //-
-                    assert(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro));
+                    assert(gene_pool.size() == pop_size);
                     reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
@@ -469,17 +470,19 @@ void M_NIPES::remove_oldest_gene(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     if(gene_pool.size() <= pop_size)
         return;
-    int i = 1, oldest_idx = 0, oldest_age = gene_pool[0].age;
-    for(; i < gene_pool.size(); i++){
-        if(oldest_age < gene_pool[i].age){
-            oldest_idx = i;
-            oldest_age = gene_pool[i].age;
-        }
-    }
-    gene_pool.erase(gene_pool.begin() + oldest_age);
+    //first gather all the oldest genes
+    std::vector<int> oldest_gene_idx;
+    for(int i = 0; i < gene_pool.size(); i++)
+        if(gene_pool[i].age == highest_age)
+            oldest_gene_idx.push_back(i);
+    //-
+
+    //then erase one selected randomly among the oldest.
+    gene_pool.erase(gene_pool.begin() + oldest_gene_idx[randomNum->randInt(0,oldest_gene_idx.size()-1)]);
 }
 
 void M_NIPES::increment_age(){
+    highest_age++;
     for(auto& gene: gene_pool)
         gene.age++;
 }

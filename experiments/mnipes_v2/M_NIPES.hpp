@@ -233,6 +233,7 @@ private:
     std::vector<genome_t> gene_pool;
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
+    int highest_age = 0;
 
     float current_ind_past_pos[3];
     int move_counter = 0;
