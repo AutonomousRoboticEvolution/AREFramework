@@ -8,6 +8,7 @@
 #include "ARE/nn2/NN2Control.hpp"
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
+#include "obstacleAvoidance.hpp"
 
 //TO DO find a way to flush the population
 
@@ -37,6 +38,8 @@ typedef struct genome_t{
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
     int age;
+    std::vector<waypoint> trajectory;
+    Eigen::VectorXd behavioral_descriptor;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;
@@ -59,6 +62,11 @@ typedef enum FitnessType{
     LEARNING_PROG = 2,
     DIVERSITY = 3
 }FitnessType;
+
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
 
 class M_NIPESIndividual : public Individual
 {
@@ -132,6 +140,9 @@ public:
 
     void set_nbr_dropped_eval(int nde){nbr_dropped_eval = nde;}
     int get_nbr_dropped_eval(){return nbr_dropped_eval;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+
 
 private:
     void createMorphology() override;
@@ -155,6 +166,9 @@ private:
     int nbr_dropped_eval = 0;
 
     ControllerArchive controller_archive;
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 

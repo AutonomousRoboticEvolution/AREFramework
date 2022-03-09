@@ -33,9 +33,8 @@ void ObstacleAvoidance::init(){
             i++;
         }
     }
-    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
+    final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
     trajectory.clear();
 
     grid_zone = Eigen::MatrixXi::Zero(8,8);

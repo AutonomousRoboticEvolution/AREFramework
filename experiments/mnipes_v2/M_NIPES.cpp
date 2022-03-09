@@ -306,7 +306,11 @@ bool M_NIPES::update(const Environment::Ptr &env){
     Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance"){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+        }
     }
     //If one the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
@@ -356,21 +360,24 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
+                new_gene.trajectory = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectory();
+                new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
 
-                //remove learner from learning pool and remove oldest gene
-                remove_oldest_gene();
-                increment_age();
-                //-
 
-                //Perform selection and generate a new morph gene.
-                if(gene_pool.size() >= pop_size){
-                    assert(gene_pool.size() == pop_size);
+                //Perform survival and selection and generate a new morph gene.
+                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").values; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
+                if(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro)){
+                    //remove oldest gene and increase age
+                    remove_oldest_gene();
+                    increment_age();
+                    //-
+                    assert(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro));
                     reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
-
+                //-
             }else if(is_ctrl_next_gen){ //if the NIPES goes for a next gen
                 init_new_ctrl_pop(learner);
             }
