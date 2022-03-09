@@ -150,8 +150,16 @@ void Morphology_CPPNMatrix::create()
         }
 
         if(convexDecompositionSuccess){
+            int joints_number = 0;
             // Create organs
             for(auto & i : organList){
+                // Limit number of legs to 4
+                if(i.getOrganType() == 3 && joints_number == 4){
+                    i.set_organ_removed(true);
+                    i.set_organ_checked(true);
+                    continue;
+                }
+
                 if(i.getOrganType() != 0)
                     setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
@@ -166,7 +174,10 @@ void Morphology_CPPNMatrix::create()
                         i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     i.repressOrgan();
                 }
-                /// Cap the number of organs.
+                // Count number of good organs.
+                if(!i.isOrganRemoved() && i.isOrganChecked() && i.getOrganType() == 3)
+                    joints_number++;
+                // Cap the number of all organs to 8.
                 short int goodOrganCounter = 0;
                 for(auto & j : organList){
                     if(!j.isOrganRemoved() && j.isOrganChecked())
