@@ -91,9 +91,9 @@ inline bool operator ==(const CartDesc& cd1, const CartDesc& cd2){
             cd1.jointNumber == cd2.jointNumber &&
             cd1.sensorNumber == cd2.sensorNumber &&
             cd1.voxelNumber == cd2.voxelNumber &&
-            fabs(cd1.robotDepth - cd2.robotDepth) <= 1e-4 &&
-            fabs(cd1.robotHeight - cd2.robotHeight) <= 1e-4 &&
-            fabs(cd1.robotWidth - cd2.robotWidth) <= 1e-4;
+            fabs(cd1.robotDepth - cd2.robotDepth) <= 1e-3 &&
+            fabs(cd1.robotHeight - cd2.robotHeight) <= 1e-3 &&
+            fabs(cd1.robotWidth - cd2.robotWidth) <= 1e-3;
 }
 
 
