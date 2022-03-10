@@ -365,10 +365,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
+                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").value; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
+                if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
+                    warming_up = false;
+                    reproduction();
+                    assert(learning_pool.size() == pop_size);
+                }
 
                 //Perform survival and selection and generate a new morph gene.
-                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").value; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
-                if(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro)){
+                else if(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro)){
                     //remove oldest gene and increase age
                     while(gene_pool.size() > pop_size)
                         remove_oldest_gene();

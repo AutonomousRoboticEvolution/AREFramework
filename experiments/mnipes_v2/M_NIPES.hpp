@@ -240,6 +240,7 @@ private:
     float current_ind_past_pos[3];
     int move_counter = 0;
     int nbr_dropped_eval = 0;
+    bool warming_up = true; //whether the algorithm is initialisation phase.
 };
 
 
