@@ -31,7 +31,9 @@ typedef struct genome_t{
         morph_genome(g.morph_genome),
         ctrl_genome(g.ctrl_genome),
         objectives(g.objectives),
-        age(g.age){}
+        age(g.age),
+        trajectory(g.trajectory),
+        behavioral_descriptor(g.behavioral_descriptor){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;

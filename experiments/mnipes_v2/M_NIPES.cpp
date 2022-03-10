@@ -312,7 +312,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
         }
     }
-    //If one the client or just sequential mode
+    //If on the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
@@ -364,7 +364,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
-
 
                 //Perform survival and selection and generate a new morph gene.
                 float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").value; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
