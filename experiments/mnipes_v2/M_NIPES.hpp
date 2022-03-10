@@ -87,7 +87,8 @@ public:
         trajectory(ind.trajectory),
         energy_cost(ind.energy_cost),
         sim_time(ind.sim_time),
-        controller_archive(ind.controller_archive)
+        controller_archive(ind.controller_archive),
+        nbr_dropped_eval(ind.nbr_dropped_eval)
     {}
 
     Individual::Ptr clone() override {
@@ -141,6 +142,7 @@ public:
     bool has_sensor(){return !no_sensors;}
 
     void set_nbr_dropped_eval(int nde){nbr_dropped_eval = nde;}
+    void incr_nbr_dropped_eval(){nbr_dropped_eval++;}
     int get_nbr_dropped_eval(){return nbr_dropped_eval;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
@@ -239,7 +241,7 @@ private:
 
     float current_ind_past_pos[3];
     int move_counter = 0;
-    int nbr_dropped_eval = 0;
+
     bool warming_up = true; //whether the algorithm is initialisation phase.
 };
 

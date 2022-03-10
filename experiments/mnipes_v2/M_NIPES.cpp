@@ -244,11 +244,9 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     }
 
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
-    if(drop_eval) {
-        nbr_dropped_eval++;
-        learner_t learner = find_learner(population[corr_indexes[currentIndIndex]]->get_morph_genome()->id());
-        learner.ctrl_learner.set_nbr_dropped_eval(nbr_dropped_eval);
-    }
+    if(drop_eval)
+        std::dynamic_pointer_cast<M_NIPESIndividual>(population[corr_indexes[currentIndIndex]])->incr_nbr_dropped_eval();
+
     std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 
     float tPos[3];
@@ -365,15 +363,17 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
-                float synchro = settings::getParameter<settings::Float>(parameters,"#synchronicity").value; //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone.
+
+                //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+                int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
+                if(nbr_offsprings == 0) nbr_offsprings = 1;
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
                     warming_up = false;
                     reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
-
                 //Perform survival and selection and generate a new morph gene.
-                else if(gene_pool.size() == pop_size+static_cast<int>(pop_size*synchro)){
+                else if(gene_pool.size() == pop_size+nbr_offsprings){
                     //remove oldest gene and increase age
                     while(gene_pool.size() > pop_size)
                         remove_oldest_gene();
