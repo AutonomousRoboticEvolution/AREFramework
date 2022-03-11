@@ -28,7 +28,7 @@ void Organ::createOrgan(int skeletonHandle)
         modelsPath += "/organs/sensor.ttm";
     else if(organType == 3) {// Joints
         if(are::settings::getParameter<are::settings::Boolean>(parameters,"#isLeg").value)
-            modelsPath += "/organs/leg.ttm";
+            modelsPath += "/organs/leg_2.ttm";
         else
             modelsPath += "/organs/joint.ttm";
     }
