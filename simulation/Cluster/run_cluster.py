@@ -45,12 +45,12 @@ def run_client(args):
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = "./client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen(["gdb","--args",
+    return subprocess.Popen([#"gdb","--ex=r","--args",
         args.client,
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])
+    ],stdout=logfile)
 
 
 def wait(servers, client, timeout=None):

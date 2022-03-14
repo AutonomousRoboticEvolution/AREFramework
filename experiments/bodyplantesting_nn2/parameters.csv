@@ -1,9 +1,10 @@
 #experimentName,string,bodyplantesting_nn2
 #expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
-#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,4
+#extSettingsClass,bool,0
+#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
+#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#populationSize,int,100
 #maxEvalTime,float,1
 #numberOfGeneration,int,25
 #repository,string,/home/leni/are-logs/
@@ -16,7 +17,6 @@
 #noiseLevel,double,0.
 #maxVelocity,double,10.
 #nbrWaypoints,int,2
-#nbrRepetitions,int,2
 
 #fitnessFile,string,fitnesses.csv
 #mdCartWdhFile,string,MD_Cart_WDH.csv
@@ -27,7 +27,7 @@
 
 #jointControllerType,int,2
 
-#isSegmentedRobot,bool,0
+#isSegmentedRobot,bool,1
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -37,10 +37,7 @@
 #loadExperiment,string,/home/leni/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
-#isScreenshotEnable,bool,0
-#imageRepository,string,images
-#imagesInLogFolder,bool,1
-
+#isScreenshotEnable,bool,1
 
 #kValue,int,15
 #noveltyThreshold,double,0.1
@@ -49,28 +46,25 @@
 
 #flatFloor,bool,1
 #arenaSize,double,2
-#initPosition,sequence_double,0.0;0.0;0.1
+#target_x,double,0.0
+#target_y,double,0.75
+#target_z,double,0.05
+#init_x,float,0.0
+#init_y,float,0.0
+#init_z,float,0.2
 
 #seed,int,-1
 #reloadController,bool,0
 #withBeacon,bool,0
+#imageRepository,string,/home/leni/are-logs/images/
 
-#cppnFixedStructure,bool,0
-#maxNbrConnections,int,100
+#maxNbrConnections,int,500
 #minNbrConnections,int,10
-#maxNbrNeurons,int,5
-#minNbrNeurons,int,0
-#mutationType,int,0
-#mutateConnection,bool,1
-#mutateNeurons,bool,1
-#rateMutateConnection,float,0.5
-#rateMutateNeuron,float,0.5
+#maxNbrNeurons,int,10
+#minNbrNeurons,int,1
 #rateAddNeuron,float,0.1
 #rateAddConnection,float,0.1
-#rateDeleteNeuron,float,0.1
-#rateDeleteConnection,float,0.1
+#rateDeleteNeuron,float,0.01
+#rateDeleteConnection,float,0.01
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
-#cppnFixedStructure,bool,0
-#rateMutation,float,0.9
-#rateCrossover,float,0.8
