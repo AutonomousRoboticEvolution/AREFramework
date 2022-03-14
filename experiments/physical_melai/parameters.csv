@@ -1,7 +1,8 @@
 #experimentName,string,physical_melai_test
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
-#repository,string,/home/robofab/are-logs/
+#repository,string,/home/leni/are-logs/
+#learnerToLoad,string,learner_0_0_3
 #seed,int,-1
 
 #populationSize,int,10
@@ -12,13 +13,13 @@
 #archiveAddingProbability,double,0.4
 #noveltyThreshold,double,0.9
 
-#cameraPipe,string,http://192.168.2.248/img/video.mjpeg
+#cameraPipe,string,tcp://127.0.0.1:5557
 #init_x,float,0
 #init_y,float,0
 #init_z,float,0.12
 #target_x,double,1
 #target_y,double,1
-#organsPath,string,/home/robofab/evolutionary_robotics_framework/experiments/sim/
+#modelsPath,string,/home/leni/evolutionary_robotics_framework/models
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -36,8 +37,8 @@
 #NNType,int,2
 #nbrHiddenNeurons,int,8
 
-#cmaesNbrEval,int,2
-#cmaesPopSize,int,2
+#cmaesNbrEval,int,10
+#cmaesPopSize,int,5
 #CMAESStep,double,1.
 #FTarget,double,0.05
 #elitistRestart,bool,0
@@ -53,7 +54,5 @@
 #isSegmentedRobot,bool,1
 #isExportModel,bool,0
 #reloadController,bool,0
-
-#organsVersion,int,3
 
 

@@ -14,7 +14,7 @@ class TrackingSystem:
 
     def __init__(self):
         # set parameters
-        self.show_frames = True
+        self.show_frames = False
 
         #set up zmq
         context = zmq.Context()

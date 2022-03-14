@@ -94,7 +94,7 @@ float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &
 //        if(coll > 0 && number_of_collisions < 64)
 //            number_of_collisions+=1;
 //    }
-//    std::cout << wp.to_string() << std::endl;
+    std::cout << wp.to_string() << std::endl;
 
     if(wp.is_nan())
         return 1;
