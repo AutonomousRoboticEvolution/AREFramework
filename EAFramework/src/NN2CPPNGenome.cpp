@@ -16,7 +16,7 @@ float cppn_params::cppn::_rate_add_neuron = 0.1f;
 float cppn_params::cppn::_rate_del_neuron = 0.1f;
 float cppn_params::cppn::_rate_add_conn = 0.1f;
 float cppn_params::cppn::_rate_del_conn = 0.1f;
-float cppn_params::cppn::_rate_change_conn = 0.05f;
+float cppn_params::cppn::_rate_change_conn = 0.1f;
 float cppn_params::cppn::_rate_crossover = 0.5f;
 
 size_t cppn_params::cppn::_min_nb_neurons = 0;
