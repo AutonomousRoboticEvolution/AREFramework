@@ -26,8 +26,12 @@ void Organ::createOrgan(int skeletonHandle)
         modelsPath += "/organs/wheel.ttm";
     else if(organType == 2) // Sensors
         modelsPath += "/organs/sensor.ttm";
-    else if(organType == 3) // Joints
-        modelsPath += "/organs/joint.ttm";
+    else if(organType == 3) {// Joints
+        if(are::settings::getParameter<are::settings::Boolean>(parameters,"#isLeg").value)
+            modelsPath += "/organs/leg_2.ttm";
+        else
+            modelsPath += "/organs/joint.ttm";
+    }
     else if(organType == 4) // Caster
         modelsPath+= "/organs/caster.ttm";
     else
@@ -327,13 +331,6 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
             collisionResult = simCheckCollision(gripperHandle, i);
             if (collisionResult == 1) // Collision detected!
                 return;
-        }
-    }
-    // Check collision with skeleton.
-    for (int skeletonHandle : skeletonHandles) {
-        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
-        if (collisionResult == 1) { // Collision detected!
-            return;
         }
     }
 

@@ -149,6 +149,7 @@ public:
         arch & cppn;
         arch & morph_desc;
         arch & parents_ids;
+        arch & matrix_4d;
         arch & generation;
     }
 
@@ -159,6 +160,8 @@ public:
     void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
     void set_cppn(const nn2_cppn_t &c){cppn = c;}
     const nn2_cppn_t& get_cppn() const {return cppn;}
+    void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
+    const std::vector<std::vector<double>>& get_matrix_4d(){return matrix_4d;}
 
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
@@ -176,6 +179,7 @@ private:
     nn2_cppn_t cppn;
     CartDesc morph_desc;
     int generation;
+    std::vector<std::vector<double>> matrix_4d;
 };
 
 namespace nn2_cppn {

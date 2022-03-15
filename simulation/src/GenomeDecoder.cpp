@@ -33,7 +33,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
 
-                if(cppn.Output()[1] > 0) {
+                if(cppn.Output()[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
                     areVoxel.bone = morph_const::filled_voxel;
                 }
                 areMatrix.setVoxel(x, y, z, areVoxel);
@@ -64,11 +64,31 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                     assert(!std::isnan(o));
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
-
-                if(outputs[1] > 0) {
+                if(outputs[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
                     areVoxel.bone = morph_const::filled_voxel;
                 }
                 areMatrix.setVoxel(x, y, z, areVoxel);
+            }
+        }
+    }
+}
+
+void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, std::vector<std::vector<double>> &matrix_4d)
+{
+    AREVoxel areVoxel;
+    int cell_counter = 0;
+    // Generate voxel matrix
+    auto region = areMatrix.getEnclosingRegion();
+    for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+                // Take output from NN and store it.
+                areVoxel.bone = morph_const::empty_voxel;
+                if(matrix_4d.at(1).at(cell_counter) > 0.00001) { // Sometimes values are very close to zero and these causes problems.
+                    areVoxel.bone = morph_const::filled_voxel;
+                }
+                areMatrix.setVoxel(x, y, z, areVoxel);
+                cell_counter++;
             }
         }
     }
@@ -331,6 +351,20 @@ void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>
                                  int &numSkeletonVoxels)
 {
     decodeGenome(areMatrix, cppn);
+    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
+    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
+    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
+    skeletonRegionCounter(skeletonMatrix);
+    removeSkeletonRegions(skeletonMatrix);
+    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
+}
+
+void GenomeDecoder::genomeDecoder(std::vector<std::vector<double>> &matrix_4d, PolyVox::RawVolume<AREVoxel> &areMatrix,
+                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
+                                  int &numSkeletonVoxels)
+{
+    decodeGenome(areMatrix, matrix_4d);
     generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
     createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
