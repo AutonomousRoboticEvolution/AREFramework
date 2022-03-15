@@ -299,6 +299,9 @@ void M_NIPES::init_next_pop(){
                 init_new_ctrl_pop(learner);
         }
     }
+    for(int i = 0; i < population.size(); i++)
+        corr_indexes.push_back(i);
+
 }
 
 bool M_NIPES::update(const Environment::Ptr &env){
@@ -370,11 +373,12 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 gene_pool.push_back(new_gene);
                 //-
 
-                //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+		//level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
                 if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
                     warming_up = false;
+                    increment_age();
                     reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
@@ -483,9 +487,16 @@ void M_NIPES::remove_oldest_gene(){
         return;
     //first gather all the oldest genes
     std::vector<int> oldest_gene_idx;
+    
     for(int i = 0; i < gene_pool.size(); i++)
         if(gene_pool[i].age == highest_age)
             oldest_gene_idx.push_back(i);
+    while(oldest_gene_idx.empty()){//if no more genomes of the highest age remain decrement it and search again.
+	highest_age--;
+        for(int i = 0; i < gene_pool.size(); i++)
+            if(gene_pool[i].age == highest_age)
+               oldest_gene_idx.push_back(i);
+    }
     //-
 
     //then erase one selected randomly among the oldest.
