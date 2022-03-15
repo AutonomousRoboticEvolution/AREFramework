@@ -67,7 +67,7 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
-        _id = static_id++;
+//        _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);

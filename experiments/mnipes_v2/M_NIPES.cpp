@@ -44,7 +44,7 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
     nn2_cppn_t cppn = gene_pool[best_idx].morph_genome.get_cppn();
     cppn.mutate();
     NN2CPPNGenome new_gene(cppn);
-    new_gene.set_parents_ids({gene_pool[best_idx].morph_genome.id()});
+    new_gene.set_parents_ids({gene_pool[best_idx].morph_genome.id(),-1});
     return new_gene;
 };
 
@@ -369,7 +369,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
 		//level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
-                if(nbr_offsprings == 0) nbr_offsprings = 1;
+                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
                     warming_up = false;
                     increment_age();
