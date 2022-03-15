@@ -128,7 +128,6 @@ void ER::handleSimulation()
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
-
     if (simulationTime >
         settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
         ea->finish_eval(environment)) {

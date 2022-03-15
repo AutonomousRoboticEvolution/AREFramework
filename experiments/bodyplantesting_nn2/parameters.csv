@@ -29,15 +29,15 @@
 #jointControllerType,int,2
 
 #isSegmentedRobot,bool,0
-#isWheel,bool,0
-#isSensor,bool,0
+#isWheel,bool,1
+#isSensor,bool,1
 #isJoint,bool,1
-#isCaster,bool,0
+#isCaster,bool,1
 
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
