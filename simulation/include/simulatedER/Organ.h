@@ -103,6 +103,8 @@ public:
     int get_graphical_connector_handle() const {return physics_connector_handle;}
     bool isOrganRemoved() const {return organRemoved;}
     bool isOrganChecked() const {return organChecked;}
+    void set_organ_removed(bool oR) {organRemoved = oR;}
+    void set_organ_checked(bool oC) {organChecked = oC;}
 };
 
 }//sim
