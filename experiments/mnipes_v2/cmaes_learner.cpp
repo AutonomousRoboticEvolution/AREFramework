@@ -119,6 +119,7 @@ void CMAESLearner::next_pop(){
     _population.clear();
     for(int i = 0; i < pop_size; i++)
         _population.push_back(new_samples.col(i));
+    new_population_available = true;
 }
 
 
@@ -151,9 +152,10 @@ bool CMAESLearner::is_learning_finish() const{
 }
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
-    std::vector<w_b_pair_t>  new_pop;
-
-    for(const auto gen: _population){
+    if(new_population_available){
+      std::vector<w_b_pair_t>  new_pop;
+	
+      for(const auto gen: _population){
         std::vector<double> weights;
         std::vector<double> biases;
         int i = 0;
@@ -163,9 +165,12 @@ std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
             biases.push_back(std::tanh(gen(i)));
 
         new_pop.push_back(std::make_pair(weights,biases));
+      }
+      current_nbr_ind+=new_pop.size();
+      new_population_available = false;
+      return new_pop;
     }
-    current_nbr_ind+=new_pop.size();
-    return new_pop;
+    return std::vector<w_b_pair_t>(0);
 }
 
 

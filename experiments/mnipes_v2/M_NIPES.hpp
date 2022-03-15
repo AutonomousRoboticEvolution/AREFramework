@@ -187,11 +187,11 @@ public:
     M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
 
     void init() override;
-    void epoch() override{
-        population.clear();
-        if(learning_pool.empty())
-            reproduction();
-    }
+//    void epoch() override{
+//        population.clear();
+//        if(learning_pool.empty())
+//            reproduction();
+//    }
     void init_morph_pop();
     void init_next_pop() override;
     bool update(const Environment::Ptr &) override;
