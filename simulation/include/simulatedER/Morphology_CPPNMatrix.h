@@ -157,9 +157,10 @@ private:
                         cartDesc.wheelNumber++;
                     if (it->getOrganType() == 2)
                         cartDesc.sensorNumber++;
-                    if (it->getOrganType() == 3)
+                    if (it->getOrganType() == 3) {
                         cartDesc.jointNumber++;
-                    if (it->getOrganType() == 4)
+                        cartDesc.jointNumber++;
+                    }if (it->getOrganType() == 4)
                         cartDesc.casterNumber++;
                 }
 

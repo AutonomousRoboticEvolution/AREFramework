@@ -11,7 +11,7 @@
 #repository,string,/home/ebb505/ARE_Project/are-logs
 
 #maxNbrOrgans,int,16
-#isSegmentedRobot,bool,1
+#isSegmentedRobot,bool,0
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
@@ -26,6 +26,8 @@
 #init_x,float,-0.6
 #init_y,float,0.
 #init_z,float,0.2
+#initPosition,sequence_double,-0.6;0;0.2;
+#targetPosition,sequence_double,0.6;0;0.2;
 
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -37,14 +39,14 @@
 #reloadController,bool,1
 #jointControllerType,int,2
 
-#populationSize,int,10
+#populationSize,int,20
 #maxEvalTime,float,120
 #timeStep,float,0.1
 #maxNbrEval,int,100
 #fitnessType,int,0
 
 #cmaesNbrEval,int,200
-#cmaesPopSize,int,4
+#cmaesPopSize,int,10
 #CMAESStep,double,1.
 #FTarget,double,0.05
 #elitistRestart,bool,0
@@ -64,9 +66,9 @@
 
 #randomOrientation,bool,1
 #isWheel,bool,0
-#isSensor,bool,1
+#isSensor,bool,0
 #isJoint,bool,1
-#isCaster,bool,1
+#isCaster,bool,0
 #manufacturabilityMethod,int,1
 
 #flatFloor,bool,1
