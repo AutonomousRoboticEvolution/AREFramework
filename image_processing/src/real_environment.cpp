@@ -4,40 +4,36 @@ using namespace are;
 
 RealEnvironment::RealEnvironment():
     Environment(),
-    robot_pos_subs(context, ZMQ_REQ),
-    tags_pos_subs(context, ZMQ_SUB){
+    zmq_requester_socket(context, ZMQ_REQ)
+{
 
     current_position.resize(2);
     beacon_position.resize(2);
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#target",new settings::Sequence<double>({0.,0.,0.12}));
+
 }
 
 void RealEnvironment::init(){
 
-     std::string pipe = settings::getParameter<settings::String>(parameters,"#cameraPipe").value;
+    //start zmq
+    std::string pipe = settings::getParameter<settings::String>(parameters,"#cameraPipe").value;
+    zmq_requester_socket.connect( pipe );
 
-     //** Subscribers to camera topics
-     robot_pos_subs.connect(pipe);
-     robot_pos_subs.set(zmq::sockopt::subscribe, "Robot:");
-     tags_pos_subs.connect(pipe);
-     tags_pos_subs.set(zmq::sockopt::subscribe, "Tags:");
-     //*/
+    // initialise the variables for robot and beacon location to some sensible defaults, in case they cannot be seen in the first frame:
+    // TODO make these parameters?
+    current_position = {0,0};
+    beacon_position = {0,0};
 
-     grid_zone = Eigen::MatrixXi::Zero(8,8);
+    grid_zone = Eigen::MatrixXi::Zero(grid_zone_size,grid_zone_size);
 
-     std::vector<int> colour_bnd = settings::getParameter<settings::Sequence<int>>(parameters,"#colourBoundaries").value;
-     colour_range.first = cv::Scalar(colour_bnd[0],colour_bnd[2],colour_bnd[4]);
-     colour_range.second = cv::Scalar(colour_bnd[1],colour_bnd[3],colour_bnd[5]);
-
-
-     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
-
+    target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
 }
+
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
-
+    trajectory.clear();
     if(env_type == 0)
         return fit_targeted_locomotion();
     else if(env_type == 1)
@@ -92,26 +88,58 @@ std::vector<double> RealEnvironment::fit_foraging(){
 }
 
 void RealEnvironment::update_info(double time){
-    std::string robot_position;
-    phy::send_string(robot_position,"Robot:position",robot_pos_subs,"Robot:");
 
-    std::stringstream sstr(robot_position);
-    cv::Point2f pixel_coord;
-    std::string topic;
-    char par1,par2,comma;
-    sstr >> topic >> par1 >> pixel_coord.x >> comma >> pixel_coord.y >> par2;
-    std::cout << "From topic " << topic << " position " << pixel_coord << std::endl;
-    if(pixel_coord.x == -999 || pixel_coord.y == -999)
-        return;
-    cv::Point2f world_coord = image_proc::convert_pixel_to_world_frame(pixel_coord,parameters);
-    current_position = {world_coord.x,world_coord.y};
+    // update position of robot
+    std::string robot_position_string;
+    phy::send_string(robot_position_string,"position",zmq_requester_socket,"Robot:");
 
+    if(robot_position_string != "None"){ // tracking found a robot position, else the robot wasn't seen, so we will not update the current_position variable
+        // parse the string, expected format is [x, y]
+        boost::erase_all(robot_position_string, "[");
+        boost::erase_all(robot_position_string, "]");
+        std::vector<std::string> robot_position_split_string;
+        boost::split(robot_position_split_string, robot_position_string, boost::is_any_of(","));
+
+        current_position = { std::stod(robot_position_split_string[0]) , std::stod(robot_position_split_string[1]) };
+    }
+
+
+    // update position of barrel
+    std::string aruco_tags_string;
+    phy::send_string(aruco_tags_string,"position",zmq_requester_socket,"Tags:");
+    if (aruco_tags_string!="[]"){
+        int tag_number_of_barrel = settings::getParameter<settings::Integer>(parameters,"#arucoTagOnBarrel").value;
+        // see if we can find the barrel amoung the list of seen aruco tags
+        // expect a string of this format:
+        // [[tag_number, x, y], [tag_number, x, y] ... [tag_number, x, y]]
+        boost::erase_all(aruco_tags_string, ","); // remove the original commas - we'll just use the brackets and spaces to delimit
+        boost::replace_all(aruco_tags_string, "] [",","); // put commas between each tag
+        boost::erase_all(aruco_tags_string, "["); // remove any other brackets
+        boost::erase_all(aruco_tags_string, "]");
+
+        std::vector<std::string> aruco_tags_split_string;
+        boost::split(aruco_tags_split_string, aruco_tags_string, boost::is_any_of(","));
+        //each string in aruco_tags_split_string is now an individual tag, spaces between the numbers, e.g. "10 0.1 1.2" would be tag 10 at (0.1,1.2)
+
+        for (int i = 0; i < aruco_tags_split_string.size(); i++){
+            std::string this_tag_string = aruco_tags_split_string[i];
+            std::vector<std::string> this_tag_string_split;
+            boost::split(this_tag_string_split, this_tag_string, boost::is_any_of(" "));
+            // tag ID number is this_tag_string_split[0]
+            if ( std::stoi(this_tag_string_split[0]) == tag_number_of_barrel){
+                // this is the correct tag, so save the location
+                beacon_position = { std::stod( this_tag_string_split[1] ),std::stod( this_tag_string_split[2])};
+            }
+        }
+    }
+
+    // (for exploration task) compute which grid zone the robot is in:
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
     grid_zone(indexes.first,indexes.second) = 1;
 
+    // adding waypoint to the trajectory
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
-
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(time >= interval*trajectory.size()){
         waypoint wp;
@@ -127,8 +155,6 @@ void RealEnvironment::update_info(double time){
 
     final_position = current_position;
 
-    for(const auto &val : current_position)
-        std::cout << val << ",";
 }
 
 
@@ -137,9 +163,15 @@ std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::v
 
     indexes.first = std::trunc(pos[0]/0.25 + 4);
     indexes.second = std::trunc(pos[1]/0.25 + 4);
-    if(indexes.first == 8)
-        indexes.first = 7;
-    if(indexes.second == 8)
-        indexes.second = 7;
+    // limit each index to the range 0 to grid_zone_size-1:
+    if(indexes.first<0) indexes.first=0;
+    if(indexes.first>=grid_zone_size) indexes.first=grid_zone_size-1;
+    if(indexes.second<0) indexes.second=0;
+    if(indexes.second>=grid_zone_size) indexes.second=grid_zone_size-1;
+
+//    if(indexes.first == 8)
+//        indexes.first = 7;
+//    if(indexes.second == 8)
+//        indexes.second = 7;
     return indexes;
 }

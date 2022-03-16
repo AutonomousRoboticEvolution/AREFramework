@@ -138,7 +138,7 @@ public:
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
-    const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;};
+    const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;}
 
 private:
     ///////////////////////
@@ -184,9 +184,9 @@ private:
                 }
             }
             // Get dimmensions
-            cartDesc.robotWidth = abs(maxX - minX);
-            cartDesc.robotDepth = abs(maxY - minY);
-            cartDesc.robotHeight = abs(maxZ - minZ);
+            cartDesc.robotWidth = fabs(maxX - minX);
+            cartDesc.robotDepth = fabs(maxY - minY);
+            cartDesc.robotHeight = fabs(maxZ - minZ);
         }
         void getOrganPositions(std::vector<Organ> organList){
             for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){

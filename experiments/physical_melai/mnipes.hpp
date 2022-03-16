@@ -85,6 +85,7 @@ public:
     int get_currentID(){return currentIndIndex;}
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
     std::vector<double> get_objectives(){return objectives;}
+    const std::map<int, CMAESLearner> &get_learners(){return learners;}
 
 private:
     std::vector<std::pair<int,int>> ids;

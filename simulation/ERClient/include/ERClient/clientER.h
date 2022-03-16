@@ -24,6 +24,14 @@ namespace are {
 
 namespace client {
 
+enum EvalOrder{
+    FIFO = 0,
+    FILO,
+    RANDOM,
+    FIFO_RANDOM
+};
+
+
 class ER : public sim::ER
 {
 public:

@@ -94,13 +94,18 @@ void CMAESLearner::iterate(){
     bool stop = _cma_strat->stop();
     _is_finish = _cma_strat->have_reached_ftarget();
     if(stop){
+        bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
         bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
         bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
         if(withRestart && stop){
             if(verbose)
                 std::cout << "Restart !" << std::endl;
 
-            _cma_strat->lambda_inc();
+            if(incrPop){
+                int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
+                if(_cma_strat->get_parameters().lambda() < max_pop_size)
+                    _cma_strat->lambda_inc();
+            }
             _cma_strat->reset_search_state();
         }
     }
@@ -114,6 +119,7 @@ void CMAESLearner::next_pop(){
     _population.clear();
     for(int i = 0; i < pop_size; i++)
         _population.push_back(new_samples.col(i));
+    new_population_available = true;
 }
 
 
@@ -136,14 +142,20 @@ bool CMAESLearner::step(){
 
 bool CMAESLearner::is_learning_finish() const{
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if(verbose)
+        std::cout << "INFO - CMAES: Learning ending conditions: " << current_nbr_ind << " = 0 and (nbr evals "
+                  << _nbr_eval << " >= " << max_nbr_eval << " or reach target " << _is_finish << " or "
+                  << "nbr dropped evals " << nbr_dropped_eval << " > 50)" << std::endl;
     return current_nbr_ind == 0 && (_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50);
 
 }
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
-    std::vector<w_b_pair_t>  new_pop;
-
-    for(const auto gen: _population){
+    if(new_population_available){
+      std::vector<w_b_pair_t>  new_pop;
+	
+      for(const auto gen: _population){
         std::vector<double> weights;
         std::vector<double> biases;
         int i = 0;
@@ -153,9 +165,12 @@ std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
             biases.push_back(std::tanh(gen(i)));
 
         new_pop.push_back(std::make_pair(weights,biases));
+      }
+      current_nbr_ind+=new_pop.size();
+      new_population_available = false;
+      return new_pop;
     }
-    current_nbr_ind+=new_pop.size();
-    return new_pop;
+    return std::vector<w_b_pair_t>(0);
 }
 
 

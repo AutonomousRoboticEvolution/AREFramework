@@ -41,6 +41,8 @@ struct cppn_params{
         static constexpr nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
         static constexpr float eta_m = 15.f;
         static constexpr float eta_c = 15.f;
+        static constexpr float min = -1;
+        static constexpr float max = 1;
     };
 };
 
@@ -65,7 +67,7 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
-        _id = static_id++;
+//        _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
@@ -148,6 +150,7 @@ public:
         arch & morph_desc;
         arch & parents_ids;
         arch & matrix_4d;
+        arch & generation;
     }
 
     const CartDesc& get_morph_desc() const {return morph_desc;}

@@ -4,8 +4,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 find_package(OpenCV REQUIRED)
 
-add_library(AREImageProc SHARED 
-         src/blob_tracking.cpp
+add_library(AREImageProc SHARED
          src/real_environment.cpp)
 
 target_include_directories(AREImageProc PUBLIC

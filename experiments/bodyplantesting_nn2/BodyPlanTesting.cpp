@@ -69,9 +69,26 @@ void BODYPLANTESTING::initPopulation()
 
 }
 
+void BODYPLANTESTING::init_next_pop(){
+    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
+    if(repetition < nbr_rep){
+        repetition++;
+        return;
+    }
+    repetition = 0;
+    NSGA2::init_next_pop();
+}
+
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
+    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
+
+    if(repetition < nbr_rep){
+        std::cout << "number of repetitions : " << repetition << " over " << nbr_rep << std::endl;
+        return;
+    }
+
     /** NOVELTY **/
     if(Novelty::k_value >= population.size())
         Novelty::k_value = population.size()/2;

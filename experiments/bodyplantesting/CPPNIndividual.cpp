@@ -13,6 +13,10 @@ void CPPNIndividual::createMorphology()
     float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
     float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
+    if(std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_morph_desc().defined())
+        assert(std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+
+    std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     setGenome();
     setMorphDesc();
     setManRes();

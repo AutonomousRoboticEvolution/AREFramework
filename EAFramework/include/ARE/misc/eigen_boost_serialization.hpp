@@ -21,8 +21,9 @@ THE SOFTWARE.
 */
 
 
-#ifndef EIGEN_BOOST_SERIALIZATION
-#define EIGEN_BOOST_SERIALIZATION
+#ifndef EIGEN_BOOST_SERIALIZATION_HPP
+#define EIGEN_BOOST_SERIALIZATION_HPP
+
 #include <Eigen/Sparse>
 #include <Eigen/Dense>
 #include <boost/serialization/split_free.hpp>
@@ -120,4 +121,4 @@ namespace boost{namespace serialization{
         }
 
 }}
-#endif
+#endif //EIGEN_BOOST_SERIALIZATION_HPP

@@ -3,6 +3,9 @@
 using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
+
+
+
     initialize();
 
     for (int i = 0; i < nbrOfInst; i++) {
@@ -81,14 +84,59 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
-    currentIndexVec[slaveIndex] = indToEval.front();
-    if(!indToEval.empty())
+    if(indToEval.empty())
+        return;
+
+    int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
+    if(eval_order == EvalOrder::FIFO){
+        //First in Last out
+        currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
+        currentIndexVec[slaveIndex] = indToEval.back();
+        indToEval.erase(indToEval.begin()+indToEval.size());
+    }
+    else if(eval_order == EvalOrder::FILO){
+        //First in First out
+        currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
+        currentIndexVec[slaveIndex] = indToEval.front();
         indToEval.erase(indToEval.begin());
+    }
+    else if(eval_order == EvalOrder::RANDOM){
+        //Random pick
+        int rand_idx = randNum->randInt(0,indToEval.size()-1);
+        int index = indToEval[rand_idx];
+        currentIndVec[slaveIndex] = ea->getIndividual(index);
+        currentIndexVec[slaveIndex] = index;
+        indToEval.erase(indToEval.begin()+rand_idx);
+        indToEval.shrink_to_fit();
+    }
+    else if(eval_order == EvalOrder::FIFO_RANDOM){
+        std::vector<int> discrete_distri;
+        for(int i = 0; i < indToEval.size(); i++)
+            discrete_distri.push_back(i);
+
+        std::discrete_distribution<int> dd(discrete_distri.begin(),discrete_distri.end());
+        //Random pick
+        int rand_idx = dd(randNum->gen);
+        int index = indToEval[rand_idx];
+        currentIndVec[slaveIndex] = ea->getIndividual(index);
+        currentIndexVec[slaveIndex] = index;
+        indToEval.erase(indToEval.begin()+rand_idx);
+        indToEval.shrink_to_fit();
+    }
+    currentIndVec[slaveIndex]->set_client_id(serverInstances[slaveIndex]->get_clientID());
+    currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
+    currentIndVec[slaveIndex]->set_generation(ea->get_generation());
+    serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
+    serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
 }
 
 void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    std::string message;
+    serverInstances[slaveIndex]->getStringSignal("currentInd",message);
+    currentIndVec[slaveIndex]->from_string(message);
+    evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
+
     if(verbose)
         std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " is evaluated" << std::endl;
 
@@ -101,10 +149,10 @@ void ER::endOfSimulation(int slaveIndex){
     }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
     ea->update(environment);
-    if(population_size < ea->get_population().size() && !ea->is_finish()){
-        for(int i = population_size; i < ea->get_population().size(); i++)
+    if(population_size < ea->get_pop_size() && !ea->is_finish()){
+        for(int i = population_size; i < ea->get_pop_size(); i++)
             indToEval.push_back(i);
-        population_size = ea->get_population().size();
+        population_size = ea->get_pop_size();
     }
 
     //        if(evalIsFinish)
@@ -136,11 +184,6 @@ bool ER::updateSimulation()
                 ///@todo start in slave to handle errors
                 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
                 startOfSimulation(slaveIdx);
-                currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
-                currentIndVec[slaveIdx]->set_individual_id(currentIndexVec[slaveIdx]);
-                currentIndVec[slaveIdx]->set_generation(ea->get_generation());
-                serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
-                serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
             }
             else if(state == BUSY)
             {
@@ -156,13 +199,8 @@ bool ER::updateSimulation()
             }
             else if(state == FINISH)
             {
-                std::string message;
-                serverInstances[slaveIdx]->getStringSignal("currentInd",message);
-                currentIndVec[slaveIdx]->from_string(message);
-                evalIsFinish = serverInstances[slaveIdx]->getIntegerSignal("evalIsFinish");
                 endOfSimulation(slaveIdx);
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
-
             }
             else if(state == ERROR)
             {

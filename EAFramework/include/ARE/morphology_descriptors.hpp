@@ -48,6 +48,10 @@ struct CartDesc
     int casterNumber = 0;
     int jointNumber = 0;
 
+    /**
+     * @brief get the descriptor with normalized values. Mainly intended for novelty search
+     * @return
+     */
     Eigen::VectorXd getCartDesc() const{
         Eigen::VectorXd cartDesc(8);
         cartDesc(0) = robotWidth / morph_const::dimension_limit;
@@ -60,6 +64,12 @@ struct CartDesc
         cartDesc(7) = (double) casterNumber / morph_const::organ_trait_limit;
         return cartDesc;
     }
+
+    /**
+     * @brief Is the descriptor defined? i.e. Is the descriptor describing an actual body-plan?
+     * @return
+     */
+    bool defined() const{return voxelNumber >= 24;}
 
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
@@ -74,6 +84,18 @@ struct CartDesc
         arch & jointNumber;
     }
 };
+
+inline bool operator ==(const CartDesc& cd1, const CartDesc& cd2){
+    return cd1.casterNumber == cd2.casterNumber &&
+            cd1.wheelNumber == cd2.wheelNumber &&
+            cd1.jointNumber == cd2.jointNumber &&
+            cd1.sensorNumber == cd2.sensorNumber &&
+            cd1.voxelNumber == cd2.voxelNumber &&
+            fabs(cd1.robotDepth - cd2.robotDepth) <= 1e-3 &&
+            fabs(cd1.robotHeight - cd2.robotHeight) <= 1e-3 &&
+            fabs(cd1.robotWidth - cd2.robotWidth) <= 1e-3;
+}
+
 
 struct OrganPositionDesc
 {

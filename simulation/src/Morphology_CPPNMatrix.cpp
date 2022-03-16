@@ -481,6 +481,8 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output.push_back(matrix_4d.at(0).at(pos_in_vector));
 
     }
+    for(const auto& o: output)
+        assert(!std::isnan(o));
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
