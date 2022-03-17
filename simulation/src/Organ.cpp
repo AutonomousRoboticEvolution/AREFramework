@@ -15,165 +15,10 @@ using namespace are::sim;
 //namespace cop = coppelia;
 using mc = are::morph_const;
 
-
-void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
-{
-    int8_t collisionResult;
-    // Check collision with skeleton
-    for (int oH : objectHandles) {
-        for (int skeletonHandle : skeletonHandles) {
-            collisionResult = simCheckCollision(oH, skeletonHandle);
-            if (collisionResult == 1) { // Collision detected!
-                organColliding = true;
-                return;
-            }
-        }
-    }
-    // Check collision with other organs
-    for (int oH : objectHandles) {
-        for (auto &organComp : organList) {
-            if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
-                continue;
-            if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
-                continue;
-            for (auto &i : organComp.objectHandles) {
-                collisionResult = simCheckCollision(oH, i);
-                if (collisionResult == 1) { // Collision detected!
-                    organColliding = true;
-                    return;
-                }
-            }
-        }
-    }
-}
-
-//void Organ::isOrganGoodOrientation()
-//{
-//    float diffPosZ;
-//    diffPosZ = connectorPos[2] - organPos[2];
-//    /// \todo EB: remove this hard-coded value
-//    organGoodOrientation = (diffPosZ > -0.01) && (diffPosZ < 0.01); // Is organ pointing along x-y plane.
-//}
-
-void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
-{
-    float gripperPosition[3];
-    float gripperOrientation[3];
-    /// \todo EB: would it be better to use the frame of the organ? It's easy change
-    gripperPosition[0] = connectorPos[0]; gripperPosition[1] = connectorPos[1]; gripperPosition[2] = connectorPos[2];
-    gripperOrientation[0] = connectorOri[0]; gripperOrientation[1] = connectorOri[1]; gripperOrientation[2] = connectorOri[2];
-    simSetObjectPosition(gripperHandle, -1, gripperPosition);
-    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
-
-    // Orientation
-    gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
-    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
-    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI;
-    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
-
-    // Move relative to gripper.
-    gripperPosition[0] = -0.035;
-    gripperPosition[1] = 0.0;
-    /// \todo EB: This offset should be somewhere else or constant.
-    if(organType == 1) // Wheels
-        gripperPosition[2] = -0.13;
-    else if(organType == 2) // Sensors
-        gripperPosition[2] = -0.15;
-    else if(organType == 3) // Joints
-        gripperPosition[2] = -0.195;
-    else if(organType == 4) // Caster
-        gripperPosition[2] = -0.1;
-    else
-        assert(false);
-
-    simSetObjectPosition(gripperHandle, gripperHandle, gripperPosition);
-    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 1.5708;
-    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
-    int8_t collisionResult;
-    // Check collision with skeleton (s)
-    for(int skeletonHandle : skeletonHandles) {
-        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
-        if (collisionResult == 1) // Collision detected!
-            return;
-    }
-    /// \todo EB: Wheels are ignored in the following loop.
-    // Check collision with other organs
-    for (auto &organComp : organList) {
-        if(organComp.isOrganRemoved() && organComp.isOrganChecked())
-            continue;
-        for (auto &i : organComp.objectHandles) {
-            collisionResult = simCheckCollision(gripperHandle, i);
-            if (collisionResult == 1) // Collision detected!
-                return;
-        }
-    }
-    organGripperAccess = true;
-    gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
-    simSetObjectPosition(gripperHandle, -1, gripperPosition);
-}
-
-void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
-{
-    // Transform organPos from m to voxels
-    int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));
-    int yPos = static_cast<int>(std::round(organPos[1]/mc::voxel_real_size));
-    int zPos = static_cast<int>(std::round(organPos[2]/mc::voxel_real_size));
-    zPos -= mc::matrix_size/2.;
-    uint8_t voxelValue;
-    voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
-    if(voxelValue == mc::filled_voxel) {// Organ centre point inside of skeleton
-        organInsideSkeleton = true;
-        return;
-    }
-    else if(voxelValue == mc::empty_voxel) {
-        /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
-        if(xPos <= mc::xHeadUpperLimit && xPos >= mc::xHeadLowerLimit &&
-           yPos <= mc::yHeadUpperLimit && yPos >= mc::yHeadLowerLimit) {
-            organInsideSkeleton = true;
-            return;
-        }
-        else {
-            return;
-        }
-    }
-    else
-        assert(false);
-}
-
-void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
-                      const std::vector<Organ>& organList)
-{
-    IsOrganColliding(skeletonHandles, organList);
-    isGripperCollision(gripperHandle, skeletonHandles, organList);
-    isOrganInsideMainSkeleton(skeletonMatrix);
-}
-
-void Organ::repressOrgan()
-{
-    if(organInsideSkeleton || organColliding || !organGripperAccess){
-        simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
-        simRemoveModel(organHandle); // Remove model.
-        simRemoveModel(graphicConnectorHandle);
-        organRemoved = true;
-    }
-    else{
-        organRemoved = false;
-    }
-}
-
 void Organ::createOrgan(int skeletonHandle)
 {
     organChecked = true;
-    /// \todo EB: It might be worth to have this as a separate parameters (?)
     std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    int version = are::settings::getParameter<are::settings::Integer>(parameters,"#organsVersion").value;
-
-    if(version != 2 && version != 3 && version != 4 && version != 5 && version != 6){
-        std::cout << "Version of organs not set. Set to default valuee of 3." << std::endl;
-        version = 3;
-    }
-    std::stringstream vers;
-    vers << version;
 
     if(organType == 0) // Brain
         modelsPath += "/organs/head.ttm";
@@ -273,14 +118,14 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         tempOrganPos[2] = 0.0;
     else if(organType == 1) // Wheels
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     else if(organType == 2) { // Sensors
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     }else if(organType == 3) // Joints
-        tempOrganPos[2] = -0.045;
+        tempOrganPos[2] = -0.05;
     else if(organType == 4) { // Caster
         tempOrganPos[0] = 0.01;
-        tempOrganPos[2] = -0.03;
+        tempOrganPos[2] = -0.035;
     } else
         assert(false);
 
@@ -311,15 +156,15 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
     if(organType != 0)
-        createMaleConnector(skeletonHandle);
-
+        createMaleConnector();
 }
 
-void Organ::createMaleConnector(int skeletonHandle)
+void Organ::createMaleConnector()
 {
     float tempConnectorPosition[3];
     float tempConnectorOrientation[3];
-    int tempConnectorHandle;
+    int temp_physics_connector_handle;
+    int temp_visual_connector_handle = -1;
 
     tempConnectorPosition[0] = connectorPos.at(0);
     tempConnectorPosition[1] = connectorPos.at(1);
@@ -329,14 +174,20 @@ void Organ::createMaleConnector(int skeletonHandle)
     tempConnectorOrientation[1] = connectorOri.at(1);
     tempConnectorOrientation[2] = connectorOri.at(2);
 
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    modelsPath += "utils/male_connector_visual.ttm";
+    std::string physics_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    std::string visual_path = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+    visual_path += "utils/male_connector_visual.ttm";
+    physics_path += "utils/male_connector_physics.ttm";
 
-    tempConnectorHandle = simLoadModel(modelsPath.c_str());
-    assert(tempConnectorHandle != -1);
+    temp_physics_connector_handle = simLoadModel(physics_path.c_str());
+    assert(temp_physics_connector_handle != -1);
+    temp_visual_connector_handle = simLoadModel(visual_path.c_str());
+    assert(temp_visual_connector_handle != -1);
 
-    simSetObjectPosition(tempConnectorHandle, -1, tempConnectorPosition);
-    simSetObjectOrientation(tempConnectorHandle, -1, tempConnectorOrientation);
+    simSetObjectPosition(temp_physics_connector_handle, -1, tempConnectorPosition);
+    simSetObjectOrientation(temp_physics_connector_handle, -1, tempConnectorOrientation);
+    simSetObjectPosition(temp_visual_connector_handle, -1, tempConnectorPosition);
+    simSetObjectOrientation(temp_visual_connector_handle, -1, tempConnectorOrientation);
 
     /// \todo EB: We need to find a better way align origins of connectors and connectors! This distance only applies for the second male conenctor
     tempConnectorPosition[0] = 0.00;
@@ -347,9 +198,174 @@ void Organ::createMaleConnector(int skeletonHandle)
     tempConnectorOrientation[1] = 0.0;
     tempConnectorOrientation[2] = 0.0;
 
-    simSetObjectPosition(tempConnectorHandle, tempConnectorHandle, tempConnectorPosition);
-    simSetObjectOrientation(tempConnectorHandle, tempConnectorHandle, tempConnectorOrientation);
+    simSetObjectPosition(temp_visual_connector_handle, temp_visual_connector_handle, tempConnectorPosition);
+    simSetObjectOrientation(temp_visual_connector_handle, temp_visual_connector_handle, tempConnectorOrientation);
+    simSetObjectParent(temp_visual_connector_handle, organHandle, 1);
 
-    simSetObjectParent(tempConnectorHandle, skeletonHandle, 1);
-    graphicConnectorHandle = tempConnectorHandle;
+    simSetObjectPosition(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorPosition);
+    simSetObjectOrientation(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorOrientation);
+    simSetObjectParent(temp_physics_connector_handle, organHandle, 1);
+
+    physics_connector_handle = temp_physics_connector_handle;
+}
+
+void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
+                      const std::vector<Organ>& organList)
+{
+    IsOrganColliding(skeletonHandles, organList);
+    isGripperCollision(gripperHandle, skeletonHandles, organList);
+    isOrganInsideMainSkeleton(skeletonMatrix);
+}
+
+void Organ::repressOrgan()
+{
+    if(organInsideSkeleton || organColliding || !organGripperAccess){
+        simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
+        simRemoveModel(organHandle); // Remove model.
+        simRemoveModel(physics_connector_handle);
+        organRemoved = true;
+    }
+    else{
+        organRemoved = false;
+    }
+}
+
+void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
+{
+    int8_t collisionResult;
+    // Check collision with skeleton
+    for (int oH : objectHandles) {
+        for (int skeletonHandle : skeletonHandles) {
+            collisionResult = simCheckCollision(oH, skeletonHandle);
+            if (collisionResult == 1) { // Collision detected!
+                organColliding = true;
+                return;
+            }
+        }
+    }
+    // Check collision with other organs
+    for (int oH : objectHandles) {
+        for (auto &organComp : organList) {
+            if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
+                continue;
+            if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
+                continue;
+            for (auto &i : organComp.objectHandles) {
+                collisionResult = simCheckCollision(oH, i);
+                if (collisionResult == 1) { // Collision detected!
+                    organColliding = true;
+                    return;
+                }
+            }
+        }
+    }
+    // Check connector collision
+//    for (int oH : objectHandles) {
+        for (auto &organComp : organList) {
+            if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
+                continue;
+            if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
+                continue;
+            //for (auto &i : organComp.objectHandles) {
+            collisionResult = simCheckCollision(physics_connector_handle, organComp.get_graphical_connector_handle());
+            if (collisionResult == 1) { // Collision detected!
+                organColliding = true;
+                return;
+            }
+            //}
+//        }
+    }
+}
+
+void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
+{
+    float gripperPosition[3];
+    float gripperOrientation[3];
+    /// \todo EB: would it be better to use the frame of the organ? It's easy change
+    gripperPosition[0] = connectorPos[0]; gripperPosition[1] = connectorPos[1]; gripperPosition[2] = connectorPos[2];
+    gripperOrientation[0] = connectorOri[0]; gripperOrientation[1] = connectorOri[1]; gripperOrientation[2] = connectorOri[2];
+    simSetObjectPosition(gripperHandle, -1, gripperPosition);
+    simSetObjectOrientation(gripperHandle, -1, gripperOrientation);
+
+    // Orientation
+    gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
+    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
+    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI;
+    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
+
+    // Move relative to gripper.
+    gripperPosition[0] = -0.035;
+    gripperPosition[1] = 0.0;
+    /// \todo EB: This offset should be somewhere else or constant.
+    if(organType == 1) // Wheels
+        gripperPosition[2] = -0.25;
+    else if(organType == 2) // Sensors
+        gripperPosition[2] = -0.24;
+    else if(organType == 3) // Joints
+        gripperPosition[2] = -0.26;
+    else if(organType == 4) // Caster
+        gripperPosition[2] = -0.26;
+    else
+        assert(false);
+
+    simSetObjectPosition(gripperHandle, gripperHandle, gripperPosition);
+    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 1.5708;
+    simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
+    int8_t collisionResult;
+    // Check collision with skeleton (s)
+    for(int skeletonHandle : skeletonHandles) {
+        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
+        if (collisionResult == 1) // Collision detected!
+            return;
+    }
+    /// \todo EB: Wheels are ignored in the following loop.
+    // Check collision with other organs
+    for (auto &organComp : organList) {
+        if(organComp.isOrganRemoved() && organComp.isOrganChecked())
+            continue;
+        for (auto &i : organComp.objectHandles) {
+            collisionResult = simCheckCollision(gripperHandle, i);
+            if (collisionResult == 1) // Collision detected!
+                return;
+        }
+    }
+    // Check collision with skeleton.
+    for (int skeletonHandle : skeletonHandles) {
+        collisionResult = simCheckCollision(gripperHandle, skeletonHandle);
+        if (collisionResult == 1) { // Collision detected!
+            return;
+        }
+    }
+
+    organGripperAccess = true;
+    gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
+    simSetObjectPosition(gripperHandle, -1, gripperPosition);
+}
+
+void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+{
+    // Transform organPos from m to voxels
+    int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));
+    int yPos = static_cast<int>(std::round(organPos[1]/mc::voxel_real_size));
+    int zPos = static_cast<int>(std::round(organPos[2]/mc::voxel_real_size));
+    zPos -= mc::matrix_size/2.;
+    uint8_t voxelValue;
+    voxelValue = skeletonMatrix.getVoxel(xPos,yPos,zPos);
+    if(voxelValue == mc::filled_voxel) {// Organ centre point inside of skeleton
+        organInsideSkeleton = true;
+        return;
+    }
+    else if(voxelValue == mc::empty_voxel) {
+        /// \todo EB: This temporary fixes the issue of the joint colliding with the head organ!
+        if(xPos <= mc::xHeadUpperLimit && xPos >= mc::xHeadLowerLimit &&
+           yPos <= mc::yHeadUpperLimit && yPos >= mc::yHeadLowerLimit) {
+            organInsideSkeleton = true;
+            return;
+        }
+        else {
+            return;
+        }
+    }
+    else
+        assert(false);
 }
