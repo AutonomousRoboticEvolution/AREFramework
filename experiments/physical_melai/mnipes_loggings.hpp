@@ -25,6 +25,13 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class BestControllerLog : public Logging
+{
+public:
+    BestControllerLog() : Logging(false){}
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
 
 }//are
 
