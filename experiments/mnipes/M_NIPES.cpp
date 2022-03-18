@@ -660,7 +660,10 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     }
 
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
-    if(drop_eval) nbr_dropped_eval++;
+    if(drop_eval) {
+        nbr_dropped_eval++;
+        std::dynamic_pointer_cast<CMAESLearner>(population[currentIndIndex]->get_learner())->set_nbr_dropped_eval(nbr_dropped_eval);
+    }
 
     if(env->get_name() == "mazeEnv")
     {

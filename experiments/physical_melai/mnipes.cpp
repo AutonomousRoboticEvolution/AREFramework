@@ -6,10 +6,7 @@ void PMEIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
-    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
 
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
@@ -60,11 +57,7 @@ bool MNIPES::update(const Environment::Ptr &env){
 
     PMEIndividual::Ptr ind(new PMEIndividual);
     objectives = env->fitnessFunction(ind);
-    if(verbose){
-        std::cout << "fitnesses = " << std::endl;
-        for(const double fitness : objectives)
-            std::cout << fitness << std::endl;
-    }
+    ind.reset();
 
     std::vector<double> final_pos = env->get_final_position();
     Eigen::VectorXd desc(3);
@@ -216,9 +209,9 @@ void MNIPES::init_learner(int id){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
     bool useArucoAsInput = settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
+    std::string learner_file = settings::getParameter<settings::String>(parameters,"#learnerToLoad").value;
 
 
-    //TODO: load saved learners
     int wheels, joints, sensors;
     phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
     int nn_inputs;
@@ -244,19 +237,27 @@ void MNIPES::init_learner(int id){
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
 
-    if(!load_existing_ctrls && !use_ctrl_arch)
+    //Load an existing learner
+    if(boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
         learner.init();
+        learner.from_file(Logging::log_folder + "/" + learner_file);
+        std::cout << learner.print_info() << std::endl;
+    }
     else{
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-        if(load_existing_ctrls)// load existing controllers
-            phy::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
-        else if(use_ctrl_arch)// load from controller archive
-            ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
-        else learner.init();
-
-        if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
+        if(!load_existing_ctrls && !use_ctrl_arch)
             learner.init();
-        else learner.init(ctrl_gen->get_full_genome());
+        else{
+            NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+            if(load_existing_ctrls)// load existing controllers
+                phy::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
+            else if(use_ctrl_arch)// load from controller archive
+                ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
+            else learner.init();
+
+            if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
+                learner.init();
+            else learner.init(ctrl_gen->get_full_genome());
+        }
     }
 
     learners.emplace(id,learner);

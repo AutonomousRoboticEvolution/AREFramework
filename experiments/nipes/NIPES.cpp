@@ -72,14 +72,21 @@ void NIPES::init(){
     cmaParam.set_quiet(!verbose);
 
 
-    cmaStrategy.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
-    cmaStrategy->set_elitist_restart(elitist_restart);
-    cmaStrategy->set_length_of_stagnation(lenStag);
-    cmaStrategy->set_novelty_ratio(novelty_ratio);
-    cmaStrategy->set_novelty_decr(novelty_decr);
-    cmaStrategy->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    _cma_strat->set_elitist_restart(elitist_restart);
+    _cma_strat->set_length_of_stagnation(lenStag);
+    _cma_strat->set_novelty_ratio(novelty_ratio);
+    _cma_strat->set_novelty_decr(novelty_decr);
+    _cma_strat->set_pop_stag_thres(pop_stag_thres);
 
-    dMat init_samples = cmaStrategy->ask();
+    bool start_from_learner = settings::getParameter<settings::Boolean>(parameters,"#startFromExistingLearner").value;
+    if(start_from_learner){
+        std::string filename = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
+        _cma_strat->from_file(filename);
+        pop_size =  _cma_strat->get_parameters().lambda();
+    }
+
+    dMat init_samples = _cma_strat->ask();
 
     std::vector<double> weights(nbr_weights);
     std::vector<double> biases(nbr_bias);
@@ -154,11 +161,11 @@ void NIPES::epoch(){
         pop.push_back(cma_ind);
     }
 
-    cmaStrategy->set_population(pop);
-    cmaStrategy->eval();
-    cmaStrategy->tell();
-    bool stop = cmaStrategy->stop();
-//    if(cmaStrategy->have_reached_ftarget()){
+    _cma_strat->set_population(pop);
+    _cma_strat->eval();
+    _cma_strat->tell();
+    bool stop = _cma_strat->stop();
+//    if(_cma_strat->have_reached_ftarget()){
 //        _is_finish = true;
 ////        return;
 //    }
@@ -167,23 +174,23 @@ void NIPES::epoch(){
         if(verbose)
             std::cout << "Restart !" << std::endl;
 
-        cmaStrategy->capture_best_solution(best_run);
+        _cma_strat->capture_best_solution(best_run);
 
         if(incrPop)
-            cmaStrategy->lambda_inc();
+            _cma_strat->lambda_inc();
 
-        cmaStrategy->reset_search_state();
+        _cma_strat->reset_search_state();
         if(!elitist_restart){
             float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
-            cmaStrategy->get_parameters().set_x0(-max_weight,max_weight);
+            _cma_strat->get_parameters().set_x0(-max_weight,max_weight);
         }
     }
 }
 
 void NIPES::init_next_pop(){
-    int pop_size = cmaStrategy->get_parameters().lambda();
+    int pop_size = _cma_strat->get_parameters().lambda();
 
-    dMat new_samples = cmaStrategy->ask();
+    dMat new_samples = _cma_strat->ask();
 
     int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(population[0]->get_ctrl_genome())->get_weights().size();
     int nbr_bias = std::dynamic_pointer_cast<NNParamGenome>(population[0]->get_ctrl_genome())->get_biases().size();
@@ -277,3 +284,13 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     return  dist < fTarget;
 }
 
+void NIPES::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
+    int idx = _cma_strat->get_population().size();
+    IPOPCMAStrategy::individual_t ind;
+    ind.genome = std::dynamic_pointer_cast<NNParamGenome>(population[idx]->get_ctrl_genome())->get_full_genome();
+    ind.objectives = obj;
+    ind.descriptor.resize(desc.rows());
+    for(int i = 0; i < desc.rows(); i++)
+        ind.descriptor[i] = desc(i);
+    _cma_strat->add_individual(ind);
+}
