@@ -99,6 +99,10 @@ public:
      */
     void exportRobotModel(int indNum);
     /**
+     * @brief Retrieve matrices
+     */
+    void retrieve_matrices_from_cppn();
+    /**
      * Returns the organ for the specific input organ coordinate.
      * @param input - coordinate
      * @return Organ type
@@ -121,6 +125,8 @@ public:
         nn2_cppn = nn;
     }
 
+    void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
+
     Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
     Eigen::VectorXd getOrganPosDesc() const {return indDesc.organDesc.getCartDesc();}
     const CartDesc& getCartDesc() const {return indDesc.cartDesc;}
@@ -132,6 +138,7 @@ public:
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
+    const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;}
 
 private:
     ///////////////////////
@@ -177,9 +184,9 @@ private:
                 }
             }
             // Get dimmensions
-            cartDesc.robotWidth = abs(maxX - minX);
-            cartDesc.robotDepth = abs(maxY - minY);
-            cartDesc.robotHeight = abs(maxZ - minZ);
+            cartDesc.robotWidth = fabs(maxX - minX);
+            cartDesc.robotDepth = fabs(maxY - minY);
+            cartDesc.robotHeight = fabs(maxZ - minZ);
         }
         void getOrganPositions(std::vector<Organ> organList){
             for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
@@ -188,20 +195,19 @@ private:
                     int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
                     int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
                     int matPosX, matPosY, matPosZ;
-                    matPosX = voxelPosX + mc::matrix_size / 2;
-                    matPosY = voxelPosY + mc::matrix_size / 2;
-                    matPosZ = voxelPosZ + mc::matrix_size / 2;
-
-                    if (matPosX > mc::matrix_size)
-                        matPosX = mc::matrix_size - 1;
+                    matPosX = voxelPosX + 5;
+                    matPosY = voxelPosY + 5;
+                    matPosZ = voxelPosZ - 1; // The connector is slightly up and when rounding it increases one voxel.
+                    if (matPosX > mc::real_matrix_size)
+                        matPosX = mc::real_matrix_size;
                     if (matPosX < 0)
                         matPosX = 0;
-                    if (matPosY > mc::matrix_size)
-                        matPosY = mc::matrix_size - 1;
+                    if (matPosY > mc::real_matrix_size)
+                        matPosY = mc::real_matrix_size;
                     if (matPosY < 0)
                         matPosY = 0;
-                    if (matPosZ > mc::matrix_size)
-                        matPosZ = mc::matrix_size - 1;
+                    if (matPosZ > mc::real_matrix_size)
+                        matPosZ = mc::real_matrix_size;
                     if (matPosZ < 0)
                         matPosZ = 0;
                     organDesc.organ_matrix[matPosX][matPosY][matPosZ] = it->getOrganType();
@@ -231,6 +237,8 @@ private:
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     NEAT::Substrate substrate;
+
+    std::vector<std::vector<double>> matrix_4d;
 };
 
 }//sim

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
+add_definitions(-DEIGEN3_ENABLED)
 
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
@@ -28,6 +28,7 @@ add_library(M_NIPES2 SHARED
    M_NIPES.cpp 
    cmaes_learner.cpp
    MNIPESLoggings.cpp
+   ../common/obstacleAvoidance.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES2 ARE simulatedER cmaes tbb)

@@ -11,9 +11,8 @@ MazeEnv::MazeEnv()
     name = "mazeEnv";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#target_x",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_y",new settings::Double(0.));
-    settings::defaults::parameters->emplace("#target_z",new settings::Double(0.05));
+    settings::defaults::parameters->emplace("#targetPosition",new settings::Sequence<double>({0.,0.,0.1}));
+    settings::defaults::parameters->emplace("#initPosition",new settings::Sequence<double>({0.,0.,0.1}));
     settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
     settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
@@ -39,13 +38,9 @@ void MazeEnv::init(){
         }
     }
 
-    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
+    final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
-    target_position = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-                       settings::getParameter<settings::Double>(parameters,"#target_y").value,
-                       settings::getParameter<settings::Double>(parameters,"#target_z").value};
+    target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
 
@@ -81,7 +76,7 @@ void MazeEnv::init(){
 std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     double max_dist = sqrt(2*arena_size*arena_size);
-    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
+    auto distance = [](std::vector<double> a,std::vector<double> b) -> float
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                          (a[1] - b[1])*(a[1] - b[1]) +

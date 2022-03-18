@@ -18,9 +18,9 @@ struct morphology_constants{
     static constexpr int voxel_multiplier = 22;
     static constexpr float voxel_real_size = 0.0198;//voxel_size * voxel_multiplier;
     static constexpr int matrix_size = 12; //264 / voxel_multiplier;
+    static constexpr int real_matrix_size = 11; // Polivox generates a matrix with one voxel lower.
     static constexpr float shape_scale_value = 0.0198;//voxel_real_size; // results into 23.76x23.76x23.76 cm³ - in reality is 28x28x25 cm³
-    static constexpr int voxels_number = 1728;//matrix_size*matrix_size*matrix_size;
-    static constexpr float matrix_size_m = 0.2376; //matrix_size * voxel_real_size;
+    static constexpr int voxels_number = 1331;//real_matrix_size*real_matrix_size*real_matrix_size;
     static constexpr short int empty_voxel=0;
     static constexpr short int filled_voxel=255;
 
@@ -48,6 +48,10 @@ struct CartDesc
     int casterNumber = 0;
     int jointNumber = 0;
 
+    /**
+     * @brief get the descriptor with normalized values. Mainly intended for novelty search
+     * @return
+     */
     Eigen::VectorXd getCartDesc() const{
         Eigen::VectorXd cartDesc(8);
         cartDesc(0) = robotWidth / morph_const::dimension_limit;
@@ -60,6 +64,12 @@ struct CartDesc
         cartDesc(7) = (double) casterNumber / morph_const::organ_trait_limit;
         return cartDesc;
     }
+
+    /**
+     * @brief Is the descriptor defined? i.e. Is the descriptor describing an actual body-plan?
+     * @return
+     */
+    bool defined() const{return voxelNumber >= 24;}
 
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
@@ -75,15 +85,27 @@ struct CartDesc
     }
 };
 
+inline bool operator ==(const CartDesc& cd1, const CartDesc& cd2){
+    return cd1.casterNumber == cd2.casterNumber &&
+            cd1.wheelNumber == cd2.wheelNumber &&
+            cd1.jointNumber == cd2.jointNumber &&
+            cd1.sensorNumber == cd2.sensorNumber &&
+            cd1.voxelNumber == cd2.voxelNumber &&
+            fabs(cd1.robotDepth - cd2.robotDepth) <= 1e-3 &&
+            fabs(cd1.robotHeight - cd2.robotHeight) <= 1e-3 &&
+            fabs(cd1.robotWidth - cd2.robotWidth) <= 1e-3;
+}
+
+
 struct OrganPositionDesc
 {
-    int organ_matrix[morph_const::matrix_size][morph_const::matrix_size][morph_const::matrix_size] = {{{0}}};
+    int organ_matrix[morph_const::real_matrix_size][morph_const::real_matrix_size][morph_const::real_matrix_size] = {{{0}}};
     Eigen::VectorXd getCartDesc() const{
-        Eigen::VectorXd organ_position_descriptor(morph_const::matrix_size*morph_const::matrix_size*morph_const::matrix_size);
+        Eigen::VectorXd organ_position_descriptor((morph_const::real_matrix_size)*(morph_const::real_matrix_size)*(morph_const::real_matrix_size));
         int counter = 0;
-        for(int k = 0; k < morph_const::matrix_size; k++){
-            for(int j = 0; j < morph_const::matrix_size; j++) {
-                for(int i = 0; i < morph_const::matrix_size; i++) {
+        for(int k = 0; k < morph_const::real_matrix_size; k++){
+            for(int j = 0; j < morph_const::real_matrix_size; j++) {
+                for(int i = 0; i < morph_const::real_matrix_size; i++) {
                     organ_position_descriptor(counter) = organ_matrix[i][j][k];
                     counter++;
                 }

@@ -26,8 +26,12 @@ void Morphology_CPPNMatrix::create()
     PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     // Decoding CPPN
     GenomeDecoder genomeDecoder;
-    if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-    else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value){
+        if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+    }
+    else
+        genomeDecoder.genomeDecoder(matrix_4d,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
 
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
@@ -146,8 +150,16 @@ void Morphology_CPPNMatrix::create()
         }
 
         if(convexDecompositionSuccess){
+            int joints_number = 0;
             // Create organs
             for(auto & i : organList){
+                // Limit number of legs to 4
+                if(i.getOrganType() == 3 && joints_number == 4){
+                    i.set_organ_removed(true);
+                    i.set_organ_checked(true);
+                    continue;
+                }
+
                 if(i.getOrganType() != 0)
                     setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
@@ -162,7 +174,10 @@ void Morphology_CPPNMatrix::create()
                         i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
                     i.repressOrgan();
                 }
-                /// Cap the number of organs.
+                // Count number of good organs.
+                if(!i.isOrganRemoved() && i.isOrganChecked() && i.getOrganType() == 3)
+                    joints_number++;
+                // Cap the number of all organs to 8.
                 short int goodOrganCounter = 0;
                 for(auto & j : organList){
                     if(!j.isOrganRemoved() && j.isOrganChecked())
@@ -304,11 +319,8 @@ void Morphology_CPPNMatrix::create()
             }
         }
     }
-    // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
-        exportRobotModel(loadInd);
-    }
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value)
+        retrieve_matrices_from_cppn();
     // Get info from body plan for body plan descriptors or logging.
     if(indVerResult || convexDecompositionSuccess){
         indDesc.getRobotDimensions(organList);
@@ -316,9 +328,14 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
     }
+    blueprint.createBlueprint(organList);
     destroyGripper();
     destroy_physical_connectors();
-    blueprint.createBlueprint(organList);
+    // Export model
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
+        exportRobotModel(loadInd);
+    }
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -443,16 +460,29 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
     input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
     input[2] -= mc::matrix_size/2;
     input[3] = static_cast<double>(sqrt(pow(input[0],2)+pow(input[1],2)+pow(input[2],2)));
-    if(use_neat){
-        // Set inputs to NN
-        cppn.Input(input);
-        // Activate NN
-        cppn.Activate();
-        output = cppn.Output();
-    }else{
-        nn2_cppn.step(input);
-        output = nn2_cppn.outf();
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value) {
+        if (use_neat) {
+            // Set inputs to NN
+            cppn.Input(input);
+            // Activate NN
+            cppn.Activate();
+            output = cppn.Output();
+        } else {
+            nn2_cppn.step(input);
+            output = nn2_cppn.outf();
+        }
+    } else{
+        int pos_x = input.at(0) + 5;
+        int pos_y = input.at(1) + 5;
+        int pos_z = input.at(2) + 5;
+        // If no thereshold it crashes for joints because the coordinates is out boundaries
+        if(pos_x > 10) pos_x = 10; if(pos_y > 10) pos_y = 10; if(pos_z > 10) pos_z = 10;
+        int pos_in_vector = pos_x * 121 + pos_y * 11 + pos_z;
+        output.push_back(matrix_4d.at(0).at(pos_in_vector));
+
     }
+    for(const auto& o: output)
+        assert(!std::isnan(o));
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
@@ -535,19 +565,57 @@ void Morphology_CPPNMatrix::destroy_physical_connectors()
     }
 }
 
+void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
+{
+    std::vector<double> input{0,0,0,0};
+    std::vector<double> output;
+    matrix_4d.resize(6);
+    for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1){
+        for(int j = -mc::matrix_size/2 + 1; j < mc::matrix_size/2; j += 1){
+            for(int k = -mc::matrix_size/2 + 1; k < mc::matrix_size/2; k += 1){
+                input[0] = static_cast<double>(i);
+                input[1] = static_cast<double>(j);
+                input[2] = static_cast<double>(k);
+                input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
+                nn2_cppn.step(input);
+                output = nn2_cppn.outf();
+                matrix_4d.at(0).push_back(output.at(0));
+                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(2).push_back(output.at(2));
+                matrix_4d.at(3).push_back(output.at(3));
+                matrix_4d.at(4).push_back(output.at(4));
+                matrix_4d.at(5).push_back(output.at(5));
+            }
+        }
+    }
+}
+
 int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 {
     int organ_type = -1;
     std::vector<double> output;
-    if(use_neat){
-        // Set inputs to NN
-        cppn.Input(input);
-        // Activate NN
-        cppn.Activate();
-        output = cppn.Output();
-    }else{
-        nn2_cppn.step(input);
-        output = nn2_cppn.outf();
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value) {
+        if (use_neat) {
+            // Set inputs to NN
+            cppn.Input(input);
+            // Activate NN
+            cppn.Activate();
+            output = cppn.Output();
+        } else {
+            nn2_cppn.step(input);
+            output = nn2_cppn.outf();
+        }
+    } else{
+        int pos_x = input.at(0) + 5;
+        int pos_y = input.at(1) + 5;
+        int pos_z = input.at(2) + 5;
+        int pos_in_vector = pos_x * 121 + pos_y * 11 + pos_z;
+        output.push_back(0); output.push_back(0);
+        output.push_back(matrix_4d.at(2).at(pos_in_vector));
+        output.push_back(matrix_4d.at(3).at(pos_in_vector));
+        output.push_back(matrix_4d.at(4).at(pos_in_vector));
+        output.push_back(matrix_4d.at(5).at(pos_in_vector));
+
     }
     // Is there an organ?
     organ_type = -1;

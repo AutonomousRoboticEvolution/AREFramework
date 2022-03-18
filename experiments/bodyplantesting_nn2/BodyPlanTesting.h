@@ -20,6 +20,7 @@ public:
     void init() override;
     void initPopulation();
     void epoch() override;
+    void init_next_pop() override;
     bool is_finish() override;
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     bool update(const Environment::Ptr&);
@@ -37,6 +38,7 @@ private:
 protected:
     NEAT::RNG rng;
     int currentIndIndex;
+    int repetition =0;
 
 };
 

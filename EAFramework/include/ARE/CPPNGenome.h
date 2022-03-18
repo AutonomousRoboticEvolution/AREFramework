@@ -57,8 +57,8 @@ public:
         arch & morpho_desc;
     }
 
-    void set_morpho_desc(const CartDesc& md){morpho_desc = md;}
-    const CartDesc &get_morpho_desc(){return morpho_desc;}
+    void set_morph_desc(const CartDesc& md){morpho_desc = md;}
+    const CartDesc &get_morph_desc() const{return morpho_desc;}
 
     int get_nb_neurons() const {return neat_genome.NumNeurons();}
     int get_nb_connections() const {return neat_genome.NumLinks();}

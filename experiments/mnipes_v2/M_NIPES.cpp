@@ -44,7 +44,7 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
     nn2_cppn_t cppn = gene_pool[best_idx].morph_genome.get_cppn();
     cppn.mutate();
     NN2CPPNGenome new_gene(cppn);
-    new_gene.set_parents_ids({gene_pool[best_idx].morph_genome.id()});
+    new_gene.set_parents_ids({gene_pool[best_idx].morph_genome.id(),-1});
     return new_gene;
 };
 
@@ -53,10 +53,12 @@ void M_NIPESIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
-    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+    if(ctrlGenome->get_type() != "empty_genome")
+       assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    
+		      
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     setMorphDesc();
     setManRes();
@@ -127,10 +129,16 @@ void M_NIPESIndividual::setManRes()
 
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    Eigen::VectorXd desc(3);
-    desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
-    return desc;
+    if(descriptor_type == FINAL_POSITION){
+        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        Eigen::VectorXd desc(3);
+        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
+        return desc;
+    }else if(descriptor_type == VISITED_ZONES){
+        Eigen::MatrixXd vz = visited_zones.cast<double>();
+        Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
+        return desc;
+    }
 }
 
 std::string M_NIPESIndividual::to_string()
@@ -204,6 +212,7 @@ void M_NIPES::init_morph_pop(){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
         morphgenome->random();
+
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
@@ -241,13 +250,10 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     }
 
     bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
-    if(drop_eval) {
-        nbr_dropped_eval++;
-        std::dynamic_pointer_cast<CMAESLearner>(population[currentIndIndex]->get_learner())->set_nbr_dropped_eval(nbr_dropped_eval);
-    }
-    std::vector<double> target = {settings::getParameter<settings::Double>(parameters,"#target_x").value,
-                                  settings::getParameter<settings::Double>(parameters,"#target_y").value,
-                                  settings::getParameter<settings::Double>(parameters,"#target_z").value};
+    if(drop_eval)
+        std::dynamic_pointer_cast<M_NIPESIndividual>(population[corr_indexes[currentIndIndex]])->incr_nbr_dropped_eval();
+
+    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 
     float tPos[3];
     tPos[0] = static_cast<float>(target[0]);
@@ -293,6 +299,9 @@ void M_NIPES::init_next_pop(){
                 init_new_ctrl_pop(learner);
         }
     }
+    for(int i = 0; i < population.size(); i++)
+        corr_indexes.push_back(i);
+
 }
 
 bool M_NIPES::update(const Environment::Ptr &env){
@@ -305,13 +314,17 @@ bool M_NIPES::update(const Environment::Ptr &env){
     Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance"){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+        }
     }
-    //If one the client or just sequential mode
+    //If on the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
         learner_t &learner = find_learner(morph_id);
-
+        learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
             learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
             int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
@@ -355,21 +368,32 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
+                new_gene.trajectory = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectory();
+                new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
 
-                //remove learner from learning pool and remove oldest gene
-                remove_oldest_gene();
-                increment_age();
-                //-
-
-                //Perform selection and generate a new morph gene.
-                if(gene_pool.size() >= pop_size){
+		//level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+                int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
+                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
+                if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
+                    warming_up = false;
+                    increment_age();
+                    reproduction();
+                    assert(learning_pool.size() == pop_size);
+                }
+                //Perform survival and selection and generate a new morph gene.
+                else if(gene_pool.size() == pop_size+nbr_offsprings){
+                    //remove oldest gene and increase age
+                    while(gene_pool.size() > pop_size)
+                        remove_oldest_gene();
+                    increment_age();
+                    //-
                     assert(gene_pool.size() == pop_size);
                     reproduction();
                     assert(learning_pool.size() == pop_size);
                 }
-
+                //-
             }else if(is_ctrl_next_gen){ //if the NIPES goes for a next gen
                 init_new_ctrl_pop(learner);
             }
@@ -387,7 +411,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
-    while(learning_pool.size() <= pop_size){ //create offspring until refilling entirely the learning pool
+    while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
         std::vector<int> random_indexes;
         random_indexes.push_back(randomNum->randInt(0,gene_pool.size()-1));
@@ -461,17 +485,26 @@ void M_NIPES::remove_oldest_gene(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     if(gene_pool.size() <= pop_size)
         return;
-    int i = 1, oldest_idx = 0, oldest_age = gene_pool[0].age;
-    for(; i < gene_pool.size(); i++){
-        if(oldest_age < gene_pool[i].age){
-            oldest_idx = i;
-            oldest_age = gene_pool[i].age;
-        }
+    //first gather all the oldest genes
+    std::vector<int> oldest_gene_idx;
+    
+    for(int i = 0; i < gene_pool.size(); i++)
+        if(gene_pool[i].age == highest_age)
+            oldest_gene_idx.push_back(i);
+    while(oldest_gene_idx.empty()){//if no more genomes of the highest age remain decrement it and search again.
+	highest_age--;
+        for(int i = 0; i < gene_pool.size(); i++)
+            if(gene_pool[i].age == highest_age)
+               oldest_gene_idx.push_back(i);
     }
-    gene_pool.erase(gene_pool.begin() + oldest_age);
+    //-
+
+    //then erase one selected randomly among the oldest.
+    gene_pool.erase(gene_pool.begin() + oldest_gene_idx[randomNum->randInt(0,oldest_gene_idx.size()-1)]);
 }
 
 void M_NIPES::increment_age(){
+    highest_age++;
     for(auto& gene: gene_pool)
         gene.age++;
 }

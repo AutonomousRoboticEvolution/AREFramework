@@ -45,3 +45,18 @@ void LearnerStateLog::saveLog(EA::Ptr &ea)
     ifs.close();
 }
 
+void BestControllerLog::saveLog(EA::Ptr &ea)
+{
+    int id = static_cast<MNIPES*>(ea.get())->get_currentID();
+    if(!static_cast<MNIPES*>(ea.get())->get_learners().at(id).is_learning_finish())
+        return;
+    std::stringstream sstr;
+    sstr << "ctrl_genome_" << id;
+    std::ofstream ifs;
+    if(!openOLogFile(ifs,sstr.str())){
+        std::cerr << "Unable to open file : " << sstr.str() << std::endl;
+        return;
+    }
+    ifs << static_cast<MNIPES*>(ea.get())->get_best_current_ctrl_genome().to_string();
+    ifs.close();
+}

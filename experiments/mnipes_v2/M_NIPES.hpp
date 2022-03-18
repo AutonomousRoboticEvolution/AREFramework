@@ -8,6 +8,7 @@
 #include "ARE/nn2/NN2Control.hpp"
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
+#include "obstacleAvoidance.hpp"
 
 //TO DO find a way to flush the population
 
@@ -30,13 +31,17 @@ typedef struct genome_t{
         morph_genome(g.morph_genome),
         ctrl_genome(g.ctrl_genome),
         objectives(g.objectives),
-        age(g.age){}
+        age(g.age),
+        trajectory(g.trajectory),
+        behavioral_descriptor(g.behavioral_descriptor){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
     int age;
+    std::vector<waypoint> trajectory;
+    Eigen::VectorXd behavioral_descriptor;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;
@@ -60,6 +65,11 @@ typedef enum FitnessType{
     DIVERSITY = 3
 }FitnessType;
 
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
+
 class M_NIPESIndividual : public Individual
 {
 public:
@@ -77,7 +87,8 @@ public:
         trajectory(ind.trajectory),
         energy_cost(ind.energy_cost),
         sim_time(ind.sim_time),
-        controller_archive(ind.controller_archive)
+        controller_archive(ind.controller_archive),
+        nbr_dropped_eval(ind.nbr_dropped_eval)
     {}
 
     Individual::Ptr clone() override {
@@ -116,6 +127,7 @@ public:
 //        arch & sim_time;
         arch & controller_archive;
         arch & morphDesc;
+        arch & nbr_dropped_eval;
     }
 
     std::string to_string() override;
@@ -128,6 +140,13 @@ public:
 
     bool is_actuated(){return !no_actuation;}
     bool has_sensor(){return !no_sensors;}
+
+    void set_nbr_dropped_eval(int nde){nbr_dropped_eval = nde;}
+    void incr_nbr_dropped_eval(){nbr_dropped_eval++;}
+    int get_nbr_dropped_eval(){return nbr_dropped_eval;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+
 
 private:
     void createMorphology() override;
@@ -148,8 +167,12 @@ private:
     std::vector<waypoint> trajectory;
     double sim_time;
     std::vector<double> final_position;
+    int nbr_dropped_eval = 0;
 
     ControllerArchive controller_archive;
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 
@@ -164,11 +187,11 @@ public:
     M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
 
     void init() override;
-    void epoch() override{
-        population.clear();
-        if(learning_pool.empty())
-            reproduction();
-    }
+//    void epoch() override{
+//        population.clear();
+//        if(learning_pool.empty())
+//            reproduction();
+//    }
     void init_morph_pop();
     void init_next_pop() override;
     bool update(const Environment::Ptr &) override;
@@ -190,6 +213,7 @@ public:
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
     const ControllerArchive& get_controller_archive_obj() const {return controller_archive;}
 
+    size_t get_pop_size() const override {return corr_indexes.size();}
 
     genome_t &find_gene(int id);
     learner_t &find_learner(int id);
@@ -213,10 +237,12 @@ private:
     std::vector<genome_t> gene_pool;
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
+    int highest_age = 0;
 
     float current_ind_past_pos[3];
     int move_counter = 0;
-    int nbr_dropped_eval = 0;
+
+    bool warming_up = true; //whether the algorithm is initialisation phase.
 };
 
 

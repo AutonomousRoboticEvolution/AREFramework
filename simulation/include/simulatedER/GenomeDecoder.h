@@ -51,11 +51,29 @@ public:
                        std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
     /**
+     * @brief Runs all the steps to decode the genome.
+     * @param matrix_4d - Body plan genome
+     * @param areMatrix - All regions for each organ.
+     * @param skeletonMatrix - Main skeleton matrix.
+     * @param skeletonSurfaceCoord - Voxels on the surface of the skeleton.
+     * @param numSkeletonVoxels - Keeps track of the number of voxels (for descriptor purposes).
+     */
+    void genomeDecoder(std::vector<std::vector<double>> &matrix_4d, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
+    /**
      * @brief Reads the genome and creates the regions for each organ.
      * @param areMatrix - All regions for each organ.
      * @param cppn - Body plan genome
      */
     static void decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::NeuralNetwork &cppn);
+
+    /**
+     * @brief Reads the cppn from nn2 and creates the regions for each organ.
+     * @param areMatrix - All regions for each organ.
+     * @param matrix_4d - Body plan genome
+     */
+    static void decodeGenome(PolyVox::RawVolume<AREVoxel> &areMatrix, std::vector<std::vector<double>> &matrix_4d);
 
     /**
      * @brief Reads the cppn from nn2 and creates the regions for each organ.
