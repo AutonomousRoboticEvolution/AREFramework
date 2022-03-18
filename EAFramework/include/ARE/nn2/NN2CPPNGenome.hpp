@@ -171,7 +171,7 @@ public:
 
     void set_randNum(const misc::RandNum::Ptr& rn) override{
         randomNum = rn;
-        nn2::rgen_t::gen.seed(randomNum->getSeed());
+        //nn2::rgen_t::gen.seed(randomNum->getSeed());
     }
 
 private:
