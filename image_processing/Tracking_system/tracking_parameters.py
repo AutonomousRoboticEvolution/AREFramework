@@ -30,8 +30,8 @@ with open('location.txt') as f:
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
-    # pipe = "http://192.168.2.248/img/video.mjpeg"
-    pipe =0
+    pipe = "http://192.168.2.248/img/video.mjpeg"
+    #pipe =0
 
     #mask filter parameters
     brainMin = (0,157,78)
