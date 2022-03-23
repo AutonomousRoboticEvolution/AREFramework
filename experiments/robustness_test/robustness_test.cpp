@@ -143,7 +143,6 @@ void RobustnessTest::setObjectives(size_t indIdx, const std::vector<double> &obj
 }
 
 bool RobustnessTest::update(const Environment::Ptr & env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     if(simulator_side){
