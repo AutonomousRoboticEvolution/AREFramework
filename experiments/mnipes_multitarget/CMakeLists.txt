@@ -28,7 +28,7 @@ add_library(MNIPESMulti SHARED
    M_NIPES.cpp 
    cmaes_learner.cpp
    MNIPESLoggings.cpp
-   multiTargetMaze.cpp
+   ../common/multiTargetMaze.cpp
     )
 target_include_directories(MNIPESMulti PUBLIC ${INCLUDES})
 target_link_libraries(MNIPESMulti ARE simulatedER cmaes tbb)

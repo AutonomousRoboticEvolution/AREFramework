@@ -126,12 +126,6 @@ public:
 
     int get_numberEvaluation() const {return numberEvaluation;}
 
-    std::chrono::nanoseconds getEvalCompTime() const {
-        return std::chrono::duration_cast<std::chrono::nanoseconds>
-               (endEvalTime - startEvalTime);
-    }
-    void set_startEvalTime(const hr_clock::time_point& t){startEvalTime = t;}
-    void set_endEvalTime(const hr_clock::time_point& t){endEvalTime = t;}
     void set_simulator_side(bool ss){simulator_side = ss;}
 
     virtual const Genome::Ptr get_next_controller_genome(int id){} //method for the physical side
@@ -155,9 +149,6 @@ protected:
     int numberEvaluation = 0;
     bool simulator_side = true;
     int currentIndIndex = 0;
-
-    hr_clock::time_point startEvalTime;
-    hr_clock::time_point endEvalTime;
 };
 
 }//are

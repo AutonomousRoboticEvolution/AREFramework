@@ -39,7 +39,6 @@ public:
 
     void build_tiled_floor(std::vector<int> &tiles_handles);
 
-    void load_target_positions(const std::string &filename);
     int get_number_of_targets(){return target_positions.size();}
     const std::vector<double> &get_current_target(){return target_positions[current_target];}
 

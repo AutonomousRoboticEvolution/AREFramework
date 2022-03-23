@@ -76,7 +76,6 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
 {
-
     const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream))

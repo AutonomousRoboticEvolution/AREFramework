@@ -9,6 +9,7 @@
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
+#include "multiTargetMaze.hpp"
 
 //TO DO find a way to flush the population
 
@@ -146,8 +147,10 @@ public:
     int get_nbr_dropped_eval(){return nbr_dropped_eval;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
-
-
+    int get_number_times_evaluated(){return rewards.size();}
+    void reset_rewards(){rewards.clear();}
+    void add_reward(double reward){rewards.push_back(reward);}
+    void compute_fitness();
 private:
     void createMorphology() override;
     void createController() override;
@@ -173,6 +176,7 @@ private:
 
     Eigen::MatrixXi visited_zones;
     DescriptorType descriptor_type = FINAL_POSITION;
+    std::vector<double> rewards;
 };
 
 
@@ -205,6 +209,7 @@ public:
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         currentIndIndex = indIndex;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         population[corr_indexes[indIndex]]->setObjectives(objectives);
     }
 

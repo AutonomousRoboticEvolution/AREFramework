@@ -14,6 +14,9 @@ extern "C" are::Environment::Ptr environmentFactory
     }
     else if(env_type == 1)
         env.reset(new are::sim::ObstacleAvoidance(param));
+    else if(env_type == 2)
+        env.reset(new are::sim::MultiTargetMaze(param));
+
     return env;
 }
 

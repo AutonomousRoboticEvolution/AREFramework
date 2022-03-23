@@ -210,7 +210,6 @@ void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
 
 
 bool NIPES::update(const Environment::Ptr & env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
     reevaluated++;
 

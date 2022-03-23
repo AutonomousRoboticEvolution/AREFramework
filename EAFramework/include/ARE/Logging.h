@@ -56,13 +56,6 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
-class EvalTimeLog : public Logging
-{
-public:
-    EvalTimeLog(const std::string &file) : Logging(file,false){}
-    void saveLog(EA::Ptr & ea);
-    void loadLog(const std::string& logFile){}
-};
 
 template <class ind_t>
 class BehavDescLog : public Logging
