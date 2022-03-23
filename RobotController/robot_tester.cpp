@@ -5,11 +5,47 @@
 #include "LedDriver.hpp"
 #include "MotorOrgan.hpp"
 #include "SensorOrgan.hpp"
+#include "JointOrgan.hpp"
 #include <iostream>
 
 #include <wiringPi.h> //for timing functions
 
 
+void jointTest(){
+    JointOrgan j1(0x0B);
+    JointOrgan j2(0x0C);
+
+    if (j1.testConnection()){std::cout<<"Joint 1 good"<<std::endl;} else {std::cout<<"Joint 1 bad!"<<std::endl;}
+    if (j2.testConnection()){std::cout<<"Joint 2 good"<<std::endl;} else {std::cout<<"Joint 2 bad!"<<std::endl;}
+
+#define period 5000 // milliseconds
+#define number_of_periods 5
+#define amplitude1 0.8 // 0-1
+#define amplitude2 0.6 // 0-1
+#define phase_offset period/4 // milliseconds
+#define pi 3.14159265359
+#define timestep 10 // milliseconds
+#define N_timesteps (number_of_periods*period)/timestep
+
+    unsigned int start_time = millis();
+
+    j1.setCurrentLimit(33);
+    j2.setCurrentLimit(33);
+
+    // go to start positions
+    j1.setTargetAngleNormalised(0);
+    j2.setTargetAngleNormalised( 2*pi*phase_offset/period);
+
+    delay(2); // allow time to move to start positions
+
+    for (unsigned int i_time=0; i_time<N_timesteps; i_time++){
+        while(millis()< start_time + i_time*timestep){}
+        //std::cout<< "time: "<< float(i_time*timestep)/1000.0 <<"s" <<std::endl;
+        j1.setTargetAngleNormalised(amplitude1*sin(2*pi*(i_time*timestep)/period));
+        j2.setTargetAngleNormalised(amplitude2*sin( 2*pi*((i_time*timestep)+phase_offset)/period));
+    }
+
+}
 
 void cameraTest(){
     #define basic false
@@ -78,6 +114,10 @@ int main(int argc, char** argv){
     ledDriver.flash(BLUE, 1000000 ,20);
 
     /*** camera blur test ***/
-    cameraTest();
+    //cameraTest();
+
+    /*** joint test ***/
+    jointTest();
+
 
 }
