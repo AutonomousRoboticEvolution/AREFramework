@@ -79,20 +79,25 @@ bool MNIPES::update(const Environment::Ptr &env){
         //Update Controller Archive
         std::vector<double> weights;
         std::vector<double> biases;
-        NNParamGenome best_ctrl_gen;
+        int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+        int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
         auto &best_controller = learner.get_best_solution();
         int nbr_weights = learner.get_nbr_weights();
         weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
         biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
-        best_ctrl_gen.set_weights(weights);
-        best_ctrl_gen.set_biases(biases);
+        best_current_ctrl_genome.set_weights(weights);
+        best_current_ctrl_genome.set_biases(biases);
+        best_current_ctrl_genome.set_nbr_input(learner.get_nbr_inputs());
+        best_current_ctrl_genome.set_nbr_output(learner.get_nbr_outputs());
+        best_current_ctrl_genome.set_nbr_hidden(nb_hidden);
+        best_current_ctrl_genome.set_nn_type(nn_type);
         //update the archive
         if(use_ctrl_arch){
             std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
             std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
             int wheels,joints,sensors;
             phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
-            ctrl_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,wheels,joints,sensors);
+            ctrl_archive.update(std::make_shared<NNParamGenome>(best_current_ctrl_genome),1-best_controller.first,wheels,joints,sensors);
         }
         //-
     }
