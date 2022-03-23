@@ -208,8 +208,9 @@ public:
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
+        if(simulator_side)
+            std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
-        std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         population[corr_indexes[indIndex]]->setObjectives(objectives);
     }
 
@@ -248,6 +249,7 @@ private:
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
+    bool is_multi_target = false;
 };
 
 
