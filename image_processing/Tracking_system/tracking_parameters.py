@@ -20,7 +20,7 @@ aruco_parameters = aruco.DetectorParameters_create()
 
 zmq_port_number= "5557"
 
-location = "york"
+location = "napier"
 
 #location specific parameters
 if location == "bristol":
@@ -41,10 +41,21 @@ if location == "bristol":
 elif location == "york":
     pipe = 0
 
-    brainMin = (171,120,75)
+    brainMin = (0,86,142)
     brainMax = (179,255,255)
     
     centre_reference = (340,300) #not calibrated
     pixel_scale = 100 #nc
 
     crop_rectangle = [-1]
+elif location == "napier":
+    pipe = "tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink"
+
+    brainMin = (169,100,165)
+    brainMax = (179,255,255)
+    
+    centre_reference = (600,545)
+    pixel_scale = 500 #nc
+
+    crop_rectangle = [-1]
+
