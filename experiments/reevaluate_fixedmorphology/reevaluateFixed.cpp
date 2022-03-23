@@ -77,7 +77,6 @@ void ReevaluateFixed::setObjectives(size_t indIdx, const std::vector<double> &ob
 }
 
 bool ReevaluateFixed::update(const Environment::Ptr & env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     if(simulator_side){

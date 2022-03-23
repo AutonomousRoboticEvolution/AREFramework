@@ -107,7 +107,7 @@ int main(int argc, char* argv[])
     }
 
     //Main Loop
-    while (client->execute()) usleep(10000);
+    while (client->execute()) usleep(5000);
 
     extApi_sleepMs(5000);
     client->quitSimulation();

@@ -132,7 +132,6 @@ void BasicEA::setObjectives(size_t indIdx, const std::vector<double> &objectives
 }
 
 bool BasicEA::update(const Environment::Ptr & env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     if(simulator_side){

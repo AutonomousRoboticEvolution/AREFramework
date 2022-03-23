@@ -27,10 +27,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::FitnessLog::Ptr fitlog(new are::FitnessLog(fit_log_file));
     logs.push_back(fitlog);
 
-    std::string eval_time_log_file = are::settings::getParameter<are::settings::String>(param,"#evalTimeFile").value;
-    are::EvalTimeLog::Ptr etlog(new are::EvalTimeLog(eval_time_log_file));
-    logs.push_back(etlog);
-
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;
     are::BehavDescLog<are::sim::NN2Individual>::Ptr bdlog(new are::BehavDescLog<are::sim::NN2Individual>(behav_desc_log_file));
     logs.push_back(bdlog);

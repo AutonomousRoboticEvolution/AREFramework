@@ -1,10 +1,10 @@
 #experimentName,string,nipes
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libNIPES.so
+#expPluginName,string,/home/edgar/vrep/lib/libNIPES.so
 #envType,int,0
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#robotPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/robots/ARE-legs.ttm
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/ebb505/ARE_Project/are-logs
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#robotPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/robots/ARE-legs.ttm
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/edgar/are-logs
 
 #verbose,bool,1
 #instanceType,int,0

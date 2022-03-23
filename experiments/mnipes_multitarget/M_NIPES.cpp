@@ -386,7 +386,6 @@ void M_NIPES::init_next_pop(){
 }
 
 bool M_NIPES::update(const Environment::Ptr& env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     Individual::Ptr ind = population[currentIndIndex];
