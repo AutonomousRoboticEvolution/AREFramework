@@ -33,7 +33,6 @@ void RealEnvironment::init(){
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
-
     if(env_type == 0)
         return fit_targeted_locomotion();
     else if(env_type == 1)
@@ -91,6 +90,9 @@ void RealEnvironment::update_info(double time){
 
     bool robot_seen=false;
     bool barrel_seen=false;
+
+    if(time == 0)
+        trajectory.clear();
 
     // update position of robot
     std::string robot_position_string;

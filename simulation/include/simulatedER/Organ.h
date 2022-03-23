@@ -27,7 +27,7 @@ private:
     int organHandle;
     int organType;
     int connectorHandle;
-    int graphicConnectorHandle;
+    int physics_connector_handle;
     std::vector<float> connectorOri;
     bool organRemoved;
     bool organChecked;
@@ -48,12 +48,12 @@ public:
 
     Organ(int oT, std::vector<float> oP, std::vector<float> oO, const are::settings::ParametersMapPtr &param){
         organType = oT;
-        organHandle = -1; connectorHandle = -1; graphicConnectorHandle = -1;
+        organHandle = -1; connectorHandle = -1; physics_connector_handle = -1;
         organPos = oP;
         organOri = oO;
         connectorPos.clear();  connectorOri.clear();
         organInsideSkeleton = false; organColliding = false;
-        organGripperAccess = true; organRemoved = false; organChecked = false;
+        organGripperAccess = false; organRemoved = false; organChecked = false;
         objectHandles.clear();
         parameters = param;
     }
@@ -64,9 +64,8 @@ public:
     void createOrgan(int skeletonHandle);
     /**
      * @brief Creates the male connect just for visualization.
-     * @param skeletonHandle - parent skeleton
      */
-    void createMaleConnector(int skeletonHandle);
+    void createMaleConnector();
     /**
      * @brief This method applies all the manufacturability tests.
      * @param skeletonMatrix - Skeleton of the main body
@@ -101,8 +100,11 @@ public:
     /// Getters and setters
     int getOrganHandle() const {return organHandle;}
     int getOrganType() const {return organType;}
+    int get_graphical_connector_handle() const {return physics_connector_handle;}
     bool isOrganRemoved() const {return organRemoved;}
     bool isOrganChecked() const {return organChecked;}
+    void set_organ_removed(bool oR) {organRemoved = oR;}
+    void set_organ_checked(bool oC) {organChecked = oC;}
 };
 
 }//sim

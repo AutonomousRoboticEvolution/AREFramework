@@ -104,6 +104,8 @@ protected:
     std::vector<Eigen::VectorXd> _novelty_archive;
     int nbr_dropped_eval = 0;
     int current_nbr_ind = 0;
+    bool new_population_available = true;
+    
 
     bool initialized = false;
 };

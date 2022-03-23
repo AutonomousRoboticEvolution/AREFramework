@@ -41,6 +41,8 @@ struct cppn_params{
         static constexpr nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
         static constexpr float eta_m = 15.f;
         static constexpr float eta_c = 15.f;
+        static constexpr float min = -1;
+        static constexpr float max = 1;
     };
 };
 
@@ -65,7 +67,7 @@ public:
     typedef std::shared_ptr<const NN2CPPNGenome> ConstPtr;
 
     NN2CPPNGenome() : Genome(){
-        _id = static_id++;
+//        _id = static_id++;
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
         parents_ids= std::vector<int>(2,-1);
@@ -147,6 +149,8 @@ public:
         arch & cppn;
         arch & morph_desc;
         arch & parents_ids;
+        arch & matrix_4d;
+        arch & generation;
     }
 
     const CartDesc& get_morph_desc() const {return morph_desc;}
@@ -156,6 +160,8 @@ public:
     void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
     void set_cppn(const nn2_cppn_t &c){cppn = c;}
     const nn2_cppn_t& get_cppn() const {return cppn;}
+    void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
+    const std::vector<std::vector<double>>& get_matrix_4d(){return matrix_4d;}
 
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
@@ -165,7 +171,7 @@ public:
 
     void set_randNum(const misc::RandNum::Ptr& rn) override{
         randomNum = rn;
-        nn2::rgen_t::gen.seed(randomNum->getSeed());
+        //nn2::rgen_t::gen.seed(randomNum->getSeed());
     }
 
 private:
@@ -173,6 +179,7 @@ private:
     nn2_cppn_t cppn;
     CartDesc morph_desc;
     int generation;
+    std::vector<std::vector<double>> matrix_4d;
 };
 
 namespace nn2_cppn {

@@ -36,6 +36,7 @@ private:
 protected:
     NEAT::RNG rng;
     int currentIndIndex;
+    int repetition = 0;
 
 };
 

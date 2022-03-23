@@ -11,11 +11,16 @@ std::vector<double> Morphology::update(){
 }
 
 void Morphology::command(const std::vector<double> &ctrl_com){
+    assert(ctrl_com.size() == wheelHandles.size() + jointHandles.size());
     if(ctrl_com.empty())
         return;
+    
+        
     double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
     energy_cost = 0;
 
+
+    
     if(!wheelHandles.empty()){
         //Wheel Commands
         std::vector<double> wheel_com;

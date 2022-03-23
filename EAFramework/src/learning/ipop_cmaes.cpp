@@ -200,3 +200,47 @@ double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
     }
     return bf;
 }
+
+std::string IPOPCMAStrategy::to_string(){
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    oarch.register_type<libcmaes::RankedCandidate>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void IPOPCMAStrategy::from_string(const std::string & str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    iarch.register_type<libcmaes::RankedCandidate>();
+    iarch >> *this;
+}
+
+void IPOPCMAStrategy::from_file(const std::string &filename){
+    std::ifstream ifs(filename);
+    if(!ifs){
+        std::cerr << "unable to open : " << filename << std::endl;
+        return;
+    }
+    boost::archive::text_iarchive iarch(ifs);
+    iarch.register_type<libcmaes::CMAParameters<geno_pheno_t>>();
+    iarch.register_type<libcmaes::RankedCandidate>();
+    iarch >> *this;
+    ifs.close();
+}
+
+std::string IPOPCMAStrategy::print_info(){
+    std::stringstream sstr;
+    sstr << "INFO - CMA-ES" <<
+            " / dim = " << _parameters.dim() <<
+            " / lambda = " << _parameters.lambda() <<
+            " / sigma0 = " << _solutions.sigma() <<
+            " / novelty_ratio = " << novelty_ratio;
+
+    return sstr.str();
+}
+
+

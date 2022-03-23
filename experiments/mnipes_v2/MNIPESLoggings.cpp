@@ -22,6 +22,18 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
     mofstr.close();
     //-
 
+    //Log descriptor
+    std::ofstream mdofs;
+    if(!openOLogFile(mdofs,"/morph_descriptors.csv"))
+        return;
+    mdofs << genome.morph_genome.id() << ",";
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_morph_desc().getCartDesc();
+    for(int j = 0; j < morphDesc.size(); j++){
+        mdofs << morphDesc(j) << ",";
+    }
+    mdofs << std::endl;
+    mdofs.close();
+
     //Log the ctrl genome
     if(!genome.ctrl_genome.get_weights().empty()){
         std::stringstream ctrl_filepath;
@@ -29,6 +41,23 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         std::ofstream cofstr(ctrl_filepath.str());
         cofstr << genome.ctrl_genome.to_string();
         cofstr.close();
+
+        //If there is a ctrl genome there are a trajectory and a behavioural descriptor
+        //Log Trajectory
+        std::stringstream traj_filepath;
+        traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id();
+        std::ofstream tofs(traj_filepath.str());
+        for(const auto &wp: genome.trajectory)
+            tofs << wp.to_string() << std::endl;
+        tofs.close();
+
+        //Log descriptor
+        std::ofstream dofs;
+        if(!openOLogFile(dofs,"/behavioral_descriptors"))
+            return;
+        dofs << genome.morph_genome.id() << std::endl;
+        dofs << genome.behavioral_descriptor << std::endl;
+        dofs.close();
     }
     //-
 

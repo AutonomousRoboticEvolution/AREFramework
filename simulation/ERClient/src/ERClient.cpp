@@ -62,6 +62,7 @@ int main(int argc, char* argv[])
 
     settings::defaults::parameters->emplace("#killWhenNotConnected",new settings::Boolean(false));
     settings::defaults::parameters->emplace("#shouldReopenConnections",new settings::Boolean(false));
+    settings::defaults::parameters->emplace("#evaluationOrder",new settings::Integer(1)); //Default first in last out
 
     //Load the parameters
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(

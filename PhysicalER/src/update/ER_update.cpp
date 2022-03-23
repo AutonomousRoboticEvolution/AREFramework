@@ -71,11 +71,8 @@ void ER::write_data(){
 
 void ER::save_logs(bool eog)
 {
-    for(const auto &log : logs){
-        if(log->isEndOfGen() == eog){
-            log->saveLog(ea);
-        }
-    }
+    for(const auto &log : logs)
+        log->saveLog(ea);
 }
 bool ER::execute(){
 
@@ -198,6 +195,12 @@ bool ER::stop_evaluation(){
     for(const double fitness : objectives)
         std::cout << fitness << "\t";
     std::cout<<std::endl;
+    if(verbose){
+        Individual::Ptr ind;
+        auto objectives = environment->fitnessFunction(ind);
+        std::cout << "fitnesses = " << std::endl;
+        for(const double fitness : objectives)
+            std::cout << fitness << std::endl;
 
     // display some infomation about how well the tracking worked
     std::cout<<"Saw the robot in ";
@@ -210,6 +213,8 @@ bool ER::stop_evaluation(){
     std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
     std::cout<<")"<<std::endl;
 
+    }
+
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
     std::getline(std::cin,str);
@@ -219,13 +224,13 @@ bool ER::stop_evaluation(){
     }
 
     nbrEval++;
-
     if(ea->update(environment)){
         nbrEval = 0;
     }
     ea->set_endEvalTime(hr_clock::now());
     write_data();
     save_logs();
+
 
     current_id = choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);

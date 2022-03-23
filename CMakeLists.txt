@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0)
 project(ARE)
 
-add_compile_options("$<$<CONFIG:RELEASE>:-O3>$<$<CONFIG:DEBUG>:-O0>")
+add_compile_options("$<$<CONFIG:RELEASE>:-O3 -NDEBUG>$<$<CONFIG:DEBUG>:-O0>")
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

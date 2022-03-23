@@ -25,5 +25,11 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 {
     are::RobotInfoLog::Ptr robInfoLog(new are::RobotInfoLog);
     logs.push_back(robInfoLog);
+
+    are::LearnerStateLog::Ptr learnerStateLog(new are::LearnerStateLog);
+    logs.push_back(learnerStateLog);
+
+    are::BestControllerLog::Ptr bestControllerLog(new are::BestControllerLog);
+    logs.push_back(bestControllerLog);
 }
 

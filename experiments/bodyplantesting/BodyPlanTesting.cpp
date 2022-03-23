@@ -80,6 +80,11 @@ void BODYPLANTESTING::initPopulation()
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
+    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
+    if(repetition < nbr_rep){
+        repetition++;
+        return;
+    }
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -134,6 +139,13 @@ void BODYPLANTESTING::setObjectives(size_t indIdx, const std::vector<double> &ob
 }
 
 void BODYPLANTESTING::init_next_pop(){
+
+    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
+    if(repetition < nbr_rep){
+        return;
+    }
+    repetition = 0;
+
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
 
     population.clear();
