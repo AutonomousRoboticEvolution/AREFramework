@@ -335,6 +335,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
             }
         }
+        if(env->get_name() == "barrel_task"){
+            int number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
+            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
+                return false;
+            }else{
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+            }
+        }
     }
 
     //If on the client or just sequential mode

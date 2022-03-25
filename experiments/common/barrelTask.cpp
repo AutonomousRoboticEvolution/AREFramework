@@ -10,7 +10,7 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
 
     final_position.resize(3);
     barrel_current_position.resize(3);
-    name = "multi_target_maze";
+    name = "barrel_task";
 
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
