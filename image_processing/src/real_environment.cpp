@@ -28,17 +28,42 @@ void RealEnvironment::init(){
     grid_zone = Eigen::MatrixXi::Zero(grid_zone_size,grid_zone_size);
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
-}
 
+    // reset frames counters
+    number_of_frames_where_robot_was_seen = 0;
+    number_of_frames_where_barrel_was_seen = 0;
+    total_number_of_frames = 0;
+}
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
-    if(env_type == 0)
-        return fit_targeted_locomotion();
-    else if(env_type == 1)
-        return fit_exploration();
-    else if(env_type == 2)
-        return fit_foraging();
+    int verbose = are::settings::getParameter<are::settings::Boolean>(parameters,"#verbose").value;
+
+    std::vector<double> fitness;
+    bool fitness_computed = false;
+    if(env_type == 0){
+        fitness = fit_targeted_locomotion();
+        fitness_computed=true;
+    }
+    else if(env_type == 1){
+        fitness = fit_exploration();
+        fitness_computed=true;
+    }
+    else if(env_type == 2){
+        fitness = fit_foraging();
+        fitness_computed=true;
+    }
+
+    if (verbose){
+        // display some infomation about how well the tracking worked
+        std::cout<<"Saw the robot in " << number_of_frames_where_robot_was_seen << " frames (out of " << total_number_of_frames<<")"<<std::endl;
+        std::cout<<"Saw the barrel in " << number_of_frames_where_barrel_was_seen  << " frames (out of "  << total_number_of_frames <<")"<<std::endl;
+        std::cout<<"Fitness computed as:\t";
+        for(const double val : fitness)
+           std::cout << val << "\t";
+        std::cout<<std::endl;
+    }
+    if (fitness_computed) {return fitness;}
 
     std::cerr << "Unknown type of environment type : " << env_type << std::endl;
     return {0};
@@ -186,3 +211,4 @@ std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::v
 //        indexes.second = 7;
     return indexes;
 }
+

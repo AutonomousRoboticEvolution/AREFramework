@@ -114,10 +114,6 @@ void ER::start_evaluation(){
         isEnvInit=true;
         environment->init();
     }
-    // reset frames counters
-    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_robot_was_seen = 0;
-    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_barrel_was_seen = 0;
-    std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames = 0;
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
@@ -188,37 +184,14 @@ bool ER::stop_evaluation(){
         }
     }
 
-    // display the fitness that will be calculated
-    const Individual::Ptr ind;
-    std::vector<double> objectives = environment->fitnessFunction(ind);
-    std::cout << "Estimated fitness:";
-    for(const double fitness : objectives)
-        std::cout << fitness << "\t";
-    std::cout<<std::endl;
-    if(verbose){
-        Individual::Ptr ind;
-        auto objectives = environment->fitnessFunction(ind);
-        std::cout << "fitnesses = " << std::endl;
-        for(const double fitness : objectives)
-            std::cout << fitness << std::endl;
+    // display the fitness:
+    Individual::Ptr ind;
+    environment->fitnessFunction(ind);
 
-    // display some infomation about how well the tracking worked
-    std::cout<<"Saw the robot in ";
-    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_robot_was_seen;
-    std::cout<<" frames (out of ";
-    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
-    std::cout<<"}\nSaw the barrel in ";
-    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> number_of_frames_where_barrel_was_seen;
-    std::cout<<" frames (out of ";
-    std::cout<< std::dynamic_pointer_cast<are::RealEnvironment>(environment) -> total_number_of_frames;
-    std::cout<<")"<<std::endl;
-
-    }
-
+    // ask user whether to re-do this evaluation
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
     std::getline(std::cin,str);
-
     if(str == "y" || str == "Y" || str == "yes"){
         return true;
     }
