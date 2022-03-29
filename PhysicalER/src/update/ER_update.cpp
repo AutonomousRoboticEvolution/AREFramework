@@ -185,8 +185,7 @@ bool ER::stop_evaluation(){
     }
 
     // display the fitness:
-    Individual::Ptr ind;
-    environment->fitnessFunction(ind);
+    environment->print_info();
 
     // ask user whether to re-do this evaluation
     std::string str;

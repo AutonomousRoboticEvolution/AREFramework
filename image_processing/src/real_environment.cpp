@@ -37,37 +37,27 @@ void RealEnvironment::init(){
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
-    int verbose = are::settings::getParameter<are::settings::Boolean>(parameters,"#verbose").value;
 
-    std::vector<double> fitness;
-    bool fitness_computed = false;
-    if(env_type == 0){
-        fitness = fit_targeted_locomotion();
-        fitness_computed=true;
-    }
-    else if(env_type == 1){
-        fitness = fit_exploration();
-        fitness_computed=true;
-    }
-    else if(env_type == 2){
-        fitness = fit_foraging();
-        fitness_computed=true;
-    }
-
-    if (verbose){
-        // display some infomation about how well the tracking worked
-        std::cout<<"Saw the robot in " << number_of_frames_where_robot_was_seen << " frames (out of " << total_number_of_frames<<")"<<std::endl;
-        std::cout<<"Saw the barrel in " << number_of_frames_where_barrel_was_seen  << " frames (out of "  << total_number_of_frames <<")"<<std::endl;
-        std::cout<<"Fitness computed as:\t";
-        for(const double val : fitness)
-           std::cout << val << "\t";
-        std::cout<<std::endl;
-    }
-    if (fitness_computed) {return fitness;}
+    if(env_type == 0)
+        return fit_targeted_locomotion();
+    else if(env_type == 1)
+        return fit_exploration();
+    else if(env_type == 2)
+        return fit_foraging();
 
     std::cerr << "Unknown type of environment type : " << env_type << std::endl;
     return {0};
 
+}
+
+void RealEnvironment::print_info(){
+    // display some infomation about how well the tracking worked
+    std::cout<<"Saw the robot in " << number_of_frames_where_robot_was_seen << " frames (out of " << total_number_of_frames<<")"<<std::endl;
+    std::cout<<"Saw the barrel in " << number_of_frames_where_barrel_was_seen  << " frames (out of "  << total_number_of_frames <<")"<<std::endl;
+    std::cout<<"Fitness computed as:\t";
+    for(const double val : fitness)
+       std::cout << val << "\t";
+    std::cout<<std::endl;
 }
 
 std::vector<double> RealEnvironment::fit_targeted_locomotion(){

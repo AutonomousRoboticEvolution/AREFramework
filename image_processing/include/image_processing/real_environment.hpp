@@ -16,6 +16,7 @@ public:
     RealEnvironment();
     void init() override;
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
+    void print_info() override;
     void update_info(double time) override;
     const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
 
