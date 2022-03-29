@@ -55,6 +55,8 @@ void RealEnvironment::print_info(){
     std::cout<<"Saw the robot in " << number_of_frames_where_robot_was_seen << " frames (out of " << total_number_of_frames<<")"<<std::endl;
     std::cout<<"Saw the barrel in " << number_of_frames_where_barrel_was_seen  << " frames (out of "  << total_number_of_frames <<")"<<std::endl;
     std::cout<<"Fitness computed as:\t";
+    Individual::Ptr ind;
+    auto fitness = fitnessFunction(ind); // dummy individual in order to call the fitness function
     for(const double val : fitness)
        std::cout << val << "\t";
     std::cout<<std::endl;
