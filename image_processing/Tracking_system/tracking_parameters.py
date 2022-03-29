@@ -18,14 +18,20 @@ blob_detection_parameters.minInertiaRatio = 0.01
 aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
 aruco_parameters = aruco.DetectorParameters_create()
 
+resolution_width = -1 # 1920 # set negative to leave as the default for your camera
+resolution_height = -1 # 1080 # set negative to leave as the default for your camera
+
 zmq_port_number= "5557"
 
-location = "york"
+with open('location.txt') as f:
+    location = f.read().replace("\n","")
+    print("location: {}".format(location))
 
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
     pipe = "http://192.168.2.248/img/video.mjpeg"
+    #pipe =0
 
     #mask filter parameters
     brainMin = (0,157,78)

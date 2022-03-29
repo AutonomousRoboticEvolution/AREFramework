@@ -27,6 +27,7 @@ class Printer:
         self.skeletonPositionOnPrintbed = makeTransformInputFormatted([0.150, 0.150, 0]) # default middle of bed, can be updated
         self.timeout=5 # timeout in seconds for api requests to octoPrint
         self.defaultBedCooldownTemperature = printerConfiguration["BED_COOLDOWN_TEMPERATURE"]
+        self.print_time_estimate_seconds=-1
 
         # response = requests.get("http://"+self.IPAddress+"/api/printer")
         self.apiKeyHeader = { 'X-Api-Key': '{}'.format(printerConfiguration["API_KEY"])}
@@ -92,7 +93,7 @@ class Printer:
         debugPrint("This might take a while...", messageVerbosity=1)
         completed = subprocess.run(terminalCommand, cwd=self.openSCADDirectory, shell=True)
         if completed.returncode != 0:
-            raise RuntimeError("OpenSCAD terminal command failed")
+            raise RuntimeError("OpenSCAD terminal command failed\n{}".format(terminalCommand))
 
         # copy the resulting mesh (with clips) into the meshes folder
         if os.path.isfile("{}mesh_{}.stl".format(self.meshesDirectory, ID_number)):
@@ -232,11 +233,11 @@ class Printer:
         output = str( subprocess.check_output (terminalCommand, cwd="./printerSettings",shell=True, stderr=subprocess.STDOUT) )
         # extract some meta-data, i.e. the estimated print time and filamanet used
         print_time_location_in_output = output.find("Print time: ")
-        print_time_estimate_seconds=int(output[print_time_location_in_output +12 : output.find("\\n",print_time_location_in_output)])
+        self.print_time_estimate_seconds=int(output[print_time_location_in_output +12 : output.find("\\n",print_time_location_in_output)])
         filament_used_location_in_output = output.find("Filament: ")
         filament_used_estimate_seconds=int(output[filament_used_location_in_output +10 : output.find("\\n",filament_used_location_in_output)])
 
-        debugPrint("Estimated print time: {} seconds = {:.2f} hours".format(print_time_estimate_seconds,float(print_time_estimate_seconds)/(60*60)),0)
+        debugPrint("Estimated print time: {} seconds = {:.2f} hours".format(self.print_time_estimate_seconds,float(self.print_time_estimate_seconds)/(60*60)),0)
         debugPrint("Estimated Filament used (m): {}".format(filament_used_estimate_seconds),0)
 
     # create a dummy gcode file instead of actually slicing the file, which could be useful for debugging and testing, because you don't have to wait for the actual part to print!
@@ -288,10 +289,16 @@ if __name__ == "__main__":
         robot_ID=str(ID_num)
         print("ID: {}".format(robot_ID))
     '''
-    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
+
+    ## to print a hand-made stl file using the same settings as an automated mesh file:
+    printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json')),0)
+    printer.slice("testpart")
+    printer.uploadGCodeToOctoPrint("gcode/testpart")
+    printer.printFileOnOctoprint("testpart")
+    printer.coolBed(30)
 
 
 
     # printer=Printer("192.168.2.251" , json.load(open('configuration_BRL.json'))["PRINTER_1"])
     #printer.printARobot("test3", FAKE_SLICE_ONLY=False)
-    printer.coolBed(30)
+    # printer.coolBed(30)

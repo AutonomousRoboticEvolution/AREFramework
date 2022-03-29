@@ -69,6 +69,8 @@ public:
 
     virtual void update_info(double time) = 0;
 
+    virtual void print_info(){}
+
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}

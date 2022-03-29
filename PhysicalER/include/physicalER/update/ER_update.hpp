@@ -11,6 +11,7 @@
 #include "physicalER/pi_communication.hpp"
 #include "physicalER/pi_individual.hpp"
 #include "physicalER/io_helpers.hpp"
+#include "../image_processing/include/image_processing/real_environment.hpp"
 
 namespace are {
 namespace phy {

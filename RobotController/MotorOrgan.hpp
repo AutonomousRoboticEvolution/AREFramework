@@ -123,7 +123,7 @@ class MotorOrgan  : public Organ {
             @brief Set the current limit value
             @param tensOfMilliamps the desired limit, in tens of milliams (i.e. 100 = 1A)
 
-            NOTE: Must have a delay between using this function and further writes to I2C
+            NOTE: Must have a delay between using this function and further writes to I2C, therefore this function includes a sleep of 100ms.
             I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
         */
         void setCurrentLimit(uint8_t tensOfMilliamps);
