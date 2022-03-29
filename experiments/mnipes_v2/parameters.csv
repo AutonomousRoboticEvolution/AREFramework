@@ -34,7 +34,7 @@
 #reloadController,bool,1
 #jointControllerType,int,2
 
-#populationSize,int,20
+#populationSize,int,5
 #maxEvalTime,float,120
 #timeStep,float,0.1
 #maxNbrEval,int,100
@@ -62,10 +62,10 @@
 #maxNbrOrgans,int,16
 #isSegmentedRobot,bool,0
 #randomOrientation,bool,1
-#isWheel,bool,0
-#isSensor,bool,0
+#isWheel,bool,1
+#isSensor,bool,1
 #isJoint,bool,1
-#isCaster,bool,0
+#isCaster,bool,1
 #manufacturabilityMethod,int,1
 #isLeg,bool,1
 

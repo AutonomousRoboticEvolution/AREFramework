@@ -10,7 +10,7 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
 
     final_position.resize(3);
     barrel_current_position.resize(3);
-    name = "multi_target_maze";
+    name = "barrel_task";
 
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
@@ -71,16 +71,26 @@ void BarrelTask::init(){
     trajectory.clear();
 
     // Create target
-    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-    modelsPath += "/utils/aruco_big.ttm";
-    int target_handle;
-    target_handle = simLoadModel(modelsPath.c_str());
-    const float tPos[3] = {static_cast<float>(target_position.at(0)),
-                           static_cast<float>(target_position.at(1)),
-                           static_cast<float>(target_position.at(2))};
-    simSetObjectPosition(target_handle,-1,tPos);
-    const float tRot[3] = {0.,M_PI_2,0.};
-    simSetObjectOrientation(target_handle,target_handle,tRot);
+//    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+//    modelsPath += "/utils/aruco_big.ttm";
+//    int target_handle;
+//    target_handle = simLoadModel(modelsPath.c_str());
+//    const float tPos1[3] = {static_cast<float>(target_position.at(0)),
+//                           static_cast<float>(target_position.at(1)),
+//                           static_cast<float>(target_position.at(2)+0.1025)};
+//    simSetObjectPosition(target_handle,-1,tPos1);
+//    const float tRot1[3] = {0.,M_PI_2,0.};
+//    simSetObjectOrientation(target_handle,target_handle,tRot1);
+//    modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
+//    modelsPath += "/utils/aruco_small.ttm";
+//    target_handle = simLoadModel(modelsPath.c_str());
+//    const float tPos2[3] = {static_cast<float>(target_position.at(0)),
+//                           static_cast<float>(target_position.at(1)),
+//                           static_cast<float>(target_position.at(2)-0.0125)};
+//    simSetObjectPosition(target_handle,-1,tPos2);
+//    const float tRot2[3] = {0.,M_PI_2,0.};
+//    simSetObjectOrientation(target_handle,target_handle,tRot2);
+
     std::vector<int> th;
     build_tiled_floor(th);
 }

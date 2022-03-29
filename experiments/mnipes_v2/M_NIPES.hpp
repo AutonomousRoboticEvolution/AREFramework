@@ -10,6 +10,7 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
 #include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
 
 //TO DO find a way to flush the population
 
