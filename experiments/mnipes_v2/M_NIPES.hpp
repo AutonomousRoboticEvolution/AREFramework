@@ -10,11 +10,19 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
 #include "multiTargetMaze.hpp"
+#include "exploration.hpp"
 
 //TO DO find a way to flush the population
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
+
+typedef enum task_t{
+    MAZE = 0,
+    OBSTACLES = 1,
+    MULTI_TARGETS = 2,
+    EXPLORATION = 3
+} task_t;
 
 typedef struct learner_t{
     learner_t(){}
