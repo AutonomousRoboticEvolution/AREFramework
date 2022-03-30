@@ -71,25 +71,37 @@ void BarrelTask::init(){
     trajectory.clear();
 
     // Create target
-//    std::string modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-//    modelsPath += "/utils/aruco_big.ttm";
-//    int target_handle;
-//    target_handle = simLoadModel(modelsPath.c_str());
-//    const float tPos1[3] = {static_cast<float>(target_position.at(0)),
-//                           static_cast<float>(target_position.at(1)),
-//                           static_cast<float>(target_position.at(2)+0.1025)};
-//    simSetObjectPosition(target_handle,-1,tPos1);
-//    const float tRot1[3] = {0.,M_PI_2,0.};
-//    simSetObjectOrientation(target_handle,target_handle,tRot1);
-//    modelsPath = are::settings::getParameter<are::settings::String>(parameters,"#modelsPath").value;
-//    modelsPath += "/utils/aruco_small.ttm";
-//    target_handle = simLoadModel(modelsPath.c_str());
-//    const float tPos2[3] = {static_cast<float>(target_position.at(0)),
-//                           static_cast<float>(target_position.at(1)),
-//                           static_cast<float>(target_position.at(2)-0.0125)};
-//    simSetObjectPosition(target_handle,-1,tPos2);
-//    const float tRot2[3] = {0.,M_PI_2,0.};
-//    simSetObjectOrientation(target_handle,target_handle,tRot2);
+    float aruco_square_size[3] = {0.013f,0.013f,0.005f};
+    std::vector<int> handles;
+    float aruco_color[3] = {0.0f,0.0f,0.0f};
+    float aruco_pos[3];
+    float aruco_ori[3] = {0.,M_PI_2,0.};
+    aruco_pos[0] = static_cast<float>(target_position.at(0));
+    aruco_pos[1] = static_cast<float>(target_position.at(1));
+    aruco_pos[2] = static_cast<float>(target_position.at(2));
+    /// \todo: Eb - Hard coded values
+    float pos_y[8] = {0.07,0.07,-0.07,-0.07,0.02,0.02,-0.02,-0.02};
+    float pos_z[8] = {0.07,-0.07,-0.07,0.07,0.02,-0.02,-0.02,0.02};
+    float temp_pos[3];
+    for(int i = 0; i < 8; i++){
+        handles.push_back(simCreatePureShape(0,0,aruco_square_size,0.05f,nullptr));
+        temp_pos[0] = aruco_pos[0];
+        temp_pos[1] = pos_y[i] + aruco_pos[1];
+        if(i < 4) /// \todo: Eb - Hard coded values
+            temp_pos[2] = 0.205;
+        else
+            temp_pos[2] = 0.09;
+        temp_pos[2] = pos_z[i] + temp_pos[2];
+        simSetObjectPosition(handles.at(i),-1,temp_pos);
+        simSetShapeColor(handles.at(i), nullptr, sim_colorcomponent_ambient_diffuse, aruco_color);
+        std::string string = "aruco_" + std::to_string(i);
+        simSetObjectName(handles.at(i),string.c_str());
+        simSetObjectOrientation(handles.at(i),handles.at(i),aruco_ori);
+        simSetObjectInt32Parameter(handles.at(i), sim_shapeintparam_static, 1);
+        simSetObjectSpecialProperty(handles.at(i), sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
+                                                   sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
+    }
+
 
     std::vector<int> th;
     build_tiled_floor(th);
