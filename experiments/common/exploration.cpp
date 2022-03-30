@@ -50,7 +50,7 @@ void Exploration::init(){
     std::vector<double> init_positions = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     init_position.clear();
-    init_position.insert(final_position.begin(),init_positions.begin() + current_scene, init_positions.begin()+current_scene+2);
+    init_position.insert(init_position.begin(),init_positions.begin() + current_scene, init_positions.begin()+current_scene+2);
     final_position = init_position;
 
     trajectory.clear();
