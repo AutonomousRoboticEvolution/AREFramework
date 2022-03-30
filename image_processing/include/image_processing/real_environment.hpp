@@ -16,6 +16,7 @@ public:
     RealEnvironment();
     void init() override;
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
+    void print_info() override;
     void update_info(double time) override;
     const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
 
@@ -24,6 +25,11 @@ public:
     std::vector<double> fit_targeted_locomotion();
     std::vector<double> fit_exploration();
     std::vector<double> fit_foraging();
+
+    // some infomation about how successful the tracking was
+    int total_number_of_frames=0;
+    int number_of_frames_where_robot_was_seen=0;
+    int number_of_frames_where_barrel_was_seen=0;
 
 private:
     std::vector<double> current_position;

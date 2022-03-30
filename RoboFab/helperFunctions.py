@@ -6,7 +6,7 @@ import numpy as np
 import time
 
 DEBUG_PRINT = True
-DEBUG_PRINT_VERBOSITY_LEVEL = 3 #higher value will mean more stuff gets spewed to command line.
+DEBUG_PRINT_VERBOSITY_LEVEL = 0 #higher value will mean more stuff gets spewed to command line.
 READ_OUT_VERBOSITY_LEVEL = -1 #higher value will mean more stuff gets read out by the computerised voice
 
 ## Prints its input string.
@@ -221,6 +221,7 @@ def findDisplacementBetweenTransforms(transformA, transformB=None):
     outputDictionary["delta_x"] = transformA[0,3] - transformB[0,3]
     outputDictionary["delta_y"] = transformA[1,3] - transformB[1,3]
     outputDictionary["delta_z"] = transformA[2,3] - transformB[2,3]
+    outputDictionary["magnitude"] = np.linalg.norm( [ outputDictionary["delta_x"], outputDictionary["delta_y"], outputDictionary["delta_z"]] )
 
     outputDictionary["direction_about_z"] = -math.atan2(outputDictionary["delta_x"],outputDictionary["delta_y"])
 

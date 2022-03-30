@@ -7,6 +7,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#include <opencv2/opencv.hpp>
 #include <opencv2/aruco.hpp>
 #include <opencv2/videoio.hpp> // for cv::VideoCapture
 #include <list>
@@ -23,9 +24,9 @@ class Camera{
         /**
          * see if a aruco tag (in the list tags_to_look_for) is visible to the camera
          */
-        bool presenceDetect();
-    
-    private:
+        bool presenceDetect(std::string save_image_for_debugging="");
+
+private:
         /**
             the dictionary that defines the settings for aruco tags,
             i.e. 4x4 grid, and only using 50 possible tags

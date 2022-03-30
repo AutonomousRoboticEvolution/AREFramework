@@ -184,19 +184,13 @@ bool ER::stop_evaluation(){
         }
     }
 
-    if(verbose){
-        Individual::Ptr ind;
-        auto objectives = environment->fitnessFunction(ind);
-        std::cout << "fitnesses = " << std::endl;
-        for(const double fitness : objectives)
-            std::cout << fitness << std::endl;
+    // display the fitness:
+    environment->print_info();
 
-    }
-
+    // ask user whether to re-do this evaluation
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
     std::getline(std::cin,str);
-
     if(str == "y" || str == "Y" || str == "yes"){
         return true;
     }

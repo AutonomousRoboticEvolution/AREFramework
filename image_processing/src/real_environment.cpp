@@ -28,11 +28,16 @@ void RealEnvironment::init(){
     grid_zone = Eigen::MatrixXi::Zero(grid_zone_size,grid_zone_size);
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
-}
 
+    // reset frames counters
+    number_of_frames_where_robot_was_seen = 0;
+    number_of_frames_where_barrel_was_seen = 0;
+    total_number_of_frames = 0;
+}
 
 std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
+
     if(env_type == 0)
         return fit_targeted_locomotion();
     else if(env_type == 1)
@@ -43,6 +48,18 @@ std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind)
     std::cerr << "Unknown type of environment type : " << env_type << std::endl;
     return {0};
 
+}
+
+void RealEnvironment::print_info(){
+    // display some infomation about how well the tracking worked
+    std::cout<<"Saw the robot in " << number_of_frames_where_robot_was_seen << " frames (out of " << total_number_of_frames<<")"<<std::endl;
+    std::cout<<"Saw the barrel in " << number_of_frames_where_barrel_was_seen  << " frames (out of "  << total_number_of_frames <<")"<<std::endl;
+    std::cout<<"Fitness computed as:\t";
+    Individual::Ptr ind;
+    auto fitness = fitnessFunction(ind); // dummy individual in order to call the fitness function
+    for(const double val : fitness)
+       std::cout << val << "\t";
+    std::cout<<std::endl;
 }
 
 std::vector<double> RealEnvironment::fit_targeted_locomotion(){
@@ -88,6 +105,9 @@ std::vector<double> RealEnvironment::fit_foraging(){
 
 void RealEnvironment::update_info(double time){
 
+    bool robot_seen=false;
+    bool barrel_seen=false;
+
     if(time == 0)
         trajectory.clear();
 
@@ -96,6 +116,7 @@ void RealEnvironment::update_info(double time){
     phy::send_string(robot_position_string,"position",zmq_requester_socket,"Robot:");
 
     if(robot_position_string != "None"){ // tracking found a robot position, else the robot wasn't seen, so we will not update the current_position variable
+        robot_seen=true;
         // parse the string, expected format is [x, y]
         boost::erase_all(robot_position_string, "[");
         boost::erase_all(robot_position_string, "]");
@@ -130,6 +151,7 @@ void RealEnvironment::update_info(double time){
             // tag ID number is this_tag_string_split[0]
             if ( std::stoi(this_tag_string_split[0]) == tag_number_of_barrel){
                 // this is the correct tag, so save the location
+                barrel_seen=true;
                 beacon_position = { std::stod( this_tag_string_split[1] ),std::stod( this_tag_string_split[2])};
             }
         }
@@ -155,10 +177,14 @@ void RealEnvironment::update_info(double time){
         trajectory.push_back(wp);
     }
 
+    // keep count of the number of frames:
+    total_number_of_frames++;
+    if (robot_seen) number_of_frames_where_robot_was_seen++;
+    if (barrel_seen) number_of_frames_where_barrel_was_seen++;
+
     final_position = current_position;
 
 }
-
 
 std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::vector<double> &pos){
     std::pair<int,int> indexes;
@@ -177,3 +203,4 @@ std::pair<int,int> RealEnvironment::real_coordinate_to_matrix_index(const std::v
 //        indexes.second = 7;
     return indexes;
 }
+
