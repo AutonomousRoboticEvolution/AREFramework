@@ -13,6 +13,7 @@
 #include "ARE/learning/Novelty.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/Settings.h"
+#include "barrelTask.hpp"
 
 namespace are{
 

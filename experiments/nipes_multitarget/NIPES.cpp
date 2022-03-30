@@ -236,8 +236,14 @@ bool NIPES::is_finish(){
 }
 
 bool NIPES::finish_eval(const Environment::Ptr &env){
-
-    std::vector<double> target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
+    int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
+    std::vector<double> target;
+    if(env_type == 0){
+        target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
+    }
+    if(env_type == 1){
+        target = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_current_target();
+    }
     float tPos[3];
     tPos[0] = static_cast<float>(target[0]);
     tPos[1] = static_cast<float>(target[1]);
