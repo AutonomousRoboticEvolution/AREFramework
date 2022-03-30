@@ -26,7 +26,6 @@ public:
     VirtualEnvironment(){}
     VirtualEnvironment(const VirtualEnvironment& env) :
         envObjectHandles(env.envObjectHandles),
-        initialPos(env.initialPos),
         maxTime(env.maxTime){}
     ~VirtualEnvironment(){}
 
@@ -43,7 +42,7 @@ public:
      */
     virtual std::vector<double> fitnessFunction(const Individual::Ptr &ind) = 0;
 
-    virtual void update_info(double time) override{};
+    virtual void update_info(double time) override{}
 
     /**
      * @brief update the info of the objects (e.g. robot) in the environments
@@ -63,8 +62,6 @@ public:
 protected:
     ///handle of the object in the environment
     std::vector<int> envObjectHandles;
-    ///initial position of the object
-    std::vector<float> initialPos;
     ///maximum simulation time
     float maxTime = 0.0;
 
