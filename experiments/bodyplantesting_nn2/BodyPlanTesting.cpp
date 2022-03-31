@@ -81,8 +81,8 @@ void BODYPLANTESTING::init_next_pop(){
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    bool only_organ = settings::getParameter<settings::Boolean>(parameters,"#onlyOrganNovelty").value;
     int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
+    int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
 
     if(repetition < nbr_rep){
         std::cout << "number of repetitions : " << repetition << " over " << nbr_rep << std::endl;
@@ -101,21 +101,25 @@ void BODYPLANTESTING::epoch(){
     //compute novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
-
-        if(only_organ)
-            ind_desc = ind_desc.block<4,1>(4,0);
+        ind_desc = population[i]->descriptor();
 
 
         //Compute distances to find the k nearest neighbors of ind
         std::vector<size_t> pop_indexes;
-        std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
+
+        std::vector<double> distances;
+        if(descriptor == CART_DESC)
+            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
+        else if(descriptor == ORGAN_POSITION)
+            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::positional);
 
         //Compute novelty
         double ind_nov = Novelty::sparseness(distances);
-
+        if(descriptor == CART_DESC)
+            ind_nov /= 2.64;
         //set the objetives
-        std::vector<double> objectives = {ind_nov / 2.64 /*+ organ_score)/2.f*/}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
+
+        std::vector<double> objectives = {ind_nov}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
         std::dynamic_pointer_cast<CPPNIndividual>(population[i])->setObjectives(objectives);
 
 

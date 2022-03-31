@@ -55,12 +55,13 @@ public :
 
     /// Setters for descritors
     void setMorphDesc();
-    void setGraphMatrix();
-    void setSymDesc();
+    void set_4d_matrix();
     /// Getters for descritors
     CartDesc getMorphDesc(){return morphDesc;}
-
+    std::vector<std::vector<double>> get_matrix_4d(){return matrix_4d;};
     Eigen::VectorXd descriptor();
+    Eigen::VectorXd get_organ_position_descriptor(){return organ_position_descriptor;}
+    void set_organ_position_descriptor();
 
 protected:
     void createMorphology() override;
@@ -70,6 +71,8 @@ protected:
 
     /// Descritors
     CartDesc morphDesc;
+    Eigen::VectorXd organ_position_descriptor;
+    std::vector<std::vector<double>> matrix_4d;
 };
 
 }//are

@@ -10,6 +10,7 @@
 
 namespace are {
 
+
 class BODYPLANTESTING : public NSGA2<CPPNIndividual>
 {
 public:
