@@ -56,6 +56,7 @@ public:
     virtual void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     const std::string& get_type(){return type;}
     const int id() const {return _id;}
+    void set_id(int id){_id = id;}
 
 
     template <class archive>
