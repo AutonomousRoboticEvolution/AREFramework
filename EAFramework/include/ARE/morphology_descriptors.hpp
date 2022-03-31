@@ -37,6 +37,11 @@ struct morphology_constants{
 
 using morph_const = struct morphology_constants;
 
+typedef enum desc_type_t{
+    CART_DESC = 0,
+    ORGAN_POSITION = 1
+} desc_type_t;
+
 struct CartDesc
 {
     float robotWidth = 0; // X
