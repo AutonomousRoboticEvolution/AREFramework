@@ -8,10 +8,7 @@ namespace st = settings;
 void VisuInd::createMorphology(){
     bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
 
-
-    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
-    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     morphology.reset(new CPPNMorph(parameters));
     morphology->set_randNum(randNum);
@@ -26,11 +23,11 @@ void VisuInd::createMorphology(){
         nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
     }
-    std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
 
 
-//    float pos[3];
-//    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
+    //    float pos[3];
+    //    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
 }
 
 void VisuInd::createController(){
@@ -106,16 +103,70 @@ void VisuInd::update(double delta_time){
 }
 
 void Visu::init(){
-
-
-    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
     generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
     int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
-    bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
-    bool load_all_morph_gen = settings::getParameter<settings::Boolean>(parameters,"#loadAllMorphGenome").value;
     bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
+    bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
 
     std::vector<std::string> ctrl_gen_files;
+    std::vector<std::string> morph_gen_files;
+    if(id > 0)
+        load_per_id(id,morph_gen_files,ctrl_gen_files);
+    else load_per_gen_ind(indIdx,morph_gen_files,ctrl_gen_files);
+
+
+    Genome::Ptr morph_gen;
+    Genome::Ptr ctrl_gen;
+    //load morphology genome
+    for(size_t i = 0; i < morph_gen_files.size(); i++){
+        if(is_neat_genome){
+            NEAT::Genome neat_gen(morph_gen_files[i].c_str());
+            morph_gen.reset(new CPPNGenome(neat_gen));
+            std::vector<std::string> split_str;
+            misc::split_line(morph_gen_files[i],"_",split_str);
+            morph_gen->set_id(std::stoi(split_str[split_str.size()-2])*std::stoi(split_str.back()));
+        }
+        else{
+            nn2_cppn_t cppn;
+            std::ifstream ifs(morph_gen_files[i]);
+            boost::archive::text_iarchive iarch(ifs);
+            iarch >> cppn;
+            morph_gen.reset(new NN2CPPNGenome(cppn));
+            std::vector<std::string> split_str;
+            misc::split_line(morph_gen_files[i],"_",split_str);
+            morph_gen->set_id(std::stoi(split_str.back()));
+        }
+        morph_gen->set_randNum(randomNum);
+        morph_gen->set_parameters(parameters);
+
+
+        if(empty_ctrl_gen)
+            ctrl_gen.reset(new EmptyGenome);
+        else{
+            ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
+            std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_files[i]);
+        }
+
+        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }
+
+    morph_gen.reset();
+    ctrl_gen.reset();
+}
+
+bool Visu::is_finish(){
+    return currentIndIndex == population.size() - 1;
+}
+
+void Visu::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){
+    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
+    bool load_all_morph_gen = settings::getParameter<settings::Boolean>(parameters,"#loadAllMorphGenome").value;
+
     if(!empty_ctrl_gen){
         if(indIdx < 0){
             int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
@@ -132,7 +183,6 @@ void Visu::init(){
         }
     }
 
-    std::vector<std::string> morph_gen_files;
     if(load_all_morph_gen){
         std::string filename;
         std::vector<std::string> split_str;
@@ -157,39 +207,37 @@ void Visu::init(){
             morph_gen_files.push_back(sstr2.str());
         }
     }
-
-    Genome::Ptr morph_gen;
-    Genome::Ptr ctrl_gen;
-    //load morphology genome
-    for(size_t i = 0; i < morph_gen_files.size(); i++){
-        if(is_neat_genome){
-            NEAT::Genome neat_gen(morph_gen_files[i].c_str());
-            morph_gen.reset(new CPPNGenome(neat_gen));
-        }
-        else{
-            nn2_cppn_t cppn;
-            std::ifstream ifs(morph_gen_files[i]);
-            boost::archive::text_iarchive iarch(ifs);
-            iarch >> cppn;
-            morph_gen.reset(new NN2CPPNGenome(cppn));
-        }
-        morph_gen->set_randNum(randomNum);
-        morph_gen->set_parameters(parameters);
-
-        if(empty_ctrl_gen)
-            ctrl_gen.reset(new EmptyGenome);
-        else{
-            ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
-            std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_files[i]);
-        }
-
-        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-        ind->set_parameters(parameters);
-        ind->set_randNum(randomNum);
-        population.push_back(ind);
-    }
-
-    morph_gen.reset();
-    ctrl_gen.reset();
 }
 
+void Visu::load_per_id(int id, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files){
+    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+    bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
+    bool load_all_morph_gen = settings::getParameter<settings::Boolean>(parameters,"#loadAllMorphGenome").value;
+
+    if(load_all_morph_gen){
+        std::string filename;
+        std::vector<std::string> split_str;
+        for(const auto &dirit : fs::directory_iterator(fs::path(folder_to_load))){
+            filename = dirit.path().string();
+            boost::split(split_str,filename,boost::is_any_of("/"));
+            boost::split(split_str,split_str.back(),boost::is_any_of("_"));
+            if(split_str[0] == "morph" && split_str[1] == "genome")
+                morph_gen_files.push_back(filename);
+            if(!empty_ctrl_gen){
+                std::stringstream sstr;
+                sstr << folder_to_load << "/ctrl_genome_" << split_str.back();
+                ctrl_gen_files.push_back(sstr.str());
+            }
+        }
+    }else{
+        std::stringstream sstr2;
+        sstr2 << folder_to_load << "/morph_genome_" << id;
+        morph_gen_files.push_back(sstr2.str());
+        if(!empty_ctrl_gen){
+            std::stringstream sstr;
+            sstr << folder_to_load << "/ctrl_genome_" << id;
+            ctrl_gen_files.push_back(sstr.str());
+
+        }
+    }
+}

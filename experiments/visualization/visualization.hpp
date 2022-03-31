@@ -48,7 +48,10 @@ public:
     ~Visu(){
     }
 
-    void init();
+    void init() override;
+    bool is_finish() override;
+    void load_per_gen_ind(int indIdx, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
+    void load_per_id(int id, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
 
 };
 

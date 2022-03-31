@@ -322,6 +322,7 @@ void M_NIPES::init_morph_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
+        morph_gen->set_id(generation*i);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
@@ -355,6 +356,10 @@ void M_NIPES::epoch(){
             biases.insert(biases.begin(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
             best_gen.set_weights(weights);
             best_gen.set_biases(biases);
+            best_gen.set_nbr_hidden(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden());
+            best_gen.set_nbr_input(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input());
+            best_gen.set_nbr_output(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output());
+            best_gen.set_nn_type(std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type());
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_genome(std::make_shared<NNParamGenome>(best_gen)); //put best genome back in the ind for log
             //update the archive
             const Eigen::VectorXd &morph_desc = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->getMorphDesc();
@@ -375,6 +380,7 @@ void M_NIPES::init_next_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
+        morph_gen->set_id(generation*i);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
