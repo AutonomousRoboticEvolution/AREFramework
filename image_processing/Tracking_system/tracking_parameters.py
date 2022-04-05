@@ -54,3 +54,15 @@ elif location == "york":
     pixel_scale = 100 #nc
 
     crop_rectangle = [-1]
+
+elif location == "amsterdam":
+    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    #mask filter parameters
+    brainMin = (0,157,154)
+    brainMax = (10,221,208)
+
+    #centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (386,264) # defined in the uncropped image
+    pixel_scale = 175
+    
+    crop_rectangle = [-1]
