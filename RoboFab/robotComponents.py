@@ -4,6 +4,7 @@
 
 import math
 import os
+import csv # for loading blueprints
 
 from helperFunctions import makeTransform, makeTransformInputFormatted, debugPrint, findAngleBetweenTransforms, \
     makeTransformMillimetersDegrees, findDisplacementBetweenTransforms
@@ -143,6 +144,37 @@ class Robot:
         self.ID = ID
         #self.organInsertionTrackingList = [ ] # Will be a list with one entry per organ. Start as False. Once an organ is physically inserted, its value in this list is turned True.
         #self.hasOrgansNeedingInsertion = False # if any of the organs in the previous list are still False (ie not yet inserted), this will be True (ie "we need to keep going!")
+
+    def createOrgansFromBlueprint(self, blueprintFilePath, dictionaryOfOrganTypes, gripperTCP):
+        # open blueprint and parse basic organ data
+        debugPrint ( "Loading the blueprint file: blueprint_" + self.ID, messageVerbosity=0 )
+        blueprintList = [ ]
+        # with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
+        with open ( blueprintFilePath, newline='' ) as blueprintFile:
+            blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
+            for rowString in blueprintReader:
+                rowAsListOfStrings = rowString [ 0 ].split ( ',' )
+                # Reads the information about organs and converts to correct format
+                # i = 0,1 type & parent ID,  i = 2-4 position in m, i = 5-7 rotation in radians
+                blueprintRowToAppend: List [ float ] = [ int ( float ( i ) ) for i in rowAsListOfStrings [ 0:2 ] ] + \
+                                                       [ float ( i ) for i in rowAsListOfStrings [ 2:5 ] ] + \
+                                                       [ float ( i ) for i in rowAsListOfStrings [ 5:8 ] ]
+
+                blueprintList.append ( blueprintRowToAppend )  # converted to meters & radians
+        debugPrint ( 'organ locations are: ' + str ( blueprintList ), messageVerbosity=1 )
+
+        # define all the required organs to the robot object:
+        debugPrint ( "Defining the organs", messageVerbosity=1 )
+        for organ_raw_data in blueprintList:  # n.b. the first row must be the core organ
+            debugPrint ( "adding an organ of type {} ({})".format ( str ( organ_raw_data [ 1 ] ), dictionaryOfOrganTypes [ str ( organ_raw_data [ 1 ] ) ] [ "friendlyName" ] ), messageVerbosity=2 )
+            self.addOrgan (
+                makeOrganFromBlueprintData ( blueprintRow=organ_raw_data, dictionaryOfAllOrganTypes=dictionaryOfOrganTypes, gripper_TCP=gripperTCP )
+            )
+
+        # information on where the cables need to go
+        # each organ that has a cable to connect (so organ.transformOrganOriginToMaleCableSocket is not None) needs to have a point defined where this will be put, called organ.cableDestination
+        self.createLimbList ()
+        self.determineCableDestinations ()
 
     def addOrgan ( self, organToAdd ):
         self.organsList.append ( organToAdd )
