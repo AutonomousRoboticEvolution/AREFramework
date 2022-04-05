@@ -9,12 +9,15 @@ import time
 import cv2
 
 # Initialise the camera and create a reference to it
-is_picamera = True
+is_picamera = False
 if is_picamera:
     rawCapture = cv2.VideoCapture(0)
 else:
     #rawCapture = cv2.VideoCapture("v4l2src device=/dev/video2 ! videoconvert ! appsink")
-    rawCapture = cv2.VideoCapture('http://192.168.2.248/img/video.mjpeg')
+    #'http://192.168.2.248/img/video.mjpeg'
+    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    
+    rawCapture = cv2.VideoCapture(pipe)
 
 # Allow the camera time to warm up
 time.sleep(0.1)
@@ -76,10 +79,16 @@ def sliders_do(image):
         return
 
 # Capture frames from the camera
-
+def scaleImage(image, scale, dimensions=[1920,1080]):
+    width, height = int(dimensions[0]*scale),int(dimensions[1]*scale)
+    resize = cv2.resize(image, (width,height))
+    return resize
 
 while(1):
     ret,image = rawCapture.read()
+    image = scaleImage(image,0.3)
+    print(image.shape)
+    
     sliders_do(image)
 
 
