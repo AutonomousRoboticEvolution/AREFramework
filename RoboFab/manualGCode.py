@@ -120,8 +120,8 @@ blueprint_filename = "blueprint_{}.csv".format(robotID)
 mesh_filename = "mesh_{}.csv".format(robotID)
 
 printer = Printer ( None, config )
-#printer.createSTL(robotID,True)
-#printer.slice("mesh_{}".format(robotID))
+printer.createSTL(robotID,True)
+printer.slice("mesh_{}".format(robotID))
 
 myRobot=Robot(ID=robotID)
 print("{}/{}".format(waiting_to_be_built_folder_path,blueprint_filename))
