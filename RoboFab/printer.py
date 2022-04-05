@@ -16,6 +16,7 @@ class Printer:
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
+        self.openSCADScriptFileNameManualVersion = "skeleton_maker_manual.scad"
         self.openSCADDirectory = "./OpenSCAD/"
         # self.meshesNoClipsDirectory = "./meshes_no_clips/"
         self.meshesNoClipsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
@@ -60,7 +61,7 @@ class Printer:
     ## assumes the existence of the following files:
     ## ./meshes_no_clips/mesh[ID_number].stl
     ## ./blueprints/blueprint[ID_number].csv
-    def createSTL(self, ID_number: str):
+    def createSTL( self, ID_number: str, manualVersion=False ):
         debugPrint("Creating an STL file for individual {}".format(ID_number))
         blueprintFilename = "blueprint_" + ID_number + ".csv"
         debugPrint("using blueprint: {}{}".format(self.blueprintsDirectory, blueprintFilename),messageVerbosity=2)
@@ -83,8 +84,12 @@ class Printer:
         # make a new (temporary) openscad file, with the blueprint data at the start:
         with open("{}temporaryScript.scad".format(self.openSCADDirectory), "w") as temporaryFile:
             temporaryFile.write(blueprint_string)
-            temporaryFile.write(
-                open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
+            if manualVersion:
+                temporaryFile.write(
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
+            else:
+                temporaryFile.write(
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileNameManualVersion), "r").read())
             temporaryFile.close()
 
         # run the OpenSCAD terminal command
