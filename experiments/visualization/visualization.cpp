@@ -102,6 +102,37 @@ void VisuInd::update(double delta_time){
     std::dynamic_pointer_cast<CPPNMorph>(morphology)->command(outputs);
 }
 
+std::string VisuInd::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<VisuInd>();
+    oarch.register_type<NNParamGenome>();
+    oarch.register_type<NN2CPPNGenome>();
+    oarch.register_type<CPPNGenome>();
+    oarch.register_type<EmptyGenome>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void VisuInd::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<VisuInd>();
+    iarch.register_type<NNParamGenome>();
+    iarch.register_type<NN2CPPNGenome>();
+    iarch.register_type<CPPNGenome>();
+    iarch.register_type<EmptyGenome>();
+    iarch >> *this;
+
+    //set the parameters and randNum of the genome because their are not included in the serialisation
+    ctrlGenome->set_parameters(parameters);
+    ctrlGenome->set_randNum(randNum);
+    morphGenome->set_parameters(parameters);
+    morphGenome->set_randNum(randNum);
+}
+
 void Visu::init(){
     int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
     generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
@@ -111,7 +142,7 @@ void Visu::init(){
 
     std::vector<std::string> ctrl_gen_files;
     std::vector<std::string> morph_gen_files;
-    if(id > 0)
+    if(id >= 0)
         load_per_id(id,morph_gen_files,ctrl_gen_files);
     else load_per_gen_ind(indIdx,morph_gen_files,ctrl_gen_files);
 

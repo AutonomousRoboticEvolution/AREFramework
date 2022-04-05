@@ -21,6 +21,7 @@ using CPPNMorph = sim::Morphology_CPPNMatrix;
 class VisuInd : public Individual
 {
 public:
+    VisuInd() : Individual(){}
     VisuInd(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen)
         : Individual(morph_gen,ctrl_gen)
     {
@@ -33,6 +34,19 @@ public:
     };
     void update(double delta_time) override;
 
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & ctrlGenome;
+        arch & morphGenome;
+        arch & individual_id;
+        arch & generation;
+    }
+
+    std::string to_string() override;
+    void from_string(const std::string &str) override;
 
 private:
     void createMorphology() override;
