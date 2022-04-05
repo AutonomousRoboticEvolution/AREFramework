@@ -86,10 +86,10 @@ class Printer:
             temporaryFile.write(blueprint_string)
             if manualVersion:
                 temporaryFile.write(
-                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileNameManualVersion), "r").read())
             else:
                 temporaryFile.write(
-                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileNameManualVersion), "r").read())
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
             temporaryFile.close()
 
         # run the OpenSCAD terminal command
