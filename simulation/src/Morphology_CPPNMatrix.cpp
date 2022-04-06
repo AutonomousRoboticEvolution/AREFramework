@@ -648,86 +648,26 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
-    if ((x < 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261; orientation.at(1) = +0.5235; orientation.at(2) = +2.1861;
-    }
-    else if ((x < 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = +3.1415; orientation.at(1) = +0.7853; orientation.at(2) = -3.1415;
-    }
-    else if ((x < 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5261; orientation.at(1) = +0.6981; orientation.at(2) = -2.1862;
-    }
-    else if ((x == 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.3561; orientation.at(1) = +0.5960; orientation.at(2) = +1.5707;
-    }
-    else if ((x == 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415; orientation.at(1) = +0.000; orientation.at(2) = +0.0000;
-    }
-    else if ((x == 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.3561; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261; orientation.at(1) = -0.5236; orientation.at(2) = +0.9552;
-    }
-    else if ((x > 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415; orientation.at(1) = -0.7854; orientation.at(2) = +0.0000;
-    }
-    else if ((x > 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5132; orientation.at(1) = -0.5235; orientation.at(2) = -0.9552;
-    }
-    else if ((x < 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708; orientation.at(1) = +0.7853; orientation.at(2) = +1.5707;
+    
+    // Gives the direction of the organ given the direction of the surface
+    // Confusing list of angles that are in radians
+    if ((x == 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = -M_PI; orientation.at(1) = +0.0; orientation.at(2) = +0.0;
     }
     else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = +1.5707; orientation.at(2) = +0.0000;
-    }
-    else if ((x < 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707; orientation.at(1) = +0.7853; orientation.at(2) = -1.5708;
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI/2; orientation.at(2) = +0.0;
     }
     else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708; orientation.at(1) = +0.0000; orientation.at(2) = +1.5708;
+        orientation.at(0) = -M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI;
     }
     else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z == 0)) {
-        orientation.at(0) = +1.5707; orientation.at(1) = -0.7854; orientation.at(2) = +1.5708;
+        orientation.at(0) = +M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI/2;
     }
     else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0000; orientation.at(1) = -1.5708; orientation.at(2) = +3.1415;
-    }
-    else if ((x > 0) && (y > 0) && (z == 0)) {
-        orientation.at(0) = +1.5708; orientation.at(1) = -0.7854; orientation.at(2) = -1.5708;
-    }
-    else if ((x < 0) && (y < 0) && (z < 0)) {
-        orientation.at(0) = -0.6154; orientation.at(1) = +0.5235; orientation.at(2) = +0.9552;
-    }
-    else if ((x < 0) && (y == 0) && (z < 0)) {
-        orientation.at(0) = +0.0000; orientation.at(1) = +0.78563; orientation.at(2) = +0.0000;
-    }
-    else if ((x < 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.6154; orientation.at(1) = +0.5235; orientation.at(2) = -0.9552;
-    }
-    else if ((x == 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.7851; orientation.at(1) = +0.5235; orientation.at(2) = +1.5708;
-    }
-    else  if ((x == 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = +0.0000; orientation.at(2) = +0.0000;
-    }
-    else if ((x == 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.7853; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.6154; orientation.at(1) = -0.5236; orientation.at(2) = +2.1861;
-    }
-    else if ((x > 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = -0.7854; orientation.at(2) = -3.1415;
-    }
-    else if ((x > 0) && (y > 0) && (z < 0)) {
-        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI/2; orientation.at(2) = +M_PI;
     }
     else {
-        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.0; orientation.at(1) = 0.0; orientation.at(2) = 0.0;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }
