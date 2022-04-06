@@ -313,8 +313,8 @@ class Robot:
         plt.title("Robot ID: {}".format(self.ID))
 
         # save as pdf
-        filepath = "{}/waiting_to_be_evaluated/plan_{}".format(saveDirectory,self.ID)
-        if os.path.exists("{}.pdf".format(filepath)): os.remove("{}.pdf".format(filepath))  # delete it if it already exists to avoid errors
+        filepath = "{}/waiting_to_be_evaluated/plan_{}.pdf".format(saveDirectory,self.ID)
+        if os.path.exists(filepath): os.remove(filepath)  # delete it if it already exists to avoid errors
         pdf = PdfPages ( filepath )
         pdf.savefig ( plt.gcf() )
         pdf.close ()
