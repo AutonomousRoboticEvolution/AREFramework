@@ -83,6 +83,11 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setCurrentLimit(17); // in 10s of milliAmps
         }
+        else if (thisOrgan->organType == JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisJoint= static_cast<JointOrgan *>(thisOrgan);
+            thisJoint->setCurrentLimit(100); // in 10s of milliAmps
+        }
     }
 
     // initialise the Head LEDs
