@@ -45,6 +45,8 @@ public:
 
     int get_number_of_scenes(){return scenes_path.size();}
 
+    const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
+
 private:
     int move_counter = 0;
     int number_of_collisions = 0;
@@ -52,6 +54,7 @@ private:
     std::vector<std::string> scenes_path;
     int current_scene = 0;
     std::vector<double> init_position;
+    std::vector<std::vector<waypoint>> trajectories;
 };
 
 } //sim

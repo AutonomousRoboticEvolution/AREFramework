@@ -20,6 +20,9 @@ MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
     for(int i = 0; i < targets.size();i+=3)
         target_positions.push_back({targets[i],targets[i+1],targets[i+2]});
+
+    trajectories.resize(target_positions.size());
+
 }
 
 void MultiTargetMaze::init(){
@@ -117,8 +120,10 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
-    else if(simulationTime >= evalTime)
+    else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
+        trajectories[current_target] = trajectory;
+    }
 
     return 0;
 }

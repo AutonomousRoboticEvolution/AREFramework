@@ -22,6 +22,8 @@ Exploration::Exploration(const settings::ParametersMapPtr& params)
     for(const auto& sn: scenes_names)
         scenes_path.push_back(models_folder + "/scenes/" + sn);
 
+    trajectories.resize(scenes_path.size());
+
 }
 
 void Exploration::init(){
@@ -57,7 +59,6 @@ void Exploration::init(){
 
     grid_zone = Eigen::MatrixXi::Zero(8,8);
     number_of_collisions = 0;
-
 
     bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
 
@@ -126,8 +127,10 @@ float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph)
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
-    else if(simulationTime >= evalTime)
+    else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
+        trajectories[current_scene] = trajectory;
+    }
 
     return 0;
 }

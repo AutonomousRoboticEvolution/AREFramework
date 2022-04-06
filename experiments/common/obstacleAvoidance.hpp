@@ -41,7 +41,7 @@ public:
 
     std::pair<int,int> real_coordinate_to_matrix_index(const std::vector<double> &pos);
 
-    const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
+    const Eigen::MatrixXi& get_visited_zone_matrix(){return grid_zone;}
 
 private:
     int move_counter = 0;

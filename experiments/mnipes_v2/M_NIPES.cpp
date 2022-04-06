@@ -177,6 +177,7 @@ void M_NIPESIndividual::compute_fitness(){
         fitness += r;
     fitness /= static_cast<double>(rewards.size());
     objectives[0] = fitness;
+    copy_rewards = rewards;
 }
 
 void M_NIPES::init(){
@@ -322,10 +323,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
     Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
         if(env->get_name() == "obstacle_avoidance"){
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
         }
         else if(env->get_name() == "multi_target_maze"){
             int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
@@ -334,6 +335,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             }else{
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
             }
         }
         else if(env->get_name() == "exploration"){
@@ -345,7 +347,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
             }else{
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::Exploration>(env)->get_trajectories());
             }
+        }else if(env->get_name() == "mazeEnv"){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
         }
     }
 
@@ -397,7 +402,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-                new_gene.trajectory = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectory();
+                new_gene.trajectories = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
+                new_gene.rewards = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_rewards();
                 new_gene.behavioral_descriptor = ind->descriptor();
                 gene_pool.push_back(new_gene);
                 //-
