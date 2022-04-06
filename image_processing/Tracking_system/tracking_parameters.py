@@ -58,11 +58,11 @@ elif location == "york":
 elif location == "amsterdam":
     pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
     #mask filter parameters
-    brainMin = (0,157,154)
-    brainMax = (10,221,208)
+    brainMin = (0,47,87)
+    brainMax = (11,255,255)
 
     #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (386,264) # defined in the uncropped image
-    pixel_scale = 175
+    centre_reference = (970,430) # defined in the uncropped image
+    pixel_scale = 540
     
     crop_rectangle = [-1]

@@ -84,10 +84,14 @@ def scaleImage(image, scale, dimensions=[1920,1080]):
     resize = cv2.resize(image, (width,height))
     return resize
 
+ret,image = rawCapture.read()
+file_path = "Raw_pic.jpg"
+cv2.imwrite(file_path, image)
+
 while(1):
     ret,image = rawCapture.read()
     image = scaleImage(image,0.3)
-    print(image.shape)
+    #print(image.shape)
     
     sliders_do(image)
 
