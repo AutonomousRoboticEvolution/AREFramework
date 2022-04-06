@@ -337,6 +337,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
             }
         }
         else if(env->get_name() == "exploration"){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::Exploration>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
             int number_of_scenes = std::dynamic_pointer_cast<sim::Exploration>(env)->get_number_of_scenes();
             if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes){
                 return false;

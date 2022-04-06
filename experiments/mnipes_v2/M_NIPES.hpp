@@ -97,7 +97,8 @@ public:
         energy_cost(ind.energy_cost),
         sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
-        nbr_dropped_eval(ind.nbr_dropped_eval)
+        nbr_dropped_eval(ind.nbr_dropped_eval),
+        descriptor_type(ind.descriptor_type)
     {}
 
     Individual::Ptr clone() override {
@@ -137,6 +138,7 @@ public:
         arch & controller_archive;
         arch & morphDesc;
         arch & nbr_dropped_eval;
+        arch & descriptor_type;
     }
 
     std::string to_string() override;
