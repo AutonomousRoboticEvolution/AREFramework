@@ -132,7 +132,9 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            thisJoint->setTargetAngleNormalised(values[i]);
+            double value = values[i];
+            value = std::sin(value*(time_milli/1000.0));
+            thisJoint->setTargetAngleNormalised(value);
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++;
         }
