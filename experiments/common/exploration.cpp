@@ -45,20 +45,22 @@ void Exploration::init(){
         }
     }
 
-    current_scene++;
-    if(current_scene >= scenes_path.size())
-        current_scene = 0;
+
 
     std::vector<double> init_positions = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     init_position.clear();
-    init_position.insert(init_position.begin(),init_positions.begin() + current_scene, init_positions.begin()+current_scene+2);
+    init_position.insert(init_position.begin(),init_positions.begin() + current_scene*3, init_positions.begin() + current_scene*3 + 2);
     final_position = init_position;
 
     trajectory.clear();
 
     grid_zone = Eigen::MatrixXi::Zero(8,8);
     number_of_collisions = 0;
+
+    current_scene++;
+    if(current_scene >= scenes_path.size())
+        current_scene = 0;
 
     bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
 

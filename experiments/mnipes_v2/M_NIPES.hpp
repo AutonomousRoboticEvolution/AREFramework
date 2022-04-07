@@ -161,7 +161,7 @@ public:
     int get_number_times_evaluated(){return rewards.size();}
     void reset_rewards(){rewards.clear();}
     void add_reward(double reward){rewards.push_back(reward);}
-    const std::vector<double>& get_rewards(){return rewards;}
+    const std::vector<double>& get_rewards(){return copy_rewards;}
     void compute_fitness();
 private:
     void createMorphology() override;
