@@ -279,6 +279,11 @@ int AREControl::exec(zmq::socket_t& socket){
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->standby();
         }
+        if (thisOrgan->organType = JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisjoint= static_cast<JointOrgan *>(thisOrgan);
+            thisjoint->setServoOff();
+        }
     }
     ledDriver->flash(BLUE);
     daughterBoards->turnOff();
