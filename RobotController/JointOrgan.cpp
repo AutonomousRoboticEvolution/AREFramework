@@ -19,8 +19,6 @@ JointOrgan::JointOrgan(uint8_t address) : Organ(address){
 //new Target is a signed value in degrees for the target angle to move to
 void JointOrgan::setTargetAngle(int8_t newTarget) {
 	//Send to device (write8To inherited from I2CDevice)
-    std::clog << static_cast<int>(newTarget);
-
     write8To(TARGET_POSITION_REGISTER, newTarget);
 }
 

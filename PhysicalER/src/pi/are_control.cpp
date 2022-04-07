@@ -140,9 +140,7 @@ void AREControl::sendOutputOrganCommands(const std::vector<double> &values, uint
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             double value = values[i];
             value = std::sin(value*(time_milli/1000.0));
-            std::clog << "Joint ["<<i<<"]: " << value << " -> ";
             thisJoint->setTargetAngleNormalised(value);
-            std::clog << std::endl;
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++;
         }
