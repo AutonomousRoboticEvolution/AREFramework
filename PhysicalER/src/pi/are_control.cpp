@@ -201,7 +201,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
 }
 
 void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
-    if (nn_inputs.empty()) return;
+    if (!cameraInputToNN) return; // without aruco tag input, this debugging LED output wouldn't make any sense
     // compute brightness between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
     if (nn_inputs.back()>0){ // camera reading is the last NN input
         ledDriver->setAllTo(GREEN,200);
