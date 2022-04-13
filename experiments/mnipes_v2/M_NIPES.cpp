@@ -55,7 +55,7 @@ void M_NIPESIndividual::createMorphology(){
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     int i = rewards.size();
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0+i],init_pos[1+i],init_pos[2+i]);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
     if(ctrlGenome->get_type() != "empty_genome")
        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     
@@ -330,7 +330,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
         }
         else if(env->get_name() == "multi_target_maze"){
             int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
+            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
                 return false;
             }else{
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
@@ -342,7 +342,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::Exploration>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
             int number_of_scenes = std::dynamic_pointer_cast<sim::Exploration>(env)->get_number_of_scenes();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes){
+            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes && ind->get_morph_genome()->get_type() != "empty_genome"){
                 return false;
             }else{
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();

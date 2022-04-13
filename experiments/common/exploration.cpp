@@ -56,10 +56,6 @@ void Exploration::init(){
     grid_zone = Eigen::MatrixXi::Zero(8,8);
     number_of_collisions = 0;
 
-    current_scene++;
-    if(current_scene >= scenes_path.size())
-        current_scene = 0;
-
     bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
 
     if(with_tiles){
@@ -76,6 +72,10 @@ std::vector<double> Exploration::fitnessFunction(const Individual::Ptr &ind){
                 sum += abs(i - init.first) + abs(j - init.second);
         return sum;
     };
+    current_scene++;
+    if(current_scene >= scenes_path.size())
+        current_scene = 0;
+
     return {static_cast<double>(grid_zone.sum())/static_cast<double>(max_fitness(8,real_coordinate_to_matrix_index(init_position)))};
 }
 
@@ -130,6 +130,7 @@ float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph)
     else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
         trajectories[current_scene] = trajectory;
+        current_scene++;
     }
 
     return 0;
