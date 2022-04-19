@@ -23,13 +23,13 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
         for(int y = 0; y < dim; y++){
             for(int z = 0; z < dim; z++){
                 int i = x + y*dim + z*dim*dim;
-                if(w(i) > 0 && w(i) > 0){
+                if(w(i) > 0 && v(i) > 0){
                     sum += v(i) == w(i) ? dim : 0;
                     continue;
                 }
-                if(v(i) > 0)
+                else if(v(i) > 0)
                     v_coord.push_back({x,y,z});
-                if(w(i) > 0)
+                else if(w(i) > 0)
                     w_coord.push_back({x,y,z});
             }
         }
