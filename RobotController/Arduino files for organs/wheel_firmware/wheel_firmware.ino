@@ -6,7 +6,7 @@
 #define INDICATOR_LED_SHOW_MOTOR_POWER
 #define DEBUG 0
 
-#define SLAVE_ADDRESS 0x60 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x61 // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //Libraries
 #include <Wire.h>
@@ -255,8 +255,8 @@ void interpret_control_register_value(){
     Serial.println(motor_state);
     Serial.print("New demand velocity:");
     Serial.println(demand_velocity);
-    Serial.print("OL controller value:");
-    Serial.println(FF_controller( demand_velocity ));
+//    Serial.print("OL controller value:");
+//    Serial.println(FF_controller( demand_velocity ));
 #endif
 }
 
@@ -264,10 +264,11 @@ void interpret_control_register_value(){
 // triggered on every i2c conversation:
 void receiveData(int received_data_byte_count){
   // the first byte received is the register value, and determines what we should do
-    input_buffer[0] = Wire.read(); // register
+  input_buffer[0] = Wire.read(); // register
   #ifdef SERIAL_DEBUG_PRINTING
     Serial.print("Received: 0x");
-    Serial.print(input_buffer[0],HEX);
+    if (received_data_byte_count>1){Serial.print(input_buffer[0],HEX);}
+    else { Serial.println(input_buffer[0],HEX);}
   #endif
   if (received_data_byte_count>1){
     input_buffer[1] = Wire.read(); // value
@@ -376,9 +377,15 @@ void setCurrentLimit (uint8_t tens_of_milliamps) {
   //Write to digital potentiometer
   //Must isolate from external I2C bus first to not interact with other joints
   extI2CEnable(false);
+  #ifdef SERIAL_DEBUG_PRINTING
+      Serial.print("Setting pot_value...");
+  #endif
   Wire.beginTransmission(DIG_POT_ADDRESS); // transmit to device
   Wire.write(pot_value);            // set register value
   int tx_info = Wire.endTransmission();     // stop transmitting 
+  #ifdef SERIAL_DEBUG_PRINTING
+      Serial.println("done.");
+  #endif
   extI2CEnable(true);
 
   //Update global variable for current limit
@@ -414,7 +421,7 @@ int readMotorCurrent() {
 
   //Debug info
   if (DEBUG) {
-    Serial.print("Servo current: ");
+    Serial.print("Measured current: ");
     Serial.print(current_reading, DEC);
     Serial.println("mA");
   }

@@ -52,7 +52,16 @@ void CPPNIndividual::set_4d_matrix()
 }
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
-    return morphDesc.getCartDesc();
+    int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
+    if(descriptor == CART_DESC)
+        return morphDesc.getCartDesc();
+    else if(descriptor == ORGAN_POSITION)
+        return organ_position_descriptor;
+    else{
+        std::cerr << "Unknown descriptor" << std::endl;
+        return Eigen::VectorXd::Zero(1);
+    }
+
 }
 
 std::string CPPNIndividual::to_string()

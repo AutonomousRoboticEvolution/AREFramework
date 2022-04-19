@@ -5,6 +5,7 @@
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,1
+#evaluationOrder,int,3
 
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/

@@ -14,7 +14,7 @@ void Camera::setTagsToLookFor(std::vector<int> tags_list){
     tags_to_look_for=tags_list;
 }
 
-bool Camera::presenceDetect(){
+bool Camera::presenceDetect(std::string save_image_for_debugging){
     //if(debugPrinting){std::cout<<"cam test..."<<std::endl;}
     u_int32_t start_time = millis();
 
@@ -35,12 +35,12 @@ bool Camera::presenceDetect(){
     
     u_int32_t end_time = millis();
     // debugging printing:
-    if(debugPrinting){
+    if(save_image_for_debugging!=""){
         std::cout<<"Time taken: "<<end_time-start_time<<" ms\t";
 
-        //cv::aruco::drawDetectedMarkers(image, markerCorners,foundTags);
-        //cv::aruco::drawDetectedMarkers(image, rejectedCandidates);
-        //cv::imwrite("/home/pi/debugOutput.png", image);
+        cv::aruco::drawDetectedMarkers(image, markerCorners,foundTags);
+        cv::imwrite("/home/pi/"+save_image_for_debugging+".png", image);
+//        cv::imshow("Camera image",image); // doesn't work on pi
 
         if (foundTags.size() > 0){
             std::cout<<"can see tags:\t";

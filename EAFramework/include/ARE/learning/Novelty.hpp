@@ -5,11 +5,20 @@
 #include <tbb/tbb.h>
 #include <Eigen/Core>
 #include "ARE/Logging.h"
+#include <functional>
 
 namespace are {
 
 
 struct Novelty {
+
+    typedef std::function<double(Eigen::VectorXd,Eigen::VectorXd)> distance_fct_t;
+
+    typedef struct distance_fcts{
+        static distance_fct_t euclidian;
+        static distance_fct_t positional;
+        static distance_fct_t positional_normalized;
+    } distance_fcts;
 
     /**
      * @brief compute sparseness from a given list of distances and k_value a static parameter
@@ -40,7 +49,8 @@ struct Novelty {
      */
     static std::vector<double> distances(const Eigen::VectorXd& desc,
                                         const std::vector<Eigen::VectorXd> &archive,
-                                        const std::vector<Eigen::VectorXd> &pop);
+                                        const std::vector<Eigen::VectorXd> &pop,
+                                        const distance_fct_t dist_fct = distance_fcts::euclidian);
 
     /**
      * @brief Compute distances of a descriptor to the archive and a population. And return the vector of distances sorted in increasing order.
@@ -53,7 +63,8 @@ struct Novelty {
     static std::vector<double> distances(const Eigen::VectorXd& desc,
                                         const std::vector<Eigen::VectorXd> &archive,
                                         const std::vector<Eigen::VectorXd> &pop,
-                                        std::vector<size_t> & sorted_pop_indexes);
+                                        std::vector<size_t> & sorted_pop_indexes,
+                                         const distance_fct_t dist_fct = distance_fcts::euclidian);
 
 
     static int k_value;

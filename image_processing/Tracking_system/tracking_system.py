@@ -22,6 +22,7 @@ class TrackingSystem:
         self.socket.bind("tcp://*:{}".format(zmq_port_number))
 
         # the robot and aruco_tags objects that are updated inside the threaded_updater:
+        self.uncropped_image = None
         self.robot = None
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
@@ -70,9 +71,9 @@ class TrackingSystem:
         if self.show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            cv2.imshow("Holy Mask",mask)
-            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
-            cv2.imshow("Blob",kp_image)
+#            cv2.imshow("Holy Mask",mask)
+#            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
+#            cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
         if len(keypoints) >0 :
@@ -109,9 +110,9 @@ class TrackingSystem:
                 tag_list += [[ids[i][0], x_pos, y_pos]]
 
         #displays tags
-        if self.show_frames:
-            frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
-            cv2.imshow("Frame", frame_markers)
+ #       if self.show_frames:
+ #           frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
+ #           cv2.imshow("Frame", frame_markers)
 
         # returns list
         return tag_list
@@ -128,13 +129,17 @@ class TrackingSystem:
     def camera_updater(self):
         vid = cv2.VideoCapture(pipe) # pipe is set in tracking_parameters.py
 
+        # set resolution:
+        if resolution_width>0: vid.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_width)
+        if resolution_height>0: vid.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_height)
+
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, uncropped_image = vid.read()
+            self.frame_return_success, self.uncropped_image = vid.read()
 
             if self.frame_return_success:
-                image = self.crop_image(uncropped_image)
+                image = self.crop_image(self.uncropped_image)
                 # gets robot location
                 self.robot = self.robot_location(image, brainMin, brainMax)
 
@@ -142,13 +147,21 @@ class TrackingSystem:
                 self.aruco_tags = self.aruco_locations(image)
 
                 if self.show_frames:
-                    cv2.imshow("Image", image )
-                    cv2.imshow("Cropped", self.crop_image(image) )
+                    cv2.imshow("Image", image)
+                    #print("Image size: {}".format(self.uncropped_image.shape))
+                    cv2.imshow("Uncropped", self.uncropped_image )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
-            
 
+    def show_im(self):
+        vid = cv2.VideoCapture(pipe)
+        while (1):
+            self.frame_return_success, image = vid.read()
+
+            if self.frame_return_success:
+                cv2.imshow("Uncropped", image )
+                cv2.waitKey(1)
     def zmq_updater(self):
         #main loop waiting for a zmq message
         print("Starting loop for zmq messages")
@@ -162,7 +175,8 @@ class TrackingSystem:
 
             if str(message) == "Robot:position":
                 # send the latest value of self.robot
-                # print("Sending robot position: {}".format(self.robot))
+                if self.show_frames:
+                    print("Sending robot position: {}".format(self.robot))
                 if self.robot is not None and self.frame_return_success:
                     self.socket.send_string(f"Robot:{self.robot}")
                 else:
@@ -170,12 +184,20 @@ class TrackingSystem:
 
             elif str(message) == "Tags:position":
                 # send the latest value of self.aruco_tags
-                # print("Sending aruco tags position(s): {}".format(self.aruco_tags))
+                if self.show_frames:
+                    print("Sending aruco tags position(s): {}".format(self.aruco_tags))
                 if self.frame_return_success:
                     self.socket.send_string(f"Tags:{self.aruco_tags}")
                 else:
                     self.socket.send_string("Tags:[]") # empty list
 
+            elif str(message) == "Image:resolution":
+                print("Sending image resolution of {}x{}x{}".format(self.uncropped_image.shape[0],self.uncropped_image.shape[1],self.uncropped_image.shape[2]))
+                self.socket.send_string("Image:{}".format(self.uncropped_image.shape))
+
+            elif str(message) == "Image:image":
+                # print(self.uncropped_image)
+                self.socket.send(self.uncropped_image.tobytes())
             else:
                 warnings.warn("Got an unrecognised message: {}".format(message))
 
@@ -190,3 +212,4 @@ class TrackingSystem:
 
 tracking_system = TrackingSystem()
 tracking_system.main()
+

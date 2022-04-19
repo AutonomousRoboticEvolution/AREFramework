@@ -270,6 +270,13 @@ void localMessageHandler(int message){
 
 void clientMessageHandler(int message){
 
+    simInt length;
+    simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
+    if(log_folder != nullptr){
+        are::Logging::log_folder = std::string(log_folder);
+        are::Logging::log_folder.resize(length);
+    }
+
     if(message == sim_message_eventcallback_modelloaded)
         return;
 

@@ -63,7 +63,7 @@ class RoboFab_host:
     def setupRobotObject(self, robotID:str, printer:Printer):
 
         self.robotID = robotID
-        self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed )
+        self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed, ID=robotID )
 
         # open blueprint and parse basic organ data
         debugPrint ( "Loading the blueprint file: blueprint_" + robotID , messageVerbosity=0 )
@@ -83,27 +83,21 @@ class RoboFab_host:
         debugPrint( 'organ locations are: ' + str( blueprintList ) ,messageVerbosity=1 )
 
 
-        # define all the required organs and cables to the robot object:
+        # define all the required organs to the robot object:
         debugPrint( "Defining the organs" ,messageVerbosity=1)
         for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
-            print(self.dictionaryOfOrganTypes[str(organ_raw_data[1])])
             debugPrint ( "adding an organ of type {} ({})".format(str( organ_raw_data[1] ) , self.dictionaryOfOrganTypes[str(organ_raw_data[1])]["friendlyName"]) ,messageVerbosity=2)
             self.myRobot.addOrgan (
                 makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
             )
 
-        # information on where the cables need to go - currently manually defined.
+        # information on where the cables need to go
         # each organ that has a cable to connect (so organ.transformOrganOriginToMaleCableSocket is not None) needs to have a point defined where this will be put, called organ.cableDestination
-        # todo: need to automatically compute which Head slot each organ should be attached to
-        if DO_ORGAN_INSERTIONS:
-            debugPrint ( "manually defining some cables" ,messageVerbosity=1 )
-            i=-1
-            for organ in self.myRobot.organsList:
-                if organ.transformOrganOriginToMaleCableSocket is not None:
-                    i+=1
-                    organ.cableDestination = self.myRobot.organsList[0].positionTransformWithinBankOrRobot \
-                                             * self.myRobot.organsList[0].transformOrganOriginToCableSocket[i] # socket slot in Head, relative to robot origin
+        self.myRobot.createLimbList()
+        self.myRobot.determineCableDestinations()
+        self.myRobot.drawRobot(self.logDirectory)
 
+    # returns true if the bank has enough organs to provide all those required by the loaded robot
     def checkBankHasEnoughOrgans(self):
         # count the organs we need:
         organs_in_robot = {}
@@ -142,7 +136,6 @@ class RoboFab_host:
             debugPrint( "Core organ insert..." )
             self.UR5.insertHeadOrgan ( bank=self.organBank, printer=printer, robot=self.myRobot, gripperTCP=self.gripperTCP_A, assemblyFixture=self.AF )
         else:
-            self.myRobot.organInsertionTrackingList[0]=True # pretend we have done the core organ insert
             self.AF.turnElectromagnetsOn() # grip the robot
         self.myRobot.origin = self.AF.currentPosition # update the origin position of the robot now that it is on the assembly fixture
         timer.add("Finished Head Insert")
@@ -151,11 +144,11 @@ class RoboFab_host:
         # attach each organ in turn
         if DO_ORGAN_INSERTIONS:
             debugPrint( "Doing organ insertions" )
-            while self.myRobot.hasOrgansNeedingInsertion:
+            while not all ( [x.hasBeenInserted for x in self.myRobot.organsByLimbList[0]] ) :
                 nextOrganFromRobot = self.myRobot.getNextOrganToInsert()
-                if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None:
+                if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
                     thisOrgan = self.UR5.insertOrganWithoutCable(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
-                else:
+                else: # has a cable that needs connecting to Head
                     thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A )
         else:
             debugPrint( "Organ insertions skipped" )
@@ -168,32 +161,35 @@ class RoboFab_host:
 
         if DO_EXPORT_ORGANS_LIST:
             self.save_log_files()
+            self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
     def save_log_files( self ):
-        file = open ( "robot_build_file.txt", "w" )
-        # file.write ( "ID:{}\n".format(self.robotID) )
+        # write list_of_organs file
+        os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
+        file = open ( "{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) , "w" )
         for organ in self.myRobot.organsList:
             file.write ( "{},{}\n".format(organ.organType, organ.I2CAddress) )
             # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
         file.close ()
 
-        # move build log specified log folder, and now that it is build delete the blueprint :
-        print("{}/waiting_to_be_evaluated".format ( self.logDirectory ))
-        print("{}/blueprint_archive".format(self.logDirectory))
-        os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
-        # move the list_of_organs_addresses to the right folder:
-        shutil.move ( "robot_build_file.txt","{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) )
-        print("Saved list of organs as: {}/waiting_to_be_evaluated/list_of_organs_addresses_{}.csv".format ( self.logDirectory, self.robotID ) )
-        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
-        shutil.move ( "{}/waiting_to_be_built/morph_genome_{}","{}/waiting_to_be_evaluated/morph_genome_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
-        shutil.move ( "{}/waiting_to_be_built/blueprint_{}","{}/logs/blueprint_{}".format ( self.logDirectory, self.robotID, self.logDirectory, self.robotID ) )
-        shutil.move("{}/waiting_to_be_built/mesh_{}", "{}/logs/mesh_{}".format(self.logDirectory, self.robotID, self.logDirectory, self.robotID))
+        # move the blueprint and mesh files to "archive" folder
+        os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
+        blueprint_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","blueprint_{}.csv".format(self.robotID))
+        mesh_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","mesh_{}.stl".format(self.robotID))
+        blueprint_new_path = os.path.join(self.logDirectory,"blueprint_archive","blueprint_{}.csv".format(self.robotID))
+        mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))
+        if os.path.exists(blueprint_new_path): os.remove(blueprint_new_path) # delete it if it already exists to avoid errors
+        if os.path.exists(mesh_new_path): os.remove(mesh_new_path) # delete it if it already exists to avoid errors
+        shutil.move(blueprint_old_path, blueprint_new_path)
+        shutil.move(mesh_old_path, mesh_new_path)
 
-        ## move the blueprint to the archive folder
-        # os.makedirs("{}/blueprint_archive".format(self.logDirectory), exist_ok=True) # create the folder if it doesn't already exists
-        # shutil.move ( "{}/waiting_to_be_built/blueprint{}.csv".format(self.logDirectory,self.robotID), "{}/blueprint_archive/blueprint{}.csv".format(self.logDirectory,self.robotID))
+        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
+        genome_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","morph_genome_{}".format(self.robotID))
+        genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
+        if os.path.exists(genome_new_path): os.remove(genome_new_path)
+        shutil.move ( genome_old_path, genome_new_path)
 
     def temp_limb_demo(self):
         ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology

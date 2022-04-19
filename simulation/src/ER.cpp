@@ -62,17 +62,18 @@ void ER::startOfSimulation()
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->init();
+    int ind_id = currentInd->get_morph_genome()->id();
     // Get images?
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
             Logging::create_folder(Logging::log_folder + "/" + image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+            robotScreenshot(ind_id,image_repo);
         }
     }
     ea->setCurrentIndIndex(currentIndIndex);
@@ -90,17 +91,18 @@ void ER::initIndividual(){
     if(nbrEval == 0)
         currentInd->from_string(mess);
     currentInd->init();
+    int ind_id = currentInd->get_morph_genome()->id();
     evalIsFinish = false;
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
             Logging::create_folder(Logging::log_folder + "/" + image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+            robotScreenshot(ind_id,image_repo);
         }
     }
 }

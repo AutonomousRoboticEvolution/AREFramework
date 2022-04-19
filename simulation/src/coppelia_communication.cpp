@@ -243,7 +243,7 @@ void sim::printSimulatorState(int simState){
     else std::cout << "UNKNOWN" << std::endl;
 }
 
-void sim::robotScreenshot(int individual, int generation, std::string repository)
+void sim::robotScreenshot(int ind_id, std::string repository)
 {
     // https://www.coppeliarobotics.com/helpFiles/en/regularApi/simCreateVisionSensor.htm
     const int resX = 1152, resY = 1152;
@@ -306,7 +306,7 @@ void sim::robotScreenshot(int individual, int generation, std::string repository
         int resolutionX, resolutionY;
         const simUChar* image_buf_char = simGetVisionSensorCharImage(handleVisionSensor, &resolutionX, &resolutionY);
         std::stringstream filepath;
-        filepath << repository << "/robot" << "_" << generation << "_" << individual << "_" << i << ".png";
+        filepath << repository << "/robot" << "_" << ind_id << "_" << i << ".png";
         const std::string temp = filepath.str();
 
         simInt res[2];

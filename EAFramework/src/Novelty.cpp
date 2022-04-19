@@ -6,6 +6,85 @@ int Novelty::k_value = 15;
 double Novelty::novelty_thr = 0.9;
 double Novelty::archive_adding_prob = 0.4;
 
+Novelty::distance_fct_t Novelty::distance_fcts::euclidian = [](Eigen::VectorXd v,Eigen::VectorXd w) -> double {
+    return (w-v).norm();
+};
+
+Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd v,Eigen::VectorXd w) -> double {
+    auto L1 = [](std::array<int,3> p1, std::array<int,3> p2){// Distance L1 on integers
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1]) + abs(p1[2] - p2[2]);
+    };
+
+    //Retrieve matrix coordinates of all organs with different positions and add to the sum _dim_ if two different organs are on the same position.
+    int sum = 0;
+    int dim = v.rows()/3;
+    std::vector<std::array<int,3>> v_coord, w_coord;
+    for(int x = 0; x < dim; x++){
+        for(int y = 0; y < dim; y++){
+            for(int z = 0; z < dim; z++){
+                int i = x + y*dim + z*dim*dim;
+                if(w(i) > 0 && v(i) > 0){
+                    sum += v(i) == w(i) ? dim : 0;
+                    continue;
+                }
+                else if(v(i) > 0)
+                    v_coord.push_back({x,y,z});
+                else if(w(i) > 0)
+                    w_coord.push_back({x,y,z});
+            }
+        }
+    }
+
+    //If one of the robot does not have any more organs
+    //then just return sum of _dim_ of the number of extra organs of the other robot.
+    if(v_coord.empty()){
+        for(int i = 0; i < w_coord.size(); i++)
+            sum+=dim;
+        return sum;
+    }
+    else if(w_coord.empty()){
+        for(int i = 0; i < v_coord.size(); i++)
+            sum+=dim;
+        return sum;
+    }
+
+    //Compute all the distances between the organs on different positions
+    std::vector<std::vector<std::array<int,3>>> distances;
+    auto& L = std::max(v_coord,w_coord,[](const auto& a,const auto& b) -> bool{return a.size() < b.size();}); //longest
+    auto& S = std::min(w_coord,v_coord,[](const auto& a,const auto& b) -> bool{return a.size() < b.size();}); //shortest
+    for(int i = 0; i < L.size(); i++){
+        std::vector<std::array<int,3>> dists;
+        for(int j = 0; j < S.size(); j++){
+            dists.push_back({L1(L[i],S[j]),i,j});
+        }
+        //sort in ascendent order
+        std::sort(dists.begin(),dists.end(),
+                  [&](const auto &a, const auto &b){
+                        return a[0] < b[0];
+        });
+        distances.push_back(dists);
+    }
+
+
+
+    //add to the sum the N first distances (closest organs) and _dim_ if the organs are different.
+    //where N is the largest number of organs betweeen the two body-plans
+    for(int i = 0; i < std::max(v_coord.size(),w_coord.size()); i++){
+        const auto & dist = distances[i][0]; //get the pair with the smallest distance
+        int j = v_coord[dist[1]][0] + v_coord[dist[1]][1]*dim + v_coord[dist[1]][2]*dim*dim;
+        int k = w_coord[dist[2]][0] + w_coord[dist[2]][1]*dim + w_coord[dist[2]][2]*dim*dim;
+        sum += dist[0] + v(j) == w(k) ? dim : 0;
+    }
+
+    return sum;
+};
+
+Novelty::distance_fct_t Novelty::distance_fcts::positional_normalized = [](Eigen::VectorXd v,Eigen::VectorXd w) -> double {
+    double dist = Novelty::distance_fcts::positional(v,w);
+    int dim = v.rows()/3;
+    return dist/(dim*dim*dim*dim);
+};
+
 double Novelty::sparseness(const std::vector<double> &dist){
     double sum = 0;
     if(dist.size() >  k_value + 1){
@@ -20,7 +99,8 @@ double Novelty::sparseness(const std::vector<double> &dist){
 
 std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                                        const std::vector<Eigen::VectorXd> &archive,
-                                       const std::vector<Eigen::VectorXd> &pop){
+                                       const std::vector<Eigen::VectorXd> &pop,
+                                       const distance_fct_t dist_fct){
 
     std::vector<double> dist(archive.size() + pop.size());
     // Comparing with archive
@@ -28,7 +108,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                       [&](tbb::blocked_range<size_t> r){
 
         for(size_t i = r.begin(); i != r.end(); i++){
-            dist[i] = (archive[i] - ind_desc).norm();
+            dist[i] = dist_fct(archive[i],ind_desc);
         }
     });
 
@@ -40,7 +120,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
             if(pop[i] == ind_desc)
                 dist[i+archive.size()] = 1.;
             else
-                dist[i+archive.size()] = (pop[i] - ind_desc).norm();
+                dist[i+archive.size()] = dist_fct(pop[i],ind_desc);
         }
     });
 
@@ -53,7 +133,8 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
 std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                                        const std::vector<Eigen::VectorXd> &archive,
                                        const std::vector<Eigen::VectorXd> &pop,
-                                       std::vector<size_t> & sorted_pop_indexes){
+                                       std::vector<size_t> & sorted_pop_indexes,
+                                       const distance_fct_t dist_fct){
 
     std::vector<double> dist(archive.size() + pop.size());
 
@@ -62,7 +143,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                       [&](tbb::blocked_range<size_t> r){
 
         for(size_t i = r.begin(); i != r.end(); i++){
-            dist[i] = (archive[i] - ind_desc).norm();
+            dist[i] = dist_fct(archive[i],ind_desc);
         }
     });
 
@@ -76,7 +157,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
             if(pop[i] == ind_desc)
                 pop_dist[i] = 1.;
             else
-                pop_dist[i] = (pop[i] - ind_desc).norm();
+                pop_dist[i] = dist_fct(pop[i],ind_desc);
             dist[i+archive.size()] = pop_dist[i];
         }
     });

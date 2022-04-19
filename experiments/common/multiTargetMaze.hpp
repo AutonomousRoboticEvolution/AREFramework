@@ -42,10 +42,14 @@ public:
     int get_number_of_targets(){return target_positions.size();}
     const std::vector<double> &get_current_target(){return target_positions[current_target];}
 
+    const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
+
 private:
     int current_target = 0;
     std::vector<std::vector<double>> target_positions;
     int move_counter = 0;
+    std::vector<std::vector<waypoint>> trajectories;
+
 };
 
 } //sim

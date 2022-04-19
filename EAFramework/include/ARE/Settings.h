@@ -227,6 +227,30 @@ public:
     }
 };
 
+template<>
+class Sequence<std::string> : public Type
+{
+public:
+    Sequence(){name = "sequence_string";}
+    Sequence(std::vector<std::string> s) : value(s) {name = "sequence_string";}
+    std::vector<std::string> value;
+    void fromString(const std::string& str){
+        misc::split_line(str,";",value);
+    }
+    friend std::ostream & operator << (std::ostream &out, const Sequence &s){
+        for(const auto& val: s.value){
+            out << val << ";";
+        }
+        return out;
+    }
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & name;
+        arch & value;
+    }
+};
+
 Type::Ptr buildType(const std::string &name);
 
 std::string toString(const std::string &name, const Type::ConstPtr &element);

@@ -9,15 +9,17 @@ extern "C" are::Environment::Ptr environmentFactory
 {
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
-    if(env_type == 0){
+    if(env_type == are::MAZE){
         env.reset(new are::sim::MazeEnv);
         env->set_parameters(param);
     }
     else if(env_type == 1)
         env.reset(new are::sim::ObstacleAvoidance(param));
-    else if(env_type == 2)
+    else if(env_type == are::MULTI_TARGETS)
         env.reset(new are::sim::MultiTargetMaze(param));
-    else if(env_type == 3)
+    else if(env_type == are::EXPLORATION)
+        env.reset(new are::sim::Exploration(param));
+    else if(env_type == are::BARREL)
         env.reset(new are::sim::BarrelTask(param));
 
     return env;
