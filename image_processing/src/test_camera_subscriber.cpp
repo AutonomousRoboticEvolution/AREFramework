@@ -54,7 +54,7 @@ int main(int argc, char** argv){
 
     std::cout<<"Starting test_camera_subscriber"<<std::endl;
 
-    if(argc =! 2){
+    if(argc != 3){
         std::cout << "usage: address of publisher, sleep time (micro seconds)" << std::endl;
         return 1;
     }
