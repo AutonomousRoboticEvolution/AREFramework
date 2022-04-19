@@ -1,14 +1,14 @@
 #experimentName,string,mnipes2
-#expPluginName,string,/home/edgar/vrep/lib/libM_NIPES2.so
+#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libM_NIPES2.so
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,1
 
-#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/edgar/are-logs
+#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/ebb505/ARE_Project/are-logs
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
@@ -18,7 +18,7 @@
 
 #fitnessFile,string,fitnesses.csv
 
-#envType,int,3
+#envType,int,1
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.95;0.0;0.12
 #targets,sequence_double,0.0;0.0;0.12;0.0;0.5;0.12;0.0;-0.5;0.12
@@ -28,17 +28,18 @@
 #maxVelocity,double,10.
 #MaxWeight,float,1.0
 #NNType,int,2
-#NbrHiddenNeurones,int,2
+#NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
 #useControllerArchive,bool,1
-#reloadController,bool,1
+#reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,5
+#populationSize,int,2
 #maxEvalTime,float,120
 #timeStep,float,0.1
-#maxNbrEval,int,100
+#maxNbrEval,int,200000
 #fitnessType,int,0
+#synchronicity,float,0.
 
 #cmaesNbrEval,int,200
 #cmaesPopSize,int,10
