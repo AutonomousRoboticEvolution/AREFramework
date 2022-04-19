@@ -130,7 +130,6 @@ float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph)
     else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
         trajectories[current_scene] = trajectory;
-        current_scene++;
     }
 
     return 0;
