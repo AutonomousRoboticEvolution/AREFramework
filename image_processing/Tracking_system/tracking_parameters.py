@@ -59,6 +59,15 @@ elif location == "napier":
 
     brainMin = (169,100,165)
     brainMax = (179,255,255)
+elif location == "amsterdam":
+    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    #mask filter parameters
+    brainMin = (0,47,87)
+    brainMax = (11,255,255)
+
+    #centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (970,430) # defined in the uncropped image
+    pixel_scale = 540
     
     centre_reference = (600,545)
     pixel_scale = 500 #nc

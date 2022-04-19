@@ -77,9 +77,15 @@ def sliders_do(image):
 
 # Capture frames from the camera
 
+ret,image = rawCapture.read()
+file_path = "Raw_pic.jpg"
+cv2.imwrite(file_path, image)
 
 while(1):
     ret,image = rawCapture.read()
+    image = scaleImage(image,0.3)
+    #print(image.shape)
+    
     sliders_do(image)
 
 

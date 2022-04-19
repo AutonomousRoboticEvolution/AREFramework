@@ -147,14 +147,21 @@ class TrackingSystem:
                 self.aruco_tags = self.aruco_locations(image)
 
                 if self.show_frames:
-                    cv2.imshow("Image", image )
-                cv2.imshow("Uncropped", self.uncropped_image )
-                print("Image size: {}".format(self.uncropped_image.shape))
+                    cv2.imshow("Image", image)
+                    #print("Image size: {}".format(self.uncropped_image.shape))
+                    cv2.imshow("Uncropped", self.uncropped_image )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
-            
 
+    def show_im(self):
+        vid = cv2.VideoCapture(pipe)
+        while (1):
+            self.frame_return_success, image = vid.read()
+
+            if self.frame_return_success:
+                cv2.imshow("Uncropped", image )
+                cv2.waitKey(1)
     def zmq_updater(self):
         #main loop waiting for a zmq message
         print("Starting loop for zmq messages")
@@ -204,3 +211,4 @@ class TrackingSystem:
 
 tracking_system = TrackingSystem()
 tracking_system.main()
+
