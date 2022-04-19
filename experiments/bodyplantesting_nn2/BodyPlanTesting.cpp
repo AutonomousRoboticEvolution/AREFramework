@@ -96,7 +96,7 @@ void BODYPLANTESTING::epoch(){
 
     std::vector<Eigen::VectorXd> pop_desc;
     for (size_t i = 0; i < population_size; i++) { // Body plans
-        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc());
+        pop_desc.push_back(std::dynamic_pointer_cast<CPPNIndividual>(population[i])->descriptor());
     }
     //compute novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
@@ -127,7 +127,7 @@ void BODYPLANTESTING::epoch(){
     //update archive for novelty score
     for (size_t i = 0; i < population_size; i++) { // Body plans
         Eigen::VectorXd ind_desc;
-        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getMorphDesc().getCartDesc();
+        ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->descriptor();;
 
         double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getObjectives().back();
         Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
