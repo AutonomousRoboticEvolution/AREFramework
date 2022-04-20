@@ -48,6 +48,32 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
     return new_gene;
 };
 
+selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
+{
+    double best_fitness[2] = {gene_pool[0].objectives[0],gene_pool[1].objectives[1]};
+    int best_idx[2] = {0,1};
+    for(int i = 2; i < gene_pool.size(); i++){
+        if(best_fitness[0] < gene_pool[i].objectives[0]){//Best
+            best_fitness[0] = gene_pool[i].objectives[0];
+            best_idx[0] = i;
+        }else if(best_fitness[1] < gene_pool[i].objectives[0]){//Second Best
+            best_fitness[1] = gene_pool[i].objectives[0];
+            best_idx[1] = i;
+        }
+    }
+
+
+    nn2_cppn_t parents[2] = {gene_pool[best_idx[0]].morph_genome.get_cppn(),
+                          gene_pool[best_idx[1]].morph_genome.get_cppn()};
+    nn2_cppn_t child;
+    parents[0].crossover(parents[1],child); //crossover to generate the child
+    child.mutate(); //mutate the child
+    NN2CPPNGenome new_gene(child);
+    new_gene.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()}); //store the ids of the parents
+    return new_gene;
+};
+
+
 void M_NIPESIndividual::createMorphology(){
     individual_id = morphGenome->id();
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
@@ -202,7 +228,9 @@ void M_NIPES::init(){
             controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
         }
 
-        selection_fct = SelectionFunctions::best_of_subset;
+        bool with_crossover = settings::getParameter<settings::Boolean>(parameters,"#withCrossover").value;
+        if(with_crossover) selection_fct = SelectionFunctions::two_best_of_subset;
+        else selection_fct = SelectionFunctions::best_of_subset;
         init_morph_pop();
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);

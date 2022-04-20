@@ -58,6 +58,7 @@ typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct
 
 typedef struct SelectionFunctions{
     static selection_fct_t best_of_subset;
+    static selection_fct_t two_best_of_subset;
 }SelectionFunctions;
 
 typedef std::function<double(const CMAESLearner&)> fitness_fct_t;

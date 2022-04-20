@@ -5,7 +5,6 @@ using namespace are;
 void CMAESLearner::init(std::vector<double> initial_point){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesPopSize").value;
     float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
     double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
@@ -15,8 +14,11 @@ void CMAESLearner::init(std::vector<double> initial_point){
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
 
-    if(initial_point.empty())
+    int pop_size = 0;
+    if(initial_point.empty()){ //Start learning from scratch: 1) generate a random starting point and assifn the large population size
         initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
+        pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesLargePopSize").value;
+    }else pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesSmallPopSize").value;
 
     double lb[_dimension], ub[_dimension];
     for(int i = 0; i < _dimension; i++){
@@ -26,7 +28,7 @@ void CMAESLearner::init(std::vector<double> initial_point){
 
     geno_pheno_t gp(lb,ub,_dimension);
 
-    cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,_rand_num->getSeed(),gp);
+        cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,_rand_num->getSeed(),gp);
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
