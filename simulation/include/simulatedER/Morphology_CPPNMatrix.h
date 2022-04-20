@@ -127,9 +127,17 @@ public:
 
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
 
-    Eigen::VectorXd getMorphDesc() const {return indDesc.cartDesc.getCartDesc();}
-    Eigen::VectorXd getOrganPosDesc() const {return indDesc.organDesc.getCartDesc();}
-    const CartDesc& getCartDesc() const {return indDesc.cartDesc;}
+    Eigen::VectorXd getMorphDesc() const {
+        int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
+        if(descriptor == CART_DESC)
+            return indDesc.cartDesc.getCartDesc();
+        else if(descriptor == ORGAN_POSITION)
+            return indDesc.organDesc.getCartDesc();
+        else std::cerr << "Morphology CPPN Matrix getMorphDesc: unknown descriptor type" << std::endl;
+        return Eigen::VectorXd::Zero(1);
+    }
+    OrganPositionDesc getOrganPosDesc() const {return indDesc.organDesc;}
+    CartDesc getCartDesc() const {return indDesc.cartDesc;}
     int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
     int get_sensorNumber() const {return indDesc.cartDesc.sensorNumber;}

@@ -28,7 +28,7 @@ add_library(NIPES_MULTITARGET SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
-    multiTargetMaze.cpp
+    ../common/multiTargetMaze.cpp
     )
 target_include_directories(NIPES_MULTITARGET PUBLIC ${INCLUDES})
 target_link_libraries(NIPES_MULTITARGET ARE

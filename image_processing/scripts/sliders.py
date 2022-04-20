@@ -11,7 +11,7 @@ import cv2
 # Initialise the camera and create a reference to it
 is_picamera = False
 if is_picamera:
-    rawCapture = cv2.VideoCapture(0)
+    rawCapture = cv2.VideoCapture("tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink")
 else:
     #rawCapture = cv2.VideoCapture("v4l2src device=/dev/video2 ! videoconvert ! appsink")
     #'http://192.168.2.248/img/video.mjpeg'

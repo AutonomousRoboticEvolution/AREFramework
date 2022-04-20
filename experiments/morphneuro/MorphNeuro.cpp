@@ -829,7 +829,6 @@ std::vector<int> MorphNeuro::listInds()
 
 bool MorphNeuro::update(const Environment::Ptr & env){
     //// update location information in the maze
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
     reevaluated++;
     if(simulator_side){

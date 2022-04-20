@@ -44,12 +44,17 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
 
         //If there is a ctrl genome there are a trajectory and a behavioural descriptor
         //Log Trajectory
-        std::stringstream traj_filepath;
-        traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id();
-        std::ofstream tofs(traj_filepath.str());
-        for(const auto &wp: genome.trajectory)
-            tofs << wp.to_string() << std::endl;
-        tofs.close();
+        int i = 0;
+        for(const auto &traj: genome.trajectories)
+        {
+            std::stringstream traj_filepath;
+            traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id() << "_" << i;
+            std::ofstream tofs(traj_filepath.str());
+            for(const auto &wp: traj)
+                tofs << wp.to_string() << std::endl;
+            tofs.close();
+            i++;
+        }
 
         //Log descriptor
         std::ofstream dofs;
@@ -70,13 +75,14 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << id << ",";
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
+    for(const double& obj: genome.rewards)
+        fitness_file_stream << obj << ",";
     fitness_file_stream << "\n";
     //-
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
 {
-
     const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
     std::ofstream logFileStream;
     if(!openOLogFile(logFileStream))

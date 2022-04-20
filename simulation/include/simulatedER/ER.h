@@ -34,7 +34,9 @@ public:
     typedef std::unique_ptr<ER> Ptr;
     typedef std::unique_ptr<const ER> ConstPtr;
 
-    ER(){}
+    ER(){
+        reference_time = hr_clock::now();
+    }
     virtual ~ER(){
         if(parameters.get())
             parameters.reset();
@@ -135,6 +137,15 @@ protected:
     int clientID = 0;
 
     bool evalIsFinish;
+
+
+
+    hr_clock::time_point reference_time;
+    hr_clock::time_point start_eval_time;
+    hr_clock::time_point end_eval_time;
+
+    hr_clock::time_point start_overhead_time;
+    hr_clock::time_point end_overhead_time;
 };
 
 }//sim

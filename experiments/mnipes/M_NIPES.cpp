@@ -347,6 +347,7 @@ void M_NIPES::init_morph_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
+        morph_gen->set_id(generation*i);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
@@ -405,6 +406,7 @@ void M_NIPES::init_next_pop(){
         CPPNGenome::Ptr morph_gen(new CPPNGenome(mgen));
         morph_gen->set_parameters(parameters);
         morph_gen->set_randNum(randomNum);
+        morph_gen->set_id(generation*i);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         CMAESLearner::Ptr cma_learner(new CMAESLearner);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen,cma_learner));
@@ -416,7 +418,6 @@ void M_NIPES::init_next_pop(){
 }
 
 bool M_NIPES::update_maze(const Environment::Ptr &env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     Individual::Ptr ind = population[currentIndIndex];
@@ -442,7 +443,6 @@ bool M_NIPES::update_maze(const Environment::Ptr &env){
 }
 
 bool M_NIPES::update_obstacle_avoidance(const Environment::Ptr &env){
-    endEvalTime = hr_clock::now();
     numberEvaluation++;
 
     Individual::Ptr ind = population[currentIndIndex];

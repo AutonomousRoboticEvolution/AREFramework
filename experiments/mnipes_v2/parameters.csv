@@ -5,27 +5,26 @@
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,-1
+#evaluationOrder,int,3
 
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
 #repository,string,/home/leni/are-logs
 
-#maxNbrOrgans,int,16
-#isSegmentedRobot,bool,1
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
 #isScreenshotEnable,bool,0
+#isCPPNGenome,bool,1
 
 #fitnessFile,string,fitnesses.csv
 
+#envType,int,3
+#scenes,sequence_string,shapes_exploration.ttt;hard_race.ttt;multi_rooms.ttt
 #arenaSize,double,2.
-#target_x,double,0.75
-#target_y,double,0.75
-#target_z,double,0.12
-#init_x,float,-0.75
-#init_y,float,-0.75
-#init_z,float,0.12
+#targetPosition,sequence_double,0.75;0.75;0.12
+#targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
+#initPosition,sequence_double,0;0;0.12;-0.75;-0.75;0.12;0.15;0.15;0.12
 
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -43,8 +42,8 @@
 #maxNbrEval,int,100
 #fitnessType,int,0
 
-#cmaesNbrEval,int,5
-#cmaesPopSize,int,4
+#cmaesNbrEval,int,2
+#cmaesPopSize,int,2
 #CMAESStep,double,1.
 #FTarget,double,0.05
 #elitistRestart,bool,0
@@ -62,13 +61,17 @@
 #withBeacon,bool,1
 #energyBudget,double,100
 
+#maxNbrOrgans,int,16
+#isSegmentedRobot,bool,0
 #randomOrientation,bool,1
 #isWheel,bool,1
 #isSensor,bool,1
-#isJoint,bool,1
+#isJoint,bool,0
 #isCaster,bool,1
 #manufacturabilityMethod,int,1
+#isLeg,bool,0
 
+#withTiles,bool,1
 #flatFloor,bool,1
 #energyReduction,bool,0
 

@@ -8,6 +8,7 @@ namespace interproc = boost::interprocess;
 /// settings file. A random number class will also be created and all other files refer to this class
 void ER::initialize()
 {
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
@@ -52,7 +53,7 @@ void ER::initialize()
 /// individual of the optimization strategy chosen.
 void ER::startOfSimulation()
 {
-    ea->set_startEvalTime(hr_clock::now());
+    start_eval_time = hr_clock::now();
 
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
@@ -61,25 +62,24 @@ void ER::startOfSimulation()
 
     currentInd = ea->getIndividual(currentIndIndex);
     currentInd->init();
+    int ind_id = currentInd->get_morph_genome()->id();
     // Get images?
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
             Logging::create_folder(Logging::log_folder + "/" + image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+            robotScreenshot(ind_id,image_repo);
         }
     }
     ea->setCurrentIndIndex(currentIndIndex);
 }
 
 void ER::initIndividual(){
-    ea->set_startEvalTime(hr_clock::now());
-
     int length;
     std::string mess(simGetStringSignal("currentInd",&length));
     if(length == 0){
@@ -91,17 +91,18 @@ void ER::initIndividual(){
     if(nbrEval == 0)
         currentInd->from_string(mess);
     currentInd->init();
+    int ind_id = currentInd->get_morph_genome()->id();
     evalIsFinish = false;
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
         std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
         bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
         if(images_in_logs){
             Logging::create_folder(Logging::log_folder + "/" + image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),Logging::log_folder + "/" + image_repo);
+            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
         }
         else{
             Logging::create_folder(image_repo);
-            robotScreenshot(currentIndIndex,ea->get_generation(),image_repo);
+            robotScreenshot(ind_id,image_repo);
         }
     }
 }
@@ -130,8 +131,8 @@ void ER::handleSimulation()
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
 
     if (simulationTime >
-            settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
-            ea->finish_eval(environment)) {
+        settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
+        ea->finish_eval(environment)) {
         simStopSimulation();
     }
 }
@@ -162,12 +163,17 @@ void ER::endOfSimulation()
                 currentIndIndex++;
                 nbrEval = 0;
             }
-            ea->set_endEvalTime(hr_clock::now());
+            end_eval_time = hr_clock::now();
+            std::stringstream sstr;
+            sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(start_eval_time - reference_time).count()
+                 << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_eval_time - reference_time).count() << std::endl;
+            Logging::saveStringToFile("times.csv",sstr.str());
             saveLogs(false);
         }
 
         if(currentIndIndex >= ea->get_population().size())
         {
+            start_overhead_time = hr_clock::now();
             ea->epoch();
             saveLogs();
             ea->init_next_pop();
@@ -175,7 +181,13 @@ void ER::endOfSimulation()
                 std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
             ea->incr_generation();
             currentIndIndex = 0;
+            end_overhead_time = hr_clock::now();
+            std::stringstream sstr;
+            sstr << "overhead," << std::chrono::duration_cast<std::chrono::microseconds>(start_overhead_time - reference_time).count()
+                 << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_overhead_time - reference_time).count() << std::endl;
+            Logging::saveStringToFile("times.csv",sstr.str());
         }
+
         if(ea->is_finish()){
             if(verbose)
             {
@@ -198,7 +210,6 @@ void ER::endOfSimulation()
         if(evalIsFinish)
             nbrEval = 0;
 
-        ea->set_endEvalTime(hr_clock::now());
         simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }

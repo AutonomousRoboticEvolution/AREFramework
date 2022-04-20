@@ -47,13 +47,35 @@ if location == "bristol":
 elif location == "york":
     pipe = 0
 
-    brainMin = (171,120,75)
+    brainMin = (0,86,142)
     brainMax = (179,255,255)
     
     centre_reference = (340,300) #not calibrated
     pixel_scale = 100 #nc
 
     crop_rectangle = [-1]
+elif location == "napier":
+    pipe = "tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink"
+
+    brainMin = (169,100,165)
+    brainMax = (179,255,255)
+
+    centre_reference = (600,545)
+    pixel_scale = 500 #nc
+
+    crop_rectangle = [-1]
+elif location == "amsterdam":
+    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    #mask filter parameters
+    brainMin = (0,157,154)
+    brainMax = (10,221,208)
+
+    #centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (386,264) # defined in the uncropped image
+    pixel_scale = 175
+    
+    crop_rectangle = [-1]
+
 
 elif location == "amsterdam":
     pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
@@ -64,5 +86,7 @@ elif location == "amsterdam":
     #centre of uncropped arena and ratio of pixels/metre
     centre_reference = (970,430) # defined in the uncropped image
     pixel_scale = 540
-    
+
     crop_rectangle = [-1]
+    
+    

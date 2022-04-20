@@ -9,11 +9,20 @@
 #include "cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
+#include "multiTargetMaze.hpp"
+#include "exploration.hpp"
 
 //TO DO find a way to flush the population
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
+
+typedef enum task_t{
+    MAZE = 0,
+    OBSTACLES = 1,
+    MULTI_TARGETS = 2,
+    EXPLORATION = 3
+} task_t;
 
 typedef struct learner_t{
     learner_t(){}
@@ -32,15 +41,16 @@ typedef struct genome_t{
         ctrl_genome(g.ctrl_genome),
         objectives(g.objectives),
         age(g.age),
-        trajectory(g.trajectory),
+        trajectories(g.trajectories),
         behavioral_descriptor(g.behavioral_descriptor){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
+    std::vector<double> rewards;
     int age;
-    std::vector<waypoint> trajectory;
+    std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
 }genome_t;
 
@@ -84,11 +94,12 @@ public:
         morphDesc(ind.morphDesc),
         symDesc(ind.symDesc),
         final_position(ind.final_position),
-        trajectory(ind.trajectory),
+        trajectories(ind.trajectories),
         energy_cost(ind.energy_cost),
         sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
-        nbr_dropped_eval(ind.nbr_dropped_eval)
+        nbr_dropped_eval(ind.nbr_dropped_eval),
+        descriptor_type(ind.descriptor_type)
     {}
 
     Individual::Ptr clone() override {
@@ -97,13 +108,12 @@ public:
 
     void update(double delta_time) override;
 
-
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor();
     void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
     const std::vector<double>& get_final_position(){return final_position;}
-    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
-    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+    void set_trajectories(const std::vector<std::vector<waypoint>>& traj){trajectories = traj;}
+    const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
     double get_energy_cost(){return energy_cost;}
     double get_sim_time(){return sim_time;}
     void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
@@ -123,11 +133,13 @@ public:
         arch & ctrlGenome;
         arch & final_position;
 //        arch & energy_cost;
-        arch & trajectory;
+        arch & trajectories;
 //        arch & sim_time;
         arch & controller_archive;
         arch & morphDesc;
         arch & nbr_dropped_eval;
+        arch & descriptor_type;
+        arch & copy_rewards;
     }
 
     std::string to_string() override;
@@ -146,12 +158,14 @@ public:
     int get_nbr_dropped_eval(){return nbr_dropped_eval;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
-
-
+    int get_number_times_evaluated(){return rewards.size();}
+    void reset_rewards(){rewards.clear();}
+    void add_reward(double reward){rewards.push_back(reward);}
+    const std::vector<double>& get_rewards(){return copy_rewards;}
+    void compute_fitness();
 private:
     void createMorphology() override;
     void createController() override;
-
 
     std::vector<bool> testRes;
     double manScore;
@@ -164,7 +178,7 @@ private:
 
 
     double energy_cost;
-    std::vector<waypoint> trajectory;
+    std::vector<std::vector<waypoint>> trajectories;
     double sim_time;
     std::vector<double> final_position;
     int nbr_dropped_eval = 0;
@@ -173,6 +187,9 @@ private:
 
     Eigen::MatrixXi visited_zones;
     DescriptorType descriptor_type = FINAL_POSITION;
+    std::vector<double> rewards;
+    std::vector<double> copy_rewards;
+
 };
 
 
@@ -204,6 +221,8 @@ public:
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
+        if(simulator_side)
+            std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
     }
@@ -243,6 +262,7 @@ private:
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
+    bool is_multi_target = false;
 };
 
 

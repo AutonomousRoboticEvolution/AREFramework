@@ -3,9 +3,6 @@
 using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
-
-
-
     initialize();
 
     for (int i = 0; i < nbrOfInst; i++) {
@@ -28,6 +25,7 @@ int ER::init(int nbrOfInst, int port){
     }
     currentIndVec.resize(serverInstances.size());
     currentIndexVec.resize(serverInstances.size());
+    eval_times.resize(serverInstances.size());
     return true;
 }
 
@@ -53,7 +51,6 @@ void ER::initialize(){
     ea = EAFactory(randNum, parameters);
     ea->set_simulator_side(false);
     ea->init();
-    ea->set_startEvalTime(hr_clock::now());
     population_size = ea->get_population().size();
     for(int i = 0; i < ea->get_population().size(); i++)
         indToEval.push_back(i);
@@ -181,6 +178,8 @@ bool ER::updateSimulation()
             }
             else if(state == READY && !indToEval.empty())
             {
+                eval_times[slaveIdx].first = hr_clock::now();
+
                 ///@todo start in slave to handle errors
                 //            simxStartSimulation(slave->get_clientID(),simx_opmode_blocking);
                 startOfSimulation(slaveIdx);
@@ -201,6 +200,11 @@ bool ER::updateSimulation()
             {
                 endOfSimulation(slaveIdx);
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+                eval_times[slaveIdx].second = hr_clock::now();
+                std::stringstream sstr;
+                sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
+                     << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].second - reference_time).count() << std::endl;
+                Logging::saveStringToFile("times.csv",sstr.str());
             }
             else if(state == ERROR)
             {
@@ -224,16 +228,20 @@ bool ER::updateSimulation()
     }
     if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
+        start_overhead_time = hr_clock::now();
         ea->epoch();
         saveLogs();
-        ea->set_startEvalTime(hr_clock::now());
         ea->init_next_pop();
         for(int i = 0; i < ea->get_population().size(); i++)
             indToEval.push_back(i);
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();
-
+        end_overhead_time = hr_clock::now();
+        std::stringstream sstr;
+        sstr << "overhead," << std::chrono::duration_cast<std::chrono::microseconds>(start_overhead_time - reference_time).count()
+             << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_overhead_time - reference_time).count() << std::endl;
+        Logging::saveStringToFile("times.csv",sstr.str());
         if(ea->is_finish()){
             if(verbose)
             {

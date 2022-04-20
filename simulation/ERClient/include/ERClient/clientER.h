@@ -35,7 +35,7 @@ enum EvalOrder{
 class ER : public sim::ER
 {
 public:
-    ER(){}
+    ER():sim::ER(){}
     ~ER(){
     	for(auto& si : serverInstances)
 		si.reset();
@@ -63,7 +63,7 @@ private:
     std::vector<Individual::Ptr> currentIndVec;
     std::vector<int> currentIndexVec;
     std::vector<int> indToEval;
-
+    std::vector<std::pair<hr_clock::time_point,hr_clock::time_point>> eval_times;
 };
 
 } //client

@@ -14,7 +14,7 @@ class TrackingSystem:
 
     def __init__(self):
         # set parameters
-        self.show_frames = False
+        self.show_frames = True
 
         #set up zmq
         context = zmq.Context()
@@ -71,9 +71,9 @@ class TrackingSystem:
         if self.show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            cv2.imshow("Holy Mask",mask)
-            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
-            cv2.imshow("Blob",kp_image)
+#            cv2.imshow("Holy Mask",mask)
+#            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
+#            cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
         if len(keypoints) >0 :
@@ -110,9 +110,9 @@ class TrackingSystem:
                 tag_list += [[ids[i][0], x_pos, y_pos]]
 
         #displays tags
-        if self.show_frames:
-            frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
-            cv2.imshow("Frame", frame_markers)
+ #       if self.show_frames:
+ #           frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
+ #           cv2.imshow("Frame", frame_markers)
 
         # returns list
         return tag_list

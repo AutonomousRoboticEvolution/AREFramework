@@ -41,6 +41,8 @@ settings::Type::Ptr settings::buildType(const std::string &name)
         return std::make_shared<settings::Sequence<float>>(Sequence<float>());
     else if(name == "sequence_double")
         return std::make_shared<settings::Sequence<double>>(Sequence<double>());
+    else if(name == "sequence_string")
+        return std::make_shared<settings::Sequence<std::string>>(Sequence<std::string>());
     else
     {
         std::cerr << "[ARE error] unknown parameter type : " << name << std::endl;
@@ -84,30 +86,24 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
 
 std::string settings::toString(const std::string &name, const settings::Type::ConstPtr& elt){
     std::stringstream sstr;
-    if(elt->name == "bool"){
+    if(elt->name == "bool")
         sstr << name << ",bool," << *(settings::cast<settings::Boolean>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "int"){
+    else if(elt->name == "int")
         sstr << name << ",int," << *(settings::cast<settings::Integer>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "float"){
+    else if(elt->name == "float")
         sstr << name << ",float," << *(settings::cast<settings::Float>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "double"){
+    else if(elt->name == "double")
         sstr << name << ",double," << *(settings::cast<settings::Double>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "string"){
+    else if(elt->name == "string")
         sstr << name << ",string," << *(settings::cast<settings::String>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "sequence_int"){
+    else if(elt->name == "sequence_int")
         sstr << name << ",sequence_int," << *(settings::cast<settings::Sequence<int>>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "sequence_int"){
+    else if(elt->name == "sequence_int")
         sstr << name << ",sequence_float," << *(settings::cast<settings::Sequence<float>>(elt)).get() << std::endl;
-    }
-    else if(elt->name == "sequence_double"){
+    else if(elt->name == "sequence_double")
         sstr << name << ",sequence_double," << *(settings::cast<settings::Sequence<double>>(elt)).get() << std::endl;
-    }
+    else if(elt->name == "sequence_string")
+        sstr << name << ",sequence_string," << *(settings::cast<settings::Sequence<std::string>>(elt)).get() << std::endl;
     return sstr.str();
 }
 

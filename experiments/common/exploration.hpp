@@ -1,5 +1,5 @@
-#ifndef OBSTACLE_AVOIDANCE_HPP
-#define OBSTACLE_AVOIDANCE_HPP
+#ifndef EXPLORATION_HPP
+#define EXPLORATION_HPP
 
 #include <cmath>
 
@@ -17,16 +17,16 @@ namespace are {
 
 namespace sim{
 
-class ObstacleAvoidance : public VirtualEnvironment
+class Exploration : public VirtualEnvironment
 {
 public:
 
-    typedef std::shared_ptr<ObstacleAvoidance> Ptr;
-    typedef std::shared_ptr<const ObstacleAvoidance> ConstPtr;
+    typedef std::shared_ptr<Exploration> Ptr;
+    typedef std::shared_ptr<const Exploration> ConstPtr;
 
-    ObstacleAvoidance(const settings::ParametersMapPtr& params);
+    Exploration(const settings::ParametersMapPtr& params);
 
-    ~ObstacleAvoidance(){}
+    ~Exploration(){}
     void init() override;
 
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
@@ -41,17 +41,25 @@ public:
 
     std::pair<int,int> real_coordinate_to_matrix_index(const std::vector<double> &pos);
 
-    const Eigen::MatrixXi& get_visited_zone_matrix(){return grid_zone;}
+    const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
+
+    int get_number_of_scenes(){return scenes_path.size();}
+
+    const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
 
 private:
     int move_counter = 0;
     int number_of_collisions = 0;
     Eigen::MatrixXi grid_zone;
+    std::vector<std::string> scenes_path;
+    int current_scene = 0;
+    std::vector<double> init_position;
+    std::vector<std::vector<waypoint>> trajectories;
 };
 
 } //sim
 
 } //are
 
-#endif //OBSTACLE_AVOIDANCE_HPP
+#endif //EXPLORATION_HPP
 

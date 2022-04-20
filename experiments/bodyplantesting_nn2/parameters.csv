@@ -1,15 +1,13 @@
 #experimentName,string,bodyplantesting_nn2
 #expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
-#extSettingsClass,bool,0
-#vrepFolder,string,/home/leni/CoppeliaSim_Edu_V4_1_0_Ubuntu18_04/
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/ARE_arena.ttt
-#organsPath,string,/home/leni/git/evolutionary_robotics_framework/experiments/sim/
-#populationSize,int,100
-#maxEvalTime,float,1
-#numberOfGeneration,int,25
-#repository,string,/home/leni/are-logs/
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
+#populationSize,int,20
+#maxEvalTime,float,30
+#numberOfGeneration,int,1
+#repository,string,/home/leni/are-logs
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
@@ -20,6 +18,7 @@
 
 #fitnessFile,string,fitnesses.csv
 #mdCartWdhFile,string,MD_Cart_WDH.csv
+#organPositionDescFile,string,organ_pos_desc.csv
 #positionsFile,string,final_positions.csv
 #testsFile,string,tests.csv
 #nbrConnNeuFile,string,nbr_conn_neu.csv
@@ -27,17 +26,19 @@
 
 #jointControllerType,int,2
 
-#isSegmentedRobot,bool,1
-#isWheel,bool,1
-#isSensor,bool,1
+#isSegmentedRobot,bool,0
+#isWheel,bool,0
+#isSensor,bool,0
 #isJoint,bool,1
-#isCaster,bool,1
+#isCaster,bool,0
 
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/leni/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
+#imagesInLogFolder,bool,1
+#imageRepository,string,images
 
 #kValue,int,15
 #noveltyThreshold,double,0.1
@@ -45,26 +46,34 @@
 #archiveAddingProbability,double,0.05
 
 #flatFloor,bool,1
+#withTiles,bool,1
 #arenaSize,double,2
-#target_x,double,0.0
-#target_y,double,0.75
-#target_z,double,0.05
-#init_x,float,0.0
-#init_y,float,0.0
-#init_z,float,0.2
+#targetPosition,sequence_double,0.0;0.0;0.12
+#initPosition,sequence_double,0.0;0.0;0.12
 
-#seed,int,-1
+#seed,int,1
 #reloadController,bool,0
 #withBeacon,bool,0
-#imageRepository,string,/home/leni/are-logs/images/
 
-#maxNbrConnections,int,500
+
+#mutationType,int,0
+#mutateConnection,bool,1
+#mutateNeurons,bool,1
+#cppnFixedStructure,bool,0
+#maxNbrConnections,int,100
 #minNbrConnections,int,10
-#maxNbrNeurons,int,10
-#minNbrNeurons,int,1
+#maxNbrNeurons,int,5
+#minNbrNeurons,int,0
+#rateMutation,float,0.9
+#rateMutateConnection,float,0.1
+#rateMutateNeuron,float,0.1
 #rateAddNeuron,float,0.1
 #rateAddConnection,float,0.1
 #rateDeleteNeuron,float,0.01
 #rateDeleteConnection,float,0.01
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
+#rateCrossover,float,0.5
+
+#isCPPNGenome,bool,1
+#isLeg,bool,0

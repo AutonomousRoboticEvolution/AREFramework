@@ -17,8 +17,12 @@ MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
-    std::string targets_file = settings::getParameter<settings::String>(parameters,"#targets").value;
-    load_target_positions(targets_file);
+    std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
+    for(int i = 0; i < targets.size();i+=3)
+        target_positions.push_back({targets[i],targets[i+1],targets[i+2]});
+
+    trajectories.resize(target_positions.size());
+
 }
 
 void MultiTargetMaze::init(){
@@ -38,9 +42,7 @@ void MultiTargetMaze::init(){
         }
     }
 
-    final_position = {settings::getParameter<settings::Float>(parameters,"#init_x").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_y").value,
-                       settings::getParameter<settings::Float>(parameters,"#init_z").value};
+    final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
 
@@ -65,20 +67,6 @@ void MultiTargetMaze::init(){
 
     std::vector<int> th;
     build_tiled_floor(th);
-}
-
-void MultiTargetMaze::load_target_positions(const std::string& filename){
-    std::ifstream ifs(filename);
-    if(!ifs){
-        std::cerr << "unable to open file : " << filename << std::endl;
-        exit(1);
-    }
-    double pos1,pos2,pos3;
-    do{
-        if(ifs >> pos1 >> pos2 >> pos3)
-            target_positions.push_back({pos1,pos2,pos3});
-    }while(ifs.peek() != EOF);
-    ifs.close();
 }
 
 std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
@@ -132,8 +120,10 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
-    else if(simulationTime >= evalTime)
+    else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
+        trajectories[current_target] = trajectory;
+    }
 
     return 0;
 }

@@ -180,7 +180,7 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file" , message );
+            Logging::saveStringToFile( "log_file.txt" , message );
         }
     }
 
@@ -199,7 +199,6 @@ bool ER::stop_evaluation(){
     if(ea->update(environment)){
         nbrEval = 0;
     }
-    ea->set_endEvalTime(hr_clock::now());
     write_data();
     save_logs();
 

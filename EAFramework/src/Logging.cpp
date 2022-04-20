@@ -39,7 +39,7 @@ void are::Logging::create_folder(const std::string &name){
 }
 
 void are::Logging::saveStringToFile(const std::string &fileName, const std::string &data){
-    std::ofstream out(log_folder + "/" + fileName+".txt");
+    std::ofstream out(log_folder + "/" + fileName,std::ios::out | std::ios::ate | std::ios::app);
     if(!out)
     {
         std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + fileName << std::endl;
@@ -116,17 +116,5 @@ void are::FitnessLog::saveLog(are::EA::Ptr &ea)
     savePopFile.close();
 }
 
-void are::EvalTimeLog::saveLog(EA::Ptr &ea){
 
-    std::ofstream logFileStream;
-    if(!openOLogFile(logFileStream))
-        return;
-
-    int nbEval = ea->get_numberEvaluation();
-    std::chrono::nanoseconds eval_time = ea->getEvalCompTime();
-
-    logFileStream << nbEval <<  ", " << eval_time.count() << std::endl;
-
-    logFileStream.close();
-}
 

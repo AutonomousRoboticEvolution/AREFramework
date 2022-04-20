@@ -19,13 +19,11 @@ void CPPNIndividual::createMorphology()
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 
-    if(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().defined())
-        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
 
     setMorphDesc();
     setManRes();
+    set_organ_position_descriptor();
+    set_4d_matrix();
 }
 
 
@@ -34,13 +32,32 @@ void CPPNIndividual::setMorphDesc()
     morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc();
 }
 
+void CPPNIndividual::set_organ_position_descriptor()
+{
+    organ_position_descriptor = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc();
+}
+
 void CPPNIndividual::setManRes()
 {
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
 }
 
+void CPPNIndividual::set_4d_matrix()
+{
+    matrix_4d = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_matrix_4d();
+}
+
 Eigen::VectorXd CPPNIndividual::descriptor(){
-    return morphDesc.getCartDesc();
+    int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
+    if(descriptor == CART_DESC)
+        return morphDesc.getCartDesc();
+    else if(descriptor == ORGAN_POSITION)
+        return organ_position_descriptor.getCartDesc();
+    else{
+        std::cerr << "Unknown descriptor" << std::endl;
+        return Eigen::VectorXd::Zero(1);
+    }
+
 }
 
 std::string CPPNIndividual::to_string()
