@@ -10,6 +10,7 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
 #include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
 #include "exploration.hpp"
 
 //TO DO find a way to flush the population
@@ -21,7 +22,8 @@ typedef enum task_t{
     MAZE = 0,
     OBSTACLES = 1,
     MULTI_TARGETS = 2,
-    EXPLORATION = 3
+    EXPLORATION = 3,
+    BARREL = 4
 } task_t;
 
 typedef struct learner_t{

@@ -6,7 +6,7 @@ std::vector<double> Morphology::update(){
     std::vector<double> sensorValues;
     readProximitySensors(proxHandles,sensorValues);
     readPassivIRSensors(IRHandles, sensorValues);
-
+    readCamera(camera_handle,sensorValues);
     return sensorValues;
 }
 
