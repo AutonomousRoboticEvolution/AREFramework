@@ -201,8 +201,9 @@ void sim::sentCommandToJointsProportional(const std::vector<int>& handles, const
 void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const std::vector<double> &commands)
 {
     double simulationTime = simGetSimulationTime();
+    const double amplitude = 1.0, time_offset = 0.0, position_offset = 0.0;
     for (size_t i = 0; i < handles.size(); i++){
-        double angle = sin(simulationTime*commands[i]);
+        double angle = misc::sinusoidal(amplitude, simulationTime, commands[i], time_offset, position_offset);
         simSetJointTargetPosition(handles[i],static_cast<float>(angle*M_PI/2.));
     }
 }

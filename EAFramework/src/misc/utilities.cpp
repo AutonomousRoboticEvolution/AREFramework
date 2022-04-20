@@ -50,6 +50,6 @@ void misc::eigenvect_to_stdvect(const Eigen::VectorXd &eigen_v, std::vector<doub
         std_v[i] = eigen_v[i];
 }
 
-double sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset){
+double misc::sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset){
     return amplitude * sin(time * frequency + time_offset) + position_offset;
 }
