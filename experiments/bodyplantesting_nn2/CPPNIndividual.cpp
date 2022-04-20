@@ -19,10 +19,6 @@ void CPPNIndividual::createMorphology()
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 
-    if(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc().defined())
-        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
 
     setMorphDesc();
     setManRes();
@@ -56,7 +52,7 @@ Eigen::VectorXd CPPNIndividual::descriptor(){
     if(descriptor == CART_DESC)
         return morphDesc.getCartDesc();
     else if(descriptor == ORGAN_POSITION)
-        return organ_position_descriptor;
+        return organ_position_descriptor.getCartDesc();
     else{
         std::cerr << "Unknown descriptor" << std::endl;
         return Eigen::VectorXd::Zero(1);
