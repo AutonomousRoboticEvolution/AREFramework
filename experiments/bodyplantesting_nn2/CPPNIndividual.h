@@ -60,7 +60,7 @@ public :
     CartDesc getMorphDesc(){return morphDesc;}
     std::vector<std::vector<double>> get_matrix_4d(){return matrix_4d;};
     Eigen::VectorXd descriptor();
-    Eigen::VectorXd get_organ_position_descriptor(){return organ_position_descriptor;}
+    const OrganPositionDesc& get_organ_position_descriptor() const {return organ_position_descriptor;}
     void set_organ_position_descriptor();
 
 protected:
@@ -71,7 +71,7 @@ protected:
 
     /// Descritors
     CartDesc morphDesc;
-    Eigen::VectorXd organ_position_descriptor;
+    OrganPositionDesc organ_position_descriptor;
     std::vector<std::vector<double>> matrix_4d;
 };
 
