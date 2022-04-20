@@ -70,7 +70,7 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectPosition(forceSensor,-1,tempOrganPos);
     simSetObjectPosition(organHandle, -1, tempOrganPos);
 
-    // Create connector and offset by some distance
+    // Create connector and offset by some distance relative to the organ itself
     /// \todo EB: This offset shouldn't be here.
     float tempConnectorPos[3];
     tempConnectorPos[0] = tempOrganPos[0]; tempConnectorPos[1] = tempOrganPos[1]; tempConnectorPos[2] = tempOrganPos[2];
@@ -114,20 +114,20 @@ void Organ::createOrgan(int skeletonHandle)
     // Set parents
     simSetObjectParent(forceSensor,skeletonHandle,1);
     simSetObjectParent(organHandle, forceSensor, 1);
-    /// \todo There might be a bug somewhere! The lines commented work well for ARE-Puck and ARE-Potato. The uncommented lines work well with evolved morphologies...
     // This moves the organ slightly away from the surface. This parameters were calibrated through visual inspection
     /// \todo: EB: We might not need this in the future
     tempOrganPos[0] = 0.0; tempOrganPos[1] = 0.0; tempOrganPos[2] = 0.0;
 
     if(organType == 0) // Brain
         tempOrganPos[2] = 0.0;
-    else if(organType == 1) // Wheels
+    else if(organType == 1) { // Wheels
+//        tempOrganPos[0] = -0.013; // Relative to the floor
+        tempOrganPos[2] = -0.035; // Relative to the surface of the skeleton
+    } else if(organType == 2) { // Sensors
         tempOrganPos[2] = -0.035;
-    else if(organType == 2) { // Sensors
-        tempOrganPos[2] = -0.035;
-    }else if(organType == 3) // Joints
+    }else if(organType == 3) { // Joints
         tempOrganPos[2] = -0.05;
-    else if(organType == 4) { // Caster
+    }else if(organType == 4) { // Caster
         tempOrganPos[0] = 0.01;
         tempOrganPos[2] = -0.035;
     } else

@@ -42,6 +42,8 @@ public:
     int get_number_of_targets(){return barrel_initial_positions.size();}
     const std::vector<double> &get_current_target(){return barrel_initial_positions[current_target];}
 
+    const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
+
 private:
     int current_target = 0;
     int move_counter = 0;
@@ -50,6 +52,7 @@ private:
     std::vector<double> barrel_current_position;
     std::vector<double> target_position;
     int barrel_handle;
+    std::vector<std::vector<waypoint>> trajectories;
 
 };
 

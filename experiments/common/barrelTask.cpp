@@ -24,6 +24,8 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
     barrel_handle = -1;
+
+    trajectories.resize(barrel_initial_positions.size());
 }
 
 void BarrelTask::init(){
@@ -157,8 +159,11 @@ float BarrelTask::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
         trajectory.push_back(wp);
-    else if(simulationTime >= evalTime)
+    else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
+        trajectories[current_target] = trajectory;
+    }
+
 
     // Get beacon position
     simGetObjectPosition(barrel_handle, -1, wp.position);

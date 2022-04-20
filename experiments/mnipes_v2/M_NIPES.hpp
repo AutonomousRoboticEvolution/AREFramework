@@ -23,7 +23,7 @@ typedef enum task_t{
     OBSTACLES = 1,
     MULTI_TARGETS = 2,
     EXPLORATION = 3,
-    BARRREL = 4
+    BARREL = 4
 } task_t;
 
 typedef struct learner_t{
