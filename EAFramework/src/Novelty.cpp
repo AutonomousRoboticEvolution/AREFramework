@@ -17,7 +17,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
 
     //Retrieve matrix coordinates of all organs with different positions and add to the sum _dim_ if two different organs are on the same position.
     int sum = 0;
-    int dim = v.rows()/3;
+    int dim = static_cast<int>(round(cbrt(v.rows()))); //cube root of the number of cells to obtain the dim of the 3D matrix
     std::vector<std::array<int,3>> v_coord, w_coord;
     for(int x = 0; x < dim; x++){
         for(int y = 0; y < dim; y++){
