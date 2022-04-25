@@ -206,11 +206,11 @@ void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const 
     for (size_t i = 0; i < handles.size(); i++){
         double frequency = commands[i] * (max_frequency / 2.) + max_frequency / 2.; // From [-1,1] to [0,max_frequency]
         double angle = misc::sinusoidal(amplitude, simulationTime, frequency, time_offset, position_offset);
-        // Limitation by the joints of -90 to 90 degrees
-        if(angle > M_PI/2.)
-            angle = M_PI/2.;
-        if(angle < -M_PI/2.)
-            angle = -M_PI/2.;
+        // Limitation by the joints of -80 to 80 degrees
+        if(angle > (4/9) * (M_PI))
+            angle = (4/9) * (M_PI);
+        if(angle < -(4/9) * (M_PI))
+            angle = -(4/9) * (M_PI);
         simSetJointTargetPosition(handles[i],static_cast<float>(angle));
     }
 }
