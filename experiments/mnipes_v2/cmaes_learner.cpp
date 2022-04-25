@@ -145,8 +145,8 @@ bool CMAESLearner::step(){
 bool CMAESLearner::is_learning_finish() const{
     int max_nbr_eval = 0;
     if(from_scratch)
-        max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesSmallNbrEval").value;
-    else max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesLargeNbrEval").value;
+        max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesLargeNbrEval").value;
+    else max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesSmallNbrEval").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
         std::cout << "INFO - CMAES: Learning ending conditions: " << current_nbr_ind << " = 0 and (nbr evals "
