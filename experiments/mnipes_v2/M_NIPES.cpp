@@ -336,9 +336,6 @@ void M_NIPES::init_next_pop(){
                 init_new_ctrl_pop(learner);
         }
     }
-    for(int i = 0; i < population.size(); i++)
-        corr_indexes.push_back(i);
-
 }
 
 bool M_NIPES::update(const Environment::Ptr &env){
