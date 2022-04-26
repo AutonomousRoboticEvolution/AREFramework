@@ -89,7 +89,7 @@ void Organ::createOrgan(int skeletonHandle)
     }
     else
         assert(false);
-
+    /// \todo EB: Destroy this dummy
     connectorHandle = simCreateDummy(0.01,nullptr);
     simSetObjectParent(connectorHandle, organHandle, 1);
     simSetObjectPosition(connectorHandle,-1,tempConnectorPos);
@@ -108,9 +108,7 @@ void Organ::createOrgan(int skeletonHandle)
     }
     /// \todo EB: These two lines work but I don't understand why with the previous method no.
     simGetObjectOrientation(organHandle, -1, tempOrganOri);
-
     organOri.at(0) = tempOrganOri[0]; organOri.at(1) = tempOrganOri[1]; organOri.at(2) = tempOrganOri[2];
-    simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
     // Set parents
     simSetObjectParent(forceSensor,skeletonHandle,1);
     simSetObjectParent(organHandle, forceSensor, 1);
@@ -121,7 +119,7 @@ void Organ::createOrgan(int skeletonHandle)
     if(organType == 0) // Brain
         tempOrganPos[2] = 0.0;
     else if(organType == 1) { // Wheels
-//        tempOrganPos[0] = -0.013; // Relative to the floor
+        tempOrganPos[0] = -0.013; // Relative to the floor
         tempOrganPos[2] = -0.035; // Relative to the surface of the skeleton
     } else if(organType == 2) { // Sensors
         tempOrganPos[2] = -0.035;
@@ -159,16 +157,21 @@ void Organ::createOrgan(int skeletonHandle)
 #elif ISROBOTSTATIC == 1
     simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
+    connector_frame_pos.resize(3);
     if(organType != 0)
         createMaleConnector();
+    else
+        connector_frame_pos = connectorPos;
 }
 
 void Organ::createMaleConnector()
 {
     float tempConnectorPosition[3];
     float tempConnectorOrientation[3];
+    float temp_connector_frame_pos[3];
     int temp_physics_connector_handle;
     int temp_visual_connector_handle = -1;
+
 
     tempConnectorPosition[0] = connectorPos.at(0);
     tempConnectorPosition[1] = connectorPos.at(1);
@@ -196,7 +199,7 @@ void Organ::createMaleConnector()
     /// \todo EB: We need to find a better way align origins of connectors and connectors! This distance only applies for the second male conenctor
     tempConnectorPosition[0] = 0.00;
     tempConnectorPosition[1] = 0.0;
-    tempConnectorPosition[2] = 0.005;
+    tempConnectorPosition[2] = 0.0;
 
     tempConnectorOrientation[0] = 3.14159;
     tempConnectorOrientation[1] = 0.0;
@@ -211,6 +214,11 @@ void Organ::createMaleConnector()
     simSetObjectParent(temp_physics_connector_handle, organHandle, 1);
 
     physics_connector_handle = temp_physics_connector_handle;
+
+    simGetObjectPosition(simGetObjectChild(temp_visual_connector_handle,0),-1,temp_connector_frame_pos); // Get the position of the dummy for the blueprint
+    connector_frame_pos.at(0) = temp_connector_frame_pos[0];
+    connector_frame_pos.at(1) = temp_connector_frame_pos[1];
+    connector_frame_pos.at(2) = temp_connector_frame_pos[2];
 }
 
 void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,

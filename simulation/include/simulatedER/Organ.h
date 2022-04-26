@@ -32,6 +32,7 @@ private:
     bool organRemoved;
     bool organChecked;
     are::settings::ParametersMapPtr parameters;
+    std::vector<float> connector_frame_pos;
 
 public:
 
@@ -100,6 +101,7 @@ public:
     /// Getters and setters
     int getOrganHandle() const {return organHandle;}
     int getOrganType() const {return organType;}
+    std::vector<float> get_connector_frame_pos() const {return connector_frame_pos;}
     int get_graphical_connector_handle() const {return physics_connector_handle;}
     bool isOrganRemoved() const {return organRemoved;}
     bool isOrganChecked() const {return organChecked;}

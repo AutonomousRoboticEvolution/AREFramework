@@ -328,14 +328,15 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
     }
-    blueprint.createBlueprint(organList);
     destroyGripper();
-    destroy_physical_connectors();
+    blueprint.createBlueprint(organList);
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
+
+    destroy_physical_connectors();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
