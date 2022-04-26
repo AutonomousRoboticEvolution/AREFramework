@@ -225,8 +225,8 @@ private:
     };
 
 public:
-    NEAT::Substrate get_substrate() { return substrate;}
-    void set_substrate(NEAT::Substrate sub){substrate = sub;}
+    //NEAT::Substrate get_substrate() { return substrate;}
+    //void set_substrate(NEAT::Substrate sub){substrate = sub;}
 
 private:
     NEAT::NeuralNetwork nn;
@@ -244,7 +244,7 @@ private:
     Blueprint blueprint;
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
-    NEAT::Substrate substrate;
+    //NEAT::Substrate substrate;
 
     std::vector<std::vector<double>> matrix_4d;
 };
