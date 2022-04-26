@@ -392,12 +392,21 @@ bool M_NIPES::update(const Environment::Ptr &env){
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else{
-                genome_t new_gene(learner.morph_genome,NNParamGenome(),{0});
-                gene_pool.push_back(new_gene);
-                if(gene_pool.size() > pop_size)
-                    remove_oldest_gene();
+            }else{//if this robot has no actuator, it is not included in the genomes pool and it is replaced by a new random one.
                 learner.ctrl_learner.to_be_erased();
+                EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+                NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+                morphgenome->random();
+
+                learner_t new_learner(*morphgenome.get());
+                new_learner.ctrl_learner.set_parameters(parameters);
+                learning_pool.push_back(new_learner);
+
+                M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+                corr_indexes.push_back(corr_indexes.back() + 1);
             }
         }else{
             numberEvaluation++;
