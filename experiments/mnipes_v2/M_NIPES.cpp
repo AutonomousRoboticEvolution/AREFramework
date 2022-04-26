@@ -425,11 +425,13 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-                weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-                biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
-                best_ctrl_gen.set_weights(weights);
-                best_ctrl_gen.set_biases(biases);
+                if(!best_controller.second.empty()){
+                    int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
+                    weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+                    biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+                    best_ctrl_gen.set_weights(weights);
+                    best_ctrl_gen.set_biases(biases);
+                }
                 //update the archive
                 if(use_ctrl_arch){
                     CartDesc morph_desc = learner.morph_genome.get_morph_desc();
