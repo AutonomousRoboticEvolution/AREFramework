@@ -16,7 +16,6 @@ void CPPNIndividual::createMorphology()
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_x,init_y,0.15);
     setMorphDesc();
     setManRes();
-    set_organ_position_descriptor();
     set_4d_matrix();
 }
 
@@ -24,11 +23,6 @@ void CPPNIndividual::createMorphology()
 void CPPNIndividual::setMorphDesc()
 {
     morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc();
-}
-
-void CPPNIndividual::set_organ_position_descriptor()
-{
-    organ_position_descriptor = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc();
 }
 
 void CPPNIndividual::setManRes()
