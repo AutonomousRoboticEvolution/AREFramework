@@ -32,14 +32,14 @@ void MATRIXEVOLUTION::init()
     if(operation_mode == 0 || operation_mode == 1){ // Simply load or mutation - single robot
         std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
         std::string temp_string = genome_pool + genome_id;
-        first_parent_matrix_4d = load_robot_matrix(temp_string);
+        first_parent_matrix_4d = protomatrix::load_robot_matrix(temp_string);
     } else if(operation_mode == 2){ // Crossover
         std::string genome_id = settings::getParameter<settings::String>(parameters,"#firstParentID").value;
         std::string temp_string = genome_pool + genome_id;
-        first_parent_matrix_4d = load_robot_matrix(temp_string);
+        first_parent_matrix_4d = protomatrix::load_robot_matrix(temp_string);
         genome_id = settings::getParameter<settings::String>(parameters,"#secondParentID").value;
         temp_string = genome_pool + genome_id;
-        second_parent_matrix_4d = load_robot_matrix(temp_string);
+        second_parent_matrix_4d = protomatrix::load_robot_matrix(temp_string);
     } else if(operation_mode == 3) { // List of robots
         load_list_robot_matrix(genome_pool);
     } else{
@@ -63,8 +63,8 @@ void MATRIXEVOLUTION::initPopulation()
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
 //        child_matrix_4d = first_parent_matrix_4d;
-//        child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
-        child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
+        child_matrix_4d = protomatrix::mutate_matrix(first_parent_matrix_4d);
+//        child_matrix_4d = protomatrix::crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
         morphgenome->set_matrix_4d(child_matrix_4d);
         if(cppn_fixed)
             morphgenome->fixed_structure();
@@ -85,11 +85,11 @@ void MATRIXEVOLUTION::initPopulation()
             if(operation_mode == 0) // No changes - single robot
                 child_matrix_4d = first_parent_matrix_4d;
             else if(operation_mode == 1) // Mutation - single robot
-                child_matrix_4d = mutate_matrix(first_parent_matrix_4d);
+                child_matrix_4d = protomatrix::mutate_matrix(first_parent_matrix_4d);
             else if(operation_mode == 2) // Crossover
-                child_matrix_4d = crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
+                child_matrix_4d = protomatrix::crossover_matrix(first_parent_matrix_4d,second_parent_matrix_4d);
             else if(operation_mode == 3) // No changes - set robots
-                child_matrix_4d = mutate_matrix(list_parents_matrix_4d.at(counter));
+                child_matrix_4d = protomatrix::mutate_matrix(list_parents_matrix_4d.at(counter));
                 //child_matrix_4d = list_parents_matrix_4d.at(i);
             else{
                 std::cerr << "Operation_mode: " << operation_mode << " " << __func__ << std::endl;
@@ -215,31 +215,6 @@ bool MATRIXEVOLUTION::update(const Environment::Ptr& env)
     return true;
 }
 
-std::vector<std::vector<double>> MATRIXEVOLUTION::load_robot_matrix(std::string filepath)
-{
-    std::vector<std::vector<double>> matrix_4d;
-    // Create an input filestream
-    std::ifstream myFile(filepath);
-    if(!myFile.is_open()) throw std::runtime_error("Could not open file");
-    std::string line;
-    std::vector<std::string> split_str;
-    int output_counter = 0;
-    matrix_4d.resize(6);
-    while(std::getline(myFile, line)){
-        // Create a stringstream of the current line
-        std::stringstream ss(line);
-        // Keep track of the current column index
-        boost::split(split_str,line,boost::is_any_of(","),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
-        for(int i = 1; i < split_str.size()-1; i++){
-            matrix_4d.at(output_counter).push_back(std::stod(split_str.at(i)));
-        }
-        output_counter++;
-    }
-    // Close file
-    myFile.close();
-    return matrix_4d;
-}
-
 void MATRIXEVOLUTION::load_list_robot_matrix(std::string filepath)
 {
     int robots_number = settings::getParameter<settings::Integer>(parameters,"#robotsNumber").value;
@@ -268,63 +243,4 @@ void MATRIXEVOLUTION::load_list_robot_matrix(std::string filepath)
         myFile.close();
         list_parents_matrix_4d.push_back(robot_matrix_4d);
     }
-}
-
-std::vector<std::vector<double>> MATRIXEVOLUTION::mutate_matrix(std::vector<std::vector<double>> matrix_4d)
-{
-    std::vector<std::vector<double>> mutated_matrix_4d = matrix_4d;
-    float mutation_rate = settings::getParameter<settings::Float>(parameters,"#mutationRate").value;
-    float mutation_parameter = settings::getParameter<settings::Float>(parameters,"#mutationParameter").value;
-    int mutation_type = settings::getParameter<settings::Integer>(parameters,"#mutationType").value;
-    for(int i = 0; i < matrix_4d.size(); i++){
-        for(int j = 0; j < matrix_4d.at(0).size(); j++){
-            if(std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen) < mutation_rate) {
-                if(mutation_type == 0){ // Uniform distribution
-                    double temp_variable;
-                    double rand_number = std::uniform_real_distribution<>(-mutation_parameter,mutation_parameter)(nn2::rgen_t::gen);
-                    temp_variable = rand_number  + matrix_4d.at(i).at(j);
-                    if (temp_variable < -1.0)
-                        temp_variable = -1.0;
-                    else if (temp_variable > 1.0)
-                        temp_variable = 1.0;
-                    mutated_matrix_4d.at(i).at(j) = temp_variable;
-                }
-                else if(mutation_type == 1){ // Polynomial mutation
-                    const float eta_m = mutation_parameter;
-                    assert(eta_m != -1.0f);
-                    float ri = std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen);
-                    float delta_i = ri < 0.5 ?
-                                    pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
-                                    1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
-                    assert(!std::isnan(delta_i));
-                    assert(!std::isinf(delta_i));
-                    float temp_variable = matrix_4d.at(i).at(j) + delta_i;
-                    if (temp_variable < -1.0)
-                        temp_variable = -1.0;
-                    else if (temp_variable > 1.0)
-                        temp_variable = 1.0;
-                    mutated_matrix_4d.at(i).at(j) = temp_variable;
-                } else{
-                    std::cerr << "Wrong mutation_type: " << mutation_type << " in " << __func__ << std::endl;
-                    assert(false);
-                }
-            }
-        }
-    }
-    return mutated_matrix_4d;
-}
-
-std::vector<std::vector<double>> MATRIXEVOLUTION::crossover_matrix(std::vector<std::vector<double>> first_parent_4d,std::vector<std::vector<double>> second_parent_4d)
-{
-    std::vector<std::vector<double>> child_matrix_4d;
-    child_matrix_4d = first_parent_4d;
-    for(int i = 0; i < first_parent_4d.size(); i++){
-        for(int j = 0; j < first_parent_4d.at(0).size(); j++){
-            double first_parent_output = first_parent_4d.at(i).at(j);
-            double second_parent_output = second_parent_4d.at(i).at(j);
-            double result = (first_parent_output + second_parent_output)/2.;
-            child_matrix_4d.at(i).at(j) = result;
-        }
-    }
-    return child_matrix_4d;
 }

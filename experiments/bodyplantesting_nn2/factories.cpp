@@ -43,10 +43,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));
     logs.push_back(testslog);
 
-    if(!are::settings::getParameter<are::settings::Boolean>(param,"#isCPPNGenome").value){
+//    if(!are::settings::getParameter<are::settings::Boolean>(param,"#isCPPNGenome").value){
         are::SkeletonMatrixLog::Ptr skeleton_matrix_log(new are::SkeletonMatrixLog());
         logs.push_back(skeleton_matrix_log);
-    }
+//    }
 
     std::string md_cart_wd_log_file = are::settings::getParameter<are::settings::String>(param,"#mdCartWdhFile").value;
     are::morphDescCartWHDLog::Ptr mdcartwdlog(new are::morphDescCartWHDLog(md_cart_wd_log_file));

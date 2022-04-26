@@ -4,8 +4,8 @@
 #vrepFolder,string,/home/ebb505/ARE_Project/vrep/
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,20
-#maxEvalTime,float,30
+#populationSize,int,4
+#maxEvalTime,float,1
 #numberOfGeneration,int,1
 #repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
@@ -37,7 +37,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
@@ -76,9 +76,6 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 #rateCrossover,float,0.5
-
-#isCPPNGenome,bool,1
-#isLeg,bool,0
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1

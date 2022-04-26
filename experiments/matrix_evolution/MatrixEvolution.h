@@ -6,7 +6,7 @@
 #include "eigen3/Eigen/Core"
 #include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
-
+#include "protomatrix_utils.hpp"
 
 namespace are {
 
@@ -23,10 +23,7 @@ public:
     bool is_finish() override;
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     bool update(const Environment::Ptr&);
-    std::vector<std::vector<double>> load_robot_matrix(std::string filepath);
     void load_list_robot_matrix(std::string filepath);
-    std::vector<std::vector<double>> mutate_matrix(std::vector<std::vector<double>> matrix_4d);
-    std::vector<std::vector<double>> crossover_matrix(std::vector<std::vector<double>> first_parent_4d,std::vector<std::vector<double>> second_parent_4d);
 
     NEAT::Genome loadInd(short int genomeID);
     std::vector<int> listInds();

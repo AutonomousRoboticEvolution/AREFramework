@@ -17,7 +17,9 @@ add_library(matrix_evolution SHARED
     MatrixEvolution.cpp
     CPPNIndividual.cpp
     factories.cpp
-    ManLog.cpp)
+    ManLog.cpp
+    ../common/protromatrix_utils.cpp
+        )
 target_include_directories(matrix_evolution PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
