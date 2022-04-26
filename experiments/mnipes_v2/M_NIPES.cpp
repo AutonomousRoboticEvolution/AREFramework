@@ -406,7 +406,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 ind->set_parameters(parameters);
                 ind->set_randNum(randomNum);
                 population.push_back(ind);
-                corr_indexes.push_back(corr_indexes.back() + 1);
+                int i = corr_indexes.size()-1;
+                while(corr_indexes[i] < 0)
+                    i--;
+                corr_indexes.push_back(corr_indexes[i] + 1);
             }
         }else{
             numberEvaluation++;
