@@ -6,6 +6,7 @@ using namespace protomatrix;
 std::mt19937 nn2::rgen_t::gen;
 
 int static_id = 0;
+int protomatrix_id = 0;
 //int cppn_params::cppn::_mutation_type = 0; //uniform
 //bool cppn_params::cppn::_mutate_connections = true;
 //bool cppn_params::cppn::_mutate_neurons = true;

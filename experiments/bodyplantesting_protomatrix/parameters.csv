@@ -1,13 +1,13 @@
 #experimentName,string,bodyplantesting_protomatrix
-#expPluginName,string,/home/edgar/vrep/lib/libbodyplantesting_protomatrix.so
+#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting_protomatrix.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/edgar/vrep/
-#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
+#vrepFolder,string,/home/ebb505/ARE_Project/vrep/
+#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,4
 #maxEvalTime,float,1
 #numberOfGeneration,int,2
-#repository,string,/home/edgar/are-logs
+#repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -75,7 +75,9 @@
 #rateDeleteConnection,float,0.01
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
-#rateCrossover,float,0.5
+#rateCrossover,float,0.
 
-#isCPPNGenome,bool,1
+#isCPPNGenome,bool,0
 #isLeg,bool,1
+#isRandomStartingPopulation,bool,0
+#genomePool,string,/home/ebb505/ARE_Project/are-logs/bodyplantesting_nn2_26_3_17-4-23-3242-3535697966/matrices_

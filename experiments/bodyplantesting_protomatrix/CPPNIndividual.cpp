@@ -14,9 +14,8 @@ void CPPNIndividual::createMorphology()
     };
 
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-//    nn2_cppn_t cppn = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_cppn();
-//    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_matrix_4d(m4d);
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 

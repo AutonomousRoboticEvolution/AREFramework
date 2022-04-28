@@ -8,6 +8,7 @@
 #include "ARE/Genome.h"
 #include "ARE/morphology_descriptors.hpp"
 #include "ARE/Logging.h"
+#include "protomatrix_utils.hpp"
 
 namespace are {
 
@@ -57,6 +58,7 @@ namespace are {
 //using nn2_cppn_t = nn2::CPPN<cppn::neuron_t,cppn::connection_t,cppn_params>;
 
 //static int static_id;
+static int protomatrix_id; /// \todo EB: Why can't I use static_id
 
 class ProtomatrixGenome : public Genome
 {
@@ -68,20 +70,22 @@ public:
 
     ProtomatrixGenome() : Genome(){
 //        _id = static_id++;
+        _id = protomatrix_id++;
 //        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
-        type = "nn2_protomatrix_genome";
+        type = "protomatrix_genome";
         parents_ids= std::vector<int>(2,-1);
     }
     ProtomatrixGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
 //        _id = static_id++;
+        _id = protomatrix_id++;
 //        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
-        type = "nn2_protomatrix_genome";
+        type = "protomatrix_genome";
         parents_ids= std::vector<int>(2,-1);
-
     }
 //    ProtomatrixGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
 //        _id = static_id++;
+//        _id = protomatrix_id++;
 //    }
     ProtomatrixGenome(const ProtomatrixGenome &gen) :
         Genome(gen), matrix_4d(gen.matrix_4d), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){
@@ -93,7 +97,7 @@ public:
     }
 
     void init() override {
-//        cppn.init();
+
     }
 
     void fixed_structure(){
@@ -102,10 +106,20 @@ public:
 
     void random(){
 //        cppn.random();
+        if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value) {
+            matrix_4d = protomatrix::random_matrix(matrix_4d);
+        }
+        else{
+            std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
+            std::string genome_id = std::to_string(id());
+            std::string temp_string = genome_pool + genome_id;
+            matrix_4d = protomatrix::load_robot_matrix(temp_string);
+        }
     }
 
     void mutate() override {
 //        cppn.mutate();
+        matrix_4d = protomatrix::mutate_matrix(matrix_4d);
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
@@ -158,8 +172,6 @@ public:
 
     const std::vector<int>& get_parents_ids() const {return parents_ids;}
     void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
-//    void set_cppn(const nn2_cppn_t &c){cppn = c;}
-//    const nn2_cppn_t& get_cppn() const {return cppn;}
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
     const std::vector<std::vector<double>>& get_matrix_4d(){return matrix_4d;}
 

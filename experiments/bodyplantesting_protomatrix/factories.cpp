@@ -32,9 +32,9 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 //    are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog(new are::nn2_cppn::NbrConnNeurLog(ncn_file));
 //    logs.push_back(ncnlog);
 //
-//    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
-//    are::nn2_cppn::ParentingLog::Ptr parlog(new are::nn2_cppn::ParentingLog(par_file));
-//    logs.push_back(parlog);
+    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
+    are::protomatrix::ParentingLog::Ptr parlog(new are::protomatrix::ParentingLog(par_file));
+    logs.push_back(parlog);
 //
 //    are::nn2_cppn::GraphVizLog::Ptr gvlog(new are::nn2_cppn::GraphVizLog);
 //    logs.push_back(gvlog);

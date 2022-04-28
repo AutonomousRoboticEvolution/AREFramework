@@ -28,6 +28,18 @@ std::vector<std::vector<double>> protomatrix::load_robot_matrix(std::string file
     myFile.close();
     return matrix_4d;
 }
+std::vector<std::vector<double>> protomatrix::random_matrix(std::vector<std::vector<double>> matrix_4d){
+    matrix_4d.resize(6);
+    const float mutation_parameter = 1.0;
+    for(int i = 0; i < matrix_4d.size(); i++) {
+        for(int j = 0; j < 1331; j++) { /// \todo EB: Hardcoded value!
+            double rand_number = std::uniform_real_distribution<>(-mutation_parameter,mutation_parameter)(nn2::rgen_t::gen);
+            matrix_4d.at(i).push_back(rand_number);
+        }
+    }
+    return matrix_4d;
+}
+
 std::vector<std::vector<double>> protomatrix::mutate_matrix(std::vector<std::vector<double>> matrix_4d){
     std::vector<std::vector<double>> mutated_matrix_4d = matrix_4d;
     const float mutation_rate = 0.1;

@@ -72,7 +72,7 @@
 #CPPNParametersMutationRate,float,0.1
 
 #isCPPNGenome,bool,0
-#operationMode,int,2
+#operationMode,int,1
 #robotsNumber,int,20
 #evaluationsNumber,int,20
 
