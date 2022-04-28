@@ -17,7 +17,9 @@ add_library(bodyplantesting_protomatrix SHARED
     BodyPlanTesting.cpp
     CPPNIndividual.cpp
     factories.cpp
-    ManLog.cpp)
+    ManLog.cpp
+    ProtomatrixGenome.cpp
+        )
 target_include_directories(bodyplantesting_protomatrix PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>

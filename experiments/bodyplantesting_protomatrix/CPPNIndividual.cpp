@@ -14,8 +14,9 @@ void CPPNIndividual::createMorphology()
     };
 
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+//    nn2_cppn_t cppn = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_cppn();
+//    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+    std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 
@@ -65,7 +66,7 @@ std::string CPPNIndividual::to_string()
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
-    oarch.register_type<NN2CPPNGenome>();
+    oarch.register_type<ProtomatrixGenome>();
     oarch << *this;
     return sstream.str();
 }
@@ -75,7 +76,7 @@ void CPPNIndividual::from_string(const std::string &str){
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
-    iarch.register_type<NN2CPPNGenome>();
+    iarch.register_type<ProtomatrixGenome>();
     iarch >> *this;
 
     //set parameters and randNum to the genome as it is not contained in the serialisation

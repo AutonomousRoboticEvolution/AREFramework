@@ -25,19 +25,19 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::FitnessLog::Ptr fitlog(new are::FitnessLog(fit_log_file));
     logs.push_back(fitlog);
 
-    are::nn2_cppn::NN2CPPNGenomeLog::Ptr genlog(new are::nn2_cppn::NN2CPPNGenomeLog);
-    logs.push_back(genlog);
-
-    std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
-    are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog(new are::nn2_cppn::NbrConnNeurLog(ncn_file));
-    logs.push_back(ncnlog);
-
-    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
-    are::nn2_cppn::ParentingLog::Ptr parlog(new are::nn2_cppn::ParentingLog(par_file));
-    logs.push_back(parlog);
-
-    are::nn2_cppn::GraphVizLog::Ptr gvlog(new are::nn2_cppn::GraphVizLog);
-    logs.push_back(gvlog);
+//    are::nn2_cppn::ProtomatrixGenomeLog::Ptr genlog(new are::nn2_cppn::ProtomatrixGenomeLog);
+//    logs.push_back(genlog);
+//
+//    std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
+//    are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog(new are::nn2_cppn::NbrConnNeurLog(ncn_file));
+//    logs.push_back(ncnlog);
+//
+//    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
+//    are::nn2_cppn::ParentingLog::Ptr parlog(new are::nn2_cppn::ParentingLog(par_file));
+//    logs.push_back(parlog);
+//
+//    are::nn2_cppn::GraphVizLog::Ptr gvlog(new are::nn2_cppn::GraphVizLog);
+//    logs.push_back(gvlog);
 
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog(new are::TestsLog(tests_log_file));

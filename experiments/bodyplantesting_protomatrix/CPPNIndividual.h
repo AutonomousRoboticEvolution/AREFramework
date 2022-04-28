@@ -1,7 +1,7 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "ProtomatrixGenome.hpp"
 #include "ARE/Individual.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
@@ -17,14 +17,14 @@ public :
     typedef std::shared_ptr<const CPPNIndividual> ConstPtr;
 
     CPPNIndividual() : Individual(){}
-    CPPNIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
+    CPPNIndividual(const ProtomatrixGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
             Individual(morph_gen, ctrl_gen){}
     CPPNIndividual(const CPPNIndividual& ind):
             Individual(ind),
             testRes(ind.testRes),
             morphDesc(ind.morphDesc)
     {
-        morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
+        morphGenome = std::make_shared<ProtomatrixGenome>(*std::dynamic_pointer_cast<ProtomatrixGenome>(ind.morphGenome));
         ctrlGenome = std::make_shared<EmptyGenome>(*std::dynamic_pointer_cast<EmptyGenome>(ind.ctrlGenome));
     }
     Individual::Ptr clone() override{

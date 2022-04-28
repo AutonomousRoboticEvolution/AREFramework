@@ -42,7 +42,7 @@ void BODYPLANTESTING::initPopulation()
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+        ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
         if(cppn_fixed)
             morphgenome->fixed_structure();
         else
@@ -55,7 +55,7 @@ void BODYPLANTESTING::initPopulation()
         const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-            NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+            ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
             if(cppn_fixed)
                 morphgenome->fixed_structure();
             else

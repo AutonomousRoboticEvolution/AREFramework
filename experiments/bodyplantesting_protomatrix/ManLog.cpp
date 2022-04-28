@@ -48,7 +48,7 @@ void SkeletonMatrixLog::saveLog(EA::Ptr &ea)
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;
-        filename << "matrices_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
+        filename << "matrices_" << std::dynamic_pointer_cast<ProtomatrixGenome>(
                 ea->get_population()[i]->get_morph_genome()
         )->id();
         if(!openOLogFile(logFileStream, filename.str()))
