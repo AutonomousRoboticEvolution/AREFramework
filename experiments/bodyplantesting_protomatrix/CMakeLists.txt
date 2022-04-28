@@ -12,13 +12,13 @@ SET(VREP_SRC
     )
 
 
-add_library(bodyplantesting_nn2 SHARED
+add_library(bodyplantesting_protomatrix SHARED
     ${VREP_SRC}
     BodyPlanTesting.cpp
     CPPNIndividual.cpp
     factories.cpp
     ManLog.cpp)
-target_include_directories(bodyplantesting_nn2 PUBLIC
+target_include_directories(bodyplantesting_protomatrix PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
     "../../EAFramework/include/"
@@ -26,5 +26,5 @@ target_include_directories(bodyplantesting_nn2 PUBLIC
     "../common/"
     "/usr/include/eigen3"
     )
-target_link_libraries(bodyplantesting_nn2 ARE simulatedER)
-install(TARGETS bodyplantesting_nn2 DESTINATION lib)
+target_link_libraries(bodyplantesting_protomatrix ARE simulatedER)
+install(TARGETS bodyplantesting_protomatrix DESTINATION lib)
