@@ -420,6 +420,7 @@ void Morphology_CPPNMatrix::createHead()
 
 void Morphology_CPPNMatrix::createGripper()
 {
+    gripperHandles.resize(2);
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
@@ -427,12 +428,13 @@ void Morphology_CPPNMatrix::createGripper()
     std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
     tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[0] = tempGripperHandle;
     tempGripperHandle = -1;
     std::string gripperSensorPath = models_path + "/utils/gripper_s.ttm";
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[1] = tempGripperHandle;
+    gripperHandles.shrink_to_fit();
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
@@ -481,8 +483,10 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output.push_back(matrix_4d.at(0).at(pos_in_vector));
 
     }
-    for(const auto& o: output)
-        assert(!std::isnan(o));
+
+    for(auto& o: output)
+        if(std::isnan(o))
+            o = 0;
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);

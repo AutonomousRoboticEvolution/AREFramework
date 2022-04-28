@@ -62,7 +62,6 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
         }
     }
 
-
     nn2_cppn_t parents[2] = {gene_pool[best_idx[0]].morph_genome.get_cppn(),
                           gene_pool[best_idx[1]].morph_genome.get_cppn()};
     nn2_cppn_t child;
@@ -82,8 +81,15 @@ void M_NIPESIndividual::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     int i = rewards.size();
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
-    if(ctrlGenome->get_type() != "empty_genome")
-       assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    if(ctrlGenome->get_type() != "empty_genome"){
+        if(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() ==
+                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc()){
+            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+            if(verbose)
+                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
+            nbr_dropped_eval = 50; //set it directly to 50 to stop the learning.
+        }
+    }
     
 		      
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());

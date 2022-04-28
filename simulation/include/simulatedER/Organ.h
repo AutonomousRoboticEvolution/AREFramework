@@ -57,6 +57,21 @@ public:
         objectHandles.clear();
         parameters = param;
     }
+    Organ(const Organ& o):
+        organHandle(o.organHandle),
+        organType(o.organType),
+        connectorHandle(o.connectorHandle),
+        physics_connector_handle(o.physics_connector_handle),
+        connectorOri(o.connectorOri),
+        organRemoved(o.organRemoved),
+        organChecked(o.organChecked),
+        parameters(o.parameters),
+        organPos(o.organPos),
+        connectorPos(o.connectorPos),
+        organOri(o.organOri),
+        organInsideSkeleton(o.organInsideSkeleton),
+        organColliding(o.organColliding),
+        organGripperAccess(o.organGripperAccess){}
     /**
      * @brief This method creates, places and rotates the simulated organ. The parent will be the skeleton hangle passed.
      * @param skeletonHandle - parent skeleton

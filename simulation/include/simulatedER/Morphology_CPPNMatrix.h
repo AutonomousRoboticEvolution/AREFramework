@@ -24,6 +24,20 @@ class Morphology_CPPNMatrix : public Morphology
 {
 public:
     Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){}
+    Morphology_CPPNMatrix(const Morphology_CPPNMatrix& mcm): Morphology(mcm),
+        use_neat(mcm.use_neat),
+        cppn(mcm.cppn),
+        nn2_cppn(mcm.nn2_cppn),
+        id(mcm.id),
+        organList(mcm.organList),
+        numSkeletonVoxels(mcm.numSkeletonVoxels),
+        indDesc(mcm.indDesc),
+        skeletonHandles(mcm.skeletonHandles),
+        gripperHandles(mcm.gripperHandles),
+        blueprint(mcm.blueprint),
+        skeletonListVertices(mcm.skeletonListVertices),
+        skeletonListIndices(mcm.skeletonListIndices),
+        matrix_4d(mcm.matrix_4d){}
 
     class RobotManRes{
     public:
@@ -229,7 +243,6 @@ public:
     //void set_substrate(NEAT::Substrate sub){substrate = sub;}
 
 private:
-    NEAT::NeuralNetwork nn;
     bool use_neat=true;
     NEAT::NeuralNetwork cppn;
     nn2_cppn_t nn2_cppn;
