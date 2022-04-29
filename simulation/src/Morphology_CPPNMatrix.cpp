@@ -555,9 +555,13 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
 
 void Morphology_CPPNMatrix::destroyGripper()
 {
-    for(auto & i : gripperHandles) {
-        simRemoveModel(i);
-    }
+    simRemoveModel(gripperHandles[0]);
+    simRemoveModel(gripperHandles[1]);
+
+
+//    for(auto & i : gripperHandles) {
+//        simRemoveModel(i);
+//    }
 }
 
 void Morphology_CPPNMatrix::destroy_physical_connectors()
