@@ -82,8 +82,8 @@ void M_NIPESIndividual::createMorphology(){
     int i = rewards.size();
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
     if(ctrlGenome->get_type() != "empty_genome"){
-        if(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() !=
-                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc()){
+        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() ==
+                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
             bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
             if(verbose)
                 std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
