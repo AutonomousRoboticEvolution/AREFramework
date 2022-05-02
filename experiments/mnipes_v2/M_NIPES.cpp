@@ -87,7 +87,7 @@ void M_NIPESIndividual::createMorphology(){
             bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
             if(verbose)
                 std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
-            nbr_dropped_eval = 50; //set it directly to 50 to stop the learning.
+            drop_learning = true; //set it directly to 50 to stop the learning.
         }
     }
     
@@ -99,7 +99,7 @@ void M_NIPESIndividual::createMorphology(){
 
 void M_NIPESIndividual::createController(){
 
-    if(ctrlGenome->get_type() == "empty_genome")
+    if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
         return;
 
     int nn_inputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
@@ -417,6 +417,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     i--;
                 corr_indexes.push_back(corr_indexes[i] + 1);
             }
+        }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
+            learner.ctrl_learner.to_be_erased();
         }else{
             numberEvaluation++;
             //update learner

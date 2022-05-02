@@ -141,6 +141,7 @@ public:
         arch & nbr_dropped_eval;
         arch & descriptor_type;
         arch & copy_rewards;
+        arch & drop_learning;
     }
 
     std::string to_string() override;
@@ -164,6 +165,9 @@ public:
     void add_reward(double reward){rewards.push_back(reward);}
     const std::vector<double>& get_rewards(){return copy_rewards;}
     void compute_fitness();
+
+    bool is_learning_dropped(){return drop_learning;}
+
 private:
     void createMorphology() override;
     void createController() override;
@@ -190,6 +194,7 @@ private:
     DescriptorType descriptor_type = FINAL_POSITION;
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
+    bool drop_learning = false;
 
 };
 
