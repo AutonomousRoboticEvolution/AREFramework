@@ -87,6 +87,9 @@ public:
 //        _id = static_id++;
 //        _id = protomatrix_id++;
 //    }
+    ProtomatrixGenome(const std::vector<std::vector<double>> &m4d) : matrix_4d(m4d){
+        _id = protomatrix_id++;
+    }
     ProtomatrixGenome(const ProtomatrixGenome &gen) :
         Genome(gen), matrix_4d(gen.matrix_4d), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){
     }
@@ -119,7 +122,7 @@ public:
 
     void mutate() override {
 //        cppn.mutate();
-        _id = protomatrix_id++;
+//        _id = protomatrix_id++; /// \todo EB: This is not necessary here.
         matrix_4d = protomatrix::mutate_matrix(matrix_4d);
     }
 
@@ -136,6 +139,19 @@ public:
 //        child2->set_randNum(randomNum);
 //        std::dynamic_pointer_cast<ProtomatrixGenome>(child1)->set_parents_ids({_id,partner->id()});
 //        std::dynamic_pointer_cast<ProtomatrixGenome>(child2)->set_parents_ids({_id,partner->id()});
+
+        std::vector<std::vector<double>> matrix_child1, matrix_child2;
+        std::vector<std::vector<double>> matrix_partner = std::dynamic_pointer_cast<ProtomatrixGenome>(partner)->get_matrix_4d();
+        matrix_child1 = protomatrix::crossover_matrix(matrix_partner,matrix_4d);
+        matrix_child2 = protomatrix::crossover_matrix(matrix_4d,matrix_partner);
+        *child1 = ProtomatrixGenome(matrix_child1);
+        *child2 = ProtomatrixGenome(matrix_child2);
+        child1->set_parameters(parameters);
+        child2->set_parameters(parameters);
+        child1->set_randNum(randomNum);
+        child2->set_randNum(randomNum);
+        std::dynamic_pointer_cast<ProtomatrixGenome>(child1)->set_parents_ids({_id,partner->id()});
+        std::dynamic_pointer_cast<ProtomatrixGenome>(child2)->set_parents_ids({_id,partner->id()});
     }
 
 
