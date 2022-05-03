@@ -42,6 +42,7 @@ public :
         arch & testRes;
         arch & individual_id;
         arch & generation;
+        arch & matrix_4d;
     }
     // Serialization
     std::string to_string();
