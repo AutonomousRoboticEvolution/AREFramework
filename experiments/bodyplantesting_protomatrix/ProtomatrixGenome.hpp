@@ -119,6 +119,7 @@ public:
 
     void mutate() override {
 //        cppn.mutate();
+        _id = protomatrix_id++;
         matrix_4d = protomatrix::mutate_matrix(matrix_4d);
     }
 
