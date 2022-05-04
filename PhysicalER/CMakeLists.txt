@@ -64,7 +64,7 @@ else()
 
     file(GLOB SRC_UPDATE src/update/*)
 
-    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/pi_individual.cpp src/io_helpers.cpp ../image_processing/src/real_environment.cpp)
+    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/pi_individual.cpp ../image_processing/src/real_environment.cpp)
     target_include_directories(are-update PUBLIC
         # ${OpenCV_INCLUDE_DIRS}
         "include/"
@@ -98,10 +98,10 @@ else()
 
     if(VREP_FOUND)
         SET(LIB_EXT v_repExtGenerate)
-        SET(PLUGIN_SRC src/generate/ER_generate.cpp src/generate/v_repExtGenerate.cpp src/io_helpers.cpp)
+        SET(PLUGIN_SRC src/generate/ER_generate.cpp src/generate/v_repExtGenerate.cpp)
     elseif(COPPELIASIM_FOUND)
         SET(LIB_EXT simExtGenerate)
-        SET(PLUGIN_SRC src/generate/ER_generate.cpp src/generate/simExtGenerate.cpp src/io_helpers.cpp)
+        SET(PLUGIN_SRC src/generate/ER_generate.cpp src/generate/simExtGenerate.cpp)
     endif()
 
     add_library(${LIB_EXT} SHARED ${VREP_SRC} ${PLUGIN_SRC})
