@@ -201,17 +201,22 @@ void sim::sentCommandToJointsProportional(const std::vector<int>& handles, const
 void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const std::vector<double> &commands)
 {
     double simulationTime = simGetSimulationTime();
-    double amplitude = M_PI/2., time_offset = 0.0, position_offset = 0.0;
-    double max_frequency = 0.5;
+    double amplitude = M_PI_4, time_offset = 0.0, position_offset = 0.0; // Constant
+    double max_frequency = 1.0;
     for (size_t i = 0; i < handles.size(); i++){
         double frequency = commands[i] * (max_frequency / 2.) + max_frequency / 2.; // From [-1,1] to [0,max_frequency]
-        double angle = misc::sinusoidal(amplitude, simulationTime, frequency, time_offset, position_offset);
+        double pos_diff = misc::sinusoidal(amplitude, simulationTime, frequency, time_offset, position_offset);
+        if(i == 0)
+            std::cout << pos_diff << std::endl;
+        float actual_pos;
+        simGetJointPosition(handles[i], &actual_pos);
+        double next_pos = pos_diff + actual_pos;
         // Limitation by the joints of -80 to 80 degrees
-        if(angle > (4./9.) * M_PI)
-            angle = (4./9.) * M_PI;
-        if(angle < -(4./9.) * M_PI)
-            angle = -(4./9.) * M_PI;
-        simSetJointTargetPosition(handles[i],static_cast<float>(angle));
+        if(next_pos > (4./9.) * M_PI)
+            next_pos = (4./9.) * M_PI;
+        if(next_pos < -(4./9.) * M_PI)
+            next_pos = -(4./9.) * M_PI;
+        simSetJointTargetPosition(handles[i],static_cast<float>(next_pos));
     }
 }
 
