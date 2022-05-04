@@ -89,7 +89,7 @@ void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
         return;
 
     logFileStream << genome.morph_genome.id() << ",";
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_morph_desc().getCartDesc();
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
     for(int j = 0; j < morphDesc.size(); j++){
         logFileStream << morphDesc(j) << ",";
     }
