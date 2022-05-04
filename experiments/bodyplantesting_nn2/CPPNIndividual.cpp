@@ -21,7 +21,7 @@ void CPPNIndividual::createMorphology()
 
     if(ctrlGenome->get_type() != "empty_genome")
        assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
 
     setMorphDesc();
     setManRes();
