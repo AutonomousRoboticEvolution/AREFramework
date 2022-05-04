@@ -120,7 +120,7 @@ public:
         child1->set_randNum(randomNum);
         child2->set_randNum(randomNum);
         std::dynamic_pointer_cast<NN2CPPNGenome>(child1)->set_parents_ids({_id,partner->id()});
-        std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({_id,partner->id()});
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({partner->id(),_id});
     }
 
 
