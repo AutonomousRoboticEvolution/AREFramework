@@ -82,7 +82,7 @@ void M_NIPESIndividual::createMorphology(){
     int i = rewards.size();
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
     if(ctrlGenome->get_type() != "empty_genome"){
-        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() ==
+        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
                 std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
             bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
             if(verbose)
@@ -400,9 +400,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
             learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
-            int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
-            int joint_nbr = learner.morph_genome.get_morph_desc().jointNumber;
-            int sensor_nbr = learner.morph_genome.get_morph_desc().sensorNumber;
+            int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
+            int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
+            int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
@@ -450,7 +450,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 }
                 //update the archive
                 if(use_ctrl_arch){
-                    CartDesc morph_desc = learner.morph_genome.get_morph_desc();
+                    CartDesc morph_desc = learner.morph_genome.get_cart_desc();
                     controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
                 }
                 //-
@@ -660,8 +660,8 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nbr_output(learner.morph_genome.get_morph_desc().wheelNumber + learner.morph_genome.get_morph_desc().jointNumber);
-        ctrl_gen->set_nbr_input(learner.morph_genome.get_morph_desc().sensorNumber*2);
+        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
+        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2);
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
