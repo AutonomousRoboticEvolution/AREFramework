@@ -92,7 +92,8 @@ void M_NIPESIndividual::createMorphology(){
     }
     
 		      
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
     setManRes();
 }
@@ -210,6 +211,13 @@ void M_NIPESIndividual::compute_fitness(){
     fitness /= static_cast<double>(rewards.size());
     objectives[0] = fitness;
     copy_rewards = rewards;
+}
+
+M_NIPES::M_NIPES(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) : EA(rn, param){
+    settings::defaults::parameters->emplace("#tournamentSize",new settings::Integer(4));
+    settings::defaults::parameters->emplace("#useControllerArchive",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#fitnessType",new settings::Integer(0));
+    settings::defaults::parameters->emplace("#populationSize",new settings::Integer(25));
 }
 
 void M_NIPES::init(){
@@ -391,7 +399,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner_t &learner = find_learner(morph_id);
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-            learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
+            learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
             int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
             int joint_nbr = learner.morph_genome.get_morph_desc().jointNumber;
             int sensor_nbr = learner.morph_genome.get_morph_desc().sensorNumber;
@@ -455,7 +463,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 gene_pool.push_back(new_gene);
                 //-
 
-		//level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+                //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
                 if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
@@ -492,6 +500,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
 
     while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
@@ -507,7 +516,7 @@ void M_NIPES::reproduction(){
                 }
             if(!already_drawn)
                 random_indexes.push_back(rand_idx);
-        }while(random_indexes.size() < 4);
+        }while(random_indexes.size() < tournament_size);
         //-
 
         //Add these new gene to learning pool

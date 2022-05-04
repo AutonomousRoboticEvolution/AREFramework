@@ -328,7 +328,8 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
     }
-    blueprint.createBlueprint(organList);
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
+        blueprint.createBlueprint(organList);
     destroyGripper();
     destroy_physical_connectors();
     // Export model

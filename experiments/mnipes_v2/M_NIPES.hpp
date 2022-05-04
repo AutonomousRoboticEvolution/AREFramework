@@ -207,7 +207,7 @@ public:
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 
     M_NIPES() : EA(){}
-    M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
+    M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
 
     void init() override;
 //    void epoch() override{
