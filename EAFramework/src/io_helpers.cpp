@@ -1,10 +1,10 @@
-#include "physicalER/io_helpers.hpp"
+#include "ARE/io_helpers.hpp"
 
 using namespace are;
-namespace  st = settings;
+namespace st = settings;
 namespace fs = boost::filesystem;
 
-bool phy::move_file(const std::string &origin, const std::string &dest){
+bool ioh::move_file(const std::string &origin, const std::string &dest){
     try{
         fs::copy_file(origin,dest);
     }catch(const fs::filesystem_error &e){
@@ -19,7 +19,7 @@ bool phy::move_file(const std::string &origin, const std::string &dest){
     return true;
 }
 
-void phy::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap &morph_gen_info){
+void ioh::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap &morph_gen_info){
     std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));
     std::ifstream ifs(genome_info_file);
     if(!ifs){
@@ -56,7 +56,7 @@ void phy::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap 
     morph_gen_info.emplace(id,mgi);
 }
 
-void phy::load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &robot_ids){
+void ioh::load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &robot_ids){
 
     std::string eval_queue_folder(folder + std::string("/waiting_to_be_evaluated"));
 
@@ -77,7 +77,7 @@ void phy::load_ids_to_be_evaluated(const std::string &folder,std::vector<int> &r
 }
 
 
-void phy::load_list_of_organs(const std::string &folder, const int& id, std::string &pi_address, std::string &list_of_organs){
+void ioh::load_list_of_organs(const std::string &folder, const int& id, std::string &pi_address, std::string &list_of_organs){
 
     std::stringstream filepath;
     filepath << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
@@ -95,13 +95,13 @@ void phy::load_list_of_organs(const std::string &folder, const int& id, std::str
         list_of_organs.append(line+"\n");
 }
 
-void phy::load_controller_genome(const std::string &folder, const int &id, const Genome::Ptr &genome){
+void ioh::load_controller_genome(const std::string &folder, const int &id, const Genome::Ptr &genome){
     std::stringstream filepath;
     filepath << folder << "/waiting_to_be_evaluated/ctrl_genome_" << id;
     genome->from_file(filepath.str());
 }
 
-void phy::load_nbr_organs(const std::string &folder, const int& id, int &wheels, int& joints, int& sensors){
+void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels, int& joints, int& sensors){
     std::stringstream filepath;
     filepath << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
     std::ifstream ifs(filepath.str());
@@ -122,7 +122,7 @@ void phy::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
 
 }
 
-int phy::choice_of_robot_to_evaluate(const std::vector<int> &ids)
+int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
 {
     std::cout << "Robots available for evaluation: " << std::endl;
     std::function<void(void)> print_ids = [&](){
@@ -136,9 +136,14 @@ int phy::choice_of_robot_to_evaluate(const std::vector<int> &ids)
     int chosen_id;
     while(!good){
         good = true;
-        std::cout << "Please enter the id of the robot to evaluate." << std::endl;
+        std::cout << "Please enter the id of the robot to evaluate. (default : " << ids.front() << ")" << std::endl;
         std::string entry;
-        std::cin >> entry;
+        std::getline(std::cin,entry);
+        if(entry.empty()){
+            good == true;
+            chosen_id = ids.front();
+            break;
+        }
         //check if the entry is a number. More precisely if the entry is a string convertible into an integer.
         try{
             chosen_id = std::stoi(entry);
@@ -163,7 +168,7 @@ int phy::choice_of_robot_to_evaluate(const std::vector<int> &ids)
     return chosen_id;
 }
 
-void phy::write_morph_genomes(const std::string &folder, const std::vector<Individual::Ptr> &population){
+void ioh::write_morph_genomes(const std::string &folder, const std::vector<Individual::Ptr> &population){
     int id = 0;
     for(const auto& ind: population){
         id = ind->get_morph_genome()->id();
@@ -182,7 +187,7 @@ void phy::write_morph_genomes(const std::string &folder, const std::vector<Indiv
 }
 
 
-void phy::add_morph_genome_to_gp(const std::string &folder, int id, const MorphGenomeInfo &morph_info){
+void ioh::add_morph_genome_to_gp(const std::string &folder, int id, const MorphGenomeInfo &morph_info){
     //move morph genome from waiting_to_be_built to the genomes pool
     std::stringstream origin, dest;
     origin << folder << "/waiting_to_be_evaluated/morph_genome_" << id;
