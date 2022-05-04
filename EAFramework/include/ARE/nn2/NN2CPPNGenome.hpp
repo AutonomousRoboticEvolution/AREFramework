@@ -84,7 +84,7 @@ public:
         _id = static_id++;
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){
+        Genome(gen), cppn(gen.cppn), cart_desc(gen.cart_desc), organ_position_desc(gen.organ_position_desc), parents_ids(gen.parents_ids){
     }
     ~NN2CPPNGenome() override {}
 
