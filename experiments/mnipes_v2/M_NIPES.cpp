@@ -399,7 +399,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner_t &learner = find_learner(morph_id);
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-            learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+            learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
             int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
             int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
             int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
