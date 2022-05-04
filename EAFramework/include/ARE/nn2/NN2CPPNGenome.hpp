@@ -147,7 +147,8 @@ public:
     {
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
-        arch & morph_desc;
+        arch & cart_desc;
+        arch & organ_position_desc;
         arch & parents_ids;
         arch & matrix_4d;
         arch & generation;
