@@ -206,8 +206,6 @@ void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const 
     for (size_t i = 0; i < handles.size(); i++){
         double frequency = commands[i] * (max_frequency / 2.) + max_frequency / 2.; // From [-1,1] to [0,max_frequency]
         double pos_diff = misc::sinusoidal(amplitude, simulationTime, frequency, time_offset, position_offset);
-        if(i == 0)
-            std::cout << pos_diff << std::endl;
         float actual_pos;
         simGetJointPosition(handles[i], &actual_pos);
         double next_pos = pos_diff + actual_pos;

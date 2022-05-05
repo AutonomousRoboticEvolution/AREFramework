@@ -1,13 +1,13 @@
 #experimentName,string,bodyplantesting_nn2
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting_nn2.so
+#expPluginName,string,/home/edgar/vrep/lib/libbodyplantesting_nn2.so
 #extSettingsClass,bool,0
-#vrepFolder,string,/home/ebb505/ARE_Project/vrep/
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#vrepFolder,string,/home/edgar/vrep/
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,20
-#maxEvalTime,float,1
+#maxEvalTime,float,30
 #numberOfGeneration,int,1
-#repository,string,/home/ebb505/ARE_Project/are-logs
+#repository,string,/home/edgar/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -37,7 +37,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
@@ -56,7 +56,6 @@
 #reloadController,bool,0
 #withBeacon,bool,0
 #imageRepository,string,images/
-
 
 #mutationType,int,0
 #mutateConnection,bool,1

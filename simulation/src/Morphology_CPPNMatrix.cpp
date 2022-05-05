@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 using namespace are::sim;
 
@@ -122,7 +122,7 @@ void Morphology_CPPNMatrix::create()
             // Create brain primitive
             float brainSize[3] = {0.084,0.084,0.11};
             brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
-            float brainPos[3] = {0.0,0.0,0.06};
+            float brainPos[3] = {0.0,0.0,0.06}; // 0.06
             simSetObjectPosition(brainHandle,-1,brainPos);
             // Group primitives
             int groupHandles[2] = {convexHandle, brainHandle};

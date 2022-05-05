@@ -218,7 +218,7 @@ void Organ::createMaleConnector()
     simGetObjectPosition(simGetObjectChild(temp_visual_connector_handle,0),-1,temp_connector_frame_pos); // Get the position of the dummy for the blueprint
     connector_frame_pos.at(0) = temp_connector_frame_pos[0];
     connector_frame_pos.at(1) = temp_connector_frame_pos[1];
-    connector_frame_pos.at(2) = temp_connector_frame_pos[2];
+    connector_frame_pos.at(2) = temp_connector_frame_pos[2] - 0.0098;
 }
 
 void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
