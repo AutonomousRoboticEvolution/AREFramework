@@ -1,4 +1,5 @@
 #include "physicalER/pi/are_control.hpp"
+#include <cmath>
 
 using namespace are::pi;
 
@@ -83,6 +84,11 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setCurrentLimit(17); // in 10s of milliAmps
         }
+        else if (thisOrgan->organType == JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisJoint= static_cast<JointOrgan *>(thisOrgan);
+            thisJoint->setCurrentLimit(100); // in 10s of milliAmps
+        }
     }
 
     // initialise the Head LEDs
@@ -117,7 +123,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
-void AREControl::sendOutputOrganCommands(std::vector<double> values){
+void AREControl::sendOutputOrganCommands(const std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
     int i=0;
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
@@ -132,7 +138,11 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            thisJoint->setTargetAngleNormalised(values[i]);
+            double value = values[i];
+            value = std::sin(value*(time_milli/1000.0));
+            std::clog << "Joint ["<<i<<"]: " << value << " -> ";
+            thisJoint->setTargetAngleNormalised(value);
+            std::clog << std::endl;
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++;
         }
@@ -201,6 +211,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
 }
 
 void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
+    if (!cameraInputToNN) return; // without aruco tag input, this debugging LED output wouldn't make any sense
     // compute brightness between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
     if (nn_inputs.back()>0){ // camera reading is the last NN input
         ledDriver->setAllTo(GREEN,200);
@@ -238,7 +249,7 @@ int AREControl::exec(zmq::socket_t& socket){
         nn_outputs = controller.get_ouputs();
 
         // send the new values to the actuators
-        sendOutputOrganCommands(nn_outputs);
+        sendOutputOrganCommands(nn_outputs, this_loop_start_time);
 
         // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
         if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}
@@ -268,6 +279,11 @@ int AREControl::exec(zmq::socket_t& socket){
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->standby();
+        }
+        if (thisOrgan->organType = JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisjoint= static_cast<JointOrgan *>(thisOrgan);
+            thisjoint->setServoOff();
         }
     }
     ledDriver->flash(BLUE);

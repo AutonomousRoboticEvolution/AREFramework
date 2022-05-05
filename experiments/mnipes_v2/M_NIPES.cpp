@@ -390,6 +390,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
             }
         }else if(env->get_name() == "mazeEnv"){
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
+        }else if(env->get_name() == "barrel_task"){
+            int number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
+            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
+                return false;
+            }else{
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
+            }
         }
     }
 
@@ -618,7 +627,7 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-    int nn_inputs = sensor_nbr*2;
+    int nn_inputs = sensor_nbr * 2 + 1; // Two per multi-sensor + 1 camera
     int nn_outputs = wheel_nbr + joint_nbr;
 
     int nbr_weights, nbr_bias;
@@ -660,8 +669,8 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
-        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2);
+        ctrl_gen->set_nbr_output(learner.morph_genome.get_morph_desc().wheelNumber + learner.morph_genome.get_morph_desc().jointNumber);
+        ctrl_gen->set_nbr_input(learner.morph_genome.get_morph_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
