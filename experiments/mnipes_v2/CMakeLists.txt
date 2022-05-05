@@ -30,6 +30,7 @@ add_library(M_NIPES2 SHARED
    MNIPESLoggings.cpp
    ../common/obstacleAvoidance.cpp
    ../common/multiTargetMaze.cpp
+   ../common/barrelTask.cpp
   ../common/exploration.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})

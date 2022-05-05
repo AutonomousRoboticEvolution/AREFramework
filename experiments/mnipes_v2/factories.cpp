@@ -1,4 +1,5 @@
 #include "simulatedER/mazeEnv.h"
+#include "barrelTask.hpp"
 #include "obstacleAvoidance.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
@@ -18,6 +19,8 @@ extern "C" are::Environment::Ptr environmentFactory
         env.reset(new are::sim::MultiTargetMaze(param));
     else if(env_type == are::EXPLORATION)
         env.reset(new are::sim::Exploration(param));
+    else if(env_type == are::BARREL)
+        env.reset(new are::sim::BarrelTask(param));
 
     return env;
 }
