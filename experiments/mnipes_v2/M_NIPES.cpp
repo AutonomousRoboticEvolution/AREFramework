@@ -48,6 +48,31 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
     return new_gene;
 };
 
+selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
+{
+    double best_fitness[2] = {gene_pool[0].objectives[0],gene_pool[1].objectives[1]};
+    int best_idx[2] = {0,1};
+    for(int i = 2; i < gene_pool.size(); i++){
+        if(best_fitness[0] < gene_pool[i].objectives[0]){//Best
+            best_fitness[0] = gene_pool[i].objectives[0];
+            best_idx[0] = i;
+        }else if(best_fitness[1] < gene_pool[i].objectives[0]){//Second Best
+            best_fitness[1] = gene_pool[i].objectives[0];
+            best_idx[1] = i;
+        }
+    }
+
+    nn2_cppn_t parents[2] = {gene_pool[best_idx[0]].morph_genome.get_cppn(),
+                          gene_pool[best_idx[1]].morph_genome.get_cppn()};
+    nn2_cppn_t child;
+    parents[0].crossover(parents[1],child); //crossover to generate the child
+    child.mutate(); //mutate the child
+    NN2CPPNGenome new_gene(child);
+    new_gene.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()}); //store the ids of the parents
+    return new_gene;
+};
+
+
 void M_NIPESIndividual::createMorphology(){
     individual_id = morphGenome->id();
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
@@ -56,18 +81,26 @@ void M_NIPESIndividual::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     int i = rewards.size();
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
-    if(ctrlGenome->get_type() != "empty_genome")
-       assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_morph_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    if(ctrlGenome->get_type() != "empty_genome"){
+        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
+                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
+            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+            if(verbose)
+                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
+            drop_learning = true; //set it directly to 50 to stop the learning.
+        }
+    }
     
 		      
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
     setManRes();
 }
 
 void M_NIPESIndividual::createController(){
 
-    if(ctrlGenome->get_type() == "empty_genome")
+    if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
         return;
 
     int nn_inputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
@@ -180,6 +213,13 @@ void M_NIPESIndividual::compute_fitness(){
     copy_rewards = rewards;
 }
 
+M_NIPES::M_NIPES(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) : EA(rn, param){
+    settings::defaults::parameters->emplace("#tournamentSize",new settings::Integer(4));
+    settings::defaults::parameters->emplace("#useControllerArchive",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#fitnessType",new settings::Integer(0));
+    settings::defaults::parameters->emplace("#populationSize",new settings::Integer(25));
+}
+
 void M_NIPES::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
 
@@ -202,7 +242,9 @@ void M_NIPES::init(){
             controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
         }
 
-        selection_fct = SelectionFunctions::best_of_subset;
+        bool with_crossover = settings::getParameter<settings::Boolean>(parameters,"#withCrossover").value;
+        if(with_crossover) selection_fct = SelectionFunctions::two_best_of_subset;
+        else selection_fct = SelectionFunctions::best_of_subset;
         init_morph_pop();
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
@@ -308,9 +350,10 @@ void M_NIPES::init_next_pop(){
                 init_new_ctrl_pop(learner);
         }
     }
-    for(int i = 0; i < population.size(); i++)
-        corr_indexes.push_back(i);
 
+    if(corr_indexes.empty())
+        for(int i = 0; i < population.size(); i++)
+            corr_indexes.push_back(i);
 }
 
 bool M_NIPES::update(const Environment::Ptr &env){
@@ -369,20 +412,34 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner_t &learner = find_learner(morph_id);
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-            learner.morph_genome.set_morph_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_morph_desc());
-            int wheel_nbr = learner.morph_genome.get_morph_desc().wheelNumber;
-            int joint_nbr = learner.morph_genome.get_morph_desc().jointNumber;
-            int sensor_nbr = learner.morph_genome.get_morph_desc().sensorNumber;
+            learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+            int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
+            int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
+            int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else{
-                genome_t new_gene(learner.morph_genome,NNParamGenome(),{0});
-                gene_pool.push_back(new_gene);
-                if(gene_pool.size() > pop_size)
-                    remove_oldest_gene();
+            }else{//if this robot has no actuator, it is not included in the genomes pool and it is replaced by a new random one.
                 learner.ctrl_learner.to_be_erased();
+                EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+                NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+                morphgenome->random();
+
+                learner_t new_learner(*morphgenome.get());
+                new_learner.ctrl_learner.set_parameters(parameters);
+                learning_pool.push_back(new_learner);
+
+                M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+                int i = corr_indexes.size()-1;
+                while(corr_indexes[i] < 0)
+                    i--;
+                corr_indexes.push_back(corr_indexes[i] + 1);
             }
+        }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
+            learner.ctrl_learner.to_be_erased();
         }else{
             numberEvaluation++;
             //update learner
@@ -397,14 +454,16 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-                weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-                biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
-                best_ctrl_gen.set_weights(weights);
-                best_ctrl_gen.set_biases(biases);
+                if(!best_controller.second.empty()){
+                    int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
+                    weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
+                    biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+                    best_ctrl_gen.set_weights(weights);
+                    best_ctrl_gen.set_biases(biases);
+                }
                 //update the archive
                 if(use_ctrl_arch){
-                    CartDesc morph_desc = learner.morph_genome.get_morph_desc();
+                    CartDesc morph_desc = learner.morph_genome.get_cart_desc();
                     controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
                 }
                 //-
@@ -417,7 +476,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 gene_pool.push_back(new_gene);
                 //-
 
-		//level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+                //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
                 if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
@@ -454,6 +513,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
 
     while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
@@ -469,7 +529,7 @@ void M_NIPES::reproduction(){
                 }
             if(!already_drawn)
                 random_indexes.push_back(rand_idx);
-        }while(random_indexes.size() < 4);
+        }while(random_indexes.size() < tournament_size);
         //-
 
         //Add these new gene to learning pool
@@ -613,8 +673,8 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nbr_output(learner.morph_genome.get_morph_desc().wheelNumber + learner.morph_genome.get_morph_desc().jointNumber);
-        ctrl_gen->set_nbr_input(learner.morph_genome.get_morph_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
+        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
+        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);

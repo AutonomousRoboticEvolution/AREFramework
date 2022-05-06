@@ -148,8 +148,8 @@ class TrackingSystem:
 
                 if self.show_frames:
                     cv2.imshow("Image", image)
-                    #print("Image size: {}".format(self.uncropped_image.shape))
-                    cv2.imshow("Uncropped", self.uncropped_image )
+                    print("Image size: {}".format(self.uncropped_image.shape))
+                cv2.imshow("Uncropped", self.uncropped_image )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")

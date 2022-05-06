@@ -69,8 +69,11 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
             continue;
         for(auto v : values)
             param.push_back(v);
-        if(param.size() != 3)
+        if(param.size() != 3){
+            param.clear();
+            values.clear();
             continue;
+        }
 
         Type::Ptr val = buildType(param[1]);
         val->fromString(param[2]);

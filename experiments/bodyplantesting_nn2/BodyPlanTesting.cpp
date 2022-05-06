@@ -193,6 +193,5 @@ std::vector<int> BODYPLANTESTING::listInds()
 
 bool BODYPLANTESTING::update(const Environment::Ptr& env)
 {
-
     return true;
 }

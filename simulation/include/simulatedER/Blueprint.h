@@ -33,13 +33,13 @@ public:
     }
 
     std::vector<int> getOrganTypes()
-    { return organTypes; };
+    { return organTypes;}
 
     std::vector<std::vector<float>> getOrganPosList()
-    { return organPosList; };
+    { return organPosList;}
 
     std::vector<std::vector<float>> getOrganOriList()
-    { return organOriList; };
+    { return organOriList;}
 };
 }
 }

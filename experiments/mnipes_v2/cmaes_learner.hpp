@@ -105,7 +105,7 @@ protected:
     int nbr_dropped_eval = 0;
     int current_nbr_ind = 0;
     bool new_population_available = true;
-    
+    bool from_scratch=true;
 
     bool initialized = false;
 };

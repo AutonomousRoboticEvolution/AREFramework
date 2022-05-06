@@ -215,13 +215,13 @@ bool ER::updateSimulation()
 //                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
             }
             else{
-                std::cerr << "state value unknown : " << state << std::endl
-                          << "Possible states are : " << std::endl
-                          << "\t IDLE : 0" << std::endl
-                          << "\t READY : 1" << std::endl
-                          << "\t BUSY : 2" << std::endl
-                          << "\t FINISH : 3" << std::endl
-                          << "\t ERROR : 9" << std::endl;
+//                std::cerr << "state value unknown : " << state << std::endl
+//                          << "Possible states are : " << std::endl
+//                          << "\t IDLE : 0" << std::endl
+//                          << "\t READY : 1" << std::endl
+//                          << "\t BUSY : 2" << std::endl
+//                          << "\t FINISH : 3" << std::endl
+//                          << "\t ERROR : 9" << std::endl;
                 all_instances_finish = false;
             }
         }

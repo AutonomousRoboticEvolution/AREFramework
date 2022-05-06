@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 1
+#define ISROBOTSTATIC 0
 
 using namespace are::sim;
 
@@ -122,7 +122,7 @@ void Morphology_CPPNMatrix::create()
             // Create brain primitive
             float brainSize[3] = {0.084,0.084,0.11};
             brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
-            float brainPos[3] = {0.0,0.0,0.06}; // 0.06
+            float brainPos[3] = {0.0,0.0,0.06};
             simSetObjectPosition(brainHandle,-1,brainPos);
             // Group primitives
             int groupHandles[2] = {convexHandle, brainHandle};
@@ -328,14 +328,14 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
     }
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
+        blueprint.createBlueprint(organList);
     destroyGripper();
-    blueprint.createBlueprint(organList);
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
-
     destroy_physical_connectors();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
@@ -421,6 +421,7 @@ void Morphology_CPPNMatrix::createHead()
 
 void Morphology_CPPNMatrix::createGripper()
 {
+    gripperHandles.resize(2);
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
@@ -428,12 +429,13 @@ void Morphology_CPPNMatrix::createGripper()
     std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
     tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[0] = tempGripperHandle;
     tempGripperHandle = -1;
     std::string gripperSensorPath = models_path + "/utils/gripper_s.ttm";
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[1] = tempGripperHandle;
+    gripperHandles.shrink_to_fit();
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
@@ -482,8 +484,10 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output.push_back(matrix_4d.at(0).at(pos_in_vector));
 
     }
-    for(const auto& o: output)
-        assert(!std::isnan(o));
+
+    for(auto& o: output)
+        if(std::isnan(o))
+            o = 0;
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
@@ -597,9 +601,13 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
 
 void Morphology_CPPNMatrix::destroyGripper()
 {
-    for(auto & i : gripperHandles) {
-        simRemoveModel(i);
-    }
+    simRemoveModel(gripperHandles[0]);
+    simRemoveModel(gripperHandles[1]);
+
+
+//    for(auto & i : gripperHandles) {
+//        simRemoveModel(i);
+//    }
 }
 
 void Morphology_CPPNMatrix::destroy_physical_connectors()

@@ -60,6 +60,7 @@ typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct
 
 typedef struct SelectionFunctions{
     static selection_fct_t best_of_subset;
+    static selection_fct_t two_best_of_subset;
 }SelectionFunctions;
 
 typedef std::function<double(const CMAESLearner&)> fitness_fct_t;
@@ -142,6 +143,7 @@ public:
         arch & nbr_dropped_eval;
         arch & descriptor_type;
         arch & copy_rewards;
+        arch & drop_learning;
     }
 
     std::string to_string() override;
@@ -165,6 +167,9 @@ public:
     void add_reward(double reward){rewards.push_back(reward);}
     const std::vector<double>& get_rewards(){return copy_rewards;}
     void compute_fitness();
+
+    bool is_learning_dropped(){return drop_learning;}
+
 private:
     void createMorphology() override;
     void createController() override;
@@ -191,6 +196,7 @@ private:
     DescriptorType descriptor_type = FINAL_POSITION;
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
+    bool drop_learning = false;
 
 };
 
@@ -203,7 +209,7 @@ public:
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 
     M_NIPES() : EA(){}
-    M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
+    M_NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
 
     void init() override;
 //    void epoch() override{
