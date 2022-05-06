@@ -37,7 +37,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
@@ -75,6 +75,9 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 #rateCrossover,float,0.5
+#saveBlueprint,bool,0
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1
+
+#descriptor,int,0

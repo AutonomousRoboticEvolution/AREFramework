@@ -19,7 +19,7 @@ elseif(ONLY_SIMULATION)
     endif()
 
     if(WITH_NN2)
-        add_subdirectory(neuroEvolution)
+        #add_subdirectory(neuroEvolution)
         add_subdirectory(nipes)
         add_subdirectory(mnipes)
         add_subdirectory(mnipes_multitarget)

@@ -76,8 +76,11 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 #rateCrossover,float,0.
+#saveBlueprint,bool,0
 
 #isCPPNGenome,bool,0
 #isLeg,bool,1
 #isRandomStartingPopulation,bool,0
 #genomePool,string,/home/edgar/are-logs/bodyplantesting_nn2_3_4_14-42-50-244-2583714704/matrices_
+
+#descriptor,int,0
