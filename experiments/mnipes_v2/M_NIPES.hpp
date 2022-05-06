@@ -2,6 +2,7 @@
 #define M_NIPES_HPP
 
 #include <functional>
+#include <boost/optional.hpp>
 
 #include "ARE/learning/controller_archive.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -27,16 +28,22 @@ typedef enum task_t{
 } task_t;
 
 typedef struct learner_t{
+
+    typedef std::shared_ptr<learner_t> ptr;
+
     learner_t(){}
     learner_t(const learner_t& l) :
         morph_genome(l.morph_genome),
-        ctrl_learner(l.ctrl_learner){}
-    learner_t(const NN2CPPNGenome &mg): morph_genome(mg){}
+        ctrl_learner(l.ctrl_learner),
+        undefined(false){}
+    learner_t(const NN2CPPNGenome &mg): morph_genome(mg), undefined(false){}
     NN2CPPNGenome morph_genome;
     CMAESLearner ctrl_learner;
+    bool undefined = true;
 } learner_t;
 
 typedef struct genome_t{
+    typedef std::shared_ptr<learner_t> ptr;
     genome_t(){}
     genome_t(const genome_t& g) :
         morph_genome(g.morph_genome),
@@ -51,7 +58,7 @@ typedef struct genome_t{
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
     std::vector<double> rewards;
-    int age;
+    int age = -1;
     std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
 }genome_t;
@@ -242,8 +249,8 @@ public:
 
     size_t get_pop_size() const override {return corr_indexes.size();}
 
-    genome_t &find_gene(int id);
-    learner_t &find_learner(int id);
+    boost::optional<genome_t&> find_gene(int id);
+    boost::optional<learner_t&> find_learner(int id);
 
 private:
 

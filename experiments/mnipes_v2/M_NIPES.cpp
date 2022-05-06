@@ -409,7 +409,16 @@ bool M_NIPES::update(const Environment::Ptr &env){
     //If on the client or just sequential mode
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
-        learner_t &learner = find_learner(morph_id);
+        auto op_learner = find_learner(morph_id);
+        if(!op_learner){ //learner was not found so erase this individual
+            population.erase(population.begin() + corr_indexes[currentIndIndex]);
+            population.shrink_to_fit();
+            corr_indexes[currentIndIndex] = -1;
+            for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
+                corr_indexes[i]--;
+            return true;
+        }
+        learner_t& learner = *op_learner;
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
             learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
@@ -562,19 +571,21 @@ void M_NIPES::reproduction(){
     }
 }
 
-genome_t &M_NIPES::find_gene(int id){
+boost::optional<genome_t&> M_NIPES::find_gene(int id){
     for(auto& gene: gene_pool)
         if(gene.morph_genome.id() == id)
-            return gene;
+            return boost::optional<genome_t&>(gene);
     std::cerr << "Unable to find genome with id: " << id << std::endl;
+    return boost::optional<genome_t&>();
 }
 
 
-learner_t& M_NIPES::find_learner(int id){
+boost::optional<learner_t&> M_NIPES::find_learner(int id){
     for(auto& learner: learning_pool)
         if(learner.morph_genome.id() == id)
-            return learner;
+            return boost::optional<learner_t&>(learner);
     std::cerr << "Unable to find learner with id: " << id << std::endl;
+    return boost::optional<learner_t&>();
 }
 
 void M_NIPES::remove_learner(int id){
