@@ -1,6 +1,6 @@
 #!/bin/bash
-ISVIKING=1
-ISAREPC=0
+ISVIKING=0
+ISAREPC=1
 if [[ $ISVIKING == 1 ]]; then
 	echo "Downloading from viking"
 	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/body*"
@@ -12,9 +12,9 @@ else
 		echo "Wrong!"
 	fi
 fi
-DESTINATION="/home/edgar/are-logs/diversity/nn2/"
-# FILES=('parameters.csv' 'fitnesses.csv')
-FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv')
+DESTINATION="/home/edgar/are-logs/oscillatory/"
+FILES=('parameters.csv' 'fitnesses.csv')
+#FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv')
 for t in ${FILES[@]}; do
 	echo "$t"
 	rsync -va --prune-empty-dirs --include '*/' --include $t --exclude "*" $ORIGIN $DESTINATION
