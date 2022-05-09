@@ -345,10 +345,13 @@ void M_NIPES::init_next_pop(){
     if(learning_pool.empty())
         reproduction();
     else{
-        for(auto& learner: learning_pool){
+        for(auto& learner: learning_pool)
             if(!learner.ctrl_learner.is_learning_finish())
                 init_new_ctrl_pop(learner);
-        }
+        if(population.empty())
+            for(auto& learner: learning_pool)
+                if(!learner.ctrl_learner.is_learning_finish())
+                    push_back_remaining_ctrl(learner);
     }
 
     if(corr_indexes.empty())
@@ -397,6 +400,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
         }else if(env->get_name() == "barrel_task"){
             int number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
             if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
+                return false;
+            }else{
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
+            }
+        }else if(env->get_name() == "gradual_tasks"){
+            int number_of_scenes = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_number_of_scenes();
+            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes && ind->get_morph_genome()->get_type() != "empty_genome"){
                 return false;
             }else{
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
@@ -675,6 +687,35 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
 
 void M_NIPES::init_new_ctrl_pop(learner_t &learner){
     auto new_ctrl_pop = learner.ctrl_learner.get_new_population();
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+
+    for(const auto &wb : new_ctrl_pop){
+        NN2CPPNGenome::Ptr morph_gen(new NN2CPPNGenome(learner.morph_genome));
+        NNParamGenome::Ptr ctrl_gen(new NNParamGenome(randomNum,parameters,morph_gen->id()));
+        ctrl_gen->set_weights(wb.first);
+        ctrl_gen->set_biases(wb.second);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
+        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
+        ctrl_gen->set_nn_type(nn_type);
+        Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
+        population.push_back(ind);
+        if(!corr_indexes.empty()){
+            int i = corr_indexes.size() - 1;
+            while(corr_indexes[i] < 0) i--;
+            corr_indexes.push_back(corr_indexes[i]+1);
+        }else{
+            corr_indexes.push_back(0);
+        }
+    }
+}
+
+void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
+    auto new_ctrl_pop = learner.ctrl_learner.get_remaining_population();
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
 

@@ -79,6 +79,7 @@ public:
     bool is_learning_finish() const;
 
     std::vector<w_b_pair_t> get_new_population();
+    std::vector<w_b_pair_t> get_remaining_population();
 
     bool is_initialized() const {return initialized;}
 
