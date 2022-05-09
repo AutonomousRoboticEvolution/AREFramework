@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 using namespace are::sim;
 
@@ -169,9 +169,9 @@ void Morphology_CPPNMatrix::create()
                     else if(i.getOrganType() == 2)
                         i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
                     else if(i.getOrganType() == 3)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(2), skeletonHandles, organList);
                     else if(i.getOrganType() == 4)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(3), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 // Count number of good organs.
@@ -421,7 +421,7 @@ void Morphology_CPPNMatrix::createHead()
 
 void Morphology_CPPNMatrix::createGripper()
 {
-    gripperHandles.resize(2);
+    gripperHandles.resize(4);
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
@@ -435,6 +435,16 @@ void Morphology_CPPNMatrix::createGripper()
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
     gripperHandles[1] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperLegPath = models_path + "/utils/gripper_l.ttm";
+    tempGripperHandle = simLoadModel(gripperLegPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[2] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperCasterPath = models_path + "/utils/gripper_c.ttm";
+    tempGripperHandle = simLoadModel(gripperCasterPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[3] = tempGripperHandle;
     gripperHandles.shrink_to_fit();
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
@@ -603,7 +613,8 @@ void Morphology_CPPNMatrix::destroyGripper()
 {
     simRemoveModel(gripperHandles[0]);
     simRemoveModel(gripperHandles[1]);
-
+    simRemoveModel(gripperHandles[2]);
+    simRemoveModel(gripperHandles[3]);
 
 //    for(auto & i : gripperHandles) {
 //        simRemoveModel(i);

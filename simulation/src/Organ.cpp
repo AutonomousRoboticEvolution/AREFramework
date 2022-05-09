@@ -8,7 +8,7 @@
 #include "simLib.h"
 #endif
 
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 /// \todo EB: Do i need this?
 using namespace are::sim;
@@ -303,22 +303,37 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
 
     // Orientation
     gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
+    if(organType == 1) { // Wheels
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
+    } else if(organType == 3) { // Joints
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = M_PI_2; gripperOrientation[2] = 0.0;
+    }
     simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
-    gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI;
+    if(organType == 1) { // Wheels
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI_2;
+    } else if(organType == 2) { // Sensors
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = -M_PI_2;
+    } else if(organType == 3) { // Joints
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI;
+    } if(organType == 4) { // Caster
+        gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = M_PI_2;
+    }
     simSetObjectOrientation(gripperHandle, gripperHandle, gripperOrientation);
 
     // Move relative to gripper.
-    gripperPosition[0] = -0.035;
-    gripperPosition[1] = 0.0;
     /// \todo EB: This offset should be somewhere else or constant.
-    if(organType == 1) // Wheels
-        gripperPosition[2] = -0.25;
-    else if(organType == 2) // Sensors
-        gripperPosition[2] = -0.24;
-    else if(organType == 3) // Joints
-        gripperPosition[2] = -0.26;
-    else if(organType == 4) // Caster
-        gripperPosition[2] = -0.26;
+    if(organType == 1) { // Wheels
+        gripperPosition[0] = -0.01; gripperPosition[1] = -0.03;  gripperPosition[2] = -0.229;
+    }
+    else if(organType == 2) { // Sensors
+        gripperPosition[0] = 0.015; gripperPosition[1] = 0.025;  gripperPosition[2] = -0.24;
+    }
+    else if(organType == 3) { // Joints
+        gripperPosition[0] = -0.14; gripperPosition[1] = 0.0; gripperPosition[2] = -0.19;
+    }
+    else if(organType == 4){ // Caster
+        gripperPosition[0] = -0.035; gripperPosition[1] = -0.035;  gripperPosition[2] = -0.17;
+    }
     else
         assert(false);
 
