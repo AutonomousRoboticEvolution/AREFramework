@@ -81,9 +81,6 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    if(indToEval.empty())
-        return;
-
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
     if(eval_order == EvalOrder::FIFO){
         //First in Last out
