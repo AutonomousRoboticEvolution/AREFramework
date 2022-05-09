@@ -122,11 +122,13 @@ void Organ::createOrgan(int skeletonHandle)
         tempOrganPos[0] = -0.013; // Relative to the floor
         tempOrganPos[2] = -0.035; // Relative to the surface of the skeleton
     } else if(organType == 2) { // Sensors
+        tempOrganPos[0] = -0.013; // Relative to the floor
         tempOrganPos[2] = -0.035;
     }else if(organType == 3) { // Joints
+        tempOrganPos[0] = -0.014; // Relative to the floor
         tempOrganPos[2] = -0.05;
     }else if(organType == 4) { // Caster
-        tempOrganPos[0] = 0.01;
+        tempOrganPos[0] = -0.003; // Relative to the floor
         tempOrganPos[2] = -0.035;
     } else
         assert(false);
