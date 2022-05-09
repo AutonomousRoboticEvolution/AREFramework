@@ -360,7 +360,8 @@ void MNIPES::load_data_for_generate(){
     _survival(morph_gen_info,list_to_load);
 
     /** CrossMigration
-     *
+     * 1) look at the robot library for interesting robot
+     * 2) load this robot and add it to the building queue
      */
 
     ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
