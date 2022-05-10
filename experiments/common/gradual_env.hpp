@@ -60,7 +60,7 @@ public:
 
     const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
 
-    void set_current_scene(int cs){current_scene = cs;}
+    const env_t &get_current_scene(){return environments_info[current_scene];}
 
     void load_environments_list(const std::string &file_name, std::vector<env_t> &env_info);
 

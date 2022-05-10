@@ -152,6 +152,7 @@ public:
         arch & descriptor_type;
         arch & copy_rewards;
         arch & drop_learning;
+        arch & current_gradual_scene;
     }
 
     std::string to_string() override;
@@ -177,6 +178,9 @@ public:
     void compute_fitness();
 
     bool is_learning_dropped(){return drop_learning;}
+
+    void incr_gradual_scene(){current_gradual_scene++;}
+    int get_current_gradual_scene(){return current_gradual_scene;}
 
 private:
     void createMorphology() override;
@@ -205,6 +209,7 @@ private:
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
     bool drop_learning = false;
+    int current_gradual_scene = 0;
 
 };
 
@@ -263,6 +268,8 @@ private:
     void increment_age();
     void clean_learning_pool();
     void reproduction();
+
+    void incr_gradual_scene();
 
     std::vector<int> corr_indexes;
 

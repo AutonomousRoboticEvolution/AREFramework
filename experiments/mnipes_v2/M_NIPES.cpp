@@ -371,7 +371,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         if(env->get_name() == "obstacle_avoidance"){
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
         }
         else if(env->get_name() == "multi_target_maze"){
@@ -407,14 +406,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
             }
         }else if(env->get_name() == "gradual_tasks"){
-            int number_of_scenes = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_number_of_scenes();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes && ind->get_morph_genome()->get_type() != "empty_genome"){
-                return false;
-            }else{
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
-            }
+            const auto &current_scene = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_current_scene();
+            if(current_scene.fitness_fct == sim::GradualEnvironment::EXPLORATION)
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+            else std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(FINAL_POSITION);
+            //TODO add case for foraging
+
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_trajectories());
+
         }
     }
 
@@ -469,12 +468,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
             //-
 
             if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
-
+                double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"#fTarget").value;
                 //Update Controller Archive
                 std::vector<double> weights;
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
+                if(best_controller.first >= fitness_target)
+                    incr_gradual_scene();
+
                 if(!best_controller.second.empty()){
                     int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
                     weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
@@ -741,4 +743,9 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
             corr_indexes.push_back(0);
         }
     }
+}
+
+void M_NIPES::incr_gradual_scene(){
+    for(auto& ind : population)
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->incr_gradual_scene();
 }

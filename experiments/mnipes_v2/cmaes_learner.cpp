@@ -24,8 +24,6 @@ void CMAESLearner::init(std::vector<double> initial_point){
     if(initial_point.empty())
         initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
 
-
-
     geno_pheno_t gp(lb,ub,_dimension);
 
     cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,_rand_num->getSeed(),gp);
