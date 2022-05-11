@@ -203,7 +203,8 @@ void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const 
     double simulationTime = simGetSimulationTime();
     for (size_t i = 0; i < handles.size(); i++){
         float actual_pos;
-        simGetJointPosition(handles[i], &actual_pos);
+//        simGetJointPosition(handles[i], &actual_pos);
+        simGetJointTargetPosition(handles[i], &actual_pos);
         double next_pos = misc::get_next_joint_position(commands[i], simulationTime, actual_pos);
         simSetJointTargetPosition(handles[i],static_cast<float>(next_pos));
     }
