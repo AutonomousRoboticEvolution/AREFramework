@@ -141,6 +141,12 @@ public:
      * @param skeletonSurfaceCoord -
      */
     void findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
+
+    /**
+     * @brief find any overhangs greater than one voxel and remove the overhanging voxels
+     * @param skeletonMatrix- Main skeleton matrix
+     */
+    void removeOverhangs(PolyVox::RawVolume<uint8_t> &skeletonMatrix);
 };
 
 
