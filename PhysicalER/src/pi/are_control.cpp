@@ -125,7 +125,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendOutputOrganCommands(const std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
-    int i=0;
+    int i=0; // index of the organ being considered (in listOfOrgans)
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == WHEEL) {
@@ -133,19 +133,19 @@ void AREControl::sendOutputOrganCommands(const std::vector<double> &values, uint
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
             logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
-            i++;
+            i++; // increment organ in listOfOrgans
         }
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            double value = values[i];
-            value = std::sin(value*(time_milli/1000.0));
-            std::clog << "Joint ["<<i<<"]: " << value << " -> ";
-            thisJoint->setTargetAngleNormalised(value);
-            std::clog << std::endl;
+            double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
+            double newTargetAngle = misc::get_next_joint_position(valueFromNN, double(time_milli/1000.0), thisJoint->savedLastPositionRadians); // the new target angle in radians
+            thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
+            thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
-            i++;
+            i++; // increment organ in listOfOrgans
         }
+        // any other thisOrgan->organType value can be ignored, since it's not an output
     }
 
     if(debugDisplayOnPi){
