@@ -19,6 +19,7 @@ void split_line(const std::string &line,const std::string &delim,
 void stdvect_to_eigenvect(const std::vector<double>& std_v, Eigen::VectorXd &eigen_v);
 void eigenvect_to_stdvect(const Eigen::VectorXd &eigen_v, std::vector<double>& std_v);
 double sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset);
+double get_next_joint_position(double nn_output, double time, double previous_position);
 
 }//misc
 

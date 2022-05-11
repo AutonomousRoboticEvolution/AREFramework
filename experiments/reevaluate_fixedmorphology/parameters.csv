@@ -6,7 +6,7 @@
 #populationSize,int,200
 #maxEvalTime,float,120
 #numberOfGeneration,int,10
-#repository,string,/home/edgar/are-logs/oscillatory/2000/60
+#repository,string,/home/edgar/are-logs/oscillatory/smooth/2000/60
 #verbose,bool,1
 #instanceType,int,0
 #noiseLevel,double,0
