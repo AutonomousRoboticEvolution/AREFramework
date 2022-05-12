@@ -342,7 +342,10 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
 bool M_NIPES::is_finish(){
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-    if(numberEvaluation >= max_nbr_eval)
+    bool fullfil_all_tasks = false;
+    if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+        fullfil_all_tasks = current_gradual_scene > environments_info.size();
+    if(numberEvaluation >= max_nbr_eval || fullfil_all_tasks)
         return true;
     return false;
 }
@@ -483,8 +486,11 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target)
-                    incr_gradual_scene();
+                if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
+                    int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
+                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || numberEvaluation >= nbr_eval_per_task)
+                        incr_gradual_scene();
+                }
 
 
                 if(!best_controller.second.empty()){
