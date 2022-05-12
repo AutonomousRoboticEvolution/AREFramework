@@ -25,7 +25,8 @@ typedef enum task_t{
     OBSTACLES = 1,
     MULTI_TARGETS = 2,
     EXPLORATION = 3,
-    BARREL = 4
+    BARREL = 4,
+    GRADUAL = 5
 } task_t;
 
 typedef struct learner_t{
@@ -181,6 +182,7 @@ public:
 
     void incr_gradual_scene(){current_gradual_scene++;}
     int get_current_gradual_scene(){return current_gradual_scene;}
+    void set_current_gradual_scene(int cgs){current_gradual_scene = cgs;}
 
 private:
     void createMorphology() override;
@@ -242,7 +244,8 @@ public:
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
-        if(simulator_side)
+        int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
+        if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
@@ -287,6 +290,8 @@ private:
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
     bool is_multi_target = false;
+
+    int current_gradual_scene=0;
 };
 
 

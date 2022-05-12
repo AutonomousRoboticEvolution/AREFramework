@@ -149,6 +149,11 @@ void M_NIPESIndividual::update(double delta_time){
     if(std::isnan(energy_cost))
         energy_cost = 0;
     sim_time = delta_time;
+    int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
+    float position[3];
+    simGetObjectPosition(morphHandle, -1, position);
+    std::cout << "current position: " << position[0] << " "  << position[1] << " " << position[2] << std::endl;
+
 }
 
 void M_NIPESIndividual::setMorphDesc()
@@ -411,7 +416,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
             else std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(FINAL_POSITION);
             //TODO add case for foraging
-
+            std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->set_current_scene(
+			                            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_current_gradual_scene());
             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_trajectories());
 
         }
@@ -468,14 +474,16 @@ bool M_NIPES::update(const Environment::Ptr &env){
             //-
 
             if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
-                double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"#fTarget").value;
+                double fitness_target = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
                 //Update Controller Archive
                 std::vector<double> weights;
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                if(best_controller.first >= fitness_target)
-                    incr_gradual_scene();
+                if(best_controller.first <= fitness_target){
+                 	std::cout << best_controller.first << " >= " << fitness_target << " load next environment" << std::endl; 
+		     	incr_gradual_scene();
+		}
 
                 if(!best_controller.second.empty()){
                     int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
@@ -705,7 +713,9 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
-        population.push_back(ind);
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
+
+	population.push_back(ind);
         if(!corr_indexes.empty()){
             int i = corr_indexes.size() - 1;
             while(corr_indexes[i] < 0) i--;
@@ -733,6 +743,7 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+	std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         population.push_back(ind);
         if(!corr_indexes.empty()){
@@ -746,6 +757,7 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
 }
 
 void M_NIPES::incr_gradual_scene(){
+    current_gradual_scene++;
     for(auto& ind : population)
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->incr_gradual_scene();
 }

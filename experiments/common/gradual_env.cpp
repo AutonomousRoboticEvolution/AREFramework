@@ -43,6 +43,7 @@ void GradualEnvironment::init(){
         }
     }
     init_position = environments_info[current_scene].init_position;
+    _fitness_fcts = environments_info[current_scene].fitness_fct; 
     if(environments_info[current_scene].fitness_fct == TARGET ||
             environments_info[current_scene].fitness_fct == FORAGING)
         target_position = environments_info[current_scene].target_position;
