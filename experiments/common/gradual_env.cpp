@@ -17,7 +17,9 @@ GradualEnvironment::GradualEnvironment(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
     std::string filename = settings::getParameter<settings::String>(params,"#envListFile").value;
-    load_environments_list(filename,environments_info);
+    std::string scenes_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value + "/scenes/";
+
+    load_environments_list(filename,scenes_folder,environments_info);
     trajectories.resize(environments_info.size());
 
 }
@@ -158,32 +160,31 @@ void GradualEnvironment::build_tiled_floor(std::vector<int> &tiles_handles){
     }
 }
 
-void GradualEnvironment::load_environments_list(const std::string &file_name, std::vector<env_t> &env_info){
+void GradualEnvironment::load_environments_list(const std::string &file_name, const std::string &scenes_folder , std::vector<env_t> &env_info){
     std::ifstream ifs(file_name);
     if(!ifs){
         std::cerr << "Unable to open file : " << file_name << std::endl;
         return;
     }
 
-    std::string models_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value;
-
     std::vector<std::string> split;
     std::vector<std::string> split2;
     env_t env;
     for(std::string line; std::getline(ifs,line);){
         misc::split_line(line,";",split);
-        env.scene_path = models_folder + "/scenes/" + split[0];
-        misc::split_line(split[2],",",split2);
+        env.scene_path = scenes_folder + "/" + split[0];
+        env.fitness_target = std::stod(split[2]);
+        misc::split_line(split[3],",",split2);
         env.init_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         if(split[1] == "exploration")
             env.fitness_fct = EXPLORATION;
         else if(split[1] == "target"){
             env.fitness_fct = TARGET;
-            misc::split_line(split[3],",",split2);
+            misc::split_line(split[4],",",split2);
             env.target_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         }else if(split[1] == "foraging"){
             env.fitness_fct = FORAGING;
-            misc::split_line(split[3],",",split2);
+            misc::split_line(split[4],",",split2);
             env.target_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         }
         env_info.push_back(env);

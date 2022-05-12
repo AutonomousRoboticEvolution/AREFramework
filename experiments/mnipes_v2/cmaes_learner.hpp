@@ -52,7 +52,7 @@ public:
         initialized(cl.initialized),
         current_nbr_ind(cl.current_nbr_ind){}
 
-    void init(std::vector<double> initial_point = std::vector<double>());
+    void init(double ftarget, std::vector<double> initial_point = std::vector<double>());
 
     bool step();
 

@@ -178,6 +178,8 @@ public:
     const std::vector<double>& get_rewards(){return copy_rewards;}
     void compute_fitness();
 
+    void set_init_position(const std::vector<double>& ip){init_position = ip;}
+
     bool is_learning_dropped(){return drop_learning;}
 
     void incr_gradual_scene(){current_gradual_scene++;}
@@ -202,6 +204,7 @@ private:
     std::vector<std::vector<waypoint>> trajectories;
     double sim_time;
     std::vector<double> final_position;
+    std::vector<double> init_position;
     int nbr_dropped_eval = 0;
 
     ControllerArchive controller_archive;
@@ -292,6 +295,7 @@ private:
     bool is_multi_target = false;
 
     int current_gradual_scene=0;
+    std::vector<sim::GradualEnvironment::env_t> environments_info;
 };
 
 

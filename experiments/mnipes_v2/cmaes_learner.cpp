@@ -2,12 +2,11 @@
 
 using namespace are;
 
-void CMAESLearner::init(std::vector<double> initial_point){
+void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesPopSize").value;
     float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
-    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
@@ -156,7 +155,7 @@ bool CMAESLearner::is_learning_finish() const{
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_remaining_population(){
     std::vector<w_b_pair_t>  new_pop;
-    for(int k = current_nbr_ind - _population.size(); k < _population.size();k++){
+    for(int k = current_nbr_ind - _population.size(); k < _population.size(); k++){
         auto gen = _population[k];
         std::vector<double> weights;
         std::vector<double> biases;

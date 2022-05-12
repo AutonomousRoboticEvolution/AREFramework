@@ -32,6 +32,7 @@ public:
         std::vector<double> init_position;
         fitness_fcts fitness_fct;
         std::vector<double> target_position;
+        double fitness_target;
     } env_t;
 
     typedef std::shared_ptr<GradualEnvironment> Ptr;
@@ -63,7 +64,7 @@ public:
     const env_t &get_current_scene(){return environments_info[current_scene];}
     void set_current_scene(int cs){current_scene = cs;}
 
-    void load_environments_list(const std::string &file_name, std::vector<env_t> &env_info);
+    static void load_environments_list(const std::string &file_name, const std::string &scenes_folder, std::vector<env_t> &env_info);
 
 private:
     int move_counter = 0;

@@ -78,9 +78,8 @@ void M_NIPESIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     int i = rewards.size();
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[i*3],init_pos[i*3+1],init_pos[i*3+2]);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
     if(ctrlGenome->get_type() != "empty_genome"){
         if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
                 std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
@@ -90,7 +89,6 @@ void M_NIPESIndividual::createMorphology(){
             drop_learning = true; //set it directly to 50 to stop the learning.
         }
     }
-    
 		      
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
@@ -245,6 +243,12 @@ void M_NIPES::init(){
         if(use_ctrl_arch){
             int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
             controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
+        }
+
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
+            std::string filename = settings::getParameter<settings::String>(parameters,"#envListFile").value;
+            std::string scenes_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value + "/scenes/";
+            sim::GradualEnvironment::load_environments_list(filename,scenes_folder,environments_info);
         }
 
         bool with_crossover = settings::getParameter<settings::Boolean>(parameters,"#withCrossover").value;
@@ -474,16 +478,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
             //-
 
             if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
-                double fitness_target = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
                 //Update Controller Archive
                 std::vector<double> weights;
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                if(best_controller.first <= fitness_target){
-                 	std::cout << best_controller.first << " >= " << fitness_target << " load next environment" << std::endl; 
-		     	incr_gradual_scene();
-		}
+                if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target)
+                    incr_gradual_scene();
+
 
                 if(!best_controller.second.empty()){
                     int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
@@ -683,16 +685,22 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
 
+    double ftarget;
+    if(settings::getParameter<settings::Integer>(parameters,"#FTarget").value == GRADUAL)
+        ftarget = environments_info[current_gradual_scene].fitness_target;
+    else ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+
+
     if(use_ctrl_arch){
         auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
 
         if(starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
-            learner.init();
+            learner.init(ftarget);
         else{
             std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
-            learner.init(init_pt);
+            learner.init(ftarget,init_pt);
         }
-    }else learner.init();
+    }else learner.init(ftarget);
 }
 
 void M_NIPES::init_new_ctrl_pop(learner_t &learner){
@@ -714,8 +722,13 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ind->set_randNum(randomNum);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
-
-	population.push_back(ind);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        population.push_back(ind);
         if(!corr_indexes.empty()){
             int i = corr_indexes.size() - 1;
             while(corr_indexes[i] < 0) i--;
@@ -743,8 +756,15 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
         Individual::Ptr ind(new M_NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-	std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+
         population.push_back(ind);
         if(!corr_indexes.empty()){
             int i = corr_indexes.size() - 1;
