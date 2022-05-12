@@ -1,13 +1,13 @@
 #experimentName,string,visualization
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/escape_room_ridges.ttt
-#folderToLoad,string,/home/ebb505/ARE_Project/are-logs/leg_experiments/evolved_multitarget_ridges/robot
+#expPluginName,string,/home/edgar/vrep/lib/libvisualization.so
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
+#folderToLoad,string,/home/edgar/are-logs/mnipes2_12_4_13-15-14-4082-1259317630/robot
 #genToLoad,int,0
-#indToLoad,int,66
-#maxEvalTime,float,120
+#indToLoad,int,90
+#maxEvalTime,float,60
 #numberOfGeneration,int,1
 #populationSize,int,25
-#repository,string,/home/ebb505/ARE_Project/are-logs
+#repository,string,/home/edgar/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -24,7 +24,8 @@
 #init_x,float,0
 #init_y,float,0
 #init_z,float,0.2
-#targetPosition,sequence_double,0.75;0.75;0.15;
+#initPosition,sequence_double,-0.6;0;0.2
+#targetPosition,sequence_double,0.95;0.0;0.15;
 #MutateWeightsSevereProb,float,0.0
 #WeightMutationRate,float,1.0
 #WeightMutationMaxPower,float,1.0
@@ -41,15 +42,13 @@
 #randomOrientation,bool,1
 #emptyCtrlGenome,bool,0
 #loadAllMorphGenome,bool,0
-#isNEATGenome,bool,0
-#isCPPNGenome,bool,1
 
-#isWheel,bool,1
-#isSensor,bool,1
+#isWheel,bool,0
+#isSensor,bool,0
 #isJoint,bool,1
-#isCaster,bool,1
+#isCaster,bool,0
 #isExportModel,bool,0
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #isSegmentedRobot,bool,0
 #organsVersion,int,6
 
@@ -58,6 +57,9 @@
 #imageRepository,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/images/
 #nbrWaypoints,int,2
 
+#isCPPNGenome,bool,1
 #isLeg,bool,1
+
+#descriptor,int,0
 
 

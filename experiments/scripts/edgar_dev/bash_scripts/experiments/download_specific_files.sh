@@ -3,7 +3,7 @@ ISVIKING=1
 ISAREPC=0
 if [[ $ISVIKING == 1 ]]; then
 	echo "Downloading from viking"
-	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/diversity/trait/*"
+	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/body*"
 else
 	if [[ $ISAREPC == 1 ]]; then
         	echo "Downloading from are-pc"
@@ -12,7 +12,7 @@ else
 		echo "Wrong!"
 	fi
 fi
-DESTINATION="/home/edgar/are-logs/diversity/trait/"
+DESTINATION="/home/edgar/are-logs/diversity/trait_images/"
 #FILES=('parameters.csv' 'fitnesses.csv')
 FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv' 'nbr_conn_neu.csv')
 for t in ${FILES[@]}; do
