@@ -1,8 +1,9 @@
 #experimentName,string,visualization
 #expPluginName,string,/home/edgar/vrep/lib/libvisualization.so
 #scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
-#folderToLoad,string,/home/edgar/are-logs/mnipes2_12_4_13-15-14-4082-1259317630/robot
-#genToLoad,int,0
+#folderToLoad,string,/home/edgar/are-logs/mnipes2_12_4_17-21-3-3233-1105566833
+#idToLoad,int,0
+#genToLoad,int,175
 #indToLoad,int,90
 #maxEvalTime,float,60
 #numberOfGeneration,int,1
@@ -33,7 +34,7 @@
 #WeightReplacementMaxPower,float,1.0
 #MaxWeight,float,10.0
 #NNType,int,2
-#NbrHiddenNeurones,int,2
+#NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
 #genType,int,2
 #withBeacon,bool,1
@@ -47,7 +48,8 @@
 #isSensor,bool,0
 #isJoint,bool,1
 #isCaster,bool,0
-#isExportModel,bool,0
+#isExportModel,bool,1
+#saveBlueprint,bool,1
 #modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #isSegmentedRobot,bool,0
 #organsVersion,int,6

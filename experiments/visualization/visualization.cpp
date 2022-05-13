@@ -43,7 +43,7 @@ void VisuInd::createController(){
     int joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
     int sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
 
-    int nb_inputs = sensor_nbr*2;
+    int nb_inputs = sensor_nbr*2 + 1;
     int nb_outputs = wheel_nbr + joint_nbr;
 
     int nbr_weights, nbr_bias;

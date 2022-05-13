@@ -38,11 +38,11 @@
 #populationSize,int,4
 #maxEvalTime,float,60
 #timeStep,float,0.1
-#maxNbrEval,int,200000
+#maxNbrEval,int,6000
 #fitnessType,int,0
 #synchronicity,float,0.
 
-#cmaesNbrEval,int,200
+#cmaesNbrEval,int,600
 #cmaesPopSize,int,10
 #CMAESStep,double,1.
 #FTarget,double,0.05
