@@ -111,7 +111,8 @@ public:
         sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
-        descriptor_type(ind.descriptor_type)
+        descriptor_type(ind.descriptor_type),
+	init_position(ind.init_position)
     {}
 
     Individual::Ptr clone() override {
@@ -154,6 +155,7 @@ public:
         arch & copy_rewards;
         arch & drop_learning;
         arch & current_gradual_scene;
+	arch & init_position;
     }
 
     std::string to_string() override;

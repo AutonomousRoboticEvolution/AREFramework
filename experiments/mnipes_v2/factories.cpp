@@ -21,7 +21,8 @@ extern "C" are::Environment::Ptr environmentFactory
         env.reset(new are::sim::Exploration(param));
     else if(env_type == are::BARREL)
         env.reset(new are::sim::BarrelTask(param));
-
+    else if(env_type == are::GRADUAL)
+        env.reset(new are::sim::GradualEnvironment(param));
     return env;
 }
 

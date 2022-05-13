@@ -280,6 +280,8 @@ void M_NIPES::init_morph_pop(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+	std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+	std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);
     }
@@ -692,7 +694,7 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     learner.set_randNum(randomNum);
 
     double ftarget;
-    if(settings::getParameter<settings::Integer>(parameters,"#FTarget").value == GRADUAL)
+    if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
         ftarget = environments_info[current_gradual_scene].fitness_target;
     else ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
