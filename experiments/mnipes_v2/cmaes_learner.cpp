@@ -155,7 +155,7 @@ bool CMAESLearner::is_learning_finish() const{
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_remaining_population(){
     std::vector<w_b_pair_t>  new_pop;
-    for(int k = current_nbr_ind - _population.size(); k < _population.size(); k++){
+    for(int k = _population.size() - current_nbr_ind; k < _population.size(); k++){
         auto gen = _population[k];
         std::vector<double> weights;
         std::vector<double> biases;
