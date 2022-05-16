@@ -155,7 +155,8 @@ public:
         arch & copy_rewards;
         arch & drop_learning;
         arch & current_gradual_scene;
-	arch & init_position;
+        arch & init_position;
+        arch & visited_zones;
     }
 
     std::string to_string() override;
