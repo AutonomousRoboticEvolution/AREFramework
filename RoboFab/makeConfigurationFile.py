@@ -51,7 +51,7 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
 		PRINTER_2_API_KEY = "change_me"
-		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
+		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
