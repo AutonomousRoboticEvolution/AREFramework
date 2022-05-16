@@ -377,6 +377,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     clean_learning_pool();
 
@@ -490,8 +491,12 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
                 if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
                     int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
-                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || numberEvaluation >= nbr_eval_per_task)
+                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || numberEvaluation >= nbr_eval_per_task){
+                        if(verbose)
+                            std::cout << "fitness: " << best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
+                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - change task" << std::endl;
                         incr_gradual_scene();
+                    }
                 }
 
 
