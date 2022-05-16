@@ -148,7 +148,7 @@ def makeFile(location):
 				"forceModeTravelDistance": 30 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000, # positive value will make it hold further onto organ
-                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=56, z=4.5, rotX=0, rotY=90, rotZ=90).tolist(),
+                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=47.9, z=-2.9, rotX=0, rotY=90, rotZ=90).tolist(),
                  "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=0, y=-19.338, z=-8, rotX=90, rotY=0, rotZ=0).tolist(),
                  "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=35, z=34.4, rotX=180, rotY=0, rotZ=0).tolist(),
                 "transformOrganOriginToFemaleCableSocket": None, # female socket(s)
@@ -161,7 +161,7 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=42.57, z=-7.7, rotX=0, rotY=90, rotZ=90).tolist(),
+                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=34.47, z=-15, rotX=0, rotY=90, rotZ=90).tolist(),
                 "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=-6, y=0, z=-9.579, rotX=180, rotY=0, rotZ=90).tolist(),
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=21.57, z=22.2, rotX=180, rotY=0, rotZ=0).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None, # female socket(s)
@@ -174,7 +174,7 @@ def makeFile(location):
 				"forceModeTravelDistance": 30 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=47.741, z=-30, rotX=0, rotY=90, rotZ=90).tolist(),
+                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=39.641, z=-37.29, rotX=0, rotY=90, rotZ=90).tolist(),
                 "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-35.238, rotX=180, rotY=0, rotZ=0).tolist(),
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=8, y=12.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
 				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.292, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
@@ -187,8 +187,8 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=18.312,rotX=180)).tolist(),
-				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=16,z=20.1,rotX=0,rotY=180,rotZ=90).tolist(),
+				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=-14.912,rotZ=180)).tolist(),
+				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=90,rotZ=-90).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
 				"gripperOpeningFraction": 0.6,
 				"gripperClosedFraction": 0.8,
