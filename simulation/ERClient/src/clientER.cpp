@@ -128,7 +128,13 @@ void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
-    currentIndVec[slaveIndex]->from_string(message);
+    try{
+        currentIndVec[slaveIndex]->from_string(message);
+    }catch(boost::archive::archive_exception& e){
+        std::cerr << e.what() << std::endl;
+        return;
+    }
+
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
 
     if(verbose)
