@@ -38,7 +38,7 @@
 #populationSize,int,4
 #maxEvalTime,float,60
 #timeStep,float,0.1
-#maxNbrEval,int,6000
+#maxNbrEval,int,60000
 #fitnessType,int,0
 #synchronicity,float,0.
 
@@ -64,10 +64,10 @@
 #maxNbrOrgans,int,16
 #isSegmentedRobot,bool,0
 #randomOrientation,bool,1
-#isWheel,bool,0
-#isSensor,bool,0
+#isWheel,bool,1
+#isSensor,bool,1
 #isJoint,bool,1
-#isCaster,bool,0
+#isCaster,bool,1
 #manufacturabilityMethod,int,1
 #saveBlueprint,bool,0
 

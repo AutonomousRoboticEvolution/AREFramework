@@ -12,7 +12,7 @@ else
 		echo "Wrong!"
 	fi
 fi
-DESTINATION="/home/edgar/are-logs/oscillatory/smooth/3000/"
+DESTINATION="/home/edgar/are-logs/oscillatory/smooth/new_robot/"
 FILES=('parameters.csv' 'fitnesses.csv')
 #FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv' 'nbr_conn_neu.csv')
 for t in ${FILES[@]}; do

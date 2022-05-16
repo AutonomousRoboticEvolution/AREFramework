@@ -1,12 +1,12 @@
 #experimentName,string,reevaluate_fixed
 #expPluginName,string,/home/edgar/vrep/lib/libreevaluateFixed.so
 #scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
-#robotPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/robots/ARE-1405-legs.ttm
+#robotPath,string,/home/edgar/robotlibrary/morph_0/model_0.ttm
 #modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,200
 #maxEvalTime,float,120
 #numberOfGeneration,int,10
-#repository,string,/home/edgar/are-logs/oscillatory/smooth/2000/60
+#repository,string,/home/edgar/are-logs/oscillatory/smooth/new_robot/60/
 #verbose,bool,1
 #instanceType,int,0
 #noiseLevel,double,0
@@ -27,8 +27,8 @@
 #NbrOutputNeurones,int,8
 #NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
-#folderToLoad,string,nipes_5_4_19-11-26-6812-308887444
-#genToLoad,int,50
+#folderToLoad,string,nipes_14_4_0-12-2-2096-2585903199
+#genToLoad,int,64
 #indToLoad,int,0
 #genType,int,2
 #maxVelocity,double,10.
