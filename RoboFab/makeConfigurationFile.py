@@ -64,17 +64,6 @@ def makeFile(location):
 	else:
 		raise Exception("unknown location given for making configuration file")
 
-	# using a loop to make all the cables in the cable bank, this will be added into the structure later:
-	cable_bank_cables_temp = []
-	x_spacing = 0.0336
-	y_spacing = 0.0330
-	for y_pos in [0, 1, 2]:
-		for x_pos in [0, 1]:
-			cable_bank_cables_temp.append([makeTransformInputFormatted([x_spacing * 2 * x_pos, y_spacing * y_pos, 0]).tolist() ,
-                                           makeTransformInputFormatted([x_spacing * (2 * x_pos + 1), y_spacing * y_pos, 0]).tolist()])
-
-
-
 	data = {
 
 		"location":location,
