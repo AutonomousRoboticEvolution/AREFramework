@@ -39,7 +39,30 @@ def makeFile(location):
 
 
 	elif location == "YRK":
+		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
+		COPPELIASIM_FOLDER = "/home/robofab/vrep"
+		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
+		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
+		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
+		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
+		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
+		PRINTER_2_API_KEY = "change_me"
+		ORGAN_BANK_1_ORIGIN = makeTransformInputFormatted([-0.400 , -0.1598 , -10.12 / 1000 , math.radians(0.245) , 0 , math.radians(90)]).tolist()
+
+		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
+
+		# define what constitutes "open" and "closed" for the servos on the gripper:
+		A_open_position = 2400
+		A_closed_position = 1350
+		B_open_position = 2100
+		B_closed_position = 1350
+
+
+		''' Old version 2021
 		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
 		COPPELIASIM_FOLDER = "/home/robofab/programs/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/programs/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
@@ -60,7 +83,7 @@ def makeFile(location):
 		A_closed_position = 1125
 		B_open_position = 2100
 		B_closed_position = 1350
-
+		'''
 	else:
 		raise Exception("unknown location given for making configuration file")
 
