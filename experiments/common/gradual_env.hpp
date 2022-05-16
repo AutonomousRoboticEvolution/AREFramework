@@ -33,6 +33,7 @@ public:
         fitness_fcts fitness_fct;
         std::vector<double> target_position;
         double fitness_target;
+        double max_eval_time;
     } env_t;
 
     typedef std::shared_ptr<GradualEnvironment> Ptr;

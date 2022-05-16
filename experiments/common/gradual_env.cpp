@@ -172,19 +172,22 @@ void GradualEnvironment::load_environments_list(const std::string &file_name, co
     env_t env;
     for(std::string line; std::getline(ifs,line);){
         misc::split_line(line,";",split);
+        if(split.size() < 6)
+            continue;
         env.scene_path = scenes_folder + "/" + split[0];
-        env.fitness_target = std::stod(split[2]);
-        misc::split_line(split[3],",",split2);
+        env.max_eval_time = std::stod(split[2]);
+        env.fitness_target = std::stod(split[3]);
+        misc::split_line(split[4],",",split2);
         env.init_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         if(split[1] == "exploration")
             env.fitness_fct = EXPLORATION;
         else if(split[1] == "target"){
             env.fitness_fct = TARGET;
-            misc::split_line(split[4],",",split2);
+            misc::split_line(split[5],",",split2);
             env.target_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         }else if(split[1] == "foraging"){
             env.fitness_fct = FORAGING;
-            misc::split_line(split[4],",",split2);
+            misc::split_line(split[5],",",split2);
             env.target_position = {std::stod(split2[0]),std::stod(split2[1]),std::stod(split2[2])};
         }
         env_info.push_back(env);
