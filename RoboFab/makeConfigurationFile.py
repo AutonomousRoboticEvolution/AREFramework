@@ -228,26 +228,34 @@ def makeFile(location):
 		"ORIGIN":ORGAN_BANK_1_ORIGIN,
 		"ORGAN_CONTENTS":[ # a list of lists, each sub-list represents an organ: [<organ type> , <x (m)> , <y (m)> , <z (m)> , <rx (radians)> , <ry (radians)> , <rz (radians)>, i2c or IP Address]
 			[0, 204.06/1000, 286.06/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
-			[1, 2/1000,  46.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
-			[1, 94.811/1000,  81.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x61)], # wheel
-			[1, 2/1000,  (46.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
-			[1, 94.811/1000,  (81.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x63)], # wheel
-			[1, 2/1000,  (46.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
-			[1, 94.811/1000,  (81.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x65)], # wheel
-			[1, 2/1000,  (46.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
-			[1, 94.811/1000,  (81.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x67)], # wheel
-			[2, 164.631/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x30)], # sensor
-			[2, 164.631/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor
-			[2, 164.631/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x34)], # sensor
-			[2, 164.631/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x36)], # sensor
-			[2, 191.491/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
-			[2, 191.491/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
-			[2, 191.491/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
-			[2, 191.491/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
-			[4 , 300/1000, 60/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 95/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 130/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 165/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)] #castor
+			[1, 20/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
+			[1, 95/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x61)], # wheel
+			[1, 20/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
+			[1, 95/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x63)], # wheel
+			[1, 20/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
+			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x65)], # wheel
+			[1, 20/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
+			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x67)], # wheel
+			[2, 178.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x30)], # sensor
+			[2, 228.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x32)], # sensor
+			[2, 178.43/1000, (77.5 + 40 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x34)], # sensor
+			[2, 228.43/1000, (77.5 + 40 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x36)], # sensor
+			[2, 178.43/1000, (77.5 + 80 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
+			[2, 228.43/1000, (77.5 + 80 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
+			[2, 178.43/1000, (77.5 + 120)/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
+			[2, 228.43/1000, (77.5 + 120)/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
+			[4, 325/1000, (65 + 0*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 1*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 2*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 3*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 4*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 5*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 6*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, 325/1000, (65 + 7*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[3, 400/1000, 106.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
+			[3, 475/1000, 106.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
+			[3, 400/1000, 216.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
+			[3, 475/1000, 216.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)]  #jointA
 			],
 		"CABLE_CONTENTS":[] # no cables
 		}
