@@ -56,10 +56,10 @@ def makeFile(location):
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
-		A_open_position = 2400
-		A_closed_position = 1350
+		A_open_position = 0
+		A_closed_position = 0
 		B_open_position = 2100
-		B_closed_position = 1350
+		B_closed_position = 1100
 
 
 		''' Old version 2021
