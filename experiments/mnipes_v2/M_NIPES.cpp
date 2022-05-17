@@ -101,21 +101,30 @@ void M_NIPESIndividual::createController(){
     if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
         return;
 
-    int nn_inputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
-    int nn_outputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();
-    int nb_hidden = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_hidden();
-    int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nn_type();
+    const int nn_inputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_input();
+    const int nn_outputs = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();
+    const int nb_hidden = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_hidden();
+    const int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nn_type();
 
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
+    if(weights.empty() || bias.empty())
+        return;
+
     if(nn_type == settings::nnType::FFNN){
+        nn2::mlp::count_t count(nn_inputs,nb_hidden,nn_outputs);
+        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
+            return;
         control.reset(new NN2Control<ffnn_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::ELMAN){
+        nn2::elman::count_t count(nn_inputs,nb_hidden,nn_outputs);
+        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
+            return;
         control.reset(new NN2Control<elman_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
@@ -123,6 +132,9 @@ void M_NIPESIndividual::createController(){
 
     }
     else if(nn_type == settings::nnType::RNN){
+        nn2::rnn::count_t count(nn_inputs,nb_hidden,nn_outputs);
+        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
+            return;
         control.reset(new NN2Control<rnn_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
@@ -499,11 +511,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     }
                 }
 
-
-                if(!best_controller.second.empty()){
-                    int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-                    weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-                    biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+                int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
+                int nbr_biases = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_biases().size();
+                if(!best_controller.second.empty() && best_controller.second.size() == nbr_weights + nbr_biases){
+                    weights.resize(nbr_weights);
+                    for(size_t i = 0; i < nbr_weights; i++)
+                        weights[i] = best_controller.second[i];
+                    biases.resize(nbr_biases);
+                    for(size_t i = nbr_weights; i < best_controller.second.size(); i++)
+                        biases[i] = best_controller.second[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
                 }

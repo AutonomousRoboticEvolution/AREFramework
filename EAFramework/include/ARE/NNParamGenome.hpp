@@ -114,10 +114,10 @@ public:
     void set_nbr_hidden(int nh){nbr_hidden = nh;}
     void set_nn_type(int nnt){nn_type = nnt;}
 
-    int get_nbr_input() const {return nbr_input;}
-    int get_nbr_output() const {return nbr_output;}
-    int get_nbr_hidden() const {return nbr_hidden;}
-    int get_nn_type() const {return nn_type;}
+    const int get_nbr_input() const {return nbr_input;}
+    const int get_nbr_output() const {return nbr_output;}
+    const int get_nbr_hidden() const {return nbr_hidden;}
+    const int get_nn_type() const {return nn_type;}
 
     std::vector<double> get_full_genome(){
         std::vector<double> genome = weights;
