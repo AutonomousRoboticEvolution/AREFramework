@@ -3,7 +3,7 @@ ISVIKING=0
 ISAREPC=1
 if [[ $ISVIKING == 1 ]]; then
 	echo "Downloading from viking"
-	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/body*"
+	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/diversity/trait_v2/body*"
 else
 	if [[ $ISAREPC == 1 ]]; then
         	echo "Downloading from are-pc"
