@@ -148,7 +148,7 @@ void M_NIPESIndividual::createController(){
 
 void M_NIPESIndividual::update(double delta_time){
 
-    if(ctrlGenome->get_type() == "empty_genome")
+    if(ctrlGenome->get_type() == "empty_genome" || drop_learning || control.get() == nullptr)
         return;
 
     std::vector<double> inputs = morphology->update();
@@ -519,7 +519,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         weights[i] = best_controller.second[i];
                     biases.resize(nbr_biases);
                     for(size_t i = nbr_weights; i < best_controller.second.size(); i++)
-                        biases[i] = best_controller.second[i];
+                        biases[i-nbr_weights] = best_controller.second[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
                 }
