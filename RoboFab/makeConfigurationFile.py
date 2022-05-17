@@ -257,8 +257,8 @@ def makeFile(location):
 			[1, 95/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x63)], # wheel
 			[1, 20/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
 			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x65)], # wheel
-			[1, 20/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
-			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x67)], # wheel
+			[1, 20/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
+			[1, 95/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x67)], # wheel
 			[2, 178.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x30)], # sensor
 			[2, 228.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x32)], # sensor
 			[2, 178.43/1000, (77.5 + 40 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x34)], # sensor
