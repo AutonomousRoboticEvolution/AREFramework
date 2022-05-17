@@ -48,8 +48,8 @@ def makeFile(location):
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
-		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
+		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
@@ -198,9 +198,9 @@ def makeFile(location):
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=39.641, z=-37.29, rotX=0, rotY=90, rotZ=90).tolist(),
-                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-35.238, rotX=180, rotY=0, rotZ=0).tolist(),
-                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=8, y=12.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
-				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.292, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
+                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-40.238, rotX=180, rotY=0, rotZ=0).tolist(),
+                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=9, y=11.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
+				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.059, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
 				"gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.5,
 				"USE_FORCE_MODE":True
@@ -250,7 +250,7 @@ def makeFile(location):
 		"ORGAN_BANK_1":{
 		"ORIGIN":ORGAN_BANK_1_ORIGIN,
 		"ORGAN_CONTENTS":[ # a list of lists, each sub-list represents an organ: [<organ type> , <x (m)> , <y (m)> , <z (m)> , <rx (radians)> , <ry (radians)> , <rz (radians)>, i2c or IP Address]
-			[0, 204.06/1000, 286.06/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
+			[0, 225/1000, 300/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
 			[1, 20/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
 			[1, 95/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x61)], # wheel
 			[1, 20/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
@@ -275,10 +275,10 @@ def makeFile(location):
 			[4, 325/1000, (65 + 5*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
 			[4, 325/1000, (65 + 6*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
 			[4, 325/1000, (65 + 7*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[3, 400/1000, 106.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
-			[3, 475/1000, 106.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
-			[3, 400/1000, 216.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #jointA
-			[3, 475/1000, 216.741/1000, 61/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)]  #jointA
+			[3, 400/1000, 106.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, 106.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 400/1000, 216.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, 216.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)]  #jointA
 			],
 		"CABLE_CONTENTS":[] # no cables
 		}
