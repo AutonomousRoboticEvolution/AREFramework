@@ -35,7 +35,7 @@ def makeFile(location):
 		A_open_position = 2400
 		A_closed_position = 1350
 		B_open_position = 2100
-		B_closed_position = 1350
+		B_closed_position = 1400
 
 
 	elif location == "YRK":
@@ -44,8 +44,8 @@ def makeFile(location):
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
-		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.3345 , 0.106 , 0.0816 , 0 , 0 , math.radians(-90)]) .tolist()
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
+		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.538-0.15 , 0.006+0.15 , 0.08507 , 0 , 0 , math.radians(-90)]) .tolist()
 		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
@@ -53,7 +53,8 @@ def makeFile(location):
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
-		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
+		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.6, y=9.1, z=208.55, rotZ=180).tolist() # single gripper
+
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
 		A_open_position = 0
@@ -193,7 +194,7 @@ def makeFile(location):
 				"USE_FORCE_MODE":True,
 				 },
 			3: {"organType": 3, # minimally tested!
-				"friendlyName": "Joint organ",
+				"friendlyName": "Leg organ",
 				"forceModeTravelDistance": 30 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
@@ -210,8 +211,8 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=-14.912,rotZ=180)).tolist(),
-				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=90,rotZ=-90).tolist(),
+				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=13.5,z=-14.912,rotZ=180)).tolist(),
+				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=90,rotZ=90).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
 				"gripperOpeningFraction": 0.6,
 				"gripperClosedFraction": 0.8,
@@ -259,14 +260,14 @@ def makeFile(location):
 			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x65)], # wheel
 			[1, 20/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
 			[1, 95/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x67)], # wheel
-			[2, 178.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x30)], # sensor
-			[2, 228.43/1000, (77.5 + 0  )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x32)], # sensor
-			[2, 178.43/1000, (77.5 + 40 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x34)], # sensor
-			[2, 228.43/1000, (77.5 + 40 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x36)], # sensor
-			[2, 178.43/1000, (77.5 + 80 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
-			[2, 228.43/1000, (77.5 + 80 )/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
-			[2, 178.43/1000, (77.5 + 120)/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
-			[2, 228.43/1000, (77.5 + 120)/1000, 35/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
+			[2, 178.43/1000, (77.5 + 0  )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x30)], # sensor
+			[2, 228.43/1000, (77.5 + 0  )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x32)], # sensor
+			[2, 178.43/1000, (77.5 + 40 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x34)], # sensor
+			[2, 228.43/1000, (77.5 + 40 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x36)], # sensor
+			[2, 178.43/1000, (77.5 + 80 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
+			[2, 228.43/1000, (77.5 + 80 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
+			[2, 178.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
+			[2, 228.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
 			[4, 325/1000, (65 + 0*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
 			[4, 325/1000, (65 + 1*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
 			[4, 325/1000, (65 + 2*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
@@ -289,4 +290,4 @@ def makeFile(location):
 
 
 if __name__ == "__main__":
-	makeFile()
+	makeFile("YRK")
