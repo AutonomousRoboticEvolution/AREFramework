@@ -53,7 +53,8 @@ def makeFile(location):
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
-		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.6, y=9.1, z=208.55, rotZ=180).tolist() # single gripper
+		gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
+
 
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
@@ -214,7 +215,7 @@ def makeFile(location):
 				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=13.5,z=-14.912,rotZ=180)).tolist(),
 				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=90,rotZ=90).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
-				"gripperOpeningFraction": 0.6,
+				"gripperOpeningFraction": 1.0,
 				"gripperClosedFraction": 0.8,
 				"USE_FORCE_MODE":True,
 				"transformOrganOriginToMaleCableSocket": None
