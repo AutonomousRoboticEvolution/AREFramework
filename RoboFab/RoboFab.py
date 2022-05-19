@@ -189,7 +189,10 @@ class RoboFab_host:
         genome_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","morph_genome_{}".format(self.robotID))
         genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
         if os.path.exists(genome_new_path): os.remove(genome_new_path)
-        shutil.move ( genome_old_path, genome_new_path)
+        if os.path.exists(genome_old_path):
+            shutil.move(genome_old_path, genome_new_path)
+        else:
+            debugPrint("WARNING {} does not exist".format(genome_old_path),messageVerbosity=0)
 
     def temp_limb_demo(self):
         ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology
