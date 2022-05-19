@@ -292,8 +292,8 @@ void M_NIPES::init_morph_pop(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-	std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
-	std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);
     }
@@ -473,7 +473,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
                 morphgenome->random();
 
-                learner_t new_learner(*morphgenome.get());
+                learner_t new_learner(*(morphgenome.get()));
                 new_learner.ctrl_learner.set_parameters(parameters);
                 learning_pool.push_back(new_learner);
 

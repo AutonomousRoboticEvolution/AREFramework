@@ -69,7 +69,7 @@ std::vector<double> Exploration::fitnessFunction(const Individual::Ptr &ind){
         int sum = 0;
         for(int i = 0; i < max; i++)
             for(int j = 0; j < max; j++)
-                sum += abs(i - init.first) + abs(j - init.second);
+                sum += floor(sqrt((i - init.first)*(i - init.first) + (j - init.second)*(j - init.second)));
         return sum;
     };
     current_scene++;
@@ -94,8 +94,8 @@ std::pair<int,int> Exploration::real_coordinate_to_matrix_index(const std::vecto
 
 float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph){
 
-    auto L1 = [](std::pair<int,int> p1, std::pair<int,int> p2)-> int {
-        return abs(p1.first - p2.first) + abs(p1.second - p2.second);
+    auto L2 = [](std::pair<int,int> p1, std::pair<int,int> p2)-> int {
+        return floor(sqrt((p1.first - p2.first)*(p1.first - p2.first) + (p1.second - p2.second)*(p1.second - p2.second)));
     };
 
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
@@ -122,7 +122,7 @@ float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph)
     std::pair<int,int> init_indexes = real_coordinate_to_matrix_index(init_position);
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(final_position);
     assert(indexes.first >= 0 && indexes.first < 8 && indexes.second >= 0 && indexes.second < 8);
-    grid_zone(indexes.first,indexes.second) = L1(init_indexes,indexes);
+    grid_zone(indexes.first,indexes.second) = L2(init_indexes,indexes);
 
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
