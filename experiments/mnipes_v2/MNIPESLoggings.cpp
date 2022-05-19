@@ -47,6 +47,10 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         int i = 0;
         for(const auto &traj: genome.trajectories)
         {
+            if(traj.empty()){
+                i++;
+                continue;
+            }
             std::stringstream traj_filepath;
             traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id() << "_" << i;
             std::ofstream tofs(traj_filepath.str());
@@ -75,10 +79,19 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << id << ",";
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
+    fitness_file_stream << genome.nbr_eval;
     for(const double& obj: genome.rewards)
         fitness_file_stream << obj << ",";
     fitness_file_stream << "\n";
+    fitness_file_stream.close();
     //-
+
+    //Log the id and the total number of evaluations in the whole evolution used before finishing the training of this robot
+    std::ofstream neofs;
+    if(!openOLogFile(neofs,"/number_of_evaluations.csv"))
+        return;
+    neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
+    neofs.close();
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)

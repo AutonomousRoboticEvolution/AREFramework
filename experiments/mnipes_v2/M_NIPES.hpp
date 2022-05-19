@@ -53,7 +53,8 @@ typedef struct genome_t{
         objectives(g.objectives),
         age(g.age),
         trajectories(g.trajectories),
-        behavioral_descriptor(g.behavioral_descriptor){}
+        behavioral_descriptor(g.behavioral_descriptor),
+        nbr_eval(g.nbr_eval){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
@@ -63,6 +64,7 @@ typedef struct genome_t{
     int age = -1;
     std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
+    int nbr_eval=0;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;

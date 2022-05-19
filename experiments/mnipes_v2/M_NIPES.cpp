@@ -535,6 +535,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.trajectories = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
                 new_gene.rewards = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_rewards();
                 new_gene.behavioral_descriptor = ind->descriptor();
+                new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
                 gene_pool.push_back(new_gene);
                 //-
 

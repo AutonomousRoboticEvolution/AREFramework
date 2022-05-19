@@ -85,6 +85,8 @@ public:
 
     void to_be_erased() {initialized = true; _is_finish = true;}
 
+    int nbr_eval(){return _nbr_eval;}
+
 protected:
     void next_pop();
     void iterate();
