@@ -53,7 +53,8 @@ def makeFile(location):
 		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
-		gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
+		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
 
 
 
@@ -204,7 +205,7 @@ def makeFile(location):
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=9, y=11.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
 				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.059, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
 				"gripperOpeningFraction": 0.0,
-				"gripperClosedFraction": 0.5,
+				"gripperClosedFraction": 0.45,
 				"USE_FORCE_MODE":True
 				 },
 			4: {"organType": 4,
@@ -213,10 +214,10 @@ def makeFile(location):
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
 				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=13.5,z=-14.912,rotZ=180)).tolist(),
-				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=90,rotZ=90).tolist(),
+				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=-90,rotZ=-90).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
-				"gripperOpeningFraction": 1.0,
-				"gripperClosedFraction": 0.8,
+				"gripperOpeningFraction": 0.0,
+				"gripperClosedFraction": 0.45,
 				"USE_FORCE_MODE":True,
 				"transformOrganOriginToMaleCableSocket": None
 				 }
@@ -269,18 +270,18 @@ def makeFile(location):
 			[2, 228.43/1000, (77.5 + 80 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
 			[2, 178.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
 			[2, 228.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
-			[4, 325/1000, (65 + 0*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 1*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 2*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 3*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 4*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 5*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 6*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[4, 325/1000, (65 + 7*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
-			[3, 400/1000, 106.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
-			[3, 475/1000, 106.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
-			[3, 400/1000, 216.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
-			[3, 475/1000, 216.741/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)]  #jointA
+			[4, (325)/1000, (65 + 0*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 1*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 2*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 3*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 4*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 5*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 6*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 7*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[3, 400/1000, (106.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, (106.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 400/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)]  #jointA
 			],
 		"CABLE_CONTENTS":[] # no cables
 		}

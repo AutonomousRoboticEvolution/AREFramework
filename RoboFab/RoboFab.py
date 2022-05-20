@@ -146,10 +146,13 @@ class RoboFab_host:
             debugPrint( "Doing organ insertions" )
             while not all ( [x.hasBeenInserted for x in self.myRobot.organsByLimbList[0]] ) :
                 nextOrganFromRobot = self.myRobot.getNextOrganToInsert()
-                if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
-                    thisOrgan = self.UR5.insertOrganWithoutCable(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
-                else: # has a cable that needs connecting to Head
+                #if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
+                if nextOrganFromRobot.transformOrganOriginToGripper is None:
+                    # use male cable to insert the organ
                     thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A )
+                else: # use the defined gripper location to pick up the organ
+                    thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
+
         else:
             debugPrint( "Organ insertions skipped" )
         timer.add("Finished Organs Insert")
