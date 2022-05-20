@@ -82,10 +82,9 @@ public:
     typedef std::shared_ptr<const NNParamGenome> ConstPtr;
 
 
-    NNParamGenome() : Genome() {}
+    NNParamGenome() : Genome() {type = "nn_param_genome";}
     NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param, int id = 0) :
-        Genome(rn,param,id){
-    }
+        Genome(rn,param,id){type = "nn_param_genome";}
     NNParamGenome(const NNParamGenome &ngen) :
         Genome(ngen), weights(ngen.weights), biases(ngen.biases),
         nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),
