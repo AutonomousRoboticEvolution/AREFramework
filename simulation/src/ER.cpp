@@ -81,11 +81,12 @@ void ER::startOfSimulation()
 
 void ER::initIndividual(){
     int length;
-    std::string mess(simGetStringSignal("currentInd",&length));
-    if(length == 0){
+    simChar* message = simGetStringSignal("currentInd",&length);
+    if(message == nullptr){
         std::cerr << "No individual received" << std::endl;
         return;
     }
+    std::string mess(message);
     mess.resize(length);
     currentInd = ea->getIndividual(0);
     if(nbrEval == 0)
@@ -105,6 +106,7 @@ void ER::initIndividual(){
             robotScreenshot(ind_id,image_repo);
         }
     }
+    simReleaseBuffer(message);
 }
 
 void ER::handleSimulation()
