@@ -1,9 +1,9 @@
 #!/bin/bash
-ISVIKING=0
-ISAREPC=1
+ISVIKING=1
+ISAREPC=0
 if [[ $ISVIKING == 1 ]]; then
 	echo "Downloading from viking"
-	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/diversity/trait_v2/body*"
+	ORIGIN="ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/diversity/protomatrix_v3/body*"
 else
 	if [[ $ISAREPC == 1 ]]; then
         	echo "Downloading from are-pc"
@@ -12,9 +12,9 @@ else
 		echo "Wrong!"
 	fi
 fi
-DESTINATION="/home/edgar/are-logs/oscillatory/smooth/new_robot/"
-FILES=('parameters.csv' 'fitnesses.csv')
-#FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv' 'nbr_conn_neu.csv')
+DESTINATION="/media/ebb505/ARE-EBB/ARE/are-logs/diversity/protomatrix_100/"
+#FILES=('parameters.csv' 'fitnesses.csv')
+FILES=('parameters.csv' 'fitnesses.csv' 'MD_Cart_WDH.csv' 'parenting.csv' 'organ_pos_desc.csv' 'nbr_conn_neu.csv')
 for t in ${FILES[@]}; do
 	echo "$t"
 	rsync -va --prune-empty-dirs --include '*/' --include $t --exclude "*" $ORIGIN $DESTINATION
