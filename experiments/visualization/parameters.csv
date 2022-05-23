@@ -1,8 +1,8 @@
 #experimentName,string,visualization
 #expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
-#folderToLoad,string,/home/ebb505/ARE_Project/are-logs/mnipes2_12_4_17-21-3-3233-1105566833
-#idToLoad,int,0
+#folderToLoad,string,/home/ebb505/ARE_Project/robotlibrary/morph_117
+#idToLoad,int,117
 #genToLoad,int,175
 #indToLoad,int,90
 #maxEvalTime,float,60
@@ -41,16 +41,16 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,0
+#emptyCtrlGenome,bool,1
 #loadAllMorphGenome,bool,0
 
-#isWheel,bool,0
-#isSensor,bool,0
+#isWheel,bool,1
+#isSensor,bool,1
 #isJoint,bool,1
-#isCaster,bool,0
+#isCaster,bool,1
 #isExportModel,bool,1
 #saveBlueprint,bool,1
-#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #isSegmentedRobot,bool,0
 #organsVersion,int,6
 

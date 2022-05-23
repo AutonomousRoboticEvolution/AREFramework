@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 using namespace are::sim;
 
@@ -509,6 +509,14 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     std::vector<double> output;
     int organ_type;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
+        // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
+        // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
+        std::sort(skeletonSurfaceCoord[m].begin(),
+                  skeletonSurfaceCoord[m].end(),
+                  [] (const std::vector<int> &a, const std::vector<int> &b)
+                  {
+                      return a[2] < b[2];
+                  });
         // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
@@ -686,7 +694,6 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     organ_type = -1;
     int max_element = -1;
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
-
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
         if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
