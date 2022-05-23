@@ -127,6 +127,8 @@ float GradualEnvironment::updateEnv(float simulationTime, const Morphology::Ptr 
         trajectory.push_back(wp);
     else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
+        for(auto &traj: trajectories)
+            traj.clear();
         trajectories[current_scene] = trajectory;
     }
 

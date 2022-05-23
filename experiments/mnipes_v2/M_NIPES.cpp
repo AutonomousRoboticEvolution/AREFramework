@@ -98,6 +98,8 @@ void M_NIPESIndividual::createMorphology(){
 
 void M_NIPESIndividual::createController(){
 
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
     if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
         return;
 
@@ -109,22 +111,19 @@ void M_NIPESIndividual::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-    if(weights.empty() || bias.empty())
+    if(weights.empty() || bias.empty()){
+        if(verbose)
+            std::cout << "Weights or biases empty! " << weights.empty() << " " << bias.empty() << std::endl;
         return;
+    }
 
     if(nn_type == settings::nnType::FFNN){
-        nn2::mlp::count_t count(nn_inputs,nb_hidden,nn_outputs);
-        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
-            return;
         control.reset(new NN2Control<ffnn_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::ELMAN){
-        nn2::elman::count_t count(nn_inputs,nb_hidden,nn_outputs);
-        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
-            return;
         control.reset(new NN2Control<elman_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
@@ -132,9 +131,6 @@ void M_NIPESIndividual::createController(){
 
     }
     else if(nn_type == settings::nnType::RNN){
-        nn2::rnn::count_t count(nn_inputs,nb_hidden,nn_outputs);
-        if(weights.size() != count.nb_weights || bias.size() != count.nb_biases)
-            return;
         control.reset(new NN2Control<rnn_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
@@ -147,9 +143,14 @@ void M_NIPESIndividual::createController(){
 }
 
 void M_NIPESIndividual::update(double delta_time){
-
-    if(ctrlGenome->get_type() == "empty_genome" || drop_learning || control.get() == nullptr)
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if(ctrlGenome->get_type() == "empty_genome" || drop_learning || control.get() == nullptr){
+        if(verbose)
+            std::cout << "drop update : " << ctrlGenome->get_type()
+                  << " learning dropped: " << drop_learning
+                  << " controller null: " << (control.get() == nullptr) << std::endl;
         return;
+    }
 
     std::vector<double> inputs = morphology->update();
     std::vector<double> outputs = control->update(inputs);
@@ -300,14 +301,16 @@ void M_NIPES::init_morph_pop(){
 }
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
+
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(population[corr_indexes[currentIndIndex]]->get_ctrl_genome()->get_type() == "empty_genome")
         return true;
 
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[corr_indexes[currentIndIndex]]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-
-    if(simGetSimulationTime() < 0.1){
+    float sim_time = simGetSimulationTime();
+    if(sim_time < 0.1){
         current_ind_past_pos[0] = pos[0];
         current_ind_past_pos[1] = pos[1];
         current_ind_past_pos[2] = pos[2];
@@ -345,10 +348,23 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
     double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
 
-    bool stop = dist < fTarget || drop_eval;
+    int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
+    bool stop = false;
+    if(env_type == GRADUAL){
+        environments_info = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_environments_info();
+        stop = dist < 1 - environments_info[current_gradual_scene].fitness_target || drop_eval || sim_time >= environments_info[current_gradual_scene].max_eval_time;
+    }
+    else
+        stop = dist < fTarget || drop_eval;
 
-    if(stop){
-        std::cout << "STOP !" << std::endl;
+    if(stop && verbose){
+        if(env_type == GRADUAL)
+            std::cout << "stop eval: " << "fitness target reached: " << (dist < 1 - environments_info[current_gradual_scene].fitness_target)
+                  << " eval dropped " << drop_eval
+                  << " sim_time " << (sim_time >= environments_info[current_gradual_scene].max_eval_time) << std::endl;
+        else
+            std::cout << "stop eval: " << "fitness target reached: " << (dist < fTarget)
+                  << " eval dropped " << drop_eval;
     }
 
     return stop;
@@ -535,6 +551,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.trajectories = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
                 new_gene.rewards = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_rewards();
                 new_gene.behavioral_descriptor = ind->descriptor();
+                new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
                 gene_pool.push_back(new_gene);
                 //-
 
