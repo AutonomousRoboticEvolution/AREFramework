@@ -1,6 +1,6 @@
 #!/bin/bash
-EXPERIMENT="mnipes_v2"
-PCNAME="edgar"
+EXPERIMENT="nipes_multitarget"
+PCNAME="ebb505/ARE_Project"
 echo "$EXPERIMENT"
 echo "$PCNAME"
 echo "Link libraries"
