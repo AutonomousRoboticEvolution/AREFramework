@@ -733,7 +733,7 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
 
     double ftarget;
     if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-        ftarget = environments_info[current_gradual_scene].fitness_target;
+        ftarget = 1 - environments_info[current_gradual_scene].fitness_target;
     else ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
 
