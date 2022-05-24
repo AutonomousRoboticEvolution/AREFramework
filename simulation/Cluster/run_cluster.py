@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import datetime
 import sys
+import time
 
 def run_servers(args,n: int):
     processes = []
@@ -22,51 +23,60 @@ def run_server(args,rank: int):
     # [1] path to the parameter file
     # [2] server port
     if(not args.xvfb) :
-        return subprocess.Popen([#"gdb","--ex=r","--args",
+        return [subprocess.Popen([#"gdb","--ex=r","--args",
             args.vrep,
             'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ],stdout=logfile)
+        ],stdout=logfile,stderr=logfile),logfile]
     else :
         print("run with xvfb")
-        return subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
+        return [subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
          # "gdb","--ex=r","--args",
             args.vrep,
             'simulation','-h',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ],stdout=logfile)
+        ],stdout=logfile,stderr=logfile),logfile]
 
 
+   
 def run_client(args):
     print('Starting client')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = "./client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen(["gdb","--args",
+    return subprocess.Popen([#"gdb","--args",
         args.client,
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])
+    ],stdout=logfile,stderr=logfile)
 
 
 def wait(servers, client, timeout=None):
     for i, server in enumerate(servers):
-        ret = server.wait(timeout=timeout)
+        ret = server[0].wait(timeout=timeout)
         print(f'v-rep rank {i} finished with code {ret}')
     if client is not None:
         ret = client.wait(timeout=timeout)
         print(f'Client finished with code {ret}')
 
+def poll(servers):
+    for i in range(len(servers)):
+        ret = servers[i][0].poll()
+        if(ret != None):
+            print(f'Restarting server rank {i}') 
+            servers[i][0] = subprocess.Popen(servers[i][0].args,stdout=servers[i][1],stderr=servers[i][1])
+
 
 def kill(servers, client):
-    if client is None:
-        processes = servers
-    else:
-        processes = servers + [client]
+    processes = []
+    for s in servers:
+        processes.append(s[0])
+    if not (client is None):
+        processes += [client]
     for p in processes:
         p.stdout.close()
         p.terminate()
@@ -99,6 +109,9 @@ def main():
 
     finally:
         try:
+            while(client.poll() == None):
+                poll(servers)
+                time.sleep(0.1)
             wait(servers, client)
         except KeyboardInterrupt:
             kill(servers, client)
