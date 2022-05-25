@@ -149,9 +149,13 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
+
+            //TEMPORARY! print the joint outputs in order to see what could be causing the freeze ups:
+            std::cout<<newTargetAngle * 180.0/M_PI<<",";
         }
         // any other thisOrgan->organType value can be ignored, since it's not an output
     }
+    std::cout<<std::endl;//TEMPORARY!
 
     if(debugDisplayOnPi){
         // debugging: display output values as bars:
