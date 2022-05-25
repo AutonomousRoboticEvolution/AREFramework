@@ -4,6 +4,7 @@
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
 #include "obstacleAvoidance.hpp"
+#include "barrelTask.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
@@ -16,6 +17,9 @@ extern "C" are::Environment::Ptr environmentFactory
     }
     else if(env_type == 1)
         env.reset(new are::sim::ObstacleAvoidance(param));
+    else if(env_type == 2) {
+        env.reset(new are::sim::BarrelTask(param));
+    }
     return env;
 }
 

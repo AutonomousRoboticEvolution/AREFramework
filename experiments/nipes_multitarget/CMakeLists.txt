@@ -29,6 +29,7 @@ add_library(NIPES_MULTITARGET SHARED
     NIPESLoggings.cpp
     NIPES.cpp
     ../common/multiTargetMaze.cpp
+    ../common/barrelTask.cpp
     )
 target_include_directories(NIPES_MULTITARGET PUBLIC ${INCLUDES})
 target_link_libraries(NIPES_MULTITARGET ARE

@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 0
+#define ISROBOTSTATIC 1
 
 using namespace are::sim;
 
@@ -169,9 +169,9 @@ void Morphology_CPPNMatrix::create()
                     else if(i.getOrganType() == 2)
                         i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
                     else if(i.getOrganType() == 3)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(2), skeletonHandles, organList);
                     else if(i.getOrganType() == 4)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(3), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 // Count number of good organs.
@@ -337,6 +337,7 @@ void Morphology_CPPNMatrix::create()
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
+    destroy_physical_connectors();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -421,7 +422,7 @@ void Morphology_CPPNMatrix::createHead()
 
 void Morphology_CPPNMatrix::createGripper()
 {
-    gripperHandles.resize(2);
+    gripperHandles.resize(4);
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
@@ -435,6 +436,16 @@ void Morphology_CPPNMatrix::createGripper()
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
     gripperHandles[1] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperLegPath = models_path + "/utils/gripper_l.ttm";
+    tempGripperHandle = simLoadModel(gripperLegPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[2] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperCasterPath = models_path + "/utils/gripper_c.ttm";
+    tempGripperHandle = simLoadModel(gripperCasterPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[3] = tempGripperHandle;
     gripperHandles.shrink_to_fit();
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
@@ -499,6 +510,14 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     std::vector<double> output;
     int organ_type;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
+        // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
+        // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
+        std::sort(skeletonSurfaceCoord[m].begin(),
+                  skeletonSurfaceCoord[m].end(),
+                  [] (const std::vector<int> &a, const std::vector<int> &b)
+                  {
+                      return a[2] < b[2];
+                  });
         // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
@@ -603,7 +622,8 @@ void Morphology_CPPNMatrix::destroyGripper()
 {
     simRemoveModel(gripperHandles[0]);
     simRemoveModel(gripperHandles[1]);
-
+    simRemoveModel(gripperHandles[2]);
+    simRemoveModel(gripperHandles[3]);
 
 //    for(auto & i : gripperHandles) {
 //        simRemoveModel(i);
@@ -675,7 +695,6 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     organ_type = -1;
     int max_element = -1;
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
-
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
         if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only

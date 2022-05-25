@@ -1,17 +1,21 @@
 #experimentName,string,bodyplantesting_nn2
 #expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,20
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#populationSize,int,100
 #maxEvalTime,float,1
-#numberOfGeneration,int,10
-#repository,string,/home/leni/are-logs
+#numberOfGeneration,int,25
+#repository,string,/home/le_goff/are-logs
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
 #evaluationOrder,int,1
+#nbrRepitions,int,0
+
+#descriptor,int,1
+#useNSGA2Diversity,bool,0
 
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -34,12 +38,11 @@
 #isCaster,bool,1
 
 #isBootstrapEvolution,bool,0
-#loadExperiment,string,/home/leni/are-logs/
+#loadExperiment,string,/home/le_goff/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
-#imageRepository,string,images
 
 #kValue,int,15
 #noveltyThreshold,double,0.1
@@ -52,11 +55,10 @@
 #targetPosition,sequence_double,0.0;0.0;0.12
 #initPosition,sequence_double,0.0;0.0;0.12
 
-#descriptor,int,1
-
 #seed,int,1
 #reloadController,bool,0
 #withBeacon,bool,0
+#imageRepository,string,images/
 
 #mutationType,int,0
 #mutateConnection,bool,1
@@ -76,8 +78,9 @@
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
 #rateCrossover,float,0.5
+#saveBlueprint,bool,0
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1
 
-#nbrRepetitions,int,1
+#descriptor,int,0

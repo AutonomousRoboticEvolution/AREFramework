@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include "ARE/misc/utilities.h"
 
 #if defined (VREP)
 #include "v_repLib.h"

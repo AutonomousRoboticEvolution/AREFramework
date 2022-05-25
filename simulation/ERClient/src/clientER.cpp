@@ -214,8 +214,9 @@ bool ER::updateSimulation()
                 std::cerr << "An error happened on the server side" << std::endl;
             }
             else if(state == READY && indToEval.empty()){
-                continue;
-//                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+               
+                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+	        continue;	
             }
             else{
 //                std::cerr << "state value unknown : " << state << std::endl

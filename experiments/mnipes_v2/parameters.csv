@@ -4,12 +4,13 @@
 #instanceType,int,1
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
-#seed,int,-1
+#seed,int,1
 #evaluationOrder,int,3
+#synchronicity,float,0.
 
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/leni/are-logs
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/le_goff/are-logs
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
@@ -19,60 +20,68 @@
 
 #fitnessFile,string,fitnesses.csv
 
-#envType,int,3
-#scenes,sequence_string,shapes_exploration.ttt;hard_race.ttt;multi_rooms.ttt
+#envType,int,5
+#envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
+#scenes,sequence_string,shapes_exploration.ttt
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.75;0.75;0.12
 #targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
-#initPosition,sequence_double,0;0;0.12;-0.75;-0.75;0.12;0.75;0.75;0.12
+#initPosition,sequence_double,0;0;0.12
 
 #noiseLevel,double,0.
-#maxVelocity,double,10.
+#maxVelocity,double,6.
 #MaxWeight,float,1.0
 #NNType,int,2
-#NbrHiddenNeurones,int,2
+#NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
 #useControllerArchive,bool,1
-#reloadController,bool,1
+#reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,4
-#maxEvalTime,float,10
+#populationSize,int,25
+#maxEvalTime,float,60
 #timeStep,float,0.1
-#maxNbrEval,int,100
+#maxNbrEval,int,10000
+#nbrEvalPerTask,int,2000
 #fitnessType,int,0
+#withCrossover,bool,1
 
-#cmaesNbrEval,int,2
-#cmaesPopSize,int,2
+#cmaesSmallNbrEval,int,200
+#cmaesLargeNbrEval,int,200
+#cmaesMaxPopSize,int,40
+#cmaesPopSize,int,10
 #CMAESStep,double,1.
-#FTarget,double,0.05
+#FTarget,double,0.5
 #elitistRestart,bool,0
 #withRestart,bool,1
 #incrPop,bool,1
 #lengthOfStagnation,int,20
-#kValue,int,15
+#kValue,int,1
 #noveltyThreshold,double,0.9
 #archiveAddingProb,double,0.4
 #noveltyRatio,double,1.
 #noveltyDecrement,double,0.05
 
-#nbrWaypoints,int,10
+#nbrWaypoints,int,100
 #populationStagnationThreshold,float,0.05
 #withBeacon,bool,1
 #energyBudget,double,100
 
-#maxNbrOrgans,int,16
+#maxNbrOrgans,int,8
 #isSegmentedRobot,bool,0
 #randomOrientation,bool,1
 #isWheel,bool,1
 #isSensor,bool,1
-#isJoint,bool,0
+#isJoint,bool,1
+#isLeg,bool,1
 #isCaster,bool,1
 #manufacturabilityMethod,int,1
-#isLeg,bool,0
+#saveBlueprint,bool,0
+
+#isCPPNGenome,bool,1
+
+#descriptor,int,0
 
 #withTiles,bool,1
 #flatFloor,bool,1
 #energyReduction,bool,0
-
-
