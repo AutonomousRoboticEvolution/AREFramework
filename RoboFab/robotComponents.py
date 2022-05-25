@@ -84,7 +84,10 @@ class Organ:
         self.postInsertExtraPushDistance = dictionaryOfThisOrganType["postInsertExtraPushDistance"]
         self.pickupExtraPushDistance = dictionaryOfThisOrganType["pickupExtraPushDistance"]
         # self.gripPosition = np.matrix( dictionaryOfThisOrganType["gripPosition"] )
-        self.transformOrganOriginToGripper = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToGripper"] )
+        if dictionaryOfThisOrganType["transformOrganOriginToGripper"] is None:
+            self.transformOrganOriginToGripper = None
+        else:
+            self.transformOrganOriginToGripper = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToGripper"] )
         self.transformOrganOriginToClipCentre = np.matrix( dictionaryOfThisOrganType["transformOrganOriginToClipCentre"] )
         if dictionaryOfThisOrganType["transformOrganOriginToFemaleCableSocket"] is None: # this is a list of the female TRRS sockets (e.g. the 8 on the Head)
             self.transformOrganOriginToFemaleCableSocket = None

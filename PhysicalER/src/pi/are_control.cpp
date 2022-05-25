@@ -19,9 +19,14 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     daughterBoards->turnOn();
 
     // each organ needs to be initiated with its i2c address, obtained from stringListOfOrgans
+
+    // some preliminaries:
     std::string thisLine;
     std::stringstream temp_string_stream(stringListOfOrgans);
     if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<"in AREControl, stringListOfOrgans: "<<stringListOfOrgans<<std::endl;
+    uint8_t proximal_joint_current_limit = settings::getParameter<settings::Integer>(parameters,"#proximalJointCurrentLimitTensOfMilliAmps").value;
+    uint8_t distal_joint_current_limit = settings::getParameter<settings::Integer>(parameters,"#distalJointCurrentLimitTensOfMilliAmps").value;
+    uint8_t wheel_current_limit = settings::getParameter<settings::Integer>(parameters,"#wheelOrganCurrentLimitTensOfMilliAmps").value;
 
     while( std::getline(temp_string_stream, thisLine,'\n') ){
         std::string organType = thisLine.substr(0, thisLine.find(","));
@@ -31,25 +36,39 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         case 0: //head
             //do nothing
             break;
+
         case 1: //wheel
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
             number_of_wheels++;
             break;
+
         case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
             number_of_sensors++;
             break;
-        case 3: //joint
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a joint, address: "<<addressValue<<std::endl;
+
+        case 3: //leg - made up of two joints
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a leg, addresses: "<<addressValue <<" and "<< std::stoi(addressValue)+1 <<std::endl;
+
+            // proximal joint of this leg:
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
-            number_of_joints++;
+            static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the curre
+
+            // distal joint of this leg:
+            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
+            static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
+
+            number_of_joints+=2;
             break;
+
         case 4: //caster
             //do nothing
             break;
-        default:// shouldn't be here
+
+        default:// shouldn't be here!
             std::cerr << "ERROR! the list of organs contains an entry of uknown type: " <<organType<< std::endl;
         }
     }
@@ -73,15 +92,6 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
                 if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"WARNING cannot find organ on either daughter board"<<std::endl;
                 thisOrgan->daughterBoardToEnable=NONE;
             }
-        }
-    }
-
-    // initialise each organ in turn, e.g. setting current limits
-    for (auto thisOrgan : listOfOrgans) {
-        if (thisOrgan->organType == WHEEL) {
-            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
-            MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
-            thisWheel->setCurrentLimit(17); // in 10s of milliAmps
         }
     }
 
@@ -117,7 +127,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
-void AREControl::sendOutputOrganCommands(std::vector<double> values){
+void AREControl::sendOutputOrganCommands(std::vector<double> values, uint32_t time_millis){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
     int i=0;
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
@@ -132,7 +142,9 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values){
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            thisJoint->setTargetAngleNormalised(values[i]);
+            double value = values[i];
+            value = std::sin(value*(time_millis/1000.0));
+            thisJoint->setTargetAngleNormalised(value);
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++;
         }
@@ -239,7 +251,7 @@ int AREControl::exec(zmq::socket_t& socket){
         nn_outputs = controller.get_ouputs();
 
         // send the new values to the actuators
-        sendOutputOrganCommands(nn_outputs);
+        sendOutputOrganCommands(nn_outputs, this_loop_start_time);
 
         // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
         if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}

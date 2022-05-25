@@ -102,7 +102,7 @@ int main(int argc, char** argv){
     // setup daughter boards
     DaughterBoards db;
     db.init();
-    db.turnOn(LEFT);
+    db.turnOn(RIGHT);
 
     // Fan (test)
     //Fan fan;
@@ -117,7 +117,13 @@ int main(int argc, char** argv){
     //cameraTest();
 
     /*** joint test ***/
-    jointTest();
+    //jointTest();
+
+    SensorOrgan sensor(0x30);
+    while (1) {
+        std::cout<<"Sensor TOF: "<< float(sensor.readTimeOfFlight()) << std::endl;
+        usleep(500000);
+    }
 
 
 }
