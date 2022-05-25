@@ -139,7 +139,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values, uint32_t ti
             logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
             i++;
         }
-        if (thisOrgan->organType == JOINT) {
+        else if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             double value = values[i];
@@ -164,6 +164,16 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values, uint32_t ti
 
     // add to log:
     std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
+}
+
+bool AREControl::testAllOrganConnections(){
+    bool allOK = true;
+    for (auto thisOrgan : listOfOrgans) {
+        if (!thisOrgan->testConnection()){
+            allOK=false;
+            std::cout<<"WARNING: LOST CONNECTION TO ORGAN 0x"<<std::hex<<thisOrgan->devAddress<<std::endl;
+        }
+    }
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
@@ -238,7 +248,10 @@ int AREControl::exec(zmq::socket_t& socket){
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
     for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
 
-    while(this_loop_start_time-start_time <= _max_eval_time){
+    // a flag to stop the evaluatoin before _max_eval_time is reached
+    bool stop_early=false;
+
+    while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
         // start a new line of log file, and add current time
         logs_to_send<<"\n"<<this_loop_start_time-start_time<<",";
 
@@ -258,6 +271,12 @@ int AREControl::exec(zmq::socket_t& socket){
 
         // the are-update running on the PC expects to get a message on every timestep:
         are::phy::send_string_no_reply("busy",socket,"pi ");
+
+        // check that none of the organs has stopped responding:
+        if (testAllOrganConnections()){
+            // something has failed! :(
+            stop_early=true; // stop the evaluation now
+        }
 
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
