@@ -1,6 +1,7 @@
 #include "M_NIPES.hpp"
 
 using namespace are;
+namespace fs = boost::filesystem;
 
 fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner& learner) -> double
 {
@@ -243,6 +244,7 @@ void M_NIPES::init(){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
+
         int fitness_type = settings::getParameter<settings::Integer>(parameters,"#fitnessType").value;
 
         if(fitness_type == BEST_FIT)
@@ -258,6 +260,11 @@ void M_NIPES::init(){
             controller_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
         }
 
+
+        std::string bootstrap_folder = settings::getParameter<settings::String>(parameters,"#bootstrapFolder").value;
+        if(bootstrap_folder != "None")
+            bootstrap_evolution(bootstrap_folder);
+
         if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
             std::string filename = settings::getParameter<settings::String>(parameters,"#envListFile").value;
             std::string scenes_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value + "/scenes/";
@@ -268,6 +275,7 @@ void M_NIPES::init(){
         if(with_crossover) selection_fct = SelectionFunctions::two_best_of_subset;
         else selection_fct = SelectionFunctions::best_of_subset;
         init_morph_pop();
+
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
@@ -281,7 +289,7 @@ void M_NIPES::init(){
 
 void M_NIPES::init_morph_pop(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    for (size_t i = 0; i < population_size; i++){ // Body plans
+    for (size_t i = population.size(); i < population_size; i++){ // Body plans
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
         morphgenome->random();
@@ -519,11 +527,18 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
                 if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
                     int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
+                    int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
                     if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || numberEvaluation >= nbr_eval_per_task){
                         if(verbose)
                             std::cout << "fitness: " << best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
-                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - change task" << std::endl;
-                        incr_gradual_scene();
+                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
+                        nbr_of_successful_solution++;
+                        if(nbr_of_successful_solution >= nss_threshold){
+                            if(verbose) std::cout << " - change task" << std::endl;
+                            incr_gradual_scene();
+                        }
+                        else if(verbose) std::cout << std::endl;
+
                     }
                 }
 
@@ -826,4 +841,46 @@ void M_NIPES::incr_gradual_scene(){
     current_gradual_scene++;
     for(auto& ind : population)
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->incr_gradual_scene();
+}
+
+
+void M_NIPES::bootstrap_evolution(const std::string &folder){
+    //Step One: fill the population with the morph_genome from the folder
+    std::string filepath, filename;
+    std::vector<std::string> split_str;
+    int i = 0;
+    for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
+        filepath = dirit.path().string();
+        misc::split_line(filepath,"/",split_str);
+        filename = split_str.back();
+        misc::split_line(filename,"_",split_str);
+        if(split_str.front() != "morph")
+            continue;
+        nn2_cppn_t cppn;
+        std::ifstream ifs(filepath);
+        boost::archive::text_iarchive iarch(ifs);
+        iarch >> cppn;
+        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(cppn));
+
+        learner_t new_learner(*morphgenome.get());
+        new_learner.ctrl_learner.set_parameters(parameters);
+        learning_pool.push_back(new_learner);
+
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        population.push_back(ind);
+        corr_indexes.push_back(i);
+        i++;
+    }
+
+    //Step Two: load controller archive
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    if(use_ctrl_arch){
+        filename = folder + std::string("/controller_archive");
+        controller_archive.from_file(filename);
+    }
 }
