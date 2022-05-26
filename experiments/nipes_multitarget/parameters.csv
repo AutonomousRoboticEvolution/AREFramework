@@ -3,7 +3,7 @@
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #robotPath,string,/home/ebb505/ARE_Project/robotlibrary/morph_117_decoding_updated/model_117.ttm
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,10
+#populationSize,int,4
 #maxEvalTime,float,60
 #maxNbrEval,int,2000
 #repository,string,/home/ebb505/ARE_Project/are-logs
@@ -21,7 +21,7 @@
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
-#seed,int,-1
+#seed,int,1
 #arenaSize,double,2.
 #init_x,float,0.
 #init_y,float,0.
