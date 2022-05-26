@@ -14,8 +14,7 @@
 #include "barrelTask.hpp"
 #include "exploration.hpp"
 #include "gradual_env.hpp"
-
-//TO DO find a way to flush the population
+#include "boost/filesystem.hpp"
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
@@ -282,6 +281,8 @@ private:
 
     void incr_gradual_scene();
 
+    void bootstrap_evolution(const std::string &folder);
+
     std::vector<int> corr_indexes;
 
     fitness_fct_t fitness_fct;
@@ -299,7 +300,9 @@ private:
     bool warming_up = true; //whether the algorithm is initialisation phase.
     bool is_multi_target = false;
 
-    int current_gradual_scene=0;
+    //attribute for gradual tasks
+    int nbr_of_successful_solution = 0;
+    int current_gradual_scene = 0;
     std::vector<sim::GradualEnvironment::env_t> environments_info;
 };
 

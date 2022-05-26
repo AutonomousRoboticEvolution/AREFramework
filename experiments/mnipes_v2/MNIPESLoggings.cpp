@@ -80,8 +80,11 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
     fitness_file_stream << genome.nbr_eval;
-    for(const double& obj: genome.rewards)
-        fitness_file_stream << obj << ",";
+    if(!genome.rewards.empty()){
+        fitness_file_stream << "," << genome.rewards.front();
+        for(size_t i = 1; i < genome.rewards.size(); i++)
+            fitness_file_stream << "," << genome.rewards[i];
+    }
     fitness_file_stream << "\n";
     fitness_file_stream.close();
     //-
@@ -141,4 +144,18 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
     logFileStream << static_cast<M_NIPES*>(ea.get())->get_controller_archive_obj().to_string();
     logFileStream.close();
 
+}
+
+void GenomesPoolLog::saveLog(EA::Ptr &ea){
+    const std::vector<genome_t>& genomes = static_cast<M_NIPES*>(ea.get())->get_gene_pool();
+    if(genomes.empty())
+        return;
+    std::ofstream ofs;
+    if(!openOLogFile(ofs))
+        return;
+    ofs << genomes.front().morph_genome.id();
+    for(size_t i = 1; i < genomes.size(); i++)
+        ofs << "," << genomes.at(i).morph_genome.id();
+    ofs << std::endl;
+    ofs.close();
 }
