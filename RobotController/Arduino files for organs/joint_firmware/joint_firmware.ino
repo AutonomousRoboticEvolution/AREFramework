@@ -5,7 +5,7 @@
 */
 
 //I2C ADDRESS
-#define SLAVE_ADDRESS 0x0B // <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
+#define SLAVE_ADDRESS 0x12// <=== THIS NEEDS TO BE SET FOR EACH UNIQUE ORGAN
 
 //CALIBRATION VALUES (replace with copy-paste from joint_calibration output)
 #define CALIB_CENTRE_POSITION_US 1440
@@ -66,6 +66,17 @@
 #define SET_TEST_VALUE_REGISTER 0x90 // save a given value
 #define GET_TEST_VALUE_REGISTER 0x91 // return the saved value
 
+//Loop rate
+#define LOOP_TIME_US 10000 // will set the controller update frequency; 10,000us -> 100Hz
+
+//Slew rate limiting parameter (max allowed value change per timestep)
+//Total output range is -127 to +127 (255 total), so e.g. a value of 10 here would take 25 timesteps to do a maximum end-end swing
+//For a loop time of 10ms this example would be ~255ms
+//Quoted unloaded movement rate for FS5115M-FB servo is 160ms for 60deg at 6V
+//Driving at 5V and loaded, so will be slower, but taking this value, would be 480ms for full 180deg swing (48 timesteps)
+//This corresponds to a slew rate limit of ~5.3 per timestep. Round up to 6; should be faster than any physical servo dynamics
+#define MAX_OUTPUT_SLEW_RATE 3 //Servo position demand output cannot change by more than this per timestep.
+
 //I2C comms
 volatile uint8_t input_buffer[2];
 volatile uint8_t send_buffer;
@@ -89,6 +100,11 @@ volatile bool update_current_limit_flag = false;
 volatile bool update_target_position_flag = false;
 volatile bool update_led_brightness_flag = false;
 
+//Loop rate control
+unsigned long loop_target_end_time;
+
+//Slew rate limiting global - last demand position
+int8_t last_target_position;
 
 //Variables only used for testing
 bool rotationDirection = 0; //0 is -ve, 1 is +ve
@@ -128,10 +144,29 @@ void setup() {
   //Open I2C channel to outside world
   extI2CEnable(true);
   Serial.println("I2C to outside world enabled");
+
+  // prepare for loop start
+  loop_target_end_time = micros();
 }
 
 /******MAIN LOOP********************/
 void loop() {
+
+  // wait until it is time for next loop
+  unsigned long time_now = micros();
+  loop_target_end_time += LOOP_TIME_US;
+  if (loop_target_end_time > time_now) {
+      if (loop_target_end_time - time_now > 16380) // delayMicroseconds is limited to 16383 so use delay() instead if longer than this
+      { delay( (loop_target_end_time - time_now )/1000 );}
+      else{delayMicroseconds(loop_target_end_time - time_now); }
+  }
+  else
+  { // couldn't keep up
+      #ifdef SERIAL_DEBUG_PRINTING
+          Serial.println("can't keep up");
+      #endif
+      loop_target_end_time = time_now+ LOOP_TIME_US;
+  }
 
   //Update measurements
   measured_position = readServoPosition();
@@ -142,16 +177,19 @@ void loop() {
   led_brightness = currentProportionOfLimit * 255; //Scale to AnalogOut range
   update_led_brightness_flag = true;
 
+  //Update target position
+  setTargetPosition(target_position_setting);
+
   //Update settings
   if (update_current_limit_flag) {
     setCurrentLimit(current_limit_setting);
     update_current_limit_flag = false;
   }
   
-  if (update_target_position_flag) {
-    setTargetPosition(target_position_setting);
-    update_target_position_flag = false;
-  }
+  // if (update_target_position_flag) {
+  //   setTargetPosition(target_position_setting);
+  //   update_target_position_flag = false;
+  // }
   
   if (update_led_brightness_flag){
     update_led_brightness_flag=false;
@@ -331,21 +369,33 @@ int readServoPosition() {
   @param target_position The target position in degrees -90 to 90. Full range will not actually be available.
 */
 void setTargetPosition (int8_t target_position) {
-  //Enable power to servo if not already
-  if(!servo_is_started) {
-    servoEnable(true);
-  }
   
+  //Limit the slew rate of the demand signal
+  int target_position_set;
+  int change_magnitude = absDiff(target_position, last_target_position);
+
+  //If target value is too far from previous value, constrain the magnitude of the change to restrict the slew rate
+  if (change_magnitude > MAX_OUTPUT_SLEW_RATE) {
+      //Add (or subtract, for negative the maximum increment from the last target position if demanded slew rate is too fast
+      target_position_set = (target_position > last_target_position) ? (last_target_position + MAX_OUTPUT_SLEW_RATE) : (last_target_position - MAX_OUTPUT_SLEW_RATE);
+  } else {
+      //Otherwise can go straight to the target position
+      target_position_set = target_position;
+  }
+
   //Calculate microseconds value and move servo
   //Note that for any calibrated centrepoint which is not exactly halfway in the PWM range,
   //the servo will not actually be able to reach the full extent in one of the directions
-  unsigned int us_value = CALIB_CENTRE_POSITION_US + (float)target_position/DEG_PER_US;
+  unsigned int us_value = CALIB_CENTRE_POSITION_US + (float)target_position_set/DEG_PER_US;
   joint_servo.writeMicroseconds(us_value);
+
+  //Update last target position
+  last_target_position = target_position_set;
 
   //Debug info
   if (DEBUG) {
     Serial.print("I've been told to set the position to: ");
-    Serial.print(target_position,DEC);
+    Serial.print(target_position_set,DEC);
     Serial.print(", which is a microsecond value of:");
     Serial.println(us_value,DEC);
   }
@@ -397,6 +447,10 @@ void receiveData(int received_data_byte_count){
     case TARGET_POSITION_REGISTER :
       target_position_setting = input_buffer[1];
       update_target_position_flag = true;
+       //Enable power to servo if not already
+      if(!servo_is_started) {
+        servoEnable(true);
+      }
       break;
 
     //Set indicator LED brightness
@@ -427,4 +481,25 @@ void receiveData(int received_data_byte_count){
       Serial.println(input_buffer[0], HEX);
       break;
   }
+}
+
+/*
+    absDiff
+    @brief Finds the absolute difference between two signed integers
+    @param val1 The first integer
+    @param val2 The second integer
+    @return The magnitude of the difference between the two integers
+*/
+int absDiff(int val1, int val2) {
+    //If val1 is greater than val2 (or equal)
+    //Both positive: v1-v2 = +ve
+    //Both negative but val1 smaller: v1-v2 = +ve
+    //Val1 positive and val2 negative: v1-v2 = +ve
+    if (val1 >= val2) {
+        return val1-val2;
+    } else {
+        //If val2 is greater than val1
+        //Same three possibilities as above, all give +ve results
+        return val2-val1;
+    }
 }

@@ -143,10 +143,9 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
         if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
-            double newTargetAngle = misc::get_next_joint_position(valueFromNN, double(time_milli/1000.0), thisJoint->savedLastPositionRadians); // the new target angle in radians
-            thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
-            thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
+            double value = values[i];
+            value = std::sin(value*(time_millis/1000.0));
+            thisJoint->setTargetAngleNormalised(value);
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }

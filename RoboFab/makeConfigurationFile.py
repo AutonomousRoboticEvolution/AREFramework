@@ -35,11 +35,37 @@ def makeFile(location):
 		A_open_position = 2400
 		A_closed_position = 1350
 		B_open_position = 2100
-		B_closed_position = 1350
+		B_closed_position = 1400
 
 
 	elif location == "YRK":
+		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
+		COPPELIASIM_FOLDER = "/home/robofab/vrep"
+		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
+		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
+		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.538-0.15 , 0.006+0.15 , 0.08507 , 0 , 0 , math.radians(-90)]) .tolist()
+		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
+		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
+		PRINTER_2_API_KEY = "change_me"
+		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
+
+		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
+
+
+
+		# define what constitutes "open" and "closed" for the servos on the gripper:
+		A_open_position = 0
+		A_closed_position = 0
+		B_open_position = 2100
+		B_closed_position = 1100
+
+
+		''' Old version 2021
 		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
 		COPPELIASIM_FOLDER = "/home/robofab/programs/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/programs/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
@@ -60,20 +86,9 @@ def makeFile(location):
 		A_closed_position = 1125
 		B_open_position = 2100
 		B_closed_position = 1350
-
+		'''
 	else:
 		raise Exception("unknown location given for making configuration file")
-
-	# using a loop to make all the cables in the cable bank, this will be added into the structure later:
-	cable_bank_cables_temp = []
-	x_spacing = 0.0336
-	y_spacing = 0.0330
-	for y_pos in [0, 1, 2]:
-		for x_pos in [0, 1]:
-			cable_bank_cables_temp.append([makeTransformInputFormatted([x_spacing * 2 * x_pos, y_spacing * y_pos, 0]).tolist() ,
-                                           makeTransformInputFormatted([x_spacing * (2 * x_pos + 1), y_spacing * y_pos, 0]).tolist()])
-
-
 
 	data = {
 
@@ -159,7 +174,7 @@ def makeFile(location):
 				"forceModeTravelDistance": 30 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000, # positive value will make it hold further onto organ
-                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=56, z=4.5, rotX=0, rotY=90, rotZ=90).tolist(),
+                 "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=47.9, z=-2.9, rotX=0, rotY=90, rotZ=90).tolist(),
                  "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=0, y=-19.338, z=-8, rotX=90, rotY=0, rotZ=0).tolist(),
                  "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=35, z=34.4, rotX=180, rotY=0, rotZ=0).tolist(),
                 "transformOrganOriginToFemaleCableSocket": None, # female socket(s)
@@ -172,7 +187,7 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=42.57, z=-7.7, rotX=0, rotY=90, rotZ=90).tolist(),
+                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=34.47, z=-15, rotX=0, rotY=90, rotZ=90).tolist(),
                 "transformOrganOriginToGripper": None, #makeTransformMillimetersDegrees(x=-6, y=0, z=-9.579, rotX=180, rotY=0, rotZ=90).tolist(),
                 "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=0, y=21.57, z=22.2, rotX=180, rotY=0, rotZ=0).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None, # female socket(s)
@@ -181,16 +196,16 @@ def makeFile(location):
 				"USE_FORCE_MODE":True,
 				 },
 			3: {"organType": 3, # minimally tested!
-				"friendlyName": "Joint organ",
+				"friendlyName": "Leg organ",
 				"forceModeTravelDistance": 30 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=47.741, z=-30, rotX=0, rotY=90, rotZ=90).tolist(),
-                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-35.238, rotX=180, rotY=0, rotZ=0).tolist(),
-                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=8, y=12.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
-				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.292, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
+                "transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0, y=39.641, z=-37.29, rotX=0, rotY=90, rotZ=90).tolist(),
+                "transformOrganOriginToGripper": makeTransformMillimetersDegrees(x=0, y=37.741, z=-40.238, rotX=180, rotY=0, rotZ=0).tolist(),
+                "transformOrganOriginToMaleCableSocket": makeTransformMillimetersDegrees(x=9, y=11.741, z=0, rotX=180, rotY=0, rotZ=0).tolist(),
+				"transformOrganOriginToFemaleCableSocket":  [makeTransformMillimetersDegrees(x=-12.217, y=-35.059, z=3.5, rotX=180, rotY=0, rotZ=0).tolist()],  # female socket(s)
 				"gripperOpeningFraction": 0.0,
-				"gripperClosedFraction": 0.5,
+				"gripperClosedFraction": 0.45,
 				"USE_FORCE_MODE":True
 				 },
 			4: {"organType": 4,
@@ -198,11 +213,11 @@ def makeFile(location):
 				"forceModeTravelDistance": 5 / 1000,
 				"postInsertExtraPushDistance": 2.0 / 1000,
 				"pickupExtraPushDistance": 0 / 1000,
-				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=6,z=18.312,rotX=180)).tolist(),
-				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=16,z=20.1,rotX=0,rotY=180,rotZ=90).tolist(),
+				"transformOrganOriginToGripper": (makeTransformMillimetersDegrees(x=0,y=13.5,z=-14.912,rotZ=180)).tolist(),
+				"transformOrganOriginToClipCentre": makeTransformMillimetersDegrees(x=0,y=15.4,z=-9.4,rotX=0,rotY=-90,rotZ=-90).tolist(),
 				"transformOrganOriginToFemaleCableSocket": None,  # female socket(s)
-				"gripperOpeningFraction": 0.6,
-				"gripperClosedFraction": 0.8,
+				"gripperOpeningFraction": 0.0,
+				"gripperClosedFraction": 0.45,
 				"USE_FORCE_MODE":True,
 				"transformOrganOriginToMaleCableSocket": None
 				 }
@@ -238,27 +253,35 @@ def makeFile(location):
 		"ORGAN_BANK_1":{
 		"ORIGIN":ORGAN_BANK_1_ORIGIN,
 		"ORGAN_CONTENTS":[ # a list of lists, each sub-list represents an organ: [<organ type> , <x (m)> , <y (m)> , <z (m)> , <rx (radians)> , <ry (radians)> , <rz (radians)>, i2c or IP Address]
-			[0, 204.06/1000, 286.06/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
-			[1, 2/1000,  46.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
-			[1, 94.811/1000,  81.061/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x61)], # wheel
-			[1, 2/1000,  (46.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
-			[1, 94.811/1000,  (81.061+82)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x63)], # wheel
-			[1, 2/1000,  (46.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
-			[1, 94.811/1000,  (81.061+82*2)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x65)], # wheel
-			[1, 2/1000,  (46.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
-			[1, 94.811/1000,  (81.061+82*3)/1000, 10/1000, math.radians(0), math.radians(0), math.radians(90) , str(0x67)], # wheel
-			[2, 164.631/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x30)], # sensor
-			[2, 164.631/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x32)], # sensor
-			[2, 164.631/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x34)], # sensor
-			[2, 164.631/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(90) , str(0x36)], # sensor
-			[2, 191.491/1000, 30.5/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
-			[2, 191.491/1000, (30.5+41)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
-			[2, 191.491/1000, (30.5+41*2)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
-			[2, 191.491/1000, (30.5+41*3)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
-			[4 , 300/1000, 60/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 95/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 130/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)], #castor
-			[4 , 300/1000, 165/1000 , 12/1000, 0, 0, math.radians(90), str(0x00)] #castor
+			[0, 225/1000, 300/1000, 3/1000 , 0, 0, 0 , "192.168.20.101"], # Head
+			[1, 20/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x60)], # wheel
+			[1, 95/1000,  75/1000 , 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x61)], # wheel
+			[1, 20/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x62)], # wheel
+			[1, 95/1000,  150/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x63)], # wheel
+			[1, 20/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x64)], # wheel
+			[1, 95/1000,  225/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x65)], # wheel
+			[1, 20/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x66)], # wheel
+			[1, 95/1000,  300/1000, 35/1000, math.radians(0), math.radians(0), math.radians(-90) , str(0x67)], # wheel
+			[2, 178.43/1000, (77.5 + 0  )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x30)], # sensor
+			[2, 228.43/1000, (77.5 + 0  )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x32)], # sensor
+			[2, 178.43/1000, (77.5 + 40 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x34)], # sensor
+			[2, 228.43/1000, (77.5 + 40 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x36)], # sensor
+			[2, 178.43/1000, (77.5 + 80 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x38)], # sensor
+			[2, 228.43/1000, (77.5 + 80 )/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3A)], # sensor
+			[2, 178.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3C)], # sensor
+			[2, 228.43/1000, (77.5 + 120)/1000, 22.2/1000, 0, 0, math.radians(-90) , str(0x3E)], # sensor
+			[4, (325)/1000, (65 + 0*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 1*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 2*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 3*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 4*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 5*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 6*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[4, (325)/1000, (65 + 7*37.5)/1000 , 17/1000, math.radians(180), math.radians(0), math.radians(0), str(0x00)], #castor
+			[3, 400/1000, (106.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, (106.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 400/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
+			[3, 475/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)]  #jointA
 			],
 		"CABLE_CONTENTS":[] # no cables
 		}
@@ -269,4 +292,4 @@ def makeFile(location):
 
 
 if __name__ == "__main__":
-	makeFile()
+	makeFile("YRK")
