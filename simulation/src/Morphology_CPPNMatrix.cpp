@@ -8,7 +8,7 @@
 #include "simulatedER/coppelia_communication.hpp"
 
 #define ISCLUSTER 0
-#define ISROBOTSTATIC 1
+#define ISROBOTSTATIC 0
 
 using namespace are::sim;
 
