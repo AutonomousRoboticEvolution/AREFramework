@@ -190,7 +190,7 @@ void Visu::init(){
 }
 
 bool Visu::is_finish(){
-    return currentIndIndex == population.size() - 1;
+    return currentIndIndex >= population.size() - 1;
 }
 
 void Visu::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){

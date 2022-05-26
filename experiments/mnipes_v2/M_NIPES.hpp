@@ -2,6 +2,7 @@
 #define M_NIPES_HPP
 
 #include <functional>
+#include <boost/optional.hpp>
 
 #include "ARE/learning/controller_archive.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -12,8 +13,8 @@
 #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
-
-//TO DO find a way to flush the population
+#include "gradual_env.hpp"
+#include "boost/filesystem.hpp"
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
@@ -23,20 +24,27 @@ typedef enum task_t{
     OBSTACLES = 1,
     MULTI_TARGETS = 2,
     EXPLORATION = 3,
-    BARREL = 4
+    BARREL = 4,
+    GRADUAL = 5
 } task_t;
 
 typedef struct learner_t{
+
+    typedef std::shared_ptr<learner_t> ptr;
+
     learner_t(){}
     learner_t(const learner_t& l) :
         morph_genome(l.morph_genome),
-        ctrl_learner(l.ctrl_learner){}
-    learner_t(const NN2CPPNGenome &mg): morph_genome(mg){}
+        ctrl_learner(l.ctrl_learner),
+        undefined(false){}
+    learner_t(const NN2CPPNGenome &mg): morph_genome(mg), undefined(false){}
     NN2CPPNGenome morph_genome;
     CMAESLearner ctrl_learner;
+    bool undefined = true;
 } learner_t;
 
 typedef struct genome_t{
+    typedef std::shared_ptr<learner_t> ptr;
     genome_t(){}
     genome_t(const genome_t& g) :
         morph_genome(g.morph_genome),
@@ -44,16 +52,18 @@ typedef struct genome_t{
         objectives(g.objectives),
         age(g.age),
         trajectories(g.trajectories),
-        behavioral_descriptor(g.behavioral_descriptor){}
+        behavioral_descriptor(g.behavioral_descriptor),
+        nbr_eval(g.nbr_eval){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
     std::vector<double> rewards;
-    int age;
+    int age = -1;
     std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
+    int nbr_eval=0;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;
@@ -102,7 +112,8 @@ public:
         sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
-        descriptor_type(ind.descriptor_type)
+        descriptor_type(ind.descriptor_type),
+	init_position(ind.init_position)
     {}
 
     Individual::Ptr clone() override {
@@ -144,6 +155,9 @@ public:
         arch & descriptor_type;
         arch & copy_rewards;
         arch & drop_learning;
+        arch & current_gradual_scene;
+        arch & init_position;
+        arch & visited_zones;
     }
 
     std::string to_string() override;
@@ -168,7 +182,13 @@ public:
     const std::vector<double>& get_rewards(){return copy_rewards;}
     void compute_fitness();
 
+    void set_init_position(const std::vector<double>& ip){init_position = ip;}
+
     bool is_learning_dropped(){return drop_learning;}
+
+    void incr_gradual_scene(){current_gradual_scene++;}
+    int get_current_gradual_scene(){return current_gradual_scene;}
+    void set_current_gradual_scene(int cgs){current_gradual_scene = cgs;}
 
 private:
     void createMorphology() override;
@@ -188,6 +208,7 @@ private:
     std::vector<std::vector<waypoint>> trajectories;
     double sim_time;
     std::vector<double> final_position;
+    std::vector<double> init_position;
     int nbr_dropped_eval = 0;
 
     ControllerArchive controller_archive;
@@ -197,6 +218,7 @@ private:
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
     bool drop_learning = false;
+    int current_gradual_scene = 0;
 
 };
 
@@ -229,7 +251,8 @@ public:
 
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
-        if(simulator_side)
+        int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
+        if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
@@ -242,18 +265,23 @@ public:
 
     size_t get_pop_size() const override {return corr_indexes.size();}
 
-    genome_t &find_gene(int id);
-    learner_t &find_learner(int id);
+    boost::optional<genome_t&> find_gene(int id);
+    boost::optional<learner_t&> find_learner(int id);
 
 private:
 
     void init_new_learner(CMAESLearner &learner, const int wheel_nbr, int joint_nbr, int sensor_nbr);
     void init_new_ctrl_pop(learner_t &gene);
+    void push_back_remaining_ctrl(learner_t &gene);
     void remove_oldest_gene();
     void remove_learner(int id);
     void increment_age();
     void clean_learning_pool();
     void reproduction();
+
+    void incr_gradual_scene();
+
+    void bootstrap_evolution(const std::string &folder);
 
     std::vector<int> corr_indexes;
 
@@ -271,6 +299,11 @@ private:
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
     bool is_multi_target = false;
+
+    //attribute for gradual tasks
+    int nbr_of_successful_solution = 0;
+    int current_gradual_scene = 0;
+    std::vector<sim::GradualEnvironment::env_t> environments_info;
 };
 
 

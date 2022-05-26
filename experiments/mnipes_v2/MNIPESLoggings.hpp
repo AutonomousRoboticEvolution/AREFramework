@@ -40,6 +40,14 @@ public:
     void loadLog(const std::string &file = std::string()) override{}
 };
 
+class GenomesPoolLog : public Logging
+{
+public:
+    GenomesPoolLog(const std::string &file) : Logging(file, false){}
+    void saveLog(EA::Ptr &ea) override;
+    void loadLog(const std::string &file = std::string()) override{}
+};
+
 }//are
 
 #endif //CMAES_LOGGINGS_H

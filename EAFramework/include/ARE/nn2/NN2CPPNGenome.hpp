@@ -183,7 +183,7 @@ private:
     nn2_cppn_t cppn;
     CartDesc cart_desc;
     OrganPositionDesc organ_position_desc;
-    int generation;
+    int generation=0;
     std::vector<std::vector<double>> matrix_4d;
 };
 

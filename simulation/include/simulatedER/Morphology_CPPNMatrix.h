@@ -23,7 +23,9 @@ namespace sim {
 class Morphology_CPPNMatrix : public Morphology
 {
 public:
-    Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){}
+    Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){
+        matrix_4d.resize(0);
+    }
     Morphology_CPPNMatrix(const Morphology_CPPNMatrix& mcm): Morphology(mcm),
         use_neat(mcm.use_neat),
         cppn(mcm.cppn),

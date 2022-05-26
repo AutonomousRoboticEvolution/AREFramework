@@ -73,6 +73,10 @@ public:
 
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases){
         nn = nn_t(nb_input,nb_hidden,nb_output);
+        if(nn.get_nb_connections() != weights.size() || nn.get_nb_neurons() != biases.size()){
+            std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            return;
+        }
         nn.set_all_weights(weights);
         nn.set_all_biases(biases);
         nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
@@ -80,6 +84,10 @@ public:
     }
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
         nn = nn_t(nb_input,nb_hidden,nb_output, joint_subs);
+        if(nn.get_nb_connections() != weights.size() || nn.get_nb_neurons() != biases.size()){
+            std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            return;
+        }
         nn.set_all_weights(weights);
         nn.set_all_biases(biases);
         nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));

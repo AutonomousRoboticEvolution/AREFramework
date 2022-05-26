@@ -47,6 +47,10 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         int i = 0;
         for(const auto &traj: genome.trajectories)
         {
+            if(traj.empty()){
+                i++;
+                continue;
+            }
             std::stringstream traj_filepath;
             traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id() << "_" << i;
             std::ofstream tofs(traj_filepath.str());
@@ -75,10 +79,22 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << id << ",";
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
-    for(const double& obj: genome.rewards)
-        fitness_file_stream << obj << ",";
+    fitness_file_stream << genome.nbr_eval;
+    if(!genome.rewards.empty()){
+        fitness_file_stream << "," << genome.rewards.front();
+        for(size_t i = 1; i < genome.rewards.size(); i++)
+            fitness_file_stream << "," << genome.rewards[i];
+    }
     fitness_file_stream << "\n";
+    fitness_file_stream.close();
     //-
+
+    //Log the id and the total number of evaluations in the whole evolution used before finishing the training of this robot
+    std::ofstream neofs;
+    if(!openOLogFile(neofs,"/number_of_evaluations.csv"))
+        return;
+    neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
+    neofs.close();
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
@@ -128,4 +144,18 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
     logFileStream << static_cast<M_NIPES*>(ea.get())->get_controller_archive_obj().to_string();
     logFileStream.close();
 
+}
+
+void GenomesPoolLog::saveLog(EA::Ptr &ea){
+    const std::vector<genome_t>& genomes = static_cast<M_NIPES*>(ea.get())->get_gene_pool();
+    if(genomes.empty())
+        return;
+    std::ofstream ofs;
+    if(!openOLogFile(ofs))
+        return;
+    ofs << genomes.front().morph_genome.id();
+    for(size_t i = 1; i < genomes.size(); i++)
+        ofs << "," << genomes.at(i).morph_genome.id();
+    ofs << std::endl;
+    ofs.close();
 }

@@ -73,7 +73,7 @@ public:
         std::vector<size_t> a1 = shuffle();
         std::vector<size_t> a2 = shuffle();
 
-        //Fill indexes 4 vy 4
+        //Fill indexes 4 by 4
         std::vector<size_t> indexes(
                 [&]() -> std::vector<size_t> {
                     std::vector<size_t> v;
@@ -128,7 +128,6 @@ public:
             parents.insert(parents.end(),front[i].begin(),front[i].end());
             i++;
         }
-
 
         if(compute_crowd_distance)
             crowding_distance(i);

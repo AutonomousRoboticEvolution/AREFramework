@@ -81,9 +81,6 @@ void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
 
-    if(indToEval.empty())
-        return;
-
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
     if(eval_order == EvalOrder::FIFO){
         //First in Last out
@@ -131,7 +128,13 @@ void ER::endOfSimulation(int slaveIndex){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
-    currentIndVec[slaveIndex]->from_string(message);
+    try{
+        currentIndVec[slaveIndex]->from_string(message);
+    }catch(boost::archive::archive_exception& e){
+        std::cerr << e.what() << std::endl;
+        return;
+    }
+
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
 
     if(verbose)
@@ -211,8 +214,9 @@ bool ER::updateSimulation()
                 std::cerr << "An error happened on the server side" << std::endl;
             }
             else if(state == READY && indToEval.empty()){
-                continue;
-//                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+               
+                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
+	        continue;	
             }
             else{
 //                std::cerr << "state value unknown : " << state << std::endl
