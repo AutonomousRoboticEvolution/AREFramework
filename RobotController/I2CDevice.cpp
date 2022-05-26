@@ -1,5 +1,5 @@
 #include "I2CDevice.hpp"
-#define DEBUG_PRINT true
+#define DEBUG_PRINT false
 
 //devAddress must be the 7-bit version, omitting the R/W bit (LSB)
 I2CDevice::I2CDevice(uint8_t address) {
@@ -58,7 +58,9 @@ int I2CDevice::read8() {
 //8-bit read from specific register
 int I2CDevice::read8From(uint8_t subAddress) {
 	//Attempt to read from the device, report if error
-	int rxData = wiringPiI2CReadReg8(devHandle, subAddress);
+    write8(subAddress);
+    int rxData = read8();
+    //int rxData = wiringPiI2CReadReg8(devHandle, subAddress);
 	if(rxData < 0) {
 		if(DEBUG_PRINT) printf("[I2CDevice 0x%02X] 8-bit read failed: %s\n", devAddress, strerror(errno));
 	}
