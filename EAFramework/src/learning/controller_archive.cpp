@@ -82,6 +82,8 @@ void ControllerArchive::from_file(const std::string& ctrl_arch_file){
         }else if(state == 1){
             std::stringstream sstr;
             sstr << elt << std::endl;
+            std::getline(stream,elt);
+            sstr << elt << std::endl;
             nbr_weights = std::stoi(elt);
             std::getline(stream,elt);
             sstr << elt << std::endl;
