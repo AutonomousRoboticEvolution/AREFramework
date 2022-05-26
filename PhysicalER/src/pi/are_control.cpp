@@ -52,11 +52,12 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             break;
 
         case 3: //leg - made up of two joints
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Setting up a leg, addresses: "<<addressValue <<" and "<< std::stoi(addressValue)+1 <<std::endl;
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("Setting up a leg, addresses: 0x%02X and 0x%02X\n", std::stoi(addressValue), std::stoi(addressValue)+1);
 
             // proximal joint of this leg:
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
-            static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the curre
+            daughterBoards->turnOn( findDaughterBoardForOrgan(listOfOrgans.back()) ) ; // turn on the correct daughterboard
+            static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the current limit
 
             // distal joint of this leg:
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
@@ -77,23 +78,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     //loop through each organ and work out which daughter board it is connected to:
     if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Finding daughterboards for each organ..."<<std::endl;
     for (auto thisOrgan : listOfOrgans) {
-        daughterBoards->turnOn(LEFT);
-        if (thisOrgan->testConnection()){
-            // is on LEFT
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"organ on LEFT daughter board"<<std::endl;
-            thisOrgan->daughterBoardToEnable=LEFT;
-        }else{
-            daughterBoards->turnOn(RIGHT);
-            if (thisOrgan->testConnection()){
-                //is on RIGHT
-                if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"organ on RIGHT daughter board"<<std::endl;
-                thisOrgan->daughterBoardToEnable=RIGHT;
-            } else{
-                // is not on either - this is bad!
-                if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"WARNING cannot find organ on either daughter board"<<std::endl;
-                thisOrgan->daughterBoardToEnable=NONE;
-            }
-        }
+        findDaughterBoardForOrgan(thisOrgan);
     }
 
     // initialise the Head LEDs
@@ -125,6 +110,29 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     }
 
     if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<< "starting main loop:"<< std::endl;
+}
+
+boardSelection AREControl::findDaughterBoardForOrgan(Organ* thisOrgan){
+    daughterBoards->turnOn(LEFT);
+    if (thisOrgan->testConnection()){
+        // is on LEFT
+        if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("Organ 0x%02X in LEFT daughter board\n", thisOrgan->getI2CAddress());
+        thisOrgan->daughterBoardToEnable=LEFT;
+        return LEFT;
+    }else{
+        daughterBoards->turnOn(RIGHT);
+        if (thisOrgan->testConnection()){
+            //is on RIGHT
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("Organ 0x%02X in RIGHT daughter board\n", thisOrgan->getI2CAddress());
+            thisOrgan->daughterBoardToEnable=RIGHT;
+            return RIGHT;
+        } else{
+            // is not on either - this is bad!
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("WARNING cannot find organ 0x%02X on either daughter board\n", thisOrgan->getI2CAddress());
+            thisOrgan->daughterBoardToEnable=NONE;
+            throw std::runtime_error("cannot find an organ on either daughter board");
+        }
+    }
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
@@ -174,13 +182,26 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
 }
 
 bool AREControl::testAllOrganConnections(){
-    bool allOK = true;
+    bool anyFailed = false;
     for (auto thisOrgan : listOfOrgans) {
-        if (!thisOrgan->testConnection()){
-            allOK=false;
-            std::cout<<"WARNING: LOST CONNECTION TO ORGAN 0x"<<std::hex<<thisOrgan->devAddress<<std::endl;
+        daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+        int retries = 0;
+        bool has_passed=false;
+        while (!has_passed and retries<10){
+            has_passed = thisOrgan->testConnection();
+            if (!has_passed){
+                usleep(100 + (rand() % 100) );
+                retries++;
+            }
         }
+
+        if(!has_passed){
+            printf("WARNING: LOST CONNECTION TO ORGAN 0x%02X\n", thisOrgan->getI2CAddress());
+            anyFailed=true;
+        }
+        else if (retries>0) printf("WARNING: Organ 0x%02X took %i retries\n", thisOrgan->getI2CAddress(), retries);
     }
+    return anyFailed;
 }
 
 void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
@@ -258,6 +279,7 @@ int AREControl::exec(zmq::socket_t& socket){
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
 
+    // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
         // start a new line of log file, and add current time
         logs_to_send<<"\n"<<this_loop_start_time-start_time<<",";
@@ -271,9 +293,9 @@ int AREControl::exec(zmq::socket_t& socket){
         nn_outputs = controller.get_ouputs();
 
         // send the new values to the actuators
-        sendOutputOrganCommands(nn_outputs, this_loop_start_time);
+        sendOutputOrganCommands(nn_outputs, this_loop_start_time-start_time);
 
-        // set the LED brightnesses for human visualisation (for debugging) - note you need to add #debugDisplayOnPi,bool,1 to the parameters file
+        // turn on the green LED when the aruco tag is seen (for debugging) - note you need to add #debugLEDsOnPi,bool,1 to the parameters file
         if (debugLEDsOnPi){setLedDebugging(sensor_values,nn_outputs);}
 
         // the are-update running on the PC expects to get a message on every timestep:
@@ -283,6 +305,7 @@ int AREControl::exec(zmq::socket_t& socket){
         if (testAllOrganConnections()){
             // something has failed! :(
             stop_early=true; // stop the evaluation now
+            std::cout<<"WARNING: stopping early due to organ connection failure"<<std::endl;
         }
 
         // update timestep value ready for next loop
@@ -300,6 +323,8 @@ int AREControl::exec(zmq::socket_t& socket){
         }
 
     }
+
+    std::cout<<"time: "<<this_loop_start_time-start_time<<std::endl;
 
     // turn everything off
     for (auto thisOrgan : listOfOrgans) {

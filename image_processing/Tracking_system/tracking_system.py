@@ -14,7 +14,7 @@ class TrackingSystem:
 
     def __init__(self):
         # set parameters
-        self.show_frames = True
+        self.show_frames = False
 
         #set up zmq
         context = zmq.Context()
@@ -148,7 +148,7 @@ class TrackingSystem:
 
                 if self.show_frames:
                     cv2.imshow("Image", image)
-                    print("Image size: {}".format(self.uncropped_image.shape))
+                    #print("Image size: {}".format(self.uncropped_image.shape))
                 cv2.imshow("Uncropped", self.uncropped_image )
                 cv2.waitKey(1)
             else:
