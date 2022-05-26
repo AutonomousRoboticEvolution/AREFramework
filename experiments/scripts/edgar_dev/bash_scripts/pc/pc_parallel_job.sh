@@ -1,5 +1,5 @@
 #!/bin/bash
-EXPERIMENT="nipes_multitarget"
+EXPERIMENT="mnipes_v2_protomatrix"
 PCNAME="ebb505/ARE_Project"
 echo "$EXPERIMENT"
 echo "$PCNAME"

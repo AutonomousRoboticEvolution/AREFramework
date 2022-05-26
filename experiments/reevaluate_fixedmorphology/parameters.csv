@@ -27,9 +27,9 @@
 #NbrOutputNeurones,int,8
 #NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
-#folderToLoad,string,nipes_multitarget_23_4_14-32-22-2864-679214293
-#genToLoad,int,78
-#indToLoad,int,0
+#folderToLoad,string,nipes_multitarget_25_4_16-0-33-3381-2710062919
+#genToLoad,int,333
+#indToLoad,int,15
 #genType,int,2
 #maxVelocity,double,10.
 #nbrWaypoints,int,2
@@ -41,4 +41,4 @@
 #energyCostFile,string,energy_cost.csv
 #simTimeFile,string,sim_time.csv
 #jointControllerType,int,2
-#targetPosition,sequence_double,0.75;0.75;0.2
+#targetPosition,sequence_double,-0.75;-0.75;0.2
