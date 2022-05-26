@@ -88,6 +88,7 @@ private:
     /** * @return false if all the organs are OK, true if any fail the testConnection test
     /** */
     bool testAllOrganConnections();
+    boardSelection findDaughterBoardForOrgan(Organ *thisOrgan);
 };
 
 }//pi
