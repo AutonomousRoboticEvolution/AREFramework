@@ -53,7 +53,8 @@ public:
 
     void addObjective(double obj){objectives.push_back(obj);}
 
-    void crossover(const Individual::Ptr &partner, Individual& child1, Individual& child2) override;
+    void crossover(const Individual::Ptr &partner, Individual& child) override;
+    void symmetrical_crossover(const Individual::Ptr &partner, Individual& child1, Individual& child2) override;
 
     std::string to_string();
     void from_string(const std::string&);

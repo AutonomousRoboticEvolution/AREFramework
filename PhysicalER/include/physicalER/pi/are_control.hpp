@@ -63,14 +63,14 @@ private:
         @param time_millis the current time in milliseconds
         Each value should generally be between -1.0 and 1.0
     */
-    void sendOutputOrganCommands(std::vector<double> &values, uint32_t time_millis);
+    void sendOutputOrganCommands(const std::vector<double> &values, uint32_t time_millis);
 
     /**
         @brief retrieveSensorValues get the values from each of the robot's sensors
         @param sensor_vals a vector of the inputs for the controller, to be populated.
         Each value will generally be between 0.0 and 1.0
     */
-    void retrieveSensorValues(std::vector<double> &sensor_vals);
+    void retrieveSensorValues(const std::vector<double> &sensor_vals);
 
     /**
      * @brief setLedDebugging sets the LEDs in the Head to show something about what is happening, to help a human to understand and debug problems
@@ -80,7 +80,7 @@ private:
      * @param nn_inputs
      * @param nn_outputs
      */
-    void setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs);
+    void setLedDebugging(const std::vector<double> &nn_inputs,std::vector<double> &nn_outputs);
 };
 
 }//pi

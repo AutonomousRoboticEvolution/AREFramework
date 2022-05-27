@@ -83,10 +83,7 @@ public:
         type = "protomatrix_genome";
         parents_ids= std::vector<int>(2,-1);
     }
-//    ProtomatrixGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
-//        _id = static_id++;
-//        _id = protomatrix_id++;
-//    }
+
     ProtomatrixGenome(const std::vector<std::vector<double>> &m4d) : matrix_4d(m4d){
         _id = protomatrix_id++;
     }
@@ -103,12 +100,9 @@ public:
 
     }
 
-    void fixed_structure(){
-//        cppn.build_fixed_structure();
-    }
+
 
     void random(){
-//        cppn.random();
         if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value) {
             matrix_4d = protomatrix::random_matrix(matrix_4d);
         }
@@ -126,20 +120,17 @@ public:
         matrix_4d = protomatrix::mutate_matrix(matrix_4d);
     }
 
-    void crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override {
-//        are::nn2_cppn_t cppn_child1, cppn_child2;
-//        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<ProtomatrixGenome>(partner)->get_cppn();
-//        cppn.crossover(cppn_partner,cppn_child1);
-//        cppn_partner.crossover(cppn,cppn_child2);
-//        *child1 = ProtomatrixGenome(cppn_child1);
-//        *child2 = ProtomatrixGenome(cppn_child2);
-//        child1->set_parameters(parameters);
-//        child2->set_parameters(parameters);
-//        child1->set_randNum(randomNum);
-//        child2->set_randNum(randomNum);
-//        std::dynamic_pointer_cast<ProtomatrixGenome>(child1)->set_parents_ids({_id,partner->id()});
-//        std::dynamic_pointer_cast<ProtomatrixGenome>(child2)->set_parents_ids({_id,partner->id()});
+    void crossover(const Genome::Ptr &partner, Genome::Ptr child) override {
+        std::vector<std::vector<double>> matrix_child;
+        std::vector<std::vector<double>> matrix_partner = std::dynamic_pointer_cast<ProtomatrixGenome>(partner)->get_matrix_4d();
+        matrix_child = protomatrix::crossover_matrix(matrix_partner,matrix_4d);
+        *child = ProtomatrixGenome(matrix_child);
+        child->set_parameters(parameters);
+        child->set_randNum(randomNum);
+        std::dynamic_pointer_cast<ProtomatrixGenome>(child)->set_parents_ids({_id,partner->id()});
+    }
 
+    void symmetrical_crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override{
         std::vector<std::vector<double>> matrix_child1, matrix_child2;
         std::vector<std::vector<double>> matrix_partner = std::dynamic_pointer_cast<ProtomatrixGenome>(partner)->get_matrix_4d();
         matrix_child1 = protomatrix::crossover_matrix(matrix_partner,matrix_4d);

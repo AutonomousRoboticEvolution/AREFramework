@@ -29,16 +29,18 @@ void MNIPES::init(){
 
 void MNIPES::init_random_pop(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
     for(int i = 0; i < pop_size; i++){
         //create a new morph genome with random structure and parameters
-        NN2CPPNGenome new_morph_gene;
-        new_morph_gene.random();
-        new_morph_gene.set_parameters(parameters);
-        new_morph_gene.set_randNum(randomNum);
-        //-
-
+        Genome::Ptr morph_genome;
+        if(genome_type == CPPN)
+            morph_genome.reset(new NN2CPPNGenome);
+        else
+            morph_genome.reset(new ProtomatrixGenome);
+        morph_genome->random();
+        morph_genome->set_parameters(parameters);
+        morph_genome->set_randNum(randomNum);
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
-        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
         PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
         ind->set_parameters(parameters);
@@ -169,7 +171,7 @@ void MNIPES::_reproduction(){
         genome_ids.push_back(elt.first);
 
     auto random_selection = [&](std::vector<int> ids, int size) -> std::vector<int>{
-            std::vector<int> random_indexes;
+        std::vector<int> random_indexes;
         if(ids.size() < size){
             for(int i = 0; i < ids.size();i++)
             random_indexes.push_back(i);
@@ -204,13 +206,15 @@ void MNIPES::_reproduction(){
             return best_id;
     };
 
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
 
     for(int i = 0; i < nbr_of_offsprings; i++){
-        NN2CPPNGenome new_morph_gene;
+        Genome::Ptr new_morph_gene;
         /** CROSSBREEDING **\
          * 1 - Check if crossbreeding should be activated
          * 2 - Select individual from robot library to be crossbreed
          * 3 - pairing
+         * TODO : extract protomatrix from cppn genome
          */
         Crossbreeding crossbreeding(parameters,randomNum);
         if(crossbreeding.should_crossbreed(morph_genomes_info)){
@@ -227,27 +231,28 @@ void MNIPES::_reproduction(){
             nn2_cppn_t new_cppn;
             rl_parent.crossover(parent,new_cppn);
 
-            new_morph_gene = morph_genomes[best_id];
-            new_morph_gene.set_cppn(new_cppn);
+            robot_lib_genomes[rl_id].crossover(std::make_shared<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
+
            // new_morph_gene.mutate(); //mutate?
-            new_morph_gene.incr_generation();
-            new_morph_gene.set_parameters(parameters);
-            new_morph_gene.set_randNum(randomNum);
+            new_morph_gene->incr_generation();
+            new_morph_gene->set_parameters(parameters);
+            new_morph_gene->set_randNum(randomNum);
         }
         else{//without crossbreeding
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
             int best_id = best_of_subset(random_indexes);
-            new_morph_gene = morph_genomes[best_id];
-            new_morph_gene.mutate();
-            new_morph_gene.incr_generation();
-            new_morph_gene.set_parameters(parameters);
-            new_morph_gene.set_randNum(randomNum);
+            if(genome_type == CPPN)
+                new_morph_gene.reset(new NN2CPPNGenome(morph_genomes[best_id]));
+            else new_morph_gene.reset(new ProtomatrixGenome(morph_genomes[best_id]));
+            new_morph_gene->mutate();
+            new_morph_gene->incr_generation();
+            new_morph_gene->set_parameters(parameters);
+            new_morph_gene->set_randNum(randomNum);
         }
 
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
-        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
-        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        PMEIndividual::Ptr ind(new PMEIndividual(new_morph_gene,ctrl_genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -347,6 +352,7 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
 void MNIPES::load_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
 
 
     ioh::MorphGenomeInfoMap morph_gen_info;
@@ -364,7 +370,9 @@ void MNIPES::load_data_for_generate(){
      * 2) load this robot and add it to the building queue
      */
 
-    ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
+    if(GenomeType == CPPN)
+        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
+    sle ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
 
 }
 
@@ -392,6 +400,8 @@ void MNIPES::load_data_for_update() {
 }
 
 void MNIPES::write_data_for_update(){
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
         if(!learner.second.is_learning_finish())
@@ -399,8 +409,10 @@ void MNIPES::write_data_for_update(){
         std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
         std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-        std::map<int,NN2CPPNGenome> gen;
-        ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+        std::map<int,Genome::Ptr> gen;
+        if(genome_type == CPPN)
+            ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+        else ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
         ioh::MorphGenomeInfo morph_info;
         morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));

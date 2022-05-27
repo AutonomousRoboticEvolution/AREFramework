@@ -128,7 +128,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
-void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t time_milli){
+void AREControl::sendOutputOrganCommands(const std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
     int i=0; // index of the organ being considered (in listOfOrgans)
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
@@ -168,7 +168,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
     std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
 
-void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
+void AREControl::retrieveSensorValues(const std::vector<double> &sensor_vals){
     // loop through each sensor and get it's time-of-flight value, then loop through again for the IR values
     sensor_vals.clear();
     sensor_vals = {};
@@ -214,7 +214,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     std::copy(sensor_vals.begin(), sensor_vals.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
 
-void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
+void AREControl::setLedDebugging(const std::vector<double> &nn_inputs,const std::vector<double> &nn_outputs){
     if (!cameraInputToNN) return; // without aruco tag input, this debugging LED output wouldn't make any sense
     // compute brightness between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
     if (nn_inputs.back()>0){ // camera reading is the last NN input

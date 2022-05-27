@@ -99,7 +99,8 @@ public:
 
     }
     void mutate() override;
-    void crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
+    void crossover(const Genome::Ptr &partner, Genome::Ptr child) override;
+    void symmetrical_crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
 
 
     void set_weights(const std::vector<double>& w){weights = w;}

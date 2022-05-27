@@ -91,8 +91,8 @@ public:
                 indPtr ind22 = tournament(parents[a2[idx+2]],parents[a2[i+3]]);
                 //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
                 indPtr child1(new individual_t(*ind11)) ,child2(new individual_t(*ind12)), child3(new individual_t(*ind21)), child4(new individual_t(*ind22));
-                std::dynamic_pointer_cast<individual_t>(ind11)->crossover(ind12,*child1,*child2);
-                std::dynamic_pointer_cast<individual_t>(ind21)->crossover(ind22,*child3,*child4);
+                std::dynamic_pointer_cast<individual_t>(ind11)->symmetrical_crossover(ind12,*child1,*child2);
+                std::dynamic_pointer_cast<individual_t>(ind21)->symmetrical_crossover(ind22,*child3,*child4);
                 childrens[idx] = child1;
                 childrens[idx+1] = child2;
                 childrens[idx+2] = child3;

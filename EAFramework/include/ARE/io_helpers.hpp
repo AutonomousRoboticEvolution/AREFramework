@@ -48,7 +48,7 @@ template<class Genome>
  * @param genomes
  */
 void load_morph_genomes(const std::string &folder,
-                        const std::vector<int> &list_to_load, std::map<int,Genome>& genomes){
+                        const std::vector<int> &list_to_load, std::map<int,std::shared_ptr<Genome>>& genomes){
 
     std::string filepath, filename;
     std::list<std::string> split_str;
@@ -71,8 +71,8 @@ void load_morph_genomes(const std::string &folder,
         if(!load)
             continue;
 
-        Genome genome;
-        genome.from_string(filepath);
+        std::shared_ptr<Genome> genome(new Genome);
+        genome->from_string(filepath);
         genomes.emplace(id,genome);
     }
 

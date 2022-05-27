@@ -14,8 +14,14 @@
 #include "cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
 #include "ARE/crossbreeding.hpp"
+#include "common/ProtomatrixGenome.hpp"
 
 namespace are{
+
+typedef enum GenomeType{
+    CPPN = 0,
+    PROTOMATRIX = 1
+} GenomeType;
 
 class PMEIndividual : public Individual
 {
@@ -90,8 +96,8 @@ public:
     const NNParamGenome &get_best_current_ctrl_genome() const {return best_current_ctrl_genome;}
 private:
     std::vector<std::pair<int,int>> ids;
-    std::map<int,NN2CPPNGenome> morph_genomes;
-    std::map<int,NN2CPPNGenome> xmigrator_genomes; //genomes from simulation to be directly introduced in physical population
+    std::map<int,Genome::Ptr> morph_genomes;
+    std::map<int,Genome::Ptr> xmigrator_genomes; //genomes from simulation to be directly introduced in physical population
     std::map<int,CMAESLearner> learners;
     std::vector<waypoint> trajectory;
     std::vector<double> objectives;
