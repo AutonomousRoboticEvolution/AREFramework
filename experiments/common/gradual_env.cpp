@@ -3,6 +3,15 @@
 
 using namespace are::sim;
 
+std::string GradualEnvironment::fitness_fcts_name(fitness_fcts ff){
+    if(ff == EXPLORATION)
+        return "exploration";
+    else if(ff == TARGET)
+        return "target";
+    else if(ff == FORAGING)
+        return "foraging";
+}
+
 GradualEnvironment::GradualEnvironment(const settings::ParametersMapPtr& params)
 {
     parameters = params;

@@ -27,6 +27,8 @@ public:
         FORAGING
     } fitness_fcts;
 
+    static std::string fitness_fcts_name(fitness_fcts ff);
+
     typedef struct env_t{
         std::string scene_path;
         std::vector<double> init_position;

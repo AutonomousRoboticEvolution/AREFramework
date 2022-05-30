@@ -48,6 +48,16 @@ public:
     void loadLog(const std::string &file = std::string()) override{}
 };
 
+
+class BestGenomesArchiveLog : public Logging
+{
+public:
+    BestGenomesArchiveLog(const std::string &file) : Logging(file, false){}
+    void saveLog(EA::Ptr &ea) override;
+    void loadLog(const std::string &file = std::string()) override{}
+};
+
+
 }//are
 
 #endif //CMAES_LOGGINGS_H
