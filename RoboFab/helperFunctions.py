@@ -6,7 +6,7 @@ import numpy as np
 import time
 
 DEBUG_PRINT = True
-DEBUG_PRINT_VERBOSITY_LEVEL = 0 #higher value will mean more stuff gets spewed to command line.
+DEBUG_PRINT_VERBOSITY_LEVEL = 1 #higher value will mean more stuff gets spewed to command line.
 READ_OUT_VERBOSITY_LEVEL = -1 #higher value will mean more stuff gets read out by the computerised voice
 
 ## Prints its input string.
