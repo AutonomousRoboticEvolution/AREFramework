@@ -104,7 +104,7 @@ public:
 
     void random(){
         if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value) {
-            matrix_4d = protomatrix::random_matrix(matrix_4d);
+            protomatrix::random_matrix(matrix_4d);
         }
         else{
             std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;

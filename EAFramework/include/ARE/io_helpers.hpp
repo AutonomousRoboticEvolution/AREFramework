@@ -39,7 +39,7 @@ bool move_file(const std::string& origin, const std::string& dest);
  */
 void load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap& morph_gen_info);
 
-template<class Genome>
+template<class genome_t>
 /**
  * @brief load the morphological genomes meeting the condition
  * @param folder
@@ -48,7 +48,7 @@ template<class Genome>
  * @param genomes
  */
 void load_morph_genomes(const std::string &folder,
-                        const std::vector<int> &list_to_load, std::map<int,std::shared_ptr<Genome>>& genomes){
+                        const std::vector<int> &list_to_load, std::map<int,are::Genome::Ptr>& genomes){
 
     std::string filepath, filename;
     std::list<std::string> split_str;
@@ -71,8 +71,8 @@ void load_morph_genomes(const std::string &folder,
         if(!load)
             continue;
 
-        std::shared_ptr<Genome> genome(new Genome);
-        genome->from_string(filepath);
+        std::shared_ptr<genome_t> genome(new genome_t);
+        genome->from_file(filepath);
         genomes.emplace(id,genome);
     }
 

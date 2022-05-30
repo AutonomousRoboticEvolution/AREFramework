@@ -14,7 +14,7 @@
 #include "cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
 #include "ARE/crossbreeding.hpp"
-#include "common/ProtomatrixGenome.hpp"
+#include "ProtomatrixGenome.hpp"
 
 namespace are{
 

@@ -52,10 +52,11 @@ def run_client(args):
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ],stdout=logfile,stderr=logfile)
+    ])#,stdout=logfile,stderr=logfile)
 
 
 def wait(servers, client, timeout=None):
+    print("WAIT")
     for i, server in enumerate(servers):
         ret = server[0].wait(timeout=timeout)
         print(f'v-rep rank {i} finished with code {ret}')
@@ -66,19 +67,21 @@ def wait(servers, client, timeout=None):
 def poll(servers):
     for i in range(len(servers)):
         ret = servers[i][0].poll()
-        if(ret != None):
+        if(ret is not None):
             print(f'Restarting server rank {i}') 
             servers[i][0] = subprocess.Popen(servers[i][0].args,stdout=servers[i][1],stderr=servers[i][1])
 
 
 def kill(servers, client):
+    print("KILL")
     processes = []
     for s in servers:
         processes.append(s[0])
-    if not (client is None):
+    if client is not None:
         processes += [client]
     for p in processes:
-        p.stdout.close()
+        if p.stdout is not None:
+            p.stdout.close()
         p.terminate()
     try:
         wait(servers, client, timeout=30)
@@ -90,7 +93,6 @@ def kill(servers, client):
 
 
 def main():
-
     servers = []
     client = None
     try:
@@ -109,9 +111,10 @@ def main():
 
     finally:
         try:
-            while(client.poll() == None):
+            while(client.poll() is None):
                 poll(servers)
                 time.sleep(0.1)
+            kill(servers, client)
             wait(servers, client)
         except KeyboardInterrupt:
             kill(servers, client)

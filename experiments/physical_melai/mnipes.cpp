@@ -218,7 +218,7 @@ void MNIPES::_reproduction(){
          */
         Crossbreeding crossbreeding(parameters,randomNum);
         if(crossbreeding.should_crossbreed(morph_genomes_info)){
-            std::map<int,NN2CPPNGenome> robot_lib_genomes;
+            std::map<int,Genome::Ptr> robot_lib_genomes;
             crossbreeding.selection(tournament_size,robot_lib_genomes);
             std::vector<int> rl_genome_ids;
             for(const auto &elt: robot_lib_genomes)
@@ -226,15 +226,21 @@ void MNIPES::_reproduction(){
             std::vector<int> ri_genomes = random_selection(genome_ids,tournament_size);
             int rl_id = rl_genome_ids[random_selection(rl_genome_ids,1).back()];
             int best_id = best_of_subset(ri_genomes);
-            nn2_cppn_t rl_parent = robot_lib_genomes[rl_id].get_cppn();
-            nn2_cppn_t parent = morph_genomes[best_id].get_cppn();
-            nn2_cppn_t new_cppn;
-            rl_parent.crossover(parent,new_cppn);
-
-            robot_lib_genomes[rl_id].crossover(std::make_shared<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
-
+//            nn2_cppn_t rl_parent = robot_lib_genomes[rl_id].get_cppn();
+//            nn2_cppn_t parent = morph_genomes[best_id].get_cppn();
+//            nn2_cppn_t new_cppn;
+//            rl_parent.crossover(parent,new_cppn);
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->crossover(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
+            else{
+                auto matrix = protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn());
+                auto child_matrix = protomatrix::crossover_matrix(matrix,std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id])->get_matrix_4d());
+                std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->set_matrix_4d(child_matrix);
+            }
            // new_morph_gene.mutate(); //mutate?
-            new_morph_gene->incr_generation();
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
+            else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
         }
@@ -242,10 +248,12 @@ void MNIPES::_reproduction(){
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
             int best_id = best_of_subset(random_indexes);
             if(genome_type == CPPN)
-                new_morph_gene.reset(new NN2CPPNGenome(morph_genomes[best_id]));
-            else new_morph_gene.reset(new ProtomatrixGenome(morph_genomes[best_id]));
+                new_morph_gene.reset(new NN2CPPNGenome(*(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]).get())));
+            else new_morph_gene.reset(new ProtomatrixGenome(*(std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id]).get())));
             new_morph_gene->mutate();
-            new_morph_gene->incr_generation();
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
+            else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
         }
@@ -370,9 +378,9 @@ void MNIPES::load_data_for_generate(){
      * 2) load this robot and add it to the building queue
      */
 
-    if(GenomeType == CPPN)
+    if(genome_type == CPPN)
         ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
-    sle ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
+    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
 
 }
 
@@ -409,12 +417,19 @@ void MNIPES::write_data_for_update(){
         std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
         std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-        std::map<int,Genome::Ptr> gen;
-        if(genome_type == CPPN)
-            ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
-        else ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
         ioh::MorphGenomeInfo morph_info;
-        morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
+        std::map<int,Genome::Ptr> gen;
+        if(genome_type == CPPN){
+            ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+            morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<NN2CPPNGenome>(gen[learner.first])->get_generation()));
+        }
+
+        else{
+            ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+            morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<ProtomatrixGenome>(gen[learner.first])->get_generation()));
+        }
+
+
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }

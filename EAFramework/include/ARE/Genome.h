@@ -48,6 +48,8 @@ public:
         child2 = partner->clone();
     }
 
+    virtual void random(){}
+
     virtual std::string to_string() const = 0;
     virtual void from_string(const std::string&) = 0;
     virtual void from_file(const std::string&);
