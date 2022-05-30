@@ -1,11 +1,11 @@
 #experimentName,string,bodyplantesting_nn2
-#expPluginName,string,/usr/local/lib/libbodyplantesting_nn2.so
-#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting_nn2.so
+#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,100
 #maxEvalTime,float,1
 #numberOfGeneration,int,25
-#repository,string,/home/le_goff/are-logs
+#repository,string,/home/ebb505/ARE_Project/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
