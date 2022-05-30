@@ -1,16 +1,16 @@
 #experimentName,string,mnipes2
-#expPluginName,string,/usr/local/lib/libM_NIPES2.so
+#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libM_NIPES2.so
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,1
 #evaluationOrder,int,3
 #synchronicity,float,0.
 
-#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/le_goff/are-logs
+#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/ebb505/ARE_Project/are-logs
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
@@ -20,7 +20,7 @@
 
 #fitnessFile,string,fitnesses.csv
 
-#envType,int,5
+#envType,int,2
 #envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
 #scenes,sequence_string,shapes_exploration.ttt
 #arenaSize,double,2.
@@ -85,3 +85,4 @@
 #withTiles,bool,1
 #flatFloor,bool,1
 #energyReduction,bool,0
+#bootstrapFolder,string,None
