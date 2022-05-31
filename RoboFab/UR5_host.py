@@ -216,7 +216,13 @@ class UR5Robot:
         startingPostition = self.getCurrentPosition()
         self.sendString("print_bed_pull")
         finishPosition = self.getCurrentPosition()
-        return findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02
+        if findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02:
+            # has moved, so assume it has released from bed
+            return True
+        else:
+            # hasn't moved (much), so return to the starting position
+            self.moveArm(startingPostition)
+            return False
 
 
     ##  Handles receipt of messages from the UR5.
@@ -499,12 +505,10 @@ class UR5Robot:
         has_pulled_off_bed = False
         temperature_cooling_increment = 2 # degrees of cooling per pull attempt
 
-        # a catch for if the bed is already quite cool, we might not need to wait at all
-        if printer.getTemperatures()["bed_actual"] < 35:
-            if self.printBedPull(): has_pulled_off_bed=True
+        temperature_to_cool_to = 44
 
         while not has_pulled_off_bed:
-            temperature_to_cool_to = round(printer.getTemperatures()["bed_actual"],0) - temperature_cooling_increment
+            temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
             debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
             self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
             if temperature_to_cool_to<printer.defaultBedCooldownTemperature:

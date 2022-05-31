@@ -17,7 +17,7 @@ def makeFile(location):
 
 		LOG_FOLDER = "/home/robofab/are-logs/hardware_test/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
-		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+		SOFTWARE_PARAMETERS_FILE = "/home/robofab/parameters.csv"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
