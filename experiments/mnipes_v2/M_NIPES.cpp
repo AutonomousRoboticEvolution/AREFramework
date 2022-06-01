@@ -527,10 +527,13 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
 
-
-
                 int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
                 int nbr_biases = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_biases().size();
+                int nbr_inputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input();
+                int nbr_outputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output();
+                int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
+                int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
+
                 if(!best_controller.second.empty() && best_controller.second.size() == nbr_weights + nbr_biases){
                     weights.resize(nbr_weights);
                     for(size_t i = 0; i < nbr_weights; i++)
@@ -540,6 +543,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         biases[i-nbr_weights] = best_controller.second[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
+                    best_ctrl_gen.set_nbr_input(nbr_inputs);
+                    best_ctrl_gen.set_nbr_output(nbr_outputs);
+                    best_ctrl_gen.set_nbr_hidden(nbr_hidden);
+                    best_ctrl_gen.set_nn_type(nn_type);
                 }
                 //update the archive
                 if(use_ctrl_arch){
