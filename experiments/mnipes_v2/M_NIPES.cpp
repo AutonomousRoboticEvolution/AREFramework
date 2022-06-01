@@ -563,7 +563,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
                     if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || nbr_eval_current_task >= nbr_eval_per_task){
                         if(verbose)
-                            std::cout << "fitness: " << best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
+                            std::cout << "fitness: " << 1 - best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
                                       << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
                         nbr_of_successful_solution++;
                         new_gene.environment = environments_info[current_gradual_scene].scene_path;

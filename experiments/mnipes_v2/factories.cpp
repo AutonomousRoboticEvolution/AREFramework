@@ -46,6 +46,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::GenomesPoolLog::Ptr gplog(new are::GenomesPoolLog(gp_log_file));
     logs.push_back(gplog);
 
+    std::string bgi_log_file = are::settings::getParameter<are::settings::String>(param,"#bestGenomesInfoFile").value;
+    are::BestGenomesArchiveLog::Ptr bgilog(new are::BestGenomesArchiveLog(bgi_log_file));
+    logs.push_back(bgilog);
+
     bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
     if(use_ctrl_arch){
         are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());

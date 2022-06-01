@@ -58,18 +58,17 @@ void ER::initialize(){
 
 bool ER::execute()
 {
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
-    int tries = 0;
-    int pauseTime = 100; // milliseconds
 
+    bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
+    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    serverInstances = updateSimulatorList();
+    if(update_sim_list)
+        serverInstances = updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -213,10 +212,9 @@ bool ER::updateSimulation()
             {
                 std::cerr << "An error happened on the server side" << std::endl;
             }
-            else if(state == READY && indToEval.empty()){
-               
+            else if(state == READY && indToEval.empty()){                
                 std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
-	        continue;	
+                continue;
             }
             else{
 //                std::cerr << "state value unknown : " << state << std::endl
