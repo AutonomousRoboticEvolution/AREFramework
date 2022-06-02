@@ -58,7 +58,6 @@ void ER::initialize(){
 
 bool ER::execute()
 {
-
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
     bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
@@ -163,6 +162,7 @@ void ER::endOfSimulation(int slaveIndex){
 bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
     bool all_instances_finish = true;
     int state = IDLE;
 
@@ -228,6 +228,10 @@ bool ER::updateSimulation()
             }
         }
     }
+
+    bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
+    if(!wait_for_all_instances) all_instances_finish = true;
+
     if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
