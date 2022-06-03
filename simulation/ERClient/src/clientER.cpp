@@ -111,10 +111,15 @@ void ER::startOfSimulation(int slaveIndex){
         int rand_idx = dd(randNum->gen);
         int index = indToEval[rand_idx];
         currentIndVec[slaveIndex] = ea->getIndividual(index);
-        currentIndexVec[slaveIndex] = index;
+        if(currentIndVec[slaveIndex] == nullptr)
+            currentIndexVec[slaveIndex] = -1;
+        else
+            currentIndexVec[slaveIndex] = index;
         indToEval.erase(indToEval.begin()+rand_idx);
         indToEval.shrink_to_fit();
     }
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     currentIndVec[slaveIndex]->set_client_id(serverInstances[slaveIndex]->get_clientID());
     currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
@@ -123,6 +128,8 @@ void ER::startOfSimulation(int slaveIndex){
 }
 
 void ER::endOfSimulation(int slaveIndex){
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
