@@ -310,9 +310,13 @@ void M_NIPES::init_morph_pop(){
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
+    if(corr_indexes[currentIndIndex] < 0)
+        return true;
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(population[corr_indexes[currentIndIndex]]->get_ctrl_genome()->get_type() == "empty_genome")
         return true;
+
 
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[corr_indexes[currentIndIndex]]->get_morphology())->getMainHandle();
     float pos[3];
@@ -416,6 +420,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     clean_learning_pool();
+
+    if(corr_indexes[currentIndIndex] < 0)
+        return true;
 
     Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
