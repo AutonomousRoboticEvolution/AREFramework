@@ -238,8 +238,7 @@ bool ER::updateSimulation()
         ea->epoch();
         saveLogs();
         ea->init_next_pop();
-        for(int i = 0; i < ea->get_population().size(); i++)
-            indToEval.push_back(i);
+        ea->fill_ind_to_eval(indToEval);
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();

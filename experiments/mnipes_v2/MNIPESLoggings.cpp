@@ -42,7 +42,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         cofstr << genome.ctrl_genome.to_string();
         cofstr.close();
 
-        //If there is a ctrl genome there are a trajectory and a behavioural descriptor
+        //If there is a ctrl genome there is a trajectory and a behavioural descriptor
         //Log Trajectory
         int i = 0;
         for(const auto &traj: genome.trajectories)
@@ -276,7 +276,7 @@ void BestGenomesArchiveLog::saveLog(EA::Ptr &ea){
     //Update genomes info file
     std::ofstream giofs(Logging::log_folder + "/best_genomes_archive/" + logFile,std::ios::out | std::ios::ate | std::ios::app);
     if(!giofs){
-        std::cerr << "Unable to open file " << Logging::log_folder << "/best_genomes_archive/" << logFile << std::endl;
+        std::cerr << "Unable to open file " << Logging::log_folder <<  "/best_genomes_archive/" << logFile << std::endl;
         return;
     }
 

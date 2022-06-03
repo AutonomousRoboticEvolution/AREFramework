@@ -262,6 +262,8 @@ public:
         population[corr_indexes[indIndex]]->setObjectives(objectives);
     }
 
+    void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
+
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
     const std::vector<genome_t>& get_best_gene_archive() const {return best_gene_archive;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}

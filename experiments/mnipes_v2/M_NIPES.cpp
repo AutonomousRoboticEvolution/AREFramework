@@ -900,3 +900,9 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         controller_archive.from_file(filename);
     }
 }
+
+void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){
+    for(int i = 0; i < corr_indexes.size(); i++)
+        if(corr_indexes[i] >= 0)
+            ind_to_eval.push_back(i);
+}
