@@ -32,7 +32,7 @@ void CMAESLearner::init(std::vector<double> initial_point){
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
-    _cma_strat.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
     _cma_strat->set_elitist_restart(elitist_restart);
     _cma_strat->set_length_of_stagnation(lenStag);
     _cma_strat->set_novelty_ratio(novelty_ratio);

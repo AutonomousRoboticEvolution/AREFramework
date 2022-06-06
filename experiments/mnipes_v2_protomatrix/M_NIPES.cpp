@@ -94,7 +94,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
 
 void M_NIPESIndividual::createMorphology(){
     individual_id = morphGenome->id();
-    morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
+    morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
 //    nn2_cppn_t cppn = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_cppn();
 //    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
@@ -133,27 +133,25 @@ void M_NIPESIndividual::createController(){
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
     if(nn_type == settings::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
-
     }
     else if(nn_type == settings::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
-        return;
     }
 }
 

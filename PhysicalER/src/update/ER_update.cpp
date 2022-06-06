@@ -11,7 +11,7 @@ void ER::initialize(){
         seed = rd();
         are::settings::random::parameters->emplace("#seed",new are::settings::Integer(seed));
     }
-    randNum.reset(new are::misc::RandNum(seed));
+    randNum = std::make_shared<are::misc::RandNum>(seed);
 
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;

@@ -63,28 +63,26 @@ void VisuInd::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-    if(nn_type == st::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+    if(nn_type == settings::nnType::FFNN){
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
-    else if(nn_type == st::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+    else if(nn_type == settings::nnType::ELMAN){
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
-
     }
-    else if(nn_type == st::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+    else if(nn_type == settings::nnType::RNN){
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
-        return;
     }
 
 }

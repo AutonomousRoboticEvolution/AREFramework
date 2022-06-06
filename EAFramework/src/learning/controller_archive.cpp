@@ -15,7 +15,7 @@ void ControllerArchive::init(int max_wheels, int max_joints, int max_sensors)
     for(auto& w : archive){
         for(auto& j : w){
             for(auto& s : j){
-                s.first.reset(new NNParamGenome());
+                s.first = std::make_shared<NNParamGenome>();
                 s.second = 0;
             }
         }

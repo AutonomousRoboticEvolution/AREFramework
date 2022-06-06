@@ -97,7 +97,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     }
 
     // initialise the Head LEDs
-    ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be changed
+    ledDriver = std::make_shared<LedDriver>(0x6A); // <- the Led driver is always the same i2c address, it cannot be changed
     ledDriver->init();
 
     // battery voltage check
