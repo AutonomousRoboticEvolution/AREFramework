@@ -63,6 +63,7 @@ private:
     std::vector<Individual::Ptr> currentIndVec;
     std::vector<int> currentIndexVec;
     std::vector<int> indToEval;
+    int nbrIndInEval = 0;
     std::vector<std::pair<hr_clock::time_point,hr_clock::time_point>> eval_times;
 };
 

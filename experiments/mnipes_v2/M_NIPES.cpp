@@ -181,8 +181,11 @@ void M_NIPESIndividual::setManRes()
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
     if(descriptor_type == FINAL_POSITION){
+        if(final_position.empty())
+            return Eigen::VectorXd::Zero(3);
         double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
         Eigen::VectorXd desc(3);
+
         desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
         return desc;
     }else if(descriptor_type == VISITED_ZONES){
@@ -393,7 +396,10 @@ bool M_NIPES::is_finish(){
 }
 
 void M_NIPES::init_next_pop(){
-    corr_indexes.clear();
+    if(population.empty()){
+        corr_indexes.clear();
+        corr_indexes.shrink_to_fit();
+    }
     clean_learning_pool();
 
     if(learning_pool.empty())
