@@ -53,7 +53,9 @@ typedef struct genome_t{
         age(g.age),
         trajectories(g.trajectories),
         behavioral_descriptor(g.behavioral_descriptor),
-        nbr_eval(g.nbr_eval){}
+        nbr_eval(g.nbr_eval),
+        environment(g.environment),
+        task(g.task){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
     NN2CPPNGenome morph_genome;
@@ -64,6 +66,8 @@ typedef struct genome_t{
     std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
     int nbr_eval=0;
+    std::string environment;
+    std::string task;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;
@@ -246,6 +250,8 @@ public:
     bool is_finish() override;
 
     Individual::Ptr getIndividual(size_t index) const override{
+        if(corr_indexes[index] < 0)
+            return nullptr;
         return population[corr_indexes[index]];
     }
 
@@ -255,10 +261,15 @@ public:
         if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
+        if(corr_indexes[indIndex] < 0)
+            return;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
     }
 
+    void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
+
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
+    const std::vector<genome_t>& get_best_gene_archive() const {return best_gene_archive;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
     const ControllerArchive& get_controller_archive_obj() const {return controller_archive;}
@@ -290,6 +301,7 @@ private:
     selection_fct_t selection_fct;
 
     std::vector<genome_t> gene_pool;
+    std::vector<genome_t> best_gene_archive;
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
     int highest_age = 0;
@@ -303,6 +315,7 @@ private:
     //attribute for gradual tasks
     int nbr_of_successful_solution = 0;
     int current_gradual_scene = 0;
+    int nbr_eval_current_task = 0;
     std::vector<sim::GradualEnvironment::env_t> environments_info;
 };
 

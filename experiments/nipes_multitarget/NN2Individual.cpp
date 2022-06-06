@@ -75,11 +75,22 @@ void NN2Individual::update(double delta_time){
     sim_time = delta_time;
 }
 
-void NN2Individual::crossover(const Individual::Ptr &partner, Individual& child1, Individual& child2){
+void NN2Individual::crossover(const Individual::Ptr &partner, Individual& child){
+    Genome::Ptr child_genome(new NNParamGenome);
+    EmptyGenome::Ptr empty_gen(new EmptyGenome);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->crossover(partner->get_ctrl_genome(),child_genome);
+    child_genome->set_parameters(parameters);
+    child_genome->set_randNum(randNum);
+    child = NN2Individual(empty_gen,std::dynamic_pointer_cast<NNParamGenome>(child_genome));
+    child.set_randNum(randNum);
+    child.set_parameters(parameters);
+}
+
+void NN2Individual::symmetrical_crossover(const Individual::Ptr &partner, Individual& child1, Individual& child2){
     Genome::Ptr child_genome1(new NNParamGenome);
     Genome::Ptr child_genome2(new NNParamGenome);
     EmptyGenome::Ptr empty_gen(new EmptyGenome);
-    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->crossover(partner->get_ctrl_genome(),child_genome1,child_genome2);
+    std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->symmetrical_crossover(partner->get_ctrl_genome(),child_genome1,child_genome2);
     child_genome1->set_parameters(parameters);
     child_genome2->set_parameters(parameters);
     child_genome1->set_randNum(randNum);
@@ -91,7 +102,6 @@ void NN2Individual::crossover(const Individual::Ptr &partner, Individual& child1
     child1.set_parameters(parameters);
     child2.set_parameters(parameters);
 }
-
 
 std::string NN2Individual::to_string()
 {

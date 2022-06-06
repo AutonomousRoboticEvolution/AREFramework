@@ -39,10 +39,16 @@ public:
 
     virtual void mutate() = 0;
 
-    virtual void crossover(const Genome::Ptr& partner,Genome::Ptr child1,Genome::Ptr child2){
+    virtual void crossover(const Genome::Ptr& partner,Genome::Ptr child1){
+        child1 = clone();
+    }
+
+    virtual void symmetrical_crossover(const Genome::Ptr& partner,Genome::Ptr child1,Genome::Ptr child2){
         child1 = clone();
         child2 = partner->clone();
     }
+
+    virtual void random(){}
 
     virtual std::string to_string() const = 0;
     virtual void from_string(const std::string&) = 0;

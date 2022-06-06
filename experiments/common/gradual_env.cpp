@@ -3,6 +3,15 @@
 
 using namespace are::sim;
 
+std::string GradualEnvironment::fitness_fcts_name(fitness_fcts ff){
+    if(ff == EXPLORATION)
+        return "exploration";
+    else if(ff == TARGET)
+        return "target";
+    else if(ff == FORAGING)
+        return "foraging";
+}
+
 GradualEnvironment::GradualEnvironment(const settings::ParametersMapPtr& params)
 {
     parameters = params;
@@ -127,8 +136,8 @@ float GradualEnvironment::updateEnv(float simulationTime, const Morphology::Ptr 
         trajectory.push_back(wp);
     else if(simulationTime >= evalTime){
         trajectory.push_back(wp);
-        for(auto &traj: trajectories)
-            traj.clear();
+//        for(auto &traj: trajectories)
+//            traj.clear();
         trajectories[current_scene] = trajectory;
     }
 

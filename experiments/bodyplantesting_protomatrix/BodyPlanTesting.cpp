@@ -36,17 +36,13 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
 
     rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
-        if(cppn_fixed)
-            morphgenome->fixed_structure();
-        else
-            morphgenome->random();
+        morphgenome->random();
         CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -56,10 +52,8 @@ void BODYPLANTESTING::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
-            if(cppn_fixed)
-                morphgenome->fixed_structure();
-            else
-                morphgenome->random();
+
+            morphgenome->random();
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);

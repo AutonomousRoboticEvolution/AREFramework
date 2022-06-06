@@ -58,18 +58,16 @@ void ER::initialize(){
 
 bool ER::execute()
 {
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
-    int tries = 0;
-    int pauseTime = 100; // milliseconds
-
+    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    serverInstances = updateSimulatorList();
+    if(update_sim_list)
+        serverInstances = updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -113,10 +111,15 @@ void ER::startOfSimulation(int slaveIndex){
         int rand_idx = dd(randNum->gen);
         int index = indToEval[rand_idx];
         currentIndVec[slaveIndex] = ea->getIndividual(index);
-        currentIndexVec[slaveIndex] = index;
+        if(currentIndVec[slaveIndex] == nullptr)
+            currentIndexVec[slaveIndex] = -1;
+        else
+            currentIndexVec[slaveIndex] = index;
         indToEval.erase(indToEval.begin()+rand_idx);
         indToEval.shrink_to_fit();
     }
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     currentIndVec[slaveIndex]->set_client_id(serverInstances[slaveIndex]->get_clientID());
     currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
@@ -125,6 +128,8 @@ void ER::startOfSimulation(int slaveIndex){
 }
 
 void ER::endOfSimulation(int slaveIndex){
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
@@ -164,6 +169,7 @@ void ER::endOfSimulation(int slaveIndex){
 bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
     bool all_instances_finish = true;
     int state = IDLE;
 
@@ -213,10 +219,9 @@ bool ER::updateSimulation()
             {
                 std::cerr << "An error happened on the server side" << std::endl;
             }
-            else if(state == READY && indToEval.empty()){
-               
+            else if(state == READY && indToEval.empty()){                
                 std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
-	        continue;	
+                continue;
             }
             else{
 //                std::cerr << "state value unknown : " << state << std::endl
@@ -230,14 +235,17 @@ bool ER::updateSimulation()
             }
         }
     }
+
+    bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
+    if(!wait_for_all_instances) all_instances_finish = true;
+
     if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
         ea->epoch();
         saveLogs();
         ea->init_next_pop();
-        for(int i = 0; i < ea->get_population().size(); i++)
-            indToEval.push_back(i);
+        ea->fill_ind_to_eval(indToEval);
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();

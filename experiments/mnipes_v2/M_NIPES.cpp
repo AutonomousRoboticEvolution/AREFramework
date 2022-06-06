@@ -181,8 +181,11 @@ void M_NIPESIndividual::setManRes()
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
     if(descriptor_type == FINAL_POSITION){
+        if(final_position.empty())
+            return Eigen::VectorXd::Zero(3);
         double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
         Eigen::VectorXd desc(3);
+
         desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
         return desc;
     }else if(descriptor_type == VISITED_ZONES){
@@ -310,9 +313,13 @@ void M_NIPES::init_morph_pop(){
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
+    if(corr_indexes[currentIndIndex] < 0)
+        return true;
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(population[corr_indexes[currentIndIndex]]->get_ctrl_genome()->get_type() == "empty_genome")
         return true;
+
 
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[corr_indexes[currentIndIndex]]->get_morphology())->getMainHandle();
     float pos[3];
@@ -389,7 +396,10 @@ bool M_NIPES::is_finish(){
 }
 
 void M_NIPES::init_next_pop(){
-    corr_indexes.clear();
+    if(population.empty()){
+        corr_indexes.clear();
+        corr_indexes.shrink_to_fit();
+    }
     clean_learning_pool();
 
     if(learning_pool.empty())
@@ -416,6 +426,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     clean_learning_pool();
+
+    if(corr_indexes[currentIndIndex] < 0)
+        return true;
 
     Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
     if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
@@ -514,6 +527,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
             learner.ctrl_learner.to_be_erased();
         }else{
             numberEvaluation++;
+            nbr_eval_current_task++;
             //update learner
             learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor());
             bool is_ctrl_next_gen = learner.ctrl_learner.step();
@@ -525,25 +539,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 std::vector<double> biases;
                 NNParamGenome best_ctrl_gen;
                 auto &best_controller = learner.ctrl_learner.get_best_solution();
-                if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
-                    int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
-                    int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
-                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || numberEvaluation >= nbr_eval_per_task){
-                        if(verbose)
-                            std::cout << "fitness: " << best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
-                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
-                        nbr_of_successful_solution++;
-                        if(nbr_of_successful_solution >= nss_threshold){
-                            if(verbose) std::cout << " - change task" << std::endl;
-                            incr_gradual_scene();
-                        }
-                        else if(verbose) std::cout << std::endl;
-
-                    }
-                }
 
                 int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
                 int nbr_biases = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_biases().size();
+                int nbr_inputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input();
+                int nbr_outputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output();
+                int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
+                int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
+
                 if(!best_controller.second.empty() && best_controller.second.size() == nbr_weights + nbr_biases){
                     weights.resize(nbr_weights);
                     for(size_t i = 0; i < nbr_weights; i++)
@@ -553,6 +556,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         biases[i-nbr_weights] = best_controller.second[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
+                    best_ctrl_gen.set_nbr_input(nbr_inputs);
+                    best_ctrl_gen.set_nbr_output(nbr_outputs);
+                    best_ctrl_gen.set_nbr_hidden(nbr_hidden);
+                    best_ctrl_gen.set_nn_type(nn_type);
                 }
                 //update the archive
                 if(use_ctrl_arch){
@@ -569,6 +576,28 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
                 gene_pool.push_back(new_gene);
                 //-
+
+                //If gradual task change the task if conditions are met.
+                if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
+                    int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
+                    int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
+                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || nbr_eval_current_task >= nbr_eval_per_task){
+                        if(verbose)
+                            std::cout << "fitness: " << 1 - best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
+                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
+                        nbr_of_successful_solution++;
+                        new_gene.environment = environments_info[current_gradual_scene].scene_path;
+                        new_gene.task = sim::GradualEnvironment::fitness_fcts_name(environments_info[current_gradual_scene].fitness_fct);
+                        best_gene_archive.push_back(new_gene);
+                        if(nbr_of_successful_solution >= nss_threshold || nbr_eval_current_task >= nbr_eval_per_task){
+                            if(verbose) std::cout << " - change task" << std::endl;
+                            incr_gradual_scene();
+                            nbr_eval_per_task = 0;
+                        }
+                        else if(verbose) std::cout << std::endl;
+
+                    }
+                }
 
                 //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
@@ -883,4 +912,10 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         filename = folder + std::string("/controller_archive");
         controller_archive.from_file(filename);
     }
+}
+
+void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){
+    for(int i = 0; i < corr_indexes.size(); i++)
+        if(corr_indexes[i] >= 0)
+            ind_to_eval.push_back(i);
 }

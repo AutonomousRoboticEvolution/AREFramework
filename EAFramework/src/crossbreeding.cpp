@@ -92,7 +92,7 @@ bool Crossbreeding::should_crossbreed(const ioh::MorphGenomeInfoMap &mgim){
     return _trigger(mgim,parameters);
 }
 
-void Crossbreeding::selection(int nbr_to_select,std::map<int,NN2CPPNGenome>& genomes){
+void Crossbreeding::selection(int nbr_to_select,std::map<int,Genome::Ptr>& genomes){
     std::string robot_library_path = settings::getParameter<settings::String>(parameters,"#robotLibrary").value;
     ioh::MorphGenomeInfoMap morph_genomes_info;
     ioh::load_morph_genomes_info(robot_library_path,morph_genomes_info);

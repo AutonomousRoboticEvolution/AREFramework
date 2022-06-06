@@ -265,7 +265,7 @@ class UR5Robot:
     #  Takes inputs:
     #  bank: where to search for the organ
     #  robot: the robot class being inserted into
-    def insertOrganWithoutCable (self, organInRobot , bank, assemblyFixture, gripperTCP):
+    def insertOrganUsingGripperFeature (self, organInRobot, bank, assemblyFixture, gripperTCP):
 
         vertical_clearance = 0.20 # how high vertically above the pickup and preDropoff to be for pre-pickup and abovePreDropoff
         preDropoffDistanceUp = 0.04 # how far back in the end effector frame to go just before pushing in the organ

@@ -60,7 +60,7 @@ class TrackingSystem:
         detector = cv2.SimpleBlobDetector_create(blob_detection_parameters)
 
         #fills holes in mask to improve blob detection
-        fix_mask = False
+        fix_mask = True
         if fix_mask:
             fixed_mask = self.fillHoles(mask)
             keypoints = detector.detect(fixed_mask)
@@ -71,9 +71,9 @@ class TrackingSystem:
         if self.show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-#            cv2.imshow("Holy Mask",mask)
-#            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
-#            cv2.imshow("Blob",kp_image)
+            cv2.imshow("Holy Mask",mask)
+            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
+            cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
         if len(keypoints) >0 :

@@ -12,6 +12,8 @@
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #repository,string,/home/ebb505/ARE_Project/are-logs
 
+#bootstrapFolder,string,/home/leni/are-logs/test_bootstrap_mnipes_v2
+
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,0
@@ -19,6 +21,7 @@
 #isCPPNGenome,bool,1
 
 #fitnessFile,string,fitnesses.csv
+#genomesPoolFile,string,genomes_pool.csv
 
 #envType,int,2
 #envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
@@ -38,18 +41,17 @@
 #reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,25
-#maxEvalTime,float,60
+#populationSize,int,12
+#maxEvalTime,float,10
 #timeStep,float,0.1
-#maxNbrEval,int,10000
-#nbrEvalPerTask,int,2000
+#maxNbrEval,int,10
 #fitnessType,int,0
 #withCrossover,bool,1
 
-#cmaesSmallNbrEval,int,200
-#cmaesLargeNbrEval,int,200
+#cmaesSmallNbrEval,int,2
+#cmaesLargeNbrEval,int,2
+#cmaesPopSize,int,2
 #cmaesMaxPopSize,int,40
-#cmaesPopSize,int,10
 #CMAESStep,double,1.
 #FTarget,double,0.5
 #elitistRestart,bool,0
@@ -62,7 +64,7 @@
 #noveltyRatio,double,1.
 #noveltyDecrement,double,0.05
 
-#nbrWaypoints,int,100
+#nbrWaypoints,int,10
 #populationStagnationThreshold,float,0.05
 #withBeacon,bool,1
 #energyBudget,double,100

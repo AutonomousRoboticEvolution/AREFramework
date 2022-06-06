@@ -13,6 +13,10 @@
 
 using namespace are::sim;
 
+// makes just the skeleton not the organs
+
+// 3 different decodeGenome which is actually a sub-function for of the 3 genomeDecoder
+// decodeGenome generates the voxel cubes
 void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::NeuralNetwork &cppn)
 {
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
@@ -95,6 +99,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, std::v
     }
 }
 
+//checks skeleton is connected to start and not in the head
 void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
 {
     AREVoxel areVoxel;
@@ -149,6 +154,7 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
     }
 }
 
+//add voxels to create head attachment square
 void GenomeDecoder::createSkeletonBase(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
 {
     auto region = skeletonMatrix.getEnclosingRegion();
@@ -176,6 +182,7 @@ void GenomeDecoder::createSkeletonBase(PolyVox::RawVolume<uint8_t> &skeletonMatr
     }
 }
 
+//makes empty space for head
 void GenomeDecoder::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
 {
     auto region = skeletonMatrix.getEnclosingRegion();
@@ -193,6 +200,7 @@ void GenomeDecoder::emptySpaceForHead(PolyVox::RawVolume<uint8_t> &skeletonMatri
     }
 }
 
+//no idea what this function does
 void GenomeDecoder::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // This matrix stores the visited elements.
@@ -216,6 +224,7 @@ void GenomeDecoder::skeletonRegionCounter(PolyVox::RawVolume<uint8_t> &skeletonM
     }
 }
 
+// remove skeleton for head
 void GenomeDecoder::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     int regionConnected = -1;
@@ -245,6 +254,8 @@ void GenomeDecoder::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &skeletonM
     }
 }
 
+//generates a list surface coordinates
+// recures through each direction
 void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                     PolyVox::RawVolume<bool> &visitedVoxels, int32_t posX, int32_t posY,
                                     int32_t posZ, int surfaceCounter, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
@@ -252,6 +263,7 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     uint8_t voxel;
     // Explore neighbourhood.
+    // finds surface on the top of robot but doesnt actually use them as organ can't be on the top
     for (int dz = -1; dz <= 1; dz+=1) {
         if (posZ + dz > -morph_const::matrix_size/2 && posZ + dz < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX, posY, posZ + dz);
@@ -261,6 +273,8 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
             /// EB: Organ pointing upwards or downwards (z-axis) are not allowed by the RoboFab.
         }
     }
+    // finds surfaces in the y direction
+    // saves it to be facing in the y direction +/-
     for (int dy = -1; dy <= 1; dy+=1) {
         if (posY + dy > -morph_const::matrix_size/2 && posY + dy < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX, posY + dy, posZ);
@@ -273,6 +287,7 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
             }
         }
     }
+    // finds surfaces in the x direction
     for (int dx = -1; dx <= 1; dx+=1) {
         if (posX + dx > -morph_const::matrix_size/2 && posX + dx < morph_const::matrix_size/2) {
             voxel = skeletonMatrix.getVoxel(posX + dx, posY, posZ);
@@ -287,6 +302,7 @@ void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
     }
 }
 
+//generates a list of coords in a region
 void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonMatrix, PolyVox::RawVolume<bool> &visitedVoxels,
                                           int32_t posX, int32_t posY,int32_t posZ, int regionCounter)
 {
@@ -363,6 +379,8 @@ void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMat
     }
 }
 
+
+// following 3 functions call all the above stuff in order
 void GenomeDecoder::genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
