@@ -55,7 +55,7 @@ double misc::sinusoidal(double amplitude, double time, double frequency, double 
 }
 
 double misc::get_next_joint_position(double nn_output, double time, double previous_position) {
-    double amplitude = M_PI_4 * 8./9., time_offset = 0.0, position_offset = 0.0; // Constant
+    double amplitude = M_PI_2 * 8./9., time_offset = 0.0, position_offset = 0.0; // Constant
     double max_frequency = 3.0;
     double frequency = nn_output * (max_frequency / 2.) + max_frequency / 2.; // From [-1,1] to [0,max_frequency];
     double pos_diff = sinusoidal(amplitude*frequency*0.1, time, frequency, time_offset, position_offset);

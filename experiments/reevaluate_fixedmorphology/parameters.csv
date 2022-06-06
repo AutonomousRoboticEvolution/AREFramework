@@ -4,9 +4,9 @@
 #robotPath,string,/home/ebb505/ARE_Project/robotlibrary/morph_0/model_0.ttm
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,200
-#maxEvalTime,float,60
+#maxEvalTime,float,30
 #numberOfGeneration,int,10
-#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs/learning/directed_locomotion/60/
+#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs/learning/directed_locomotion/smooth/new_controller_90/30/
 #verbose,bool,1
 #instanceType,int,0
 #noiseLevel,double,0
@@ -27,8 +27,8 @@
 #NbrOutputNeurones,int,8
 #NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
-#folderToLoad,string,nipes_27_4_13-59-8-8631-3802129502
-#genToLoad,int,99
+#folderToLoad,string,nipes_31_4_14-26-19-9303-194290107
+#genToLoad,int,36
 #indToLoad,int,0
 #genType,int,2
 #maxVelocity,double,10.
