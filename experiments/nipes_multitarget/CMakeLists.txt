@@ -28,6 +28,7 @@ add_library(NIPES_MULTITARGET SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
+    NN2Individual.cpp
     ../common/multiTargetMaze.cpp
     ../common/barrelTask.cpp
     )

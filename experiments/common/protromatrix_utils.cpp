@@ -5,7 +5,7 @@
 
 using namespace are;
 
-std::vector<std::vector<double>> protomatrix::load_robot_matrix(std::string filepath){
+std::vector<std::vector<double>> protomatrix::load_robot_matrix(const std::string &filepath){
     std::vector<std::vector<double>> matrix_4d;
     // Create an input filestream
     std::ifstream myFile(filepath);
@@ -28,7 +28,7 @@ std::vector<std::vector<double>> protomatrix::load_robot_matrix(std::string file
     myFile.close();
     return matrix_4d;
 }
-std::vector<std::vector<double>> protomatrix::random_matrix(std::vector<std::vector<double>> matrix_4d){
+void protomatrix::random_matrix(std::vector<std::vector<double>> &matrix_4d){
     matrix_4d.resize(6);
     const float mutation_parameter = 1.0;
     for(int i = 0; i < matrix_4d.size(); i++) {
@@ -37,10 +37,9 @@ std::vector<std::vector<double>> protomatrix::random_matrix(std::vector<std::vec
             matrix_4d.at(i).push_back(rand_number);
         }
     }
-    return matrix_4d;
 }
 
-std::vector<std::vector<double>> protomatrix::mutate_matrix(std::vector<std::vector<double>> matrix_4d){
+std::vector<std::vector<double>> protomatrix::mutate_matrix(const std::vector<std::vector<double>> &matrix_4d){
     std::vector<std::vector<double>> mutated_matrix_4d = matrix_4d;
     const float mutation_rate = 0.1;
     const float mutation_parameter = 0.5;
@@ -48,41 +47,52 @@ std::vector<std::vector<double>> protomatrix::mutate_matrix(std::vector<std::vec
     for(int i = 0; i < matrix_4d.size(); i++){
         for(int j = 0; j < matrix_4d.at(0).size(); j++){
             if(std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen) < mutation_rate) {
-                if(mutation_type == 0){ // Uniform distribution
-                    double temp_variable;
-                    double rand_number = std::uniform_real_distribution<>(-mutation_parameter,mutation_parameter)(nn2::rgen_t::gen);
-                    temp_variable = rand_number  + matrix_4d.at(i).at(j);
-                    if (temp_variable < -1.0)
-                        temp_variable = -1.0;
-                    else if (temp_variable > 1.0)
-                        temp_variable = 1.0;
-                    mutated_matrix_4d.at(i).at(j) = temp_variable;
-                }
-                else if(mutation_type == 1){ // Polynomial mutation
-                    const float eta_m = mutation_parameter;
-                    assert(eta_m != -1.0f);
-                    float ri = std::uniform_real_distribution<>(0,1)(nn2::rgen_t::gen);
-                    float delta_i = ri < 0.5 ?
-                                    pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
-                                    1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
-                    assert(!std::isnan(delta_i));
-                    assert(!std::isinf(delta_i));
-                    float temp_variable = matrix_4d.at(i).at(j) + delta_i;
-                    if (temp_variable < -1.0)
-                        temp_variable = -1.0;
-                    else if (temp_variable > 1.0)
-                        temp_variable = 1.0;
-                    mutated_matrix_4d.at(i).at(j) = temp_variable;
-                } else{
-                    std::cerr << "Wrong mutation_type: " << mutation_type << " in " << __func__ << std::endl;
-                    assert(false);
+                if(i == 1){
+                    if(matrix_4d.at(i).at(j) == -1)
+                        mutated_matrix_4d.at(i).at(j) = 1.;
+                    else if(matrix_4d.at(i).at(j) == 1)
+                        mutated_matrix_4d.at(i).at(j) = -1.;
+                    else {
+                        std::cerr << "We can't be here! " << __func__ << std::endl;
+                        assert(false);
+                    }
+                } else {
+                    if (mutation_type == 0) { // Uniform distribution
+                        double temp_variable;
+                        double rand_number = std::uniform_real_distribution<>(-mutation_parameter, mutation_parameter)(
+                                nn2::rgen_t::gen);
+                        temp_variable = rand_number + matrix_4d.at(i).at(j);
+                        if (temp_variable < -1.0)
+                            temp_variable = -1.0;
+                        else if (temp_variable > 1.0)
+                            temp_variable = 1.0;
+                        mutated_matrix_4d.at(i).at(j) = temp_variable;
+                    } else if (mutation_type == 1) { // Polynomial mutation
+                        const float eta_m = mutation_parameter;
+                        assert(eta_m != -1.0f);
+                        float ri = std::uniform_real_distribution<>(0, 1)(nn2::rgen_t::gen);
+                        float delta_i = ri < 0.5 ?
+                                        pow(2.0 * ri, 1.0 / (eta_m + 1.0)) - 1.0 :
+                                        1 - pow(2.0 * (1.0 - ri), 1.0 / (eta_m + 1.0));
+                        assert(!std::isnan(delta_i));
+                        assert(!std::isinf(delta_i));
+                        float temp_variable = matrix_4d.at(i).at(j) + delta_i;
+                        if (temp_variable < -1.0)
+                            temp_variable = -1.0;
+                        else if (temp_variable > 1.0)
+                            temp_variable = 1.0;
+                        mutated_matrix_4d.at(i).at(j) = temp_variable;
+                    } else {
+                        std::cerr << "Wrong mutation_type: " << mutation_type << " in " << __func__ << std::endl;
+                        assert(false);
+                    }
                 }
             }
         }
     }
     return mutated_matrix_4d;
 }
-std::vector<std::vector<double>> protomatrix::crossover_matrix(std::vector<std::vector<double>> first_parent_4d,std::vector<std::vector<double>> second_parent_4d){
+std::vector<std::vector<double>> protomatrix::crossover_matrix(const std::vector<std::vector<double> > &first_parent_4d, const std::vector<std::vector<double> > &second_parent_4d){
     std::vector<std::vector<double>> child_matrix_4d;
     child_matrix_4d = first_parent_4d;
     for(int i = 0; i < first_parent_4d.size(); i++){
@@ -94,4 +104,29 @@ std::vector<std::vector<double>> protomatrix::crossover_matrix(std::vector<std::
         }
     }
     return child_matrix_4d;
+}
+
+std::vector<std::vector<double>> retrieve_matrices_from_cppn(nn2_cppn_t cppn){
+    using mc = are::morph_const;
+    std::vector<double> input{0,0,0,0};
+    std::vector<double> output;
+    std::vector<std::vector<double>> matrix_4d(6);
+    for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1){
+        for(int j = -mc::matrix_size/2 + 1; j < mc::matrix_size/2; j += 1){
+            for(int k = -mc::matrix_size/2 + 1; k < mc::matrix_size/2; k += 1){
+                input[0] = static_cast<double>(i);
+                input[1] = static_cast<double>(j);
+                input[2] = static_cast<double>(k);
+                input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
+                cppn.step(input);
+                output = cppn.outf();
+                matrix_4d.at(0).push_back(output.at(0));
+                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(2).push_back(output.at(2));
+                matrix_4d.at(3).push_back(output.at(3));
+                matrix_4d.at(4).push_back(output.at(4));
+                matrix_4d.at(5).push_back(output.at(5));
+            }
+        }
+    }
 }

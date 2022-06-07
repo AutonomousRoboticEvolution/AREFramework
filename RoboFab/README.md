@@ -11,7 +11,7 @@ I've included a Doxygen config file (with the default name Doxygen), but exclude
 The RoboFab repository contains the files needed to drive the Robot Fabricator. It is spit into several files:
 
 - __RoboFab.py__ contains the top-level class, and will load the configuration file (configuration_BRL.json) and a blueprint, and create the other classes and tell them what to do.
-- __robotComponents.py__ contains classes to desribe an individual robot
+- __robotComponents.py__ contains classes to describe an individual robot
 - __UR5_host.py__ contains classes to control the UR5 robotic arm and the gripper
 - __RoboFabComponets.py__ contains classes to describe/control various parts of the Robot Fabricator (except those in the UR5_host.py)
 - __configuration_BRL.json__ contains lots of the "hard coded" settings, including positions of things and various options. At some point, we will need to make separate versions for BRL and York

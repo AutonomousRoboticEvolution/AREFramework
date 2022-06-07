@@ -52,7 +52,7 @@ public:
         initialized(cl.initialized),
         current_nbr_ind(cl.current_nbr_ind){}
 
-    void init(std::vector<double> initial_point = std::vector<double>());
+    void init(double ftarget, std::vector<double> initial_point = std::vector<double>());
 
     bool step();
 
@@ -79,10 +79,13 @@ public:
     bool is_learning_finish() const;
 
     std::vector<w_b_pair_t> get_new_population();
+    std::vector<w_b_pair_t> get_remaining_population();
 
     bool is_initialized() const {return initialized;}
 
     void to_be_erased() {initialized = true; _is_finish = true;}
+
+    int nbr_eval(){return _nbr_eval;}
 
 protected:
     void next_pop();

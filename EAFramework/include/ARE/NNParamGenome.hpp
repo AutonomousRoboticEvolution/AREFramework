@@ -82,10 +82,9 @@ public:
     typedef std::shared_ptr<const NNParamGenome> ConstPtr;
 
 
-    NNParamGenome() : Genome() {}
+    NNParamGenome() : Genome() {type = "nn_param_genome";}
     NNParamGenome(misc::RandNum::Ptr rn, settings::ParametersMapPtr param, int id = 0) :
-        Genome(rn,param,id){
-    }
+        Genome(rn,param,id){type = "nn_param_genome";}
     NNParamGenome(const NNParamGenome &ngen) :
         Genome(ngen), weights(ngen.weights), biases(ngen.biases),
         nbr_input(ngen.nbr_input),nbr_output(ngen.nbr_output),
@@ -100,7 +99,8 @@ public:
 
     }
     void mutate() override;
-    void crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
+    void crossover(const Genome::Ptr &partner, Genome::Ptr child) override;
+    void symmetrical_crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2) override;
 
 
     void set_weights(const std::vector<double>& w){weights = w;}
@@ -114,10 +114,10 @@ public:
     void set_nbr_hidden(int nh){nbr_hidden = nh;}
     void set_nn_type(int nnt){nn_type = nnt;}
 
-    int get_nbr_input() const {return nbr_input;}
-    int get_nbr_output() const {return nbr_output;}
-    int get_nbr_hidden() const {return nbr_hidden;}
-    int get_nn_type() const {return nn_type;}
+    const int get_nbr_input() const {return nbr_input;}
+    const int get_nbr_output() const {return nbr_output;}
+    const int get_nbr_hidden() const {return nbr_hidden;}
+    const int get_nn_type() const {return nn_type;}
 
     std::vector<double> get_full_genome(){
         std::vector<double> genome = weights;

@@ -50,7 +50,7 @@ public:
      */
     bool should_crossbreed(const ioh::MorphGenomeInfoMap& mgim);
 
-    void selection(int nbr_to_select,std::map<int,NN2CPPNGenome>& genomes);
+    void selection(int nbr_to_select, std::map<int, Genome::Ptr> &genomes);
 
     void set_selection_fct(selection_fct_t fct){_selection_fct = fct;}
     void set_trigger(trigger_criterion_t trigger){_trigger = trigger;}

@@ -3,7 +3,7 @@
 #define K_I 0.5
 #define MAX_INTEGRAL_VALUE 150 // for anti-windup, the integral term will never have magnitude greater than this
 
-//Slew rate limiting parameter
+//Slew rate limiting parameter (max allowed value change per timestep)
 //Total output range is -255 to +255 (510 total), so e.g. a value of 10 here would take 51 timesteps to do a maximum end-end swing
 //For a loop time of 10ms this example would be 510ms
 //A rate of 125 of more is too fast (motor cuts out). 100 appears to be ok but is probably borderline.

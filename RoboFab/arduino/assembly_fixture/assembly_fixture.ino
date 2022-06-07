@@ -2,7 +2,7 @@
 #include "Keyboard.h"
 
 #define DEGREES_PER_STEP 1.8 //1.8 for our 12v stepper, 0.9 for the earlier 2.8v stepper
-#define WORM_GEAR_RATIO 50  //Rotations of worm gear for one rotation of wheel gear
+#define WORM_GEAR_RATIO 48  //Rotations of worm gear for one rotation of wheel gear. 50 in Bristol, 48 in York.
 #define ACCEL_INCREMENT_US 4 //Step duration changed by this much per step when accelerating [2] <-brackets indicate good settings for 2.8V stepper [12V: 4]
 #define STEP_MIN_DURATION_US 1500 //Shortest pulse width (defines maximum rotation speed) [700] [12V: 1200]
 #define STEP_MAX_DURATION_US 2000 //Longest pulse width (defines minimum, i.e. start and end speed)[1200] [12V: 2000]

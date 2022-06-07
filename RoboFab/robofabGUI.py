@@ -16,6 +16,8 @@ NUMBER_OF_PRINTERS = 3
 class RobofabGUI:
     def __init__(self, configurationData):
 
+        print("Configured for {}".format(configurationData["location"]))
+
         # extract information from configuration data:
         self.configurationData = configurationData
         self.logDirectory = configurationData["logDirectory"]
@@ -345,7 +347,7 @@ class RobofabGUI:
         # print("Manage organ bank...")
 
         self.window_bankManager = tk.Tk()
-        frame = tk.Frame(master=self.window_bankManager, width=900, height=750)
+        frame = tk.Frame(master=self.window_bankManager, width=1200, height=750)
         tk.Button(master=self.window_bankManager, text="Update addresses and close", bg="yellow", command=self.updateI2CAddressesAndClose).pack()
         frame.pack()
 

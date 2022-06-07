@@ -46,12 +46,14 @@ if location == "bristol":
 
 elif location == "york":
     pipe = 0
+    #brainMin = (146,89,30)
+    #brainMax = (179,184,110)
+    brainMin = (0,120,52)
+    brainMax = (16,206,139)
 
-    brainMin = (146,89,30)
-    brainMax = (179,184,110)
     
-    centre_reference = (340,300) #not calibrated
-    pixel_scale = 100 #nc
+    centre_reference = (347,240) # centre of arena in pixels
+    pixel_scale = 270 # mm per meter
 
     crop_rectangle = [-1]
 elif location == "napier":

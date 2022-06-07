@@ -331,12 +331,12 @@ void Morphology_CPPNMatrix::create()
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
     destroyGripper();
+    destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
-    destroy_physical_connectors();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -509,6 +509,14 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     std::vector<double> output;
     int organ_type;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
+        // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
+        // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
+        std::sort(skeletonSurfaceCoord[m].begin(),
+                  skeletonSurfaceCoord[m].end(),
+                  [] (const std::vector<int> &a, const std::vector<int> &b)
+                  {
+                      return a[2] < b[2];
+                  });
         // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
@@ -644,8 +652,10 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
+
+//                matrix_4d.at(0).push_back(output.at(0));
                 matrix_4d.at(0).push_back(output.at(0));
-                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(1).push_back((output.at(1) > 0.0) ? 1.0 : -1.0);
                 matrix_4d.at(2).push_back(output.at(2));
                 matrix_4d.at(3).push_back(output.at(3));
                 matrix_4d.at(4).push_back(output.at(4));
@@ -686,7 +696,6 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     organ_type = -1;
     int max_element = -1;
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
-
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
         if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
@@ -713,86 +722,26 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
-    if ((x < 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261; orientation.at(1) = +0.5235; orientation.at(2) = +2.1861;
-    }
-    else if ((x < 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = +3.1415; orientation.at(1) = +0.7853; orientation.at(2) = -3.1415;
-    }
-    else if ((x < 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5261; orientation.at(1) = +0.6981; orientation.at(2) = -2.1862;
-    }
-    else if ((x == 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.3561; orientation.at(1) = +0.5960; orientation.at(2) = +1.5707;
-    }
-    else if ((x == 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415; orientation.at(1) = +0.000; orientation.at(2) = +0.0000;
-    }
-    else if ((x == 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.3561; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z > 0)){
-        orientation.at(0) = -2.5261; orientation.at(1) = -0.5236; orientation.at(2) = +0.9552;
-    }
-    else if ((x > 0) && (y == 0) && (z > 0)){
-        orientation.at(0) = -3.1415; orientation.at(1) = -0.7854; orientation.at(2) = +0.0000;
-    }
-    else if ((x > 0) && (y > 0) && (z > 0)){
-        orientation.at(0) = +2.5132; orientation.at(1) = -0.5235; orientation.at(2) = -0.9552;
-    }
-    else if ((x < 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708; orientation.at(1) = +0.7853; orientation.at(2) = +1.5707;
+    
+    // Gives the direction of the organ given the direction of the surface
+    // Confusing list of angles that are in radians
+    if ((x == 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = -M_PI; orientation.at(1) = +0.0; orientation.at(2) = +0.0;
     }
     else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = +1.5707; orientation.at(2) = +0.0000;
-    }
-    else if ((x < 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707; orientation.at(1) = +0.7853; orientation.at(2) = -1.5708;
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI/2; orientation.at(2) = +0.0;
     }
     else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -1.5708; orientation.at(1) = +0.0000; orientation.at(2) = +1.5708;
+        orientation.at(0) = -M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI;
     }
     else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +1.5707; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z == 0)) {
-        orientation.at(0) = +1.5707; orientation.at(1) = -0.7854; orientation.at(2) = +1.5708;
+        orientation.at(0) = +M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI/2;
     }
     else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0000; orientation.at(1) = -1.5708; orientation.at(2) = +3.1415;
-    }
-    else if ((x > 0) && (y > 0) && (z == 0)) {
-        orientation.at(0) = +1.5708; orientation.at(1) = -0.7854; orientation.at(2) = -1.5708;
-    }
-    else if ((x < 0) && (y < 0) && (z < 0)) {
-        orientation.at(0) = -0.6154; orientation.at(1) = +0.5235; orientation.at(2) = +0.9552;
-    }
-    else if ((x < 0) && (y == 0) && (z < 0)) {
-        orientation.at(0) = +0.0000; orientation.at(1) = +0.78563; orientation.at(2) = +0.0000;
-    }
-    else if ((x < 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.6154; orientation.at(1) = +0.5235; orientation.at(2) = -0.9552;
-    }
-    else if ((x == 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.7851; orientation.at(1) = +0.5235; orientation.at(2) = +1.5708;
-    }
-    else  if ((x == 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = +0.0000; orientation.at(2) = +0.0000;
-    }
-    else if ((x == 0) && (y > 0) && (z < 0)){
-        orientation.at(0) = +0.7853; orientation.at(1) = +0.0000; orientation.at(2) = -1.5708;
-    }
-    else if ((x > 0) && (y < 0) && (z < 0)){
-        orientation.at(0) = -0.6154; orientation.at(1) = -0.5236; orientation.at(2) = +2.1861;
-    }
-    else if ((x > 0) && (y == 0) && (z < 0)){
-        orientation.at(0) = +0.0000; orientation.at(1) = -0.7854; orientation.at(2) = -3.1415;
-    }
-    else if ((x > 0) && (y > 0) && (z < 0)) {
-        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI/2; orientation.at(2) = +M_PI;
     }
     else {
-        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        orientation.at(0) = +0.0; orientation.at(1) = 0.0; orientation.at(2) = 0.0;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }

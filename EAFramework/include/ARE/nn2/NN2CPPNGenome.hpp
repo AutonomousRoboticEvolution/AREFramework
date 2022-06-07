@@ -108,7 +108,17 @@ public:
         cppn.mutate();
     }
 
-    void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
+    void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
+        are::nn2_cppn_t cppn_child;
+        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
+        cppn.crossover(cppn_partner,cppn_child);
+        *child = NN2CPPNGenome(cppn_child);
+        child->set_parameters(parameters);
+        child->set_randNum(randomNum);
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child)->set_parents_ids({_id,partner->id()});
+    }
+
+    void symmetrical_crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override{
         are::nn2_cppn_t cppn_child1, cppn_child2;
         are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child1);
@@ -122,7 +132,6 @@ public:
         std::dynamic_pointer_cast<NN2CPPNGenome>(child1)->set_parents_ids({_id,partner->id()});
         std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({partner->id(),_id});
     }
-
 
     void from_string(const std::string & str) override
     {
@@ -183,7 +192,7 @@ private:
     nn2_cppn_t cppn;
     CartDesc cart_desc;
     OrganPositionDesc organ_position_desc;
-    int generation;
+    int generation=0;
     std::vector<std::vector<double>> matrix_4d;
 };
 
