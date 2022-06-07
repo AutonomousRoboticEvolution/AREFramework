@@ -152,7 +152,7 @@ def makeFile(location):
 				"postInsertExtraPushDistance": 0.0 / 1000, # positive for extra pushing when attaching organ to skeleton
 				"pickupExtraPushDistance": 2 / 1000, # offset in gripper frame z direction just when picking up organ
 				# "transformOrganOriginToGripper": np.linalg.inv(makeTransformInputFormatted ( [ 0, 0, 72 / 1000, 0, math.radians ( 180 ), math.radians(180) ] ) ).tolist(), # Head v0.1
-				"transformOrganOriginToGripper": np.linalg.inv(makeTransformMillimetersDegrees (z=85 , rotX=180 )).tolist(), # Head v0.2
+				"transformOrganOriginToGripper": (np.linalg.inv(makeTransformMillimetersDegrees (z=85 , rotX=180 )) * makeTransformMillimetersDegrees(rotX=3) ).tolist(), # Head v0.2
 				"transformOrganOriginToClipCentre": makeTransformInputFormatted().tolist(),
 				"transformOrganOriginToFemaleCableSocket": [
 					(makeTransformMillimetersDegrees(x=-24 , y=-34.67 , z=107.49 , rotX=180,rotZ=180)).tolist (),
@@ -236,17 +236,17 @@ def makeFile(location):
 
 		"PRINTER_0":{
 		"ORIGIN":PRINTER_0_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30,
+        "BED_COOLDOWN_TEMPERATURE":35,
 		"API_KEY":PRINTER_0_API_KEY
 		},
 		"PRINTER_1":{
 		"ORIGIN":PRINTER_1_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30,
+        "BED_COOLDOWN_TEMPERATURE":35,
 		"API_KEY":PRINTER_1_API_KEY
 		},
 		"PRINTER_2":{
 		"ORIGIN":PRINTER_2_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":30,
+        "BED_COOLDOWN_TEMPERATURE":35,
 		"API_KEY":PRINTER_2_API_KEY
 		},
 

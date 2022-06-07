@@ -466,8 +466,8 @@ if __name__ == "__main__":
     # Make the settings file then extract the settings from it
     from makeConfigurationFile import makeFile as makeConfigurationFile
 
-    makeConfigurationFile(location="BRL")  # <--- change this depending on if you're in York or BRL
+    makeConfigurationFile(location="YRK")  # <--- change this depending on if you're in York or BRL
     configurationData = json.load(
-        open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+        open('configuration_YRK.json'))  # <--- change this depending on if you're in York or BRL
 
     gui = RobofabGUI(configurationData)
