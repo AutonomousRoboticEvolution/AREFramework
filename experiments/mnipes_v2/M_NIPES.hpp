@@ -117,7 +117,7 @@ public:
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
         descriptor_type(ind.descriptor_type),
-	init_position(ind.init_position)
+        init_position(ind.init_position)
     {}
 
     Individual::Ptr clone() override {

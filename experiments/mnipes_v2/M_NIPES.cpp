@@ -304,7 +304,11 @@ void M_NIPES::init_morph_pop(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);
@@ -673,6 +677,12 @@ void M_NIPES::reproduction(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morph_genome,ctrl_genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         if(!corr_indexes.empty()){
             int i = corr_indexes.size() - 1;
@@ -899,7 +909,11 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);
