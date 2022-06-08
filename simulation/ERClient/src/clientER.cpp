@@ -304,6 +304,7 @@ void ER::reopenConnections()
 
 bool ER::confirmConnections()
 {
+    int counter = 0;
     for (auto &slave: serverInstances) {
         if (!slave->status()) {
             std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
@@ -311,10 +312,11 @@ bool ER::confirmConnections()
             extApi_sleepMs(20);
         }
         else {
+            counter++;
             continue;
         }
     }
-
+    std::cout << counter << "/" << serverInstances.size() << " servers online" << std::endl;
     //    std::cout << "Connections confirmed" << std::endl;
     return true;
 }
