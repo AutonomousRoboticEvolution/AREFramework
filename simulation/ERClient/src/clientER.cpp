@@ -59,15 +59,13 @@ void ER::initialize(){
 bool ER::execute()
 {
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
-    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    if(update_sim_list)
-        serverInstances = updateSimulatorList();
+    serverInstances = updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -330,7 +328,11 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
             std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
-            serverInstances[idx].reset();
+            bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
+            if(update_sim_list)
+                serverInstances[idx].reset();
+            else
+                newServInst.push_back(std::move(serverInstances[idx]));
             indToEval.push_back(currentIndexVec[idx]);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
