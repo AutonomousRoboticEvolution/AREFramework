@@ -4,7 +4,7 @@ using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
     initialize();
-
+    nbr_of_instances = nbrOfInst;
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + port));
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
@@ -59,13 +59,15 @@ void ER::initialize(){
 bool ER::execute()
 {
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
+    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    serverInstances = updateSimulatorList();
+    if(update_sim_list)
+        serverInstances = updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -328,11 +330,7 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
             std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
-            bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
-            if(update_sim_list)
-                serverInstances[idx].reset();
-            else
-                newServInst.push_back(std::move(serverInstances[idx]));
+            serverInstances[idx].reset();
             indToEval.push_back(currentIndexVec[idx]);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
@@ -340,6 +338,7 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
             newCurrentIndexVec.push_back(currentIndexVec[idx]);
         }
      }
+
 
     currentIndVec = newCurrentIndVec;
     currentIndexVec = newCurrentIndexVec;
