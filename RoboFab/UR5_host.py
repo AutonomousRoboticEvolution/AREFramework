@@ -397,7 +397,7 @@ class UR5Robot:
 
         verticalClearancePreInsert = 0.28  # how high vertically above the pickup and preDropoff to for pre-pickup
         insertRotation = math.radians(20) # the amount of rotation needed for the Head clipping mechanism
-        postInsertExtraRotation = math.radians(5)
+        postInsertExtraRotation = math.radians(8)
         BedPullUpDistance = 50/1000
         postBedRemovalSidewaysClearance = 0.1 # after pulling the skeleton off the bed, we should move horizontally out to avoid the skeleton hitting the frame of the printer
 
@@ -499,7 +499,6 @@ class UR5Robot:
         organInRobot.actualDropoffPosition = actualDropoffPosition
 
         ## the Head is now in the skeleton, on the printbed
-
         ## wait for the bed to cool somewhat, then try pulling. If unsuccessful, wait some more and try again.
         debugPrint("Starting bed pulling procedure",messageVerbosity=0)
         has_pulled_off_bed = False
@@ -509,17 +508,19 @@ class UR5Robot:
 
         while not has_pulled_off_bed:
             temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
-            debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
             self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
             if temperature_to_cool_to<printer.defaultBedCooldownTemperature:
-                # we don't want to wait for a temperature less than room temperature(!) so if we are below the default value we will wait 30 seconds instead
+                debugPrint("Waiting 30 seconds",messageVerbosity=1)
                 time.sleep(30)
             else:
+                debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
                 printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
             debugPrint("Pulling!",messageVerbosity=1)
             self.gripper.enableServos()
             if self.printBedPull():
                 has_pulled_off_bed=True
+            else:
+                self.moveArm(dropoffPoint)
 
         self.setMoveSpeed(self.speedValueReallySlow)
         self.moveArm(postDropoffPointUp)
@@ -540,6 +541,7 @@ class UR5Robot:
             [0, 0, AFDistanceForCompliantMove + AFPostInsertExtraPushDistance])  # point back from final position from which to start force mode
 
         # go to to AF
+        self.setMoveSpeed(self.speedValueNormal)
         self.moveBetweenStations("AF")
         # now on the Assembly fixture, turn on the magnets
         self.sendNothingToArm()
