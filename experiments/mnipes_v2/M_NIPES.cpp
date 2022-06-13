@@ -76,7 +76,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
 
 void M_NIPESIndividual::createMorphology(){
     individual_id = morphGenome->id();
-    morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
+    morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     int i = rewards.size();
@@ -119,20 +119,20 @@ void M_NIPESIndividual::createController(){
     }
 
     if(nn_type == settings::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
 
     }
     else if(nn_type == settings::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nn_inputs,nb_hidden,nn_outputs,weights,bias);
@@ -304,7 +304,11 @@ void M_NIPES::init_morph_pop(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);
@@ -673,6 +677,12 @@ void M_NIPES::reproduction(){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morph_genome,ctrl_genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         if(!corr_indexes.empty()){
             int i = corr_indexes.size() - 1;
@@ -899,7 +909,11 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         corr_indexes.push_back(i);

@@ -4,7 +4,7 @@ using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
     initialize();
-
+    nbr_of_instances = nbrOfInst;
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + port));
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
@@ -304,6 +304,7 @@ void ER::reopenConnections()
 
 bool ER::confirmConnections()
 {
+    int counter = 0;
     for (auto &slave: serverInstances) {
         if (!slave->status()) {
             std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
@@ -311,10 +312,11 @@ bool ER::confirmConnections()
             extApi_sleepMs(20);
         }
         else {
+            counter++;
             continue;
         }
     }
-
+    std::cout << counter << "/" << serverInstances.size() << " servers online" << std::endl;
     //    std::cout << "Connections confirmed" << std::endl;
     return true;
 }
@@ -336,6 +338,7 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
             newCurrentIndexVec.push_back(currentIndexVec[idx]);
         }
      }
+
 
     currentIndVec = newCurrentIndVec;
     currentIndexVec = newCurrentIndexVec;
