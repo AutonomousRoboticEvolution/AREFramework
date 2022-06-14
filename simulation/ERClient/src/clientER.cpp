@@ -333,7 +333,12 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
                 serverInstances[idx].reset();
             else
                 newServInst.push_back(std::move(serverInstances[idx]));
-            indToEval.push_back(currentIndexVec[idx]);
+            bool contain = false;
+            for(int i: indToEval)
+                if(i == currentIndexVec[idx])
+                    contain = true;
+            if(!contain)
+                indToEval.push_back(currentIndexVec[idx]);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
             newCurrentIndVec.push_back(currentIndVec[idx]);
