@@ -176,6 +176,8 @@ bool ER::updateSimulation()
     if(ea->get_population().size() > 0){
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
+            if(serverInstances[slaveIdx]->state() == SlaveConnection::DOWN)
+                continue;
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
             all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
@@ -330,8 +332,18 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
             std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
-            serverInstances[idx].reset();
-            indToEval.push_back(currentIndexVec[idx]);
+            bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
+            if(update_sim_list)
+                serverInstances[idx].reset();
+            else
+                newServInst.push_back(std::move(serverInstances[idx]));
+            bool contain = false;
+            for(int i: indToEval)
+                if(i == currentIndexVec[idx])
+                    contain = true;
+            if(!contain)
+                indToEval.push_back(currentIndexVec[idx]);
+            newServInst.back()->setState(SlaveConnection::DOWN);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
             newCurrentIndVec.push_back(currentIndVec[idx]);
