@@ -330,7 +330,7 @@ void Morphology_CPPNMatrix::create()
     }
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
-    destroyGripper();
+//    destroyGripper();
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -722,26 +722,17 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
-    
     // Gives the direction of the organ given the direction of the surface
-    // Confusing list of angles that are in radians
-    if ((x == 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = -M_PI; orientation.at(1) = +0.0; orientation.at(2) = +0.0;
-    }
-    else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0; orientation.at(1) = +M_PI/2; orientation.at(2) = +0.0;
-    }
-    else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI;
-    }
-    else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI/2;
-    }
-    else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0; orientation.at(1) = -M_PI/2; orientation.at(2) = +M_PI;
-    }
-    else {
-        orientation.at(0) = +0.0; orientation.at(1) = 0.0; orientation.at(2) = 0.0;
+    if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }
