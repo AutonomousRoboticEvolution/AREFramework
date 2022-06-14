@@ -1,10 +1,10 @@
-#experimentName,string,nipes
-#expPluginName,string,/home/edgar/vrep/lib/libNIPES.so
+#experimentName,string,test_are_generate
+#expPluginName,string,/usr/local/lib/libphysical_update.so
 #envType,int,0
-#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
-#robotPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/robots/ARE-1405-legs.ttm
-#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/edgar/are-logs
+#scenePath,string,/home/robofab/programs/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
+#robotPath,string,/home/robofab/programs/evolutionary_robotics_framework/simulation/models/robots/ARE-1405-legs.ttm
+#modelsPath,string,/home/robofab/programs/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/robofab/are-logs
 
 #verbose,bool,1
 #instanceType,int,0

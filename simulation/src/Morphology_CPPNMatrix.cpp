@@ -330,14 +330,13 @@ void Morphology_CPPNMatrix::create()
     }
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
-    destroyGripper();
+//    destroyGripper();
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         int loadInd = 0; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
-    destroy_physical_connectors();
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -653,8 +652,10 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
+
+//                matrix_4d.at(0).push_back(output.at(0));
                 matrix_4d.at(0).push_back(output.at(0));
-                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(1).push_back((output.at(1) > 0.0) ? 1.0 : -1.0);
                 matrix_4d.at(2).push_back(output.at(2));
                 matrix_4d.at(3).push_back(output.at(3));
                 matrix_4d.at(4).push_back(output.at(4));
@@ -721,26 +722,17 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
-    
     // Gives the direction of the organ given the direction of the surface
-    // Confusing list of angles that are in radians
-    if ((x == 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = -M_PI; orientation.at(1) = +0.0; orientation.at(2) = +0.0;
-    }
-    else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0; orientation.at(1) = +M_PI/2; orientation.at(2) = +0.0;
-    }
-    else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI;
-    }
-    else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI/2;
-    }
-    else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0; orientation.at(1) = -M_PI/2; orientation.at(2) = +M_PI;
-    }
-    else {
-        orientation.at(0) = +0.0; orientation.at(1) = 0.0; orientation.at(2) = 0.0;
+    if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }
