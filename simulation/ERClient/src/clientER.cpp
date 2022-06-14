@@ -174,6 +174,8 @@ bool ER::updateSimulation()
     if(ea->get_population().size() > 0){
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
+            if(serverInstances[slaveIdx]->state() == SlaveConnection::DOWN)
+                continue;
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
             all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
@@ -339,6 +341,7 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
                     contain = true;
             if(!contain)
                 indToEval.push_back(currentIndexVec[idx]);
+            newServInst.back()->setState(SlaveConnection::DOWN);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
             newCurrentIndVec.push_back(currentIndVec[idx]);
