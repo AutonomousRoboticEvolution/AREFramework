@@ -81,6 +81,14 @@ private:
      * @param nn_outputs
      */
     void setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs);
+
+
+    /**
+    /** * @brief will loop through all the organs in listOfOrgans and check the testConnection() function
+    /** * @return false if all the organs are OK, true if any fail the testConnection test
+    /** */
+    bool testAllOrganConnections();
+    boardSelection findDaughterBoardForOrgan(Organ *thisOrgan);
 };
 
 }//pi

@@ -36,6 +36,8 @@ public:
      */
     bool testConnection();
 
+    uint8_t getI2CAddress(){return devAddress;}
+
     OrganType organType;
 
 private:
