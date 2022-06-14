@@ -296,8 +296,11 @@ if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # Make the settings file then extract the settings from it
-    makeConfigurationFile(location="YRK") # <--- change this depending on if you're in York or BRL
-    configurationData = json.load(open('configuration_YRK.json'))  # <--- change this depending on if you're in York or BRL
+    with open('location.txt') as f:
+        location = f.read().replace("\n", "")
+        print("location: {}".format(location))
+    makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
 
     if DO_CORE_ORGAN_INSERT:
         printer_number=0

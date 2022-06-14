@@ -106,7 +106,8 @@
          Wait: 0.1
        ElseIf cmd_str≟"nothing"
          Wait: 0.1
-       Else
-         Popup
+       ElseIf cmd_str≟"print_bed_pull"
+         Force
+           Wait: 5.0
        socket_send_string("UR_ready")
      socket_close()
