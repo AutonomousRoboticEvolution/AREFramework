@@ -318,7 +318,7 @@ if __name__ == "__main__":
     # while(1): pass
 
     # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)
+    RoboFab.setupRobotObject ( robotID= "117" , printer=printer)
 
     # make robot:
     RoboFab.buildRobot(printer)
