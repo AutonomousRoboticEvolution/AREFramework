@@ -25,7 +25,7 @@ public:
         for (std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++) {
             if (!it->isOrganRemoved() && it->isOrganChecked()) {
                 organTypes.push_back(it->getOrganType());
-                organPosList.push_back(it->connectorPos);
+                organPosList.push_back(it->get_connector_frame_pos());
                 organOriList.push_back(it->organOri);
             }
         }
@@ -33,13 +33,13 @@ public:
     }
 
     std::vector<int> getOrganTypes()
-    { return organTypes; };
+    { return organTypes;}
 
     std::vector<std::vector<float>> getOrganPosList()
-    { return organPosList; };
+    { return organPosList;}
 
     std::vector<std::vector<float>> getOrganOriList()
-    { return organOriList; };
+    { return organOriList;}
 };
 }
 }

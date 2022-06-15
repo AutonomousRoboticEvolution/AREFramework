@@ -1,0 +1,11 @@
+export QT_QPA_PLATFORM='offscreen'; export LD_LIBRARY_PATH=/home/are/vrep:/home/are/vrep/lib
+
+cmake -DONLY_SIMULATION=1 -DVREP_FOLDER=/home/are/vrep -DCMAKE_INSTALL_PREFIX=/home/are/vrep -DLIMBO_FOLDER=/home/are/evolutionary_robotics_framework/modules/limbo ..
+
+python3 run_cluster.py 25 --vrep /home/are/vrep/vrep.sh --client /home/are/evolutionary_robotics_framework/build/simulation/ERClient/are-client --params /home/are/evolutionary_robotics_framework/experiments/object_multitarget/parameters.csv --port-start 20000 --xvfb 0 &
+
+ ./vrep.sh -h -g/home/are/evolutionary_robotics_framework/experiments/nipes_barrel/parameters.csv &
+
+nohup xvfb-run -a -s "-screen 0 1024x768x24" ./vrep.sh -h -g/home/are/evolutionary_robotics_framework/experiments/nipes_barrel/parameters.csv &
+
+nohup xvfb-run -a -s "-screen 0 1024x768x24" ./coppeliaSim.sh -h -g/home/are/evolutionary_robotics_framework/experiments/joint_nipes/parameters.csv &

@@ -21,7 +21,6 @@ add_library(physical_melai SHARED
    factories.cpp
    mnipes.cpp
    cmaes_learner.cpp
-   ../../PhysicalER/src/io_helpers.cpp
    mnipes_loggings.cpp
    )
 

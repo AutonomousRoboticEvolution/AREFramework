@@ -205,6 +205,8 @@ void NIPES::init_next_pop(){
 }
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
+    if(simulator_side)
+        std::dynamic_pointer_cast<sim::NN2Individual>(population[indIdx])->add_reward(objectives[0]);
     population[indIdx]->setObjectives(objectives);
 }
 
@@ -215,8 +217,18 @@ bool NIPES::update(const Environment::Ptr & env){
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
-        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
+//        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
+//        std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
+        int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+        if(std::dynamic_pointer_cast<sim::NN2Individual>(ind)->get_number_times_evaluated() < number_of_targets){
+            return false;
+        }else{
+            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_final_position(env->get_final_position());
+            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->compute_fitness();
+            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->reset_rewards();
+//            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectory(env->get_trajectory());
+        }
     }
 
 
@@ -236,8 +248,14 @@ bool NIPES::is_finish(){
 }
 
 bool NIPES::finish_eval(const Environment::Ptr &env){
-
-    std::vector<double> target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
+    int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
+    std::vector<double> target;
+    if(env_type == 0){
+        target = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_current_target();
+    }
+    if(env_type == 1){
+        target = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_current_target();
+    }
     float tPos[3];
     tPos[0] = static_cast<float>(target[0]);
     tPos[1] = static_cast<float>(target[1]);

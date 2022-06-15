@@ -64,8 +64,9 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                 // Activate NN
                 cppn.step(input);
                 outputs = cppn.outf();
-                for(const auto& o: outputs)
-                    assert(!std::isnan(o));
+                for(auto& o: outputs)
+                    if(std::isnan(o))
+                        o = 0;
                 // Take output from NN and store it.
                 areVoxel.bone = morph_const::empty_voxel;
                 if(outputs[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
@@ -326,8 +327,37 @@ void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonM
     }
 }
 
-//loops through every bit of skeleton to find surface
-//this is over kill with the fact that the exploreSkeleton also has a recursion
+void GenomeDecoder::removeOverhangs(PolyVox::RawVolume<uint8_t> &skeletonMatrix){
+    // loop through every voxel, starting at the second z layer (since the whole first layer is supported by the bed so none need be removed)
+    auto region = skeletonMatrix.getEnclosingRegion();
+    for(int32_t z = region.getLowerZ()+2; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+
+                if( skeletonMatrix.getVoxel(x, y, z) == morph_const::filled_voxel ){
+                    // if we are in here, then this voxel is currently filled, so we need to test if it is supported
+                    bool isSupported=false;
+
+                    // check the potentially supporting voxels, i.e. the 9 voxels below this one:
+                    for (int dx=-1; dx<=1; dx+=1){ // dx is the offset in x direction, so we want to test -1, 0 and +1
+                        for (int dy=-1; dy<=1; dy+=1){ // dy is the offset in y direction, so we want to test -1, 0 and +1
+
+                            // check that the potentially supporting voxel is inside the volume (may bot be the case for voxels on the edge of the volume):
+                            if( x+dx >= region.getLowerX() && x+dx <= region.getUpperX() && y+dy >= region.getLowerY() && y+dy <= region.getUpperY() ) {
+                                // check if the potenitally supporting voxel is filled, in which case it is supported
+                                if (skeletonMatrix.getVoxel(x+dx, y+dy, z-1) == morph_const::filled_voxel) {isSupported=true;}
+                            }
+                        }}
+
+                    // if we did not find any supporting voxel, this voxel should not be filled:
+                    if (!isSupported){
+                        skeletonMatrix.setVoxel(x, y, z, morph_const::empty_voxel);
+                    }
+                }
+
+            }}} // end of loop through every voxel
+}
+
 void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
     // This matrix stores the visited elements.
@@ -362,6 +392,7 @@ void GenomeDecoder::genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);
     removeSkeletonRegions(skeletonMatrix);
+    removeOverhangs(skeletonMatrix);
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
@@ -376,6 +407,7 @@ void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);
     removeSkeletonRegions(skeletonMatrix);
+    removeOverhangs(skeletonMatrix);
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
@@ -390,5 +422,6 @@ void GenomeDecoder::genomeDecoder(std::vector<std::vector<double>> &matrix_4d, P
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);
     removeSkeletonRegions(skeletonMatrix);
+    removeOverhangs(skeletonMatrix);
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }

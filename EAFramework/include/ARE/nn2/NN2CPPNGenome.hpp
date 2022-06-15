@@ -84,7 +84,7 @@ public:
         _id = static_id++;
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), morph_desc(gen.morph_desc), parents_ids(gen.parents_ids){
+        Genome(gen), cppn(gen.cppn), cart_desc(gen.cart_desc), organ_position_desc(gen.organ_position_desc), parents_ids(gen.parents_ids){
     }
     ~NN2CPPNGenome() override {}
 
@@ -108,7 +108,17 @@ public:
         cppn.mutate();
     }
 
-    void crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override {
+    void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
+        are::nn2_cppn_t cppn_child;
+        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
+        cppn.crossover(cppn_partner,cppn_child);
+        *child = NN2CPPNGenome(cppn_child);
+        child->set_parameters(parameters);
+        child->set_randNum(randomNum);
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child)->set_parents_ids({_id,partner->id()});
+    }
+
+    void symmetrical_crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override{
         are::nn2_cppn_t cppn_child1, cppn_child2;
         are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child1);
@@ -120,9 +130,8 @@ public:
         child1->set_randNum(randomNum);
         child2->set_randNum(randomNum);
         std::dynamic_pointer_cast<NN2CPPNGenome>(child1)->set_parents_ids({_id,partner->id()});
-        std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({_id,partner->id()});
+        std::dynamic_pointer_cast<NN2CPPNGenome>(child2)->set_parents_ids({partner->id(),_id});
     }
-
 
     void from_string(const std::string & str) override
     {
@@ -147,14 +156,18 @@ public:
     {
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
-        arch & morph_desc;
+        arch & cart_desc;
+        arch & organ_position_desc;
         arch & parents_ids;
         arch & matrix_4d;
         arch & generation;
     }
 
-    const CartDesc& get_morph_desc() const {return morph_desc;}
-    void set_morph_desc(const CartDesc& md){morph_desc = md;}
+    const CartDesc& get_cart_desc() const {return cart_desc;}
+    void set_cart_desc(const CartDesc& md){cart_desc = md;}
+
+    const OrganPositionDesc& get_organ_position_desc(){return organ_position_desc;}
+    void set_organ_position_desc(const OrganPositionDesc& opd){organ_position_desc = opd;}
 
     const std::vector<int>& get_parents_ids() const {return parents_ids;}
     void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
@@ -177,8 +190,9 @@ public:
 private:
     std::vector<int> parents_ids;
     nn2_cppn_t cppn;
-    CartDesc morph_desc;
-    int generation;
+    CartDesc cart_desc;
+    OrganPositionDesc organ_position_desc;
+    int generation=0;
     std::vector<std::vector<double>> matrix_4d;
 };
 

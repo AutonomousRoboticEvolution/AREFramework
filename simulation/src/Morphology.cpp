@@ -15,12 +15,9 @@ void Morphology::command(const std::vector<double> &ctrl_com){
     if(ctrl_com.empty())
         return;
     
-        
     double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
     energy_cost = 0;
 
-
-    
     if(!wheelHandles.empty()){
         //Wheel Commands
         std::vector<double> wheel_com;

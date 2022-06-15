@@ -35,3 +35,7 @@ Individual::Ptr EA::getIndividual(size_t index) const
     return population[index];
 }
 
+void EA::fill_ind_to_eval(std::vector<int> &ind_to_eval){
+    for(int i = 0; i < population.size(); i++)
+        ind_to_eval.push_back(i);
+}

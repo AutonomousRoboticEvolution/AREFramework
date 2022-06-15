@@ -7,7 +7,8 @@ void PMEIndividual::createMorphology(){
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_morph_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
 
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
     listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
@@ -16,6 +17,10 @@ void PMEIndividual::createMorphology(){
     skeletonListVertices = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getSkeletonListVertices();
 }
 
+MNIPES::MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){
+    settings::defaults::parameters->emplace("#tournamentSize",new settings::Integer(4));
+    settings::defaults::parameters->emplace("#nbrOfOffSprings",new settings::Integer(1));
+}
 
 void MNIPES::init(){
 
@@ -24,16 +29,18 @@ void MNIPES::init(){
 
 void MNIPES::init_random_pop(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
     for(int i = 0; i < pop_size; i++){
         //create a new morph genome with random structure and parameters
-        NN2CPPNGenome new_morph_gene;
-        new_morph_gene.random();
-        new_morph_gene.set_parameters(parameters);
-        new_morph_gene.set_randNum(randomNum);
-        //-
-
+        Genome::Ptr morph_genome;
+        if(genome_type == CPPN)
+            morph_genome.reset(new NN2CPPNGenome);
+        else
+            morph_genome.reset(new ProtomatrixGenome);
+        morph_genome->random();
+        morph_genome->set_parameters(parameters);
+        morph_genome->set_randNum(randomNum);
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
-        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
         PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
         ind->set_parameters(parameters);
@@ -96,7 +103,7 @@ bool MNIPES::update(const Environment::Ptr &env){
             std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
             std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
             int wheels,joints,sensors;
-            phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
+            ioh::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
             ctrl_archive.update(std::make_shared<NNParamGenome>(best_current_ctrl_genome),1-best_controller.first,wheels,joints,sensors);
         }
         //-
@@ -104,8 +111,15 @@ bool MNIPES::update(const Environment::Ptr &env){
     return true;
 }
 
-void MNIPES::_survival(const phy::MorphGenomeInfoMap &morph_gen_info, std::vector<int> &list_ids){
+void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vector<int> &list_ids){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+
+    //if the population size is greater or equal to the number of genomes currently available (in morph_gen_info), skip the survival step
+    if(morph_gen_info.size() <= pop_size){
+        for(const auto& elt: morph_gen_info)
+            list_ids.push_back(elt.first);
+        return;
+    }
 
     int max_gen = 0;
     std::multimap<int,int> map_per_gen;
@@ -149,56 +163,104 @@ void MNIPES::_survival(const phy::MorphGenomeInfoMap &morph_gen_info, std::vecto
 }
 
 void MNIPES::_reproduction(){
-    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
-    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    std::vector<int> ids;
-    phy::load_ids_to_be_evaluated(repository + "/" + exp_name,ids);
-    int nbr_of_offsprings = pop_size - ids.size();
+    int nbr_of_offsprings = settings::getParameter<settings::Integer>(parameters,"#nbrOfOffsprings").value;
+    int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
 
     std::vector<int> genome_ids;
-    for(const auto &elt: morph_genomes_info)
+    for(const auto &elt: morph_genomes)
         genome_ids.push_back(elt.first);
 
-    for(int i = 0; i < nbr_of_offsprings; i++){
-        //Selection of 4 random parents
+    auto random_selection = [&](std::vector<int> ids, int size) -> std::vector<int>{
         std::vector<int> random_indexes;
-        random_indexes.push_back(randomNum->randInt(0,pop_size - 1));
-        do{
-            int rand_idx = randomNum->randInt(0,pop_size - 1);
-            bool already_drawn = false;
-            for(const int& idx: random_indexes)
-                if(idx == rand_idx){
-                    already_drawn = true;
-                    break;
-                }
-            if(!already_drawn)
-                random_indexes.push_back(rand_idx);
-        }while(random_indexes.size() < 4);
-        //-
+        if(ids.size() < size){
+            for(int i = 0; i < ids.size();i++)
+            random_indexes.push_back(i);
+        }else{
+            //Selection of tournament size random parents
+            random_indexes.push_back(randomNum->randInt(0,ids.size() - 1));
+            do{
+                int rand_idx = randomNum->randInt(0,ids.size() - 1);
+                bool already_drawn = false;
+                for(const int& idx: random_indexes)
+                    if(idx == rand_idx){
+                        already_drawn = true;
+                        break;
+                    }
+                if(!already_drawn)
+                    random_indexes.push_back(rand_idx);
+            }while(random_indexes.size() < size); //select up to 4 random individuals.
+        }
+        return random_indexes;
+    };
 
-        //Selection of best parents among the subset of 4
-        double best_fitness = 0;
-        int best_id = 0;
-        for(const int &i: random_indexes){
-            double fit = settings::cast<settings::Double>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
-            if(best_fitness < fit){
-                best_fitness = fit;
-                best_id = genome_ids[i];
+    auto best_of_subset = [&](const std::vector<int> &ri) -> int{ //Selection of best parents among the subset of 4
+            double best_fitness = 0;
+            int best_id = 0;
+            for(const int &i: ri){
+                double fit = settings::cast<settings::Double>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
+                if(best_fitness < fit){
+                    best_fitness = fit;
+                    best_id = genome_ids[i];
+                }
             }
+            return best_id;
+    };
+
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+
+    for(int i = 0; i < nbr_of_offsprings; i++){
+        Genome::Ptr new_morph_gene;
+        /** CROSSBREEDING **\
+         * 1 - Check if crossbreeding should be activated
+         * 2 - Select individual from robot library to be crossbreed
+         * 3 - pairing
+         * TODO : extract protomatrix from cppn genome
+         */
+        Crossbreeding crossbreeding(parameters,randomNum);
+        if(crossbreeding.should_crossbreed(morph_genomes_info)){
+            std::map<int,Genome::Ptr> robot_lib_genomes;
+            crossbreeding.selection(tournament_size,robot_lib_genomes);
+            std::vector<int> rl_genome_ids;
+            for(const auto &elt: robot_lib_genomes)
+                rl_genome_ids.push_back(elt.first);
+            std::vector<int> ri_genomes = random_selection(genome_ids,tournament_size);
+            int rl_id = rl_genome_ids[random_selection(rl_genome_ids,1).back()];
+            int best_id = best_of_subset(ri_genomes);
+//            nn2_cppn_t rl_parent = robot_lib_genomes[rl_id].get_cppn();
+//            nn2_cppn_t parent = morph_genomes[best_id].get_cppn();
+//            nn2_cppn_t new_cppn;
+//            rl_parent.crossover(parent,new_cppn);
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->crossover(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
+            else{
+                auto matrix = protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn());
+                auto child_matrix = protomatrix::crossover_matrix(matrix,std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id])->get_matrix_4d());
+                std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->set_matrix_4d(child_matrix);
+            }
+           // new_morph_gene.mutate(); //mutate?
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
+            else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
+            new_morph_gene->set_parameters(parameters);
+            new_morph_gene->set_randNum(randomNum);
+        }
+        else{//without crossbreeding
+            std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
+            int best_id = best_of_subset(random_indexes);
+            if(genome_type == CPPN)
+                new_morph_gene.reset(new NN2CPPNGenome(*(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]).get())));
+            else new_morph_gene.reset(new ProtomatrixGenome(*(std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id]).get())));
+            new_morph_gene->mutate();
+            if(genome_type == CPPN)
+                std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
+            else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
+            new_morph_gene->set_parameters(parameters);
+            new_morph_gene->set_randNum(randomNum);
         }
 
-        NN2CPPNGenome new_morph_gene = morph_genomes[best_id];
-        new_morph_gene.mutate();
-        new_morph_gene.incr_generation();
-        new_morph_gene.set_parameters(parameters);
-        new_morph_gene.set_randNum(randomNum);
-        //-
-
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
-        NN2CPPNGenome::Ptr morph_genome(new NN2CPPNGenome(new_morph_gene));
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
-        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        PMEIndividual::Ptr ind(new PMEIndividual(new_morph_gene,ctrl_genome));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -218,7 +280,7 @@ void MNIPES::init_learner(int id){
 
 
     int wheels, joints, sensors;
-    phy::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
+    ioh::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
     int nn_inputs;
     if (useArucoAsInput){
         nn_inputs = sensors*2 + 1;
@@ -254,7 +316,7 @@ void MNIPES::init_learner(int id){
         else{
             NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
             if(load_existing_ctrls)// load existing controllers
-                phy::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
+                ioh::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
             else if(use_ctrl_arch)// load from controller archive
                 ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
             else learner.init();
@@ -298,25 +360,36 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
 void MNIPES::load_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    phy::MorphGenomeInfoMap morph_gen_info;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+
+
+    ioh::MorphGenomeInfoMap morph_gen_info;
     std::string exp_folder = repo + std::string("/") + exp_name;
-    phy::load_morph_genomes_info(exp_folder,morph_gen_info);
+    ioh::load_morph_genomes_info(exp_folder,morph_gen_info);
     //if morph genomes info is empty, then we are in a initialization situation.
     if(morph_gen_info.empty())
         return;
 
     std::vector<int> list_to_load;
     _survival(morph_gen_info,list_to_load);
-    phy::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
+
+    /** CrossMigration
+     * 1) look at the robot library for interesting robot
+     * 2) load this robot and add it to the building queue
+     */
+
+    if(genome_type == CPPN)
+        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
+    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
 
 }
 
 void MNIPES::write_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    phy::write_morph_blueprints<PMEIndividual>(repo + "/" + exp_name,population);
-    phy::write_morph_meshes<PMEIndividual>(repo + "/" + exp_name,population);
-    phy::write_morph_genomes(repo + "/" + exp_name,population);
+    ioh::write_morph_blueprints<PMEIndividual>(repo + "/" + exp_name,population);
+    ioh::write_morph_meshes<PMEIndividual>(repo + "/" + exp_name,population);
+    ioh::write_morph_genomes(repo + "/" + exp_name,population);
 }
 
 void MNIPES::load_data_for_update() {
@@ -335,6 +408,8 @@ void MNIPES::load_data_for_update() {
 }
 
 void MNIPES::write_data_for_update(){
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
         if(!learner.second.is_learning_finish())
@@ -342,11 +417,26 @@ void MNIPES::write_data_for_update(){
         std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
         std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
 
-        std::map<int,NN2CPPNGenome> gen;
-        phy::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
-        phy::MorphGenomeInfo morph_info;
-        morph_info.emplace("generation",new settings::Integer(gen[learner.first].get_generation()));
+        ioh::MorphGenomeInfo morph_info;
+        std::map<int,Genome::Ptr> gen;
+        if(genome_type == CPPN){
+            ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+            morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<NN2CPPNGenome>(gen[learner.first])->get_generation()));
+        }
+
+        else{
+            ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
+            morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<ProtomatrixGenome>(gen[learner.first])->get_generation()));
+        }
+
+
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
-        phy::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
+        ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
+    }
+}
+
+void MNIPES::write_morph_descriptors(){
+    for(const auto& ind : population){
+
     }
 }

@@ -2,21 +2,16 @@
 
 using namespace are;
 
-void CMAESLearner::init(std::vector<double> initial_point){
+void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
-
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesPopSize").value;
     float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
     double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
-    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
-
-    if(initial_point.empty())
-        initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
 
     double lb[_dimension], ub[_dimension];
     for(int i = 0; i < _dimension; i++){
@@ -24,13 +19,17 @@ void CMAESLearner::init(std::vector<double> initial_point){
         ub[i] = max_weight;
     }
 
+    from_scratch = initial_point.empty();
+    if(initial_point.empty())
+        initial_point = _rand_num->randVectd(-max_weight,max_weight,_dimension);
+
     geno_pheno_t gp(lb,ub,_dimension);
 
     cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,_rand_num->getSeed(),gp);
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
-    _cma_strat.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
     _cma_strat->set_elitist_restart(elitist_restart);
     _cma_strat->set_length_of_stagnation(lenStag);
     _cma_strat->set_novelty_ratio(novelty_ratio);
@@ -141,7 +140,10 @@ bool CMAESLearner::step(){
 }
 
 bool CMAESLearner::is_learning_finish() const{
-    int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesNbrEval").value;
+    int max_nbr_eval = 0;
+    if(from_scratch)
+        max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesLargeNbrEval").value;
+    else max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesSmallNbrEval").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose)
         std::cout << "INFO - CMAES: Learning ending conditions: " << current_nbr_ind << " = 0 and (nbr evals "
@@ -150,6 +152,24 @@ bool CMAESLearner::is_learning_finish() const{
     return current_nbr_ind == 0 && (_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50);
 
 }
+
+std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_remaining_population(){
+    std::vector<w_b_pair_t>  new_pop;
+    for(int k = _population.size() - current_nbr_ind; k < _population.size(); k++){
+        auto gen = _population[k];
+        std::vector<double> weights;
+        std::vector<double> biases;
+        int i = 0;
+        for(; i < _nbr_weights; i++)
+            weights.push_back(std::tanh(gen(i)));
+        for(; i < _dimension; i++)
+            biases.push_back(std::tanh(gen(i)));
+
+        new_pop.push_back(std::make_pair(weights,biases));
+    }
+    return new_pop;
+}
+
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
     if(new_population_available){

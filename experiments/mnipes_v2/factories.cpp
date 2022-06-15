@@ -10,18 +10,19 @@ extern "C" are::Environment::Ptr environmentFactory
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
     if(env_type == are::MAZE){
-        env.reset(new are::sim::MazeEnv);
+        env = std::make_shared<are::sim::MazeEnv>();
         env->set_parameters(param);
     }
     else if(env_type == are::OBSTACLES)
-        env.reset(new are::sim::ObstacleAvoidance(param));
+        env = std::make_shared<are::sim::ObstacleAvoidance>(param);
     else if(env_type == are::MULTI_TARGETS)
-        env.reset(new are::sim::MultiTargetMaze(param));
+        env = std::make_shared<are::sim::MultiTargetMaze>(param);
     else if(env_type == are::EXPLORATION)
-        env.reset(new are::sim::Exploration(param));
+        env = std::make_shared<are::sim::Exploration>(param);
     else if(env_type == are::BARREL)
-        env.reset(new are::sim::BarrelTask(param));
-
+        env = std::make_shared<are::sim::BarrelTask>(param);
+    else if(env_type == are::GRADUAL)
+        env = std::make_shared<are::sim::GradualEnvironment>(param);
     return env;
 }
 
@@ -41,6 +42,13 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::GenomeInfoLog::Ptr gilog(new are::GenomeInfoLog(fit_log_file));
     logs.push_back(gilog);
 
+    std::string gp_log_file = are::settings::getParameter<are::settings::String>(param,"#genomesPoolFile").value;
+    are::GenomesPoolLog::Ptr gplog(new are::GenomesPoolLog(gp_log_file));
+    logs.push_back(gplog);
+
+    std::string bgi_log_file = are::settings::getParameter<are::settings::String>(param,"#bestGenomesInfoFile").value;
+    are::BestGenomesArchiveLog::Ptr bgilog(new are::BestGenomesArchiveLog(bgi_log_file));
+    logs.push_back(bgilog);
 
     bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
     if(use_ctrl_arch){

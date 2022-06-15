@@ -57,12 +57,14 @@ public:
 
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
+    int nbr_of_instances = 0;
     int population_size = 0;
     int loadingTrials = 3;
     bool sim_init = false;
     std::vector<Individual::Ptr> currentIndVec;
     std::vector<int> currentIndexVec;
     std::vector<int> indToEval;
+    int nbrIndInEval = 0;
     std::vector<std::pair<hr_clock::time_point,hr_clock::time_point>> eval_times;
 };
 

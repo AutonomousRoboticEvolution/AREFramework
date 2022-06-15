@@ -13,20 +13,20 @@ void NN2Individual::createController(){
     nb_output = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_nbr_output();
 
     if(nn_type == st::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
 
     }
     else if(nn_type == st::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);

@@ -113,7 +113,7 @@ void BasicEA::selection()
 
     for(int i = 0; i < c1.size()/2; i++){
         Individual::Ptr child1(new sim::NN2Individual), child2(new sim::NN2Individual);
-        childrens[c1[i]]->crossover(childrens[c2[i]],*child1,*child2);
+        childrens[c1[i]]->symmetrical_crossover(childrens[c2[i]],*child1,*child2);
         population.push_back(child1);
         population.push_back(child2);
     }

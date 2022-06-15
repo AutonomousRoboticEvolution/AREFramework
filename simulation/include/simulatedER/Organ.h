@@ -32,6 +32,7 @@ private:
     bool organRemoved;
     bool organChecked;
     are::settings::ParametersMapPtr parameters;
+    std::vector<float> connector_frame_pos;
 
 public:
 
@@ -57,6 +58,22 @@ public:
         objectHandles.clear();
         parameters = param;
     }
+    Organ(const Organ& o):
+        organHandle(o.organHandle),
+        organType(o.organType),
+        connectorHandle(o.connectorHandle),
+        physics_connector_handle(o.physics_connector_handle),
+        connectorOri(o.connectorOri),
+        organRemoved(o.organRemoved),
+        organChecked(o.organChecked),
+        parameters(o.parameters),
+        organPos(o.organPos),
+        connectorPos(o.connectorPos),
+        organOri(o.organOri),
+        organInsideSkeleton(o.organInsideSkeleton),
+        organColliding(o.organColliding),
+        connector_frame_pos(o.connector_frame_pos),
+        organGripperAccess(o.organGripperAccess){}
     /**
      * @brief This method creates, places and rotates the simulated organ. The parent will be the skeleton hangle passed.
      * @param skeletonHandle - parent skeleton
@@ -100,6 +117,7 @@ public:
     /// Getters and setters
     int getOrganHandle() const {return organHandle;}
     int getOrganType() const {return organType;}
+    std::vector<float> get_connector_frame_pos() const {return connector_frame_pos;}
     int get_graphical_connector_handle() const {return physics_connector_handle;}
     bool isOrganRemoved() const {return organRemoved;}
     bool isOrganChecked() const {return organChecked;}

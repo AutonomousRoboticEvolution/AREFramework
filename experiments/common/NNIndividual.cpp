@@ -5,7 +5,7 @@ using namespace are;
 void NNIndividual::createController(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<NNGenome>(ctrlGenome)->get_nn_genome();
-    control.reset(new NNControl);
+    control = std::make_shared<NNControl>();
     control->set_parameters(parameters);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
@@ -14,7 +14,7 @@ void NNIndividual::createController(){
 
 void NNIndividual::createMorphology(){
     std::string robot = settings::getParameter<settings::String>(parameters,"#robot").value;
-    morphology.reset(new FixedMorphology(parameters));
+    morphology = std::make_shared<FixedMorphology>(parameters);
     std::dynamic_pointer_cast<FixedMorphology>(morphology)->loadModel();
 
 
