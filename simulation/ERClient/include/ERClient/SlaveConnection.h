@@ -31,6 +31,7 @@ public:
         EVALUATING = 1,
         // RELOAD_GENOME = 9,
         DELAY = 10,
+        DOWN = -2
     };
 
 private:
