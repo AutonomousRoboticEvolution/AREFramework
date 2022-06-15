@@ -106,7 +106,7 @@ std::vector<std::vector<double>> protomatrix::crossover_matrix(const std::vector
     return child_matrix_4d;
 }
 
-std::vector<std::vector<double>> retrieve_matrices_from_cppn(nn2_cppn_t cppn){
+std::vector<std::vector<double>> protomatrix::retrieve_matrices_from_cppn(nn2_cppn_t cppn){
     using mc = are::morph_const;
     std::vector<double> input{0,0,0,0};
     std::vector<double> output;
