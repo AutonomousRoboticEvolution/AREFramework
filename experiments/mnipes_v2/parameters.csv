@@ -23,16 +23,16 @@
 #fitnessFile,string,fitnesses.csv
 #genomesPoolFile,string,genomes_pool.csv
 
-#envType,int,2
+#envType,int,0
 #envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
 #scenes,sequence_string,shapes_exploration.ttt
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.75;0.75;0.12
 #targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
-#initPosition,sequence_double,0;0;0.12
+#initPosition,sequence_double,0;0;0.1
 
 #noiseLevel,double,0.
-#maxVelocity,double,6.
+#maxVelocity,double,10.
 #MaxWeight,float,1.0
 #NNType,int,2
 #NbrHiddenNeurones,int,6
@@ -41,17 +41,17 @@
 #reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,12
-#maxEvalTime,float,10
+#populationSize,int,10
+#maxEvalTime,float,30
 #timeStep,float,0.1
-#maxNbrEval,int,10
+#maxNbrEval,int,20000
 #fitnessType,int,0
 #withCrossover,bool,1
 
-#cmaesSmallNbrEval,int,2
-#cmaesLargeNbrEval,int,2
-#cmaesPopSize,int,2
-#cmaesMaxPopSize,int,40
+#cmaesSmallNbrEval,int,200
+#cmaesLargeNbrEval,int,400
+#cmaesPopSize,int,10
+#cmaesMaxPopSize,int,20
 #CMAESStep,double,1.
 #FTarget,double,0.5
 #elitistRestart,bool,0
@@ -87,4 +87,3 @@
 #withTiles,bool,1
 #flatFloor,bool,1
 #energyReduction,bool,0
-#bootstrapFolder,string,None

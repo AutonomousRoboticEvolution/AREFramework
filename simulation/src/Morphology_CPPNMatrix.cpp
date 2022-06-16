@@ -330,7 +330,7 @@ void Morphology_CPPNMatrix::create()
     }
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
-//    destroyGripper();
+    destroyGripper();
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
