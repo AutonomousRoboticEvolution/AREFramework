@@ -182,7 +182,7 @@ class Robot:
         debugPrint("Allocating sockets for the organs with cables...",0)
         headOrigin = self.organsList[0].positionTransformWithinBankOrRobot
 
-        indexesOfJoints = [ i for i,o in enumerate(self.organsList) if o.friendlyName.upper().startswith("JOINT")] # get a list of index values of self.myRobot.organsList that refer to joints
+        indexesOfJoints = [ i for i,o in enumerate(self.organsList) if o.friendlyName.upper().startswith("JOINT") or o.friendlyName.upper().startswith("LEG")] # get a list of index values of self.myRobot.organsList that refer to joints
         # sort this list in order of the absolute x coordinate of each organ's male TRRS socket:
         indexesOfJoints = [indexesOfJoints[i] for i in np.argsort( [
             math.atan( abs((o.positionTransformWithinBankOrRobot * np.linalg.inv(o.transformOrganOriginToClipCentre) * o.transformOrganOriginToMaleCableSocket)[1,3]) /
