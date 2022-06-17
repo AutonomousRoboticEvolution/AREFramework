@@ -27,7 +27,7 @@ def makeFile(location):
 		PRINTER_0_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_1_API_KEY = "change_me"
 		PRINTER_2_API_KEY = "change_me"
-		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=0.037 ).tolist()
+		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=90 + 0.037 ).tolist()
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
