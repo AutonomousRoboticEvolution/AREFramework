@@ -1,6 +1,7 @@
 #tracking parameters
 import cv2
 from cv2 import aruco
+import os
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()
 
@@ -22,6 +23,13 @@ resolution_width = -1 # 1920 # set negative to leave as the default for your cam
 resolution_height = -1 # 1080 # set negative to leave as the default for your camera
 
 zmq_port_number= "5557"
+temporary_image_folder_path = "/tmp/temp_images"
+videos_folder_path = "/tmp/tracking_videos"
+# make sure folders exist to prevent errors later:
+for x in [temporary_image_folder_path, videos_folder_path]:
+    if not os.path.exists(x): os.makedirs(x)
+max_frame = 30*5*60 # 5 minutes
+
 
 with open('location.txt') as f:
     location = f.read().replace("\n","")

@@ -16,18 +16,22 @@ class TrackingSystem:
         # set parameters
         self.show_frames = True
 
+        # recording variables
+        self.is_recording = False
+        self.i_frame = 0
+
         #set up zmq
         context = zmq.Context()
         self.socket = context.socket(zmq.REP)
         self.socket.bind("tcp://*:{}".format(zmq_port_number))
 
         # the robot and aruco_tags objects that are updated inside the threaded_updater:
-        self.uncropped_image = None
+        self.cropped_image = None
         self.robot = None
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
 
-        
+
     @staticmethod
     # input pixels should be in the cropped image
     # input should be: [x, y]
@@ -60,7 +64,7 @@ class TrackingSystem:
         detector = cv2.SimpleBlobDetector_create(blob_detection_parameters)
 
         #fills holes in mask to improve blob detection
-        fix_mask = True
+        fix_mask = False
         if fix_mask:
             fixed_mask = self.fillHoles(mask)
             keypoints = detector.detect(fixed_mask)
@@ -128,19 +132,24 @@ class TrackingSystem:
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, self.uncropped_image = vid.read()
+            self.frame_return_success, temp_image = vid.read()
 
             if self.frame_return_success:
-                image = self.crop_image(self.uncropped_image)
+                self.cropped_image = self.crop_image(temp_image)
                 # gets robot location
-                self.robot = self.robot_location(image, brainMin, brainMax)
+                self.robot = self.robot_location(self.cropped_image, brainMin, brainMax)
 
                 # gets tag locations and sends them
-                self.aruco_tags = self.aruco_locations(image)
+                self.aruco_tags = self.aruco_locations(self.cropped_image)
+
+                if self.is_recording:
+                    cv2.imwrite("{}/image%04d.png".format(temporary_image_folder_path) % self.i_frame , self.cropped_image)
+                    self.i_frame += 1
+                    if self.i_frame>=max_frame: self.is_recording=False
 
                 if self.show_frames:
-                    cv2.imshow("Cropped", image )
-                    cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
+                    cv2.imshow("Cropped", self.cropped_image )
+                    cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(self.cropped_image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
@@ -162,7 +171,7 @@ class TrackingSystem:
 
             # wait for zmq request
             message = self.socket.recv().decode('utf-8')
-            # print("Got message ",message)
+            print("Got message ",message)
 
             if str(message) == "Robot:position":
                 # send the latest value of self.robot
@@ -183,17 +192,48 @@ class TrackingSystem:
                     self.socket.send_string("Tags:[]") # empty list
 
             elif str(message) == "Image:resolution":
-                print("Sending image resolution of {}x{}x{}".format(self.uncropped_image.shape[0],self.uncropped_image.shape[1],self.uncropped_image.shape[2]))
-                self.socket.send_string("Image:{}".format(self.uncropped_image.shape))
+                print("Sending image resolution of {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
+                self.socket.send_string("Image:{}".format(self.cropped_image.shape))
 
             elif str(message) == "Image:image":
                 # print(self.uncropped_image)
-                self.socket.send(self.uncropped_image.tobytes())
+                self.socket.send(self.cropped_image.tobytes())
+
+            elif str(message) == "Recording:start":
+                print("starting recording")
+                self.is_recording = False
+                self.discardRecordingImages()
+                self.is_recording = True
+                self.socket.send_string("OK")
+
+            elif str(message) == "Recording:discard":
+                self.is_recording = False
+                print("deleting images")
+                self.discardRecordingImages()
+                self.socket.send_string("OK")
+
+            elif str(message).startswith("Recording:save_"):
+                self.is_recording = False
+                filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
+                print("saving file {}".format(filename))
+                self.saveVideo(filename)
+                self.socket.send_string("OK")
+
             else:
                 warnings.warn("Got an unrecognised message: {}".format(message))
 
+    def saveVideo(self,filename):
+        ffmpeg_command = "ffmpeg -y -r 30 -i {}/image%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p {}/{}.mp4".format(temporary_image_folder_path,videos_folder_path,filename)
+        os.system(ffmpeg_command)
+        self.discardRecordingImages()
+
+    def discardRecordingImages(self):
+        # os.remove("{}/*".format(temporary_image_folder_path))
+        os.system("rm {}/*".format(temporary_image_folder_path))
+        self.i_frame = 0
+
     def main(self):
-        
+
         # start the threaded process that gets and interprets images:
         threading.Thread(target=self.zmq_updater).start()  # starting in thread allows update of the camera at a higher frequency than zmq messages are sent
         self.camera_updater()
