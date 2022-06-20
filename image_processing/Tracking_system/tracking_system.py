@@ -13,10 +13,7 @@ from tracking_parameters import *
 class TrackingSystem:
 
     def __init__(self):
-        # set parameters
-        self.show_frames = True
-
-        # create the viedo capture object, which is used to get frames from the camera
+        # create the video capture object, which is used to get frames from the camera
         self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
 
         # set resolution:
@@ -26,18 +23,17 @@ class TrackingSystem:
             self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_height)
 
         # start the video writer object, which is used to save the video to a file
-        print(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH))
         if crop_rectangle[0]<0:
             self.save_resolution = (int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         else:
             self.save_resolution = ( crop_rectangle[2],crop_rectangle[3] )
-
-        self.output_video_writer = cv2.VideoWriter('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
-
+        self.output_video_writer = cv2.VideoWriter('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
         self.is_recording = False # this boolean keeps track of whether to be saving frames or not
+        self.recording_start_time=0.0
+        self.recording_frame_number=0
+        self.video_writer_is_busy = False
 
-
-#set up zmq
+        #set up zmq
         context = zmq.Context()
         self.socket = context.socket(zmq.REP)
         self.socket.bind("tcp://*:{}".format(zmq_port_number))
@@ -47,6 +43,7 @@ class TrackingSystem:
         self.robot = None
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
+        self.last_frame_grab_time=time.time()
 
 
     @staticmethod
@@ -122,11 +119,6 @@ class TrackingSystem:
 
                 tag_list += [[ids[i][0], x_pos, y_pos]]
 
-        #displays tags
- #       if self.show_frames:
- #           frame_markers = aruco.drawDetectedMarkers(image, corners, ids)
- #           cv2.imshow("Frame", frame_markers)
-
         # returns list
         return tag_list
 
@@ -144,35 +136,43 @@ class TrackingSystem:
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, temp_image = self.vid.read()
+            self.frame_return_success, uncropped_image = self.vid.read()
+
+            timeNow = time.time()
+            if show_fps: print("{} fps".format( round ( 1/(timeNow-self.last_frame_grab_time) , 2 ) ))
+            self.last_frame_grab_time=timeNow
 
             if self.frame_return_success:
-                self.cropped_image = self.crop_image(temp_image)
-                # gets robot location
+                self.cropped_image = self.crop_image(uncropped_image)
+
+                # compute robot location
                 self.robot = self.robot_location(self.cropped_image, brainMin, brainMax)
 
-                # gets tag locations and sends them
+                # compute tag locations
                 self.aruco_tags = self.aruco_locations(self.cropped_image)
 
-                if self.is_recording:
-                    self.output_video_writer.write(self.cropped_image)
-                    print("write frame")
-
-                if self.show_frames:
+                if show_frames:
                     cv2.imshow("Cropped", self.cropped_image )
                     cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(self.cropped_image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
 
-    def show_im(self):
-        vid = cv2.VideoCapture(pipe)
-        while (1):
-            self.frame_return_success, image = vid.read()
+    def recording_updater(self):
 
-            if self.frame_return_success:
-                cv2.imshow("Uncropped", image )
-                cv2.waitKey(1)
+        while(1):
+            if self.is_recording:
+                self.recording_frame_number += 1
+
+                # wait for right time
+                while( time.time() < self.recording_start_time + (self.recording_frame_number / recording_frame_rate)):
+                    time.sleep(0.01)
+                self.video_writer_is_busy=True
+                self.output_video_writer.write(self.cropped_image)
+                self.video_writer_is_busy=False
+            else:
+                time.sleep(0.01)
+
     def zmq_updater(self):
         #main loop waiting for a zmq message
         print("Starting loop for zmq messages")
@@ -182,12 +182,11 @@ class TrackingSystem:
 
             # wait for zmq request
             message = self.socket.recv().decode('utf-8')
-            print("Got message ",message)
+            if verbose_messages: print("Got message ",message)
 
             if str(message) == "Robot:position":
                 # send the latest value of self.robot
-                if self.show_frames:
-                    print("Sending robot position: {}".format(self.robot))
+                if verbose_messages: ("Sending robot position: {}".format(self.robot))
                 if self.robot is not None and self.frame_return_success:
                     self.socket.send_string(f"Robot:{self.robot}")
                 else:
@@ -195,15 +194,15 @@ class TrackingSystem:
 
             elif str(message) == "Tags:position":
                 # send the latest value of self.aruco_tags
-                if self.show_frames:
-                    print("Sending aruco tags position(s): {}".format(self.aruco_tags))
+                if verbose_messages: ("Sending aruco tags position(s): {}".format(self.aruco_tags))
                 if self.frame_return_success:
                     self.socket.send_string(f"Tags:{self.aruco_tags}")
                 else:
                     self.socket.send_string("Tags:[]") # empty list
 
             elif str(message) == "Image:resolution":
-                print("Sending image resolution of {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
+                while(self.cropped_image is None): time.sleep(0.1)
+                if verbose_messages: print("Sending image resolution of {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
                 self.socket.send_string("Image:{}".format(self.cropped_image.shape))
 
             elif str(message) == "Image:image":
@@ -211,27 +210,34 @@ class TrackingSystem:
                 self.socket.send(self.cropped_image.tobytes())
 
             elif str(message) == "Recording:start":
-                print("starting recording")
+                if verbose_messages: print("starting recording")
+                self.recording_frame_number=0
+                self.recording_start_time=time.time()
                 self.is_recording = True
 
                 self.socket.send_string("OK")
 
             elif str(message) == "Recording:discard":
                 self.is_recording = False
-                print("discarding video")
+                while ( self.video_writer_is_busy ):time.sleep(0.01)
+                if verbose_messages: print("discarding video")
                 self.output_video_writer.release()
                 os.remove("temporary_output.avi")
-                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
+                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
 
                 self.socket.send_string("OK")
 
             elif str(message).startswith("Recording:save_"):
                 self.is_recording = False
+                while ( self.video_writer_is_busy ):time.sleep(0.01)
                 self.output_video_writer.release()
                 filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
-                print("saving as file {}".format(filename))
-                os.rename("temporary_output.avi","{}/{}.avi".format( videos_folder_path , filename))
-                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
+                if verbose_messages: print("saving as file {}.avi".format(filename))
+
+                filePath = "{}/{}.avi".format( videos_folder_path , filename)
+                if os.path.exists(filePath): os.remove(filePath) # delete it if it already exists to prevent error
+                os.rename("temporary_output.avi",filePath)
+                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
 
                 self.socket.send_string("OK")
 
@@ -243,6 +249,7 @@ class TrackingSystem:
 
         # start the threaded process that gets and interprets images:
         threading.Thread(target=self.zmq_updater).start()  # starting in thread allows update of the camera at a higher frequency than zmq messages are sent
+        threading.Thread(target=self.recording_updater).start() # will save images into a video when requested
         self.camera_updater()
 
         print("Tracking stopped")

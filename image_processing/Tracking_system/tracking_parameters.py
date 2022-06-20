@@ -2,6 +2,11 @@
 import cv2
 from cv2 import aruco
 import os
+
+show_frames = False
+show_fps = True
+verbose_messages = False
+
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()
 
@@ -26,6 +31,7 @@ zmq_port_number= "5557"
 videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
 if not os.path.exists(videos_folder_path): os.makedirs(videos_folder_path) # make sure folders exist to prevent errors later
 
+recording_frame_rate = 15.0
 
 with open('location.txt') as f:
     location = f.read().replace("\n","")
@@ -34,8 +40,8 @@ with open('location.txt') as f:
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
-    pipe = "http://192.168.2.248/img/video.mjpeg"
-    #pipe =0
+    #pipe = "http://192.168.2.248/img/video.mjpeg"
+    pipe =0
 
     #mask filter parameters
     brainMin = (0,157,78)
@@ -45,8 +51,16 @@ if location == "bristol":
     centre_reference = (386,264) # defined in the uncropped image
     pixel_scale = 175
 
+    # overwrite default resolution:
+    #resolution_width = 1920 ; resolution_height = 1056
+    resolution_width = 1280 ; resolution_height = 704 # 720
+    # resolution_width = 640 ; resolution_height = 480
+
     #crop parameters
-    crop_rectangle = [200,75,380,380]
+    width = 640; height = 480
+    # crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
+    crop_rectangle = [-1]
+    # crop_rectangle = [200,75,380,380]
 
 elif location == "york":
     pipe = 0
