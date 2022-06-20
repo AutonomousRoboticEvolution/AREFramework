@@ -16,11 +16,28 @@ class TrackingSystem:
         # set parameters
         self.show_frames = True
 
-        # recording variables
-        self.is_recording = False
-        self.i_frame = 0
+        # create the viedo capture object, which is used to get frames from the camera
+        self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
 
-        #set up zmq
+        # set resolution:
+        if resolution_width > 0:
+            self.vid.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_width)
+        if resolution_height > 0:
+            self.vid.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_height)
+
+        # start the video writer object, which is used to save the video to a file
+        print(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH))
+        if crop_rectangle[0]<0:
+            self.save_resolution = (int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
+        else:
+            self.save_resolution = ( crop_rectangle[2],crop_rectangle[3] )
+
+        self.output_video_writer = cv2.VideoWriter('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
+
+        self.is_recording = False # this boolean keeps track of whether to be saving frames or not
+
+
+#set up zmq
         context = zmq.Context()
         self.socket = context.socket(zmq.REP)
         self.socket.bind("tcp://*:{}".format(zmq_port_number))
@@ -123,16 +140,11 @@ class TrackingSystem:
 
 
     def camera_updater(self):
-        vid = cv2.VideoCapture(pipe) # pipe is set in tracking_parameters.py
-
-        # set resolution:
-        if resolution_width>0: vid.set(cv2.CAP_PROP_FRAME_WIDTH, resolution_width)
-        if resolution_height>0: vid.set(cv2.CAP_PROP_FRAME_HEIGHT, resolution_height)
 
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, temp_image = vid.read()
+            self.frame_return_success, temp_image = self.vid.read()
 
             if self.frame_return_success:
                 self.cropped_image = self.crop_image(temp_image)
@@ -143,9 +155,8 @@ class TrackingSystem:
                 self.aruco_tags = self.aruco_locations(self.cropped_image)
 
                 if self.is_recording:
-                    cv2.imwrite("{}/image%04d.png".format(temporary_image_folder_path) % self.i_frame , self.cropped_image)
-                    self.i_frame += 1
-                    if self.i_frame>=max_frame: self.is_recording=False
+                    self.output_video_writer.write(self.cropped_image)
+                    print("write frame")
 
                 if self.show_frames:
                     cv2.imshow("Cropped", self.cropped_image )
@@ -201,36 +212,32 @@ class TrackingSystem:
 
             elif str(message) == "Recording:start":
                 print("starting recording")
-                self.is_recording = False
-                self.discardRecordingImages()
                 self.is_recording = True
+
                 self.socket.send_string("OK")
 
             elif str(message) == "Recording:discard":
                 self.is_recording = False
-                print("deleting images")
-                self.discardRecordingImages()
+                print("discarding video")
+                self.output_video_writer.release()
+                os.remove("temporary_output.avi")
+                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
+
                 self.socket.send_string("OK")
 
             elif str(message).startswith("Recording:save_"):
                 self.is_recording = False
+                self.output_video_writer.release()
                 filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
-                print("saving file {}".format(filename))
-                self.saveVideo(filename)
+                print("saving as file {}".format(filename))
+                os.rename("temporary_output.avi","{}/{}.avi".format( videos_folder_path , filename))
+                self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), 30.0, self.save_resolution )
+
                 self.socket.send_string("OK")
 
             else:
                 warnings.warn("Got an unrecognised message: {}".format(message))
 
-    def saveVideo(self,filename):
-        ffmpeg_command = "ffmpeg -y -r 30 -i {}/image%04d.png -vcodec libx264 -crf 25  -pix_fmt yuv420p {}/{}.mp4".format(temporary_image_folder_path,videos_folder_path,filename)
-        os.system(ffmpeg_command)
-        self.discardRecordingImages()
-
-    def discardRecordingImages(self):
-        # os.remove("{}/*".format(temporary_image_folder_path))
-        os.system("rm {}/*".format(temporary_image_folder_path))
-        self.i_frame = 0
 
     def main(self):
 

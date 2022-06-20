@@ -23,12 +23,8 @@ resolution_width = -1 # 1920 # set negative to leave as the default for your cam
 resolution_height = -1 # 1080 # set negative to leave as the default for your camera
 
 zmq_port_number= "5557"
-temporary_image_folder_path = "/tmp/temp_images"
-videos_folder_path = "/tmp/tracking_videos"
-# make sure folders exist to prevent errors later:
-for x in [temporary_image_folder_path, videos_folder_path]:
-    if not os.path.exists(x): os.makedirs(x)
-max_frame = 30*5*60 # 5 minutes
+videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
+if not os.path.exists(videos_folder_path): os.makedirs(videos_folder_path) # make sure folders exist to prevent errors later
 
 
 with open('location.txt') as f:
