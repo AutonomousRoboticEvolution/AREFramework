@@ -40,8 +40,7 @@ with open('location.txt') as f:
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
-    #pipe = "http://192.168.2.248/img/video.mjpeg"
-    pipe =0
+    pipe = "http://192.168.2.248/img/video.mjpeg"
 
     #mask filter parameters
     brainMin = (0,157,78)
@@ -51,16 +50,29 @@ if location == "bristol":
     centre_reference = (386,264) # defined in the uncropped image
     pixel_scale = 175
 
+
+    #crop parameters
+    crop_rectangle = [200,75,380,380]
+
+if location == "bristol_pi":
+    # the pipe for getting images from the camera
+    pipe =0
+
+    #mask filter parameters
+    brainMin = (0,157,78)
+    brainMax = (26,255,224)
+
     # overwrite default resolution:
-    #resolution_width = 1920 ; resolution_height = 1056
-    resolution_width = 1280 ; resolution_height = 704 # 720
-    # resolution_width = 640 ; resolution_height = 480
+    resolution_width = 1920 ; resolution_height = 1056
+
+    #centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (int(resolution_width/2),int(resolution_height/2)) # defined in the uncropped image
+    pixel_scale = 175
 
     #crop parameters
     width = 640; height = 480
-    # crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
+    #crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
     crop_rectangle = [-1]
-    # crop_rectangle = [200,75,380,380]
 
 elif location == "york":
     pipe = 0
