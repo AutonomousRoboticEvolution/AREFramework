@@ -53,7 +53,7 @@ public:
     void openConnections();
     void reopenConnections();
     bool confirmConnections();
-    std::vector<std::unique_ptr<SlaveConnection>> updateSimulatorList();
+    void updateSimulatorList();
 
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;

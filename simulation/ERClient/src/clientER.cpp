@@ -59,15 +59,13 @@ void ER::initialize(){
 bool ER::execute()
 {
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
-    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    if(update_sim_list)
-        serverInstances = updateSimulatorList();
+    updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -323,7 +321,7 @@ bool ER::confirmConnections()
     return true;
 }
 
-std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
+void ER::updateSimulatorList(){
 
 
     std::vector<std::unique_ptr<SlaveConnection>> newServInst;
@@ -346,14 +344,33 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
             newServInst.back()->setState(SlaveConnection::DOWN);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
+            newServInst.back()->setState(SlaveConnection::FREE);
             newCurrentIndVec.push_back(currentIndVec[idx]);
             newCurrentIndexVec.push_back(currentIndexVec[idx]);
         }
      }
 
 
-    currentIndVec = newCurrentIndVec;
-    currentIndexVec = newCurrentIndexVec;
 
-    return newServInst;
+
+    currentIndexVec = newCurrentIndexVec;
+    serverInstances.clear();
+    serverInstances.resize(newServInst.size());
+    serverInstances.shrink_to_fit();
+    for(size_t i = 0; i < newServInst.size(); i++)
+        serverInstances[i] = std::move(newServInst[i]);
+    currentIndVec.clear();
+    currentIndVec.resize(newServInst.size());
+    currentIndVec.shrink_to_fit();
+    currentIndexVec.clear();
+    currentIndexVec.resize(newServInst.size());
+    currentIndexVec.shrink_to_fit();
+    for(size_t i = 0; i < currentIndVec.size(); i++){
+        if(serverInstances[i]->state() == SlaveConnection::DOWN)
+            continue;
+        currentIndVec[i] = std::move(newCurrentIndVec.back());
+        currentIndexVec[i] = newCurrentIndexVec.back();
+        newCurrentIndexVec.pop_back();
+        newCurrentIndVec.pop_back();
+    }
 }
