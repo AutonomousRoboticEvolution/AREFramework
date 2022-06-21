@@ -597,6 +597,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                             if(verbose) std::cout << " - change task" << std::endl;
                             incr_gradual_scene();
                             nbr_eval_per_task = 0;
+                            nbr_of_successful_solution = 0;
                         }
                         else if(verbose) std::cout << std::endl;
 
