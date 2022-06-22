@@ -18,7 +18,7 @@ public:
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     void print_info() override;
     void start_evaluation() override;
-    void stop_evaluation() override;
+    void stop_evaluation(std::string robotID = "") override;
     void update_info(double time) override;
     const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
 
