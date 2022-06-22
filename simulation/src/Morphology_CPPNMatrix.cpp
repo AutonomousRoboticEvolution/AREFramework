@@ -344,9 +344,29 @@ void Morphology_CPPNMatrix::create()
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
 
+void Morphology_CPPNMatrix::load(){
+    std::stringstream morph_filepath;
+    morph_filepath << Logging::log_folder << "/model_" << morph_id << ".ttm";
+    std::cout <<  morph_filepath.str() << std::endl;
+    int handle = simLoadModel(morph_filepath.str().c_str());
+
+    if(handle == -1)
+    {
+        std::cerr << "unable to load robot model" << std::endl;
+        simChar* lastError = simGetLastError();
+        std::cerr << "simGetLastError : " << lastError << std::endl;
+        simReleaseBuffer(lastError);
+        exit(1);
+    }
+
+    mainHandle = handle;
+    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
+}
+
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 {
     create();
+//    load();
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose){
         float mass;
@@ -545,7 +565,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     simSetObjectProperty(mainHandle,sim_objectproperty_selectmodelbaseinstead);
 
     std::stringstream filepath;
-    filepath << Logging::log_folder << "/model" << indNum << ".ttm";
+    filepath << Logging::log_folder << "/model_" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;
