@@ -6,10 +6,6 @@ import zmq
 import threading
 import warnings
 
-#must define location before importing parameters
-
-show_frames=True
-
 from tracking_parameters import *
 
 class TrackingSystem:
@@ -91,7 +87,7 @@ class TrackingSystem:
         detector = cv2.SimpleBlobDetector_create(blob_detection_parameters)
 
         #fills holes in mask to improve blob detection
-        fix_mask = False
+        fix_mask = True
         if fix_mask:
             fixed_mask = self.fillHoles(mask)
             keypoints = detector.detect(fixed_mask)
@@ -99,11 +95,12 @@ class TrackingSystem:
             keypoints = detector.detect(mask)
 
         #displays mask and blobs
-        if self.show_frames:
+        cv2.waitKey(1)
+        if show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            cv2.imshow("Holy Mask",mask)
-            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
+            cv2.imshow("cropped",self.cropped_image)
+            cv2.imshow("Mask",mask)
             cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
@@ -172,10 +169,6 @@ class TrackingSystem:
                 # compute tag locations
                 self.aruco_tags = self.aruco_locations(self.cropped_image)
 
-                if show_frames:
-                    cv2.imshow("Cropped", self.cropped_image )
-                    cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(self.cropped_image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
-                cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
 

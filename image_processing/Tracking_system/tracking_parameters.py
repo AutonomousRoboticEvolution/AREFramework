@@ -3,8 +3,8 @@ import cv2
 from cv2 import aruco
 import os
 
-show_frames = False
-show_fps = True
+show_frames = True
+show_fps = False
 verbose_messages = False
 
 #blob detection parameters
@@ -43,8 +43,8 @@ if location == "bristol":
     pipe = "http://192.168.2.248/img/video.mjpeg"
 
     #mask filter parameters
-    brainMin = (0,157,78)
-    brainMax = (26,255,224)
+    brainMin = ((0,157,78) , (0,0,0)) #  blue: (13,38,18) green:(31,108,82)
+    brainMax = ((17,255,224), (0,0,0)) # blue:(33,169,83) green:(53,203,158)
 
     #centre of uncropped arena and ratio of pixels/metre
     centre_reference = (386,264) # defined in the uncropped image
