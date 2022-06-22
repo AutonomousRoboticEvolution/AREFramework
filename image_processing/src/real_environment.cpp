@@ -70,13 +70,14 @@ void RealEnvironment::start_evaluation(){
     assert(reply_string=="OK");
 }
 
-void RealEnvironment::stop_evaluation(){
+void RealEnvironment::stop_evaluation(std::string robotID){
     // tell camera to stop recording
 
-    std::cout<<name<<std::endl;
+    std::cout<<robotID<<std::endl;
+    std::cout<<"Telling tracking to save file as "<<robotID<<std::endl;
 
     std::string reply_string;
-    phy::send_string(reply_string,"save_"+name,zmq_tracking_camera_requester_socket,"Recording:");
+    phy::send_string(reply_string,"save_"+robotID,zmq_tracking_camera_requester_socket,"Recording:");
     assert(reply_string=="OK");
 }
 
