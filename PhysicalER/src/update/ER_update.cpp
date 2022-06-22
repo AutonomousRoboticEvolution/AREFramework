@@ -170,7 +170,7 @@ bool ER::update_evaluation(){
     std::string message_string;
     receive_string_no_reply(message_string,subscriber,"pi ");
     if(message_string=="finish"){
-        environment->stop_evaluation();
+        environment->stop_evaluation(std::to_string(ER::current_id));
         return true;
     }
     else{
@@ -197,7 +197,7 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file.txt" , message );
+            Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
         }
     }
 
