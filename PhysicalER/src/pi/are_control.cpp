@@ -169,12 +169,16 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
                 if (i_block<n_blocks) std::cout<<"o";
                 else std::cout<<" ";
             }
+            std::cout<<"|";
         }
         std::cout<<std::endl;
     }
 
-    // add to log:
-    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
+    // add NN outputs to log:
+    for(i=0;i<values.size();i++){
+        logs_to_send<< values[i] <<","; //add NN output to log
+    }
+//    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
 
 bool AREControl::testAllOrganConnections(){
@@ -205,6 +209,15 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
     sensor_vals.clear();
     sensor_vals = {};
 
+    // binary camera input
+    if (cameraInputToNN){
+        if (camera.presenceDetect()) {
+            sensor_vals.push_back(1);
+        }else{
+            sensor_vals.push_back(0);
+        }
+    }
+
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == SENSOR) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
@@ -217,15 +230,6 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             SensorOrgan* thisSensor = static_cast<SensorOrgan *>(thisOrgan);
             sensor_vals.push_back( thisSensor->readInfraredNormalised() );
-        }
-    }
-
-    // binary camera input
-    if (cameraInputToNN){
-        if (camera.presenceDetect()) {
-            sensor_vals.push_back(1);
-        }else{
-            sensor_vals.push_back(0);
         }
     }
 
@@ -242,14 +246,16 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         std::cout<<"-----|"; // block between the input and output values to aid readability
     }
 
-    // append input values to log data, as a string:
-    std::copy(sensor_vals.begin(), sensor_vals.end(), std::ostream_iterator<int>(logs_to_send, ","));
+    // append input values to log data:
+    for(int i=0;i<sensor_vals.size();i++){
+        logs_to_send<< sensor_vals[i] <<","; //add NN input to log
+    }
 }
 
 void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
     if (!cameraInputToNN) return; // without aruco tag input, this debugging LED output wouldn't make any sense
     // compute brightness between 10 and 100 (in theory can be 0-255, but the differences are not noticable near the extremes)
-    if (nn_inputs.back()>0){ // camera reading is the last NN input
+    if (nn_inputs[0]>0){ // camera reading is the last NN input
         ledDriver->setAllTo(GREEN,200);
     }else{
         ledDriver->setAllTo(OFF,0);
@@ -268,9 +274,10 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
+    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"NN_output_"<<i<<"(mA),";}
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
