@@ -77,16 +77,29 @@ if location == "bristol_pi":
 
 elif location == "york":
     pipe = 0
-    #brainMin = (146,89,30)
-    #brainMax = (179,184,110)
-    brainMin = (0,120,52)
-    brainMax = (16,206,139)
-
+    brainMin = (0,130,52)
+    brainMax = (179,194,86)
     
     centre_reference = (347,240) # centre of arena in pixels
     pixel_scale = 270 # mm per meter
 
     crop_rectangle = [-1]
+
+elif location == "york2":
+    pipe = 0
+    
+    headMin = (0,69,0)
+    headMax = (22,255,255)
+
+    skeletonMin = (34,22,0)
+    skeletonMax = (63,255,255)
+
+    organMin = (76,42,0)
+    organMax = (123,255,255)
+    
+    brainMin = [headMin,skeletonMin,organMin]
+    brainMax = [headMax,skeletonMax,organMax]
+
 elif location == "napier":
     pipe = "tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink"
 
