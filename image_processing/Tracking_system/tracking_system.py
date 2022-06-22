@@ -184,6 +184,12 @@ class TrackingSystem:
                 self.video_writer_is_busy=True
                 self.output_video_writer.write(self.cropped_image)
                 self.video_writer_is_busy=False
+
+                # check for timeout
+                if time.time() > self.recording_start_time + recording_timeout_seconds:
+                    self.is_recording=False
+                    print("Recording timed out")
+
             else:
                 time.sleep(0.01)
 
@@ -196,7 +202,7 @@ class TrackingSystem:
 
             # wait for zmq request
             message = self.socket.recv().decode('utf-8')
-            if verbose_messages: print("Got message ",message)
+            #if verbose_messages: print("Got message ",message)
 
             if str(message) == "Robot:position":
                 # send the latest value of self.robot
@@ -220,7 +226,7 @@ class TrackingSystem:
                 self.socket.send_string("Image:{}".format(self.cropped_image.shape))
 
             elif str(message) == "Image:image":
-                # print(self.uncropped_image)
+                if verbose_messages: print("Got message ", message)
                 self.socket.send(self.cropped_image.tobytes())
 
             elif str(message) == "Recording:start":
@@ -246,9 +252,9 @@ class TrackingSystem:
                 while ( self.video_writer_is_busy ):time.sleep(0.01)
                 self.output_video_writer.release()
                 filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
-                if verbose_messages: print("saving as file {}.avi".format(filename))
 
                 filePath = "{}/{}.avi".format( videos_folder_path , filename)
+                if verbose_messages: print("saving as file {}".format(filePath))
                 if os.path.exists(filePath): os.remove(filePath) # delete it if it already exists to prevent error
                 os.rename("temporary_output.avi",filePath)
                 self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )

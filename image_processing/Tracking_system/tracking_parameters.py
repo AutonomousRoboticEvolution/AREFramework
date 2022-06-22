@@ -5,7 +5,7 @@ import os
 
 show_frames = True
 show_fps = False
-verbose_messages = False
+verbose_messages = True
 
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()
@@ -32,6 +32,7 @@ videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
 if not os.path.exists(videos_folder_path): os.makedirs(videos_folder_path) # make sure folders exist to prevent errors later
 
 recording_frame_rate = 15.0
+recording_timeout_seconds = 60*11
 
 with open('location.txt') as f:
     location = f.read().replace("\n","")
