@@ -8,6 +8,8 @@ import warnings
 
 #must define location before importing parameters
 
+
+
 from tracking_parameters import *
 
 class TrackingSystem:
@@ -52,11 +54,22 @@ class TrackingSystem:
         return mask
 
     # returns a list of two elements representing the robot location as [x,y] in meters
-    def robot_location(self,image,hsv_min,hsv_max):
+    def robot_location(self,image,hsv_mins,hsv_maxs):
         #converts image to hsv
         hsv = cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
-        #create the black/white mask
-        mask = cv2.inRange(hsv, hsv_min, hsv_max)
+        
+        masks = []
+        for i in range(len(hsv_mins)):
+            #create the black/white mask
+            hsv_min, hsv_max = hsv_mins[i], hsv_maxs[i]
+            masks += [cv2.inRange(hsv, hsv_min, hsv_max)]
+        
+        mask =  masks[0]
+        if len(masks)>1:
+            for m in masks[1:]:
+                mask = cv2.add(mask, m)
+        
+        
         detector = cv2.SimpleBlobDetector_create(blob_detection_parameters)
 
         #fills holes in mask to improve blob detection
@@ -66,6 +79,14 @@ class TrackingSystem:
             keypoints = detector.detect(fixed_mask)
         else:
             keypoints = detector.detect(mask)
+
+        #displays mask and blobs
+        if self.show_frames:
+            kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+            cv2.imshow("Holy Mask",mask)
+            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
+            cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
         if len(keypoints) >0 :
@@ -139,8 +160,9 @@ class TrackingSystem:
                 self.aruco_tags = self.aruco_locations(image)
 
                 if self.show_frames:
-                    cv2.imshow("Cropped", image )
-                    cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
+                    cv2.imshow("Image", image)
+                    #print("Image size: {}".format(self.uncropped_image.shape))
+                    cv2.imshow("Uncropped", self.uncropped_image )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")
