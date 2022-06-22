@@ -1,4 +1,4 @@
-#include "physicalER/update/ER_update.hpp"
+    #include "physicalER/update/ER_update.hpp"
 
 using namespace are::phy::update;
 
@@ -11,7 +11,7 @@ void ER::initialize(){
         seed = rd();
         are::settings::random::parameters->emplace("#seed",new are::settings::Integer(seed));
     }
-    randNum.reset(new are::misc::RandNum(seed));
+    randNum = std::make_shared<are::misc::RandNum>(seed);
 
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
@@ -46,8 +46,16 @@ void ER::initialize(){
     //Load list of robot's ids to be evaluated and ask user which one want to be evaluated.
     repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
-    current_id = choice_of_robot_to_evaluate(list_ids);
+    ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
+    if(list_ids[0] != current_id){
+        int i = 0;
+        for(;i < list_ids.size(); i++)
+            if(current_id == list_ids[i])
+                break;
+        list_ids[i] = list_ids[0];
+        list_ids[0] = current_id;
+    }
     ea->setCurrentIndIndex(current_id);
     //-
 
@@ -117,7 +125,7 @@ void ER::start_evaluation(){
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
-    load_list_of_organs(repository + "/" + exp_name,current_id,pi_address,list_of_organs);
+    ioh::load_list_of_organs(repository + "/" + exp_name,current_id,pi_address,list_of_organs);
 
     //start ZMQ
     std::stringstream sstream1,sstream2;
@@ -212,7 +220,15 @@ bool ER::stop_evaluation(){
     save_logs();
 
 
-    current_id = choice_of_robot_to_evaluate(list_ids);
+    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
+    if(list_ids[0] != current_id){ //if the chosen id is not the first place, put it in first place to be the default choice.
+        int i = 0;
+        for(;i < list_ids.size(); i++)
+            if(current_id == list_ids[i])
+                break;
+        list_ids[i] = list_ids[0];
+        list_ids[0] = current_id;
+    }
     ea->setCurrentIndIndex(current_id);
 
     return true;

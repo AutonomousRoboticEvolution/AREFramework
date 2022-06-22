@@ -1,4 +1,5 @@
 #include "physicalER/pi/are_control.hpp"
+#include <cmath>
 
 using namespace are::pi;
 
@@ -81,7 +82,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     }
 
     // initialise the Head LEDs
-    ledDriver.reset(new LedDriver(0x6A)); // <- the Led driver is always the same i2c address, it cannot be changed
+    ledDriver = std::make_shared<LedDriver>(0x6A); // <- the Led driver is always the same i2c address, it cannot be changed
     ledDriver->init();
 
     // battery voltage check
@@ -127,17 +128,17 @@ boardSelection AREControl::findDaughterBoardForOrgan(Organ* thisOrgan){
             return RIGHT;
         } else{
             // is not on either - this is bad!
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("WARNING cannot find organ 0x%02X on either daughter board\n", thisOrgan->getI2CAddress());
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("WARNING cannot find organ 0x%02X on either daughter board\n", thisOrgan->getI2CAddress());
             thisOrgan->daughterBoardToEnable=NONE;
-            throw std::runtime_error("cannot find an organ on either daughter board");
+            //throw std::runtime_error("cannot find an organ on either daughter board");
         }
     }
 }
 
 // For each ouput from the controller, send the required value to the low-level wheel object
-void AREControl::sendOutputOrganCommands(std::vector<double> values, uint32_t time_millis){
+void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
-    int i=0;
+    int i=0; // index of the organ being considered (in listOfOrgans)
     //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == WHEEL) {
@@ -145,17 +146,19 @@ void AREControl::sendOutputOrganCommands(std::vector<double> values, uint32_t ti
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
             logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
-            i++;
+            i++; // increment organ in listOfOrgans
         }
         else if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
-            double value = values[i];
-            value = std::sin(value*(time_millis/1000.0));
-            thisJoint->setTargetAngleNormalised(value);
+            double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
+            double newTargetAngle = misc::get_next_joint_position(valueFromNN, double(time_milli/1000.0), thisJoint->savedLastPositionRadians); // the new target angle in radians
+            thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
+            thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
-            i++;
+            i++; // increment organ in listOfOrgans
         }
+        // any other thisOrgan->organType value can be ignored, since it's not an output
     }
 
     if(debugDisplayOnPi){
@@ -183,7 +186,7 @@ bool AREControl::testAllOrganConnections(){
         while (!has_passed and retries<10){
             has_passed = thisOrgan->testConnection();
             if (!has_passed){
-                usleep(100 + (rand() % 100) );
+                usleep(10000 + (rand() % 1000) );
                 retries++;
             }
         }
@@ -325,6 +328,11 @@ int AREControl::exec(zmq::socket_t& socket){
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->standby();
+        }
+        if (thisOrgan->organType = JOINT) {
+            daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
+            JointOrgan* thisjoint= static_cast<JointOrgan *>(thisOrgan);
+            thisjoint->setServoOff();
         }
     }
     ledDriver->flash(BLUE);

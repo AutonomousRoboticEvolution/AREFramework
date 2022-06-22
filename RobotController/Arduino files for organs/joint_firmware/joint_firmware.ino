@@ -128,6 +128,15 @@ void setup() {
   Serial.print("My i2c address is 0x");
   Serial.println(SLAVE_ADDRESS,HEX);
 
+  Serial.println("");
+  Serial.print("#define CALIB_CENTRE_POSITION_US ");
+  Serial.println(CALIB_CENTRE_POSITION_US);
+  Serial.print("#define CALIB_ENCODER_VALUE_AT_MIN_ANGLE ");
+  Serial.println(CALIB_ENCODER_VALUE_AT_MIN_ANGLE);
+  Serial.print("#define CALIB_ENCODER_VALUE_AT_MAX_ANGLE ");
+  Serial.println(CALIB_ENCODER_VALUE_AT_MAX_ANGLE);
+  Serial.println("");
+
   //Init I2C bus (internal only at this point)
   Wire.begin(SLAVE_ADDRESS);
   Wire.onReceive(receiveData);
@@ -462,11 +471,23 @@ void receiveData(int received_data_byte_count){
     //Read measured current
     case MEASURED_CURRENT_REGISTER :
       send_buffer = measured_current; //Update send buffer with most recent reading
+      if (received_data_byte_count > 1){
+        // should not be here! Reset the i2c bus
+        Serial.println("reseting i2c");
+        TWCR = 0;
+        Wire.begin();
+      }
       break;
 
     //Read measured position
     case MEASURED_POSITION_REGISTER :
       send_buffer = measured_position; //Update send buffer with most recent reading
+      if (received_data_byte_count > 1){
+        // should not be here! Reset the i2c bus
+        Serial.println("reseting i2c");
+        TWCR = 0;
+        Wire.begin();
+      }
       break;
 
     case SET_TEST_VALUE_REGISTER:
@@ -475,6 +496,12 @@ void receiveData(int received_data_byte_count){
     
     case GET_TEST_VALUE_REGISTER:
       send_buffer=test_register_value;
+      if (received_data_byte_count > 1){
+        // should not be here! Reset the i2c bus
+        Serial.println("reseting i2c");
+        TWCR = 0;
+        Wire.begin();
+      }
       break;
     default:
       Serial.print("Attempt to access unknown register: 0x");

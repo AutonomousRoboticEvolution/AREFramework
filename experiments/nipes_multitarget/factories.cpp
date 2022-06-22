@@ -3,12 +3,20 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
+#include "barrelTask.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::sim::VirtualEnvironment::Ptr env(new are::sim::MultiTargetMaze(param));
-    return env;
+    int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
+    if(env_type == 0){
+        are::sim::VirtualEnvironment::Ptr env(new are::sim::MultiTargetMaze(param));
+        return env;
+    }
+    if(env_type == 1){
+        are::sim::VirtualEnvironment::Ptr env(new are::sim::BarrelTask(param));
+        return env;
+    }
 }
 
 

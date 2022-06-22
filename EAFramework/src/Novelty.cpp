@@ -48,14 +48,17 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
         return sum;
     }
 
+    auto V = std::make_pair(v,v_coord);
+    auto W = std::make_pair(w,w_coord);
+
     //Compute all the distances between the organs on different positions
     std::vector<std::vector<std::array<int,3>>> distances;
-    auto& L = std::max(v_coord,w_coord,[](const auto& a,const auto& b) -> bool{return a.size() < b.size();}); //longest
-    auto& S = std::min(w_coord,v_coord,[](const auto& a,const auto& b) -> bool{return a.size() < b.size();}); //shortest
-    for(int i = 0; i < L.size(); i++){
+    auto& L = std::max(V,W,[](const auto& a,const auto& b) -> bool{return a.second.size() < b.second.size();}); //longest
+    auto& S = std::min(W,V,[](const auto& a,const auto& b) -> bool{return a.second.size() < b.second.size();}); //shortest
+    for(int i = 0; i < L.second.size(); i++){
         std::vector<std::array<int,3>> dists;
-        for(int j = 0; j < S.size(); j++){
-            dists.push_back({L1(L[i],S[j]),i,j});
+        for(int j = 0; j < S.second.size(); j++){
+            dists.push_back({L1(L.second[i],S.second[j]),i,j});
         }
         //sort in ascendent order
         std::sort(dists.begin(),dists.end(),
@@ -71,9 +74,9 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
     //where N is the largest number of organs betweeen the two body-plans
     for(int i = 0; i < std::max(v_coord.size(),w_coord.size()); i++){
         const auto & dist = distances[i][0]; //get the pair with the smallest distance
-        int j = v_coord[dist[1]][0] + v_coord[dist[1]][1]*dim + v_coord[dist[1]][2]*dim*dim;
-        int k = w_coord[dist[2]][0] + w_coord[dist[2]][1]*dim + w_coord[dist[2]][2]*dim*dim;
-        sum += dist[0] + v(j) == w(k) ? dim : 0;
+        int j = L.second[dist[1]][0] + L.second[dist[1]][1]*dim + L.second[dist[1]][2]*dim*dim;
+        int k = S.second[dist[2]][0] + S.second[dist[2]][1]*dim + S.second[dist[2]][2]*dim*dim;
+        sum += dist[0] + L.first(j) == S.first(k) ? dim : 0;
     }
 
     return sum;

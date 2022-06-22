@@ -110,6 +110,8 @@ public:
      */
     virtual void write_data_for_generate(){}
 
+    virtual void fill_ind_to_eval(std::vector<int> &ind_to_eval);
+
     //GETTERS & SETTERS
     void setCurrentIndIndex(int index){currentIndIndex = index;}
     virtual Individual::Ptr getIndividual(size_t index) const;

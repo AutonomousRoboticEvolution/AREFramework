@@ -1,0 +1,36 @@
+=== Old version of the framework
+
+export LD_LIBRARY_PATH=/home/ebb505/ARE_Project/vrep:/home/ebb505/ARE_Project/vrep/lib
+
+python3 run_cluster.py 3 --vrep /home/ebb505/ARE_Project/vrep/vrep.sh --client /home/ebb505/ARE_Project/evolutionary_robotics_framework/EvolutionVREP/cmake-build-debug/ERClient/ERClient --params /home/ebb505/ARE_Project/evolutionary_robotics_framework/EvolutionVREP/experiments/hyperneat/parameters.csv --port-start 20000 --xvfb 0
+
+=== New version of the framework
+
+export LD_LIBRARY_PATH=/home/ebb505/ARE_Project/coppeliasim:/home/ebb505/ARE_Project/coppeliasim/lib
+
+python3 run_cluster.py 5 --vrep /home/ebb505/ARE_Project/coppeliasim/coppeliaSim.sh --client /home/ebb505/ARE_Project/evolutionary_robotics_framework/cmake-build-debug/simulation/ERClient/are-client --params /home/ebb505/ARE_Project/evolutionary_robotics_framework/experiments/object_multitarget/parameters.csv --port-start 20000 --xvfb 0
+
+
+
+module load lang/Python/3.7.2-GCCcore-8.2.0
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/users/ebb505/scratch/vrep:/users/ebb505/scratch/vrep/lib:/users/ebb505/scratch/include
+
+export QT_QPA_PLATFORM='offscreen'
+
+module load devel/Boost/1.66.0-foss-2018a
+
+module load toolchain/foss/2018b
+
+python3 evolutionary_robotics_framework/EvolutionVREP/Cluster/run_cluster.py 2 --vrep /users/ebb505/scratch/vrep/vrep.sh --client /users/ebb505/scratch/evolutionary_robotics_framework/build/EvolutionVREP/ERClient/ERClient --params /users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/experiments/LC_nov_locComp/parameters20.csv --port-start 20000 --xvfb 0
+
+python3 /users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/Cluster/run_cluster.py 2 --vrep /users/ebb505/scratch/vrep/vrep.sh --client /users/ebb505/scratch/evolutionary_robotics_framework/build/EvolutionVREP/ERClient/ERClient --params /users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/experiments/LC_nov_locComp/parametersPC.csv --port-start 20000 --xvfb 0
+
+ARE-PC
+
+export LD_LIBRARY_PATH=/home/are/vrep:/home/are/vrep/lib
+
+python3 evolutionary_robotics_framework/EvolutionVREP/Cluster/run_cluster.py 2 --vrep /users/ebb505/scratch/vrep/vrep.sh --client /users/ebb505/scratch/evolutionary_robotics_framework/build/EvolutionVREP/ERClient/ERClient --params /users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/experiments/LC_nov_locComp/parameters20.csv --port-start 20000 --xvfb 0
+
+python3 run_cluster.py 10 --vrep /home/are/vrep/vrep.sh --client /home/are/evolutionary_robotics_framework/build/EvolutionVREP/ERClient/ERClient --params /home/are/evolutionary_robotics_framework/EvolutionVREP/experiments/morphoneuro/parameters.csv --port-start 20000 --xvfb 0 &
+

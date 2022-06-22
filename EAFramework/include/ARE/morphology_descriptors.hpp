@@ -6,6 +6,7 @@
 
 #include <eigen3/Eigen/Core>
 #include <vector>
+#include <ARE/misc/utilities.h>
 
 namespace are {
 /////////////////////
@@ -76,6 +77,44 @@ struct CartDesc
      */
     bool defined() const{return voxelNumber >= 24;}
 
+    std::string to_string(){
+        std::stringstream sstr;
+        sstr << "robotWidth," << robotWidth << std::endl;
+        sstr << "robotHeight," << robotHeight << std::endl;
+        sstr << "robotDepth," << robotDepth << std::endl;
+        sstr << "voxelNumber," << voxelNumber << std::endl;
+        sstr << "wheelNumber," << wheelNumber << std::endl;
+        sstr << "sensorNumber," << sensorNumber << std::endl;
+        sstr << "casterNumber," << casterNumber << std::endl;
+        sstr << "jointNumber," << jointNumber << std::endl;
+        return sstr.str();
+    }
+
+    void from_string(const std::string& str){
+        std::stringstream sstr;
+        sstr << str;
+        for(std::string line; std::getline(sstr,line);){
+            std::vector<std::string> split;
+            misc::split_line(line,",",split);
+            if(split[0] == "robotWidth")
+                robotWidth = std::stof(split[1]);
+            else if(split[0] == "robotHeight")
+                robotHeight = std::stof(split[1]);
+            else if(split[0] == "robotDepth")
+                robotDepth = std::stof(split[1]);
+            else if(split[0] == "voxelNumber")
+                voxelNumber = std::stof(split[1]);
+            else if(split[0] == "wheelNumber")
+                wheelNumber = std::stof(split[1]);
+            else if(split[0] == "sensorNumber")
+                sensorNumber = std::stof(split[1]);
+            else if(split[0] == "casterNumber")
+                casterNumber = std::stof(split[1]);
+            else if(split[0] == "jointNumber")
+                jointNumber = std::stof(split[1]);
+        }
+    }
+
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
@@ -118,6 +157,37 @@ struct OrganPositionDesc
         }
         return organ_position_descriptor;
     }
+
+    std::string to_string(){
+        std::stringstream sstr;
+        sstr << organ_matrix[0][0][0];
+        for(int k = 0; k < morph_const::real_matrix_size; k++){
+            for(int j = 0; j < morph_const::real_matrix_size; j++) {
+                for(int i = 1; i < morph_const::real_matrix_size; i++) {
+                    sstr << "," << organ_matrix[i][j][k];
+                }
+            }
+        }
+    }
+
+    void from_string(const std::string& str){
+        std::stringstream sstr;
+        sstr << str;
+        int i = 0, j = 0, k = 0;
+        for(std::string line; std::getline(sstr,line,',');){
+            organ_matrix[i][j][k] = std::stoi(line);
+            i++;
+            if(i >= morph_const::real_matrix_size){
+                i = 0;
+                j++;
+                if(j >= morph_const::real_matrix_size){
+                    j=0;
+                    k++;
+                }
+            }
+        }
+    }
+
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {

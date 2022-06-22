@@ -11,8 +11,9 @@
 #include "multiTargetMaze.hpp"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
-#include "simulatedER/nn2/NN2Individual.hpp"
+#include "NN2Individual.hpp"
 #include "ARE/Settings.h"
+#include "barrelTask.hpp"
 
 namespace are{
 

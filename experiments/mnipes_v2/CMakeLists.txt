@@ -32,6 +32,7 @@ add_library(M_NIPES2 SHARED
    ../common/multiTargetMaze.cpp
    ../common/barrelTask.cpp
   ../common/exploration.cpp
+  ../common/gradual_env.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES2 ARE simulatedER cmaes tbb)

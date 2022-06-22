@@ -158,9 +158,13 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
 {
     simxUChar *states;
     simxInt length;
-    simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking);
-    message = (char*)states;
-    message.resize(length);
+    if(!simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking)){
+        message = (char*)states;
+        message.resize(length);
+    }else{
+        std::cerr << "simxGetStringSignal did not finish properly." << std::endl;
+        message = "";
+    }
 }
 
 void SlaveConnection::setStringSignal(const std::string& signalName, const std::string& state)

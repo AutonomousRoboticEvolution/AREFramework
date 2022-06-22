@@ -114,7 +114,35 @@ void NNParamGenome::mutate(){
         biases[i] = genome[i + weights.size()];
 }
 
-void NNParamGenome::crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2){
+void NNParamGenome::crossover(const Genome::Ptr &partner, Genome::Ptr child){
+    int x_type = settings::getParameter<settings::Integer>(parameters,"#crossoverType").value;
+    double x_param = settings::getParameter<settings::Double>(parameters,"#crossoverParameter").value;
+    double max_weight = settings::getParameter<settings::Double>(parameters,"#maxWeight").value;
+
+    if(x_type == crossovers::type::NO_CROSSOVER){
+        std::dynamic_pointer_cast<NNParamGenome>(child)->set_weights(std::dynamic_pointer_cast<NNParamGenome>(partner)->get_weights());
+        std::dynamic_pointer_cast<NNParamGenome>(child)->set_biases(std::dynamic_pointer_cast<NNParamGenome>(partner)->get_biases());
+        return;
+    }
+
+    std::vector<double> p1 = get_full_genome();
+    std::vector<double> p2 = std::dynamic_pointer_cast<NNParamGenome>(partner)->get_full_genome();
+    std::vector<double> c1,c2;
+
+    if(x_type == crossovers::type::SBX){
+        double param[3] {-max_weight,max_weight,x_param};
+        crossovers::sbx(p1,p2,c1,c2,param,randomNum);
+    }
+
+    std::vector<double> w,b;
+    w.insert(w.begin(),c1.begin(),c1.begin()+weights.size());
+    b.insert(b.begin(),c1.begin()+weights.size(),c1.end());
+
+    std::dynamic_pointer_cast<NNParamGenome>(child)->set_weights(w);
+    std::dynamic_pointer_cast<NNParamGenome>(child)->set_biases(b);
+}
+
+void NNParamGenome::symmetrical_crossover(const Genome::Ptr &partner, Genome::Ptr child1, Genome::Ptr child2){
     int x_type = settings::getParameter<settings::Integer>(parameters,"#crossoverType").value;
     double x_param = settings::getParameter<settings::Double>(parameters,"#crossoverParameter").value;
     double max_weight = settings::getParameter<settings::Double>(parameters,"#maxWeight").value;

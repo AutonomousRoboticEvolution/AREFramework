@@ -36,7 +36,7 @@ void M_NIPESIndividual::createMorphology(){
     NEAT::Genome gen =
             std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
 
-    morphology.reset(new CPPNMorph(parameters));
+    morphology = std::make_shared<CPPNMorph>(parameters);
     morphology->set_randNum(randNum);
     NEAT::NeuralNetwork nn;
     gen.BuildPhenotype(nn);
@@ -86,7 +86,7 @@ void M_NIPESIndividual::createController(){
             return;
         }
 
-        learner.reset(new CMAESLearner(nbr_weights, nbr_bias,nn_inputs,nn_outputs));
+        learner = std::make_shared<CMAESLearner>(nbr_weights, nbr_bias,nn_inputs,nn_outputs);
         learner->set_parameters(parameters);
         std::dynamic_pointer_cast<CMAESLearner>(learner)->set_randNum(randNum);
 
