@@ -32,7 +32,8 @@ public:
         wheelHandles(morph.wheelHandles),
         proxHandles(morph.proxHandles),
         IRHandles(morph.IRHandles),
-        camera_handle(morph.camera_handle)
+        camera_handle(morph.camera_handle),
+        morph_id(morph.morph_id)
     {}
     virtual ~Morphology()
     {
@@ -65,6 +66,9 @@ public:
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
+    void set_morph_id(int id){morph_id = id;}
+    int get_morph_id(){return morph_id;}
+
     std::vector<int> get_jointHandles(){return jointHandles;}
     std::vector<int> get_proxHandles(){return proxHandles;}
     std::vector<int> get_IRHandles(){return IRHandles;}
@@ -72,7 +76,7 @@ public:
 
 protected:
     int mainHandle;
-
+    int morph_id;
     // Handles used by the controller
     std::vector<int> jointHandles;
     std::vector<int> proxHandles;

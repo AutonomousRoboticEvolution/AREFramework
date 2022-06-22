@@ -334,7 +334,7 @@ void Morphology_CPPNMatrix::create()
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
+        int loadInd = morph_id;; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
