@@ -142,6 +142,9 @@ void ER::start_evaluation(){
     std::cout << ctrl_gen << std::endl;
     send_string(reply,ctrl_gen,request,"pi ");
     assert(reply == "starting");
+
+    // starts the recording of the video feed:
+    environment->start_evaluation();
 }
 
 bool ER::update_evaluation(){
@@ -158,7 +161,13 @@ bool ER::update_evaluation(){
 
     std::string message_string;
     receive_string_no_reply(message_string,subscriber,"pi ");
-    return message_string=="finish";
+    if(message_string=="finish"){
+        environment->stop_evaluation();
+        return true;
+    }
+    else{
+        return false;
+    }
 
 }
 

@@ -17,6 +17,8 @@ public:
     void init() override;
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     void print_info() override;
+    void start_evaluation() override;
+    void stop_evaluation() override;
     void update_info(double time) override;
     const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
 
@@ -42,7 +44,7 @@ private:
 
     // zmq stuff for getting messages from python camera program
     zmq::context_t context;
-    zmq::socket_t zmq_requester_socket;
+    zmq::socket_t zmq_tracking_camera_requester_socket;
     zmq::socket_t robot_pos_subs;
     zmq::socket_t tags_pos_subs;
 
