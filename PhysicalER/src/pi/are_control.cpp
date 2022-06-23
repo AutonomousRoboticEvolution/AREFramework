@@ -277,7 +277,7 @@ int AREControl::exec(zmq::socket_t& socket){
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
     for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"NN_output_"<<i<<"(mA),";}
+    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"NN_output_"<<i<<",";}
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
