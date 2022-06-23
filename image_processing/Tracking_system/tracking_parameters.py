@@ -60,8 +60,8 @@ if location == "bristol_pi":
     pipe =0
 
     #mask filter parameters
-    brainMin = (0,157,78)
-    brainMax = (26,255,224)
+    brainMin = ((0,157,78), (0,0,0))
+    brainMax = ((26,255,224), (0,0,0))
 
     # overwrite default resolution:
     resolution_width = 1920 ; resolution_height = 1056
@@ -72,8 +72,8 @@ if location == "bristol_pi":
 
     #crop parameters
     width = 640; height = 480
-    #crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
-    crop_rectangle = [-1]
+    crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
+    #crop_rectangle = [-1]
 
 elif location == "york":
     pipe = 0
