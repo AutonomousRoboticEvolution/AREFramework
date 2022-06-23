@@ -138,8 +138,10 @@ boardSelection AREControl::findDaughterBoardForOrgan(Organ* thisOrgan){
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
+
     int i=0; // index of the organ being considered (in listOfOrgans)
-    //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
+
+    // first we do all the wheels:
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == WHEEL) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
@@ -148,7 +150,12 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
-        else if (thisOrgan->organType == JOINT) {
+        // else: ignore anything that isn't a wheel
+    }
+
+    // then we do all the joints:
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
@@ -158,7 +165,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
-        // any other thisOrgan->organType value can be ignored, since it's not an output
+        // else: ignore anything that isn't a joint
     }
 
     if(debugDisplayOnPi){
