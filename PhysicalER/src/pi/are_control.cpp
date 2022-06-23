@@ -58,10 +58,13 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
             daughterBoards->turnOn( findDaughterBoardForOrgan(listOfOrgans.back()) ) ; // turn on the correct daughterboard
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the current limit
+            static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = true; // this is a proximal joint
+
 
             // distal joint of this leg:
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
+            static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
             number_of_joints+=2;
             break;
@@ -161,6 +164,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
             double newTargetAngle = misc::get_next_joint_position(valueFromNN, double(time_milli/1000.0), thisJoint->savedLastPositionRadians); // the new target angle in radians
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
+            if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
             logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
