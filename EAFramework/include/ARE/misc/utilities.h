@@ -29,6 +29,8 @@ double sinusoidal(double amplitude, double time, double frequency, double time_o
  */
 double get_next_joint_position(double nn_output, double time, double previous_position);
 
+std::string int_to_string(int n);
+
 }//misc
 
 }//are

@@ -29,11 +29,11 @@ void MNIPES::init(){
 
 void MNIPES::init_random_pop(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    bool is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
     for(int i = 0; i < pop_size; i++){
         //create a new morph genome with random structure and parameters
         Genome::Ptr morph_genome;
-        if(genome_type == CPPN)
+        if(is_cppn)
             morph_genome.reset(new NN2CPPNGenome);
         else
             morph_genome.reset(new ProtomatrixGenome);
@@ -305,7 +305,7 @@ void MNIPES::init_learner(int id){
     learner.set_randNum(randomNum);
 
     //Load an existing learner
-    if(boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
+    if(learner_file != "None" && boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
         learner.init();
         learner.from_file(Logging::log_folder + "/" + learner_file);
         std::cout << learner.print_info() << std::endl;
@@ -360,7 +360,6 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
 void MNIPES::load_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
 
 
     ioh::MorphGenomeInfoMap morph_gen_info;
@@ -378,7 +377,8 @@ void MNIPES::load_data_for_generate(){
      * 2) load this robot and add it to the building queue
      */
 
-    if(genome_type == CPPN)
+    bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
+    if(is_cppn_genome)
         ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
     else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
 
@@ -408,7 +408,7 @@ void MNIPES::load_data_for_update() {
 }
 
 void MNIPES::write_data_for_update(){
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
 
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
@@ -419,11 +419,10 @@ void MNIPES::write_data_for_update(){
 
         ioh::MorphGenomeInfo morph_info;
         std::map<int,Genome::Ptr> gen;
-        if(genome_type == CPPN){
+        if(is_cppn_genome){
             ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
             morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<NN2CPPNGenome>(gen[learner.first])->get_generation()));
         }
-
         else{
             ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
             morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<ProtomatrixGenome>(gen[learner.first])->get_generation()));
@@ -431,6 +430,17 @@ void MNIPES::write_data_for_update(){
 
 
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
+        std::vector<double> best_nn_params = learner.second.get_best_solution().second;
+        NNParamGenome best_ctrl;
+        best_ctrl.set_nbr_input(learner.second.get_nbr_inputs());
+        best_ctrl.set_nbr_output(learner.second.get_nbr_outputs());
+        best_ctrl.set_nbr_hidden(settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value);
+        best_ctrl.set_nn_type(settings::getParameter<settings::Integer>(parameters,"#nnType").value);
+        std::vector<double> weights,biases;
+        weights.insert(weights.begin(),learner.second.get_best_solution().second.begin(),learner.second.get_best_solution().second.begin()+learner.second.get_nbr_weights());
+        biases.insert(biases.begin(),learner.second.get_best_solution().second.begin()+learner.second.get_nbr_weights(),learner.second.get_best_solution().second.end());
+        best_ctrl.set_weights(weights);
+        best_ctrl.set_biases(biases);
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
 }

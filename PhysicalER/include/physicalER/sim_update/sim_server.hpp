@@ -12,27 +12,11 @@
 
 /// an unique pointer to ER_VREP class
 are::phy::update::ER::Ptr ERVREP;
-// TODO: EB  do we need these variables? I guess they are used for client-server mode.
-int counter = 0;
-int timeCount = 0;
-bool timerOn = false;
-double timeElapsed;
-bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
-clock_t sysTime; // Measure simulation time.
-
-enum SimulationState {
-    INITIALIZING,
-    FREE,
-    STARTING,
-    BUSY,
-    CLEANUP,
-    RESTART
-};
-
-SimulationState simulationState = FREE;
-
-/// This variable marks the start of evolution.
-bool startEvolution;
+zmq::context_t context (1);
+zmq::socket_t publisher (context, ZMQ_PUB);
+zmq::socket_t reply (context, ZMQ_REP);
+are::sim::AREControl are_ctrl;
+bool sim_started = false;
 
 #ifdef _WIN32
 	#define VREP_DLLEXPORT extern "C" __declspec(dllexport)

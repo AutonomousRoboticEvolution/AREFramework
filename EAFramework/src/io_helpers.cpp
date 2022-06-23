@@ -203,7 +203,7 @@ void ioh::add_morph_genome_to_gp(const std::string &folder, int id, const MorphG
 
     std::stringstream loo_ori,loo_dest;
     loo_ori << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
-    loo_dest << folder << "/logs/list_of_organs_" << id << ".csv";
+    loo_dest << folder << "/genomes_pool/list_of_organs_" << id << ".csv";
     if(!move_file(loo_ori.str(),loo_dest.str()))
         return;
 

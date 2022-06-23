@@ -75,7 +75,6 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
             continue;
         }
 
-	std::cout << line << std::endl;
         Type::Ptr val = buildType(param[1]);
         val->fromString(param[2]);
         parameters.emplace(param[0],val);

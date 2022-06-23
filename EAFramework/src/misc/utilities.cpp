@@ -67,3 +67,9 @@ double misc::get_next_joint_position(double nn_output, double time, double previ
         next_pos = -(4./9.) * M_PI;
     return next_pos;
 }
+
+std::string misc::int_to_string(int n){
+    std::stringstream sstr;
+    sstr << n;
+    return sstr.str();
+}
