@@ -254,8 +254,12 @@ class TrackingSystem:
                 filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
 
                 filePath = "{}/{}.avi".format( videos_folder_path , filename)
+                if os.path.exists(filePath): # need to change the filename to something unique
+                    i=0
+                    while os.path.exists(filePath):
+                        i+=1
+                        filePath = "{}/{} ({}).avi".format( videos_folder_path , filename,i)
                 if verbose_messages: print("saving as file {}".format(filePath))
-                if os.path.exists(filePath): os.remove(filePath) # delete it if it already exists to prevent error
                 os.rename("temporary_output.avi",filePath)
                 self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
 
