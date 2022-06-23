@@ -1,10 +1,10 @@
 #experimentName,string,visualization
 #expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#folderToLoad,string,/home/ebb505/ARE_Project/are-logs/mnipes2_15_5_10-33-47-7729-85836816
-#idToLoad,int,22
+#folderToLoad,string,/media/ebb505/ARE-EBB/ARE/are-logs/mnipes_experiments/exploration/mnipes2_17_5_10-56-25-5899-3598663706
+#idToLoad,int,129
 #genToLoad,int,0
-#indToLoad,int,22
+#indToLoad,int,129
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
 #populationSize,int,25
@@ -42,7 +42,7 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,0
+#emptyCtrlGenome,bool,1
 #loadAllMorphGenome,bool,0
 
 #isWheel,bool,1

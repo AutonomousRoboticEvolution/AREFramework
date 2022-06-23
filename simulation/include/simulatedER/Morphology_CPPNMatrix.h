@@ -143,6 +143,8 @@ public:
     }
 
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
+    void setLoadRobot(){isRobotModel = true;}
+    void setDecodeRobot(){isRobotModel = false;}
 
     Eigen::VectorXd getMorphDesc() const {
         int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
@@ -261,6 +263,7 @@ private:
     Blueprint blueprint;
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
+    bool isRobotModel = 0;
     //NEAT::Substrate substrate;
 
     std::vector<std::vector<double>> matrix_4d;
