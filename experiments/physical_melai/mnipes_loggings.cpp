@@ -51,7 +51,7 @@ void BestControllerLog::saveLog(EA::Ptr &ea)
     if(!static_cast<MNIPES*>(ea.get())->get_learners().at(id).is_learning_finish())
         return;
     std::stringstream sstr;
-    sstr << "ctrl_genome_" << id;
+    sstr << "/genomes_pool/ctrl_genome_" << id;
     std::ofstream ifs;
     if(!openOLogFile(ifs,sstr.str())){
         std::cerr << "Unable to open file : " << sstr.str() << std::endl;

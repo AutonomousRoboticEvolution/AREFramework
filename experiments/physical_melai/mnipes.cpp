@@ -430,17 +430,7 @@ void MNIPES::write_data_for_update(){
 
 
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
-        std::vector<double> best_nn_params = learner.second.get_best_solution().second;
-        NNParamGenome best_ctrl;
-        best_ctrl.set_nbr_input(learner.second.get_nbr_inputs());
-        best_ctrl.set_nbr_output(learner.second.get_nbr_outputs());
-        best_ctrl.set_nbr_hidden(settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value);
-        best_ctrl.set_nn_type(settings::getParameter<settings::Integer>(parameters,"#nnType").value);
-        std::vector<double> weights,biases;
-        weights.insert(weights.begin(),learner.second.get_best_solution().second.begin(),learner.second.get_best_solution().second.begin()+learner.second.get_nbr_weights());
-        biases.insert(biases.begin(),learner.second.get_best_solution().second.begin()+learner.second.get_nbr_weights(),learner.second.get_best_solution().second.end());
-        best_ctrl.set_weights(weights);
-        best_ctrl.set_biases(biases);
+
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
 }

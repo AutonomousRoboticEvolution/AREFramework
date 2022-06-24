@@ -169,7 +169,6 @@ bool ER::update_evaluation(){
 
     std::string message_string;
     receive_string_no_reply(message_string,subscriber,"pi ");
-    std::cout << message_string << std::endl;
     return message_string=="finish";
 
 }
@@ -213,17 +212,8 @@ bool ER::stop_evaluation(){
     write_data();
     save_logs();
 
-
-    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
-    if(list_ids[0] != current_id){ //if the chosen id is not the first place, put it in first place to be the default choice.
-        int i = 0;
-        for(;i < list_ids.size(); i++)
-            if(current_id == list_ids[i])
-                break;
-        list_ids[i] = list_ids[0];
-        list_ids[0] = current_id;
-    }
-    ea->setCurrentIndIndex(current_id);
+    list_ids.clear();
+    choice_of_robot();
 
     return true;
 }
