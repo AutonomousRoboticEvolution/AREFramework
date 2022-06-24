@@ -88,7 +88,6 @@ private:
     int current_id = 0;
     int nbrEval = 0;
 
-    bool isEnvInit = false;
     bool verbose=false;
 
     ///used to create the environment

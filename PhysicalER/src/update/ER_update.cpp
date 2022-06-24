@@ -118,10 +118,7 @@ void ER::start_evaluation(){
 
     eval_t1 = std::chrono::steady_clock::now();
 
-    if(!isEnvInit){
-        isEnvInit=true;
-        environment->init();
-    }
+    environment->init();
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
