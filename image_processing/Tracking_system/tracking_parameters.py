@@ -48,12 +48,9 @@ if location == "bristol":
     brainMax = ((17,255,224), (0,0,0)) # blue:(33,169,83) green:(53,203,158)
 
     #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (386,264) # defined in the uncropped image
-    pixel_scale = 175
-
-
-    #crop parameters
-    crop_rectangle = [200,75,380,380]
+    pixel_scale = 169.44444444444443
+    centre_reference = (387, 255)
+    crop_rectangle = [197, 69, 380, 373]
 
 if location == "bristol_pi":
     # the pipe for getting images from the camera
