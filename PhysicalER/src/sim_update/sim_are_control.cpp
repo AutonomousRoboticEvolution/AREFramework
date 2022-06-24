@@ -9,6 +9,8 @@ void AREIndividual::createMorphology(){
     morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     morphology->set_randNum(randNum);
     std::vector<double> init_pos = st::getParameter<st::Sequence<double>>(parameters,"#initPosition").value;
+    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
 }
 
@@ -83,14 +85,15 @@ void AREIndividual::from_string(const std::string &str){
 
 AREControl::AREControl(const AREIndividual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
-    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
-    _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value * 1000.0; // in milliseconds
+    _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value; // in milliseconds
+    _time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
     // initilise the camera
     // If this is true, the camera input (binary on/off) will be used the first input to the neural network controller:
     cameraInputToNN =  settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
     _is_ready = true;
+    controller.init();
 }
 
 
@@ -98,6 +101,7 @@ int AREControl::exec(zmq::socket_t& socket, float sim_time){
 
     if(sim_time <= _max_eval_time){
         // start a new line of log file, and add current time
+        AREControl::_sent_finish_mess = false;
 
         controller.update(sim_time);
     
@@ -106,15 +110,15 @@ int AREControl::exec(zmq::socket_t& socket, float sim_time){
         // the are-update running on the PC expects to get a message on every timestep:
         are::phy::send_string_no_reply("busy",socket,"pi ");
 
-
         return 1;
     }else{
-        _is_ready=false;
         
     
         // send finished message
-        are::phy::send_string_no_reply("finish",socket,"pi ");
-    
+        if(!_sent_finish_mess){
+            are::phy::send_string_no_reply("finish",socket,"pi ");
+            _sent_finish_mess = true;
+        }
     
         // send log data
         are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");

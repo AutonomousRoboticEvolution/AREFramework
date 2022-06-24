@@ -34,19 +34,7 @@ extern "C" {
 
 LIBRARY simLib;
 
-///save time log
-void saveLog(int num)
-{
-    std::ofstream logFile;
-    logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
-    clock_t now = clock();
-    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
-    sysTime = clock();
-    counter = 0;
-    logFile.close();
-}
+
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
@@ -115,10 +103,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
 
-
-
-    simulationState = INITIALIZING;
-    // Construct classes
+//    // Construct classes
     ERVREP = std::make_unique<are::phy::update::ER>();   // The class used to handle the EA
 
     if(verbose){
@@ -138,7 +123,11 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
 
-    //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
+    //*/  Prepare our context and socket
+    publisher.bind ("tcp://*:5555");
+    reply.bind ("tcp://*:5556");
+    /**/
+
     return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
     // version 1 was for V-REP versions before V-REP 2.5.12
     // version 2 was for V-REP versions before V-REP 2.6.0
@@ -150,25 +139,66 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
 { // This is called just once, at the end of V-REP
-    unloadVrepLibrary(simLib); // release the library
+   unloadVrepLibrary(simLib); // release the library
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
-    //*/  Prepare our context and socket
-    zmq::context_t context (1);
-    zmq::socket_t publisher (context, ZMQ_PUB);
-    zmq::socket_t reply (context, ZMQ_REP);
-    publisher.bind ("tcp://*:5555");
-    reply.bind ("tcp://*:5556");
-    /**/
+
+    if(message == sim_message_eventcallback_modelloaded
+            || message == sim_message_model_loaded
+            || message == sim_message_eventcallback_sceneloaded
+            || message == sim_message_scene_loaded
+            || message == sim_message_eventcallback_modulehandleinsensingpart
+           )
+        return NULL;
+
     bool verbose = are_sett::getParameter<are_sett::Boolean>(ERVREP->get_parameters(),"#verbose").value;
-    sim::AREControl are_ctrl;
-    std::string str_ctrl, str_organs_list, str_param;
+
+    // ABOUT TO START
+    if (message == sim_message_eventcallback_simulationabouttostart)
+    {
+        sim_started = true;
+        if (verbose) {
+            std::cout << "SIMULATION ABOUT TO START" << std::endl;
+        }
+        //        simStartSimulation();
+        ERVREP->init_env();
+        return NULL;
+
+
+    }
+    //Runing Simulation
+    else if (message == sim_message_eventcallback_modulehandle)
+    {
+
+        float sim_time = simGetSimulationTime();
+        if(are_ctrl.exec(publisher,sim_time) == 0)
+            simStopSimulation();
+        return NULL;
+    }
+    // SIMULATION ENDED
+    else if (message == sim_message_eventcallback_simulationended)
+    {
+        std::cout<<"finished running the controller"<<std::endl;
+        are_ctrl.set_ready(false);
+        simInt length;
+        simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
+        if(log_folder != nullptr){
+            are::Logging::log_folder = std::string(log_folder);
+            are::Logging::log_folder.resize(length);
+        }
+        sim_started = false;
+        return NULL;
+    }
+
 
     if(!are_ctrl.is_ready()){
+        simStartSimulation();
 
+        std::string str_ctrl, str_organs_list, str_param;
 
+        std::cout << "Wait to receive messages" << std::endl;
         //receive parameters
         phy::receive_string(str_param,"parameters_received",reply,"pi ");
         std::cout<<"Parameters received:\n"<<str_param<<std::endl;
@@ -200,54 +230,13 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
         sim::AREIndividual ind(morph_gen,ctrl_gen);
         ind.set_parameters(parameters);
         ind.set_randNum(ERVREP->get_randNum());
-        ind.init();
+
     
         // run controller
-        std::cout<<"init controller"<<std::endl;        
+        std::cout<<"init controller"<<std::endl;
         are_ctrl = sim::AREControl(ind, str_organs_list, parameters);
-    }else{
-        simStartSimulation();
-
-        std::cout<<"finished running the controller"<<std::endl;
-    
-        simInt length;
-        simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
-        if(log_folder != nullptr){
-            are::Logging::log_folder = std::string(log_folder);
-            are::Logging::log_folder.resize(length);
-        }
-    
-        are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    
-        // client and v-rep plugin communicates using signal and remote api
-        int clientState[1] = {10111};
-        simGetIntegerSignal((simChar*) "clientState", clientState);
     }
-    // ABOUT TO START
-    if (message == sim_message_eventcallback_simulationabouttostart)
-    {
 
-        if (verbose) {
-            std::cout << "SIMULATION ABOUT TO START" << std::endl;
-        }
-        //        simStartSimulation();
-        ERVREP->init_env();
-
-
-    }
-    //Runing Simulation
-    else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
-    {
-
-        float sim_time = simGetSimulationTime();
-        if(are_ctrl.exec(publisher,sim_time) == 0)
-            simStopSimulation();
-    }
-    // SIMULATION ENDED
-    else if (message == sim_message_eventcallback_simulationended)
-    {
-      //TODO
-    }
-    
+    return NULL;
 }
 

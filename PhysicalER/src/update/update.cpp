@@ -14,6 +14,7 @@ int main(int argc, char** argv){
     are_set::ParametersMap param = are_set::loadParameters(argv[1]);
     er->set_parameters(std::make_shared<are_set::ParametersMap>(param));
     er->initialize();
+    er->choice_of_robot();
     er->load_data();
     while(er->execute()) usleep(500);
     return 0;
