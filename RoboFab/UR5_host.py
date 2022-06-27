@@ -562,9 +562,10 @@ class UR5Robot:
             self.moveArm(AFDropoffPoint)
 
         self.setMoveSpeed(self.speedValueNormal)
-        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.forceModeFloat()
         self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         # linear move up out of the way of robot :
         self.moveArm(
             changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)
