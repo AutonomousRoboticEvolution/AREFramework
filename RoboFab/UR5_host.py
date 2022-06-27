@@ -470,7 +470,7 @@ class UR5Robot:
         self.moveArm(prePickupPoint)
         self.setMoveSpeed(self.speedValueNormal)  # normal
 
-        self.moveBetweenStations("printer")
+        self.moveBetweenStations("printer_" + str(printer.number))
 
         # dropoff:
         self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) )  # TCP for insertion is centre of clip

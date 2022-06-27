@@ -273,11 +273,12 @@ if __name__ == "__main__":
     makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
     configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
 
+    printer_number=0 #set which printer to use
+
     if DO_CORE_ORGAN_INSERT:
-        printer_number=0
-        printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=0 )
+        printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=printer_number )
     else:
-        printer=Printer(None, configurationData, printer_number=0)
+        printer=Printer(None, configurationData, printer_number=printer_number)
 
     # startup
     RoboFab = RoboFab_host (configurationData)
@@ -289,7 +290,7 @@ if __name__ == "__main__":
     # while(1): pass
 
     # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "117" , printer=printer)
+    RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)
 
     # make robot:
     RoboFab.buildRobot(printer)

@@ -13,6 +13,7 @@ class Printer:
     def __init__(self, IPAddress, configurationData, printer_number=0):
         debugPrint("Creating a printer object")
         printerConfiguration = configurationData["PRINTER_{}".format(printer_number)]
+        self.number=printer_number
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
