@@ -24,7 +24,7 @@ DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
-DO_EXPORT_ORGANS_LIST=1
+DO_EXPORT_ORGANS_LIST = 1
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -284,10 +284,10 @@ if __name__ == "__main__":
     RoboFab = RoboFab_host (configurationData)
 
     # # TEMP
-    # RoboFab.UR5.setTCP( RoboFab.gripperTCP_A )
-    # RoboFab.UR5.moveArm( RoboFab.organBank.origin * makeTransformMillimetersDegrees( z=400, rotX = 180) )
-    # RoboFab.UR5.moveArm( RoboFab.organBank.origin * makeTransformMillimetersDegrees( z=20, rotX = 180) )
-    # while(1): pass
+    RoboFab.UR5.setTCP( RoboFab.gripperTCP_A )
+    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=400, rotX = 180) )
+    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=20, rotX = 180) )
+    while(1): pass
 
     # open blueprint file
     RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)

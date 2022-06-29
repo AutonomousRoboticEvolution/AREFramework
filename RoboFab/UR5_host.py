@@ -562,7 +562,8 @@ class UR5Robot:
             self.moveArm(AFDropoffPoint)
 
         self.setMoveSpeed(self.speedValueNormal)
-        self.setGripperPosition(organInRobot.gripperOpenPosition)
+        #self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.setGripperPosition(0.2)
         self.forceModeFloat()
         self.setTCP(gripperTCP) # reset to the standard gripper TCP
         actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were

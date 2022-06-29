@@ -44,9 +44,8 @@ def makeFile(location):
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.4069 , 0.175 , 0.08507 , 0 , 0 , math.radians(-91.45)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformInputFormatted([0.18285 - 0.3, 0.26085 , 0.08507 , 0 , 0 , 0]).tolist()
-		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
+		PRINTER_1_ORIGIN = makeTransformInputFormatted([-0.1013, 0.244 , 0.085 , 0 , 0 , 0]).tolist()
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
 		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
