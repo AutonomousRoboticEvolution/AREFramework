@@ -279,10 +279,6 @@ int AREControl::exec(zmq::socket_t& socket){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
 
-    // set up timing system
-    uint32_t start_time = millis();
-    uint32_t this_loop_start_time = start_time;
-
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
     for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
@@ -292,6 +288,10 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
+
+    // set up timing system
+    uint32_t start_time = millis();
+    uint32_t this_loop_start_time = start_time;
 
     // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
@@ -338,7 +338,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
     }
 
-    std::cout<<"time: "<<this_loop_start_time-start_time<<std::endl;
+    std::cout<<"time elapsed: "<<(this_loop_start_time-start_time)/1000.0<<" seconds"<<std::endl;
 
     // turn everything off
     for (auto thisOrgan : listOfOrgans) {
@@ -357,8 +357,12 @@ int AREControl::exec(zmq::socket_t& socket){
     daughterBoards->turnOff();
 
 
-    // send finished message
-    are::phy::send_string_no_reply("finish",socket,"pi ");
+    // send "finish" message or "finish_with_errors" if there was some problem that caused the evaluation to stop early
+    if(stop_early){
+        are::phy::send_string_no_reply("finish_with_errors",socket,"pi ");
+    }else{
+        are::phy::send_string_no_reply("finish",socket,"pi ");
+    }
 
 
     // send log data

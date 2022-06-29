@@ -85,9 +85,9 @@ void ER::save_logs(bool eog)
 bool ER::execute(){
 
     if(robot_state == READY){
-        std::cout << "Press Enter when the robot is ready" << std::endl;
-        std::cin.ignore();
-        std::cin.ignore();
+        //std::cout << "Press Enter when the robot is ready" << std::endl;
+        //std::cin.ignore();
+        //std::cin.ignore();
 
         start_evaluation();
         robot_state = BUSY;
@@ -149,7 +149,7 @@ void ER::start_evaluation(){
     assert(reply == "starting");
 
     // starts the recording of the video feed:
-    environment->start_evaluation();
+    std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording();
 }
 
 bool ER::update_evaluation(){
@@ -167,7 +167,11 @@ bool ER::update_evaluation(){
     std::string message_string;
     receive_string_no_reply(message_string,subscriber,"pi ");
     if(message_string=="finish"){
-        environment->stop_evaluation(std::to_string(ER::current_id));
+        robot_reported_error = false;
+        return true;
+    }
+    else if(message_string=="finish_with_errors"){
+        robot_reported_error = true;
         return true;
     }
     else{
@@ -180,6 +184,13 @@ bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
+
+    // stop the recording, discarding the video if there was error(s):
+    if (robot_reported_error){
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
+    }else{
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( std::to_string(ER::current_id)); // filename of the robot ID number
+    }
 
     // get any logs that the robot has gathered:
     bool getting_logs=true;
@@ -200,6 +211,12 @@ bool ER::stop_evaluation(){
 
     // display the fitness:
     environment->print_info();
+
+    // if the robot reported an error, we automatically re-do this evaulation
+    if (robot_reported_error){
+        std::cout<<"============================\n= Robot reported an error! =\n=== Repeating evaluation ===\n============================"<<std::endl;
+        return true;
+    }
 
     // ask user whether to re-do this evaluation
     std::string str;

@@ -90,6 +90,8 @@ private:
 
     bool verbose=false;
 
+    bool robot_reported_error = false;
+
     ///used to create the environment
     std::function<Environment::Factory> environmentFactory;
 

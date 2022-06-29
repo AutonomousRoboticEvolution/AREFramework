@@ -17,8 +17,6 @@ public:
     void init() override;
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     void print_info() override;
-    void start_evaluation() override;
-    void stop_evaluation(std::string robotID = "") override;
     void update_info(double time) override;
     const Eigen::MatrixXi &get_visited_zone_matrix(){return grid_zone;}
 
@@ -27,6 +25,10 @@ public:
     std::vector<double> fit_targeted_locomotion();
     std::vector<double> fit_exploration();
     std::vector<double> fit_foraging();
+
+    void save_tracking_video(std::string filename);
+    void discard_tracking_video();
+    void start_recording();
 
     // some infomation about how successful the tracking was
     int total_number_of_frames=0;

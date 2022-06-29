@@ -70,8 +70,6 @@ public:
     virtual void update_info(double time) = 0;
 
     virtual void print_info(){}
-    virtual void start_evaluation(){}
-    virtual void stop_evaluation(std::string robotID = ""){}
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
