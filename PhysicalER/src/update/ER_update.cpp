@@ -85,9 +85,8 @@ void ER::save_logs(bool eog)
 bool ER::execute(){
 
     if(robot_state == READY){
-        //std::cout << "Press Enter when the robot is ready" << std::endl;
-        //std::cin.ignore();
-        //std::cin.ignore();
+        std::cout << "Press Enter when the robot is ready" << std::endl;
+        std::cin.ignore();
 
         start_evaluation();
         robot_state = BUSY;
