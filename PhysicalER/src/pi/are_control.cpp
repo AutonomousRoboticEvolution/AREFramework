@@ -42,13 +42,13 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
-            number_of_wheels++;
+            numberOfWheels++;
             break;
 
         case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
-            number_of_sensors++;
+            numberOfSensors++;
             break;
 
         case 3: //leg - made up of two joints
@@ -66,7 +66,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
-            number_of_joints+=2;
+            numberOfJoints+=2;
             break;
 
         case 4: //caster
@@ -102,6 +102,10 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         ledDriver->flash(GREEN); // flash green to show ready
     }
 
+    // check the controller is giving the right number of inputs and outputs:
+    std::cout<<"Number of NN inputs: "<<controller.get_number_of_inputs()<<"\nNumber of NN outputs: "<<controller.get_number_of_outputs()<<std::endl;
+    assert(controller.get_number_of_inputs() == numberOfSensors*2 + cameraInputToNN);
+    assert(controller.get_number_of_outputs() == numberOfWheels + numberOfJoints);
 
     // set debug printing flag - this prints a representation of the inputs and outputs to terminal
     if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
@@ -281,10 +285,10 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"NN_output_"<<i<<",";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
