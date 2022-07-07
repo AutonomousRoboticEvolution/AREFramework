@@ -10,7 +10,7 @@ def getDirectories(repository):
     # r=root, d=directories, f = files
     for r, d, f in os.walk(repository):
         for folder in d:
-            if(folder == "images"):
+            if(folder == "images" or folder == "best_genomes_archive"):
                continue
             temp_folder = folder.split("_")
             FOLDERS_NAMES.append(temp_folder[1])
