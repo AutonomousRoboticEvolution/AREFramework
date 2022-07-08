@@ -118,12 +118,27 @@ int AREControl::exec(zmq::socket_t& socket, float sim_time){
         if(!_sent_finish_mess){
             are::phy::send_string_no_reply("finish",socket,"pi ");
             _sent_finish_mess = true;
+            // send log data
+            are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
+            are::phy::send_string_no_reply("finished_logs",socket, "pi ");
         }
     
-        // send log data
-        are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
-        are::phy::send_string_no_reply("finished_logs",socket, "pi ");
-    
+
+
         return 0;
     }
+}
+
+void AREControl::send_fitness(zmq::socket_t& socket){
+    std::stringstream obj_sstr;
+    for(const auto &obj: controller.getObjectives())
+        obj_sstr << obj << ";";
+    are::phy::send_string_no_reply(obj_sstr.str(),socket,"pi ");
+}
+
+void AREControl::send_trajectory(zmq::socket_t& socket){
+    std::stringstream traj_sstr;
+    for(const auto &wp: controller.get_trajectory())
+        traj_sstr << wp.to_string() << std::endl;
+    are::phy::send_string_no_reply(traj_sstr.str(),socket,"pi ");
 }

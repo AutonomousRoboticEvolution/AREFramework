@@ -90,8 +90,8 @@ public:
     void write_data_for_update() override;
 
     int get_currentID(){return currentIndIndex;}
-    const std::vector<waypoint> &get_trajectory(){return trajectory;}
-    std::vector<double> get_objectives(){return objectives;}
+
+
     const std::map<int, CMAESLearner> &get_learners(){return learners;}
     const NNParamGenome &get_best_current_ctrl_genome() const {return best_current_ctrl_genome;}
 private:
@@ -99,8 +99,6 @@ private:
     std::map<int,Genome::Ptr> morph_genomes;
     std::map<int,Genome::Ptr> xmigrator_genomes; //genomes from simulation to be directly introduced in physical population
     std::map<int,CMAESLearner> learners;
-    std::vector<waypoint> trajectory;
-    std::vector<double> objectives;
     ControllerArchive ctrl_archive;
     ioh::MorphGenomeInfoMap morph_genomes_info;
     NNParamGenome best_current_ctrl_genome;

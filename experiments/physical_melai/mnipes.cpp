@@ -40,6 +40,7 @@ void MNIPES::init_random_pop(){
         morph_genome->random();
         morph_genome->set_parameters(parameters);
         morph_genome->set_randNum(randomNum);
+        morph_genome->set_id(misc::generate_unique_id(4));
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
         PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
@@ -243,6 +244,7 @@ void MNIPES::_reproduction(){
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
+            new_morph_gene->set_id(misc::generate_unique_id(4));
         }
         else{//without crossbreeding
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
@@ -256,6 +258,7 @@ void MNIPES::_reproduction(){
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
+            new_morph_gene->set_id(misc::generate_unique_id(4));
         }
 
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.

@@ -175,6 +175,7 @@ bool ER::update_evaluation(){
 
 bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool sim_mode = settings::getParameter<settings::Boolean>(parameters,"#simMode").value;
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
 
@@ -190,8 +191,29 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file.txt" , message );
+            Logging::saveStringToFile( "log_file.txt" , message);
         }
+    }
+    std::vector<double> objs;
+    std::vector<waypoint> traj;
+    if(sim_mode){
+        //receive the fitness
+        std::string message;
+        receive_string_no_reply(message,subscriber,"pi ");
+        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+        std::vector<std::string> split;
+        misc::split_line(message,";",split);
+        objs.resize(split.size());
+        for(int i = 0; i < split.size(); i++)
+            objs[i] = std::stod(split[i]);
+
+        //receive the trajectory
+        receive_string_no_reply(message,subscriber,"pi ");
+        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+        misc::split_line(message,"\n",split);
+        traj.resize(split.size());
+        for(int i = 0; i < split.size(); i++)
+            traj[i].from_string(split[i]); ;
     }
 
     // display the fitness:
@@ -209,6 +231,12 @@ bool ER::stop_evaluation(){
     if(ea->update(environment)){
         nbrEval = 0;
     }
+
+    if(sim_mode){
+        ea->set_objectives(objs);
+        ea->set_trajectory(traj);
+    }
+
     write_data();
     save_logs();
 

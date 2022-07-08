@@ -73,6 +73,7 @@ public:
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
     void init_env(){environment->init();}
+    const Environment::Ptr &get_environment(){return environment;}
 
 private:
     ///pointer to settting of EA

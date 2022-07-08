@@ -73,3 +73,10 @@ std::string misc::int_to_string(int n){
     sstr << n;
     return sstr.str();
 }
+
+int misc::generate_unique_id(int n){
+    using namespace std::chrono;
+    system_clock::time_point tp = system_clock::now();
+    auto dtn = duration_cast<nanoseconds>(tp.time_since_epoch());
+    return dtn.count()%static_cast<long int>(pow(10,n));
+}

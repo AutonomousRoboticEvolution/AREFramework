@@ -173,6 +173,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     {
 
         float sim_time = simGetSimulationTime();
+        std::dynamic_pointer_cast<are::sim::VirtualEnvironment>(ERVREP->get_environment())->updateEnv(sim_time,std::dynamic_pointer_cast<are::sim::Morphology>(are_ctrl.access_controller().get_morphology()));
         if(are_ctrl.exec(publisher,sim_time) == 0)
             simStopSimulation();
         return NULL;
@@ -182,16 +183,25 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     {
         std::cout<<"finished running the controller"<<std::endl;
         are_ctrl.set_ready(false);
+        are::Individual::Ptr ind;
+        are_ctrl.access_controller().setObjectives(ERVREP->get_environment()->fitnessFunction(ind));
+        are_ctrl.access_controller().set_trajectory(ERVREP->get_environment()->get_trajectory());
+        std::cout << "fitness obtained ";
+        for(const auto &obj: are_ctrl.access_controller().getObjectives())
+            std::cout << obj << ";";
+        std::cout << std::endl;
+        are_ctrl.send_fitness(publisher);
+        are_ctrl.send_trajectory(publisher);
         simInt length;
         simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
         if(log_folder != nullptr){
             are::Logging::log_folder = std::string(log_folder);
             are::Logging::log_folder.resize(length);
         }
+
         sim_started = false;
         return NULL;
     }
-
 
     if(!are_ctrl.is_ready()){
         simStartSimulation();

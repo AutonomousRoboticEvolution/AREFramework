@@ -132,6 +132,11 @@ public:
 
     virtual const Genome::Ptr get_next_controller_genome(int id){} //method for the physical side
 
+    std::vector<double> get_objectives(){return objectives;}
+    void set_objectives(const std::vector<double>& objs){objectives = objs;}
+    const std::vector<waypoint> &get_trajectory(){return trajectory;}
+    void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
+
 protected:
     /// This method initilizes a population of genomes
     virtual void evaluation(){} // This is now only used by NEAT but can also be done for the other genomes. However, by passing the update function to the EA different EA objects can contain different scenarios making the plugin more flexible.
@@ -146,6 +151,8 @@ protected:
     settings::ParametersMapPtr parameters;
     ///random number generator for EA
     misc::RandNum::Ptr randomNum;
+    std::vector<double> objectives; //current objectives values (used in hardware evolution)
+    std::vector<waypoint> trajectory; //current trajectory (used in hardware evolution)
 
     int generation = 0;
     int numberEvaluation = 0;

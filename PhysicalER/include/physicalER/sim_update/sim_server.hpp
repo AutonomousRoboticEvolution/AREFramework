@@ -8,6 +8,7 @@
 #include "sim_are_control.hpp"
 #include "ARE/nn2/NN2CPPNGenome.hpp"
 #include "ARE/NNParamGenome.hpp"
+#include "simulatedER/VirtualEnvironment.hpp"
 #include "physicalER/pi_communication.hpp"
 
 /// an unique pointer to ER_VREP class

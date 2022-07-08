@@ -75,6 +75,8 @@ public:
     void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
 
+
+
 protected:
     void createMorphology() override;
     void createController() override;
@@ -101,6 +103,10 @@ public:
 
     bool is_ready(){return _is_ready;}
     void set_ready(bool r = true){_is_ready = r;}
+    AREIndividual &access_controller(){return controller;}
+
+    void send_fitness(zmq::socket_t &socket);
+    void send_trajectory(zmq::socket_t &socket);
 
 private:
     AREIndividual controller;
