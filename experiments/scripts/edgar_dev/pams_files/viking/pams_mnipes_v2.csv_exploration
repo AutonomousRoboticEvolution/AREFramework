@@ -44,16 +44,16 @@
 #populationSize,int,20
 #maxEvalTime,float,30
 #timeStep,float,0.1
-#maxNbrEval,int,400000
+#maxNbrEval,int,60000
 #fitnessType,int,0
 #withCrossover,bool,1
 
 #cmaesSmallNbrEval,int,200
 #cmaesLargeNbrEval,int,400
 #cmaesPopSize,int,10
-#cmaesMaxPopSize,int,20
+#cmaesMaxPopSize,int,40
 #CMAESStep,double,1.
-#FTarget,double,0.05
+#FTarget,double,0.1
 #elitistRestart,bool,0
 #withRestart,bool,1
 #incrPop,bool,1
@@ -64,7 +64,7 @@
 #noveltyRatio,double,1.
 #noveltyDecrement,double,0.05
 
-#nbrWaypoints,int,10
+#nbrWaypoints,int,30
 #populationStagnationThreshold,float,0.05
 #withBeacon,bool,1
 #energyBudget,double,100
@@ -89,3 +89,7 @@
 #energyReduction,bool,0
 #updateSimulatorList,bool,0
 #waitForAllInstances,bool,0
+
+#nbrEvalPerTask,int,60000
+#nbrOfSuccessfullSolutions,int,5
+#bestGenomesInfoFile,string,morph_genomes_info.csv
