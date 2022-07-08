@@ -289,9 +289,14 @@ int AREControl::exec(zmq::socket_t& socket){
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
+    logs_to_send<<"Temperature";
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
+
+    // start fan
+    Fan fan;
+    fan.turnOn();
 
     // set up timing system
     uint32_t start_time = millis();
@@ -326,6 +331,9 @@ int AREControl::exec(zmq::socket_t& socket){
             std::cout<<"WARNING: stopping early due to organ connection failure"<<std::endl;
         }
 
+        // add temperature to log
+        logs_to_send<<batteryMonitor.measureTemperature()<<",";
+
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
         //std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
@@ -359,6 +367,7 @@ int AREControl::exec(zmq::socket_t& socket){
     }
     ledDriver->flash(BLUE);
     daughterBoards->turnOff();
+    fan.turnOff();
 
 
     // send "finish" message or "finish_with_errors" if there was some problem that caused the evaluation to stop early

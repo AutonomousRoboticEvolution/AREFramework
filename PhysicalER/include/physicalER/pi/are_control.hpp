@@ -13,6 +13,7 @@
 #include "SensorOrgan.hpp"
 #include "BatteryMonitor.hpp"
 #include "DaughterBoards.hpp"
+#include "Fan.hpp"
 #include "LedDriver.hpp"
 #include "Camera.hpp"
 #include <zmq.hpp>
