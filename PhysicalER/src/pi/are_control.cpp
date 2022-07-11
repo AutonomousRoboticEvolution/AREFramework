@@ -379,6 +379,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
 
     // send log data
+    logs_to_send<<"\n"; // add a final newline
     are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
     are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 
