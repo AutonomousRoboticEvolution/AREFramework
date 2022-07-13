@@ -61,7 +61,7 @@ int8_t JointOrgan::readMeasuredAngle() {
 }
 
 
-int8_t JointOrgan::readMeasuredCurrent() {
+uint8_t JointOrgan::readMeasuredCurrent() {
     return read8From(MEASURED_CURRENT_REGISTER);
 }
 

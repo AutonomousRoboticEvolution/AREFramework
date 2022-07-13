@@ -170,7 +170,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
             if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
-            logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
+            logs_to_send<< float(thisJoint->readMeasuredCurrent())*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a joint

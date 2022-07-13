@@ -97,7 +97,7 @@ class JointOrgan  : public Organ {
             @brief Read the current draw.
             @return
         */
-        int8_t readMeasuredCurrent();
+        uint8_t readMeasuredCurrent();
 
 };
 
