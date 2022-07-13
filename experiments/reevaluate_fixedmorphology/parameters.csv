@@ -6,7 +6,7 @@
 #populationSize,int,200
 #maxEvalTime,float,30
 #numberOfGeneration,int,10
-#repository,string,/home/ebb505/ARE_Project/robotlibrary/
+#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs/mnipes_experiments/corridor/
 #envType,int,0
 #verbose,bool,1
 #instanceType,int,0
@@ -16,11 +16,11 @@
 #shouldReopenConnections,bool,0
 #seed,int,1
 #arenaSize,double,2.
-#target_x,double,0.8
-#target_y,double,0.
+#target_x,double,0.6
+#target_y,double,0.025
 #target_z,double,0.2
-#init_x,float,-0.6
-#init_y,float,0.
+#init_x,float,-0.55
+#init_y,float,0.025
 #init_z,float,0.2
 #MaxWeight,float,1.0
 #NNType,int,2
@@ -28,9 +28,9 @@
 #NbrOutputNeurones,int,4
 #NbrHiddenNeurones,int,6
 #UseInternalBias,bool,1
-#folderToLoad,string,morph_71
-#genToLoad,int,42
-#indToLoad,int,11
+#folderToLoad,string,nipes_30_5_17-36-9-9834-2077102197
+#genToLoad,int,0
+#indToLoad,int,0
 #genType,int,2
 #maxVelocity,double,6.
 #nbrWaypoints,int,30
