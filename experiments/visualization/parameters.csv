@@ -1,10 +1,10 @@
 #experimentName,string,visualization
 #expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges_real.ttt
-#folderToLoad,string,/media/ebb505/ARE-EBB/ARE/are-logs/mnipes_experiments/corridor/4/mnipes2_9_6_0-6-16-6605-3806380686
-#idToLoad,int,124
+#folderToLoad,string,/media/ebb505/ARE-EBB/ARE/are-logs/mnipes_experiments/corridor/4_robots/0_119/
+#idToLoad,int,119
 #genToLoad,int,0
-#indToLoad,int,124
+#indToLoad,int,119
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
 #populationSize,int,25
@@ -42,7 +42,7 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,0
+#emptyCtrlGenome,bool,1
 #loadAllMorphGenome,bool,0
 
 #isWheel,bool,1
