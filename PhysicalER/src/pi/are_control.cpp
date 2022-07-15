@@ -205,7 +205,7 @@ bool AREControl::testAllOrganConnections(){
         while (!has_passed and retries<10){
             has_passed = thisOrgan->testConnection();
             if (!has_passed){
-                usleep(10000 + (rand() % 1000) );
+                usleep(100 + (rand() % 50) );
                 retries++;
             }
         }
