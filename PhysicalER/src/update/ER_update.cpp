@@ -200,7 +200,7 @@ bool ER::stop_evaluation(){
         //receive the fitness
         std::string message;
         receive_string_no_reply(message,subscriber,"pi ");
-        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+//        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
         std::vector<std::string> split;
         misc::split_line(message,";",split);
         objs.resize(split.size());
@@ -209,7 +209,7 @@ bool ER::stop_evaluation(){
 
         //receive the trajectory
         receive_string_no_reply(message,subscriber,"pi ");
-        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+//        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
         misc::split_line(message,"\n",split);
         traj.resize(split.size());
         for(int i = 0; i < split.size(); i++)
@@ -236,6 +236,8 @@ bool ER::stop_evaluation(){
         ea->set_objectives(objs);
         ea->set_trajectory(traj);
     }
+
+    ea->epoch();
 
     write_data();
     save_logs();

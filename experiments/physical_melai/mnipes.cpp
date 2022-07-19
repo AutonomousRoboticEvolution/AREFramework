@@ -59,21 +59,24 @@ void MNIPES::init_next_pop(){
 
 
 bool MNIPES::update(const Environment::Ptr &env){
-    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
     PMEIndividual::Ptr ind(new PMEIndividual);
     objectives = env->fitnessFunction(ind);
     ind.reset();
 
-    std::vector<double> final_pos = env->get_final_position();
-    Eigen::VectorXd desc(3);
-    desc << (final_pos[0]+arena_size/2.)/arena_size,
-            (final_pos[1]+arena_size/2.)/arena_size,
-            (final_pos[2]+arena_size/2.)/arena_size;
+    final_position = env->get_final_position();
     trajectory = env->get_trajectory();
 
+    return true;
+}
+
+void MNIPES::epoch(){
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    Eigen::VectorXd desc(3);
+    desc << (final_position[0]+arena_size/2.)/arena_size,
+            (final_position[1]+arena_size/2.)/arena_size,
+            (final_position[2]+arena_size/2.)/arena_size;
 
     //update learner
     auto& learner = learners[currentIndIndex];
@@ -109,7 +112,6 @@ bool MNIPES::update(const Environment::Ptr &env){
         }
         //-
     }
-    return true;
 }
 
 void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vector<int> &list_ids){
@@ -404,7 +406,7 @@ void MNIPES::load_data_for_update() {
     if(use_ctrl_arch){
         int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
         ctrl_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
-        ctrl_archive.from_file(repository + "/" + exp_name + "/logs/controller_archive");
+        ctrl_archive.from_file(repository + "/" + exp_name + "/controller_archive");
     }
     //create a first genome controller for the first robot chosen
     init_learner(currentIndIndex);

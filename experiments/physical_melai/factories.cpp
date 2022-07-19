@@ -39,5 +39,12 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     are::BestControllerLog::Ptr bestControllerLog(new are::BestControllerLog);
     logs.push_back(bestControllerLog);
+
+    if(are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value){
+        are::ControllerArchiveLog::Ptr ctrlArchLog(new are::ControllerArchiveLog);
+        logs.push_back(ctrlArchLog);
+    }
+
+
 }
 

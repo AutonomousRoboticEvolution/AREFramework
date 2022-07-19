@@ -80,6 +80,7 @@ public:
     void init_next_pop() override;
 
     bool update(const Environment::Ptr &env) override;
+    void epoch() override;
     void setObjectives(size_t current_id,const std::vector<double> &objs){}
     void init_learner(int id);
     const Genome::Ptr get_next_controller_genome(int id);
@@ -94,6 +95,7 @@ public:
 
     const std::map<int, CMAESLearner> &get_learners(){return learners;}
     const NNParamGenome &get_best_current_ctrl_genome() const {return best_current_ctrl_genome;}
+    const ControllerArchive &get_ctrl_archive(){return ctrl_archive;}
 private:
     std::vector<std::pair<int,int>> ids;
     std::map<int,Genome::Ptr> morph_genomes;
@@ -102,6 +104,7 @@ private:
     ControllerArchive ctrl_archive;
     ioh::MorphGenomeInfoMap morph_genomes_info;
     NNParamGenome best_current_ctrl_genome;
+    std::vector<double> final_position;
 
     void _survival(const ioh::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();

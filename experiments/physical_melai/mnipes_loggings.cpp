@@ -27,21 +27,7 @@ void RobotInfoLog::saveLog(EA::Ptr &ea)
     }
 
     ifs << "ctrl_genome;" << std::endl;
-    NNParamGenome gen;
-    gen.set_nbr_input(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_inputs());
-    gen.set_nbr_output(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_outputs());
-    gen.set_nbr_hidden(settings::getParameter<settings::Integer>(ea->get_parameters(),"#nbrHiddenNeurons").value);
-    gen.set_nn_type(settings::getParameter<settings::Integer>(ea->get_parameters(),"#NNType").value);
-
-    std::vector<double> weights, biases;
-    for(int i = 0; i < static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_weights(); i++)
-        weights.push_back(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome[i]);
-    for(int i = static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_weights(); i < static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome.size(); i++)
-        biases.push_back(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome[i]);
-    gen.set_weights(weights);
-    gen.set_biases(biases);
-    ifs << gen.to_string();
-
+    ifs << ea->getIndividual(0)->get_ctrl_genome()->to_string();
 
     ifs.close();
 }
@@ -78,4 +64,19 @@ void BestControllerLog::saveLog(EA::Ptr &ea)
     }
     ifs << static_cast<MNIPES*>(ea.get())->get_best_current_ctrl_genome().to_string();
     ifs.close();
+}
+
+void ControllerArchiveLog::saveLog(EA::Ptr &ea){
+
+    std::ofstream logFileStream;
+    std::stringstream filename;
+    filename << "controller_archive";
+    logFileStream.open(Logging::log_folder + std::string("/")  + filename.str());
+    if(!logFileStream)
+    {
+        std::cerr << "unable to open : " << Logging::log_folder + std::string("/")  + filename.str() << std::endl;
+        return;
+    }
+    logFileStream << static_cast<MNIPES*>(ea.get())->get_ctrl_archive().to_string();
+    logFileStream.close();
 }
