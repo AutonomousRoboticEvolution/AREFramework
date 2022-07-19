@@ -7,6 +7,7 @@ void RobotInfoLog::saveLog(EA::Ptr &ea)
 {
     int id = static_cast<MNIPES*>(ea.get())->get_currentID();
     int eval = static_cast<MNIPES*>(ea.get())->get_learners().at(id).nbr_eval();
+
     std::stringstream sstr;
     sstr << "robot_infos_" << id;
     std::ofstream ifs;
@@ -24,6 +25,24 @@ void RobotInfoLog::saveLog(EA::Ptr &ea)
     for(auto& wp: static_cast<MNIPES*>(ea.get())->get_trajectory()){
         ifs << wp.to_string() << std::endl;
     }
+
+    ifs << "ctrl_genome;" << std::endl;
+    NNParamGenome gen;
+    gen.set_nbr_input(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_inputs());
+    gen.set_nbr_output(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_outputs());
+    gen.set_nbr_hidden(settings::getParameter<settings::Integer>(ea->get_parameters(),"#nbrHiddenNeurons").value);
+    gen.set_nn_type(settings::getParameter<settings::Integer>(ea->get_parameters(),"#NNType").value);
+
+    std::vector<double> weights, biases;
+    for(int i = 0; i < static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_weights(); i++)
+        weights.push_back(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome[i]);
+    for(int i = static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_nbr_weights(); i < static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome.size(); i++)
+        biases.push_back(static_cast<MNIPES*>(ea.get())->get_learners().at(id).get_population().at(eval-1).genome[i]);
+    gen.set_weights(weights);
+    gen.set_biases(biases);
+    ifs << gen.to_string();
+
+
     ifs.close();
 }
 
