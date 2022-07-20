@@ -1,14 +1,14 @@
 #experimentName,string,visualization
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges_real.ttt
-#folderToLoad,string,/media/ebb505/ARE-EBB/ARE/are-logs/mnipes_experiments/corridor/4_robots/0_119/
-#idToLoad,int,119
+#expPluginName,string,/home/edgar/vrep/lib/libvisualization.so
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#folderToLoad,string,/home/edgar/are-logs/mnipes_experiments/exploration/4_robots/7_177
+#idToLoad,int,177
 #genToLoad,int,0
-#indToLoad,int,119
+#indToLoad,int,177
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
 #populationSize,int,25
-#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs
+#repository,string,/home/edgar/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -25,9 +25,6 @@
 #init_x,float,-0.6
 #init_y,float,0
 #init_z,float,0.2
-#initPosition,sequence_double,-0.625;0;0.2
-#targetPosition,sequence_double,0.775;0.0;0.15;
-#targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12;
 #MutateWeightsSevereProb,float,0.0
 #WeightMutationRate,float,1.0
 #WeightMutationMaxPower,float,1.0
@@ -51,7 +48,7 @@
 #isCaster,bool,1
 #isExportModel,bool,1
 #saveBlueprint,bool,1
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #isSegmentedRobot,bool,0
 #organsVersion,int,6
 
