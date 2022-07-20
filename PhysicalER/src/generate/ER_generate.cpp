@@ -20,6 +20,7 @@ void ER::initialize(){
     Logging::set_log_folder(repository + std::string("/") + exp_name);
     Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_built/"));
     Logging::create_folder(repository + std::string("/") + exp_name + std::string("/waiting_to_be_evaluated/"));
+    Logging::create_folder(repository + std::string("/") + exp_name + std::string("/genomes_pool/"));
 
     if (verbose) {
         std::cout << "ER initialize" << std::endl;

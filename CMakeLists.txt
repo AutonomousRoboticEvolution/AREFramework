@@ -3,8 +3,6 @@ project(ARE)
 
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>$<$<CONFIG:DEBUG>:-O0>")
 add_compile_options("$<$<CONFIG:RELEASE>:-DNDEBUG>")
-#set(CMAKE_CXX_STANDARD 17)
-#set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT RASPBERRY)
     set(RASPBERRY 0)

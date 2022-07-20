@@ -5,6 +5,8 @@
 #include <list>
 #include <vector>
 #include <eigen3/Eigen/Core>
+#include <chrono>
+#include <cmath>
 
 namespace are {
 
@@ -28,6 +30,15 @@ double sinusoidal(double amplitude, double time, double frequency, double time_o
  * @return the new target position, in radians
  */
 double get_next_joint_position(double nn_output, double time, double previous_position);
+
+std::string int_to_string(int n);
+
+/**
+ * @brief generate_unique_id
+ * @param maximum length of the id
+ * @return unique id
+ */
+int generate_unique_id(int n);
 
 }//misc
 

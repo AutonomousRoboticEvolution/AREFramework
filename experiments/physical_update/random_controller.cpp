@@ -13,19 +13,27 @@ const Genome::Ptr RandomController::get_next_controller_genome(int id){
     std::string waiting_to_be_evaluated_folder = experiment_folder + "/waiting_to_be_evaluated/";
     std::stringstream genome_file;
     genome_file << waiting_to_be_evaluated_folder << "ctrl_genome_" << id;
+    NNParamGenome::Ptr gen(new NNParamGenome);
     if(fs::exists(genome_file.str())){
-        NNParamGenome::Ptr gen(new NNParamGenome);
         ioh::load_controller_genome(experiment_folder,id,gen);
-        return gen;
+
     }else{ //generate a random controller
         std::cout<<"Robot of id " << id <<  " does not have an associated controller genome, so a random one is being created"<<std::endl;
 
         int wheel=0, joint=0, sensor=0;
         ioh::load_nbr_organs(experiment_folder,id,wheel,joint,sensor);
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
-        make_random_ctrl(wheel,joint,sensor,ctrl_gen);
-        return ctrl_gen;
+        make_random_ctrl(wheel,joint,sensor,gen);
+
     }
+    //Filtering the nn parameters
+    std::vector<double> weights, biases;
+    for(double w: gen->get_weights())
+        weights.push_back(std::tanh(w));
+    for(double b: gen->get_biases())
+        biases.push_back(std::tanh(b));
+    gen->set_weights(weights);
+    gen->set_biases(biases);
+    return gen;
 }
 
 void RandomController::load_data_for_update(){
