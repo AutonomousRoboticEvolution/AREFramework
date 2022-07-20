@@ -1,6 +1,12 @@
 #tracking parameters
 import cv2
 from cv2 import aruco
+import os
+
+show_frames = True
+show_fps = False
+verbose_messages = True
+
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()
 
@@ -22,6 +28,11 @@ resolution_width = -1 # 1920 # set negative to leave as the default for your cam
 resolution_height = -1 # 1080 # set negative to leave as the default for your camera
 
 zmq_port_number= "5557"
+videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
+if not os.path.exists(videos_folder_path): os.makedirs(videos_folder_path) # make sure folders exist to prevent errors later
+
+recording_frame_rate = 15.0
+recording_timeout_seconds = 60*11
 
 with open('location.txt') as f:
     location = f.read().replace("\n","")
@@ -31,31 +42,61 @@ with open('location.txt') as f:
 if location == "bristol":
     # the pipe for getting images from the camera
     pipe = "http://192.168.2.248/img/video.mjpeg"
-    #pipe =0
 
     #mask filter parameters
-    brainMin = (0,157,78)
-    brainMax = (26,255,224)
+    brainMin = ((0,157,78) , (0,0,0)) #  blue: (13,38,18) green:(31,108,82)
+    brainMax = ((17,255,224), (0,0,0)) # blue:(33,169,83) green:(53,203,158)
 
     #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (386,264) # defined in the uncropped image
+    pixel_scale = 169.44444444444443
+    centre_reference = (387, 255)
+    crop_rectangle = [197, 69, 380, 373]
+
+if location == "bristol_pi":
+    # the pipe for getting images from the camera
+    pipe =0
+
+    #mask filter parameters
+    brainMin = ((0,157,78), (0,0,0))
+    brainMax = ((26,255,224), (0,0,0))
+
+    # overwrite default resolution:
+    resolution_width = 1920 ; resolution_height = 1056
+
+    #centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (int(resolution_width/2),int(resolution_height/2)) # defined in the uncropped image
     pixel_scale = 175
 
     #crop parameters
-    crop_rectangle = [200,75,380,380]
+    width = 640; height = 480
+    crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
+    #crop_rectangle = [-1]
 
 elif location == "york":
     pipe = 0
-    #brainMin = (146,89,30)
-    #brainMax = (179,184,110)
-    brainMin = (0,120,52)
-    brainMax = (16,206,139)
-
+    brainMin = (0,130,52)
+    brainMax = (179,194,86)
     
     centre_reference = (347,240) # centre of arena in pixels
     pixel_scale = 270 # mm per meter
 
     crop_rectangle = [-1]
+
+elif location == "york2":
+    pipe = 0
+    
+    headMin = (0,69,0)
+    headMax = (22,255,255)
+
+    skeletonMin = (34,22,0)
+    skeletonMax = (63,255,255)
+
+    organMin = (76,42,0)
+    organMax = (123,255,255)
+    
+    brainMin = [headMin,skeletonMin,organMin]
+    brainMax = [headMax,skeletonMax,organMax]
+
 elif location == "napier":
     pipe = "tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink"
 

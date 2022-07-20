@@ -87,7 +87,6 @@ bool ER::execute(){
     if(robot_state == READY){
         std::cout << "Press Enter when the robot is ready" << std::endl;
         std::cin.ignore();
-        std::cin.ignore();
 
         start_evaluation();
         robot_state = BUSY;
@@ -118,10 +117,7 @@ void ER::start_evaluation(){
 
     eval_t1 = std::chrono::steady_clock::now();
 
-    if(!isEnvInit){
-        isEnvInit=true;
-        environment->init();
-    }
+    environment->init();
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
@@ -150,6 +146,9 @@ void ER::start_evaluation(){
     std::cout << ctrl_gen << std::endl;
     send_string(reply,ctrl_gen,request,"pi ");
     assert(reply == "starting");
+
+    // starts the recording of the video feed:
+    std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording();
 }
 
 bool ER::update_evaluation(){
@@ -166,7 +165,17 @@ bool ER::update_evaluation(){
 
     std::string message_string;
     receive_string_no_reply(message_string,subscriber,"pi ");
-    return message_string=="finish";
+    if(message_string=="finish"){
+        robot_reported_error = false;
+        return true;
+    }
+    else if(message_string=="finish_with_errors"){
+        robot_reported_error = true;
+        return true;
+    }
+    else{
+        return false;
+    }
 
 }
 
@@ -174,6 +183,13 @@ bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
+
+    // stop the recording, discarding the video if there was error(s):
+    if (robot_reported_error){
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
+    }else{
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( std::to_string(ER::current_id)); // filename of the robot ID number
+    }
 
     // get any logs that the robot has gathered:
     bool getting_logs=true;
@@ -188,12 +204,18 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file.txt" , message );
+            Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
         }
     }
 
     // display the fitness:
     environment->print_info();
+
+    // if the robot reported an error, we automatically re-do this evaulation
+    if (robot_reported_error){
+        std::cout<<"============================\n= Robot reported an error! =\n=== Repeating evaluation ===\n============================"<<std::endl;
+        return true;
+    }
 
     // ask user whether to re-do this evaluation
     std::string str;

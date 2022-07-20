@@ -20,7 +20,7 @@ from robotConnection import RobotConnection
 from printer import Printer
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_CORE_ORGAN_INSERT = 1
+DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
@@ -267,8 +267,11 @@ if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # Make the settings file then extract the settings from it
-    makeConfigurationFile(location="BRL") # <--- change this depending on if you're in York or BRL
-    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    with open('location.txt') as f:
+        location = f.read().replace("\n", "")
+        print("location: {}".format(location))
+    makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
 
     if DO_CORE_ORGAN_INSERT:
         printer_number=0
@@ -279,9 +282,14 @@ if __name__ == "__main__":
     # startup
     RoboFab = RoboFab_host (configurationData)
 
-    # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "14_9" , printer=printer)
+    # # TEMP
+    # RoboFab.UR5.setTCP( RoboFab.gripperTCP_A )
+    # RoboFab.UR5.moveArm( RoboFab.organBank.origin * makeTransformMillimetersDegrees( z=400, rotX = 180) )
+    # RoboFab.UR5.moveArm( RoboFab.organBank.origin * makeTransformMillimetersDegrees( z=20, rotX = 180) )
+    # while(1): pass
 
+    # open blueprint file
+    RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)
 
     # make robot:
     RoboFab.buildRobot(printer)

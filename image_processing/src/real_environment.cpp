@@ -4,7 +4,7 @@ using namespace are;
 
 RealEnvironment::RealEnvironment():
     Environment(),
-    zmq_requester_socket(context, ZMQ_REQ)
+    zmq_tracking_camera_requester_socket(context, ZMQ_REQ)
 {
 
     current_position.resize(2);
@@ -18,7 +18,7 @@ void RealEnvironment::init(){
 
     //start zmq
     std::string pipe = settings::getParameter<settings::String>(parameters,"#cameraPipe").value;
-    zmq_requester_socket.connect( pipe );
+    zmq_tracking_camera_requester_socket.connect( pipe );
 
     // initialise the variables for robot and beacon location to some sensible defaults, in case they cannot be seen in the first frame:
     // TODO make these parameters?
@@ -62,6 +62,14 @@ void RealEnvironment::print_info(){
     std::cout<<std::endl;
 }
 
+void RealEnvironment::start_recording(){
+    // tell camera to start recording
+    std::cout<<"Starting tracking recording"<<std::endl;
+    std::string reply_string;
+    phy::send_string(reply_string,"start",zmq_tracking_camera_requester_socket,"Recording:");
+    assert(reply_string=="OK");
+}
+
 std::vector<double> RealEnvironment::fit_targeted_locomotion(){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     double max_dist = sqrt(2*arena_size*arena_size);
@@ -103,6 +111,24 @@ std::vector<double> RealEnvironment::fit_foraging(){
     return d;
 }
 
+void RealEnvironment::save_tracking_video(std::string filename)
+{
+    // tell camera to stop recording
+    std::cout<<"Telling tracking to save file as "<<filename<<std::endl;
+
+    std::string reply_string;
+    phy::send_string(reply_string,"save_"+filename,zmq_tracking_camera_requester_socket,"Recording:");
+    assert(reply_string=="OK");
+}
+
+void RealEnvironment::discard_tracking_video()
+{
+    // tell camera to stop recording but discard the video
+    std::string reply_string;
+    phy::send_string(reply_string,"discard",zmq_tracking_camera_requester_socket,"Recording:");
+    assert(reply_string=="OK");
+}
+
 void RealEnvironment::update_info(double time){
 
     bool robot_seen=false;
@@ -113,7 +139,7 @@ void RealEnvironment::update_info(double time){
 
     // update position of robot
     std::string robot_position_string;
-    phy::send_string(robot_position_string,"position",zmq_requester_socket,"Robot:");
+    phy::send_string(robot_position_string,"position",zmq_tracking_camera_requester_socket,"Robot:");
 
     if(robot_position_string != "None"){ // tracking found a robot position, else the robot wasn't seen, so we will not update the current_position variable
         robot_seen=true;
@@ -129,7 +155,7 @@ void RealEnvironment::update_info(double time){
 
     // update position of barrel
     std::string aruco_tags_string;
-    phy::send_string(aruco_tags_string,"position",zmq_requester_socket,"Tags:");
+    phy::send_string(aruco_tags_string,"position",zmq_tracking_camera_requester_socket,"Tags:");
     if (aruco_tags_string!="[]"){
         int tag_number_of_barrel = settings::getParameter<settings::Integer>(parameters,"#arucoTagOnBarrel").value;
         // see if we can find the barrel amoung the list of seen aruco tags

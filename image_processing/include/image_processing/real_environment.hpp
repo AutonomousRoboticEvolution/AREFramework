@@ -26,6 +26,10 @@ public:
     std::vector<double> fit_exploration();
     std::vector<double> fit_foraging();
 
+    void save_tracking_video(std::string filename);
+    void discard_tracking_video();
+    void start_recording();
+
     // some infomation about how successful the tracking was
     int total_number_of_frames=0;
     int number_of_frames_where_robot_was_seen=0;
@@ -42,7 +46,7 @@ private:
 
     // zmq stuff for getting messages from python camera program
     zmq::context_t context;
-    zmq::socket_t zmq_requester_socket;
+    zmq::socket_t zmq_tracking_camera_requester_socket;
     zmq::socket_t robot_pos_subs;
     zmq::socket_t tags_pos_subs;
 
