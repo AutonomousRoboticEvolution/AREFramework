@@ -470,7 +470,7 @@ class UR5Robot:
         self.moveArm(prePickupPoint)
         self.setMoveSpeed(self.speedValueNormal)  # normal
 
-        self.moveBetweenStations("printer")
+        self.moveBetweenStations("printer_" + str(printer.number))
 
         # dropoff:
         self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) )  # TCP for insertion is centre of clip
@@ -562,9 +562,11 @@ class UR5Robot:
             self.moveArm(AFDropoffPoint)
 
         self.setMoveSpeed(self.speedValueNormal)
-        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
-        self.setGripperPosition(organInRobot.gripperOpenPosition)
+        #self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.setGripperPosition(0.2)
+        self.forceModeFloat()
         self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         # linear move up out of the way of robot :
         self.moveArm(
             changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)
