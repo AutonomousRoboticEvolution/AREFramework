@@ -15,13 +15,13 @@ const Genome::Ptr RandomController::get_next_controller_genome(int id){
     genome_file << waiting_to_be_evaluated_folder << "ctrl_genome_" << id;
     if(fs::exists(genome_file.str())){
         NNParamGenome::Ptr gen(new NNParamGenome);
-        phy::load_controller_genome(experiment_folder,id,gen);
+        ioh::load_controller_genome(experiment_folder,id,gen);
         return gen;
     }else{ //generate a random controller
         std::cout<<"Robot of id " << id <<  " does not have an associated controller genome, so a random one is being created"<<std::endl;
 
         int wheel=0, joint=0, sensor=0;
-        phy::load_nbr_organs(experiment_folder,id,wheel,joint,sensor);
+        ioh::load_nbr_organs(experiment_folder,id,wheel,joint,sensor);
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         make_random_ctrl(wheel,joint,sensor,ctrl_gen);
         return ctrl_gen;

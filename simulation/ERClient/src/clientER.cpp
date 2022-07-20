@@ -4,7 +4,7 @@ using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
     initialize();
-
+    nbr_of_instances = nbrOfInst;
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::unique_ptr<SlaveConnection>(new SlaveConnection("127.0.0.1", i + port));
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
@@ -58,18 +58,16 @@ void ER::initialize(){
 
 bool ER::execute()
 {
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool shouldReopenConnections = settings::getParameter<settings::Boolean>(parameters,"#shouldReopenConnections").value;
-    int tries = 0;
-    int pauseTime = 100; // milliseconds
-
+    bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
 
     if (shouldReopenConnections) {
         reopenConnections();
     }
 
     confirmConnections();
-    serverInstances = updateSimulatorList();
+    if(update_sim_list)
+        serverInstances = updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -80,9 +78,6 @@ bool ER::execute()
 void ER::startOfSimulation(int slaveIndex){
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
         std::cout << "Starting Simulation" << std::endl;
-
-    if(indToEval.empty())
-        return;
 
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
     if(eval_order == EvalOrder::FIFO){
@@ -116,10 +111,15 @@ void ER::startOfSimulation(int slaveIndex){
         int rand_idx = dd(randNum->gen);
         int index = indToEval[rand_idx];
         currentIndVec[slaveIndex] = ea->getIndividual(index);
-        currentIndexVec[slaveIndex] = index;
+        if(currentIndVec[slaveIndex] == nullptr)
+            currentIndexVec[slaveIndex] = -1;
+        else
+            currentIndexVec[slaveIndex] = index;
         indToEval.erase(indToEval.begin()+rand_idx);
         indToEval.shrink_to_fit();
     }
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     currentIndVec[slaveIndex]->set_client_id(serverInstances[slaveIndex]->get_clientID());
     currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
@@ -128,10 +128,18 @@ void ER::startOfSimulation(int slaveIndex){
 }
 
 void ER::endOfSimulation(int slaveIndex){
+    if(currentIndexVec[slaveIndex] < 0)
+        return;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
-    currentIndVec[slaveIndex]->from_string(message);
+    try{
+        currentIndVec[slaveIndex]->from_string(message);
+    }catch(boost::archive::archive_exception& e){
+        std::cerr << e.what() << std::endl;
+        return;
+    }
+
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
 
     if(verbose)
@@ -161,12 +169,15 @@ void ER::endOfSimulation(int slaveIndex){
 bool ER::updateSimulation()
 {
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+
     bool all_instances_finish = true;
     int state = IDLE;
 
     if(ea->get_population().size() > 0){
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
+            if(serverInstances[slaveIdx]->state() == SlaveConnection::DOWN)
+                continue;
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
             all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
@@ -210,30 +221,33 @@ bool ER::updateSimulation()
             {
                 std::cerr << "An error happened on the server side" << std::endl;
             }
-            else if(state == READY && indToEval.empty()){
+            else if(state == READY && indToEval.empty()){                
+                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
                 continue;
-//                std::cout << "Slave " << slaveIdx << " Waiting for all instances to finish before starting next generation" << std::endl;
             }
             else{
-                std::cerr << "state value unknown : " << state << std::endl
-                          << "Possible states are : " << std::endl
-                          << "\t IDLE : 0" << std::endl
-                          << "\t READY : 1" << std::endl
-                          << "\t BUSY : 2" << std::endl
-                          << "\t FINISH : 3" << std::endl
-                          << "\t ERROR : 9" << std::endl;
+//                std::cerr << "state value unknown : " << state << std::endl
+//                          << "Possible states are : " << std::endl
+//                          << "\t IDLE : 0" << std::endl
+//                          << "\t READY : 1" << std::endl
+//                          << "\t BUSY : 2" << std::endl
+//                          << "\t FINISH : 3" << std::endl
+//                          << "\t ERROR : 9" << std::endl;
                 all_instances_finish = false;
             }
         }
     }
+
+    bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
+    if(!wait_for_all_instances) all_instances_finish = true;
+
     if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
         ea->epoch();
         saveLogs();
         ea->init_next_pop();
-        for(int i = 0; i < ea->get_population().size(); i++)
-            indToEval.push_back(i);
+        ea->fill_ind_to_eval(indToEval);
         if(verbose)
             std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
         ea->incr_generation();
@@ -292,6 +306,7 @@ void ER::reopenConnections()
 
 bool ER::confirmConnections()
 {
+    int counter = 0;
     for (auto &slave: serverInstances) {
         if (!slave->status()) {
             std::cerr << "Client could not connect to server in port, trying again " << slave->port() << std::endl;
@@ -299,10 +314,11 @@ bool ER::confirmConnections()
             extApi_sleepMs(20);
         }
         else {
+            counter++;
             continue;
         }
     }
-
+    std::cout << counter << "/" << serverInstances.size() << " servers online" << std::endl;
     //    std::cout << "Connections confirmed" << std::endl;
     return true;
 }
@@ -316,14 +332,25 @@ std::vector<std::unique_ptr<SlaveConnection>> ER::updateSimulatorList(){
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
             std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
-            serverInstances[idx].reset();
-            indToEval.push_back(currentIndexVec[idx]);
+            bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
+            if(update_sim_list)
+                serverInstances[idx].reset();
+            else
+                newServInst.push_back(std::move(serverInstances[idx]));
+            bool contain = false;
+            for(int i: indToEval)
+                if(i == currentIndexVec[idx])
+                    contain = true;
+            if(!contain)
+                indToEval.push_back(currentIndexVec[idx]);
+            newServInst.back()->setState(SlaveConnection::DOWN);
         }else {
             newServInst.push_back(std::move(serverInstances[idx]));
             newCurrentIndVec.push_back(currentIndVec[idx]);
             newCurrentIndexVec.push_back(currentIndexVec[idx]);
         }
      }
+
 
     currentIndVec = newCurrentIndVec;
     currentIndexVec = newCurrentIndexVec;

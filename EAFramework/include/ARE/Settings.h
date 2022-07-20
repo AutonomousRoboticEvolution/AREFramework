@@ -35,6 +35,7 @@ public:
     Boolean(){name = "bool";}
     Boolean(bool b) : value(b){name = "bool";}
     bool value = false;
+    const bool& get_value() const{return value;}
     void fromString(const std::string& str){value = std::stoi(str);}
     friend std::ostream & operator << (std::ostream &out, const Boolean &s){
         out << s.value;
@@ -54,6 +55,7 @@ public:
     Integer(){name = "int";}
     Integer(int i) : value(i) {name = "int";}
     int value = 0;
+    const int& get_value() const{return value;}
     void fromString(const std::string& str){value = std::stoi(str);}
     friend std::ostream & operator << (std::ostream &out, const Integer &s){
         out << s.value;
@@ -73,6 +75,7 @@ public:
     Float(){name = "float";}
     Float(float f) : value(f) {name = "float";}
     float value = 0.0;
+    const float& get_value() const{return value;}
     void fromString(const std::string& str){value = std::stof(str);}
     friend std::ostream & operator << (std::ostream &out, const Float &s){
         out << s.value;
@@ -93,6 +96,7 @@ public:
     Double(){name = "double";}
     Double(double d) : value(d) {name = "double";}
     double value = 0.0;
+    const double& get_value() const{return value;}
     void fromString(const std::string& str){value = std::stod(str);}
     friend std::ostream & operator << (std::ostream &out, const Double &s){
         out << s.value;
@@ -112,6 +116,7 @@ public:
     String(){name = "string";}
     String(std::string s) : value(s) {name = "string";}
     std::string value = "";
+    const std::string& get_value() const{return value;}
     void fromString(const std::string& str){value = str;}
     friend std::ostream & operator << (std::ostream &out, const String &s){
         out << s.value;
@@ -133,6 +138,7 @@ public:
     Sequence(){name = "sequence";}
     Sequence(std::vector<T> s) : value(s) {name = "sequence";}
     std::vector<T> value;
+    const std::vector<T>& get_value() const{return value;}
     void fromString(const std::string& str){
         std::cerr << "no implementation for this type of sequence." << std::endl;
     }
@@ -157,6 +163,7 @@ public:
     Sequence(){name = "sequence_int";}
     Sequence(std::vector<int> s) : value(s) {name = "sequence_int";}
     std::vector<int> value;
+    const std::vector<int>& get_value() const{return value;}
     void fromString(const std::string& str){
         std::vector<std::string> split_str;
         misc::split_line(str,";",split_str);
@@ -182,6 +189,7 @@ public:
     Sequence(){name = "sequence_float";}
     Sequence(std::vector<float> s) : value(s) {name = "sequence_float";}
     std::vector<float> value;
+    const std::vector<float>& get_value() const{return value;}
     void fromString(const std::string& str){
         std::vector<std::string> split_str;
         misc::split_line(str,";",split_str);
@@ -208,6 +216,7 @@ public:
     Sequence(){name = "sequence_double";}
     Sequence(std::vector<double> s) : value(s) {name = "sequence_double";}
     std::vector<double> value;
+    const std::vector<double>& get_value() const{return value;}
     void fromString(const std::string& str){
         std::vector<std::string> split_str;
         misc::split_line(str,";",split_str);
@@ -234,6 +243,7 @@ public:
     Sequence(){name = "sequence_string";}
     Sequence(std::vector<std::string> s) : value(s) {name = "sequence_string";}
     std::vector<std::string> value;
+    const std::vector<std::string>& get_value() const{return value;}
     void fromString(const std::string& str){
         misc::split_line(str,";",value);
     }

@@ -13,8 +13,15 @@
 #include "physicalER/io_helpers.hpp"
 #include "cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
+#include "ARE/crossbreeding.hpp"
+#include "ProtomatrixGenome.hpp"
 
 namespace are{
+
+typedef enum GenomeType{
+    CPPN = 0,
+    PROTOMATRIX = 1
+} GenomeType;
 
 class PMEIndividual : public Individual
 {
@@ -67,7 +74,7 @@ public:
     typedef std::shared_ptr<const MNIPES> ConstPtr;
 
     MNIPES(){}
-    MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
+    MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
     void init() override;
     void init_random_pop();
     void init_next_pop() override;
@@ -89,16 +96,19 @@ public:
     const NNParamGenome &get_best_current_ctrl_genome() const {return best_current_ctrl_genome;}
 private:
     std::vector<std::pair<int,int>> ids;
-    std::map<int,NN2CPPNGenome> morph_genomes;
+    std::map<int,Genome::Ptr> morph_genomes;
+    std::map<int,Genome::Ptr> xmigrator_genomes; //genomes from simulation to be directly introduced in physical population
     std::map<int,CMAESLearner> learners;
     std::vector<waypoint> trajectory;
     std::vector<double> objectives;
     ControllerArchive ctrl_archive;
-    phy::MorphGenomeInfoMap morph_genomes_info;
+    ioh::MorphGenomeInfoMap morph_genomes_info;
     NNParamGenome best_current_ctrl_genome;
 
-    void _survival(const phy::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
+    void _survival(const ioh::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();
+
+    void write_morph_descriptors();
 };
 
 }//are

@@ -13,9 +13,11 @@ class Printer:
     def __init__(self, IPAddress, configurationData, printer_number=0):
         debugPrint("Creating a printer object")
         printerConfiguration = configurationData["PRINTER_{}".format(printer_number)]
+        self.number=printer_number
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
+        self.openSCADScriptFileNameManualVersion = "skeleton_maker_manual.scad"
         self.openSCADDirectory = "./OpenSCAD/"
         # self.meshesNoClipsDirectory = "./meshes_no_clips/"
         self.meshesNoClipsDirectory = "{}/waiting_to_be_built/".format(configurationData["logDirectory"])
@@ -60,7 +62,7 @@ class Printer:
     ## assumes the existence of the following files:
     ## ./meshes_no_clips/mesh[ID_number].stl
     ## ./blueprints/blueprint[ID_number].csv
-    def createSTL(self, ID_number: str):
+    def createSTL( self, ID_number: str, manualVersion=False ):
         debugPrint("Creating an STL file for individual {}".format(ID_number))
         blueprintFilename = "blueprint_" + ID_number + ".csv"
         debugPrint("using blueprint: {}{}".format(self.blueprintsDirectory, blueprintFilename),messageVerbosity=2)
@@ -83,8 +85,12 @@ class Printer:
         # make a new (temporary) openscad file, with the blueprint data at the start:
         with open("{}temporaryScript.scad".format(self.openSCADDirectory), "w") as temporaryFile:
             temporaryFile.write(blueprint_string)
-            temporaryFile.write(
-                open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
+            if manualVersion:
+                temporaryFile.write(
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileNameManualVersion), "r").read())
+            else:
+                temporaryFile.write(
+                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
             temporaryFile.close()
 
         # run the OpenSCAD terminal command
@@ -131,7 +137,6 @@ class Printer:
     #returns a dictionary, with keys "bed_actual", "bed_target", "tool_actual" and "tool_target" and values as temperature in degC
     def getTemperatures(self):
         responseObject = requests.get("http://{}/api/printer".format(self.IPAddress), headers=self.apiKeyHeader, timeout=self.timeout)
-        print(responseObject, self.IPAddress)
         temperatures = {"bed_actual":responseObject.json()["temperature"]["bed"]["actual"],
                         "bed_target":responseObject.json()["temperature"]["bed"]["target"],
                         "tool_actual":responseObject.json()["temperature"]["tool0"]["actual"],

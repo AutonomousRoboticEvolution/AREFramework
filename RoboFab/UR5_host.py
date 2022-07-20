@@ -8,7 +8,7 @@ import time
 import threading
 import math
 import numpy as np
-from helperFunctions import debugPrint, makeTransformInputFormatted, convertPoseToTransform, convertTransformToPose, findAngleBetweenTransforms, makeTransform, makeTransformMillimetersDegrees, changeCoordinateValue, applyCeiling
+from helperFunctions import debugPrint, makeTransformInputFormatted, convertPoseToTransform, convertTransformToPose, findAngleBetweenTransforms, makeTransform, makeTransformMillimetersDegrees, changeCoordinateValue, applyCeiling, findDisplacementBetweenTransforms
 from toolSerialCommunication import GripperHandler
 
 
@@ -210,6 +210,21 @@ class UR5Robot:
         self.requestedPoseIsReady = False  # reset for next time
         return self.requestedPose
 
+    ## pull back (negative z TCP frame) with a set force, intended to pull the skeleton off the print bed
+    ## returns true if the thing we were pulling (the robot) moved more than 2cm, false otherwise
+    def printBedPull(self):
+        startingPostition = self.getCurrentPosition()
+        self.sendString("print_bed_pull")
+        finishPosition = self.getCurrentPosition()
+        if findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02:
+            # has moved, so assume it has released from bed
+            return True
+        else:
+            # hasn't moved (much), so return to the starting position
+            self.moveArm(startingPostition)
+            return False
+
+
     ##  Handles receipt of messages from the UR5.
     #  Should be started as a thread after the socket has been set up.
     def __threadedListener ( self ):
@@ -382,8 +397,8 @@ class UR5Robot:
 
         verticalClearancePreInsert = 0.28  # how high vertically above the pickup and preDropoff to for pre-pickup
         insertRotation = math.radians(20) # the amount of rotation needed for the Head clipping mechanism
-        postInsertExtraRotation = math.radians(5)
-        BedPullUpDistance = 30/1000
+        postInsertExtraRotation = math.radians(8)
+        BedPullUpDistance = 50/1000
         postBedRemovalSidewaysClearance = 0.1 # after pulling the skeleton off the bed, we should move horizontally out to avoid the skeleton hitting the frame of the printer
 
         organInRobot = robot.organsList[0]  ## get the Head, which is always first object in organsList
@@ -455,7 +470,7 @@ class UR5Robot:
         self.moveArm(prePickupPoint)
         self.setMoveSpeed(self.speedValueNormal)  # normal
 
-        self.moveBetweenStations("printer")
+        self.moveBetweenStations("printer_" + str(printer.number))
 
         # dropoff:
         self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) )  # TCP for insertion is centre of clip
@@ -484,9 +499,28 @@ class UR5Robot:
         organInRobot.actualDropoffPosition = actualDropoffPosition
 
         ## the Head is now in the skeleton, on the printbed
-        self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
-        printer.coolBed() # turns off bed heater and waits until it is cooled
-        self.gripper.enableServos()
+        ## wait for the bed to cool somewhat, then try pulling. If unsuccessful, wait some more and try again.
+        debugPrint("Starting bed pulling procedure",messageVerbosity=0)
+        has_pulled_off_bed = False
+        temperature_cooling_increment = 2 # degrees of cooling per pull attempt
+
+        temperature_to_cool_to = 44
+
+        while not has_pulled_off_bed:
+            temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
+            self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
+            if temperature_to_cool_to<printer.defaultBedCooldownTemperature:
+                debugPrint("Waiting 30 seconds",messageVerbosity=1)
+                time.sleep(30)
+            else:
+                debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
+                printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
+            debugPrint("Pulling!",messageVerbosity=1)
+            self.gripper.enableServos()
+            if self.printBedPull():
+                has_pulled_off_bed=True
+            else:
+                self.moveArm(dropoffPoint)
 
         self.setMoveSpeed(self.speedValueReallySlow)
         self.moveArm(postDropoffPointUp)
@@ -507,6 +541,7 @@ class UR5Robot:
             [0, 0, AFDistanceForCompliantMove + AFPostInsertExtraPushDistance])  # point back from final position from which to start force mode
 
         # go to to AF
+        self.setMoveSpeed(self.speedValueNormal)
         self.moveBetweenStations("AF")
         # now on the Assembly fixture, turn on the magnets
         self.sendNothingToArm()
@@ -527,9 +562,11 @@ class UR5Robot:
             self.moveArm(AFDropoffPoint)
 
         self.setMoveSpeed(self.speedValueNormal)
-        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
-        self.setGripperPosition(organInRobot.gripperOpenPosition)
+        #self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.setGripperPosition(0.2)
+        self.forceModeFloat()
         self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
         # linear move up out of the way of robot :
         self.moveArm(
             changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)

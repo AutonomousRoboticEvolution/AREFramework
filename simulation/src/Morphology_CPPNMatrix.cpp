@@ -169,9 +169,9 @@ void Morphology_CPPNMatrix::create()
                     else if(i.getOrganType() == 2)
                         i.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
                     else if(i.getOrganType() == 3)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(2), skeletonHandles, organList);
                     else if(i.getOrganType() == 4)
-                        i.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+                        i.testOrgan(skeletonMatrix, gripperHandles.at(3), skeletonHandles, organList);
                     i.repressOrgan();
                 }
                 // Count number of good organs.
@@ -328,8 +328,9 @@ void Morphology_CPPNMatrix::create()
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
     }
-    blueprint.createBlueprint(organList);
-    destroyGripper();
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
+        blueprint.createBlueprint(organList);
+//    destroyGripper();
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -420,6 +421,7 @@ void Morphology_CPPNMatrix::createHead()
 
 void Morphology_CPPNMatrix::createGripper()
 {
+    gripperHandles.resize(4);
     float gripperPosition[3];
     float gripperOrientation[3];
     int tempGripperHandle = -1;
@@ -427,12 +429,23 @@ void Morphology_CPPNMatrix::createGripper()
     std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
     tempGripperHandle = simLoadModel(gripperWheelPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[0] = tempGripperHandle;
     tempGripperHandle = -1;
     std::string gripperSensorPath = models_path + "/utils/gripper_s.ttm";
     tempGripperHandle = simLoadModel(gripperSensorPath.c_str());
     assert(tempGripperHandle != -1);
-    gripperHandles.push_back(tempGripperHandle);
+    gripperHandles[1] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperLegPath = models_path + "/utils/gripper_l.ttm";
+    tempGripperHandle = simLoadModel(gripperLegPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[2] = tempGripperHandle;
+    tempGripperHandle = -1;
+    std::string gripperCasterPath = models_path + "/utils/gripper_c.ttm";
+    tempGripperHandle = simLoadModel(gripperCasterPath.c_str());
+    assert(tempGripperHandle != -1);
+    gripperHandles[3] = tempGripperHandle;
+    gripperHandles.shrink_to_fit();
 
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
@@ -481,8 +494,10 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
         output.push_back(matrix_4d.at(0).at(pos_in_vector));
 
     }
-    for(const auto& o: output)
-        assert(!std::isnan(o));
+
+    for(auto& o: output)
+        if(std::isnan(o))
+            o = 0;
     float rot;
     rot = output.at(0) * 0.523599; // 30 degrees limit
     organ.organOri.push_back(rot);
@@ -494,6 +509,14 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     std::vector<double> output;
     int organ_type;
     for(int m = 0; m < skeletonSurfaceCoord.size(); m++) {
+        // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
+        // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
+        std::sort(skeletonSurfaceCoord[m].begin(),
+                  skeletonSurfaceCoord[m].end(),
+                  [] (const std::vector<int> &a, const std::vector<int> &b)
+                  {
+                      return a[2] < b[2];
+                  });
         // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
@@ -596,9 +619,14 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
 
 void Morphology_CPPNMatrix::destroyGripper()
 {
-    for(auto & i : gripperHandles) {
-        simRemoveModel(i);
-    }
+    simRemoveModel(gripperHandles[0]);
+    simRemoveModel(gripperHandles[1]);
+    simRemoveModel(gripperHandles[2]);
+    simRemoveModel(gripperHandles[3]);
+
+//    for(auto & i : gripperHandles) {
+//        simRemoveModel(i);
+//    }
 }
 
 void Morphology_CPPNMatrix::destroy_physical_connectors()
@@ -624,8 +652,10 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
+
+//                matrix_4d.at(0).push_back(output.at(0));
                 matrix_4d.at(0).push_back(output.at(0));
-                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(1).push_back((output.at(1) > 0.0) ? 1.0 : -1.0);
                 matrix_4d.at(2).push_back(output.at(2));
                 matrix_4d.at(3).push_back(output.at(3));
                 matrix_4d.at(4).push_back(output.at(4));
@@ -666,7 +696,6 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     organ_type = -1;
     int max_element = -1;
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
-
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
         if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
@@ -693,26 +722,17 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
-    
     // Gives the direction of the organ given the direction of the surface
-    // Confusing list of angles that are in radians
-    if ((x == 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = -M_PI; orientation.at(1) = +0.0; orientation.at(2) = +0.0;
-    }
-    else if ((x < 0) && (y == 0) && (z == 0)){
-        orientation.at(0) = +0.0; orientation.at(1) = +M_PI/2; orientation.at(2) = +0.0;
-    }
-    else if ((x == 0) && (y < 0) && (z == 0)){
-        orientation.at(0) = -M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI;
-    }
-    else if ((x == 0) && (y > 0) && (z == 0)){
-        orientation.at(0) = +M_PI/2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI/2;
-    }
-    else if ((x > 0) && (y == 0) && (z == 0)) {
-        orientation.at(0) = +0.0; orientation.at(1) = -M_PI/2; orientation.at(2) = +M_PI;
-    }
-    else {
-        orientation.at(0) = +0.0; orientation.at(1) = 0.0; orientation.at(2) = 0.0;
+    if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }

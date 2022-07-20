@@ -50,6 +50,20 @@ void misc::eigenvect_to_stdvect(const Eigen::VectorXd &eigen_v, std::vector<doub
         std_v[i] = eigen_v[i];
 }
 
-double sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset){
-    return amplitude * sin(time * frequency + time_offset) + position_offset;
+double misc::sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset){
+    return amplitude * cos((time + time_offset) * frequency) + position_offset;
+}
+
+double misc::get_next_joint_position(double nn_output, double time, double previous_position) {
+    double amplitude = M_PI_2 * 8./9., time_offset = 0.0, position_offset = 0.0; // Constant
+    double max_frequency = 3.0;
+    double frequency = nn_output * (max_frequency / 2.) + max_frequency / 2.; // From [-1,1] to [0,max_frequency];
+    double pos_diff = sinusoidal(amplitude*frequency*0.1, time, frequency, time_offset, position_offset);
+    double next_pos = pos_diff + previous_position;
+    // Limitation by the joints of -80 to 80 degrees
+    if(next_pos > (4./9.) * M_PI)
+        next_pos = (4./9.) * M_PI;
+    if(next_pos < -(4./9.) * M_PI)
+        next_pos = -(4./9.) * M_PI;
+    return next_pos;
 }

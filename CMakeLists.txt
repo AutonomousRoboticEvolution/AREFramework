@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(ARE)
 
 add_compile_options("$<$<CONFIG:RELEASE>:-O3>$<$<CONFIG:DEBUG>:-O0>")
-add_compile_options("$<$<CONFIG:RELEASE>:-NDEBUG>")
+add_compile_options("$<$<CONFIG:RELEASE>:-DNDEBUG>")
 #set(CMAKE_CXX_STANDARD 17)
 #set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -40,7 +40,6 @@ else()
     add_subdirectory(simulation)
     add_subdirectory(image_processing)
     add_subdirectory(PhysicalER)
-    add_subdirectory(EcosystemManager)
     add_subdirectory(experiments)
 endif()
 

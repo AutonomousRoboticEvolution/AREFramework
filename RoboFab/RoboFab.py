@@ -8,7 +8,6 @@ import shutil # for file copying
 import time
 from typing import List
 import math
-import csv # for loading blueprints
 import json # for reading the configuration file
 import numpy as np
 
@@ -21,11 +20,11 @@ from robotConnection import RobotConnection
 from printer import Printer
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_CORE_ORGAN_INSERT = 1
+DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
-DO_EXPORT_ORGANS_LIST=1
+DO_EXPORT_ORGANS_LIST = 1
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -65,36 +64,8 @@ class RoboFab_host:
         self.robotID = robotID
         self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed, ID=robotID )
 
-        # open blueprint and parse basic organ data
-        debugPrint ( "Loading the blueprint file: blueprint_" + robotID , messageVerbosity=0 )
-        blueprintList = []
-        # with open ( './blueprints/blueprint'+robotID+'.csv', newline='' ) as blueprintFile:
-        with open ( '{}/waiting_to_be_built/blueprint_'.format(self.logDirectory)+robotID+'.csv', newline='' ) as blueprintFile:
-            blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
-            for rowString in blueprintReader:
-                rowAsListOfStrings = rowString [ 0 ].split ( ',' )
-                #Reads the information about organs and converts to correct format
-                #i = 0,1 type & parent ID,  i = 2-4 position in m, i = 5-7 rotation in radians
-                blueprintRowToAppend: List[float] = [ int(float(i)) for i in rowAsListOfStrings[0:2] ] + \
-                                       [float(i) for i in rowAsListOfStrings[2:5]] + \
-                                       [float(i) for i in rowAsListOfStrings[5:8]]
-                
-                blueprintList.append(blueprintRowToAppend) # converted to meters & radians
-        debugPrint( 'organ locations are: ' + str( blueprintList ) ,messageVerbosity=1 )
+        self.myRobot.createOrgansFromBlueprint('{}/waiting_to_be_built/blueprint_'.format(self.logDirectory)+robotID+'.csv', self.dictionaryOfOrganTypes, self.gripperTCP_A)
 
-
-        # define all the required organs to the robot object:
-        debugPrint( "Defining the organs" ,messageVerbosity=1)
-        for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
-            debugPrint ( "adding an organ of type {} ({})".format(str( organ_raw_data[1] ) , self.dictionaryOfOrganTypes[str(organ_raw_data[1])]["friendlyName"]) ,messageVerbosity=2)
-            self.myRobot.addOrgan (
-                makeOrganFromBlueprintData ( blueprintRow=organ_raw_data,dictionaryOfAllOrganTypes=self.dictionaryOfOrganTypes , gripper_TCP=self.gripperTCP_A)
-            )
-
-        # information on where the cables need to go
-        # each organ that has a cable to connect (so organ.transformOrganOriginToMaleCableSocket is not None) needs to have a point defined where this will be put, called organ.cableDestination
-        self.myRobot.createLimbList()
-        self.myRobot.determineCableDestinations()
         self.myRobot.drawRobot(self.logDirectory)
 
     # returns true if the bank has enough organs to provide all those required by the loaded robot
@@ -296,21 +267,30 @@ if __name__ == "__main__":
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # Make the settings file then extract the settings from it
-    makeConfigurationFile(location="BRL") # <--- change this depending on if you're in York or BRL
-    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    with open('location.txt') as f:
+        location = f.read().replace("\n", "")
+        print("location: {}".format(location))
+    makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
+
+    printer_number=0 #set which printer to use
 
     if DO_CORE_ORGAN_INSERT:
-        printer_number=0
-        printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=0 )
+        printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=printer_number )
     else:
-        printer=Printer(None, configurationData, printer_number=0)
+        printer=Printer(None, configurationData, printer_number=printer_number)
 
     # startup
     RoboFab = RoboFab_host (configurationData)
 
-    # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "14_9" , printer=printer)
+    # # TEMP
+    RoboFab.UR5.setTCP( RoboFab.gripperTCP_A )
+    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=400, rotX = 180) )
+    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=20, rotX = 180) )
+    while(1): pass
 
+    # open blueprint file
+    RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)
 
     # make robot:
     RoboFab.buildRobot(printer)

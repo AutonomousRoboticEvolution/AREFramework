@@ -145,6 +145,7 @@ class RobofabGUI:
                 self.mainWindow.update()
                 self.robofabObject.buildRobot( printer=self.printerObjects[printer_number]) # do the assembly
                 self.label_printerStatus[printer_number]["text"] = "Assembly done\n"
+                self.saveOrganBankToFile()
                 self.mainWindow.update()
             else:
                 self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nBank missing organs"
@@ -466,8 +467,11 @@ if __name__ == "__main__":
     # Make the settings file then extract the settings from it
     from makeConfigurationFile import makeFile as makeConfigurationFile
 
-    makeConfigurationFile(location="BRL")  # <--- change this depending on if you're in York or BRL
-    configurationData = json.load(
-        open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    # Make the settings file then extract the settings from it
+    with open('location.txt') as f:
+        location = f.read().replace("\n", "")
+        print("location: {}".format(location))
+    makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
 
     gui = RobofabGUI(configurationData)

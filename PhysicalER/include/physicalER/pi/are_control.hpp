@@ -63,7 +63,7 @@ private:
         @param time_millis the current time in milliseconds
         Each value should generally be between -1.0 and 1.0
     */
-    void sendOutputOrganCommands(std::vector<double> values, uint32_t time_millis);
+    void sendOutputOrganCommands(std::vector<double> &values, uint32_t time_millis);
 
     /**
         @brief retrieveSensorValues get the values from each of the robot's sensors

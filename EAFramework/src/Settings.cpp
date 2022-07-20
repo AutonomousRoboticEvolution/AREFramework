@@ -63,15 +63,19 @@ settings::ParametersMap settings::loadParameters(const std::string& file)
     std::list<std::string> values;
     std::vector<std::string> param;
     while(std::getline(ifs,line)){
-
+	
         misc::split_line(line,",",values);
         if(values.empty())
             continue;
         for(auto v : values)
             param.push_back(v);
-        if(param.size() != 3)
+        if(param.size() != 3){
+            param.clear();
+            values.clear();
             continue;
+        }
 
+	std::cout << line << std::endl;
         Type::Ptr val = buildType(param[1]);
         val->fromString(param[2]);
         parameters.emplace(param[0],val);

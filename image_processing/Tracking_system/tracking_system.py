@@ -14,7 +14,7 @@ class TrackingSystem:
 
     def __init__(self):
         # set parameters
-        self.show_frames = False
+        self.show_frames = True
 
         #set up zmq
         context = zmq.Context()
@@ -66,14 +66,6 @@ class TrackingSystem:
             keypoints = detector.detect(fixed_mask)
         else:
             keypoints = detector.detect(mask)
-
-        #displays mask and blobs
-        if self.show_frames:
-            kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-            cv2.imshow("Holy Mask",mask)
-            if fix_mask: cv2.imshow("Fixed Mask",fixed_mask)
-            cv2.imshow("Blob",kp_image)
 
         #finds biggest keypoint
         if len(keypoints) >0 :
@@ -147,9 +139,8 @@ class TrackingSystem:
                 self.aruco_tags = self.aruco_locations(image)
 
                 if self.show_frames:
-                    cv2.imshow("Image", image)
-                    #print("Image size: {}".format(self.uncropped_image.shape))
-                    cv2.imshow("Uncropped", self.uncropped_image )
+                    cv2.imshow("Cropped", image )
+                    cv2.imshow("Mask", cv2.inRange(cv2.cvtColor(image,cv2.COLOR_BGR2HSV), brainMin, brainMax) )
                 cv2.waitKey(1)
             else:
                 warnings.warn("OpenCV read() failed")

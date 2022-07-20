@@ -193,7 +193,7 @@ void IPOPCMAStrategy::reset_search_state()
 double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
     double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf > 1 - ind.objectives[0]){
+        if(bf > ind.objectives[0]){
             bf = 1 - ind.objectives[0];
             best_sample = ind.genome;
         }
