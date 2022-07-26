@@ -1,13 +1,13 @@
 #experimentName,string,visualization
 #expPluginName,string,/home/edgar/vrep/lib/libvisualization.so
-#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#folderToLoad,string,/home/edgar/are-logs/mnipes_experiments/exploration/4_robots/7_177
-#idToLoad,int,177
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges_real.ttt
+#folderToLoad,string,/home/edgar/robotlibrary/corridor/9_56/test
+#idToLoad,int,56
 #genToLoad,int,0
-#indToLoad,int,177
+#indToLoad,int,56
 #maxEvalTime,float,30
 #numberOfGeneration,int,1
-#populationSize,int,25
+#populationSize,int,1
 #repository,string,/home/edgar/are-logs
 #verbose,bool,1
 #instanceType,int,0
@@ -39,7 +39,7 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,1
+#emptyCtrlGenome,bool,0
 #loadAllMorphGenome,bool,0
 
 #isWheel,bool,1
@@ -61,5 +61,5 @@
 #isLeg,bool,1
 
 #descriptor,int,0
-
-
+#targetPosition,sequence_double,0.675;0.025;0.2
+#initPosition,sequence_double,-0.625;0.025;0.2
