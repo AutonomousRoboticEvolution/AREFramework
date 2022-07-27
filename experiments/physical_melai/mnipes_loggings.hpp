@@ -33,6 +33,15 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class ControllerArchiveLog : public Logging
+{
+public:
+    ControllerArchiveLog() : Logging(false){}
+    void saveLog(EA::Ptr &ea) override;
+    void loadLog(const std::string &file = std::string()) override{}
+};
+
+
 }//are
 
 #endif //CMAES_LOGGINGS_H

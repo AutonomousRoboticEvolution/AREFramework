@@ -161,3 +161,12 @@ void Exploration::build_tiled_floor(std::vector<int> &tiles_handles){
         }
     }
 }
+
+void Exploration::print_info(){
+    std::cout<<"Fitness computed as:\t";
+    Individual::Ptr ind;
+    auto fitness = fitnessFunction(ind); // dummy individual in order to call the fitness function
+    for(const double val : fitness)
+       std::cout << val << "\t";
+    std::cout<<std::endl;
+}

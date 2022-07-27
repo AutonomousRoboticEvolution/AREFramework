@@ -29,17 +29,18 @@ void MNIPES::init(){
 
 void MNIPES::init_random_pop(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    bool is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
     for(int i = 0; i < pop_size; i++){
         //create a new morph genome with random structure and parameters
         Genome::Ptr morph_genome;
-        if(genome_type == CPPN)
+        if(is_cppn)
             morph_genome.reset(new NN2CPPNGenome);
         else
             morph_genome.reset(new ProtomatrixGenome);
         morph_genome->random();
         morph_genome->set_parameters(parameters);
         morph_genome->set_randNum(randomNum);
+        morph_genome->set_id(misc::generate_unique_id(4));
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
         PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
@@ -58,21 +59,24 @@ void MNIPES::init_next_pop(){
 
 
 bool MNIPES::update(const Environment::Ptr &env){
-    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-
     PMEIndividual::Ptr ind(new PMEIndividual);
     objectives = env->fitnessFunction(ind);
     ind.reset();
 
-    std::vector<double> final_pos = env->get_final_position();
-    Eigen::VectorXd desc(3);
-    desc << (final_pos[0]+arena_size/2.)/arena_size,
-            (final_pos[1]+arena_size/2.)/arena_size,
-            (final_pos[2]+arena_size/2.)/arena_size;
+    final_position = env->get_final_position();
     trajectory = env->get_trajectory();
 
+    return true;
+}
+
+void MNIPES::epoch(){
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    Eigen::VectorXd desc(3);
+    desc << (final_position[0]+arena_size/2.)/arena_size,
+            (final_position[1]+arena_size/2.)/arena_size,
+            (final_position[2]+arena_size/2.)/arena_size;
 
     //update learner
     auto& learner = learners[currentIndIndex];
@@ -108,7 +112,6 @@ bool MNIPES::update(const Environment::Ptr &env){
         }
         //-
     }
-    return true;
 }
 
 void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vector<int> &list_ids){
@@ -243,6 +246,7 @@ void MNIPES::_reproduction(){
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
+            new_morph_gene->set_id(misc::generate_unique_id(4));
         }
         else{//without crossbreeding
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
@@ -256,6 +260,7 @@ void MNIPES::_reproduction(){
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
             new_morph_gene->set_randNum(randomNum);
+            new_morph_gene->set_id(misc::generate_unique_id(4));
         }
 
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
@@ -305,7 +310,7 @@ void MNIPES::init_learner(int id){
     learner.set_randNum(randomNum);
 
     //Load an existing learner
-    if(boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
+    if(learner_file != "None" && boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
         learner.init();
         learner.from_file(Logging::log_folder + "/" + learner_file);
         std::cout << learner.print_info() << std::endl;
@@ -360,7 +365,6 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
 void MNIPES::load_data_for_generate(){
     std::string repo = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
 
 
     ioh::MorphGenomeInfoMap morph_gen_info;
@@ -378,7 +382,8 @@ void MNIPES::load_data_for_generate(){
      * 2) load this robot and add it to the building queue
      */
 
-    if(genome_type == CPPN)
+    bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
+    if(is_cppn_genome)
         ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
     else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
 
@@ -401,14 +406,14 @@ void MNIPES::load_data_for_update() {
     if(use_ctrl_arch){
         int max_nbr_organs = settings::getParameter<settings::Integer>(parameters,"#maxNbrOrgans").value;
         ctrl_archive.init(max_nbr_organs,max_nbr_organs,max_nbr_organs);
-        ctrl_archive.from_file(repository + "/" + exp_name + "/logs/controller_archive");
+        ctrl_archive.from_file(repository + "/" + exp_name + "/controller_archive");
     }
     //create a first genome controller for the first robot chosen
     init_learner(currentIndIndex);
 }
 
 void MNIPES::write_data_for_update(){
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
 
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
@@ -419,11 +424,10 @@ void MNIPES::write_data_for_update(){
 
         ioh::MorphGenomeInfo morph_info;
         std::map<int,Genome::Ptr> gen;
-        if(genome_type == CPPN){
+        if(is_cppn_genome){
             ioh::load_morph_genomes<NN2CPPNGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
             morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<NN2CPPNGenome>(gen[learner.first])->get_generation()));
         }
-
         else{
             ioh::load_morph_genomes<ProtomatrixGenome>(repository + "/" + exp_name + "/waiting_to_be_evaluated/",{learner.first},gen);
             morph_info.emplace("generation",new settings::Integer(std::dynamic_pointer_cast<ProtomatrixGenome>(gen[learner.first])->get_generation()));
@@ -431,6 +435,7 @@ void MNIPES::write_data_for_update(){
 
 
         morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
+
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
 }

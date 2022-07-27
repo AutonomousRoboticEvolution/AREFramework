@@ -1,4 +1,5 @@
 #include "image_processing/real_environment.hpp"
+#include "exploration.hpp"
 #include "mnipes.hpp"
 #include "ARE/Logging.h"
 #include "mnipes_loggings.hpp"
@@ -6,9 +7,16 @@
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
-    are::Environment::Ptr env(new are::RealEnvironment());
-    env->set_parameters(param);
-    return env;
+    bool sim_mode = are::settings::getParameter<are::settings::Boolean>(param,"#simMode").value;
+    are::Environment::Ptr env;
+    if(!sim_mode){
+        env = std::make_shared<are::RealEnvironment>();
+        env->set_parameters(param);
+    }
+    else{
+        env = std::make_shared<are::sim::Exploration>(param);
+    }
+   return env;
 }
 
 
@@ -31,5 +39,12 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     are::BestControllerLog::Ptr bestControllerLog(new are::BestControllerLog);
     logs.push_back(bestControllerLog);
+
+    if(are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value){
+        are::ControllerArchiveLog::Ptr ctrlArchLog(new are::ControllerArchiveLog);
+        logs.push_back(ctrlArchLog);
+    }
+
+
 }
 
