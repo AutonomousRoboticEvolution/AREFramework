@@ -192,7 +192,8 @@ bool ER::stop_evaluation(){
     if (robot_reported_error){
         std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
     }else{
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( std::to_string(ER::current_id)); // filename of the robot ID number
+        std::string video_filename = std::to_string(ER::current_id) + "_" + ea->get_numberEvaluation();
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( video_filename ); // filename of the robot ID number
     }
 
     // get any logs that the robot has gathered:
