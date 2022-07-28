@@ -136,6 +136,7 @@ class RoboFab_host:
         if DO_EXPORT_ORGANS_LIST:
             self.save_log_files()
             self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
+            timer.save(self.logDirectory, self.robotID)
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
@@ -148,25 +149,33 @@ class RoboFab_host:
             # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
         file.close ()
 
-        # move the blueprint and mesh files to "archive" folder
+        # move the mesh file to "archive" folder
         os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
-        blueprint_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","blueprint_{}.csv".format(self.robotID))
         mesh_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","mesh_{}.stl".format(self.robotID))
-        blueprint_new_path = os.path.join(self.logDirectory,"blueprint_archive","blueprint_{}.csv".format(self.robotID))
-        mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))
-        if os.path.exists(blueprint_new_path): os.remove(blueprint_new_path) # delete it if it already exists to avoid errors
-        if os.path.exists(mesh_new_path): os.remove(mesh_new_path) # delete it if it already exists to avoid errors
-        shutil.move(blueprint_old_path, blueprint_new_path)
-        shutil.move(mesh_old_path, mesh_new_path)
+        if os.path.exists(mesh_old_path):
+            mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))
+            if os.path.exists(mesh_new_path): os.remove(mesh_new_path) # delete it if it already exists to avoid errors
+            shutil.move(mesh_old_path, mesh_new_path)
+        else:
+            debugPrint("WARNING: {} does not exist".format(mesh_old_path),messageVerbosity=0)
+
+        # move the blueprint file to "archive" folder
+        blueprint_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","blueprint_{}.csv".format(self.robotID))
+        if os.path.exists(blueprint_old_path):
+            blueprint_new_path = os.path.join(self.logDirectory,"blueprint_archive","blueprint_{}.csv".format(self.robotID))
+            if os.path.exists(blueprint_new_path): os.remove(blueprint_new_path) # delete it if it already exists to avoid errors
+            shutil.move(blueprint_old_path, blueprint_new_path)
+        else:
+            debugPrint("WARNING: {} does not exist".format(blueprint_old_path),messageVerbosity=0)
 
         # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
         genome_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","morph_genome_{}".format(self.robotID))
-        genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
-        if os.path.exists(genome_new_path): os.remove(genome_new_path)
         if os.path.exists(genome_old_path):
+            genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
+            if os.path.exists(genome_new_path): os.remove(genome_new_path)
             shutil.move(genome_old_path, genome_new_path)
         else:
-            debugPrint("WARNING {} does not exist".format(genome_old_path),messageVerbosity=0)
+            debugPrint("WARNING: {} does not exist".format(genome_old_path),messageVerbosity=0)
 
     def temp_limb_demo(self):
         ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology
