@@ -18,8 +18,10 @@ from robotComponents import Robot, Organ, Cable, makeOrganFromBlueprintData
 from UR5_host import UR5Robot
 from robotConnection import RobotConnection
 from printer import Printer
+from video_recorder import VideoRecorder
 
 # debugging flags, human switchable to turn parts of the process on/off
+DO_RECORD_VIDEO = 1
 DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
@@ -50,6 +52,9 @@ class RoboFab_host:
         debugPrint("Connecting to UR5...")
         self.UR5 = UR5Robot( configurationData )
         debugPrint("Connected to UR5")
+
+        # connect to the local webcam which will record the assembly process:
+        if DO_RECORD_VIDEO: self.webcam = VideoRecorder( configurationData ["RoboFabWebcamPipe"] )
 
         # initialise a robot object (will be filled in setupRobotObject)
         self.myRobot = None
@@ -97,6 +102,9 @@ class RoboFab_host:
 
     ## physically construct the robot
     def buildRobot( self, printer:Printer ):
+
+        if DO_RECORD_VIDEO: self.webcam.start_recording()
+
         timer=Timer()
         timer.start()
         self.UR5.moveBetweenStations("home")
@@ -137,6 +145,7 @@ class RoboFab_host:
             self.save_log_files()
             self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
             timer.save(self.logDirectory, self.robotID)
+        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/assembly_videos/assembly_{}".format( self.logDirectory, self.robotID ) )
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
 
@@ -266,6 +275,7 @@ class RoboFab_host:
     def disconnectAll( self ):
         self.UR5.stopArm()
         self.AF.disableStepperMotor()
+        if DO_RECORD_VIDEO: self.webcam.disconnect()
 
 
 ## Run an example
