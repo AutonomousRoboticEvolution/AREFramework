@@ -239,10 +239,10 @@ class Printer:
         print_time_location_in_output = output.find("Print time: ")
         self.print_time_estimate_seconds=int(output[print_time_location_in_output +12 : output.find("\\n",print_time_location_in_output)])
         filament_used_location_in_output = output.find("Filament: ")
-        filament_used_estimate_seconds=int(output[filament_used_location_in_output +10 : output.find("\\n",filament_used_location_in_output)])
+        filament_used_estimate_mm3=int(output[filament_used_location_in_output +10 : output.find("\\n",filament_used_location_in_output)])
 
         debugPrint("Estimated print time: {} seconds = {:.2f} hours".format(self.print_time_estimate_seconds,float(self.print_time_estimate_seconds)/(60*60)),0)
-        debugPrint("Estimated Filament used (m): {}".format(filament_used_estimate_seconds),0)
+        debugPrint("Estimated Filament used (kg): {}".format( round(filament_used_estimate_mm3/1000 * 1.25) / 1000),0)
 
     # create a dummy gcode file instead of actually slicing the file, which could be useful for debugging and testing, because you don't have to wait for the actual part to print!
     def fakeSlice(self, filename):
