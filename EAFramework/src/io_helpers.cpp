@@ -117,7 +117,7 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
         else if (std::stoi(line.substr(0,line.find(","))) == 2)
             sensors++;
         else if (std::stoi(line.substr(0,line.find(","))) == 3)
-            joints++;
+            joints+=2;
     }
 
 }
