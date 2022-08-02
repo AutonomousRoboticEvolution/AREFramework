@@ -25,6 +25,7 @@ class TrackingSystem:
             self.save_resolution = (int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         else:
             self.save_resolution = ( crop_rectangle[2],crop_rectangle[3] )
+        print("resolution: {} x {}".format(self.save_resolution[0] ,self.save_resolution[1] ))
         self.output_video_writer = cv2.VideoWriter('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
         self.is_recording = False # this boolean keeps track of whether to be saving frames or not
         self.recording_start_time=0.0
@@ -99,9 +100,12 @@ class TrackingSystem:
         if show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            cv2.imshow("cropped",self.cropped_image)
-            cv2.imshow("Mask",mask)
-            cv2.imshow("Blob",kp_image)
+            # cv2.imshow("cropped",self.cropped_image)
+            # cv2.imshow("Mask",mask)
+            # cv2.imshow("Blob",kp_image)
+            factor=2
+            cv2.imshow( "image", cv2.resize( self.cropped_image , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
+            cv2.imshow( "masked", cv2.resize( cv2.bitwise_and(self.cropped_image, image, mask=mask) , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
 
         #finds biggest keypoint
         if len(keypoints) >0 :

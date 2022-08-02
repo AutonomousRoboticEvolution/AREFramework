@@ -24,8 +24,8 @@ blob_detection_parameters.minInertiaRatio = 0.01
 aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
 aruco_parameters = aruco.DetectorParameters_create()
 
-resolution_width = -1 # 1920 # set negative to leave as the default for your camera
-resolution_height = -1 # 1080 # set negative to leave as the default for your camera
+resolution_width = 1920 # set negative to leave as the default for your camera
+resolution_height = 1080 # set negative to leave as the default for your camera
 
 zmq_port_number= "5557"
 videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
@@ -41,16 +41,21 @@ with open('location.txt') as f:
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
-    pipe = "http://192.168.2.248/img/video.mjpeg"
+    # pipe = "http://192.168.2.248/img/video.mjpeg"
+    pipe = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0" # usb webcam
 
     #mask filter parameters
-    brainMin = ((0,157,78) , (0,0,0)) #  blue: (13,38,18) green:(31,108,82)
-    brainMax = ((17,255,224), (0,0,0)) # blue:(33,169,83) green:(53,203,158)
+    # brainMin: (HSV1, HSV2, ..... HSVn)
+    # brainMin: (HSV1, HSV2, ..... HSVn)
+    # for each HSVn_min and HSVn_max is getting all pixel in the range between min and max
+    # then joins all `n` HSV blobs into the same image
+    brainMin = ((0,20,10) , (172,20,10)) #  blue: (13,38,18) green:(31,108,82)
+    brainMax = ((8,255,255), (255,255,255)) # blue:(33,169,83) green:(53,203,158)
 
     #centre of uncropped arena and ratio of pixels/metre
-    pixel_scale = 169.44444444444443
-    centre_reference = (387, 255)
-    crop_rectangle = [197, 69, 380, 373]
+    pixel_scale = 287.77777777777777
+    centre_reference = (1052, 395)
+    crop_rectangle = [390, 100, 1125, 834]
 
 if location == "bristol_pi":
     # the pipe for getting images from the camera

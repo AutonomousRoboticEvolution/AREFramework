@@ -15,7 +15,10 @@ if is_picamera:
 else:
     #rawCapture = cv2.VideoCapture("v4l2src device=/dev/video2 ! videoconvert ! appsink")
     #'http://192.168.2.248/img/video.mjpeg'
-    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    #pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+    pipe = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0" # usb webcam
+
+
     
     rawCapture = cv2.VideoCapture(pipe)
 
