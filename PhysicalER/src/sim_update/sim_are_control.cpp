@@ -116,6 +116,8 @@ int AREControl::exec(zmq::socket_t& socket, float sim_time){
     
         // send finished message
         if(!_sent_finish_mess){
+            std::ostringstream logs_to_send;
+
             are::phy::send_string_no_reply("finish",socket,"pi ");
             _sent_finish_mess = true;
             // send log data
