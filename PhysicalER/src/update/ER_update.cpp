@@ -219,6 +219,8 @@ bool ER::stop_evaluation(){
     // display the fitness:
     environment->print_info();
 
+    std::cout << "Evaluation number: " << nbrEval + 1 << " is finished." << std::endl;
+
     // ask user whether to re-do this evaluation
     std::string str;
     std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
