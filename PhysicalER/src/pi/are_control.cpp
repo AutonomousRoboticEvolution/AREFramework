@@ -154,7 +154,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
-            logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
+            logs_to_send<< thisWheel->readMeasuredCurrent() <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a wheel
