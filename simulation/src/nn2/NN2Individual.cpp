@@ -67,9 +67,7 @@ void NN2Individual::createMorphology(){
 
 void NN2Individual::update(double delta_time){
     std::vector<double> inputs = morphology->update();
-
     std::vector<double> outputs = control->update(inputs);
-
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->command(outputs);
     energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
     sim_time = delta_time;

@@ -154,6 +154,7 @@ class RobofabGUI:
                 self.mainWindow.update()
                 self.robofabObject.buildRobot( printer=self.printerObjects[printer_number]) # do the assembly
                 self.label_printerStatus[printer_number]["text"] = "Assembly done\n"
+                self.saveOrganBankToFile()
                 self.mainWindow.update()
             else:
                 self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nBank missing organs"
