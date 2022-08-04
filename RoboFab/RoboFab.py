@@ -21,8 +21,8 @@ from printer import Printer
 from video_recorder import VideoRecorder
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_RECORD_VIDEO = 1
-DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
+DO_RECORD_VIDEO = 0
+DO_CORE_ORGAN_INSERT = 0 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
@@ -186,92 +186,6 @@ class RoboFab_host:
         else:
             debugPrint("WARNING: {} does not exist".format(genome_old_path),messageVerbosity=0)
 
-    def temp_limb_demo(self):
-        ## temporary demo for limb assembly; these would need to be computed automatically based on robot morphology
-        skeleton_pickup_point = makeTransformInputFormatted([0.4753, -0.0326, 0.086, math.pi, 0, 0])
-        female_limb_assembly_fixture_position = makeTransformInputFormatted([-0.5122, -0.3891, -0.0610, math.pi, 0, 0])
-        male_limb_assembly_fixture_position = makeTransformInputFormatted([-0.3133, -0.3741, -0.0304 , math.pi, 0, 0])
-        joint_skeleton_dropoff_point = makeTransformInputFormatted([-0.3106, -0.4883, -0.0489 , math.pi, 0, 0])
-        joint_skeleton_extra_push_distance = 4/1000 # positive means when clipping the skeleton to the joint in the fixture, it will move a bit further to make sure the clip attaches
-        sensor_pickup_point = self.organBank.origin * makeTransformInputFormatted([0.1564, 0.1071, 0.0272]) * makeTransformInputFormatted([-0.006, 0, -0.0096, math.pi, 0, math.pi / 2])
-        sensor_dropoff_point = makeTransformInputFormatted([-0.4926, -0.4481, -0.0560, math.pi, 0, 0])
-        joint_pickup_point = self.organBank.origin * makeTransformInputFormatted([0.30006, 0.07508, 0.0335, 0, 0, math.radians(90)]) * makeTransformInputFormatted([-0.0415, 0, -0.0033 , math.pi, 0, math.pi / 2])
-
-        # put joint onto limb fixture male
-        self.UR5.moveBetweenStations("organ_bank")
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * joint_pickup_point)  # above joint
-        self.UR5.moveArm(joint_pickup_point)
-        self.UR5.setGripperPosition(0.5)  # close gripper
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * joint_pickup_point)  # picked up joint
-        self.UR5.moveBetweenStations("limb_assembly_fixture")
-        self.UR5.moveArm(male_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, -0.03]))  # above the attachment point
-        self.UR5.setMoveSpeed(self.UR5.speedValueReallySlow)
-        self.UR5.moveCompliant(male_limb_assembly_fixture_position)  # do the attachment
-        self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(male_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, -0.2]))  # above the attachment point
-
-        ## limb skeleton pickup
-        self.UR5.setGripperPosition(0.0)
-        self.UR5.moveBetweenStations("printer")
-        self.UR5.moveArm(skeleton_pickup_point * makeTransformInputFormatted([0, 0, -0.1]))
-        self.UR5.moveArm(skeleton_pickup_point)
-        self.UR5.setGripperPosition(0.5)  # close gripper
-        self.UR5.moveArm(skeleton_pickup_point * makeTransformInputFormatted([0, 0, -0.1]))
-
-        ## attach skeleton to female limb assembly fixture
-        self.UR5.moveBetweenStations("limb_assembly_fixture")
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0.03, -0.2]))  # out and above
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0.03, 0.03]))  # out and below
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, 0.03]))  # below
-        self.UR5.setMoveSpeed(self.UR5.speedValueReallySlow)
-        self.UR5.moveCompliant(female_limb_assembly_fixture_position)  # attached
-        self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, -0.2]))  # up and out of the way
-
-        # put sensor onto end of skeleton
-        self.UR5.moveBetweenStations("organ_bank")
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * sensor_pickup_point)  # above sensor
-        self.UR5.moveArm(sensor_pickup_point)
-        self.UR5.setGripperPosition(0.5)  # close gripper
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * sensor_pickup_point)  # picked up sensor
-        self.UR5.moveBetweenStations("limb_assembly_fixture")
-        self.UR5.moveArm(sensor_dropoff_point * makeTransformInputFormatted([0, 0, -0.1]))  # above the attachment point
-        self.UR5.moveArm(sensor_dropoff_point * makeTransformInputFormatted([0, 0, -0.03]))  # just above the attachment point
-        self.UR5.setMoveSpeed(self.UR5.speedValueReallySlow)
-        self.UR5.moveCompliant(sensor_dropoff_point)  # do the attachment
-        self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(sensor_dropoff_point * makeTransformInputFormatted([0, 0, -0.2]))  # above the attachment point
-
-        # remove skeleton from female limb assembly fixture
-        # self.UR5.moveBetweenStations("limb_assembly_fixture")
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, -0.2]))  # above
-        self.UR5.moveArm(female_limb_assembly_fixture_position)  # attached
-        self.UR5.setGripperPosition(0.5)  # grip onto skeleton
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0, 0.03]))  # below
-        self.UR5.moveArm(female_limb_assembly_fixture_position * makeTransformInputFormatted([0, 0.10, 0.03]))  # out and below
-
-        # put skeleton (with other organ(s) attached) onto the joint (which in the male limb assembly fixutre)
-        self.UR5.moveArm(joint_skeleton_dropoff_point * makeTransformInputFormatted([0, 0.03, 0.03]))  # out and below
-        self.UR5.moveArm(joint_skeleton_dropoff_point * makeTransformInputFormatted([0, 0, 0.03]))  # below
-        # self.UR5.setMoveSpeed(self.UR5.speedValueReallySlow)
-        self.UR5.moveArm(joint_skeleton_dropoff_point * makeTransformInputFormatted([0, 0, -joint_skeleton_extra_push_distance]))  # do the attachment
-        # self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
-        self.UR5.setGripperPosition(0.0)  # open gripper
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * joint_skeleton_dropoff_point)  # move up
-
-        # remove completed limb!
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * male_limb_assembly_fixture_position)  # above pickup point
-        self.UR5.moveArm(male_limb_assembly_fixture_position )  # pickup point
-        self.UR5.setGripperPosition(0.5)  # grip onto joint
-        self.UR5.moveArm(makeTransformInputFormatted([0, 0, 0.2]) * male_limb_assembly_fixture_position)  # above pickup point
-
-
     def disconnectAll( self ):
         self.UR5.stopArm()
         self.AF.disableStepperMotor()
@@ -302,14 +216,11 @@ if __name__ == "__main__":
     # startup
     RoboFab = RoboFab_host (configurationData)
 
-    # # TEMP
-    RoboFab.UR5.setTCP( RoboFab.gripperTCP_A )
-    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=400, rotX = 180) )
-    RoboFab.UR5.moveArm( printer.origin * makeTransformMillimetersDegrees( z=20, rotX = 180) )
-    while(1): pass
-
     # open blueprint file
-    RoboFab.setupRobotObject ( robotID= "0_0" , printer=printer)
+    RoboFab.setupRobotObject ( robotID= "test0" , printer=printer)
+
+    if not RoboFab.checkBankHasEnoughOrgans():
+        raise RuntimeError("Bank does not have enough organs")
 
     # make robot:
     RoboFab.buildRobot(printer)
