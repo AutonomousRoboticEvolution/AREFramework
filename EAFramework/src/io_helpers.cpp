@@ -124,6 +124,11 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
 
 int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
 {
+    if(ids.empty()){
+        std::cout << "No robot available for evaluation." << std::endl;
+        exit(1);
+    }
+
     std::cout << "Robots available for evaluation: " << std::endl;
     std::function<void(void)> print_ids = [&](){
         for(const int &id: ids){
@@ -163,6 +168,7 @@ int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
             std::cerr << "The robot corresponding to the chosen id is not available for evaluation" << std::endl;
             print_ids();
         }
+
     }
 
     return chosen_id;

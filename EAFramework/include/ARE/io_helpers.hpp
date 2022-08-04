@@ -51,12 +51,15 @@ void load_morph_genomes(const std::string &folder,
                         const std::vector<int> &list_to_load, std::map<int,are::Genome::Ptr>& genomes){
 
     std::string filepath, filename;
-    std::list<std::string> split_str;
+    std::vector<std::string> split_str;
     for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
         filepath = dirit.path().string();
         misc::split_line(filepath,"/",split_str);
         filename = split_str.back();
-        if(filename.substr(0,filename.find("_")) != "morph")
+        misc::split_line(filename,"_",split_str);
+        if(split_str[0] != "morph")
+            continue;
+        if(split_str[1] != "genome")
             continue;
 
         split_str.clear();
