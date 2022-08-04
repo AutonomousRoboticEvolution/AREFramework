@@ -116,10 +116,7 @@ void ER::start_evaluation(){
 
     eval_t1 = std::chrono::steady_clock::now();
 
-    if(!isEnvInit && !sim_mode){
-        isEnvInit=true;
-        environment->init();
-    }
+    environment->init();
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
@@ -210,11 +207,7 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-<<<<<<< HEAD
             Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
-=======
-            Logging::saveStringToFile( "log_file.txt" , message);
->>>>>>> 3cda8be030fd94a58f0bf911baf50a35677ac35c
         }
     }
     std::vector<double> objs;
