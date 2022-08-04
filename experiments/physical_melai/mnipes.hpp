@@ -110,6 +110,8 @@ private:
     void _reproduction();
 
     void write_morph_descriptors();
+
+    std::string get_last_learner_state(int id);
 };
 
 }//are

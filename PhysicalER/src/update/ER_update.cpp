@@ -55,15 +55,15 @@ void ER::choice_of_robot(){
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
-        if(list_ids[0] != current_id){
+    if(list_ids[0] != current_id){
         int i = 0;
         for(;i < list_ids.size(); i++)
             if(current_id == list_ids[i])
                 break;
-	if(i < list_ids.size()){
-        	list_ids[i] = list_ids[0];
-        	list_ids[0] = current_id;
-	}
+        if(i < list_ids.size()){
+            list_ids[i] = list_ids[0];
+            list_ids[0] = current_id;
+        }
     }
     current_id = ioh::choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);
@@ -152,7 +152,7 @@ void ER::start_evaluation(){
     std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
     std::stringstream sstr;
     sstr << current_id << std::endl << ctrl_gen;
-    std::cout << ctrl_gen << std::endl;
+    //std::cout << ctrl_gen << std::endl;
     send_string(reply,sstr.str(),request,"pi ");
     assert(reply == "starting");
 }
@@ -221,7 +221,6 @@ bool ER::stop_evaluation(){
     // display the fitness:
     environment->print_info();
 
-    std::cout << "Evaluation number: " << nbrEval + 1 << " is finished." << std::endl;
 
     // ask user whether to re-do this evaluation
     std::string str;

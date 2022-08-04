@@ -83,6 +83,7 @@ void MNIPES::epoch(){
     numberEvaluation++;
     learner.update_pop_info(objectives,desc);
     learner.step();
+    std::cout << "Number of evaluations: " << learner.nbr_eval() << std::endl;
 
     if(learner.is_learning_finish()){//learning is finished for this body plan
         if(verbose)
@@ -200,7 +201,7 @@ void MNIPES::_reproduction(){
             double best_fitness = 0;
             int best_id = 0;
             for(const int &i: ri){
-                double fit = settings::cast<settings::Double>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
+                double fit = settings::cast<settings::Float>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
                 if(best_fitness < fit){
                     best_fitness = fit;
                     best_id = genome_ids[i];
@@ -281,7 +282,7 @@ void MNIPES::init_learner(int id){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
     bool useArucoAsInput = settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
-    std::string learner_file = settings::getParameter<settings::String>(parameters,"#learnerToLoad").value;
+    bool load_last_learner_state = settings::getParameter<settings::Boolean>(parameters,"#loadLastLearnerState").value;
 
 
     int wheels, joints, sensors;
@@ -310,10 +311,14 @@ void MNIPES::init_learner(int id){
     learner.set_randNum(randomNum);
 
     //Load an existing learner
-    if(learner_file != "None" && boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
+    if(load_last_learner_state){
         learner.init();
-        learner.from_file(Logging::log_folder + "/" + learner_file);
-        std::cout << learner.print_info() << std::endl;
+        std::string learner_file = get_last_learner_state(id);
+        if(learner_file != "None"){
+            learner.from_file(Logging::log_folder + "/" + learner_file);
+            std::cout << "Starting from state: " << learner_file << std::endl;
+            std::cout << learner.print_info() << std::endl;
+        }
     }
     else{
         if(!load_existing_ctrls && !use_ctrl_arch)
@@ -342,6 +347,8 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
 
     if(learners.find(id) == learners.end())
     	    init_learner(id);
+
+    learners[id].print_info();
 
     //** Create Controller to send to robot
     NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
@@ -377,6 +384,8 @@ void MNIPES::load_data_for_generate(){
     if(morph_gen_info.empty())
         return;
 
+    morph_genomes_info = morph_gen_info;
+
     std::vector<int> list_to_load;
     _survival(morph_gen_info,list_to_load);
 
@@ -387,8 +396,8 @@ void MNIPES::load_data_for_generate(){
 
     bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
     if(is_cppn_genome)
-        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
-    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
+        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder + "/genomes_pool/",list_to_load,morph_genomes);
+    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder + "/genomes_pool/",list_to_load,morph_genomes);
 
 }
 
@@ -447,4 +456,25 @@ void MNIPES::write_morph_descriptors(){
     for(const auto& ind : population){
 
     }
+}
+
+std::string MNIPES::get_last_learner_state(int id){
+    std::map<int,std::string> learner_files;
+    for(const auto &dirit : fs::directory_iterator(fs::path(Logging::log_folder))){
+        std::vector<std::string> split;
+        misc::split_line(dirit.path().string(),"/",split);
+        std::string filename = split.back();
+        misc::split_line(filename,"_",split);
+        if(split[0] != "learner")
+            continue;
+        if(std::stoi(split[1]) == id)
+            learner_files.emplace(std::stoi(split.back()),filename);
+
+    }
+    if(learner_files.empty())
+        return "None";
+    int i = 1;
+    while(learner_files.find(i) != learner_files.end())
+        i++;
+    return learner_files[i-1];
 }
