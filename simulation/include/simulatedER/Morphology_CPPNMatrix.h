@@ -35,7 +35,6 @@ public:
         numSkeletonVoxels(mcm.numSkeletonVoxels),
         indDesc(mcm.indDesc),
         skeletonHandles(mcm.skeletonHandles),
-        gripperHandles(mcm.gripperHandles),
         blueprint(mcm.blueprint),
         skeletonListVertices(mcm.skeletonListVertices),
         skeletonListIndices(mcm.skeletonListIndices),
@@ -81,7 +80,7 @@ public:
     /**
      * @brief Creates a temporal gripper. The isOrganColliding method checks this gripper is not colliding.
      */
-    void createGripper();
+    void createGripper(std::vector<int> &gripperHandles);
     /**
      * @brief Takes the last three outputs of the network and converts them into rotations (radians) in x, y and z.
      * \todo EB: This method needs updating. Only one output required.
@@ -90,7 +89,7 @@ public:
     /**
      * @brief Removes the gripper created with createTemporalGripper
      */
-    void destroyGripper();
+    void destroyGripper(const std::vector<int> &gripperHandles);
     /**
      * @brief Removes all physical connector created with createTemporalConnector
      */
@@ -246,7 +245,7 @@ public:
     //void set_substrate(NEAT::Substrate sub){substrate = sub;}
 
 private:
-    bool use_neat=true;
+    bool use_neat=false;
     NEAT::NeuralNetwork cppn;
     nn2_cppn_t nn2_cppn;
 
@@ -256,13 +255,14 @@ private:
     int numSkeletonVoxels;
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
-    std::vector<int> gripperHandles;
     Blueprint blueprint;
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     //NEAT::Substrate substrate;
 
     std::vector<std::vector<double>> matrix_4d;
+    std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
+
 };
 
 }//sim

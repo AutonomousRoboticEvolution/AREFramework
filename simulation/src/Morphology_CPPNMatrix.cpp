@@ -15,15 +15,15 @@ using namespace are::sim;
 void Morphology_CPPNMatrix::create()
 {
     int meshHandle = -1;
-    std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
     mainHandle = -1;
     int convexHandle, brainHandle;
-    createGripper();
+    std::vector<int> gripperHandles;
+    createGripper(gripperHandles);
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
     numSkeletonVoxels = 0;
     createHead();
     PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
-    PolyVox::RawVolume<uint8_t > skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
+    PolyVox::RawVolume<uint8_t> skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     // Decoding CPPN
     GenomeDecoder genomeDecoder;
     if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value){
@@ -45,6 +45,8 @@ void Morphology_CPPNMatrix::create()
     // Import mesh to V-REP
     if (indVerResult) {
         generateOrgans(skeletonSurfaceCoord);
+        skeletonSurfaceCoord.clear();
+        skeletonSurfaceCoord.shrink_to_fit();
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
                                         skeletonListIndices.size(), nullptr);
         if (meshHandle == -1) {
@@ -330,7 +332,9 @@ void Morphology_CPPNMatrix::create()
     }
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
-//    destroyGripper();
+    destroyGripper(gripperHandles);
+    //gripperHandles.clear();
+//    gripperHandles.shrink_to_fit();
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -419,7 +423,7 @@ void Morphology_CPPNMatrix::createHead()
     organList.push_back(organ);
 }
 
-void Morphology_CPPNMatrix::createGripper()
+void Morphology_CPPNMatrix::createGripper(std::vector<int>& gripperHandles)
 {
     gripperHandles.resize(4);
     float gripperPosition[3];
@@ -450,7 +454,7 @@ void Morphology_CPPNMatrix::createGripper()
     gripperPosition[0] = 1.0; gripperPosition[1] = 1.0; gripperPosition[2] = 1.0;
     gripperOrientation[0] = 0.0; gripperOrientation[1] = 0.0; gripperOrientation[2] = 0.0;
 
-    for(auto & i : gripperHandles){
+    for(const auto & i : gripperHandles){
         simSetObjectPosition(i, -1, gripperPosition);
         simSetObjectOrientation(i, -1, gripperOrientation);
 #ifndef ISROBOTSTATIC
@@ -617,7 +621,7 @@ void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatri
     }
 }
 
-void Morphology_CPPNMatrix::destroyGripper()
+void Morphology_CPPNMatrix::destroyGripper(const std::vector<int>& gripperHandles)
 {
     simRemoveModel(gripperHandles[0]);
     simRemoveModel(gripperHandles[1]);
