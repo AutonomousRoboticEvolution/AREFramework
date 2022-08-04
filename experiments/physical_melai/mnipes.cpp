@@ -340,6 +340,9 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
 
+    if(learners.find(id) == learners.end())
+    	    init_learner(id);
+
     //** Create Controller to send to robot
     NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
     auto nn_params = learners[id].update_ctrl(ctrl);
