@@ -14,7 +14,9 @@
 #maxVelocity,double,6.
 #scenes,sequence_string,shapes_exploration.ttt
 
-#populationSize,int,2
+#populationSize,int,5
+#nbrOfOffsprings,int,5
+#tournamentSize,int,2
 
 #maxEvalTime,float,30
 #timeStep,float,0.05
@@ -31,19 +33,23 @@
 #isCaster,bool,1
 #isCPPNGenome,bool,1
 #isLeg,bool,1
+#genomeType,int,
 
 #envType,int,1
 #nbrWaypoints,int,300
 #arenaSize,double,2.
-#learnerToLoad,string,None
+#loadLastLearnerState,bool,1
+#loadExistingControllers,bool,1
 
 #noiseLevel,double,0
 
-#useControllerArchive,bool,0
+#useControllerArchive,bool,1
+#maxNbrOrgans,int,8
 #NNType,int,2
 #nbrHiddenNeurons,int,8
+#jointControllerType,int,2
 
-#cmaesNbrEval,int,10
+#cmaesNbrEval,int,4
 #cmaesPopSize,int,2
 #CMAESStep,double,1.
 #FTarget,double,0.05
@@ -51,11 +57,13 @@
 #withRestart,bool,1
 #incrPop,bool,1
 #lengthOfStagnation,int,20
+#populationStagnationThreshold,float,0.05
 #kValue,int,15
 #noveltyThreshold,double,0.9
 #archiveAddingProb,double,0.4
 #noveltyRatio,double,0.
 #noveltyDecrement,double,0.05
+#MaxWeight,float,1.
 
 #isSegmentedRobot,bool,1
 #isExportModel,bool,0
@@ -63,6 +71,8 @@
 #saveBlueprint,bool,1
 
 #organsVersion,int,3
+
+#useArucoAsInput,bool,0
 
 #debugDisplayOnPi,bool,1
 #debugLEDsOnPi,bool,0

@@ -317,15 +317,17 @@ void MNIPES::init_learner(int id){
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
 
+
     //Load an existing learner
-    if(load_last_learner_state){
+    std::string learner_file = "None";
+    if(load_last_learner_state)
+        learner_file = get_last_learner_state(id);
+
+    if(learner_file != "None"){
         learner.init();
-        std::string learner_file = get_last_learner_state(id);
-        if(learner_file != "None"){
-            learner.from_file(Logging::log_folder + "/" + learner_file);
-            std::cout << "Starting from state: " << learner_file << std::endl;
-            std::cout << learner.print_info() << std::endl;
-        }
+        learner.from_file(Logging::log_folder + "/" + learner_file);
+        std::cout << "Starting from state: " << learner_file << std::endl;
+        std::cout << learner.print_info() << std::endl;
     }
     else{
         if(!load_existing_ctrls && !use_ctrl_arch)
@@ -334,15 +336,15 @@ void MNIPES::init_learner(int id){
             NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
             if(load_existing_ctrls)// load existing controllers
                 ioh::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
-            else if(use_ctrl_arch)// load from controller archive
+            if(use_ctrl_arch && ctrl_gen->get_weights().empty())// load from controller archive
                 ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
-            else learner.init();
 
             if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
                 learner.init();
             else learner.init(ctrl_gen->get_full_genome());
         }
     }
+
 
     learners.emplace(id,learner);
 }
