@@ -66,6 +66,12 @@ bool MNIPES::update(const Environment::Ptr &env){
     final_position = env->get_final_position();
     trajectory = env->get_trajectory();
 
+    std::vector<int> learner_to_delete;
+    for(const auto &learner: learners)
+        if(learner.second.is_learning_finish())
+            learner_to_delete.push_back(learner.first);
+    for(const int& id: learner_to_delete)
+        learners.erase(id);
     return true;
 }
 
@@ -135,7 +141,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
 
     std::vector<int> tmp;
     int current_gen = max_gen;
-    while(list_ids.size() == pop_size){
+    while(list_ids.size() < pop_size){
         //retrieve all the morph ids of the last gen i.e. youngest
         auto range = map_per_gen.equal_range(current_gen);
         for(auto it = range.first; it != range.second; it++)
@@ -145,6 +151,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
         if(tmp.size() < pop_size - list_ids.size()){
             list_ids.insert(list_ids.end(),tmp.begin(),tmp.end());
             current_gen--;
+            tmp.clear();
         }
         else if(tmp.size() > pop_size - list_ids.size()){
 
@@ -154,7 +161,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
             for(size_t i = 0; i < tmp.size(); i++)
                 idxes.push_back(i);
 
-            for(size_t i = 0; i < pop_size; i++){
+            for(size_t i = list_ids.size(); i < pop_size; i++){
                 int n = randomNum->randInt(0,idxes.size()-1);
                 res.push_back(tmp[idxes[n]]);
                 idxes.erase(idxes.begin() + n);
@@ -210,7 +217,7 @@ void MNIPES::_reproduction(){
             return best_id;
     };
 
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    int is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
 
     for(int i = 0; i < nbr_of_offsprings; i++){
         Genome::Ptr new_morph_gene;
@@ -234,7 +241,7 @@ void MNIPES::_reproduction(){
 //            nn2_cppn_t parent = morph_genomes[best_id].get_cppn();
 //            nn2_cppn_t new_cppn;
 //            rl_parent.crossover(parent,new_cppn);
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->crossover(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
             else{
                 auto matrix = protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn());
@@ -242,7 +249,7 @@ void MNIPES::_reproduction(){
                 std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->set_matrix_4d(child_matrix);
             }
            // new_morph_gene.mutate(); //mutate?
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
@@ -252,11 +259,11 @@ void MNIPES::_reproduction(){
         else{//without crossbreeding
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
             int best_id = best_of_subset(random_indexes);
-            if(genome_type == CPPN)
+            if(is_cppn)
                 new_morph_gene.reset(new NN2CPPNGenome(*(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]).get())));
             else new_morph_gene.reset(new ProtomatrixGenome(*(std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id]).get())));
             new_morph_gene->mutate();
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
@@ -426,7 +433,6 @@ void MNIPES::load_data_for_update() {
 
 void MNIPES::write_data_for_update(){
     bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
-
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
         if(!learner.second.is_learning_finish())
@@ -450,13 +456,14 @@ void MNIPES::write_data_for_update(){
 
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
+
 }
 
-void MNIPES::write_morph_descriptors(){
-    for(const auto& ind : population){
+//void MNIPES::write_morph_descriptors(){
+//    for(const auto& ind : population){
 
-    }
-}
+//    }
+//}
 
 std::string MNIPES::get_last_learner_state(int id){
     std::map<int,std::string> learner_files;

@@ -109,7 +109,7 @@ private:
     void _survival(const ioh::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();
 
-    void write_morph_descriptors();
+//    void write_morph_descriptors();
 
     std::string get_last_learner_state(int id);
 };
