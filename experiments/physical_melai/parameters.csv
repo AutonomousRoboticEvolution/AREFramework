@@ -1,4 +1,4 @@
-#experimentName,string,physical_melai_sim
+#experimentName,string,physical_proto
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
 #repository,string,/home/leni/are-logs/
@@ -14,8 +14,9 @@
 #maxVelocity,double,6.
 #scenes,sequence_string,shapes_exploration.ttt
 
-#populationSize,int,5
-#nbrOfOffsprings,int,5
+#startFromRandomPop,bool,0
+#populationSize,int,2
+#nbrOfOffsprings,int,2
 #tournamentSize,int,2
 
 #maxEvalTime,float,30
@@ -31,9 +32,8 @@
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
-#isCPPNGenome,bool,1
+#isCPPNGenome,bool,0
 #isLeg,bool,1
-#genomeType,int,
 
 #envType,int,1
 #nbrWaypoints,int,300
