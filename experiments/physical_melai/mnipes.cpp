@@ -4,11 +4,21 @@ using namespace are;
 
 void PMEIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    if(morphGenome->get_type() == "nn2_cppn_genome"){
+        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    }
+    else if(morphGenome->get_type() == "protomatrix_genome"){
+        std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_matrix_4d(m4d);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
+        std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+        std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    }
+
 
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
     listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
@@ -34,12 +44,10 @@ void MNIPES::init_random_pop(){
         //create a new morph genome with random structure and parameters
         Genome::Ptr morph_genome;
         if(is_cppn)
-            morph_genome.reset(new NN2CPPNGenome);
+            morph_genome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
         else
-            morph_genome.reset(new ProtomatrixGenome);
+            morph_genome = std::make_shared<ProtomatrixGenome>(randomNum,parameters);
         morph_genome->random();
-        morph_genome->set_parameters(parameters);
-        morph_genome->set_randNum(randomNum);
         morph_genome->set_id(misc::generate_unique_id(4));
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
@@ -50,9 +58,52 @@ void MNIPES::init_random_pop(){
     }
 }
 
+void MNIPES::init_pop_from_migrants(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
+
+    if(!boost::filesystem::exists(Logging::log_folder + "/migrants")){
+        std::cerr << "Error: Cannot initialise protomatrices, the migrants folder does not exist." << std::endl;
+        return;
+    }
+    std::map<int,Genome::Ptr> migrants;
+    ioh::load_morph_genomes<NN2CPPNGenome>(Logging::log_folder + "/migrants/",{-1},migrants);
+    if(migrants.empty()){
+        std::cerr << "Error: Cannot initialise protomatrices, the migrants folder is empty." << std::endl;
+        return;
+    }
+    for(const auto &migrant: migrants){
+        if(population.size() >= pop_size)
+            break;
+        Genome::Ptr morph_genome;
+        if(is_cppn)
+            morph_genome = migrant.second;
+        else{
+            nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(migrant.second)->get_cppn();
+            cppn.init();
+            std::vector<std::vector<double>> matrix;
+            protomatrix::retrieve_matrices_from_cppn(cppn,matrix);
+            morph_genome = std::make_shared<ProtomatrixGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genome)->set_matrix_4d(matrix);
+        }
+        morph_genome->set_id(misc::generate_unique_id(4));
+        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
+        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }
+
+}
+
 void MNIPES::init_next_pop(){
-    if(morph_genomes_info.empty())
-        init_random_pop();
+    bool random_pop = settings::getParameter<settings::Boolean>(parameters,"#startFromRandomPop").value;
+    if(morph_genomes_info.empty()){
+        if(boost::filesystem::exists(Logging::log_folder + "/migrants") && !random_pop)
+            init_pop_from_migrants();
+        else
+            init_random_pop();
+    }
     else
         _reproduction();
 }
@@ -244,7 +295,8 @@ void MNIPES::_reproduction(){
             if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->crossover(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
             else{
-                auto matrix = protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn());
+                std::vector<std::vector<double>> matrix;
+                protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn(),matrix);
                 auto child_matrix = protomatrix::crossover_matrix(matrix,std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id])->get_matrix_4d());
                 std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->set_matrix_4d(child_matrix);
             }

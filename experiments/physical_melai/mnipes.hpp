@@ -14,7 +14,7 @@
 #include "cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
 #include "ARE/crossbreeding.hpp"
-#include "ProtomatrixGenome.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 
 namespace are{
 
@@ -77,6 +77,7 @@ public:
     MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
     void init() override;
     void init_random_pop();
+    void init_pop_from_migrants();
     void init_next_pop() override;
 
     bool update(const Environment::Ptr &env) override;
