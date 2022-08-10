@@ -55,6 +55,10 @@ void ER::choice_of_robot(){
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
+    if(list_ids.empty()){
+        std::cout << "No robot available for evaluation." << std::endl;
+        exit(1);
+    }
     if(list_ids[0] != current_id){
         int i = 0;
         for(;i < list_ids.size(); i++)
@@ -86,10 +90,6 @@ void ER::save_logs(bool eog)
 bool ER::execute(){
 
     if(robot_state == READY){
-        std::cout << "Press Enter when the robot is ready" << std::endl;
-        std::cin.ignore();
-        std::cin.ignore();
-
         start_evaluation();
         robot_state = BUSY;
     }
@@ -224,7 +224,7 @@ bool ER::stop_evaluation(){
 
     // ask user whether to re-do this evaluation
     std::string str;
-    std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
+    std::cout << "Do you want to execute the same evaluation again ? Type y,Y or yes if you do, nothing otherwise" << std::endl;
     std::getline(std::cin,str);
     if(str == "y" || str == "Y" || str == "yes"){
         return true;

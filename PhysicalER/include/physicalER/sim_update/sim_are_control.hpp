@@ -8,6 +8,7 @@
 #include "ARE/NNParamGenome.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/nn2/NN2Control.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 #include "physicalER/pi_communication.hpp"
 #include <zmq.hpp>
 #include "nn2/mlp.hpp"
@@ -42,6 +43,8 @@ public:
         Individual(ind),
         energy_cost(ind.energy_cost)
     {}
+
+
 
     void init() override{
         isEval = false;
@@ -110,6 +113,7 @@ public:
             number_of_wheels(ctrl.number_of_wheels),
             number_of_joints(ctrl.number_of_joints),
             _is_ready(ctrl._is_ready){}
+
 
     int exec( zmq::socket_t& socket, float sim_time);
 

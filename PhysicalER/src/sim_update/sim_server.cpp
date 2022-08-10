@@ -205,6 +205,9 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     }
 
     if(!are_ctrl->is_ready()){
+
+        bool is_cppn = are_sett::getParameter<are_sett::Boolean>(ERVREP->get_parameters(),"#isCPPNGenome").value;
+
         simStartSimulation();
 
         std::string str_ctrl, str_organs_list, str_param;
@@ -217,8 +220,11 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
         //receive organ addresses list
         phy::receive_string(str_organs_list,"organ_addresses_received",reply,"pi ");
         std::cout<<"Organs list received: \n"<<str_organs_list<<std::endl;
-        
-        are::NN2CPPNGenome::Ptr morph_gen(new are::NN2CPPNGenome(ERVREP->get_randNum(),parameters));
+        are::Genome::Ptr morph_gen;
+        if(is_cppn)
+            morph_gen = std::make_shared<are::NN2CPPNGenome>(ERVREP->get_randNum(),parameters);
+        else
+            morph_gen = std::make_shared<are::ProtomatrixGenome>(ERVREP->get_randNum(),parameters);
         are::NNParamGenome::Ptr ctrl_gen(new are::NNParamGenome(ERVREP->get_randNum(),parameters));
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply,"pi ");
