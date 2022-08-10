@@ -281,8 +281,10 @@ void M_NIPES::init_morph_pop(){
     for (size_t i = 0; i < population_size; i++){ // Body plans
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
-        morphgenome->random();
-
+        if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value)
+            morphgenome->random();
+        else
+            morphgenome->init();
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);

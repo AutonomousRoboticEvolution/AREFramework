@@ -1,7 +1,7 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "ProtomatrixGenome.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 #include "ARE/Individual.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
