@@ -24,7 +24,7 @@ namespace protomatrix {
     void random_matrix(std::vector<std::vector<double> > &matrix_4d);
     std::vector<std::vector<double>> mutate_matrix(const std::vector<std::vector<double>> &matrix_4d);
     std::vector<std::vector<double>> crossover_matrix(const std::vector<std::vector<double>> &first_parent_4d,const std::vector<std::vector<double>> &second_parent_4d);
-    std::vector<std::vector<double>> retrieve_matrices_from_cppn(nn2_cppn_t cppn);
+    void retrieve_matrices_from_cppn(nn2_cppn_t cppn, std::vector<std::vector<double> > &matrix_4d);
 
 
 }

@@ -97,27 +97,22 @@ public:
     }
 
     void init() override {
-
+//        std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
+//        std::string genome_id = std::to_string(id());
+//        std::string temp_string = genome_pool + genome_id;
+//        matrix_4d = protomatrix::load_robot_matrix(temp_string);
     }
 
 
 
     void random(){
-        if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value) {
-            protomatrix::random_matrix(matrix_4d);
-        }
-        else{
-            std::string genome_pool = settings::getParameter<settings::String>(parameters,"#genomePool").value;
-            std::string genome_id = std::to_string(id());
-            std::string temp_string = genome_pool + genome_id;
-            matrix_4d = protomatrix::load_robot_matrix(temp_string);
-        }
+        protomatrix::random_matrix(matrix_4d);
     }
 
     void mutate() override {
 //        cppn.mutate();
 //        _id = protomatrix_id++; /// \todo EB: This is not necessary here.
-        matrix_4d = protomatrix::mutate_matrix(matrix_4d);
+        matrix_4d  = protomatrix::mutate_matrix(matrix_4d);
     }
 
     void crossover(const Genome::Ptr &partner, Genome::Ptr child) override {
@@ -231,7 +226,7 @@ private:
 //    nn2_cppn_t cppn;
     CartDesc cart_desc;
     OrganPositionDesc organ_position_desc;
-    int generation;
+    int generation=0;
     std::vector<std::vector<double>> matrix_4d;
 };
 

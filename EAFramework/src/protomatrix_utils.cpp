@@ -1,7 +1,7 @@
 //
 // Created by edgar on 26/04/22.
 //
-#include "protomatrix_utils.hpp"
+#include "ARE/protomatrix_utils.hpp"
 
 using namespace are;
 
@@ -33,7 +33,10 @@ void protomatrix::random_matrix(std::vector<std::vector<double>> &matrix_4d){
     const float mutation_parameter = 1.0;
     for(int i = 0; i < matrix_4d.size(); i++) {
         for(int j = 0; j < 1331; j++) { /// \todo EB: Hardcoded value!
+
             double rand_number = std::uniform_real_distribution<>(-mutation_parameter,mutation_parameter)(nn2::rgen_t::gen);
+            if(i == 1)
+                rand_number = rand_number >= 0 ? 1 : -1;
             matrix_4d.at(i).push_back(rand_number);
         }
     }
@@ -106,11 +109,11 @@ std::vector<std::vector<double>> protomatrix::crossover_matrix(const std::vector
     return child_matrix_4d;
 }
 
-std::vector<std::vector<double>> protomatrix::retrieve_matrices_from_cppn(nn2_cppn_t cppn){
+void protomatrix::retrieve_matrices_from_cppn(nn2_cppn_t cppn,std::vector<std::vector<double>>& matrix_4d){
     using mc = are::morph_const;
     std::vector<double> input{0,0,0,0};
     std::vector<double> output;
-    std::vector<std::vector<double>> matrix_4d(6);
+    matrix_4d.resize(6);
     for(int i = -mc::matrix_size/2 + 1; i < mc::matrix_size/2; i += 1){
         for(int j = -mc::matrix_size/2 + 1; j < mc::matrix_size/2; j += 1){
             for(int k = -mc::matrix_size/2 + 1; k < mc::matrix_size/2; k += 1){
@@ -121,7 +124,7 @@ std::vector<std::vector<double>> protomatrix::retrieve_matrices_from_cppn(nn2_cp
                 cppn.step(input);
                 output = cppn.outf();
                 matrix_4d.at(0).push_back(output.at(0));
-                matrix_4d.at(1).push_back(output.at(1));
+                matrix_4d.at(1).push_back((output.at(1) > 0.0) ? 1.0 : -1.0);
                 matrix_4d.at(2).push_back(output.at(2));
                 matrix_4d.at(3).push_back(output.at(3));
                 matrix_4d.at(4).push_back(output.at(4));
