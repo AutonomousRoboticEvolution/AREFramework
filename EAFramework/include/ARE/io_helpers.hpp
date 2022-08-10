@@ -66,6 +66,8 @@ void load_morph_genomes(const std::string &folder,
         misc::split_line(filename,"_",split_str);
         int id = std::stoi(split_str.back());
         bool load = [&]() -> bool{
+            if(list_to_load[0] == -1)
+                return true;
             for(const int& i : list_to_load)
                 if(id == i)
                     return true;

@@ -124,10 +124,6 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
 
 int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
 {
-    if(ids.empty()){
-        std::cout << "No robot available for evaluation." << std::endl;
-        exit(1);
-    }
 
     std::cout << "Robots available for evaluation: " << std::endl;
     std::function<void(void)> print_ids = [&](){
@@ -141,7 +137,7 @@ int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
     int chosen_id;
     while(!good){
         good = true;
-        std::cout << "Please enter the id of the robot to evaluate. (default : " << ids.front() << ")" << std::endl;
+        std::cout << "Please enter the id of the robot ready to be evaluated. (default : " << ids.front() << ")" << std::endl;
         std::string entry;
         std::getline(std::cin,entry);
         if(entry.empty()){
