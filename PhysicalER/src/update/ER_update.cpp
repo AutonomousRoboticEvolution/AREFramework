@@ -54,6 +54,7 @@ void ER::choice_of_robot(){
     //Load list of robot's ids to be evaluated and ask user which one want to be evaluated.
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    bool auto_mode = settings::getParameter<settings::Boolean>(parameters,"#autoMode").value;
     ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
     if(list_ids.empty()){
         std::cout << "No robot available for evaluation." << std::endl;
@@ -69,7 +70,10 @@ void ER::choice_of_robot(){
             list_ids[0] = current_id;
         }
     }
-    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
+    if(auto_mode)
+        current_id = list_ids[0];
+    else
+        current_id = ioh::choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);
     //-
 }
@@ -223,11 +227,14 @@ bool ER::stop_evaluation(){
 
 
     // ask user whether to re-do this evaluation
-    std::string str;
-    std::cout << "Do you want to execute the same evaluation again ? Type y,Y or yes if you do, nothing otherwise" << std::endl;
-    std::getline(std::cin,str);
-    if(str == "y" || str == "Y" || str == "yes"){
-        return true;
+    bool auto_mode = settings::getParameter<settings::Boolean>(parameters,"#autoMode").value;
+    if(!auto_mode){
+        std::string str;
+        std::cout << "Do you want to execute the same evaluation again ? Type y,Y or yes if you do, nothing otherwise" << std::endl;
+        std::getline(std::cin,str);
+        if(str == "y" || str == "Y" || str == "yes"){
+            return true;
+        }
     }
 
     nbrEval++;
