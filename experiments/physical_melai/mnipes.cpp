@@ -66,23 +66,48 @@ void MNIPES::init_pop_from_migrants(){
         std::cerr << "Error: Cannot initialise protomatrices, the migrants folder does not exist." << std::endl;
         return;
     }
-    std::map<int,Genome::Ptr> migrants;
-    ioh::load_morph_genomes<NN2CPPNGenome>(Logging::log_folder + "/migrants/",{-1},migrants);
+    std::map<int,nn2_cppn_t> migrants;
+    //ioh::load_morph_genomes<NN2CPPNGenome>(Logging::log_folder + "/migrants/",{-1},migrants);
+    std::string filepath, filename;
+    std::vector<std::string> split_str;
+    for(const auto &dirit : fs::directory_iterator(fs::path(Logging::log_folder + "/migrants/"))){
+        filepath = dirit.path().string();
+        misc::split_line(filepath,"/",split_str);
+        filename = split_str.back();
+        misc::split_line(filename,"_",split_str);
+        if(split_str[0] != "morph")
+            continue;
+        if(split_str[1] != "genome")
+            continue;
+
+        split_str.clear();
+        misc::split_line(filename,"_",split_str);
+        int id = std::stoi(split_str.back());
+        std::ifstream mifstr(filepath);
+        if(!mifstr){
+            std::cerr << "Unable to open file " << filepath << std::endl;
+            return;
+        }
+        boost::archive::text_iarchive iarch(mifstr);
+        nn2_cppn_t cppn;
+        iarch >> cppn;
+        migrants.emplace(id,cppn);
+    }
     if(migrants.empty()){
         std::cerr << "Error: Cannot initialise protomatrices, the migrants folder is empty." << std::endl;
         return;
     }
-    for(const auto &migrant: migrants){
+    for(auto &migrant: migrants){
         if(population.size() >= pop_size)
             break;
         Genome::Ptr morph_genome;
-        if(is_cppn)
-            morph_genome = migrant.second;
-        else{
-            nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(migrant.second)->get_cppn();
-            cppn.init();
+        if(is_cppn){
+            morph_genome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genome)->set_cppn(migrant.second);
+        }else{
+            migrant.second.init();
             std::vector<std::vector<double>> matrix;
-            protomatrix::retrieve_matrices_from_cppn(cppn,matrix);
+            protomatrix::retrieve_matrices_from_cppn(migrant.second,matrix);
             morph_genome = std::make_shared<ProtomatrixGenome>(randomNum,parameters);
             std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genome)->set_matrix_4d(matrix);
         }
@@ -92,6 +117,13 @@ void MNIPES::init_pop_from_migrants(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
+        //If it exists, copy initial controller in waiting_to_be_evaluated
+        std::stringstream sstr,dest;
+        sstr << Logging::log_folder << "/migrants/ctrl_genome_" <<  migrant.first;
+        if(boost::filesystem::exists(sstr.str())){
+            dest << Logging::log_folder << "/waiting_to_be_evaluated/ctrl_genome_" <<  morph_genome->id();
+            ioh::copy_file(sstr.str(),dest.str());
+        }
     }
 
 }

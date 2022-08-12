@@ -23,6 +23,15 @@ typedef enum GenomeType{
     PROTOMATRIX = 1
 } GenomeType;
 
+typedef enum task_t{
+    MAZE = 0,
+    OBSTACLES = 1,
+    MULTI_TARGETS = 2,
+    EXPLORATION = 3,
+    BARREL = 4,
+    GRADUAL = 5
+} task_t;
+
 class PMEIndividual : public Individual
 {
 public:

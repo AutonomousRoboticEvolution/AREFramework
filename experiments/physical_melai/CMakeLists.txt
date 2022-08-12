@@ -34,6 +34,10 @@ add_library(physical_melai SHARED
    cmaes_learner.cpp
    mnipes_loggings.cpp
    ../common/exploration.cpp
+   ../common/obstacleAvoidance.cpp
+   ../common/multiTargetMaze.cpp
+   ../common/barrelTask.cpp
+   ../common/gradual_env.cpp
    )
 
 
