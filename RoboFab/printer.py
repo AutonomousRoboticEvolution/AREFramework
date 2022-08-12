@@ -13,6 +13,7 @@ class Printer:
     def __init__(self, IPAddress, configurationData, printer_number=0):
         debugPrint("Creating a printer object")
         printerConfiguration = configurationData["PRINTER_{}".format(printer_number)]
+        self.number=printer_number
 
         # some settings etc for OpenSCAD file handling
         self.openSCADScriptFileName = "skeleton_maker.scad"
@@ -136,7 +137,6 @@ class Printer:
     #returns a dictionary, with keys "bed_actual", "bed_target", "tool_actual" and "tool_target" and values as temperature in degC
     def getTemperatures(self):
         responseObject = requests.get("http://{}/api/printer".format(self.IPAddress), headers=self.apiKeyHeader, timeout=self.timeout)
-        print(responseObject, self.IPAddress)
         temperatures = {"bed_actual":responseObject.json()["temperature"]["bed"]["actual"],
                         "bed_target":responseObject.json()["temperature"]["bed"]["target"],
                         "tool_actual":responseObject.json()["temperature"]["tool0"]["actual"],

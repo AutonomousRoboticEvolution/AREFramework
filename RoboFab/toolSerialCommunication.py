@@ -99,21 +99,22 @@ if __name__ == "__main__":
     # Make the settings file then extract the settings from it
     from makeConfigurationFile import makeFile as makeConfigurationFile
     import json
-    makeConfigurationFile(location="BRL")
-    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    makeConfigurationFile(location="YRK")
+    configurationData = json.load(open('configuration_YRK.json'))  # <--- change this depending on if you're in York or BRL
 
     gripper = GripperHandler(configurationData)
 
     time.sleep(0.1)
-    gripper.setGripperPosition(1.0 ,"B")
+    gripper.setGripperPosition(1 ,"B")
+    time.sleep(1)
 
     # time.sleep(1)
     # gripper.setGripperPosition(0.0,"B")
-
+    #
     # time.sleep(1)
-    # gripper.setGripperPosition(0.0,"A")
+    # gripper.setGripperPosition(1.0,"B")
 
     time.sleep(1)
-    gripper.disableServos()
+    #gripper.disableServos()
     # gripper.stop()
     print("done")
