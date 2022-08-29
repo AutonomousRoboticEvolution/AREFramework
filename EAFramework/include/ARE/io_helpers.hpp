@@ -33,6 +33,14 @@ typedef std::map<int,settings::ParametersMap> MorphGenomeInfoMap;
 bool move_file(const std::string& origin, const std::string& dest);
 
 /**
+ * @brief copy_file
+ * @param origin
+ * @param dest
+ * @return
+ */
+bool copy_file(const std::string& origin, const std::string& dest);
+
+/**
  * @brief load the information of all the morpholigical genomes from
  * @param folder
  * @param morph_gen_info

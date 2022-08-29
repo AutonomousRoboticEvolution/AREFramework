@@ -19,6 +19,17 @@ bool ioh::move_file(const std::string &origin, const std::string &dest){
     return true;
 }
 
+bool ioh::copy_file(const std::string &origin, const std::string &dest){
+    try{
+        fs::copy_file(origin,dest);
+    }catch(const fs::filesystem_error &e){
+        std::cerr << "Error while trying to copy " << origin << " to " << dest << std::endl << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
 void ioh::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap &morph_gen_info){
     std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));
     std::ifstream ifs(genome_info_file);
