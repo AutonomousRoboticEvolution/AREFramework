@@ -21,8 +21,8 @@ from printer import Printer
 from video_recorder import VideoRecorder
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_RECORD_VIDEO = 0
-DO_CORE_ORGAN_INSERT = 0 #finishes with head and skeleton on assembly fixture
+DO_RECORD_VIDEO = 1
+DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
