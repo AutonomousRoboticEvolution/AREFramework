@@ -7,7 +7,7 @@
 #include "ARE/learning/controller_archive.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/nn2/NN2Control.hpp"
-#include "cmaes_learner.hpp"
+#include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "obstacleAvoidance.hpp"
 #include "multiTargetMaze.hpp"

@@ -44,7 +44,8 @@ public:
         energy_cost(ind.energy_cost)
     {}
 
-
+    ~AREIndividual(){
+    }
 
     void init() override{
         isEval = false;

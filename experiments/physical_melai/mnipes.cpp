@@ -94,7 +94,7 @@ void MNIPES::init_pop_from_migrants(){
         migrants.emplace(id,cppn);
     }
     if(migrants.empty()){
-        std::cerr << "Error: Cannot initialise protomatrices, the migrants folder is empty." << std::endl;
+        std::cerr << "Error: Migrants folder is empty." << std::endl;
         return;
     }
     for(auto &migrant: migrants){
@@ -374,6 +374,7 @@ void MNIPES::init_learner(int id){
     bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
     bool useArucoAsInput = settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
     bool load_last_learner_state = settings::getParameter<settings::Boolean>(parameters,"#loadLastLearnerState").value;
+    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
 
     int wheels, joints, sensors;
@@ -408,14 +409,14 @@ void MNIPES::init_learner(int id){
         learner_file = get_last_learner_state(id);
 
     if(learner_file != "None"){
-        learner.init();
+        learner.init(ftarget);
         learner.from_file(Logging::log_folder + "/" + learner_file);
         std::cout << "Starting from state: " << learner_file << std::endl;
         std::cout << learner.print_info() << std::endl;
     }
     else{
         if(!load_existing_ctrls && !use_ctrl_arch)
-            learner.init();
+            learner.init(ftarget);
         else{
             NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
             if(load_existing_ctrls)// load existing controllers
@@ -424,8 +425,8 @@ void MNIPES::init_learner(int id){
                 ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
 
             if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
-                learner.init();
-            else learner.init(ctrl_gen->get_full_genome());
+                learner.init(ftarget);
+            else learner.init(ftarget,ctrl_gen->get_full_genome());
         }
     }
 

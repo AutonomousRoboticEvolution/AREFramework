@@ -34,7 +34,6 @@ extern "C" are::Environment::Ptr environmentFactory
             env = std::make_shared<are::sim::BarrelTask>(param);
         else if(env_type == are::GRADUAL)
             env = std::make_shared<are::sim::GradualEnvironment>(param);
-        env = std::make_shared<are::sim::Exploration>(param);
     }
    return env;
 }

@@ -2,7 +2,7 @@ import os
 import matplotlib.pyplot as plt
 
 folder_path = "/home/robofab/are-logs/hardware_test/"
-target_position = [0.75,0.75]
+target_position = [1,0]
 
 # for each robot_infos_ file in the given folder
 for filename in os.listdir(folder_path):
@@ -78,15 +78,7 @@ for filename in os.listdir(folder_path):
                 plt.plot( xs[i], ys[i ] , color=[proportion,0,1-proportion])
             # plt.text(xs[i][-1],ys[i][-1],"{}".format(fitnesses[i]),va="centre",ha="centre")
 
-        plt.legend(loc="upper left")
+        plt.legend(loc="upper right")
         plt.title("Robot {}".format(robot_ID))
-
-        print("fitnesses: ");print(fitnesses)
-
-        plt.figure()
-        plt.plot( [x+1 for x in range(len(fitnesses))],fitnesses,"ko")
-        plt.title("Robot {} fitnesses".format(robot_ID))
-
         plt.show()
-
 

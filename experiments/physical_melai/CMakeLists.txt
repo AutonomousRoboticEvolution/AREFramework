@@ -31,7 +31,6 @@ add_library(physical_melai SHARED
     ${VREP_SRC}
    factories.cpp
    mnipes.cpp
-   cmaes_learner.cpp
    mnipes_loggings.cpp
    ../common/exploration.cpp
    ../common/obstacleAvoidance.cpp

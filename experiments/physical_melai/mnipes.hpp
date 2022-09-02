@@ -11,7 +11,7 @@
 #include "ARE/CPPNGenome.h"
 #include "physicalER/pi_individual.hpp"
 #include "physicalER/io_helpers.hpp"
-#include "cmaes_learner.hpp"
+#include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
 #include "ARE/crossbreeding.hpp"
 #include "ARE/ProtomatrixGenome.hpp"

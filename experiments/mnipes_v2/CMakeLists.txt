@@ -26,7 +26,6 @@ add_library(M_NIPES2 SHARED
     ${VREP_SRC}
    factories.cpp
    M_NIPES.cpp 
-   cmaes_learner.cpp
    MNIPESLoggings.cpp
    ../common/obstacleAvoidance.cpp
    ../common/multiTargetMaze.cpp

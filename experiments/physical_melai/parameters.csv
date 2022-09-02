@@ -1,22 +1,22 @@
-#experimentName,string,physical_proto
+#experimentName,string,physical_corridor
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
-#repository,string,/home/leni/are-logs/
+#repository,string,/home/le_goff/are-logs/
 #seed,int,-1
 
 #simMode,bool,1
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#initPosition,sequence_double,0;0;0.12
-#targetPosition,sequence_double,0.75;0.75;0.12
+#autoMode,bool,1
+#initPosition,sequence_double,-0.625;0.025;0.20
+#targetPosition,sequence_double,0.775;0.025;0.12
 #withTiles,bool,1
 #withBeacon,bool,1
 #flatFloor,bool,1
 #maxVelocity,double,6.
-#scenes,sequence_string,shapes_exploration.ttt
+#scenes,sequence_string,corridor_ridges.ttt
 
 #startFromRandomPop,bool,0
-#populationSize,int,2
-#nbrOfOffsprings,int,2
+#populationSize,int,5
+#nbrOfOffsprings,int,5
 #tournamentSize,int,2
 
 #maxEvalTime,float,30
@@ -27,16 +27,16 @@
 
 #cameraPipe,string,tcp://127.0.0.1:5557
 #target,sequence_double,0.75;0.75;0.12
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
 #isCaster,bool,1
-#isCPPNGenome,bool,0
+#isCPPNGenome,bool,1
 #isLeg,bool,1
 
-#envType,int,1
-#nbrWaypoints,int,300
+#envType,int,0
+#nbrWaypoints,int,30
 #arenaSize,double,2.
 #loadLastLearnerState,bool,1
 #loadExistingControllers,bool,1
@@ -46,12 +46,14 @@
 #useControllerArchive,bool,1
 #maxNbrOrgans,int,8
 #NNType,int,2
-#nbrHiddenNeurons,int,8
+#nbrHiddenNeurons,int,6
 #jointControllerType,int,2
 
-#cmaesNbrEval,int,4
-#cmaesPopSize,int,2
-#CMAESStep,double,1.
+#cmaesSmallNbrEval,int,100
+#cmaesLargeNbrEval,int,100
+#cmaesPopSize,int,5
+#cmaesMaxPopSize,int,20
+#CMAESStep,double,0.01
 #FTarget,double,0.05
 #elitistRestart,bool,0
 #withRestart,bool,1
@@ -65,7 +67,7 @@
 #noveltyDecrement,double,0.05
 #MaxWeight,float,1.
 
-#isSegmentedRobot,bool,1
+#isSegmentedRobot,bool,0
 #isExportModel,bool,0
 #reloadController,bool,0
 #saveBlueprint,bool,1
