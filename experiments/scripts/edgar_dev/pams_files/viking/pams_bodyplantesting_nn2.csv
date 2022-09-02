@@ -1,21 +1,18 @@
 #experimentName,string,bodyplantesting_nn2
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting_nn2.so
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,20
-#maxEvalTime,float,30
-#numberOfGeneration,int,200
-#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs
+#expPluginName,string,/users/ebb505/scratch/vrep/lib/libbodyplantesting_nn2.so
+#extSettingsClass,bool,0
+#vrepFolder,string,/users/ebb505/scratch/vrep/
+#scenePath,string,/users/ebb505/scratch/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
+#modelsPath,string,/users/ebb505/scratch/evolutionary_robotics_framework/simulation/models/
+#populationSize,int,100
+#maxEvalTime,float,1
+#numberOfGeneration,int,50
+#repository,string,/users/ebb505/scratch/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
 #timeStep,float,0.1
 #shouldReopenConnections,bool,0
-#evaluationOrder,int,1
-#nbrRepitions,int,0
-
-#descriptor,int,0
-#useNSGA2Diversity,bool,0
 
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -38,9 +35,9 @@
 #isCaster,bool,1
 
 #isBootstrapEvolution,bool,0
-#loadExperiment,string,/home/le_goff/are-logs/
+#loadExperiment,string,/home/edgar/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
@@ -55,10 +52,11 @@
 #targetPosition,sequence_double,0.0;0.0;0.12
 #initPosition,sequence_double,0.0;0.0;0.12
 
-#seed,int,1
+#seed,int,
 #reloadController,bool,0
 #withBeacon,bool,0
 #imageRepository,string,images/
+
 
 #mutationType,int,0
 #mutateConnection,bool,1
@@ -77,8 +75,9 @@
 #rateDeleteConnection,float,0.01
 #rateChangeConnection,float,0.1
 #CPPNParametersMutationRate,float,0.1
-#rateCrossover,float,0.5
-#saveBlueprint,bool,0
+#rateCrossover,float,0.0
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1
+#descriptor,int,0
+#saveBlueprint,bool,0

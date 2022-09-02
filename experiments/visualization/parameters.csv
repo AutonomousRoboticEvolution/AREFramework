@@ -1,14 +1,14 @@
 #experimentName,string,visualization
-#expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libvisualization.so
-#scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
-#folderToLoad,string,/home/ebb505/ARE_Project/robotlibrary/morph_117
-#idToLoad,int,117
-#genToLoad,int,175
-#indToLoad,int,90
-#maxEvalTime,float,60
+#expPluginName,string,/home/edgar/vrep/lib/libvisualization.so
+#scenePath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges_real.ttt
+#folderToLoad,string,/home/edgar/robotlibrary/corridor/9_56/test
+#idToLoad,int,56
+#genToLoad,int,0
+#indToLoad,int,56
+#maxEvalTime,float,30
 #numberOfGeneration,int,1
-#populationSize,int,25
-#repository,string,/home/ebb505/ARE_Project/are-logs
+#populationSize,int,1
+#repository,string,/home/edgar/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -17,16 +17,14 @@
 #seed,int,1
 
 #noiseLevel,double,0
-#maxVelocity,double,20
+#maxVelocity,double,6
 #arenaSize,double,2.
-#target_x,double,0.85
-#target_y,double,-0.85
-#target_z,double,0.2
-#init_x,float,0
+#target_x,double,0.75
+#target_y,double,0.0
+#target_z,double,0.5
+#init_x,float,-0.6
 #init_y,float,0
 #init_z,float,0.2
-#initPosition,sequence_double,-0.6;0;0.2
-#targetPosition,sequence_double,0.95;0.0;0.15;
 #MutateWeightsSevereProb,float,0.0
 #WeightMutationRate,float,1.0
 #WeightMutationMaxPower,float,1.0
@@ -41,7 +39,7 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,1
-#emptyCtrlGenome,bool,1
+#emptyCtrlGenome,bool,0
 #loadAllMorphGenome,bool,0
 
 #isWheel,bool,1
@@ -50,18 +48,18 @@
 #isCaster,bool,1
 #isExportModel,bool,1
 #saveBlueprint,bool,1
-#modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/edgar/evolutionary_robotics_framework/simulation/models/
 #isSegmentedRobot,bool,0
 #organsVersion,int,6
 
 #reloadController,bool,1
 #isScreenshotEnable,bool,0
 #imageRepository,string,/home/leni/are-logs/mnipes_obst_tcds/200/wa/mnipes_10_5_12-5-37-7006-2433159393/images/
-#nbrWaypoints,int,2
+#nbrWaypoints,int,30
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1
 
 #descriptor,int,0
-
-
+#targetPosition,sequence_double,0.675;0.025;0.2
+#initPosition,sequence_double,-0.625;0.025;0.2
