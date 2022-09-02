@@ -94,7 +94,7 @@ void MNIPES::init_pop_from_migrants(){
         migrants.emplace(id,cppn);
     }
     if(migrants.empty()){
-        std::cerr << "Error: Cannot initialise protomatrices, the migrants folder is empty." << std::endl;
+        std::cerr << "Error: Migrants folder is empty." << std::endl;
         return;
     }
     for(auto &migrant: migrants){
