@@ -13,6 +13,11 @@ LOOP_FOREVER = True
 if LOOP_FOREVER and RECORD_VIDEO:
     raise RuntimeError("RECORD VIDEO and LOOP FOREVER are not compatible")
 
+# aruco dictionary and parameters
+from cv2 import aruco
+aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
+aruco_parameters = aruco.DetectorParameters_create()
+
 #  Prepare our context and sockets
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
@@ -62,6 +67,9 @@ while time.time() < start_time + video_length_seconds or LOOP_FOREVER:
         if PRINT_INFO: print(width*height*depth)
         image = image.reshape(width,height,depth)
         if PRINT_INFO: print("image shape is {}".format(image.shape))
+
+        (corners, ids, rejected) = aruco.detectMarkers(image, aruco_dict, parameters=aruco_parameters)
+        aruco.drawDetectedMarkers(image,corners,ids)
         cv2.imshow("cropped section", image)
 
         # socket.send_string ( "Image:full_image" )
