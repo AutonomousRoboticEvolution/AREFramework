@@ -1,4 +1,4 @@
-    #include "physicalER/update/ER_update.hpp"
+#include "physicalER/update/ER_update.hpp"
 
 using namespace are::phy::update;
 
@@ -26,10 +26,7 @@ void ER::initialize(){
 
     std::string exp_plugin_name = settings::getParameter<settings::String>(parameters,"#expPluginName").value;
 
-    std::vector<std::string> split_str;
-    misc::split_line(exp_plugin_name,".",split_str);
-
-    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(split_str[0] + ".so");
+    std::unique_ptr<dlibxx::handle> &libhandler = load_plugin(exp_plugin_name);
 
     if(!load_fct_exp_plugin<Environment::Factory>
             (environmentFactory,libhandler,"environmentFactory"))
@@ -43,9 +40,20 @@ void ER::initialize(){
     ea = EAFactory(randNum, parameters);
     ea->init();
 
+    if(!load_fct_exp_plugin<Logging::Factory>
+            (loggingFactory,libhandler,"loggingFactory"))
+        exit(1);
+    loggingFactory(logs,parameters);
+
+    libhandler->close();
+
+    if (verbose) std::cout << "ER initialized" << std::endl;
+}
+
+void ER::choice_of_robot(){
     //Load list of robot's ids to be evaluated and ask user which one want to be evaluated.
-    repository = settings::getParameter<settings::String>(parameters,"#repository").value;
-    exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
+    std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
     current_id = ioh::choice_of_robot_to_evaluate(list_ids);
     if(list_ids[0] != current_id){
@@ -58,15 +66,6 @@ void ER::initialize(){
     }
     ea->setCurrentIndIndex(current_id);
     //-
-
-    if(!load_fct_exp_plugin<Logging::Factory>
-            (loggingFactory,libhandler,"loggingFactory"))
-        exit(1);
-    loggingFactory(logs,parameters);
-
-    libhandler->close();
-
-    if (verbose) std::cout << "ER initialized" << std::endl;
 }
 
 void ER::load_data(){
@@ -111,7 +110,7 @@ bool ER::execute(){
 void ER::start_evaluation(){
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
-
+    bool sim_mode = settings::getParameter<settings::Boolean>(parameters,"#simMode").value;
 
     if(verbose) std::cout << "Starting Evaluation for robot with ID: "<<current_id<<"\n=====" << std::endl;
 
@@ -123,11 +122,13 @@ void ER::start_evaluation(){
     std::string pi_address, list_of_organs;
     ioh::load_list_of_organs(repository + "/" + exp_name,current_id,pi_address,list_of_organs);
 
+    if(sim_mode) pi_address = "localhost";
+
     //start ZMQ
     std::stringstream sstream1,sstream2;
     sstream1 << "tcp://" << pi_address << ":5556";
     sstream2 << "tcp://" << pi_address << ":5555";
-    request.connect (sstream1.str().c_str());
+    request.connect(sstream1.str().c_str());
     subscriber.connect(sstream2.str().c_str());
     subscriber.set(zmq::sockopt::subscribe, "pi ");
 
@@ -143,8 +144,10 @@ void ER::start_evaluation(){
     assert(reply == "organ_addresses_received");
 
     std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
+    std::stringstream sstr;
+    sstr << current_id << std::endl << ctrl_gen;
     std::cout << ctrl_gen << std::endl;
-    send_string(reply,ctrl_gen,request,"pi ");
+    send_string(reply,sstr.str(),request,"pi ");
     assert(reply == "starting");
 
     // starts the recording of the video feed:
@@ -181,6 +184,7 @@ bool ER::update_evaluation(){
 
 bool ER::stop_evaluation(){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool sim_mode = settings::getParameter<settings::Boolean>(parameters,"#simMode").value;
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
 
@@ -188,7 +192,8 @@ bool ER::stop_evaluation(){
     if (robot_reported_error){
         std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
     }else{
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( std::to_string(ER::current_id)); // filename of the robot ID number
+        std::string video_filename = std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation());
+        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( video_filename ); // filename of the robot ID number
     }
 
     // get any logs that the robot has gathered:
@@ -198,7 +203,6 @@ bool ER::stop_evaluation(){
         std::string message;
         receive_string_no_reply(message,subscriber,"pi ");
 
-
         // if message is "finshed_logs", then we continue
         if (message=="finished_logs"){
             getting_logs=false;
@@ -206,6 +210,27 @@ bool ER::stop_evaluation(){
             //std::cout << "got a log" << message << std::endl;
             Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
         }
+    }
+    std::vector<double> objs;
+    std::vector<waypoint> traj;
+    if(sim_mode){
+        //receive the fitness
+        std::string message;
+        receive_string_no_reply(message,subscriber,"pi ");
+//        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+        std::vector<std::string> split;
+        misc::split_line(message,";",split);
+        objs.resize(split.size());
+        for(int i = 0; i < split.size(); i++)
+            objs[i] = std::stod(split[i]);
+
+        //receive the trajectory
+        receive_string_no_reply(message,subscriber,"pi ");
+//        std::cout << "Simulation mode, fitness obtained: " << message << std::endl;
+        misc::split_line(message,"\n",split);
+        traj.resize(split.size());
+        for(int i = 0; i < split.size(); i++)
+            traj[i].from_string(split[i]); ;
     }
 
     // display the fitness:
@@ -229,20 +254,19 @@ bool ER::stop_evaluation(){
     if(ea->update(environment)){
         nbrEval = 0;
     }
+
+    if(sim_mode){
+        ea->set_objectives(objs);
+        ea->set_trajectory(traj);
+    }
+
+    ea->epoch();
+
     write_data();
     save_logs();
 
-
-    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
-    if(list_ids[0] != current_id){ //if the chosen id is not the first place, put it in first place to be the default choice.
-        int i = 0;
-        for(;i < list_ids.size(); i++)
-            if(current_id == list_ids[i])
-                break;
-        list_ids[i] = list_ids[0];
-        list_ids[0] = current_id;
-    }
-    ea->setCurrentIndIndex(current_id);
+    list_ids.clear();
+    choice_of_robot();
 
     return true;
 }

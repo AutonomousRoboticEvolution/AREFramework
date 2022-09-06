@@ -158,7 +158,8 @@ SIM_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customDa
 
         if(ER->is_finish()){
             ER->write_data();
-            exit(0);
+            simQuitSimulator(true);
+            return retVal;
         }
     }
 

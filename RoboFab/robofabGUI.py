@@ -10,7 +10,7 @@ from helperFunctions import convertTransformToPose
 from printer import Printer
 from RoboFab import RoboFab_host
 
-NUMBER_OF_PRINTERS = 3
+NUMBER_OF_PRINTERS = 2
 
 
 class RobofabGUI:
@@ -119,6 +119,15 @@ class RobofabGUI:
         self.label_ur5Status.pack()
         self.button_organBankManager.pack()
 
+        # print in terminal the available robots:
+        os.makedirs("{}/waiting_to_be_built".format(self.logDirectory), exist_ok=True)  # make folder if it doesn't already exist
+        os.makedirs("{}/waiting_to_be_evaluated".format(self.logDirectory), exist_ok=True)  # make folder if it doesn't already exist
+        print("Blueprints available:")
+        for filename in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
+            if filename.startswith("blueprint_"):
+                print(filename)
+        print("")
+
         # start GUI:
         self.mainWindow.after(1, self.timedUpdateButtons())
         tk.mainloop()
@@ -145,6 +154,7 @@ class RobofabGUI:
                 self.mainWindow.update()
                 self.robofabObject.buildRobot( printer=self.printerObjects[printer_number]) # do the assembly
                 self.label_printerStatus[printer_number]["text"] = "Assembly done\n"
+                self.saveOrganBankToFile()
                 self.mainWindow.update()
             else:
                 self.label_printerStatus[printer_number]["text"] = "Can't assemble,\nBank missing organs"
@@ -198,7 +208,7 @@ class RobofabGUI:
                 elif self.robotID_loaded[i] == self.entry_robotID[i].get():
                     #  ID already loaded
                     self.button_printerLoadFile[i]["bg"] = "green"
-                elif "morphGenome_{}".format(self.entry_robotID[i].get()) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
+                elif "morph_genome_{}".format(self.entry_robotID[i].get()) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
                     #  the new ID exists in the waiting_to_be_built folder
                     self.button_printerLoadFile[i]["bg"] = "yellow"
                 else:

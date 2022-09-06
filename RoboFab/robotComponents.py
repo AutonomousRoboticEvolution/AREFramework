@@ -281,10 +281,11 @@ class Robot:
 
     # creates a pdf that shows what organs the robot has; their layout; their i2c addresses
     def drawRobot(self,saveDirectory):
+        plt.figure()  # start new figure
         for i,organ in enumerate(self.organsList):
+            # x and y are the clip position for this organ
             x= ( organ.positionTransformWithinBankOrRobot * np.linalg.inv( organ.transformOrganOriginToClipCentre ) )[0,3]
             y= ( organ.positionTransformWithinBankOrRobot * np.linalg.inv( organ.transformOrganOriginToClipCentre ) )[1,3]
-            # print("{}: x: {}, y: {}".format( organ.friendlyName,x,y ))
 
             if not organ.friendlyName.upper().startswith("HEAD"):
                 plt.plot(x, y, "bo")

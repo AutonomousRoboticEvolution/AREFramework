@@ -47,6 +47,8 @@ public:
 
     const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
 
+    void print_info();
+
 private:
     int move_counter = 0;
     int number_of_collisions = 0;

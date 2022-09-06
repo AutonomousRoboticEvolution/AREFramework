@@ -1,5 +1,5 @@
 ## some useful functions that have utility in many places, so it makes sense to have them centrally accessible
-
+import os
 from subprocess import Popen # for reading out messages
 import math, serial
 import numpy as np
@@ -278,6 +278,17 @@ class Timer:
         for i in range(len(self.timestamps)):
             if i>0:
                 print("{} to {}:\t: {}".format(self.timestamp_names[i-1],self.timestamp_names[i],self.timestamps[i]-self.timestamps[i-1]))
+
+    def save(self, directory, ID):
+        os.makedirs("{}/logs".format(directory), exist_ok=True)  # create the folder if it doesn't already exists
+        filepath = "{}/logs/assembly_timings_{}".format(directory,ID)
+        if os.path.exists(filepath): os.remove(filepath) # delete it if it already exists to avoid errors
+        file = open(filepath, "w")
+        for i in range(len(self.timestamps)):
+            if i>0:
+                line = "{} to {}:\t: {}\n".format(self.timestamp_names[i-1],self.timestamp_names[i],self.timestamps[i]-self.timestamps[i-1])
+                file.write(line)
+        file.close()
 
     def add(self,name):
         self.timestamp_names.append(name)
