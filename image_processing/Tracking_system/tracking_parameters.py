@@ -23,8 +23,8 @@ blob_detection_parameters.minInertiaRatio = 0.01
 aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
 aruco_parameters = aruco.DetectorParameters_create()
 
-resolution_width = 1920 # set negative to leave as the default for your camera
-resolution_height = 1080 # set negative to leave as the default for your camera
+resolution_width = -1 # set negative to leave as the default for your camera
+resolution_height = -1 # set negative to leave as the default for your camera
 
 zmq_port_number= "5557"
 videos_folder_path = os.path.expanduser('~')+"/tracking_videos"
@@ -39,45 +39,20 @@ with open('location.txt') as f:
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
-    # pipe = "http://192.168.2.248/img/video.mjpeg"
-    pipe = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0" # usb webcam
-
-    show_frames = True
-
-    #mask filter parameters
-    # brainMin: (HSV1, HSV2, ..... HSVn)
-    # brainMin: (HSV1, HSV2, ..... HSVn)
-    # for each HSVn_min and HSVn_max is getting all pixel in the range between min and max
-    # then joins all `n` HSV blobs into the same image
-    brainMin = ((0,20,10) , (172,20,10)) #  blue: (13,38,18) green:(31,108,82)
-    brainMax = ((8,255,255), (255,255,255)) # blue:(33,169,83) green:(53,203,158)
-
-    #centre of uncropped arena and ratio of pixels/metre
-    pixel_scale = 287.77777777777777
-    centre_reference = (1052, 395)
-    crop_rectangle = [390, 100, 1125, 834]
-
-if location == "bristol_pi":
-    # the pipe for getting images from the camera
     pipe =0
 
     show_frames = False
 
     #mask filter parameters
-    brainMin = ((0,157,78), (0,0,0))
-    brainMax = ((26,255,224), (0,0,0))
+    brainMin = ((0,114,74), (41,109,134))
+    brainMax = ((11,224,164), (50,172,194))
 
     # overwrite default resolution:
     resolution_width = 1920 ; resolution_height = 1056
 
-    #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (int(resolution_width/2),int(resolution_height/2)) # defined in the uncropped image
-    pixel_scale = 175
-
-    #crop parameters
-    width = 640; height = 480
-    crop_rectangle = [int( (resolution_width-width)/2),int((resolution_height-height)/2),width,height]
-    #crop_rectangle = [-1]
+    pixel_scale = 380.55555555555554
+    centre_reference = (943, 574)
+    crop_rectangle = [521, 156, 845, 837]
 
 elif location == "york":
     pipe = 0

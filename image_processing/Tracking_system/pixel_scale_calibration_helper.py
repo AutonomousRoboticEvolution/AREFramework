@@ -7,7 +7,7 @@
 ## 6. run this program
 ## 7. the computed values for centre_reference, pixel_scale and crop_rectangle will be displayed, for you to copy into tracking_parameters.py
 
-camera_pipe = "tcp://127.0.0.1:5557" # address of the tracking system (zeromq)
+camera_pipe = "tcp://192.168.2.247:5557" # address of the tracking system (zeromq)
 half_size_of_tag = 100 # distance from centre of tag to corner of the arena, in millimeters
 
 import zmq
