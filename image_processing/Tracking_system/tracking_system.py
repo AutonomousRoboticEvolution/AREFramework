@@ -12,7 +12,8 @@ class TrackingSystem:
 
     def __init__(self):
         # create the video capture object, which is used to get frames from the camera
-        self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
+        # self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
+        self.vid = cv2.VideoCapture ( 0, cv2.CAP_V4L2 )
 
         # set resolution:
         if resolution_width > 0:
@@ -38,6 +39,7 @@ class TrackingSystem:
 
         # the robot and aruco_tags objects that are updated inside the threaded_updater:
         self.cropped_image = None
+        self.uncropped_image = None
         self.robot = None
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
@@ -154,14 +156,14 @@ class TrackingSystem:
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, uncropped_image = self.vid.read()
+            self.frame_return_success, self.uncropped_image = self.vid.read()
 
             timeNow = time.time()
             if show_fps: print("{} fps".format( round ( 1/(timeNow-self.last_frame_grab_time) , 2 ) ))
             self.last_frame_grab_time=timeNow
 
             if self.frame_return_success:
-                self.cropped_image = self.crop_image(uncropped_image)
+                self.cropped_image = self.crop_image(self.uncropped_image)
 
                 # compute robot location
                 self.robot = self.robot_location(self.cropped_image, brainMin, brainMax)
@@ -221,13 +223,18 @@ class TrackingSystem:
                     self.socket.send_string("Tags:[]") # empty list
 
             elif str(message) == "Image:resolution":
+                if verbose_messages: print("Resolution requested")
                 while(self.cropped_image is None): time.sleep(0.1)
-                if verbose_messages: print("Sending image resolution of {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
+                if verbose_messages: print("Cropped image resolution is {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
                 self.socket.send_string("Image:{}".format(self.cropped_image.shape))
 
             elif str(message) == "Image:image":
                 if verbose_messages: print("Got message ", message)
                 self.socket.send(self.cropped_image.tobytes())
+
+            elif str ( message ) == "Image:full_image":
+                if verbose_messages: print ( "Got message ", message )
+                self.socket.send ( cv2.resize( self.uncropped_image , (480,264) ).tobytes () )
 
             elif str(message) == "Recording:start":
                 if verbose_messages: print("starting recording")

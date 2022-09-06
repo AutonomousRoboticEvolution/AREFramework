@@ -3,7 +3,6 @@ import cv2
 from cv2 import aruco
 import os
 
-show_frames = True
 show_fps = False
 verbose_messages = True
 
@@ -36,12 +35,13 @@ recording_timeout_seconds = 60*11
 
 with open('location.txt') as f:
     location = f.read().replace("\n","")
-    print("location: {}".format(location))
 
 #location specific parameters
 if location == "bristol":
     # the pipe for getting images from the camera
     pipe = "http://192.168.2.248/img/video.mjpeg"
+
+    show_frames = True
 
     #mask filter parameters
     brainMin = ((0,157,78) , (0,0,0)) #  blue: (13,38,18) green:(31,108,82)
@@ -55,6 +55,8 @@ if location == "bristol":
 if location == "bristol_pi":
     # the pipe for getting images from the camera
     pipe =0
+
+    show_frames = False
 
     #mask filter parameters
     brainMin = ((0,157,78), (0,0,0))
@@ -76,6 +78,8 @@ elif location == "york":
     pipe = 0
     brainMin = (0,130,52)
     brainMax = (179,194,86)
+
+    show_frames = True
     
     centre_reference = (347,240) # centre of arena in pixels
     pixel_scale = 270 # mm per meter
@@ -84,6 +88,8 @@ elif location == "york":
 
 elif location == "york2":
     pipe = 0
+
+    show_frames = True
     
     headMin = (0,69,0)
     headMax = (22,255,255)
@@ -100,6 +106,8 @@ elif location == "york2":
 elif location == "napier":
     pipe = "tcpclientsrc host=192.168.0.15 port=50000 ! gdpdepay ! rtph264depay ! avdec_h264 ! videoconvert ! tee ! appsink"
 
+    show_frames = True
+
     brainMin = (169,100,165)
     brainMax = (179,255,255)
 
@@ -109,6 +117,9 @@ elif location == "napier":
     crop_rectangle = [-1]
 elif location == "amsterdam":
     pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
+
+    show_frames = True
+
     #mask filter parameters
     brainMin = (0,157,154)
     brainMax = (10,221,208)
@@ -133,3 +144,9 @@ elif location == "amsterdam":
     crop_rectangle = [-1]
     
     
+print("location: {}".format(location))
+print("pipe: {}".format(pipe))
+if show_frames:
+    print ( "Show frames is on" )
+else:
+    print ( "Show frames is off" )

@@ -3,17 +3,26 @@ import zmq
 import time
 import numpy
 
+SHOW_FULL_RESOLUTION_IMAGE_AT_START = True
 SHOW_IMAGES = True
 PRINT_INFO = False
+RECORD_VIDEO = False
+video_length_seconds=5
+LOOP_FOREVER = True
+
+if LOOP_FOREVER and RECORD_VIDEO:
+    raise RuntimeError("RECORD VIDEO and LOOP FOREVER are not compatible")
 
 #  Prepare our context and sockets
 context = zmq.Context()
 socket = context.socket(zmq.REQ)
+#socket.connect("tcp://192.168.2.100:5557")
 socket.connect("tcp://192.168.2.247:5557")
 
-socket.send_string("Recording:start")
-assert( socket.recv_string() == "OK")
-time.sleep(0.1)
+if RECORD_VIDEO:
+    socket.send_string("Recording:start")
+    assert( socket.recv_string() == "OK")
+    time.sleep(0.1)
 
 
 # get resolution:
@@ -28,9 +37,18 @@ height = int(message[1])
 depth = int(message[2])
 print("Resolution is {} x {} , {}".format(width,height, depth))
 
+if SHOW_FULL_RESOLUTION_IMAGE_AT_START:
+    if PRINT_INFO: print ( "Requesting full image..." )
+    socket.send_string ( "Image:full_image" )
+    message = socket.recv ()
+    full_image = numpy.frombuffer ( message, dtype=numpy.uint8 ) .reshape(264,480,3)
+    cv2.imshow ( "full image", full_image )
+    cv2.waitKey(1)
+
+
 start_time = time.time()
 
-while time.time() < start_time + 5:
+while time.time() < start_time + video_length_seconds or LOOP_FOREVER:
 
     if SHOW_IMAGES:
         # get image:
@@ -44,8 +62,13 @@ while time.time() < start_time + 5:
         if PRINT_INFO: print(width*height*depth)
         image = image.reshape(width,height,depth)
         if PRINT_INFO: print("image shape is {}".format(image.shape))
+        cv2.imshow("cropped section", image)
 
-        cv2.imshow("receiver", image)
+        # socket.send_string ( "Image:full_image" )
+        # message = socket.recv ()
+        # full_image = numpy.frombuffer ( message, dtype=numpy.uint8 ).reshape ( 264, 480, 3 )
+        # cv2.imshow ( "full image", full_image )
+
         cv2.waitKey(1)
 
     else:
@@ -53,10 +76,12 @@ while time.time() < start_time + 5:
         message = socket.recv()
         print(message)
 
-    time.sleep(0.1)
+    #time.sleep(0.1)
 
-filename = str( int( time.time() ) )
-print("saving {}".format(filename))
-socket.send_string("Recording:save_{}".format(filename))
-assert( socket.recv_string() == "OK")
+if RECORD_VIDEO:
+    filename = str( int( time.time() ) )
+    print("saving {}".format(filename))
+    socket.send_string("Recording:save_{}".format(filename))
+    assert( socket.recv_string() == "OK")
 print("finished")
+cv2.waitKey(0)
