@@ -26,7 +26,6 @@ def makeFile(location):
 		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
 		PRINTER_0_API_KEY = "b76fba867e5ee070caff864d953ed27b"
 		PRINTER_1_API_KEY = "change_me"
-		PRINTER_2_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=90 + 0.037 ).tolist()
 
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
@@ -45,17 +44,14 @@ def makeFile(location):
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.538-0.15 , 0.006+0.15 , 0.08507 , 0 , 0 , math.radians(-90)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformInputFormatted().tolist()
-		PRINTER_2_ORIGIN = makeTransformInputFormatted().tolist()
+		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
+		PRINTER_1_ORIGIN = makeTransformInputFormatted([-0.1013, 0.244 , 0.085 , 0 , 0 , 0]).tolist()
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
-		PRINTER_1_API_KEY = "b76fba867e5ee070caff864d953ed27b"
-		PRINTER_2_API_KEY = "change_me"
+		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
 		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
 		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
-
 
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
@@ -65,28 +61,6 @@ def makeFile(location):
 		B_closed_position = 1100
 
 
-		''' Old version 2021
-		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
-		COPPELIASIM_FOLDER = "/home/robofab/programs/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
-		SOFTWARE_PARAMETERS_FILE = "/home/robofab/programs/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
-
-		ASSEMBLY_FIXTURE_ORIGIN =  makeTransformMillimetersDegrees(x=67.8, y=-710.9, z= 70.9, rotZ=90).tolist()  #  NEEDS UPDATING
-		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=536.0, y=-83.6, z=80.5, rotZ=-90) .tolist()
-		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees() .tolist()
-		PRINTER_2_ORIGIN = makeTransformMillimetersDegrees() .tolist()
-		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
-		PRINTER_1_API_KEY = "change_me"
-		PRINTER_2_API_KEY = "change_me"
-		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees(x=-373.3, y=-197.0, z=-7.8).tolist()
-		# gripper_TCP_A = (makeTransformInputFormatted([0.19326, 0.00401, 0.14262, math.radians(45), 0, math.radians(90)])).tolist()
-		gripper_TCP_A = makeTransformMillimetersDegrees(x=-0.9, y=30.7, z=209.9, rotZ=181.94).tolist() # single gripper
-
-		# define what constitutes "open" and "closed" for the servos on the gripper:
-		A_open_position = 1800
-		A_closed_position = 1125
-		B_open_position = 2100
-		B_closed_position = 1350
-		'''
 	else:
 		raise Exception("unknown location given for making configuration file")
 
@@ -105,7 +79,6 @@ def makeFile(location):
 			"PORT_FOR_GRIPPER":54321,
 			"PRINTER0_IP_ADDRESS":"192.168.2.251",
 			"PRINTER1_IP_ADDRESS":"192.168.2.250",
-			"PRINTER2_IP_ADDRESS":"192.168.2.249"
 		},
 
 		"UR5":{
@@ -115,8 +88,8 @@ def makeFile(location):
 				"organ_bank" : [math.radians(-19.04) , math.radians(-98.38) , math.radians(66.56) , math.radians(-58.10) , math.radians(-89.90) , math.radians(70.80)] ,
 				"limb_assembly_fixture" : [math.radians(40) , math.radians(-90.61) , math.radians(84.61) , math.radians(-127.85) , math.radians(-78.71) , math.radians(78.83)] ,
 				"AF" :        [math.radians(83.7) , math.radians(-106.51) , math.radians(84.60) , math.radians(-67.99) , math.radians(-89.85) , math.radians(83.52)] ,
-				"printer" : [math.radians(-189) , math.radians(-115) , math.radians(84) , math.radians(-60) , math.radians(-90) , math.radians(81)] ,
-				# "printer" : [math.radians(-160.71) , math.radians(-117.80) , math.radians(92.97) , math.radians(-47.22) , math.radians(-131.13) , math.radians(-154.05)] ,
+				"printer_0" : [math.radians(-189) , math.radians(-115) , math.radians(84) , math.radians(-60) , math.radians(-90) , math.radians(81)] ,
+				"printer_1" : [math.radians(-90) , math.radians(-131.31) , math.radians(88.06) , math.radians(-90) , math.radians(-90) , math.radians(90)] ,
 				"cable_bank": [math.radians(-195.94), math.radians(-116.06), math.radians(100.78), math.radians(-180.28), math.radians(-74.41), math.radians(94.49-180)],
 				"cable_preparation": [math.radians(25), math.radians(-54.82), math.radians(83.03), math.radians(-118.29), math.radians(90), math.radians(-38.83+180)]
 			},
@@ -244,11 +217,6 @@ def makeFile(location):
         "BED_COOLDOWN_TEMPERATURE":35,
 		"API_KEY":PRINTER_1_API_KEY
 		},
-		"PRINTER_2":{
-		"ORIGIN":PRINTER_2_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
-		"API_KEY":PRINTER_2_API_KEY
-		},
 
 		"ORGAN_BANK_1":{
 		"ORIGIN":ORGAN_BANK_1_ORIGIN,
@@ -282,8 +250,7 @@ def makeFile(location):
 			[3, 475/1000, (106.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
 			[3, 400/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)], #jointA
 			[3, 475/1000, (216.741-0.5)/1000, 61/1000, math.radians(0), math.radians(0), math.radians(180), str(0x00)]  #jointA
-			],
-		"CABLE_CONTENTS":[] # no cables
+			]
 		}
 	}
 	filename = "configuration_" + data["location"] + ".json"

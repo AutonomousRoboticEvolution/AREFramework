@@ -60,13 +60,13 @@ void loop() {
         case 'h':
           turnOnElectromagnets();
           turnOnLED();
-          Serial.write("OK\n");
+          Serial.write("OK magnets on\n");
           break;
         // Release (r) robot
         case 'r':
           turnOffElectromagnets();
           turnOffLED();
-          Serial.write("OK\n");
+          Serial.write("OK magnets off\n");
           break;
         // Reset current position memory (m)
         case 'm':
@@ -76,16 +76,16 @@ void loop() {
         // Enable outputs (e - enable)
         case 'e':
           enableOutputs();
-          Serial.write("OK\n");
+          Serial.write("OK outputs enabled\n");
           break;
         // Disable outputs (o - off)
         case 'o':
           disableOutputs();
-          Serial.write("OK\n");
+          Serial.write("OK outputs disabled\n");
           break;
         case 'f':
           findOrigin();
-          Serial.write("OK\n");
+          Serial.write("OK trying to find origin\n");
           break;
         default:
           Serial.write("error - unrecognised input\n");
