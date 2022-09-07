@@ -12,7 +12,8 @@ class TrackingSystem:
 
     def __init__(self):
         # create the video capture object, which is used to get frames from the camera
-        self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
+        # self.vid = cv2.VideoCapture(pipe)  # pipe is set in tracking_parameters.py
+        self.vid = cv2.VideoCapture ( 0, cv2.CAP_V4L2 )
 
         # set resolution:
         if resolution_width > 0:
@@ -25,6 +26,7 @@ class TrackingSystem:
             self.save_resolution = (int(self.vid.get(cv2.CAP_PROP_FRAME_WIDTH)), int(self.vid.get(cv2.CAP_PROP_FRAME_HEIGHT)))
         else:
             self.save_resolution = ( crop_rectangle[2],crop_rectangle[3] )
+        print("resolution: {} x {}".format(self.save_resolution[0] ,self.save_resolution[1] ))
         self.output_video_writer = cv2.VideoWriter('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )
         self.is_recording = False # this boolean keeps track of whether to be saving frames or not
         self.recording_start_time=0.0
@@ -38,6 +40,7 @@ class TrackingSystem:
 
         # the robot and aruco_tags objects that are updated inside the threaded_updater:
         self.cropped_image = None
+        self.uncropped_image = None
         self.robot = None
         self.aruco_tags = []
         self.frame_return_success= False # from openCV this will be `false` if no frames has been grabbed, e.g. failure to connect to camera
@@ -99,9 +102,12 @@ class TrackingSystem:
         if show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            cv2.imshow("cropped",self.cropped_image)
-            cv2.imshow("Mask",mask)
-            cv2.imshow("Blob",kp_image)
+            # cv2.imshow("cropped",self.cropped_image)
+            # cv2.imshow("Mask",mask)
+            # cv2.imshow("Blob",kp_image)
+            factor=2
+            cv2.imshow( "image", cv2.resize( self.cropped_image , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
+            cv2.imshow( "masked", cv2.resize( cv2.bitwise_and(self.cropped_image, image, mask=mask) , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
 
         #finds biggest keypoint
         if len(keypoints) >0 :
@@ -154,14 +160,14 @@ class TrackingSystem:
         print("Tracking loop started")
         # loop for tracking system
         while (1):
-            self.frame_return_success, uncropped_image = self.vid.read()
+            self.frame_return_success, self.uncropped_image = self.vid.read()
 
             timeNow = time.time()
             if show_fps: print("{} fps".format( round ( 1/(timeNow-self.last_frame_grab_time) , 2 ) ))
             self.last_frame_grab_time=timeNow
 
             if self.frame_return_success:
-                self.cropped_image = self.crop_image(uncropped_image)
+                self.cropped_image = self.crop_image(self.uncropped_image)
 
                 # compute robot location
                 self.robot = self.robot_location(self.cropped_image, brainMin, brainMax)
@@ -221,13 +227,18 @@ class TrackingSystem:
                     self.socket.send_string("Tags:[]") # empty list
 
             elif str(message) == "Image:resolution":
+                if verbose_messages: print("Resolution requested")
                 while(self.cropped_image is None): time.sleep(0.1)
-                if verbose_messages: print("Sending image resolution of {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
+                if verbose_messages: print("Cropped image resolution is {}x{}x{}".format(self.cropped_image.shape[0], self.cropped_image.shape[1], self.cropped_image.shape[2]))
                 self.socket.send_string("Image:{}".format(self.cropped_image.shape))
 
             elif str(message) == "Image:image":
                 if verbose_messages: print("Got message ", message)
                 self.socket.send(self.cropped_image.tobytes())
+
+            elif str ( message ) == "Image:full_image":
+                if verbose_messages: print ( "Got message ", message )
+                self.socket.send ( cv2.resize( self.uncropped_image , (480,264) ).tobytes () )
 
             elif str(message) == "Recording:start":
                 if verbose_messages: print("starting recording")
@@ -253,12 +264,12 @@ class TrackingSystem:
                 self.output_video_writer.release()
                 filename = str(message) [ len("Recording:save_"):] # filename is the part of the message after "save_"
 
-                filePath = "{}/{}.avi".format( videos_folder_path , filename)
-                if os.path.exists(filePath): # need to change the filename to something unique
-                    i=0
-                    while os.path.exists(filePath):
-                        i+=1
-                        filePath = "{}/{} ({}).avi".format( videos_folder_path , filename,i)
+                # create unique filename:
+                i=1
+                filePath = "{}/{} ({}).avi".format(videos_folder_path, filename, i)
+                while os.path.exists(filePath):
+                    i+=1
+                    filePath = "{}/{} ({}).avi".format( videos_folder_path , filename,i)
                 if verbose_messages: print("saving as file {}".format(filePath))
                 os.rename("temporary_output.avi",filePath)
                 self.output_video_writer.open('temporary_output.avi', cv2.VideoWriter_fourcc(*'XVID'), recording_frame_rate, self.save_resolution )

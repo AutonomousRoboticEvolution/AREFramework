@@ -1,7 +1,7 @@
 #experimentName,string,mnipes2
 #expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libM_NIPES2.so
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #seed,int,1
@@ -12,24 +12,24 @@
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #repository,string,/home/ebb505/ARE_Project/are-logs
 
-#bootstrapFolder,string,/home/leni/are-logs/test_bootstrap_mnipes_v2
+#bootstrapFolder,string,None
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,0
 #isCPPNGenome,bool,1
 
 #fitnessFile,string,fitnesses.csv
 #genomesPoolFile,string,genomes_pool.csv
 
-#envType,int,0
+#envType,int,1
 #envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
 #scenes,sequence_string,shapes_exploration.ttt
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.75;0.75;0.12
 #targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
-#initPosition,sequence_double,0;0;0.1
+#initPosition,sequence_double,0;0;0.2
 
 #noiseLevel,double,0.
 #maxVelocity,double,10.
@@ -41,7 +41,7 @@
 #reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,10
+#populationSize,int,4
 #maxEvalTime,float,30
 #timeStep,float,0.1
 #maxNbrEval,int,20000
@@ -50,10 +50,10 @@
 
 #cmaesSmallNbrEval,int,200
 #cmaesLargeNbrEval,int,400
-#cmaesPopSize,int,10
-#cmaesMaxPopSize,int,20
+#cmaesPopSize,int,20
+#cmaesMaxPopSize,int,40
 #CMAESStep,double,1.
-#FTarget,double,0.5
+#FTarget,double,0.05
 #elitistRestart,bool,0
 #withRestart,bool,1
 #incrPop,bool,1
@@ -87,3 +87,5 @@
 #withTiles,bool,1
 #flatFloor,bool,1
 #energyReduction,bool,0
+#updateSimulatorList,bool,0
+#waitForAllInstances,bool,0

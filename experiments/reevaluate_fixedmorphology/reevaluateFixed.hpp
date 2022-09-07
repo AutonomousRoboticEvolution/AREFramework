@@ -10,7 +10,7 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "simulatedER/FixedMorphology.hpp"
 #include "ARE/Settings.h"'
-
+#include "obstacleAvoidance.hpp"
 
 namespace are {
 

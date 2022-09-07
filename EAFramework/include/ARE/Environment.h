@@ -26,6 +26,13 @@ struct waypoint{
         return sstr.str();
     }
 
+    void from_string(const std::string& wp){
+        std::stringstream sstr(wp);
+        char delim[5];
+        sstr >> position[0] >> delim[0] >> position[1] >> delim[1] >> position[2] >> delim[2]
+             >> orientation[0] >> delim[3] >> orientation[1] >> delim[4] >> orientation[2];
+    }
+
     bool is_nan(){
         return std::isnan(position[0]) || std::isnan(position[1]) || std::isnan(position[2]) ||
                 std::isnan(orientation[0]) || std::isnan(orientation[1]) || std::isnan(orientation[2]);
@@ -70,8 +77,6 @@ public:
     virtual void update_info(double time) = 0;
 
     virtual void print_info(){}
-    virtual void start_evaluation(){}
-    virtual void stop_evaluation(std::string robotID = ""){}
 
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}

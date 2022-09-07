@@ -62,22 +62,11 @@ void RealEnvironment::print_info(){
     std::cout<<std::endl;
 }
 
-void RealEnvironment::start_evaluation(){
+void RealEnvironment::start_recording(){
     // tell camera to start recording
     std::cout<<"Starting tracking recording"<<std::endl;
     std::string reply_string;
     phy::send_string(reply_string,"start",zmq_tracking_camera_requester_socket,"Recording:");
-    assert(reply_string=="OK");
-}
-
-void RealEnvironment::stop_evaluation(std::string robotID){
-    // tell camera to stop recording
-
-    std::cout<<robotID<<std::endl;
-    std::cout<<"Telling tracking to save file as "<<robotID<<std::endl;
-
-    std::string reply_string;
-    phy::send_string(reply_string,"save_"+robotID,zmq_tracking_camera_requester_socket,"Recording:");
     assert(reply_string=="OK");
 }
 
@@ -120,6 +109,24 @@ std::vector<double> RealEnvironment::fit_foraging(){
         else if(f > 1) f = 1;
 
     return d;
+}
+
+void RealEnvironment::save_tracking_video(std::string filename)
+{
+    // tell camera to stop recording
+    std::cout<<"Telling tracking to save file as "<<filename<<std::endl;
+
+    std::string reply_string;
+    phy::send_string(reply_string,"save_"+filename,zmq_tracking_camera_requester_socket,"Recording:");
+    assert(reply_string=="OK");
+}
+
+void RealEnvironment::discard_tracking_video()
+{
+    // tell camera to stop recording but discard the video
+    std::string reply_string;
+    phy::send_string(reply_string,"discard",zmq_tracking_camera_requester_socket,"Recording:");
+    assert(reply_string=="OK");
 }
 
 void RealEnvironment::update_info(double time){

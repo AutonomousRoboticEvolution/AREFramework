@@ -86,6 +86,7 @@ class UR5Robot:
     ## Low-level function to send a text string to UR5 controller
     def sendString ( self, stringToSend ):
         debugPrint("Sending string to UR5: "+stringToSend , messageVerbosity=3)
+        self.isReadyForNextCommand = False
         self.c.send ( stringToSend.encode ( 'ASCII' ) )
         time.sleep(0.01)
 
@@ -103,8 +104,6 @@ class UR5Robot:
     def waitForArmToBeReady ( self ):
         while not self.isReadyForNextCommand:  # wait for ready
             time.sleep ( 0.1 )
-            # debugPrint( "Waiting for arm to be ready..." )
-        self.isReadyForNextCommand = False
         time.sleep ( 0.1 )
 
 
@@ -214,6 +213,7 @@ class UR5Robot:
     ## returns true if the thing we were pulling (the robot) moved more than 2cm, false otherwise
     def printBedPull(self):
         startingPostition = self.getCurrentPosition()
+        self.waitForArmToBeReady()
         self.sendString("print_bed_pull")
         finishPosition = self.getCurrentPosition()
         if findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02:
@@ -233,8 +233,9 @@ class UR5Robot:
             msg = self.c.recv ( 1024 )
             debugPrint ( "Received message: " + str ( msg ) ,messageVerbosity=3)
             if msg:
-                if msg == b'UR_ready':
+                if msg == b'UR_ready' or msg.startswith(b'UR_ready'):
                     # print("UR is ready")
+                    if msg != b'UR_ready': debugPrint("WARNING possible concatenated message from UR: \"{}\"".format(msg), messageVerbosity=0)
                     self.isReadyForNextCommand = True
                     if not self.UR5isConnected:
                         self.UR5isConnected = True
@@ -509,18 +510,17 @@ class UR5Robot:
         while not has_pulled_off_bed:
             temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
             self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
-            if temperature_to_cool_to<printer.defaultBedCooldownTemperature:
-                debugPrint("Waiting 30 seconds",messageVerbosity=1)
-                time.sleep(30)
-            else:
-                debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
-                printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
+            debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
+            printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
             debugPrint("Pulling!",messageVerbosity=1)
             self.gripper.enableServos()
             if self.printBedPull():
                 has_pulled_off_bed=True
             else:
                 self.moveArm(dropoffPoint)
+                if temperature_to_cool_to <= printer.defaultBedCooldownTemperature:
+                    debugPrint("WARNING! giving up on force mode to pull from bed", messageVerbosity=0)
+                    has_pulled_off_bed = True
 
         self.setMoveSpeed(self.speedValueReallySlow)
         self.moveArm(postDropoffPointUp)

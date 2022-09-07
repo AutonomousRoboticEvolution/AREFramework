@@ -42,13 +42,13 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
-            number_of_wheels++;
+            numberOfWheels++;
             break;
 
         case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
-            number_of_sensors++;
+            numberOfSensors++;
             break;
 
         case 3: //leg - made up of two joints
@@ -66,7 +66,7 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
-            number_of_joints+=2;
+            numberOfJoints+=2;
             break;
 
         case 4: //caster
@@ -102,6 +102,10 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         ledDriver->flash(GREEN); // flash green to show ready
     }
 
+    // check the controller is giving the right number of inputs and outputs:
+    std::cout<<"Number of NN inputs: "<<controller.get_number_of_inputs()<<"\nNumber of NN outputs: "<<controller.get_number_of_outputs()<<std::endl;
+    assert(controller.get_number_of_inputs() == numberOfSensors*2 + cameraInputToNN);
+    assert(controller.get_number_of_outputs() == numberOfWheels + numberOfJoints);
 
     // set debug printing flag - this prints a representation of the inputs and outputs to terminal
     if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
@@ -150,7 +154,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
-            logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
+            logs_to_send<< thisWheel->readMeasuredCurrent() <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a wheel
@@ -166,7 +170,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
             if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
-            logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
+            logs_to_send<< float(thisJoint->readMeasuredCurrent())*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a joint
@@ -201,7 +205,7 @@ bool AREControl::testAllOrganConnections(){
         while (!has_passed and retries<10){
             has_passed = thisOrgan->testConnection();
             if (!has_passed){
-                usleep(10000 + (rand() % 1000) );
+                usleep(100 + (rand() % 50) );
                 retries++;
             }
         }
@@ -279,19 +283,24 @@ int AREControl::exec(zmq::socket_t& socket){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
 
-    // set up timing system
-    uint32_t start_time = millis();
-    uint32_t this_loop_start_time = start_time;
-
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"NN_output_"<<i<<",";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
+    logs_to_send<<"Temperature";
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
+
+    // start fan
+    Fan fan;
+    fan.turnOn();
+
+    // set up timing system
+    uint32_t start_time = millis();
+    uint32_t this_loop_start_time = start_time;
 
     // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
@@ -322,6 +331,9 @@ int AREControl::exec(zmq::socket_t& socket){
             std::cout<<"WARNING: stopping early due to organ connection failure"<<std::endl;
         }
 
+        // add temperature to log
+        logs_to_send<<batteryMonitor.measureTemperature()<<",";
+
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
         //std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
@@ -338,7 +350,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
     }
 
-    std::cout<<"time: "<<this_loop_start_time-start_time<<std::endl;
+    std::cout<<"time elapsed: "<<(this_loop_start_time-start_time)/1000.0<<" seconds"<<std::endl;
 
     // turn everything off
     for (auto thisOrgan : listOfOrgans) {
@@ -355,13 +367,19 @@ int AREControl::exec(zmq::socket_t& socket){
     }
     ledDriver->flash(BLUE);
     daughterBoards->turnOff();
+    fan.turnOff();
 
 
-    // send finished message
-    are::phy::send_string_no_reply("finish",socket,"pi ");
+    // send "finish" message or "finish_with_errors" if there was some problem that caused the evaluation to stop early
+    if(stop_early){
+        are::phy::send_string_no_reply("finish_with_errors",socket,"pi ");
+    }else{
+        are::phy::send_string_no_reply("finish",socket,"pi ");
+    }
 
 
     // send log data
+    logs_to_send<<"\n"; // add a final newline
     are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
     are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 

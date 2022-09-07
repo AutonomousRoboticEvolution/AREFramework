@@ -75,6 +75,8 @@ public:
     void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
 
+
+
 protected:
     void createMorphology() override;
     void createController() override;
@@ -97,16 +99,20 @@ public:
     AREControl(){}
     AREControl(const AREIndividual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
 
-
     int exec( zmq::socket_t& socket, float sim_time);
 
     bool is_ready(){return _is_ready;}
+    void set_ready(bool r = true){_is_ready = r;}
+    AREIndividual &access_controller(){return controller;}
+
+    void send_fitness(zmq::socket_t &socket);
+    void send_trajectory(zmq::socket_t &socket);
 
 private:
     AREIndividual controller;
     u_int32_t _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
-
+    bool _sent_finish_mess = false;
 
     bool cameraInputToNN;
 

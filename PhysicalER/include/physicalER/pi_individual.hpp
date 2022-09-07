@@ -70,6 +70,9 @@ public:
     void set_inputs(const std::vector<double>& in){inputs=in;}
     const std::vector<double>& get_ouputs(){return outputs;}
 
+    int get_number_of_inputs(){return nb_input;}
+    int get_number_of_outputs(){return nb_output;}
+
     void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
     const std::vector<waypoint>& get_trajectory(){return trajectory;}
 

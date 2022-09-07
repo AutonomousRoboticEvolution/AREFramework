@@ -3,7 +3,7 @@
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
 #populationSize,int,20
-#maxEvalTime,float,1
+#maxEvalTime,float,30
 #numberOfGeneration,int,200
 #repository,string,/media/ebb505/ARE-EBB/ARE/are-logs
 #verbose,bool,1
@@ -40,7 +40,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/le_goff/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 

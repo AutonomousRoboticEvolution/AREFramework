@@ -15,9 +15,11 @@ def makeFile(location):
 	# location specific variables:
 	if location == "BRL":
 
-		LOG_FOLDER = "/home/robofab/are-logs/hardware_test/"
+		LOG_FOLDER = "/home/robofab/are-logs/exploration/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/parameters.csv"
+
+		ROBOFAB_WEBCAM_PIPE = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
@@ -41,6 +43,8 @@ def makeFile(location):
 		LOG_FOLDER = "/home/robofab/are-logs/test_are_generate"
 		COPPELIASIM_FOLDER = "/home/robofab/vrep"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
+
+		ROBOFAB_WEBCAM_PIPE = "0"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
@@ -71,6 +75,8 @@ def makeFile(location):
 		"logDirectory":LOG_FOLDER,
 		"parametersFile":SOFTWARE_PARAMETERS_FILE,
 		"coppeliasimFolder":COPPELIASIM_FOLDER,
+
+		"RoboFabWebcamPipe":ROBOFAB_WEBCAM_PIPE,
 
 		"network":{
 			"COMPUTER_ADDRESS":"192.168.2.253", # the RoboFab PC (that runs this code)
@@ -209,12 +215,12 @@ def makeFile(location):
 
 		"PRINTER_0":{
 		"ORIGIN":PRINTER_0_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_0_API_KEY
 		},
 		"PRINTER_1":{
 		"ORIGIN":PRINTER_1_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_1_API_KEY
 		},
 
