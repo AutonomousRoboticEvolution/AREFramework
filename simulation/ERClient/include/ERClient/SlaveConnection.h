@@ -1,3 +1,6 @@
+#ifndef SLAVECONNECTION_H
+#define SLAVECONNECTION_H
+
 #include <string>
 #include <sstream>
 #include <exception>
