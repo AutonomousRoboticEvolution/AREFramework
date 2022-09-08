@@ -92,12 +92,13 @@ void VisuInd::update(double delta_time){
     bool empty_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
     if(empty_gen)
         return;
-
-    std::vector<double> inputs = morphology->update();
-
-    std::vector<double> outputs = control->update(inputs);
-
-    std::dynamic_pointer_cast<CPPNMorph>(morphology)->command(outputs);
+    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
+    if( diff < 1e-4){
+        std::vector<double> inputs = morphology->update();
+        std::vector<double> outputs = control->update(inputs);
+        morphology->command(outputs);
+    }
 }
 
 std::string VisuInd::to_string()

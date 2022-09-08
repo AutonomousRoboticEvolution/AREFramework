@@ -5,7 +5,11 @@
 #include <string>
 #include <sstream>
 #include <exception>
-
+#include <chrono>
+#include <cmath>
+#include <subprocess.hpp>
+#include <boost/filesystem.hpp>
+#include <thread>
 
 extern "C" {
 #if defined (VREP)
@@ -34,6 +38,9 @@ public:
         DOWN = -2
     };
 
+public:
+    static void set_output_file_name(int rank, std::string &output_file);
+
 private:
     std::string _address;
     int _port;
@@ -42,19 +49,27 @@ private:
     int _individualNum;
     State _state;
     int reconnection_trials = 0;
+    subprocess::Popen _process;
+    std::string _output_file;
 
 public:
     explicit SlaveConnection(const std::string& address, int port);
     SlaveConnection(const SlaveConnection &other);
     SlaveConnection(SlaveConnection &&other);
+
     virtual ~SlaveConnection();
     int timeOutReconnectAttempt = 0;
 
+    bool launch(const std::string& vrep, const std::string& parameters, const std::string &port, bool with_xvfb = false);
     bool connect(int connectionTimeoutMs = CONNECTION_TIMEOUT);
     bool connect(const std::string& address, int port, int connectionTimeoutMs = CONNECTION_TIMEOUT);
     bool status() const;
     void disconnect();
     bool reconnect();
+
+    bool kill();
+    int read_data();
+
     simxInt getIntegerSignal(const std::string& signalName) const;
     /**
      * Starts the buffer reading of `signalName`
@@ -86,6 +101,8 @@ public:
     int get_clientID(){return _clientID;}
     void incr_reconnection_trials(){reconnection_trials++;}
     int get_reconnection_trials(){return reconnection_trials;}
+    void reset_reconnection_trials(){reconnection_trials = 0;}
+    std::string &output_file(){return _output_file;}
 };
 
 class VrepRemoteException: public std::exception

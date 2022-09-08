@@ -128,9 +128,9 @@ boardSelection AREControl::findDaughterBoardForOrgan(Organ* thisOrgan){
             return RIGHT;
         } else{
             // is not on either - this is bad!
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("WARNING cannot find organ 0x%02X on either daughter board\n", thisOrgan->getI2CAddress());
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("WARNING cannot find organ 0x%02X on either daughter board\n", thisOrgan->getI2CAddress());
             thisOrgan->daughterBoardToEnable=NONE;
-            throw std::runtime_error("cannot find an organ on either daughter board");
+            //throw std::runtime_error("cannot find an organ on either daughter board");
         }
     }
 }
@@ -186,7 +186,7 @@ bool AREControl::testAllOrganConnections(){
         while (!has_passed and retries<10){
             has_passed = thisOrgan->testConnection();
             if (!has_passed){
-                usleep(100 + (rand() % 100) );
+                usleep(10000 + (rand() % 1000) );
                 retries++;
             }
         }

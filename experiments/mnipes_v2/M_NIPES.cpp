@@ -80,17 +80,24 @@ void M_NIPESIndividual::createMorphology(){
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     int i = rewards.size();
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
+//    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
     if(ctrlGenome->get_type() != "empty_genome"){
-        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
-                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
-            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-            if(verbose)
-                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
-            drop_learning = true; //set it directly to 50 to stop the learning.
-        }
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setLoadRobot();
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
+//        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
+//                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
+//            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+//            if(verbose)
+//                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
+//            drop_learning = true; //set it directly to 50 to stop the learning.
+//        }
     }
-		      
+    else{
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setDecodeRobot();
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
+    }
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
@@ -153,13 +160,17 @@ void M_NIPESIndividual::update(double delta_time){
         return;
     }
 
-    std::vector<double> inputs = morphology->update();
-    std::vector<double> outputs = control->update(inputs);
+    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
+    if( diff < 1e-4){
+        std::vector<double> inputs = morphology->update();
+        std::vector<double> outputs = control->update(inputs);
+        morphology->command(outputs);
+        energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
+        if(std::isnan(energy_cost))
+            energy_cost = 0;
+    }
 
-    morphology->command(outputs);
-    energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
-    if(std::isnan(energy_cost))
-        energy_cost = 0;
     sim_time = delta_time;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
     float position[3];
@@ -394,7 +405,7 @@ bool M_NIPES::is_finish(){
     bool fullfil_all_tasks = false;
     if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
         fullfil_all_tasks = current_gradual_scene > environments_info.size();
-    if(numberEvaluation >= max_nbr_eval || fullfil_all_tasks)
+    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks)
         return true;
     return false;
 }
@@ -493,6 +504,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
         if(!op_learner){ //learner was not found so erase this individual
             population.erase(population.begin() + corr_indexes[currentIndIndex]);
             population.shrink_to_fit();
+
             corr_indexes[currentIndIndex] = -1;
             for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
                 corr_indexes[i]--;
@@ -933,4 +945,23 @@ void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){
     for(int i = 0; i < corr_indexes.size(); i++)
         if(corr_indexes[i] >= 0)
             ind_to_eval.push_back(i);
+}
+
+std::string M_NIPES::_task_name(are::task_t task){
+    if(task == MAZE)
+        return "maze";
+    else if(task == OBSTACLES)
+        return "obstacles";
+    else if(task == MULTI_TARGETS)
+        return "multi targets";
+    else if(task == EXPLORATION)
+        return "exploration";
+    else if(task == BARREL)
+        return "barrel";
+    else if(task == GRADUAL)
+        return "gradual";
+    else{
+        std::cerr << "Error: task unknow" << std::endl;
+        return "None";
+    }
 }

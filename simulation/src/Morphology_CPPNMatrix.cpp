@@ -321,6 +321,7 @@ void Morphology_CPPNMatrix::create()
             }
         }
     }
+//    usleep(1000000);
     if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value)
         retrieve_matrices_from_cppn();
     // Get info from body plan for body plan descriptors or logging.
@@ -336,7 +337,7 @@ void Morphology_CPPNMatrix::create()
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = 0; /// \todo EB: We might need to remove this or change it!
+        int loadInd = morph_id;; /// \todo EB: We might need to remove this or change it!
         exportRobotModel(loadInd);
     }
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
@@ -346,9 +347,32 @@ void Morphology_CPPNMatrix::create()
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
 
+void Morphology_CPPNMatrix::load(){
+    std::stringstream morph_filepath;
+    morph_filepath << Logging::log_folder << "/model_" << morph_id << ".ttm";
+    std::cout <<  morph_filepath.str() << std::endl;
+    int handle = simLoadModel(morph_filepath.str().c_str());
+
+    if(handle == -1)
+    {
+        std::cerr << "unable to load robot model" << std::endl;
+        simChar* lastError = simGetLastError();
+        std::cerr << "simGetLastError : " << lastError << std::endl;
+        simReleaseBuffer(lastError);
+        exit(1);
+    }
+
+    mainHandle = handle;
+    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
+}
+
 void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 {
-    create();
+    if(isRobotModel)
+        load();
+    else
+        create();
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose){
         float mass;
@@ -547,7 +571,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     simSetObjectProperty(mainHandle,sim_objectproperty_selectmodelbaseinstead);
 
     std::stringstream filepath;
-    filepath << Logging::log_folder << "/model" << indNum << ".ttm";
+    filepath << Logging::log_folder << "/model_" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;
@@ -654,6 +678,9 @@ void Morphology_CPPNMatrix::retrieve_matrices_from_cppn()
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 nn2_cppn.step(input);
                 output = nn2_cppn.outf();
+                for(auto& o: output)
+                    if(std::isnan(o))
+                        o = 0;
 
 //                matrix_4d.at(0).push_back(output.at(0));
                 matrix_4d.at(0).push_back(output.at(0));
@@ -681,6 +708,10 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
         } else {
             nn2_cppn.step(input);
             output = nn2_cppn.outf();
+            for(auto& o: output)
+                if(std::isnan(o))
+                    o = 0;
+
         }
     } else{
         int pos_x = input.at(0) + 5;

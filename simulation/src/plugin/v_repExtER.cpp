@@ -206,6 +206,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
         clientMessageHandler(message);
     }
     param.reset();
+    return NULL;
 }
 
 void localMessageHandler(int message){

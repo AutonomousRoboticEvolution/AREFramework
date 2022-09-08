@@ -56,7 +56,7 @@ public:
         return std::make_shared<AREIndividual>(*this);
     }
 
-    void update(double delta_time) override;
+    void update(double sim_time) override;
 
     std::string to_string();
     void from_string(const std::string&);

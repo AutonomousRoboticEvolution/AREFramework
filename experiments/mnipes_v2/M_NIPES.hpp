@@ -317,6 +317,8 @@ private:
     int current_gradual_scene = 0;
     int nbr_eval_current_task = 0;
     std::vector<sim::GradualEnvironment::env_t> environments_info;
+
+    std::string _task_name(are::task_t task);
 };
 
 
