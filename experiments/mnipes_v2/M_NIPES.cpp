@@ -162,7 +162,7 @@ void M_NIPESIndividual::update(double delta_time){
 
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
     double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
-    if( diff < 1e-4){
+    if( diff < 0.1){
         std::vector<double> inputs = morphology->update();
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);

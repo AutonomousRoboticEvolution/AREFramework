@@ -68,7 +68,7 @@ void NN2Individual::createMorphology(){
 void NN2Individual::update(double delta_time){
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
     double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
-    if( diff < 1e-4){
+    if( diff < 0.1){
         std::vector<double> inputs = morphology->update();
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);
