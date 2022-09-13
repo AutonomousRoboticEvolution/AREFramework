@@ -30,6 +30,7 @@ add_library(NIPES SHARED
     NIPES.cpp
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
+    ../common/exploration.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
