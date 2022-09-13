@@ -39,6 +39,7 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
     initialized = true;
 }
 
+
 void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
     int idx = _cma_strat->get_population().size();
     IPOPCMAStrategy::individual_t ind;
@@ -173,7 +174,6 @@ bool CMAESLearner::step(){
     _nbr_eval++;
     if(_cma_strat->get_population().size() < _population.size())
         return false;
-    _generation++;
 
 //    if(is_learning_finish())
 //        return true;
