@@ -63,7 +63,6 @@ public:
     std::pair<std::vector<double>,std::vector<double>> update_ctrl(Control::Ptr&);
 
     void set_randNum(const misc::RandNum::Ptr& rn){_rand_num = rn;}
-    int get_nbr_eval(){return _nbr_eval;}
 
     template<class archive>
     void serialize(archive &arch, const unsigned int v)

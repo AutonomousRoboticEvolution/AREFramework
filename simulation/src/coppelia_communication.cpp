@@ -136,6 +136,11 @@ void sim::readCamera(const int camera_handle, std::vector<double> &sensorValues)
         }
     }
     simReleaseBuffer((simChar*)handles);
+    if(big_corner_handles.size() < 1 || big_corner_handles.size() < 1){
+        sensorValues.push_back(0);
+        return;
+    }
+
     float pos[3];
     int big_result= -1;
     int small_result= -1;

@@ -13,6 +13,7 @@
 #include "SensorOrgan.hpp"
 #include "BatteryMonitor.hpp"
 #include "DaughterBoards.hpp"
+#include "Fan.hpp"
 #include "LedDriver.hpp"
 #include "Camera.hpp"
 #include <zmq.hpp>
@@ -51,9 +52,9 @@ private:
     bool debugLEDsOnPi=false; // Don't change here, set by defining #debugLEDsOnPi,bool,1 in the paramters file. Determines whether to show input/output values as Head LEDs.
 
     std::ostringstream logs_to_send;
-    int number_of_sensors=0;
-    int number_of_wheels=0;
-    int number_of_joints=0;
+    int numberOfSensors=0;
+    int numberOfWheels=0;
+    int numberOfJoints=0;
 
     // private functions:
 

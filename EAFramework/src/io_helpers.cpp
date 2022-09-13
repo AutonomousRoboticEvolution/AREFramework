@@ -117,7 +117,8 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
         else if (std::stoi(line.substr(0,line.find(","))) == 2)
             sensors++;
         else if (std::stoi(line.substr(0,line.find(","))) == 3)
-            joints++;
+            // NOTE "3" is a leg in the blueprint, comprising two joints
+            joints+=2;
     }
 
 }
@@ -193,19 +194,20 @@ void ioh::add_morph_genome_to_gp(const std::string &folder, int id, const MorphG
     origin << folder << "/waiting_to_be_evaluated/morph_genome_" << id;
     dest << folder << "/genomes_pool/morph_genome_" << id;
     if(!move_file(origin.str(),dest.str()))
-        return;
+        std::cerr << "unable to move morph_genome_" << id << std::endl;
+
 
     std::stringstream ctrl_ori,ctrl_dest;
     ctrl_ori << folder << "/waiting_to_be_evaluated/ctrl_genome_" << id;
-    ctrl_dest << folder << "/genomes_pool/ctrl_genome_" << id;
+    ctrl_dest << folder << "/genomes_pool/ctrl_genome_" << id << "_init";
     if(!move_file(ctrl_ori.str(),ctrl_dest.str()))
-        return;
+        std::cerr << "unable to move ctrl_genome_" << id << std::endl;
 
     std::stringstream loo_ori,loo_dest;
     loo_ori << folder << "/waiting_to_be_evaluated/list_of_organs_" << id << ".csv";
-    loo_dest << folder << "/logs/list_of_organs_" << id << ".csv";
+    loo_dest << folder << "/genomes_pool/list_of_organs_" << id << ".csv";
     if(!move_file(loo_ori.str(),loo_dest.str()))
-        return;
+        std::cerr << "unable to move list_of_organs_" << id << ".csv" << std::endl;
 
 
     //update morph genomes info

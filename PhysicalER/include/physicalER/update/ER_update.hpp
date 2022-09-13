@@ -52,6 +52,8 @@ public:
 
     void initialize();
 
+    void choice_of_robot();
+
     bool execute();
 
     void load_data();
@@ -70,6 +72,8 @@ public:
     void set_randNum(const misc::RandNum::Ptr &rn){randNum = rn;}
     const EA::Ptr &get_ea(){return ea;}
     const Individual::Ptr &get_currentInd(){return currentInd;}
+    void init_env(){environment->init();}
+    const Environment::Ptr &get_environment(){return environment;}
 
 private:
     ///pointer to settting of EA
@@ -88,8 +92,9 @@ private:
     int current_id = 0;
     int nbrEval = 0;
 
-    bool isEnvInit = false;
     bool verbose=false;
+
+    bool robot_reported_error = false;
 
     ///used to create the environment
     std::function<Environment::Factory> environmentFactory;

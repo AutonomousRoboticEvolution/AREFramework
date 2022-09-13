@@ -19,7 +19,7 @@ add_library(bodyplantesting_protomatrix SHARED
     factories.cpp
     ManLog.cpp
     ../common/ProtomatrixGenome.cpp
-    ../common/protromatrix_utils.cpp
+    ../common/protomatrix_utils.cpp
         )
 target_include_directories(bodyplantesting_protomatrix PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

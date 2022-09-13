@@ -43,6 +43,7 @@ int main(int argc, char** argv) {
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply,"pi ");
         std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
+        str_ctrl.erase(0, str_ctrl.find("\n") + 1);
 	    ctrl_gen->from_string(str_ctrl);
         phy::NN2Individual ind(empy_gen,ctrl_gen);
         ind.set_parameters(parameters);
