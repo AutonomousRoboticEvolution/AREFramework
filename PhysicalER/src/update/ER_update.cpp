@@ -134,10 +134,13 @@ void ER::start_evaluation(){
 
     if(sim_mode) pi_address = "localhost";
 
+
+    int port = settings::getParameter<settings::Integer>(parameters,"#ZMQPort").value;
+
     //start ZMQ
     std::stringstream sstream1,sstream2;
-    sstream1 << "tcp://" << pi_address << ":5556";
-    sstream2 << "tcp://" << pi_address << ":5555";
+    sstream1 << "tcp://" << pi_address << ":" << port + 1;
+    sstream2 << "tcp://" << pi_address << ":" << port;
     request.connect(sstream1.str().c_str());
     subscriber.connect(sstream2.str().c_str());
     subscriber.set(zmq::sockopt::subscribe, "pi ");

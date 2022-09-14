@@ -78,13 +78,13 @@ void ER::startOfSimulation(int slaveIndex){
         std::cout << "Starting Simulation" << std::endl;
 
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
-    if(eval_order == EvalOrder::FIFO){
+    if(eval_order == EvalOrder::FILO){
         //First in Last out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
         currentIndexVec[slaveIndex] = indToEval.back();
-        indToEval.erase(indToEval.begin()+indToEval.size());
+        indToEval.erase(indToEval.begin()+indToEval.size()-1);
     }
-    else if(eval_order == EvalOrder::FILO){
+    else if(eval_order == EvalOrder::FIFO){
         //First in First out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
         currentIndexVec[slaveIndex] = indToEval.front();
@@ -368,9 +368,9 @@ void ER::updateSimulatorList(){
     for(size_t i = 0; i < currentIndVec.size(); i++){
         if(serverInstances[i]->state() == SlaveConnection::DOWN)
             continue;
-        currentIndVec[i] = std::move(newCurrentIndVec.back());
-        currentIndexVec[i] = newCurrentIndexVec.back();
-        newCurrentIndexVec.pop_back();
-        newCurrentIndVec.pop_back();
+        currentIndVec[i] = std::move(newCurrentIndVec.front());
+	        currentIndexVec[i] = newCurrentIndexVec.front();
+		        newCurrentIndexVec.erase(newCurrentIndexVec.begin());
+			        newCurrentIndVec.erase(newCurrentIndVec.begin());
     }
 }

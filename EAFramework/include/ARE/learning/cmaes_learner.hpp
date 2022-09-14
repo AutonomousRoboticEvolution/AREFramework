@@ -56,6 +56,7 @@ public:
 
     void init(double ftarget, std::vector<double> initial_point = std::vector<double>());
 
+
     bool step();
 
     void update(Control::Ptr &) override{}

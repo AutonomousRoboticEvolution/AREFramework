@@ -124,9 +124,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
 
+    int port = are_sett::getParameter<are_sett::Integer>(parameters,"#ZMQPort").value;
+    
     //*/  Prepare our context and socket
-    publisher.bind ("tcp://*:5555");
-    reply.bind ("tcp://*:5556");
+    std::stringstream sstr1, sstr2;
+    sstr1 << "tcp://*:" << port;
+    sstr2 << "tcp://*:" << port + 1;
+    publisher.bind (sstr1.str());
+    reply.bind (sstr2.str());
     /**/
 
     return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
