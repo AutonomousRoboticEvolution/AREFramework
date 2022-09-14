@@ -19,28 +19,28 @@ Eigen::VectorXd NIPESIndividual::descriptor()
 
 std::string NIPESIndividual::to_string()
 {
-	    std::stringstream sstream;
-	        boost::archive::text_oarchive oarch(sstream);
-		    oarch.register_type<NIPESIndividual>();
-		        oarch.register_type<NNParamGenome>();
-			    oarch << *this;
-			        return sstream.str();
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<NIPESIndividual>();
+    oarch.register_type<NNParamGenome>();
+    oarch << *this;
+    return sstream.str();
 }
 
 void NIPESIndividual::from_string(const std::string &str){
-	    std::stringstream sstream;
-	        sstream << str;
-		    boost::archive::text_iarchive iarch(sstream);
-		        iarch.register_type<NIPESIndividual>();
-			    iarch.register_type<NNParamGenome>();
-			        iarch >> *this;
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<NIPESIndividual>();
+    iarch.register_type<NNParamGenome>();
+    iarch >> *this;
 
-				    //set the parameters and randNum of the genome because their are not included in the serialisation
-				        ctrlGenome->set_parameters(parameters);
-				            ctrlGenome->set_randNum(randNum);
-				                morphGenome->set_parameters(parameters);
-				                    morphGenome->set_randNum(randNum);
-				                    }
+    //set the parameters and randNum of the genome because their are not included in the serialisation
+    ctrlGenome->set_parameters(parameters);
+    ctrlGenome->set_randNum(randNum);
+    morphGenome->set_parameters(parameters);
+    morphGenome->set_randNum(randNum);
+}
 
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
@@ -256,7 +256,7 @@ bool NIPES::update(const Environment::Ptr & env){
         std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
         if(env->get_name() == "obstacle_avoidance"){
-		std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
 
 	}
