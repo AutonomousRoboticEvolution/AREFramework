@@ -26,18 +26,15 @@ add_library(M_NIPES2 SHARED
     ${VREP_SRC}
    factories.cpp
    M_NIPES.cpp 
-   cmaes_learner.cpp
    MNIPESLoggings.cpp
    ../common/obstacleAvoidance.cpp
    ../common/multiTargetMaze.cpp
    ../common/barrelTask.cpp
-  ../common/exploration.cpp
-  ../common/gradual_env.cpp
+   ../common/exploration.cpp
+   ../common/gradual_env.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES2 ARE simulatedER cmaes tbb)
-
-
 
 install(TARGETS M_NIPES2 DESTINATION lib)
 install(DIRECTORY . DESTINATION include/mnipes_v2 FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

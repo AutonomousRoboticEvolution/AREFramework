@@ -12,11 +12,12 @@
 #include "physicalER/pi_communication.hpp"
 
 /// an unique pointer to ER_VREP class
+
 are::phy::update::ER::Ptr ERVREP;
 zmq::context_t context (1);
 zmq::socket_t publisher (context, ZMQ_PUB);
 zmq::socket_t reply (context, ZMQ_REP);
-are::sim::AREControl are_ctrl;
+are::sim::AREControl::Ptr are_ctrl;
 bool sim_started = false;
 
 #ifdef _WIN32

@@ -105,6 +105,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 //    // Construct classes
     ERVREP = std::make_unique<are::phy::update::ER>();   // The class used to handle the EA
+    are_ctrl = std::make_unique<are::sim::AREControl>();
 
     if(verbose){
         std::cout << "Parameters Loaded" << std::endl;
@@ -123,9 +124,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
 
+    int port = are_sett::getParameter<are_sett::Integer>(parameters,"#ZMQPort").value;
+    
     //*/  Prepare our context and socket
-    publisher.bind ("tcp://*:5555");
-    reply.bind ("tcp://*:5556");
+    std::stringstream sstr1, sstr2;
+    sstr1 << "tcp://*:" << port;
+    sstr2 << "tcp://*:" << port + 1;
+    publisher.bind (sstr1.str());
+    reply.bind (sstr2.str());
     /**/
 
     return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
@@ -173,8 +179,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     {
 
         float sim_time = simGetSimulationTime();
-        std::dynamic_pointer_cast<are::sim::VirtualEnvironment>(ERVREP->get_environment())->updateEnv(sim_time,std::dynamic_pointer_cast<are::sim::Morphology>(are_ctrl.access_controller().get_morphology()));
-        if(are_ctrl.exec(publisher,sim_time) == 0)
+        std::dynamic_pointer_cast<are::sim::VirtualEnvironment>(ERVREP->get_environment())->updateEnv(sim_time,std::dynamic_pointer_cast<are::sim::Morphology>(are_ctrl->access_controller().get_morphology()));
+        if(are_ctrl->exec(publisher,sim_time) == 0)
             simStopSimulation();
         return NULL;
     }
@@ -182,16 +188,16 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     else if (message == sim_message_eventcallback_simulationended)
     {
         std::cout<<"finished running the controller"<<std::endl;
-        are_ctrl.set_ready(false);
+        are_ctrl->set_ready(false);
         are::Individual::Ptr ind;
-        are_ctrl.access_controller().setObjectives(ERVREP->get_environment()->fitnessFunction(ind));
-        are_ctrl.access_controller().set_trajectory(ERVREP->get_environment()->get_trajectory());
+        are_ctrl->access_controller().setObjectives(ERVREP->get_environment()->fitnessFunction(ind));
+        are_ctrl->access_controller().set_trajectory(ERVREP->get_environment()->get_trajectory());
         std::cout << "fitness obtained ";
-        for(const auto &obj: are_ctrl.access_controller().getObjectives())
+        for(const auto &obj: are_ctrl->access_controller().getObjectives())
             std::cout << obj << ";";
         std::cout << std::endl;
-        are_ctrl.send_fitness(publisher);
-        are_ctrl.send_trajectory(publisher);
+        are_ctrl->send_fitness(publisher);
+        are_ctrl->send_trajectory(publisher);
         simInt length;
         simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
         if(log_folder != nullptr){
@@ -203,7 +209,10 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
         return NULL;
     }
 
-    if(!are_ctrl.is_ready()){
+    if(!are_ctrl->is_ready()){
+
+        bool is_cppn = are_sett::getParameter<are_sett::Boolean>(ERVREP->get_parameters(),"#isCPPNGenome").value;
+
         simStartSimulation();
 
         std::string str_ctrl, str_organs_list, str_param;
@@ -216,8 +225,11 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
         //receive organ addresses list
         phy::receive_string(str_organs_list,"organ_addresses_received",reply,"pi ");
         std::cout<<"Organs list received: \n"<<str_organs_list<<std::endl;
-        
-        are::NN2CPPNGenome::Ptr morph_gen(new are::NN2CPPNGenome(ERVREP->get_randNum(),parameters));
+        are::Genome::Ptr morph_gen;
+        if(is_cppn)
+            morph_gen = std::make_shared<are::NN2CPPNGenome>(ERVREP->get_randNum(),parameters);
+        else
+            morph_gen = std::make_shared<are::ProtomatrixGenome>(ERVREP->get_randNum(),parameters);
         are::NNParamGenome::Ptr ctrl_gen(new are::NNParamGenome(ERVREP->get_randNum(),parameters));
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply,"pi ");
@@ -244,7 +256,8 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
     
         // run controller
         std::cout<<"init controller"<<std::endl;
-        are_ctrl = sim::AREControl(ind, str_organs_list, parameters);
+        are_ctrl.reset();
+        are_ctrl = std::make_unique<sim::AREControl>(ind, str_organs_list, parameters);
     }
 
     return NULL;

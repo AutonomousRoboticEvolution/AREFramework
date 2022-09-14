@@ -28,7 +28,7 @@ public:
     {}
     virtual ~Morphology()
     {
-        parameters.reset();
+	    parameters.reset();
         randomNum.reset();
     }
 

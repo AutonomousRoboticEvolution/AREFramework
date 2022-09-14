@@ -1,4 +1,3 @@
-#pragma once
 #ifndef SLAVECONNECTION_H
 #define SLAVECONNECTION_H
 

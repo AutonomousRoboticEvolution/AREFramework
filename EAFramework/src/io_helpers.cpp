@@ -19,6 +19,17 @@ bool ioh::move_file(const std::string &origin, const std::string &dest){
     return true;
 }
 
+bool ioh::copy_file(const std::string &origin, const std::string &dest){
+    try{
+        fs::copy_file(origin,dest);
+    }catch(const fs::filesystem_error &e){
+        std::cerr << "Error while trying to copy " << origin << " to " << dest << std::endl << e.what() << std::endl;
+        return false;
+    }
+    return true;
+}
+
+
 void ioh::load_morph_genomes_info(const std::string &folder, MorphGenomeInfoMap &morph_gen_info){
     std::string genome_info_file(folder + std::string("/genomes_pool/morph_genomes_info.csv"));
     std::ifstream ifs(genome_info_file);
@@ -125,6 +136,7 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
 
 int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
 {
+
     std::cout << "Robots available for evaluation: " << std::endl;
     std::function<void(void)> print_ids = [&](){
         for(const int &id: ids){
@@ -137,7 +149,7 @@ int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
     int chosen_id;
     while(!good){
         good = true;
-        std::cout << "Please enter the id of the robot to evaluate. (default : " << ids.front() << ")" << std::endl;
+        std::cout << "Please enter the id of the robot ready to be evaluated. (default : " << ids.front() << ")" << std::endl;
         std::string entry;
         std::getline(std::cin,entry);
         if(entry.empty()){
@@ -164,6 +176,7 @@ int ioh::choice_of_robot_to_evaluate(const std::vector<int> &ids)
             std::cerr << "The robot corresponding to the chosen id is not available for evaluation" << std::endl;
             print_ids();
         }
+
     }
 
     return chosen_id;

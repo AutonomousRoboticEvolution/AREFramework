@@ -4,11 +4,21 @@ using namespace are;
 
 void PMEIndividual::createMorphology(){
     morphology.reset(new sim::Morphology_CPPNMatrix(parameters));
-    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    if(morphGenome->get_type() == "nn2_cppn_genome"){
+        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    }
+    else if(morphGenome->get_type() == "protomatrix_genome"){
+        std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_matrix_4d(m4d);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(0,0,0.12);
+        std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+        std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    }
+
 
     listOrganTypes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganTypes();
     listOrganPos = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosList();
@@ -34,12 +44,10 @@ void MNIPES::init_random_pop(){
         //create a new morph genome with random structure and parameters
         Genome::Ptr morph_genome;
         if(is_cppn)
-            morph_genome.reset(new NN2CPPNGenome);
+            morph_genome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
         else
-            morph_genome.reset(new ProtomatrixGenome);
+            morph_genome = std::make_shared<ProtomatrixGenome>(randomNum,parameters);
         morph_genome->random();
-        morph_genome->set_parameters(parameters);
-        morph_genome->set_randNum(randomNum);
         morph_genome->set_id(misc::generate_unique_id(4));
         //Add it to the population with an empty ctrl genome to be submitted to manufacturability test.
         EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
@@ -50,9 +58,84 @@ void MNIPES::init_random_pop(){
     }
 }
 
+void MNIPES::init_pop_from_migrants(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    bool is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
+
+    if(!boost::filesystem::exists(Logging::log_folder + "/migrants")){
+        std::cerr << "Error: Cannot initialise protomatrices, the migrants folder does not exist." << std::endl;
+        return;
+    }
+    std::map<int,nn2_cppn_t> migrants;
+    //ioh::load_morph_genomes<NN2CPPNGenome>(Logging::log_folder + "/migrants/",{-1},migrants);
+    std::string filepath, filename;
+    std::vector<std::string> split_str;
+    for(const auto &dirit : fs::directory_iterator(fs::path(Logging::log_folder + "/migrants/"))){
+        filepath = dirit.path().string();
+        misc::split_line(filepath,"/",split_str);
+        filename = split_str.back();
+        misc::split_line(filename,"_",split_str);
+        if(split_str[0] != "morph")
+            continue;
+        if(split_str[1] != "genome")
+            continue;
+
+        split_str.clear();
+        misc::split_line(filename,"_",split_str);
+        int id = std::stoi(split_str.back());
+        std::ifstream mifstr(filepath);
+        if(!mifstr){
+            std::cerr << "Unable to open file " << filepath << std::endl;
+            return;
+        }
+        boost::archive::text_iarchive iarch(mifstr);
+        nn2_cppn_t cppn;
+        iarch >> cppn;
+        migrants.emplace(id,cppn);
+    }
+    if(migrants.empty()){
+        std::cerr << "Error: Migrants folder is empty." << std::endl;
+        return;
+    }
+    for(auto &migrant: migrants){
+        if(population.size() >= pop_size)
+            break;
+        Genome::Ptr morph_genome;
+        if(is_cppn){
+            morph_genome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genome)->set_cppn(migrant.second);
+        }else{
+            migrant.second.init();
+            std::vector<std::vector<double>> matrix;
+            protomatrix::retrieve_matrices_from_cppn(migrant.second,matrix);
+            morph_genome = std::make_shared<ProtomatrixGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genome)->set_matrix_4d(matrix);
+        }
+        morph_genome->set_id(misc::generate_unique_id(4));
+        EmptyGenome::Ptr ctrl_genome(new EmptyGenome);
+        PMEIndividual::Ptr ind(new PMEIndividual(morph_genome,ctrl_genome));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+        //If it exists, copy initial controller in waiting_to_be_evaluated
+        std::stringstream sstr,dest;
+        sstr << Logging::log_folder << "/migrants/ctrl_genome_" <<  migrant.first;
+        if(boost::filesystem::exists(sstr.str())){
+            dest << Logging::log_folder << "/waiting_to_be_evaluated/ctrl_genome_" <<  morph_genome->id();
+            ioh::copy_file(sstr.str(),dest.str());
+        }
+    }
+
+}
+
 void MNIPES::init_next_pop(){
-    if(morph_genomes_info.empty())
-        init_random_pop();
+    bool random_pop = settings::getParameter<settings::Boolean>(parameters,"#startFromRandomPop").value;
+    if(morph_genomes_info.empty()){
+        if(boost::filesystem::exists(Logging::log_folder + "/migrants") && !random_pop)
+            init_pop_from_migrants();
+        else
+            init_random_pop();
+    }
     else
         _reproduction();
 }
@@ -66,6 +149,12 @@ bool MNIPES::update(const Environment::Ptr &env){
     final_position = env->get_final_position();
     trajectory = env->get_trajectory();
 
+    std::vector<int> learner_to_delete;
+    for(const auto &learner: learners)
+        if(learner.second.is_learning_finish())
+            learner_to_delete.push_back(learner.first);
+    for(const int& id: learner_to_delete)
+        learners.erase(id);
     return true;
 }
 
@@ -83,6 +172,7 @@ void MNIPES::epoch(){
     numberEvaluation++;
     learner.update_pop_info(objectives,desc);
     learner.step();
+    std::cout << "Number of evaluations: " << learner.nbr_eval() << std::endl;
 
     if(learner.is_learning_finish()){//learning is finished for this body plan
         if(verbose)
@@ -134,7 +224,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
 
     std::vector<int> tmp;
     int current_gen = max_gen;
-    while(list_ids.size() == pop_size){
+    while(list_ids.size() < pop_size){
         //retrieve all the morph ids of the last gen i.e. youngest
         auto range = map_per_gen.equal_range(current_gen);
         for(auto it = range.first; it != range.second; it++)
@@ -144,6 +234,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
         if(tmp.size() < pop_size - list_ids.size()){
             list_ids.insert(list_ids.end(),tmp.begin(),tmp.end());
             current_gen--;
+            tmp.clear();
         }
         else if(tmp.size() > pop_size - list_ids.size()){
 
@@ -153,7 +244,7 @@ void MNIPES::_survival(const ioh::MorphGenomeInfoMap &morph_gen_info, std::vecto
             for(size_t i = 0; i < tmp.size(); i++)
                 idxes.push_back(i);
 
-            for(size_t i = 0; i < pop_size; i++){
+            for(size_t i = list_ids.size(); i < pop_size; i++){
                 int n = randomNum->randInt(0,idxes.size()-1);
                 res.push_back(tmp[idxes[n]]);
                 idxes.erase(idxes.begin() + n);
@@ -200,7 +291,7 @@ void MNIPES::_reproduction(){
             double best_fitness = 0;
             int best_id = 0;
             for(const int &i: ri){
-                double fit = settings::cast<settings::Double>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
+                double fit = settings::cast<settings::Float>(morph_genomes_info[genome_ids[i]]["fitness"])->value;
                 if(best_fitness < fit){
                     best_fitness = fit;
                     best_id = genome_ids[i];
@@ -209,7 +300,7 @@ void MNIPES::_reproduction(){
             return best_id;
     };
 
-    int genome_type = settings::getParameter<settings::Integer>(parameters,"#genomeType").value;
+    int is_cppn = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
 
     for(int i = 0; i < nbr_of_offsprings; i++){
         Genome::Ptr new_morph_gene;
@@ -233,15 +324,16 @@ void MNIPES::_reproduction(){
 //            nn2_cppn_t parent = morph_genomes[best_id].get_cppn();
 //            nn2_cppn_t new_cppn;
 //            rl_parent.crossover(parent,new_cppn);
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->crossover(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]),new_morph_gene);
             else{
-                auto matrix = protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn());
+                std::vector<std::vector<double>> matrix;
+                protomatrix::retrieve_matrices_from_cppn(std::dynamic_pointer_cast<NN2CPPNGenome>(robot_lib_genomes[rl_id])->get_cppn(),matrix);
                 auto child_matrix = protomatrix::crossover_matrix(matrix,std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id])->get_matrix_4d());
                 std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->set_matrix_4d(child_matrix);
             }
            // new_morph_gene.mutate(); //mutate?
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
@@ -251,11 +343,11 @@ void MNIPES::_reproduction(){
         else{//without crossbreeding
             std::vector<int> random_indexes = random_selection(genome_ids,tournament_size);
             int best_id = best_of_subset(random_indexes);
-            if(genome_type == CPPN)
+            if(is_cppn)
                 new_morph_gene.reset(new NN2CPPNGenome(*(std::dynamic_pointer_cast<NN2CPPNGenome>(morph_genomes[best_id]).get())));
             else new_morph_gene.reset(new ProtomatrixGenome(*(std::dynamic_pointer_cast<ProtomatrixGenome>(morph_genomes[best_id]).get())));
             new_morph_gene->mutate();
-            if(genome_type == CPPN)
+            if(is_cppn)
                 std::dynamic_pointer_cast<NN2CPPNGenome>(new_morph_gene)->incr_generation();
             else std::dynamic_pointer_cast<ProtomatrixGenome>(new_morph_gene)->incr_generation();
             new_morph_gene->set_parameters(parameters);
@@ -281,7 +373,8 @@ void MNIPES::init_learner(int id){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     bool load_existing_ctrls = settings::getParameter<settings::Boolean>(parameters,"#loadExistingControllers").value;
     bool useArucoAsInput = settings::getParameter<settings::Boolean>(parameters,"#useArucoAsInput").value;
-    std::string learner_file = settings::getParameter<settings::String>(parameters,"#learnerToLoad").value;
+    bool load_last_learner_state = settings::getParameter<settings::Boolean>(parameters,"#loadLastLearnerState").value;
+    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
 
     int wheels, joints, sensors;
@@ -309,28 +402,34 @@ void MNIPES::init_learner(int id){
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
 
+
     //Load an existing learner
-    if(learner_file != "None" && boost::filesystem::exists(Logging::log_folder + "/" + learner_file)){
-        learner.init();
+    std::string learner_file = "None";
+    if(load_last_learner_state)
+        learner_file = get_last_learner_state(id);
+
+    if(learner_file != "None"){
+        learner.init(ftarget);
         learner.from_file(Logging::log_folder + "/" + learner_file);
+        std::cout << "Starting from state: " << learner_file << std::endl;
         std::cout << learner.print_info() << std::endl;
     }
     else{
         if(!load_existing_ctrls && !use_ctrl_arch)
-            learner.init();
+            learner.init(ftarget);
         else{
             NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
             if(load_existing_ctrls)// load existing controllers
                 ioh::load_controller_genome(repository + "/" + exp_name,currentIndIndex,ctrl_gen);
-            else if(use_ctrl_arch)// load from controller archive
+            if(use_ctrl_arch && ctrl_gen->get_weights().empty())// load from controller archive
                 ctrl_gen = ctrl_archive.archive[wheels][joints][sensors].first;
-            else learner.init();
 
             if(ctrl_gen->get_weights().empty() && ctrl_gen->get_biases().empty())
-                learner.init();
-            else learner.init(ctrl_gen->get_full_genome());
+                learner.init(ftarget);
+            else learner.init(ftarget,ctrl_gen->get_full_genome());
         }
     }
+
 
     learners.emplace(id,learner);
 }
@@ -339,6 +438,11 @@ const Genome::Ptr MNIPES::get_next_controller_genome(int id){
     population.clear();
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
+
+    if(learners.find(id) == learners.end())
+    	    init_learner(id);
+
+    learners[id].print_info();
 
     //** Create Controller to send to robot
     NN2Control<elman_t>::Ptr ctrl(new NN2Control<elman_t>);
@@ -374,6 +478,8 @@ void MNIPES::load_data_for_generate(){
     if(morph_gen_info.empty())
         return;
 
+    morph_genomes_info = morph_gen_info;
+
     std::vector<int> list_to_load;
     _survival(morph_gen_info,list_to_load);
 
@@ -384,8 +490,8 @@ void MNIPES::load_data_for_generate(){
 
     bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
     if(is_cppn_genome)
-        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder,list_to_load,morph_genomes);
-    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder,list_to_load,morph_genomes);
+        ioh::load_morph_genomes<NN2CPPNGenome>(exp_folder + "/genomes_pool/",list_to_load,morph_genomes);
+    else ioh::load_morph_genomes<ProtomatrixGenome>(exp_folder + "/genomes_pool/",list_to_load,morph_genomes);
 
 }
 
@@ -414,7 +520,6 @@ void MNIPES::load_data_for_update() {
 
 void MNIPES::write_data_for_update(){
     bool is_cppn_genome = settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value;
-
     //Go through the list of learners and fill the GP with the one for whom learning is finished
     for(const auto &learner: learners){
         if(!learner.second.is_learning_finish())
@@ -438,10 +543,32 @@ void MNIPES::write_data_for_update(){
 
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }
+
 }
 
-void MNIPES::write_morph_descriptors(){
-    for(const auto& ind : population){
+//void MNIPES::write_morph_descriptors(){
+//    for(const auto& ind : population){
+
+//    }
+//}
+
+std::string MNIPES::get_last_learner_state(int id){
+    std::map<int,std::string> learner_files;
+    for(const auto &dirit : fs::directory_iterator(fs::path(Logging::log_folder))){
+        std::vector<std::string> split;
+        misc::split_line(dirit.path().string(),"/",split);
+        std::string filename = split.back();
+        misc::split_line(filename,"_",split);
+        if(split[0] != "learner")
+            continue;
+        if(std::stoi(split[1]) == id)
+            learner_files.emplace(std::stoi(split.back()),filename);
 
     }
+    if(learner_files.empty())
+        return "None";
+    int i = 1;
+    while(learner_files.find(i) != learner_files.end())
+        i++;
+    return learner_files[i-1];
 }
