@@ -46,7 +46,7 @@ public:
 
     std::vector<double> update(const std::vector<double> &sensorValues){
         double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
-        float evalTime = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+        float evalTime = settings::getParameter<settings::Float>(parameters,"#ctrlUpdateFrequency").value;
         boost::mt19937 rng(randomNum->getSeed());
         std::vector<double> inputs = sensorValues;
         if(noiselvl > 0.0){
