@@ -213,6 +213,10 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
     int pop_size = _cma_strat->get_parameters().lambda();
 
     dMat new_samples = _cma_strat->ask();
@@ -235,6 +239,10 @@ void NIPES::init_next_pop(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
+        ctrl_gen->set_nbr_output(nb_output);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
