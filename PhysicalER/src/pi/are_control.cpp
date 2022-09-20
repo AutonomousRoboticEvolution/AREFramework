@@ -154,7 +154,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
-            logs_to_send<< thisWheel->readMeasuredCurrent() <<","; //add measured current to log
+            logs_to_send<< std::to_string(thisWheel->readMeasuredCurrent()) <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a wheel
@@ -170,7 +170,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
             if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
-            logs_to_send<< float(thisJoint->readMeasuredCurrent())*10 << ","; //add measured current to log
+            logs_to_send<< std::to_string(float(thisJoint->readMeasuredCurrent())*10) << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a joint
@@ -191,7 +191,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
 
     // add NN outputs to log:
     for(i=0;i<values.size();i++){
-        logs_to_send<< values[i] <<","; //add NN output to log
+        logs_to_send<< std::to_string(values[i]) <<","; //add NN output to log
     }
 //    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
@@ -263,7 +263,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
 
     // append input values to log data:
     for(int i=0;i<sensor_vals.size();i++){
-        logs_to_send<< sensor_vals[i] <<","; //add NN input to log
+        logs_to_send<< std::to_string(sensor_vals[i]) <<","; //add NN input to log
     }
 }
 
@@ -305,7 +305,7 @@ int AREControl::exec(zmq::socket_t& socket){
     // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
         // start a new line of log file, and add current time
-        logs_to_send<<"\n"<<this_loop_start_time-start_time<<",";
+        logs_to_send<<"\n"<<std::to_string(this_loop_start_time-start_time)<<",";
 
         // get sensor readings
         retrieveSensorValues(sensor_values);
@@ -380,6 +380,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // send log data
     logs_to_send<<"\n"; // add a final newline
+    //std::cout<<"LOG:\n"<<logs_to_send.str()<<std::endl;
     are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
     are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 
