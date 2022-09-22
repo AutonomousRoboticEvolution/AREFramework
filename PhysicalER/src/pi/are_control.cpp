@@ -285,7 +285,8 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
