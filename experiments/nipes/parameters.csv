@@ -3,7 +3,7 @@
 #envType,int,3
 #scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges_real.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#robotPath,string,/home/le_goff/git/robotlibrary/exploration/0_177/model_177.ttm
+#robotPath,string,/home/le_goff/git/robotlibrary/exploration/1_191/model_191.ttm
 #modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
 #repository,string,/home/le_goff/are-logs/
 
@@ -13,16 +13,18 @@
 #shouldReopenConnections,bool,0
 #evaluationOrder,int,0
 #waitForAllInstances,bool,1
-#startFromExistingLearner,bool,0
+#learnerFile,string,None
+#bootstrapControllerFile,string,/home/leni/are-logs/nipes_pretraining/exploration/191/nipes_14_8_14-57-56-6050-3172684440/ctrlGenome_43_69
 
 #timeStep,float,0.02
 #ctrlUpdateFrequency,double,0.1
-#populationSize,int,10
+#populationSize,int,5
 #maxEvalTime,float,60
-#maxNbrEval,int,10000
+#maxNbrEval,int,100
 #numberOfGeneration,int,2
 
-#noiseLevel,double,0.
+#inputNoiseLevel,double,0.1
+#outputNoiseLevel,double,0.01
 #maxVelocity,double,6
 
 #fitnessFile,string,fitnesses.csv
@@ -46,17 +48,17 @@
 #MaxWeight,float,1.0
 
 #NNType,int,2
-#NbrInputNeurones,int,1
-#NbrOutputNeurones,int,7
+#NbrInputNeurones,int,9
+#NbrOutputNeurones,int,2
 #NbrHiddenNeurones,int,6
 #jointSubs,sequence_int,-1;-1;-1;0;1;2
 
 #UseInternalBias,bool,1
-#CMAESStep,double,1.
+#CMAESStep,double,0.1
 #FTarget,double,0.05
 #elitistRestart,bool,0
-#withRestart,bool,1
-#incrPop,bool,1
+#withRestart,bool,0
+#incrPop,bool,0
 #lengthOfStagnation,int,20
 #kValue,int,15
 #noveltyThreshold,double,0.9

@@ -8,6 +8,7 @@
 #include <boost/random.hpp>
 #include <boost/random/normal_distribution.hpp>
 
+#include "ARE/misc/RandNum.h"
 #include "nn2/mlp.hpp"
 #include "nn2/elman.hpp"
 #include "nn2/rnn.hpp"
@@ -45,23 +46,22 @@ public:
     }
 
     std::vector<double> update(const std::vector<double> &sensorValues){
-        double noiselvl = settings::getParameter<settings::Double>(parameters,"#noiseLevel").value;
+        double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
+        double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
         float evalTime = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-        boost::mt19937 rng(randomNum->getSeed());
+
         std::vector<double> inputs = sensorValues;
-        if(noiselvl > 0.0){
+        if(input_noise_lvl > 0.0){
             for(double &sv : inputs){
-                boost::normal_distribution<> normal(sv,noiselvl);
-                sv = normal(rng);
+                sv = randomNum->normalDist(sv,input_noise_lvl);
             }
         }
         nn.step(inputs,evalTime);
         std::vector<double> output = nn.outf();
 
-        if(noiselvl > 0.0){
+        if(output_noise_lvl > 0.0){
             for(double &o : output){
-                boost::normal_distribution<> normal(o,noiselvl);
-                o = normal(rng);
+                o = randomNum->normalDist(o,output_noise_lvl);;
             }
         }
 

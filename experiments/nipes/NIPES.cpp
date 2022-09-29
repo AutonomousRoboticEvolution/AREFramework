@@ -80,9 +80,13 @@ void NIPES::init(){
         return;
     }
 
-
-    std::vector<double> initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
-
+    std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
+    std::vector<double> initial_point;
+    if(bootstrapCtrl != "None"){
+        NNParamGenome ctrl_gen;
+        ctrl_gen.from_file(bootstrapCtrl);
+        initial_point = ctrl_gen.get_full_genome();
+    }else initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
 
     double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
     for(int i = 0; i < nbr_weights+nbr_bias; i++){
@@ -104,11 +108,12 @@ void NIPES::init(){
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
 
-    bool start_from_learner = settings::getParameter<settings::Boolean>(parameters,"#startFromExistingLearner").value;
-    if(start_from_learner){
-        std::string filename = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
-        _cma_strat->from_file(filename);
-        pop_size =  _cma_strat->get_parameters().lambda();
+    if(bootstrapCtrl == "None"){
+        std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
+        if(learnerfile != "None"){
+            _cma_strat->from_file(learnerfile);
+            pop_size =  _cma_strat->get_parameters().lambda();
+        }
     }
 
     dMat init_samples = _cma_strat->ask();
@@ -126,6 +131,10 @@ void NIPES::init(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
+        ctrl_gen->set_nbr_output(nb_output);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);

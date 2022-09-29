@@ -1,12 +1,13 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
 #scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#folderToLoad,string,/home/le_goff/are-logs/nipes_pretraining/exploration/177/nipes_13_8_17-25-52-2915-2631521776/
+#scenes,sequence_string,ARE_arena.ttt
+#folderToLoad,string,/home/le_goff/are-logs/nipes_pretraining/exploration/191/nipes_14_8_14-57-56-6050-3172684440/
 #modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
-#robotPath,string,/home/le_goff/git/robotlibrary/exploration/0_177/model_177.ttm
+#robotPath,string,/home/le_goff/git/robotlibrary/exploration/1_191/model_191.ttm
 #idToLoad,int,-1
-#genToLoad,int,49
-#indToLoad,int,0
+#genToLoad,int,43
+#indToLoad,int,69
 #maxEvalTime,float,60
 #numberOfGeneration,int,1
 #populationSize,int,1
@@ -19,7 +20,9 @@
 #shouldReopenConnections,bool,0
 #seed,int,1
 
-#noiseLevel,double,0
+#envType,int,3
+#inputNoiseLevel,double,0.1
+#outputNoiseLevel,double,0.01
 #maxVelocity,double,6.
 #arenaSize,double,2.
 #initPosition,sequence_double,0;0;0.2
