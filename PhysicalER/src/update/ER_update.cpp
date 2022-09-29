@@ -126,7 +126,7 @@ void ER::start_evaluation(){
 
     eval_t1 = std::chrono::steady_clock::now();
 
-    environment->init();
+    if(!sim_mode) { environment->init(); }
 
     // get the pi's IP address and the list of organs from the list_of_organs file
     std::string pi_address, list_of_organs;
@@ -164,7 +164,7 @@ void ER::start_evaluation(){
     assert(reply == "starting");
 
     // starts the recording of the video feed:
-    std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording();
+    if(!sim_mode) { std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording(); }
 }
 
 bool ER::update_evaluation(){
@@ -201,12 +201,13 @@ bool ER::stop_evaluation(){
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
 
-    // stop the recording, discarding the video if there was error(s):
-    if (robot_reported_error){
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
-    }else{
-        std::string video_filename = std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation());
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( video_filename ); // filename of the robot ID number
+    if(!sim_mode) { // stop the recording, discarding the video if there was error(s):
+        if (robot_reported_error){
+            std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
+        }else{
+            std::string video_filename = std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation());
+            std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( video_filename ); // filename of the robot ID number
+        }
     }
 
     // get any logs that the robot has gathered:
