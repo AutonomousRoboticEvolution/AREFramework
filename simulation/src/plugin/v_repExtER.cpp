@@ -276,7 +276,7 @@ void clientMessageHandler(int message){
     if(log_folder != nullptr){
         are::Logging::log_folder = std::string(log_folder);
         are::Logging::log_folder.resize(length);
-    }
+    }else std::cerr << "ARE Warning: log folder not retrieved from client" << std::endl;
 
     if(message == sim_message_eventcallback_modelloaded)
         return;

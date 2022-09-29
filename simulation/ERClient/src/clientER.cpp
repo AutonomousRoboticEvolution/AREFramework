@@ -12,7 +12,7 @@ int ER::init(int nbrOfInst, int port){
             // new_slave->setState(SlaveConnection::State::FREE);
            // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
           //  new_slave->setIntegerSignal("clientState",IDLE);
-            new_slave->setStringSignal("log_folder",Logging::log_folder),
+            new_slave->setStringSignal("log_folder",Logging::log_folder);
             serverInstances.push_back(std::move(new_slave));
 
         } else {
@@ -174,6 +174,8 @@ bool ER::updateSimulation()
     if(ea->get_population().size() > 0){
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
+            serverInstances[slaveIdx]->setStringSignal("log_folder",Logging::log_folder);
+
             if(serverInstances[slaveIdx]->state() == SlaveConnection::DOWN)
                 continue;
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
@@ -322,8 +324,6 @@ bool ER::confirmConnections()
 }
 
 void ER::updateSimulatorList(){
-
-
     std::vector<std::unique_ptr<SlaveConnection>> newServInst;
     std::vector<Individual::Ptr> newCurrentIndVec;
     std::vector<int> newCurrentIndexVec;
