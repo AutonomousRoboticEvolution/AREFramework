@@ -57,17 +57,20 @@ class Printer:
 
         debugPrint("Printing for {} finished".format(filename), messageVerbosity=0)
 
-
-    ## run the openSCAD script on the individual specified by ID_number.
-    ## assumes the existence of the following files:
-    ## ./meshes_no_clips/mesh[ID_number].stl
-    ## ./blueprints/blueprint[ID_number].csv
-    def createSTL( self, ID_number: str, manualVersion=False ):
-        debugPrint("Creating an STL file for individual {}".format(ID_number))
-        blueprintFilename = "blueprint_" + ID_number + ".csv"
-        debugPrint("using blueprint: {}{}".format(self.blueprintsDirectory, blueprintFilename),messageVerbosity=2)
-        debugPrint("and mesh file: {}mesh_{}.stl".format(self.meshesNoClipsDirectory, ID_number),messageVerbosity=2)
-        with open("{}{}".format(self.blueprintsDirectory, blueprintFilename), "r") as blueprintFile:
+    def createSTL(self, ID_number: str, manualVersion: bool = False) -> None:
+        """
+        run the openSCAD script on the individual specified by ID_number.
+        assumes the existence of the following files:
+        ./meshes_no_clips/mesh[ID_number].stl
+        ./blueprints/blueprint[ID_number].csv
+        :param ID_number: robot ID
+        :param manualVersion: TODO
+        """
+        debugPrint(f"Creating an STL file for individual {ID_number}")
+        blueprintFilename = f"blueprint_{ID_number}.csv"
+        debugPrint(f"using blueprint: {self.blueprintsDirectory}{blueprintFilename}", messageVerbosity=2)
+        debugPrint(f"and mesh file: {self.meshesNoClipsDirectory}mesh_{ID_number}.stl", messageVerbosity=2)
+        with open(f"{self.blueprintsDirectory}{blueprintFilename}", "r") as blueprintFile:
             blueprint_string = blueprintFile.read()
             blueprintFile.close()
 
@@ -79,43 +82,43 @@ class Printer:
         debugPrint("Organs:" + blueprint_string, messageVerbosity=2)
 
         # copy the mesh (with no clips) into the openSCAD directory as inputMesh.stl (a temporary file)
-        shutil.copyfile("{}mesh_{}.stl".format(self.meshesNoClipsDirectory, ID_number),
-                        "{}inputMesh.stl".format(self.openSCADDirectory))
+        shutil.copyfile(f"{self.meshesNoClipsDirectory}mesh_{ID_number}.stl",
+                        f"{self.openSCADDirectory}inputMesh.stl")
 
         # make a new (temporary) openscad file, with the blueprint data at the start:
-        with open("{}temporaryScript.scad".format(self.openSCADDirectory), "w") as temporaryFile:
+        with open(f"{self.openSCADDirectory}temporaryScript.scad", "w") as temporaryFile:
             temporaryFile.write(blueprint_string)
             if manualVersion:
                 temporaryFile.write(
-                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileNameManualVersion), "r").read())
+                    open(f"{self.openSCADDirectory}{self.openSCADScriptFileNameManualVersion}", "r").read())
             else:
                 temporaryFile.write(
-                    open("{}{}".format(self.openSCADDirectory, self.openSCADScriptFileName), "r").read())
+                    open(f"{self.openSCADDirectory}{self.openSCADScriptFileName}", "r").read())
             temporaryFile.close()
 
         # run the OpenSCAD terminal command
         terminalCommand = "openscad temporaryScript.scad -o outputMesh.stl"
-        debugPrint("Running OpenSCAD command: {}".format(terminalCommand), messageVerbosity=1)
+        debugPrint(f"Running OpenSCAD command: {terminalCommand}", messageVerbosity=1)
         debugPrint("This might take a while...", messageVerbosity=1)
         completed = subprocess.run(terminalCommand, cwd=self.openSCADDirectory, shell=True)
         if completed.returncode != 0:
-            raise RuntimeError("OpenSCAD terminal command failed\n{}".format(terminalCommand))
+            raise RuntimeError(f"OpenSCAD terminal command failed\n{terminalCommand}")
 
         # copy the resulting mesh (with clips) into the meshes folder
-        if os.path.isfile("{}mesh_{}.stl".format(self.meshesDirectory, ID_number)):
-            debugPrint("WARNING: mesh file mesh_{}.stl already exists, will be overwritten".format(ID_number))
+        if os.path.isfile(f"{self.meshesDirectory}mesh_{ID_number}.stl"):
+            debugPrint(f"WARNING: mesh file mesh_{ID_number}.stl already exists, will be overwritten")
         shutil.move(self.openSCADDirectory + "outputMesh.stl",
-                    "{}mesh_{}.stl".format(self.meshesDirectory, ID_number))
-
+                    f"{self.meshesDirectory}mesh_{ID_number}.stl")
+        print(f'Generated mesh file "{self.meshesDirectory}mesh_{ID_number}.stl"')
 
         # tidy up by removing temporary files
         if TIDY_UP_FILES:
-            for filename in ["{}temporaryScript.scad".format(self.openSCADDirectory),
-                             "{}inputMesh.stl".format(self.openSCADDirectory)]:
+            for filename in [f"{self.openSCADDirectory}temporaryScript.scad",
+                             f"{self.openSCADDirectory}inputMesh.stl"]:
                 if os.path.isfile(filename):
                     os.remove(filename)
 
-        debugPrint("STL created for mesh{}".format(ID_number), messageVerbosity=0)
+        debugPrint(f"STL created for mesh{ID_number}", messageVerbosity=0)
 
     # returns a string representing the current "state" of OctoPrint, e.g.:
     # "Operational"
