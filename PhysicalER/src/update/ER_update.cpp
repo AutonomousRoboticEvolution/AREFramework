@@ -212,6 +212,7 @@ bool ER::stop_evaluation(){
 
     // get any logs that the robot has gathered:
     bool getting_logs=true;
+    std::string log_to_save = "\n" + std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation()) ;
     while(getting_logs){
         // get message:
         std::string message;
@@ -222,7 +223,8 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
+            log_to_save += "\n" + message;
+            //Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
         }
     }
     std::vector<double> objs;
@@ -281,6 +283,7 @@ bool ER::stop_evaluation(){
 
     write_data();
     save_logs();
+    if(!auto_mode) Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , log_to_save );
 
     list_ids.clear();
     choice_of_robot();

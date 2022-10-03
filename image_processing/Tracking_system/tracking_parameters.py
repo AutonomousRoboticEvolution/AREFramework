@@ -44,8 +44,8 @@ if location == "bristol":
     show_frames = False
 
     #mask filter parameters
-    brainMin = ((0,114,74), (41,109,134))
-    brainMax = ((11,224,164), (50,172,194))
+    brainMin = ((0,100,0), (0,0,0,))
+    brainMax = ((14,255,255), (0,0,0))
 
     # overwrite default resolution:
     resolution_width = 1920 ; resolution_height = 1056

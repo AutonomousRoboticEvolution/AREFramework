@@ -266,7 +266,7 @@ class TrackingSystem:
 
                 # create unique filename:
                 i=1
-                filePath = "{}/{} ({}).avi".format(videos_folder_path, filename, i)
+                filePath = "{}/{}.avi".format(videos_folder_path, filename)
                 while os.path.exists(filePath):
                     i+=1
                     filePath = "{}/{} ({}).avi".format( videos_folder_path , filename,i)
