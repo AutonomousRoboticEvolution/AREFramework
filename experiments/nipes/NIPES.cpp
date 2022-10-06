@@ -304,10 +304,8 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration")
         return false;
 
-    float tPos[3];
-    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
-    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
-    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+    float t_pos[3] = {target[0],target[1],target[2]};
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
@@ -321,7 +319,7 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+    double dist = distance(pos,t_pos)/sqrt(2*arenaSize*arenaSize);
 
     if(dist < fTarget){
         std::cout << "STOP !" << std::endl;
