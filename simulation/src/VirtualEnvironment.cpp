@@ -17,8 +17,11 @@ void VirtualEnvironment::init() {
     sceneLoader();
     maxTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    bool real_time = settings::getParameter<settings::Boolean>(parameters,"#realTimeSim").value;
     // Sets time step
-    simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
+    if(!real_time)
+        simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
+    simSetBoolParameter(sim_boolparam_realtime_simulation,real_time);
 }
 
 
