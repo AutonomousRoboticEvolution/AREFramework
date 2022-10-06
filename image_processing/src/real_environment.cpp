@@ -11,7 +11,7 @@ RealEnvironment::RealEnvironment():
     beacon_position.resize(2);
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#target",new settings::Sequence<double>({0.,0.,0.12}));
-
+    settings::defaults::parameters->emplace("#initPosition",new settings::Sequence<double>({0.,0.,0.12}));
 }
 
 void RealEnvironment::init(){
@@ -28,6 +28,7 @@ void RealEnvironment::init(){
     grid_zone = Eigen::MatrixXi::Zero(grid_zone_size,grid_zone_size);
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#target").value;
+    initial_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     // reset frames counters
     number_of_frames_where_robot_was_seen = 0;
@@ -43,6 +44,8 @@ std::vector<double> RealEnvironment::fitnessFunction(const Individual::Ptr &ind)
     else if(env_type == 1)
         return fit_exploration();
     else if(env_type == 2)
+        return fit_exploration2();
+    else if(env_type == 3)
         return fit_foraging();
 
     std::cerr << "Unknown type of environment type : " << env_type << std::endl;
@@ -79,7 +82,16 @@ std::vector<double> RealEnvironment::fit_targeted_locomotion(){
 std::vector<double> RealEnvironment::fit_exploration(){
     return {static_cast<double>(grid_zone.sum())/64.f};
 }
-
+std::vector<double> RealEnvironment::fit_exploration2(){
+    auto max_fitness = [](int max,std::pair<int,int> init)->int{
+        int sum = 0;
+        for(int i = 0; i < max; i++)
+            for(int j = 0; j < max; j++)
+                sum += floor(sqrt((i - init.first)*(i - init.first) + (j - init.second)*(j - init.second)));
+        return sum;
+    };
+    return {static_cast<double>(grid_zone.sum())/static_cast<double>(max_fitness(8,real_coordinate_to_matrix_index(initial_position)))};
+}
 std::vector<double> RealEnvironment::fit_foraging(){
     double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
     double max_dist = sqrt(2*arena_size*arena_size);
@@ -156,10 +168,19 @@ void RealEnvironment::update_info(double time){
             }
         }
     }
+    int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
 
     // (for exploration task) compute which grid zone the robot is in:
     std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
-    grid_zone(indexes.first,indexes.second) = 1;
+    if(env_type == 2){
+        auto L2 = [](std::pair<int,int> p1, std::pair<int,int> p2)-> int {
+            return floor(sqrt((p1.first - p2.first)*(p1.first - p2.first) + (p1.second - p2.second)*(p1.second - p2.second)));
+        };
+        std::pair<int,int> init_indexes = real_coordinate_to_matrix_index(initial_position);
+        std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
+        grid_zone(indexes.first,indexes.second) = L2(init_indexes,indexes);
+    }
+    else grid_zone(indexes.first,indexes.second) = 1;
 
     // adding waypoint to the trajectory
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;

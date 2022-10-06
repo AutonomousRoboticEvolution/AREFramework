@@ -24,6 +24,7 @@ public:
 
     std::vector<double> fit_targeted_locomotion();
     std::vector<double> fit_exploration();
+    std::vector<double> fit_exploration2();
     std::vector<double> fit_foraging();
 
     // some infomation about how successful the tracking was
@@ -32,6 +33,7 @@ public:
     int number_of_frames_where_barrel_was_seen=0;
 
 private:
+    std::vector<double> initial_position;
     std::vector<double> current_position;
     std::vector<double> target_position;
     std::vector<double> beacon_position;
