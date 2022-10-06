@@ -27,7 +27,6 @@ Exploration::Exploration(const settings::ParametersMapPtr& params)
 }
 
 void Exploration::init(){
-    VirtualEnvironment::init();
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
@@ -35,6 +34,13 @@ void Exploration::init(){
         std::cerr << "unable to load the scene : " << scenes_path[current_scene] << std::endl;
         exit(1);
     }
+
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    bool real_time = settings::getParameter<settings::Boolean>(parameters,"#realTimeSim").value;
+    // Sets time step
+    if(!real_time)
+        simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
+    simSetBoolParameter(sim_boolparam_realtime_simulation,real_time);
 
     if(verbose){
         int i = 0;
