@@ -34,6 +34,7 @@ GradualEnvironment::GradualEnvironment(const settings::ParametersMapPtr& params)
 }
 
 void GradualEnvironment::init(){
+    VirtualEnvironment::init();
 
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;

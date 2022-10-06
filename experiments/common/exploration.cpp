@@ -27,6 +27,8 @@ Exploration::Exploration(const settings::ParametersMapPtr& params)
 }
 
 void Exploration::init(){
+    VirtualEnvironment::init();
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(simLoadScene(scenes_path[current_scene].c_str()) < 0){
