@@ -66,8 +66,7 @@ public:
     void setPosition(float,float,float);
 
     //GETTERS
-    std::vector<int> get_jointHandles(){return jointHandles;}
-    std::vector<int> get_wheelHandles(){return wheelHandles;}
+
     double get_energy_cost(){return energy_cost;}
     const NEAT::Substrate &get_substrate(){return substrate;}
 

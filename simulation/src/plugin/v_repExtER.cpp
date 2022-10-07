@@ -271,12 +271,14 @@ void localMessageHandler(int message){
 
 void clientMessageHandler(int message){
 
-    simInt length;
-    simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
-    if(log_folder != nullptr){
-        are::Logging::log_folder = std::string(log_folder);
-        are::Logging::log_folder.resize(length);
-    }else std::cerr << "ARE Warning: log folder not retrieved from client" << std::endl;
+    if(are::Logging::log_folder.empty()){
+        simInt length;
+        simChar* log_folder = simGetStringSignal((simChar*) "log_folder", &length);
+        if(log_folder != nullptr){
+            are::Logging::log_folder = std::string(log_folder);
+            are::Logging::log_folder.resize(length);
+        }else std::cerr << "ARE Warning: log folder not retrieved from client" << std::endl;
+    }
 
     if(message == sim_message_eventcallback_modelloaded)
         return;
