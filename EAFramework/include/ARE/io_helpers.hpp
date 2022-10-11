@@ -33,6 +33,14 @@ typedef std::map<int,settings::ParametersMap> MorphGenomeInfoMap;
 bool move_file(const std::string& origin, const std::string& dest);
 
 /**
+ * @brief copy_file
+ * @param origin
+ * @param dest
+ * @return
+ */
+bool copy_file(const std::string& origin, const std::string& dest);
+
+/**
  * @brief load the information of all the morpholigical genomes from
  * @param folder
  * @param morph_gen_info
@@ -51,18 +59,23 @@ void load_morph_genomes(const std::string &folder,
                         const std::vector<int> &list_to_load, std::map<int,are::Genome::Ptr>& genomes){
 
     std::string filepath, filename;
-    std::list<std::string> split_str;
+    std::vector<std::string> split_str;
     for(const auto &dirit : fs::directory_iterator(fs::path(folder))){
         filepath = dirit.path().string();
         misc::split_line(filepath,"/",split_str);
         filename = split_str.back();
-        if(filename.substr(0,filename.find("_")) != "morph")
+        misc::split_line(filename,"_",split_str);
+        if(split_str[0] != "morph")
+            continue;
+        if(split_str[1] != "genome")
             continue;
 
         split_str.clear();
         misc::split_line(filename,"_",split_str);
         int id = std::stoi(split_str.back());
         bool load = [&]() -> bool{
+            if(list_to_load[0] == -1)
+                return true;
             for(const int& i : list_to_load)
                 if(id == i)
                     return true;

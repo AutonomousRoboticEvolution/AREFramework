@@ -1,20 +1,23 @@
-#experimentName,string,physical_melai_sim
+#experimentName,string,physical_corridor
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
-#repository,string,/home/leni/are-logs/
+#repository,string,/home/le_goff/are-logs/
 #seed,int,-1
 
 #simMode,bool,1
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#initPosition,sequence_double,0;0;0.12
-#targetPosition,sequence_double,0.75;0.75;0.12
+#autoMode,bool,1
+#initPosition,sequence_double,-0.625;0.025;0.20
+#targetPosition,sequence_double,0.775;0.025;0.12
 #withTiles,bool,1
 #withBeacon,bool,1
 #flatFloor,bool,1
 #maxVelocity,double,6.
-#scenes,sequence_string,shapes_exploration.ttt
+#scenes,sequence_string,corridor_ridges.ttt
 
-#populationSize,int,2
+#startFromRandomPop,bool,0
+#populationSize,int,5
+#nbrOfOffsprings,int,5
+#tournamentSize,int,2
 
 #maxEvalTime,float,30
 #timeStep,float,0.05
@@ -24,7 +27,7 @@
 
 #cameraPipe,string,tcp://127.0.0.1:5557
 #target,sequence_double,0.75;0.75;0.12
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -32,37 +35,46 @@
 #isCPPNGenome,bool,1
 #isLeg,bool,1
 
-#envType,int,1
-#nbrWaypoints,int,300
+#envType,int,0
+#nbrWaypoints,int,30
 #arenaSize,double,2.
-#learnerToLoad,string,None
+#loadLastLearnerState,bool,1
+#loadExistingControllers,bool,1
 
 #noiseLevel,double,0
 
-#useControllerArchive,bool,0
+#useControllerArchive,bool,1
+#maxNbrOrgans,int,8
 #NNType,int,2
-#nbrHiddenNeurons,int,8
+#nbrHiddenNeurons,int,6
+#jointControllerType,int,2
 
-#cmaesNbrEval,int,10
-#cmaesPopSize,int,2
-#CMAESStep,double,1.
+#cmaesSmallNbrEval,int,100
+#cmaesLargeNbrEval,int,100
+#cmaesPopSize,int,5
+#cmaesMaxPopSize,int,20
+#CMAESStep,double,0.01
 #FTarget,double,0.05
 #elitistRestart,bool,0
 #withRestart,bool,1
 #incrPop,bool,1
 #lengthOfStagnation,int,20
+#populationStagnationThreshold,float,0.05
 #kValue,int,15
 #noveltyThreshold,double,0.9
 #archiveAddingProb,double,0.4
 #noveltyRatio,double,0.
 #noveltyDecrement,double,0.05
+#MaxWeight,float,1.
 
-#isSegmentedRobot,bool,1
+#isSegmentedRobot,bool,0
 #isExportModel,bool,0
 #reloadController,bool,0
 #saveBlueprint,bool,1
 
 #organsVersion,int,3
+
+#useArucoAsInput,bool,0
 
 #debugDisplayOnPi,bool,1
 #debugLEDsOnPi,bool,0

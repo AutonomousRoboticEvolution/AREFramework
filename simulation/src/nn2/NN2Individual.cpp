@@ -58,17 +58,21 @@ void NN2Individual::createMorphology(){
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
     morphology->set_randNum(randNum);
 
-    float init_x = settings::getParameter<settings::Float>(parameters,"#init_x").value;
-    float init_y = settings::getParameter<settings::Float>(parameters,"#init_y").value;
-    float init_z = settings::getParameter<settings::Float>(parameters,"#init_z").value;
 
-    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_x,init_y,init_z);
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
 }
 
 void NN2Individual::update(double delta_time){
-    std::vector<double> inputs = morphology->update();
-    std::vector<double> outputs = control->update(inputs);
-    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->command(outputs);
+    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
+    if( diff < 0.1){
+        std::vector<double> inputs = morphology->update();
+        std::vector<double> outputs = control->update(inputs);
+        morphology->command(outputs);
+    }
+
     energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
     sim_time = delta_time;
 }

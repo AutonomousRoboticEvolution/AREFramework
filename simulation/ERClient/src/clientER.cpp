@@ -12,7 +12,7 @@ int ER::init(int nbrOfInst, int port){
             // new_slave->setState(SlaveConnection::State::FREE);
            // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
           //  new_slave->setIntegerSignal("clientState",IDLE);
-            new_slave->setStringSignal("log_folder",Logging::log_folder),
+            new_slave->setStringSignal("log_folder",Logging::log_folder);
             serverInstances.push_back(std::move(new_slave));
 
         } else {
@@ -78,13 +78,13 @@ void ER::startOfSimulation(int slaveIndex){
         std::cout << "Starting Simulation" << std::endl;
 
     int eval_order = settings::getParameter<settings::Integer>(parameters,"#evaluationOrder").value;
-    if(eval_order == EvalOrder::FIFO){
+    if(eval_order == EvalOrder::FILO){
         //First in Last out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.back());
         currentIndexVec[slaveIndex] = indToEval.back();
-        indToEval.erase(indToEval.begin()+indToEval.size());
+        indToEval.erase(indToEval.begin()+indToEval.size()-1);
     }
-    else if(eval_order == EvalOrder::FILO){
+    else if(eval_order == EvalOrder::FIFO){
         //First in First out
         currentIndVec[slaveIndex] = ea->getIndividual(indToEval.front());
         currentIndexVec[slaveIndex] = indToEval.front();
@@ -174,6 +174,8 @@ bool ER::updateSimulation()
     if(ea->get_population().size() > 0){
         for(size_t slaveIdx = 0; slaveIdx < serverInstances.size(); slaveIdx++)
         {
+            serverInstances[slaveIdx]->setStringSignal("log_folder",Logging::log_folder);
+
             if(serverInstances[slaveIdx]->state() == SlaveConnection::DOWN)
                 continue;
             state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
@@ -322,8 +324,6 @@ bool ER::confirmConnections()
 }
 
 void ER::updateSimulatorList(){
-
-
     std::vector<std::unique_ptr<SlaveConnection>> newServInst;
     std::vector<Individual::Ptr> newCurrentIndVec;
     std::vector<int> newCurrentIndexVec;
@@ -350,9 +350,6 @@ void ER::updateSimulatorList(){
         }
      }
 
-
-
-
     currentIndexVec = newCurrentIndexVec;
     serverInstances.clear();
     serverInstances.resize(newServInst.size());
@@ -368,9 +365,9 @@ void ER::updateSimulatorList(){
     for(size_t i = 0; i < currentIndVec.size(); i++){
         if(serverInstances[i]->state() == SlaveConnection::DOWN)
             continue;
-        currentIndVec[i] = std::move(newCurrentIndVec.back());
-        currentIndexVec[i] = newCurrentIndexVec.back();
-        newCurrentIndexVec.pop_back();
-        newCurrentIndVec.pop_back();
+        currentIndVec[i] = std::move(newCurrentIndVec.front());
+        currentIndexVec[i] = newCurrentIndexVec.front();
+        newCurrentIndexVec.erase(newCurrentIndexVec.begin());
+        newCurrentIndVec.erase(newCurrentIndVec.begin());
     }
 }

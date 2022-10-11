@@ -1,5 +1,10 @@
 #include "image_processing/real_environment.hpp"
 #include "exploration.hpp"
+#include "barrelTask.hpp"
+#include "simulatedER/mazeEnv.h"
+#include "multiTargetMaze.hpp"
+#include "gradual_env.hpp"
+#include "obstacleAvoidance.hpp"
 #include "mnipes.hpp"
 #include "ARE/Logging.h"
 #include "mnipes_loggings.hpp"
@@ -14,7 +19,21 @@ extern "C" are::Environment::Ptr environmentFactory
         env->set_parameters(param);
     }
     else{
-        env = std::make_shared<are::sim::Exploration>(param);
+        int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
+        if(env_type == are::MAZE){
+            env = std::make_shared<are::sim::MazeEnv>();
+            env->set_parameters(param);
+        }
+        else if(env_type == are::OBSTACLES)
+            env = std::make_shared<are::sim::ObstacleAvoidance>(param);
+        else if(env_type == are::MULTI_TARGETS)
+            env = std::make_shared<are::sim::MultiTargetMaze>(param);
+        else if(env_type == are::EXPLORATION)
+            env = std::make_shared<are::sim::Exploration>(param);
+        else if(env_type == are::BARREL)
+            env = std::make_shared<are::sim::BarrelTask>(param);
+        else if(env_type == are::GRADUAL)
+            env = std::make_shared<are::sim::GradualEnvironment>(param);
     }
    return env;
 }

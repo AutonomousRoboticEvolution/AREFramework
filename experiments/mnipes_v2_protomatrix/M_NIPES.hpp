@@ -12,7 +12,7 @@
 #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
-#include "ProtomatrixGenome.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 
 //TO DO find a way to flush the population
 

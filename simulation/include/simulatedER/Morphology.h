@@ -37,7 +37,6 @@ public:
     {}
     virtual ~Morphology()
     {
-
     }
 
     virtual are::Morphology::Ptr clone() const = 0;

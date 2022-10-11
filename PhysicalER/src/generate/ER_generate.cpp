@@ -61,7 +61,6 @@ void ER::write_data(){
 }
 
 void ER::generate(){
-    ea->epoch();
     ea->init_next_pop();
 }
 

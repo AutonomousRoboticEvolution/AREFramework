@@ -160,13 +160,17 @@ void M_NIPESIndividual::update(double delta_time){
         return;
     }
 
-    std::vector<double> inputs = morphology->update();
-    std::vector<double> outputs = control->update(inputs);
+    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
+    if( diff < 0.1){
+        std::vector<double> inputs = morphology->update();
+        std::vector<double> outputs = control->update(inputs);
+        morphology->command(outputs);
+        energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
+        if(std::isnan(energy_cost))
+            energy_cost = 0;
+    }
 
-    morphology->command(outputs);
-    energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
-    if(std::isnan(energy_cost))
-        energy_cost = 0;
     sim_time = delta_time;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
     float position[3];
@@ -401,7 +405,7 @@ bool M_NIPES::is_finish(){
     bool fullfil_all_tasks = false;
     if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
         fullfil_all_tasks = current_gradual_scene > environments_info.size();
-    if(numberEvaluation >= max_nbr_eval || fullfil_all_tasks)
+    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks)
         return true;
     return false;
 }
@@ -500,6 +504,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
         if(!op_learner){ //learner was not found so erase this individual
             population.erase(population.begin() + corr_indexes[currentIndIndex]);
             population.shrink_to_fit();
+
             corr_indexes[currentIndIndex] = -1;
             for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
                 corr_indexes[i]--;
@@ -940,4 +945,23 @@ void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){
     for(int i = 0; i < corr_indexes.size(); i++)
         if(corr_indexes[i] >= 0)
             ind_to_eval.push_back(i);
+}
+
+std::string M_NIPES::_task_name(are::task_t task){
+    if(task == MAZE)
+        return "maze";
+    else if(task == OBSTACLES)
+        return "obstacles";
+    else if(task == MULTI_TARGETS)
+        return "multi targets";
+    else if(task == EXPLORATION)
+        return "exploration";
+    else if(task == BARREL)
+        return "barrel";
+    else if(task == GRADUAL)
+        return "gradual";
+    else{
+        std::cerr << "Error: task unknow" << std::endl;
+        return "None";
+    }
 }

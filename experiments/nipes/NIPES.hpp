@@ -14,6 +14,7 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/Settings.h"
 #include "obstacleAvoidance.hpp"
+#include "exploration.hpp"
 
 namespace are{
 
@@ -34,10 +35,25 @@ public:
           visited_zones(ind.visited_zones),
           descriptor_type(ind.descriptor_type){}
 
-
+    std::string to_string();
+    void from_string(const std::string&);
     Eigen::VectorXd descriptor() override;
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & ctrlGenome;
+        arch & final_position;
+        arch & visited_zones;
+        arch & descriptor_type;
+      //  arch & energy_cost;
+        arch & trajectory;
+      //  arch & sim_time;
+    }
+
 private:
 
     Eigen::MatrixXi visited_zones;

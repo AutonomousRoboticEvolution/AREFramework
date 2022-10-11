@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 
-find_package(Boost REQUIRED COMPONENTS serialization filesystem)
+find_package(Boost 1.77 REQUIRED COMPONENTS serialization filesystem)
 
 if (RASPBERRY)
     if(WITH_NN2)
@@ -43,6 +43,7 @@ if(WITH_NN2)
             "src/misc/*" 
             "src/nn2/*"
             "src/learning/ipop_cmaes.cpp"
+            "src/learning/cmaes_learner.cpp"
             "src/learning/controller_archive.cpp"
             )
 else()

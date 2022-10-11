@@ -52,8 +52,11 @@ void BODYPLANTESTING::initPopulation()
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
             ProtomatrixGenome::Ptr morphgenome(new ProtomatrixGenome(randomNum,parameters));
+            if(settings::getParameter<settings::Boolean>(parameters,"#isRandomStartingPopulation").value)
+                morphgenome->random();
+            else
+                morphgenome->init();
 
-            morphgenome->random();
             CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);

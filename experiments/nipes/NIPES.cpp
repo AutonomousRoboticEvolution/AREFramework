@@ -17,6 +17,31 @@ Eigen::VectorXd NIPESIndividual::descriptor()
     }
 }
 
+std::string NIPESIndividual::to_string()
+{
+    std::stringstream sstream;
+    boost::archive::text_oarchive oarch(sstream);
+    oarch.register_type<NIPESIndividual>();
+    oarch.register_type<NNParamGenome>();
+    oarch << *this;
+    return sstream.str();
+}
+
+void NIPESIndividual::from_string(const std::string &str){
+    std::stringstream sstream;
+    sstream << str;
+    boost::archive::text_iarchive iarch(sstream);
+    iarch.register_type<NIPESIndividual>();
+    iarch.register_type<NNParamGenome>();
+    iarch >> *this;
+
+    //set the parameters and randNum of the genome because their are not included in the serialisation
+    ctrlGenome->set_parameters(parameters);
+    ctrlGenome->set_randNum(randNum);
+    morphGenome->set_parameters(parameters);
+    morphGenome->set_randNum(randNum);
+}
+
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -55,9 +80,13 @@ void NIPES::init(){
         return;
     }
 
-
-    std::vector<double> initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
-
+    std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
+    std::vector<double> initial_point;
+    if(bootstrapCtrl != "None"){
+        NNParamGenome ctrl_gen;
+        ctrl_gen.from_file(bootstrapCtrl);
+        initial_point = ctrl_gen.get_full_genome();
+    }else initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
 
     double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
     for(int i = 0; i < nbr_weights+nbr_bias; i++){
@@ -79,11 +108,12 @@ void NIPES::init(){
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
 
-    bool start_from_learner = settings::getParameter<settings::Boolean>(parameters,"#startFromExistingLearner").value;
-    if(start_from_learner){
-        std::string filename = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
-        _cma_strat->from_file(filename);
-        pop_size =  _cma_strat->get_parameters().lambda();
+    if(bootstrapCtrl == "None"){
+        std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
+        if(learnerfile != "None"){
+            _cma_strat->from_file(learnerfile);
+            pop_size =  _cma_strat->get_parameters().lambda();
+        }
     }
 
     dMat init_samples = _cma_strat->ask();
@@ -101,6 +131,10 @@ void NIPES::init(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
+        ctrl_gen->set_nbr_output(nb_output);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -188,6 +222,10 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
     int pop_size = _cma_strat->get_parameters().lambda();
 
     dMat new_samples = _cma_strat->ask();
@@ -210,6 +248,10 @@ void NIPES::init_next_pop(){
         NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
+        ctrl_gen->set_nbr_output(nb_output);
+        ctrl_gen->set_nbr_input(nb_input);
+        ctrl_gen->set_nbr_hidden(nb_hidden);
+        ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -233,6 +275,11 @@ bool NIPES::update(const Environment::Ptr & env){
         if(env->get_name() == "obstacle_avoidance"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+
+	}
+	else if(env->get_name() == "exploration"){
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::Exploration>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
         }
     }
 
@@ -254,13 +301,11 @@ bool NIPES::is_finish(){
 
 bool NIPES::finish_eval(const Environment::Ptr & env){
 
-    if(env->get_name() == "obstacle_avoidance")
+    if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration")
         return false;
 
-    float tPos[3];
-    tPos[0] = settings::getParameter<settings::Double>(parameters,"#target_x").value;
-    tPos[1] = settings::getParameter<settings::Double>(parameters,"#target_y").value;
-    tPos[2] = settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+    float t_pos[3] = {target[0],target[1],target[2]};
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
@@ -274,7 +319,7 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
+    double dist = distance(pos,t_pos)/sqrt(2*arenaSize*arenaSize);
 
     if(dist < fTarget){
         std::cout << "STOP !" << std::endl;

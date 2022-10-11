@@ -32,8 +32,6 @@ add_library(M_NIPES2_PROTOMATRIX SHARED
    ../common/multiTargetMaze.cpp
    ../common/barrelTask.cpp
    ../common/exploration.cpp
-   ../common/ProtomatrixGenome.cpp
-   ../common/protomatrix_utils.cpp
 #  ../common/gradual_env.cpp
     )
 target_include_directories(M_NIPES2_PROTOMATRIX PUBLIC ${INCLUDES})

@@ -8,6 +8,7 @@
 #include "ARE/NNParamGenome.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/nn2/NN2Control.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 #include "physicalER/pi_communication.hpp"
 #include <zmq.hpp>
 #include "nn2/mlp.hpp"
@@ -43,6 +44,9 @@ public:
         energy_cost(ind.energy_cost)
     {}
 
+    ~AREIndividual(){
+    }
+
     void init() override{
         isEval = false;
         Individual::init();
@@ -52,7 +56,7 @@ public:
         return std::make_shared<AREIndividual>(*this);
     }
 
-    void update(double delta_time) override;
+    void update(double sim_time) override;
 
     std::string to_string();
     void from_string(const std::string&);
@@ -95,9 +99,22 @@ protected:
 
 class AREControl{
 public:
+    typedef std::unique_ptr<AREControl> Ptr;
+    typedef std::unique_ptr<const AREControl> ConstPtr;
 
     AREControl(){}
     AREControl(const AREIndividual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
+    AREControl(const AREControl& ctrl):
+            controller(ctrl.controller),
+            _max_eval_time(ctrl._max_eval_time),
+            _time_step(ctrl._time_step),
+            _sent_finish_mess(ctrl._sent_finish_mess),
+            cameraInputToNN(ctrl.cameraInputToNN),
+            number_of_sensors(ctrl.number_of_sensors),
+            number_of_wheels(ctrl.number_of_wheels),
+            number_of_joints(ctrl.number_of_joints),
+            _is_ready(ctrl._is_ready){}
+
 
     int exec( zmq::socket_t& socket, float sim_time);
 
@@ -116,7 +133,6 @@ private:
 
     bool cameraInputToNN;
 
-    std::ostringstream logs_to_send;
     int number_of_sensors=0;
     int number_of_wheels=0;
     int number_of_joints=0;

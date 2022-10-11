@@ -9,9 +9,16 @@ void AREIndividual::createMorphology(){
     morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     morphology->set_randNum(randNum);
     std::vector<double> init_pos = st::getParameter<st::Sequence<double>>(parameters,"#initPosition").value;
-    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+    if(morphGenome->get_type() == "nn2_cppn_genome"){
+        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+    }
+    else if(morphGenome->get_type() == "protomatrix_genome"){
+        std::vector<std::vector<double>> m4d = std::dynamic_pointer_cast<ProtomatrixGenome>(morphGenome)->get_matrix_4d();
+        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_matrix_4d(m4d);
+    }
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+
 }
 
 void AREIndividual::createController(){
@@ -49,11 +56,14 @@ void AREIndividual::createController(){
 }
 
 
-void AREIndividual::update(double delta_time){
-   std::vector<double> inputs = morphology->update();
-   std::vector<double> outputs = control->update(inputs);
-   morphology->command(outputs);
-
+void AREIndividual::update(double sim_time){
+   double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+   double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
+   if( diff < 0.1){
+       std::vector<double> inputs = morphology->update();
+       std::vector<double> outputs = control->update(inputs);
+       morphology->command(outputs);
+   }
 }
 
 
@@ -116,6 +126,8 @@ int AREControl::exec(zmq::socket_t& socket, float sim_time){
     
         // send finished message
         if(!_sent_finish_mess){
+            std::ostringstream logs_to_send;
+
             are::phy::send_string_no_reply("finish",socket,"pi ");
             _sent_finish_mess = true;
             // send log data

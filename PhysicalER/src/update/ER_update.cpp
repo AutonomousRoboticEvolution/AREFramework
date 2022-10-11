@@ -54,16 +54,26 @@ void ER::choice_of_robot(){
     //Load list of robot's ids to be evaluated and ask user which one want to be evaluated.
     std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
     std::string repository = settings::getParameter<settings::String>(parameters,"#repository").value;
+    bool auto_mode = settings::getParameter<settings::Boolean>(parameters,"#autoMode").value;
     ioh::load_ids_to_be_evaluated(repository + "/" + exp_name,list_ids);
-    current_id = ioh::choice_of_robot_to_evaluate(list_ids);
+    if(list_ids.empty()){
+        std::cout << "No robot available for evaluation." << std::endl;
+        exit(1);
+    }
     if(list_ids[0] != current_id){
         int i = 0;
         for(;i < list_ids.size(); i++)
             if(current_id == list_ids[i])
                 break;
-        list_ids[i] = list_ids[0];
-        list_ids[0] = current_id;
+        if(i < list_ids.size()){
+            list_ids[i] = list_ids[0];
+            list_ids[0] = current_id;
+        }
     }
+    if(auto_mode)
+        current_id = list_ids[0];
+    else
+        current_id = ioh::choice_of_robot_to_evaluate(list_ids);
     ea->setCurrentIndIndex(current_id);
     //-
 }
@@ -84,9 +94,6 @@ void ER::save_logs(bool eog)
 bool ER::execute(){
 
     if(robot_state == READY){
-        std::cout << "Press Enter when the robot is ready" << std::endl;
-        std::cin.ignore();
-
         start_evaluation();
         robot_state = BUSY;
     }
@@ -124,10 +131,13 @@ void ER::start_evaluation(){
 
     if(sim_mode) pi_address = "localhost";
 
+
+    int port = settings::getParameter<settings::Integer>(parameters,"#ZMQPort").value;
+
     //start ZMQ
     std::stringstream sstream1,sstream2;
-    sstream1 << "tcp://" << pi_address << ":5556";
-    sstream2 << "tcp://" << pi_address << ":5555";
+    sstream1 << "tcp://" << pi_address << ":" << port + 1;
+    sstream2 << "tcp://" << pi_address << ":" << port;
     request.connect(sstream1.str().c_str());
     subscriber.connect(sstream2.str().c_str());
     subscriber.set(zmq::sockopt::subscribe, "pi ");
@@ -146,7 +156,7 @@ void ER::start_evaluation(){
     std::string ctrl_gen = ea->get_next_controller_genome(current_id)->to_string();
     std::stringstream sstr;
     sstr << current_id << std::endl << ctrl_gen;
-    std::cout << ctrl_gen << std::endl;
+    //std::cout << ctrl_gen << std::endl;
     send_string(reply,sstr.str(),request,"pi ");
     assert(reply == "starting");
 
@@ -242,11 +252,14 @@ bool ER::stop_evaluation(){
     }
 
     // ask user whether to re-do this evaluation
-    std::string str;
-    std::cout << "Do you want to execute the same evaluation again ? (y,Y,yes)" << std::endl;
-    std::getline(std::cin,str);
-    if(str == "y" || str == "Y" || str == "yes"){
-        return true;
+    bool auto_mode = settings::getParameter<settings::Boolean>(parameters,"#autoMode").value;
+    if(!auto_mode){
+        std::string str;
+        std::cout << "Do you want to execute the same evaluation again ? Type y,Y or yes if you do, nothing otherwise" << std::endl;
+        std::getline(std::cin,str);
+        if(str == "y" || str == "Y" || str == "yes"){
+            return true;
+        }
     }
 
     nbrEval++;

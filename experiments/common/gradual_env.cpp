@@ -35,14 +35,18 @@ GradualEnvironment::GradualEnvironment(const settings::ParametersMapPtr& params)
 
 void GradualEnvironment::init(){
 
-
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(simLoadScene(environments_info[current_scene].scene_path.c_str()) < 0){
         std::cerr << "unable to load the scene : " << environments_info[current_scene].scene_path << std::endl;
         exit(1);
     }
-
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    bool real_time = settings::getParameter<settings::Boolean>(parameters,"#realTimeSim").value;
+    // Sets time step
+    if(!real_time)
+        simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
+    simSetBoolParameter(sim_boolparam_realtime_simulation,real_time);
     if(verbose){
         int i = 0;
         int handle = 0;

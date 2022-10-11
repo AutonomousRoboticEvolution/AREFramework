@@ -5,6 +5,7 @@
 #include "simulatedER/Logging.hpp"
 #include "obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
+#include "exploration.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
@@ -17,9 +18,11 @@ extern "C" are::Environment::Ptr environmentFactory
     }
     else if(env_type == 1)
         env.reset(new are::sim::ObstacleAvoidance(param));
-    else if(env_type == 2) {
+    else if(env_type == 2)
         env.reset(new are::sim::BarrelTask(param));
-    }
+    else if(env_type == 3)
+        env.reset(new are::sim::Exploration(param));
+
     return env;
 }
 

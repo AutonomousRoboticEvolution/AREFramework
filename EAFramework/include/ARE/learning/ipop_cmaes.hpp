@@ -83,6 +83,12 @@ public:
     }
 
     void init_esolver(){
+        eostrat_t::_pfunc = _defaultPFunc;
+        eostrat_t::_pffunc = _defaultFPFunc;
+
+        _esolver = Eigen::EigenMultivariateNormal<double>(false,eostrat_t::_parameters.get_seed()); // seeding the multivariate normal generator.
+
+
         _esolver.setMean(_solutions.xmean());
         _esolver.setCovar(_solutions.cov());
     }
@@ -138,6 +144,7 @@ public:
         arch & _niter;
         arch & _nevals;
         arch & _pop;
+
     }
 
     int nbr_iter() const{return _niter;}

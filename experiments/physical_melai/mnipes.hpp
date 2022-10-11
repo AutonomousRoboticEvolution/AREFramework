@@ -11,10 +11,10 @@
 #include "ARE/CPPNGenome.h"
 #include "physicalER/pi_individual.hpp"
 #include "physicalER/io_helpers.hpp"
-#include "cmaes_learner.hpp"
+#include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/learning/controller_archive.hpp"
 #include "ARE/crossbreeding.hpp"
-#include "ProtomatrixGenome.hpp"
+#include "ARE/ProtomatrixGenome.hpp"
 
 namespace are{
 
@@ -22,6 +22,15 @@ typedef enum GenomeType{
     CPPN = 0,
     PROTOMATRIX = 1
 } GenomeType;
+
+typedef enum task_t{
+    MAZE = 0,
+    OBSTACLES = 1,
+    MULTI_TARGETS = 2,
+    EXPLORATION = 3,
+    BARREL = 4,
+    GRADUAL = 5
+} task_t;
 
 class PMEIndividual : public Individual
 {
@@ -77,6 +86,7 @@ public:
     MNIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
     void init() override;
     void init_random_pop();
+    void init_pop_from_migrants();
     void init_next_pop() override;
 
     bool update(const Environment::Ptr &env) override;
@@ -109,7 +119,9 @@ private:
     void _survival(const ioh::MorphGenomeInfoMap& morph_gen_info, std::vector<int>& list_ids);
     void _reproduction();
 
-    void write_morph_descriptors();
+//    void write_morph_descriptors();
+
+    std::string get_last_learner_state(int id);
 };
 
 }//are
