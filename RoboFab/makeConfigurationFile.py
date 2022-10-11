@@ -15,9 +15,11 @@ def makeFile(location):
 	# location specific variables:
 	if location == "BRL":
 
-		LOG_FOLDER = "/home/robofab/are-logs/hardware_test/"
+		LOG_FOLDER = "/home/robofab/are-logs/exploration/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/parameters.csv"
+
+		ROBOFAB_WEBCAM_PIPE = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
@@ -28,6 +30,7 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=90 + 0.037 ).tolist()
 
+		gripper_TCP_FOR_CABLES = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
@@ -42,6 +45,8 @@ def makeFile(location):
 		COPPELIASIM_FOLDER = "/home/robofab/vrep"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
+		ROBOFAB_WEBCAM_PIPE = "0"
+
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
 		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
@@ -50,7 +55,8 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
-		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		gripper_TCP_FOR_CABLES = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) ).tolist() # single gripper
 		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
 
 
@@ -71,6 +77,8 @@ def makeFile(location):
 		"logDirectory":LOG_FOLDER,
 		"parametersFile":SOFTWARE_PARAMETERS_FILE,
 		"coppeliasimFolder":COPPELIASIM_FOLDER,
+
+		"RoboFabWebcamPipe":ROBOFAB_WEBCAM_PIPE,
 
 		"network":{
 			"COMPUTER_ADDRESS":"192.168.2.253", # the RoboFab PC (that runs this code)
@@ -103,6 +111,7 @@ def makeFile(location):
 			"STARTUP_MESSAGE":"a0b0",
 			"EXPECTED_STARTUP_REPLY":"I am the gripper",
 			"TCP_A": gripper_TCP_A,
+			"TCP_FOR_CABLES": gripper_TCP_FOR_CABLES,
 			# "TCP_A": (makeTransformInputFormatted( [0,0,0, math.radians(45),0,math.radians(-270)] ) * makeTransformInputFormatted([0.002,-30/1000,231/1000])).tolist(),
 			"TCP_B": (makeTransformInputFormatted([0, 0, 0, math.radians(-45), 0, math.radians(90)]) * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)]) * makeTransformInputFormatted([-2 / 1000, 19 / 1000, 261 / 1000]) * makeTransformInputFormatted([0, 0.001, 0.006])).tolist(),
 			"SUCCESS_MESSAGE":"OK",
@@ -209,12 +218,12 @@ def makeFile(location):
 
 		"PRINTER_0":{
 		"ORIGIN":PRINTER_0_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_0_API_KEY
 		},
 		"PRINTER_1":{
 		"ORIGIN":PRINTER_1_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_1_API_KEY
 		},
 
