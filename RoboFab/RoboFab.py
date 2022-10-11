@@ -38,9 +38,9 @@ class RoboFab_host:
         # Defines properties of each organ type, set in the configuration file
         self.dictionaryOfOrganTypes = configurationData["dictionaryOfOrganTypes"]
 
-        # Define the two gripper TCPs. This is a transform from the tool flange to the tip of each gripper
+        # Define the gripper TCP(s). This is a transform from the tool flange to the tip of the gripper
         self.gripperTCP_A = np.matrix( ( configurationData [ "gripper" ] [ "TCP_A" ] ) )
-        self.gripperTCP_B = np.matrix( ( configurationData [ "gripper" ] [ "TCP_B" ] ) )
+        self.gripperTCP_FOR_CABLES = np.matrix( ( configurationData [ "gripper" ] [ "TCP_FOR_CABLES" ] ) )
 
         # define the organ bank
         self.organBank = Bank ( configurationData [ "ORGAN_BANK_1" ] , configurationData["dictionaryOfOrganTypes"] )
@@ -128,7 +128,7 @@ class RoboFab_host:
                 #if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
                 if nextOrganFromRobot.transformOrganOriginToGripper is None:
                     # use male cable to insert the organ
-                    thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A )
+                    thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLE )
                 else: # use the defined gripper location to pick up the organ
                     thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
 

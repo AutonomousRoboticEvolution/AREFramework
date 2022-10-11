@@ -30,6 +30,7 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=90 + 0.037 ).tolist()
 
+		gripper_TCP_FOR_CABLES = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
@@ -54,7 +55,8 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
 		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
 
-		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		gripper_TCP_FOR_CABLES = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
+		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) ).tolist() # single gripper
 		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
 
 
@@ -109,6 +111,7 @@ def makeFile(location):
 			"STARTUP_MESSAGE":"a0b0",
 			"EXPECTED_STARTUP_REPLY":"I am the gripper",
 			"TCP_A": gripper_TCP_A,
+			"TCP_FOR_CABLES": gripper_TCP_FOR_CABLES,
 			# "TCP_A": (makeTransformInputFormatted( [0,0,0, math.radians(45),0,math.radians(-270)] ) * makeTransformInputFormatted([0.002,-30/1000,231/1000])).tolist(),
 			"TCP_B": (makeTransformInputFormatted([0, 0, 0, math.radians(-45), 0, math.radians(90)]) * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)]) * makeTransformInputFormatted([-2 / 1000, 19 / 1000, 261 / 1000]) * makeTransformInputFormatted([0, 0.001, 0.006])).tolist(),
 			"SUCCESS_MESSAGE":"OK",
