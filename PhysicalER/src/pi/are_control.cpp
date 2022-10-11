@@ -42,13 +42,13 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
-            number_of_wheels++;
+            numberOfWheels++;
             break;
 
         case 2: //sensor
             if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
             listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
-            number_of_sensors++;
+            numberOfSensors++;
             break;
 
         case 3: //leg - made up of two joints
@@ -58,12 +58,15 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
             daughterBoards->turnOn( findDaughterBoardForOrgan(listOfOrgans.back()) ) ; // turn on the correct daughterboard
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the current limit
+            static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = true; // this is a proximal joint
+
 
             // distal joint of this leg:
             listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
+            static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
-            number_of_joints+=2;
+            numberOfJoints+=2;
             break;
 
         case 4: //caster
@@ -99,6 +102,10 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         ledDriver->flash(GREEN); // flash green to show ready
     }
 
+    // check the controller is giving the right number of inputs and outputs:
+    std::cout<<"Number of NN inputs: "<<controller.get_number_of_inputs()<<"\nNumber of NN outputs: "<<controller.get_number_of_outputs()<<std::endl;
+    assert(controller.get_number_of_inputs() == numberOfSensors*2 + cameraInputToNN);
+    assert(controller.get_number_of_outputs() == numberOfWheels + numberOfJoints);
 
     // set debug printing flag - this prints a representation of the inputs and outputs to terminal
     if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
@@ -138,8 +145,10 @@ boardSelection AREControl::findDaughterBoardForOrgan(Organ* thisOrgan){
 // For each ouput from the controller, send the required value to the low-level wheel object
 void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t time_milli){
     // for each wheel or joint organ, set it's output. The listOfOrgans is in the same order as the relevent NN outputs.
+
     int i=0; // index of the organ being considered (in listOfOrgans)
-    //for (std::list<Organ>::iterator thisOrgan = listOfWheels.begin(); thisOrgan != listOfWheels.end(); ++thisOrgan){
+
+    // first we do all the wheels:
     for (auto thisOrgan : listOfOrgans) {
         if (thisOrgan->organType == WHEEL) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
@@ -148,17 +157,23 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
-        else if (thisOrgan->organType == JOINT) {
+        // else: ignore anything that isn't a wheel
+    }
+
+    // then we do all the joints:
+    for (auto thisOrgan : listOfOrgans) {
+        if (thisOrgan->organType == JOINT) {
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             JointOrgan* thisJoint = static_cast<JointOrgan *>(thisOrgan);
             double valueFromNN = values[i]; // this is neural network value, in range [-1,1]
             double newTargetAngle = misc::get_next_joint_position(valueFromNN, double(time_milli/1000.0), thisJoint->savedLastPositionRadians); // the new target angle in radians
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
+            if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
-            logs_to_send<< thisJoint->readMeasuredCurrent()*10 << ","; //add measured current to log
+            logs_to_send<< float(thisJoint->readMeasuredCurrent())*10 << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
-        // any other thisOrgan->organType value can be ignored, since it's not an output
+        // else: ignore anything that isn't a joint
     }
 
     if(debugDisplayOnPi){
@@ -169,12 +184,16 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
                 if (i_block<n_blocks) std::cout<<"o";
                 else std::cout<<" ";
             }
+            std::cout<<"|";
         }
         std::cout<<std::endl;
     }
 
-    // add to log:
-    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
+    // add NN outputs to log:
+    for(i=0;i<values.size();i++){
+        logs_to_send<< values[i] <<","; //add NN output to log
+    }
+//    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
 
 bool AREControl::testAllOrganConnections(){
@@ -186,7 +205,7 @@ bool AREControl::testAllOrganConnections(){
         while (!has_passed and retries<10){
             has_passed = thisOrgan->testConnection();
             if (!has_passed){
-                usleep(10000 + (rand() % 1000) );
+                usleep(100 + (rand() % 50) );
                 retries++;
             }
         }
@@ -242,8 +261,10 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
         std::cout<<"-----|"; // block between the input and output values to aid readability
     }
 
-    // append input values to log data, as a string:
-    std::copy(sensor_vals.begin(), sensor_vals.end(), std::ostream_iterator<int>(logs_to_send, ","));
+    // append input values to log data:
+    for(int i=0;i<sensor_vals.size();i++){
+        logs_to_send<< sensor_vals[i] <<","; //add NN input to log
+    }
 }
 
 void AREControl::setLedDebugging(std::vector<double> &nn_inputs,std::vector<double> &nn_outputs){
@@ -262,18 +283,24 @@ int AREControl::exec(zmq::socket_t& socket){
     std::vector<double> sensor_values;
     std::vector<double> nn_outputs;
 
-    // set up timing system
-    uint32_t start_time = millis();
-    uint32_t this_loop_start_time = start_time;
-
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<number_of_sensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
-    for(int i=0;i<(number_of_wheels+number_of_joints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
+    for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
+    logs_to_send<<"Temperature";
 
     // a flag to stop the evaluatoin before _max_eval_time is reached
     bool stop_early=false;
+
+    // start fan
+    Fan fan;
+    fan.turnOn();
+
+    // set up timing system
+    uint32_t start_time = millis();
+    uint32_t this_loop_start_time = start_time;
 
     // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
@@ -304,6 +331,9 @@ int AREControl::exec(zmq::socket_t& socket){
             std::cout<<"WARNING: stopping early due to organ connection failure"<<std::endl;
         }
 
+        // add temperature to log
+        logs_to_send<<batteryMonitor.measureTemperature()<<",";
+
         // update timestep value ready for next loop
         this_loop_start_time+=_time_step; // increment
         //std::cout<<"Time now: "<<this_loop_start_time<<std::endl;
@@ -320,7 +350,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
     }
 
-    std::cout<<"time: "<<this_loop_start_time-start_time<<std::endl;
+    std::cout<<"time elapsed: "<<(this_loop_start_time-start_time)/1000.0<<" seconds"<<std::endl;
 
     // turn everything off
     for (auto thisOrgan : listOfOrgans) {
@@ -337,13 +367,19 @@ int AREControl::exec(zmq::socket_t& socket){
     }
     ledDriver->flash(BLUE);
     daughterBoards->turnOff();
+    fan.turnOff();
 
 
-    // send finished message
-    are::phy::send_string_no_reply("finish",socket,"pi ");
+    // send "finish" message or "finish_with_errors" if there was some problem that caused the evaluation to stop early
+    if(stop_early){
+        are::phy::send_string_no_reply("finish_with_errors",socket,"pi ");
+    }else{
+        are::phy::send_string_no_reply("finish",socket,"pi ");
+    }
 
 
     // send log data
+    logs_to_send<<"\n"; // add a final newline
     are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
     are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 

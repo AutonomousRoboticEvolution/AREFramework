@@ -20,15 +20,15 @@ void Fan::init(bool usePWM){
         pinMode (FAN_GPIO_PIN, OUTPUT);
         std::cout<<"not using PWM for fan"<<std::endl;
     }
-};
+}
 
 void Fan::test() {
     std::cout << "turn on fan" << std::endl;
     turnOn();
-    usleep(200000); // 2 seconds
+    usleep(2000000); // 2 seconds
     std::cout << "fan half speed" << std::endl;
     setPWMValue(500);
-    usleep(200000); // 2 seconds
+    usleep(2000000); // 2 seconds
     std::cout << "turn off fan" << std::endl;
     turnOff();
 }
@@ -52,11 +52,11 @@ void Fan::update(float currentTemperature){
 
 void Fan::turnOn(){
     setPWMValue(FAN_PWM_MAX); // set to max speed
-};
+}
 
 void Fan::turnOff(){
     digitalWrite (FAN_GPIO_PIN, LOW);
-};
+}
 
 void Fan::setPWMValue(int value){
     if ( isUsingPWM) {
@@ -70,5 +70,5 @@ void Fan::setPWMValue(int value){
             digitalWrite (FAN_GPIO_PIN, LOW);
         }
     }
-};
+}
 

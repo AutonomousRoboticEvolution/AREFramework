@@ -92,8 +92,9 @@ private:
     int current_id = 0;
     int nbrEval = 0;
 
-    bool isEnvInit = false;
     bool verbose=false;
+
+    bool robot_reported_error = false;
 
     ///used to create the environment
     std::function<Environment::Factory> environmentFactory;

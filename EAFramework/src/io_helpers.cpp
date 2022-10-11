@@ -128,6 +128,7 @@ void ioh::load_nbr_organs(const std::string &folder, const int& id, int &wheels,
         else if (std::stoi(line.substr(0,line.find(","))) == 2)
             sensors++;
         else if (std::stoi(line.substr(0,line.find(","))) == 3)
+            // NOTE "3" is a leg in the blueprint, comprising two joints
             joints+=2;
     }
 

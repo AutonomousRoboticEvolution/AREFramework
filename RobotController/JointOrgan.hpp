@@ -37,6 +37,7 @@ class JointOrgan  : public Organ {
 		uint8_t currentState = SERVO_OFF; ///< Servo state: SERVO_OFF or SERVO_ON
         int8_t targetPostion = 128; ///< target angle, as an 8-bit number (0 to 255) representing angles from 0degrees to 180degrees
         double savedLastPositionRadians = 0.0; /// only used by the controller, which needs to know the previous position in order to create sin wave. Saved as double, in radians, to replicate the simulation side.
+        bool isProximalNotDistal = false;
 
 		//Public member functions
 		/**
@@ -96,7 +97,7 @@ class JointOrgan  : public Organ {
             @brief Read the current draw.
             @return
         */
-        int8_t readMeasuredCurrent();
+        uint8_t readMeasuredCurrent();
 
 };
 
