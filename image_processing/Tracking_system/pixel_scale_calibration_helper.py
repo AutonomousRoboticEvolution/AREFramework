@@ -1,13 +1,13 @@
 ## Instructions:
 ## 1. print an aruco tags 1 and 2 and cut the paper so that there is a known distance from the corner of the paper to the centre of the tag
 ## 2. record this known distance as half_size_of_tag below
-## 3. set the parameters file to crop_rectangle=[-1], pixel_scale=1 and centre_reference = (0,0)
+## 3. set the `tracking_parameters.py` file to crop_rectangle=[-1], pixel_scale=1 and centre_reference = (0,0)
 ## 4  start the tracking system and put the correct camera_pipe into the variable below
 ## 5. place the tags onto the floor of the arena so that they are in opposite corners (so the distance from centre of tag to each wall of the arena is half_size_of_tag)
 ## 6. run this program
 ## 7. the computed values for centre_reference, pixel_scale and crop_rectangle will be displayed, for you to copy into tracking_parameters.py
 
-camera_pipe = "tcp://127.0.0.1:5557"
+camera_pipe = "tcp://192.168.2.247:5557" # address of the tracking system (zeromq)
 half_size_of_tag = 100 # distance from centre of tag to corner of the arena, in millimeters
 
 import zmq
