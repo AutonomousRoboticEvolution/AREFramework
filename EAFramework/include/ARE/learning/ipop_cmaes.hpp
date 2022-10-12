@@ -49,7 +49,7 @@ public:
     typedef std::shared_ptr<IPOPCMAStrategy> Ptr;
     typedef std::shared_ptr<const IPOPCMAStrategy> ConstPtr;
 
-    IPOPCMAStrategy(){}
+    IPOPCMAStrategy() = default;
 
     IPOPCMAStrategy(cma::FitFunc func,cma::CMAParameters<geno_pheno_t> &parameters)
         :ipop_cmaes_t(func,parameters)
@@ -68,7 +68,7 @@ public:
         _stopcriteria.set_criteria_active(cma::FTARGET,false);//[Success] The objective function target value has been reached
     }
 
-    ~IPOPCMAStrategy() {}
+    ~IPOPCMAStrategy() = default;
 
     //custom stop criteria
     bool pop_desc_stagnation();

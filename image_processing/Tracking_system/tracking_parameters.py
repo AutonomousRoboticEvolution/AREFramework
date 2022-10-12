@@ -34,7 +34,11 @@ recording_frame_rate = 15.0
 recording_timeout_seconds = 60*11
 
 with open('location.txt') as f:
-    location = f.read().replace("\n","")
+    location = f.read().strip()
+
+# default parameters, if not set by the location
+show_frames = False
+distortion_correction_file = None
 
 #location specific parameters
 if location == "bristol":
@@ -56,8 +60,8 @@ if location == "bristol":
 
 elif location == "york":
     pipe = 0
-    brainMin = (0,130,52)
-    brainMax = (179,194,86)
+    brainMin = ((0,130,52),)
+    brainMax = ((179,194,86),)
 
     show_frames = True
     
@@ -71,14 +75,14 @@ elif location == "york2":
 
     show_frames = True
     
-    headMin = (0,69,0)
-    headMax = (22,255,255)
+    headMin = ((0,69,0),)
+    headMax = ((22,255,255),)
 
-    skeletonMin = (34,22,0)
-    skeletonMax = (63,255,255)
+    skeletonMin = ((34,22,0),)
+    skeletonMax = ((63,255,255),)
 
-    organMin = (76,42,0)
-    organMax = (123,255,255)
+    organMin = ((76,42,0),)
+    organMax = ((123,255,255),)
     
     brainMin = [headMin,skeletonMin,organMin]
     brainMax = [headMax,skeletonMax,organMax]
@@ -88,45 +92,34 @@ elif location == "napier":
 
     show_frames = True
 
-    brainMin = (169,100,165)
-    brainMax = (179,255,255)
+    brainMin = ((169,100,165),)
+    brainMax = ((179,255,255),)
 
     centre_reference = (600,545)
     pixel_scale = 500 #nc
 
     crop_rectangle = [-1]
+
 elif location == "amsterdam":
     pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
-
+    distortion_correction_file = "./calibration/amsterdam_cam_198_barrel_distortion.npz"
+    
+    
     show_frames = True
-
-    #mask filter parameters
-    brainMin = (0,157,154)
-    brainMax = (10,221,208)
-
-    #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (386,264) # defined in the uncropped image
-    pixel_scale = 175
     
-    crop_rectangle = [-1]
+    # mask filter parameters
+    brainMin = ((0,47,87),)
+    brainMax = ((11,255,255),)
 
-
-elif location == "amsterdam":
-    pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
-    #mask filter parameters
-    brainMin = (0,47,87)
-    brainMax = (11,255,255)
-
-    #centre of uncropped arena and ratio of pixels/metre
-    centre_reference = (970,430) # defined in the uncropped image
-    pixel_scale = 540
-
-    crop_rectangle = [-1]
+    # centre of uncropped arena and ratio of pixels/metre
+    centre_reference = (982,530)
+    pixel_scale = 376.34408602150535
+    crop_rectangle = [560,116,845,828]
     
     
-print("location: {}".format(location))
-print("pipe: {}".format(pipe))
+print(f"location: {location}")
+print(f"pipe: {pipe}")
 if show_frames:
-    print ( "Show frames is on" )
+    print("Show frames is on")
 else:
-    print ( "Show frames is off" )
+    print("Show frames is off")

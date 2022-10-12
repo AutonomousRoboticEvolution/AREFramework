@@ -40,7 +40,7 @@ message = message.replace(")","").split(",")
 width = int(message[0])
 height = int(message[1])
 depth = int(message[2])
-print("Resolution is {} x {} , {}".format(width,height, depth))
+print(f"Resolution is {width} x {height} , {depth}")
 
 if SHOW_FULL_RESOLUTION_IMAGE_AT_START:
     if PRINT_INFO: print ( "Requesting full image..." )
@@ -60,13 +60,13 @@ while time.time() < start_time + video_length_seconds or LOOP_FOREVER:
         if PRINT_INFO: print("Requesting image...")
         socket.send_string("Image:image")
         message = socket.recv()
-        if PRINT_INFO: print("Got message type: {}".format(type(message)))
+        if PRINT_INFO: print(f"Got message type: {type(message)}")
         image = numpy.frombuffer(message, dtype=numpy.uint8)
         if PRINT_INFO: print(image[0])
-        if PRINT_INFO: print("image is type: {}".format(type(image)))
+        if PRINT_INFO: print(f"image is type: {type(image)}")
         if PRINT_INFO: print(width*height*depth)
         image = image.reshape(width,height,depth)
-        if PRINT_INFO: print("image shape is {}".format(image.shape))
+        if PRINT_INFO: print(f"image shape is {image.shape}")
 
         (corners, ids, rejected) = aruco.detectMarkers(image, aruco_dict, parameters=aruco_parameters)
         aruco.drawDetectedMarkers(image,corners,ids)
@@ -88,8 +88,8 @@ while time.time() < start_time + video_length_seconds or LOOP_FOREVER:
 
 if RECORD_VIDEO:
     filename = str( int( time.time() ) )
-    print("saving {}".format(filename))
-    socket.send_string("Recording:save_{}".format(filename))
+    print(f"saving {filename}")
+    socket.send_string(f"Recording:save_{filename}")
     assert( socket.recv_string() == "OK")
 print("finished")
 cv2.waitKey(0)
