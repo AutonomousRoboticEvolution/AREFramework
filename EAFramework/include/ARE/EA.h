@@ -130,7 +130,7 @@ public:
 
     void set_simulator_side(bool ss){simulator_side = ss;}
 
-    virtual const Genome::Ptr get_next_controller_genome(int id){} //method for the physical side
+    virtual const Genome::Ptr get_next_controller_genome(int id) { return nullptr; } //method for the physical side
 
     std::vector<double> get_objectives(){return objectives;}
     void set_objectives(const std::vector<double>& objs){objectives = objs;}
