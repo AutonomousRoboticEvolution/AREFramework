@@ -57,8 +57,8 @@ public:
         morphGenome->mutate();
         ctrlGenome->mutate();
     }
-    virtual void crossover(const Individual::Ptr& partner, Individual &child);
-    virtual void symmetrical_crossover(const Individual::Ptr& partner, Individual &child1, Individual &child2);
+    virtual void crossover(const Individual::Ptr& partner, Individual *child);
+    virtual void symmetrical_crossover(const Individual::Ptr& partner, Individual *child1, Individual *child2);
 
 
     virtual Eigen::VectorXd descriptor(){return Eigen::VectorXd::Zero(1);}
