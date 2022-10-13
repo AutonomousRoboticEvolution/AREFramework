@@ -162,7 +162,7 @@ def makeFile(location):
                 "transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				"gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.45,
-				"USE_FORCE_MODE":True
+				"USE_FORCE_MODE":False
 				 },
 			2: {"organType": 2,
 				"friendlyName": "Sensor organ",
@@ -175,7 +175,7 @@ def makeFile(location):
 				"transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				 "gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.6,
-				"USE_FORCE_MODE":True,
+				"USE_FORCE_MODE":False,
 				 },
 			3: {"organType": 3, # minimally tested!
 				"friendlyName": "Leg organ",

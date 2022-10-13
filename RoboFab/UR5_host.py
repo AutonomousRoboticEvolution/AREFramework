@@ -588,7 +588,7 @@ class UR5Robot:
         gripperOpenPositionDropoff= 0.76  # 0 = fully open, 1= fully closed
         gripperClosedPosition = 1.0
         cableOriginToGripper = makeTransformMillimetersDegrees(y=3,z=-3)
-        FLOAT_ON_INSERTS = True
+        FLOAT_ON_INSERTS = False
 
         # sense check
         if (organInRobot.organType == 0) or (assemblyFixture is None) or (organInRobot.transformOrganOriginToMaleCableSocket is None):
