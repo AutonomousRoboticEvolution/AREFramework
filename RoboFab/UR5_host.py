@@ -1,5 +1,7 @@
 ##
 
+DEMO_FAKE_PRINTING = True
+
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket # for talking to UR5 over ethernet
@@ -471,6 +473,10 @@ class UR5Robot:
         self.moveArm(prePickupPoint)
         self.setMoveSpeed(self.speedValueNormal)  # normal
 
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+
         self.moveBetweenStations("printer_" + str(printer.number))
 
         # dropoff:
@@ -501,26 +507,30 @@ class UR5Robot:
 
         ## the Head is now in the skeleton, on the printbed
         ## wait for the bed to cool somewhat, then try pulling. If unsuccessful, wait some more and try again.
-        debugPrint("Starting bed pulling procedure",messageVerbosity=0)
-        has_pulled_off_bed = False
-        temperature_cooling_increment = 2 # degrees of cooling per pull attempt
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+        else:
+            debugPrint("Starting bed pulling procedure",messageVerbosity=0)
+            has_pulled_off_bed = False
+            temperature_cooling_increment = 2 # degrees of cooling per pull attempt
 
-        temperature_to_cool_to = 44
+            temperature_to_cool_to = 44
 
-        while not has_pulled_off_bed:
-            temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
-            self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
-            debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
-            printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
-            debugPrint("Pulling!",messageVerbosity=1)
-            self.gripper.enableServos()
-            if self.printBedPull():
-                has_pulled_off_bed=True
-            else:
-                self.moveArm(dropoffPoint)
-                if temperature_to_cool_to <= printer.defaultBedCooldownTemperature:
-                    debugPrint("WARNING! giving up on force mode to pull from bed", messageVerbosity=0)
-                    has_pulled_off_bed = True
+            while not has_pulled_off_bed:
+                temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
+                self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
+                debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
+                printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
+                debugPrint("Pulling!",messageVerbosity=1)
+                self.gripper.enableServos()
+                if self.printBedPull():
+                    has_pulled_off_bed=True
+                else:
+                    self.moveArm(dropoffPoint)
+                    if temperature_to_cool_to <= printer.defaultBedCooldownTemperature:
+                        debugPrint("WARNING! giving up on force mode to pull from bed", messageVerbosity=0)
+                        has_pulled_off_bed = True
 
         self.setMoveSpeed(self.speedValueReallySlow)
         self.moveArm(postDropoffPointUp)
@@ -529,7 +539,7 @@ class UR5Robot:
 
 
         ## Now take the robot to the Assembly Fixture (AF), and put it on:
-        assemblyFixture.setPosition(0)
+        assemblyFixture.setPosition(math.radians(180))
         AFVerticalClearanceForInsert = 0.05
         AFPostInsertExtraPushDistance = assemblyFixture.CORE_ORGAN_ATTACHMENT_Z_OFFSET
         AFDistanceForCompliantMove = 0

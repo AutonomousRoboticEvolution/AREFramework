@@ -105,8 +105,8 @@ if __name__ == "__main__":
     gripper = GripperHandler(configurationData)
 
     time.sleep(0.1)
-    gripper.setGripperPosition(1 ,"B")
-    time.sleep(1)
+    # gripper.setGripperPosition(1.0 ,"B")
+    # time.sleep(1)
 
     # time.sleep(1)
     # gripper.setGripperPosition(0.0,"B")
@@ -114,7 +114,7 @@ if __name__ == "__main__":
     # time.sleep(1)
     # gripper.setGripperPosition(1.0,"B")
 
-    time.sleep(1)
-    #gripper.disableServos()
+    # time.sleep(1)
+    gripper.disableServos()
     # gripper.stop()
     print("done")
