@@ -1,6 +1,6 @@
 ##
 
-DEMO_FAKE_PRINTING = True
+DEMO_FAKE_PRINTING = False
 
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
