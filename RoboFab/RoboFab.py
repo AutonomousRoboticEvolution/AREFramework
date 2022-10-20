@@ -128,7 +128,7 @@ class RoboFab_host:
                 #if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
                 if nextOrganFromRobot.transformOrganOriginToGripper is None:
                     # use male cable to insert the organ
-                    thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLE )
+                    thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLES )
                 else: # use the defined gripper location to pick up the organ
                     thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
 
@@ -148,6 +148,7 @@ class RoboFab_host:
         if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/assembly_videos/assembly_{}".format( self.logDirectory, self.robotID ) )
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
+        self.UR5.gripper.disableServos()
 
     def save_log_files( self ):
         # write list_of_organs file

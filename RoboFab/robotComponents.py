@@ -57,7 +57,8 @@ class Organ:
                 wrist_position = self.positionTransformWithinBankOrRobot * np.linalg.inv(self.transformOrganOriginToClipCentre) * self.transformOrganOriginToMaleCableSocket * cableOriginToGripper * np.linalg.inv(gripper_TCP) *makeTransformMillimetersDegrees(z=-300)
             x = wrist_position[0, 3]
             y = wrist_position[1, 3]
-            return math.atan2(x, y) + math.radians(-15)
+            # return math.atan2(x, y) + math.radians(-15)
+            return math.atan2(x, y) + math.radians(180 + 15)
 
             # if angleFromVertical < math.radians(30):
                 # # coming in from above, rotate so the position of organ is off to the side
