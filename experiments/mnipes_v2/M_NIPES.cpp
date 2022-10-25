@@ -66,7 +66,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
     nn2_cppn_t parents[2] = {gene_pool[best_idx[0]].morph_genome.get_cppn(),
                           gene_pool[best_idx[1]].morph_genome.get_cppn()};
     nn2_cppn_t child;
-    parents[0].crossover(parents[1],&child); //crossover to generate the child
+    parents[0].crossover(parents[1],child); //crossover to generate the child
     child.mutate(); //mutate the child
     NN2CPPNGenome new_gene(child);
     new_gene.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()}); //store the ids of the parents

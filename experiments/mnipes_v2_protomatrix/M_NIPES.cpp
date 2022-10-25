@@ -76,7 +76,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
     ProtomatrixGenome parent_2 = gene_pool[best_idx[1]].morph_genome;
     ProtomatrixGenome child_1;
     ProtomatrixGenome child_2; /// \todo: EB is this really neccesary?
-    parent_1.crossover(parent_1,&child_1,&child_2);
+    parent_1.crossover(parent_1,child_1,child_2);
     child_1.mutate();
     child_1.set_id(child_1.id() + 1);
     child_1.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()});
