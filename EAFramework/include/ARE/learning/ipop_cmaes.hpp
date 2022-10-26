@@ -6,6 +6,7 @@
 #include <libcmaes/cmaes.h>
 #include <ARE/Individual.h>
 #include <ARE/NNParamGenome.hpp>
+#include <ARE/Environment.h>
 
 namespace cma = libcmaes;
 using geno_pheno_t = cma::GenoPheno<cma::pwqBoundStrategy>;
@@ -32,6 +33,7 @@ public:
         std::vector<double> genome;
         std::vector<double> objectives; //this objectives are the oposite of the reward and novelty use here (reward = 1 - obj0) Those are the same objective values than the one obtain in the EA class.
         std::vector<double> descriptor;
+        std::vector<std::vector<waypoint>> trajectories;
 
         template<class archive>
         void serialize(archive &arch, const unsigned int v)
@@ -122,7 +124,7 @@ public:
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
     void set_novelty_decr(double nd){novelty_decr = nd;}
     void set_pop_stag_thres(float pst){pop_stag_thres = pst;}
-    const std::pair<double,std::vector<double>> &get_best_seen_solution(){return best_seen_solution;}
+    const individual_t &get_best_seen_solution(){return best_seen_solution;}
 
     bool have_reached_ftarget(){return reached_ft;}
 
@@ -153,7 +155,7 @@ private:
     std::vector<individual_t> _pop;
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
-    std::pair<double,std::vector<double>> best_seen_solution;
+    individual_t best_seen_solution;
     int len_of_stag = 20;
     float pop_stag_thres = 0.05;
     double novelty_ratio = 0;
@@ -162,7 +164,7 @@ private:
     double starting_fitness = 0;
     int number_of_eval = 0;
 
-    double best_fitness(std::vector<double> &);
+    double best_fitness(individual_t &);
 
     void _set_starting_fitness();
 

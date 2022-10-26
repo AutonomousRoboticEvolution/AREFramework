@@ -61,7 +61,7 @@ public:
 
     void update(Control::Ptr &) override{}
 
-    void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
+    void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc, std::vector<std::vector<waypoint> > &trajs);
     std::pair<std::vector<double>,std::vector<double>> update_ctrl(Control::Ptr&);
 
     void set_randNum(const misc::RandNum::Ptr& rn){_rand_num = rn;}
@@ -90,8 +90,9 @@ public:
 
     std::string archive_to_string() const;
     void set_nbr_dropped_eval(const int& nde){nbr_dropped_eval = nde;}
-    const std::pair<double,std::vector<double>>& get_best_solution() const {return _best_solution;}
+    const IPOPCMAStrategy::individual_t& get_best_solution() const {return _best_solution;}
     const std::vector<IPOPCMAStrategy::individual_t>& get_population() const {return _cma_strat->get_population();}
+
     double learning_progress() const {return _cma_strat->learning_progress();}
     bool is_learning_finish() const;
 
@@ -125,7 +126,7 @@ protected:
 
     int _dimension;
     IPOPCMAStrategy::Ptr _cma_strat;
-    std::pair<double,std::vector<double>> _best_solution;
+    IPOPCMAStrategy::individual_t _best_solution;
     misc::RandNum::Ptr _rand_num;
     std::vector<Eigen::VectorXd> _population;
     int _nn_inputs;

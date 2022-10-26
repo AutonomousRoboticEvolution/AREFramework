@@ -80,11 +80,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
     fitness_file_stream << genome.nbr_eval;
-    if(!genome.rewards.empty()){
-        fitness_file_stream << "," << genome.rewards.front();
-        for(size_t i = 1; i < genome.rewards.size(); i++)
-            fitness_file_stream << "," << genome.rewards[i];
-    }
+
     fitness_file_stream << "\n";
     fitness_file_stream.close();
     //-
@@ -264,11 +260,6 @@ void BestGenomesArchiveLog::saveLog(EA::Ptr &ea){
     for(const double& obj: genome.objectives)
         fofs << obj << ",";
     fofs << genome.nbr_eval;
-    if(!genome.rewards.empty()){
-        fofs << "," << genome.rewards.front();
-        for(size_t i = 1; i < genome.rewards.size(); i++)
-            fofs << "," << genome.rewards[i];
-    }
     fofs << "\n";
     fofs.close();
     //-

@@ -4,7 +4,7 @@ using namespace are;
 
 fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner& learner) -> double
 {
-    return 1 - learner.get_best_solution().first;
+    return learner.get_best_solution().objectives[0];
 };
 
 fitness_fct_t FitnessFunctions::average_fitness = [](const CMAESLearner& learner) -> double
@@ -464,7 +464,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
         }else{
             numberEvaluation++;
             //update learner
-            learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor());
+            auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
+            learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor(),trajs);
             bool is_ctrl_next_gen = learner.ctrl_learner.step();
             //-
 
@@ -482,13 +483,13 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
                 int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
 
-                if(!best_controller.second.empty() && best_controller.second.size() == nbr_weights + nbr_biases){
+                if(!best_controller.genome.empty() && best_controller.genome.size() == nbr_weights + nbr_biases){
                     weights.resize(nbr_weights);
                     for(size_t i = 0; i < nbr_weights; i++)
-                        weights[i] = best_controller.second[i];
+                        weights[i] = best_controller.genome[i];
                     biases.resize(nbr_biases);
-                    for(size_t i = nbr_weights; i < best_controller.second.size(); i++)
-                        biases[i-nbr_weights] = best_controller.second[i];
+                    for(size_t i = nbr_weights; i < best_controller.genome.size(); i++)
+                        biases[i-nbr_weights] = best_controller.genome[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
                     best_ctrl_gen.set_nbr_input(nbr_inputs);
@@ -499,15 +500,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //update the archive
                 if(use_ctrl_arch){
                     CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
                 }
                 //-
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-                new_gene.trajectories = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
-                new_gene.rewards = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_rewards();
-                new_gene.behavioral_descriptor = ind->descriptor();
+                new_gene.trajectories = best_controller.trajectories;
+                misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
                 gene_pool.push_back(new_gene);
                 //-
 
@@ -684,17 +684,17 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     learner = CMAESLearner(nbr_weights, nbr_bias,nn_inputs,nn_outputs);
     learner.set_parameters(parameters);
     learner.set_randNum(randomNum);
-
+    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     if(use_ctrl_arch){
         auto& starting_gen = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].first;
 
         if(starting_gen->get_weights().empty() && starting_gen->get_biases().empty())
-            learner.init();
+            learner.init(ftarget);
         else{
             std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
-            learner.init(init_pt);
+            learner.init(ftarget,init_pt);
         }
-    }else learner.init();
+    }else learner.init(ftarget);
 }
 
 void M_NIPES::init_new_ctrl_pop(learner_t &learner){

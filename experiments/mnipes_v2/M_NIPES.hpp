@@ -61,7 +61,6 @@ typedef struct genome_t{
     NN2CPPNGenome morph_genome;
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
-    std::vector<double> rewards;
     int age = -1;
     std::vector<std::vector<waypoint>> trajectories;
     Eigen::VectorXd behavioral_descriptor;
