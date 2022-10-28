@@ -83,8 +83,9 @@ std::vector<double> Exploration::fitnessFunction(const Individual::Ptr &ind){
     current_scene++;
     if(current_scene >= scenes_path.size())
         current_scene = 0;
-
-    return {static_cast<double>(grid_zone.sum())/static_cast<double>(max_fitness(8,real_coordinate_to_matrix_index(init_position)))};
+    double max_f = static_cast<double>(max_fitness(8,real_coordinate_to_matrix_index(init_position)));
+    double sum = static_cast<double>(grid_zone.sum());
+    return {sum/max_f};
 }
 
 std::pair<int,int> Exploration::real_coordinate_to_matrix_index(const std::vector<double> &pos){

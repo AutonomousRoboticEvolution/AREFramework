@@ -46,6 +46,7 @@ private:
 
     bool usingIPCamera;
 
+
     // zmq stuff for getting messages from python camera program
     zmq::context_t context;
     zmq::socket_t zmq_tracking_camera_requester_socket;

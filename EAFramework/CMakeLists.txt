@@ -56,6 +56,7 @@ add_library(ARE SHARED ${SOURCES})
 target_include_directories(ARE PUBLIC
     "include"
     "/usr/include/eigen3"
+    "/usr/local/include/"
     "../modules"
 )
 target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})

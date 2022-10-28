@@ -2,10 +2,10 @@
 #expPluginName,string,/home/ebb505/ARE_Project/vrep/lib/libbodyplantesting_nn2.so
 #scenePath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
 #modelsPath,string,/home/ebb505/ARE_Project/evolutionary_robotics_framework/simulation/models/
-#populationSize,int,100
-#maxEvalTime,float,1
-#numberOfGeneration,int,25
-#repository,string,/home/ebb505/ARE_Project/are-logs
+#populationSize,int,20
+#maxEvalTime,float,30
+#numberOfGeneration,int,200
+#repository,string,/media/ebb505/ARE-EBB/ARE/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -14,7 +14,7 @@
 #evaluationOrder,int,1
 #nbrRepitions,int,0
 
-#descriptor,int,1
+#descriptor,int,0
 #useNSGA2Diversity,bool,0
 
 #noiseLevel,double,0.
@@ -40,7 +40,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/le_goff/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 
@@ -82,5 +82,3 @@
 
 #isCPPNGenome,bool,1
 #isLeg,bool,1
-
-#descriptor,int,0

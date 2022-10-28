@@ -33,36 +33,45 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         std::string organType = thisLine.substr(0, thisLine.find(","));
         // NOTE! the string of the address value in the string (from the list_of_organs file) is in decimal, e.g. 0x63 = "99"
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
+		u_int8_t organAddress = 0x0;
+		if (addressValue.rfind("0x") == 0 || addressValue.rfind("0X") == 0) {
+			// exadecimal parsing
+			organAddress = std::stoi(addressValue, nullptr, 16);
+		} else {
+			// decimal parsing
+			organAddress = std::stoi(addressValue);
+		}
+
         switch (stoi(organType)) {
         case 0: //head
             //do nothing
             break;
 
         case 1: //wheel
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Adding wheel to list, address is "<<organAddress<<std::dec<<std::endl;
+            listOfOrgans.push_back( new MotorOrgan( organAddress ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
             numberOfWheels++;
             break;
 
         case 2: //sensor
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Adding sensor to list, address is "<<organAddress<<std::dec<<std::endl;
+            listOfOrgans.push_back( new SensorOrgan( organAddress ) ); // add a new sensor to the list, with the i2c address just extracted from the line
             numberOfSensors++;
             break;
 
         case 3: //leg - made up of two joints
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("Setting up a leg, addresses: 0x%02X and 0x%02X\n", std::stoi(addressValue), std::stoi(addressValue)+1);
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Setting up a leg, addresses: "<<organAddress<<" and "<<organAddress+1<<std::dec<<std::endl;
 
             // proximal joint of this leg:
-            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( new JointOrgan( organAddress ) ); // add a new joint to the list, with the i2c address just extracted from the line
             daughterBoards->turnOn( findDaughterBoardForOrgan(listOfOrgans.back()) ) ; // turn on the correct daughterboard
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = true; // this is a proximal joint
 
 
             // distal joint of this leg:
-            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
+            listOfOrgans.push_back( new JointOrgan( organAddress+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
@@ -70,7 +79,8 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             break;
 
         case 4: //caster
-            //do nothing
+	        if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<"Ignoring caster organ"<<std::endl;
+	        //do nothing
             break;
 
         default:// shouldn't be here!

@@ -170,7 +170,9 @@ void MNIPES::epoch(){
     //update learner
     auto& learner = learners[currentIndIndex];
     numberEvaluation++;
-    learner.update_pop_info(objectives,desc);
+    std::vector<std::vector<waypoint>> trajs;
+    trajs.push_back(trajectory);
+    learner.update_pop_info(objectives,desc,trajs);
     learner.step();
     std::cout << "Number of evaluations: " << learner.nbr_eval() << std::endl;
 
@@ -184,8 +186,8 @@ void MNIPES::epoch(){
         int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#nbrHiddenNeurons").value;
         auto &best_controller = learner.get_best_solution();
         int nbr_weights = learner.get_nbr_weights();
-        weights.insert(weights.end(),best_controller.second.begin(),best_controller.second.begin()+nbr_weights);
-        biases.insert(biases.end(),best_controller.second.begin()+nbr_weights,best_controller.second.end());
+        weights.insert(weights.end(),best_controller.genome.begin(),best_controller.genome.begin()+nbr_weights);
+        biases.insert(biases.end(),best_controller.genome.begin()+nbr_weights,best_controller.genome.end());
         best_current_ctrl_genome.set_weights(weights);
         best_current_ctrl_genome.set_biases(biases);
         best_current_ctrl_genome.set_nbr_input(learner.get_nbr_inputs());
@@ -198,7 +200,7 @@ void MNIPES::epoch(){
             std::string exp_name = settings::getParameter<settings::String>(parameters,"#experimentName").value;
             int wheels,joints,sensors;
             ioh::load_nbr_organs(repository + "/" + exp_name,currentIndIndex,wheels,joints,sensors);
-            ctrl_archive.update(std::make_shared<NNParamGenome>(best_current_ctrl_genome),1-best_controller.first,wheels,joints,sensors);
+            ctrl_archive.update(std::make_shared<NNParamGenome>(best_current_ctrl_genome),best_controller.objectives[0],wheels,joints,sensors);
         }
         //-
     }
@@ -539,7 +541,7 @@ void MNIPES::write_data_for_update(){
         }
 
 
-        morph_info.emplace("fitness",new settings::Float(1-learner.second.get_best_solution().first));
+        morph_info.emplace("fitness",new settings::Float(learner.second.get_best_solution().objectives[0]));
 
         ioh::add_morph_genome_to_gp(repository + "/" + exp_name,learner.first,morph_info);
     }

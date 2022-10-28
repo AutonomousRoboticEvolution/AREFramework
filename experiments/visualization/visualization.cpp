@@ -114,6 +114,9 @@ void VisuInd::update(double delta_time){
     double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
     if( diff < 0.1){
         std::vector<double> inputs = morphology->update();
+        for(const double& i : inputs)
+            std::cout << i << ";";
+        std::cout << std::endl;
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);
     }
@@ -224,6 +227,11 @@ void Visu::init(){
 
     morph_gen.reset();
     ctrl_gen.reset();
+}
+
+bool Visu::update(const Environment::Ptr &env){
+    Individual::Ptr ind = population[currentIndIndex];
+    std::dynamic_pointer_cast<VisuInd>(ind)->set_trajectory(env->get_trajectory());
 }
 
 bool Visu::is_finish(){

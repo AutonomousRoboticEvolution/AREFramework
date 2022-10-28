@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 directory=$(dirname $(readlink -f $0))
 sim="v_rep"
@@ -34,8 +35,8 @@ fi
 
 if [ $sim == sim ]
 then
-	$directory/coppeliaSim.sh "${@#* }"
+	exec $directory/coppeliaSim.sh "${@#* }"
 else
-	$directory/vrep.sh "${@#* }"
+	exec $directory/vrep.sh "${@#* }"
 fi
 

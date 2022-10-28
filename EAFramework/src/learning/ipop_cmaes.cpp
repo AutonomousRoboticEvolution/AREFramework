@@ -156,12 +156,12 @@ void IPOPCMAStrategy::eval(const dMat &candidates, const dMat &phenocandidates){
 void IPOPCMAStrategy::tell()
 {
     ipop_cmaes_t::tell();
-    std::vector<double> best_sample;
+    individual_t best_sample;
     best_fitnesses.push_back(best_fitness(best_sample));
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
-    if(best_fitnesses.back() < best_seen_solution.first || best_fitnesses.size() == 1)
-        best_seen_solution = std::make_pair(best_fitnesses.back(),best_sample);
+    if(best_seen_solution.objectives.empty() || best_fitnesses.back() > 1-best_seen_solution.objectives[0])
+        best_seen_solution = best_sample;
     inc_iter();
 }
 
@@ -183,19 +183,19 @@ bool IPOPCMAStrategy::stop()
 void IPOPCMAStrategy::reset_search_state()
 {
     if(elitist_restart)
-        _parameters.set_x0(best_seen_solution.second,best_seen_solution.second);
+        _parameters.set_x0(best_seen_solution.genome,best_seen_solution.genome);
 
     ipop_cmaes_t::reset_search_state();
     novelty_ratio = start_novelty_ratio;
     best_fitnesses.clear();
 }
 
-double IPOPCMAStrategy::best_fitness(std::vector<double> &best_sample){
-    double bf = 1.;
+double IPOPCMAStrategy::best_fitness(individual_t &best_sample){
+    double bf = 0;
     for(const auto& ind : _pop){
-        if(bf > 1 - ind.objectives[0]){
+        if(bf < ind.objectives[0]){
             bf = 1 - ind.objectives[0];
-            best_sample = ind.genome;
+            best_sample = ind;
         }
     }
     return bf;

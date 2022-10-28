@@ -10,7 +10,7 @@ def getDirectories(repository):
     # r=root, d=directories, f = files
     for r, d, f in os.walk(repository):
         for folder in d:
-            if(folder == "images"):
+            if(folder == "images" or folder == "best_genomes_archive"):
                continue
             temp_folder = folder.split("_")
             FOLDERS_NAMES.append(temp_folder[1])
@@ -18,7 +18,7 @@ def getDirectories(repository):
     print("--- Folders: ", len(FOLDERS))
     return FOLDERS, FOLDERS_NAMES
 
-def getDataFromFiles(folders, filename, startingColumn):
+def getDataFromFiles(folders, filename, startingColumn, endingColumn):
     print("Getting data from files...")
     dataFiles = []
     for f in folders:
@@ -29,7 +29,10 @@ def getDataFromFiles(folders, filename, startingColumn):
             with open(temp_filepath, 'r') as csvfile:
                 data = csv.reader(csvfile, delimiter=',', quotechar='"')
                 for row in data:
-                    temp_list.append(row[startingColumn:-1]) # Last character is empty for some reason
+                    if(endingColumn > 0):
+                        temp_list.append(row[startingColumn:-endingColumn]) # Last character is empty for some reason
+                    else:
+                        temp_list.append(row[startingColumn:]) # Last character is empty for some reason
             dataFiles.append(temp_list)
         else:
             print ("File not exist: " + temp_filepath)

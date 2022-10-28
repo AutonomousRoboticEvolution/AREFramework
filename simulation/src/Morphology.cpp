@@ -48,6 +48,5 @@ void Morphology::command(const std::vector<double> &ctrl_com){
             sentCommandToJointsOscillatory(jointHandles,joint_com);
         }
     }
-
-
 }
+

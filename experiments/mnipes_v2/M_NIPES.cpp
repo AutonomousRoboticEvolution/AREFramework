@@ -5,7 +5,7 @@ namespace fs = boost::filesystem;
 
 fitness_fct_t FitnessFunctions::best_fitness = [](const CMAESLearner& learner) -> double
 {
-    return 1 - learner.get_best_solution().first;
+    return learner.get_best_solution().objectives[0];
 };
 
 fitness_fct_t FitnessFunctions::average_fitness = [](const CMAESLearner& learner) -> double
@@ -80,24 +80,15 @@ void M_NIPESIndividual::createMorphology(){
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     int i = rewards.size();
-//    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    if(ctrlGenome->get_type() != "empty_genome"){
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+    if(ctrlGenome->get_type() != "empty_genome")
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setLoadRobot();
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-//        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
-//                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
-//            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-//            if(verbose)
-//                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
-//            drop_learning = true; //set it directly to 50 to stop the learning.
-//        }
-    }
-    else{
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+    else
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setDecodeRobot();
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    }
+
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
+    assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
@@ -520,7 +511,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else{//if this robot has no actuator, it is not included in the genomes pool and it is replaced by a new random one.
+            }else if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
+                     std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
+                //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
                 learner.ctrl_learner.to_be_erased();
                 EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
                 NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
@@ -545,7 +538,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
             numberEvaluation++;
             nbr_eval_current_task++;
             //update learner
-            learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor());
+            auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
+            learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor(),trajs);
             bool is_ctrl_next_gen = learner.ctrl_learner.step();
             //-
 
@@ -563,13 +557,13 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
                 int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
 
-                if(!best_controller.second.empty() && best_controller.second.size() == nbr_weights + nbr_biases){
+                if(!best_controller.genome.empty() && best_controller.genome.size() == nbr_weights + nbr_biases){
                     weights.resize(nbr_weights);
                     for(size_t i = 0; i < nbr_weights; i++)
-                        weights[i] = best_controller.second[i];
+                        weights[i] = best_controller.genome[i];
                     biases.resize(nbr_biases);
-                    for(size_t i = nbr_weights; i < best_controller.second.size(); i++)
-                        biases[i-nbr_weights] = best_controller.second[i];
+                    for(size_t i = nbr_weights; i < best_controller.genome.size(); i++)
+                        biases[i-nbr_weights] = best_controller.genome[i];
                     best_ctrl_gen.set_weights(weights);
                     best_ctrl_gen.set_biases(biases);
                     best_ctrl_gen.set_nbr_input(nbr_inputs);
@@ -580,15 +574,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //update the archive
                 if(use_ctrl_arch){
                     CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),1-best_controller.first,morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
                 }
                 //-
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-                new_gene.trajectories = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
-                new_gene.rewards = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_rewards();
-                new_gene.behavioral_descriptor = ind->descriptor();
+                new_gene.trajectories = best_controller.trajectories;
+                misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
                 new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
                 gene_pool.push_back(new_gene);
                 //-
@@ -597,9 +590,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
                     int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
                     int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
-                    if(1 - best_controller.first >= environments_info[current_gradual_scene].fitness_target || nbr_eval_current_task >= nbr_eval_per_task){
+                    if(best_controller.objectives[0] >= environments_info[current_gradual_scene].fitness_target || nbr_eval_current_task >= nbr_eval_per_task){
                         if(verbose)
-                            std::cout << "fitness: " << 1 - best_controller.first << " >= " << environments_info[current_gradual_scene].fitness_target
+                            std::cout << "fitness: " << best_controller.objectives[0] << " >= " << environments_info[current_gradual_scene].fitness_target
                                       << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
                         nbr_of_successful_solution++;
                         new_gene.environment = environments_info[current_gradual_scene].scene_path;

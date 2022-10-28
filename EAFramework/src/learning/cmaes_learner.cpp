@@ -40,12 +40,13 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
 }
 
 
-void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){
+void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc, std::vector<std::vector<waypoint>> &trajs){
     int idx = _cma_strat->get_population().size();
     IPOPCMAStrategy::individual_t ind;
     for(unsigned i = 0; i < _population[idx].rows(); i++)
         ind.genome.push_back(_population[idx](i));
     ind.objectives = obj;
+    ind.trajectories = trajs;
     ind.descriptor.resize(desc.rows());
     for(int i = 0; i < desc.rows(); i++)
         ind.descriptor[i] = desc(i);

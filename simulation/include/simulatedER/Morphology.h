@@ -45,6 +45,7 @@ public:
     virtual void create() = 0;
     virtual void createAtPosition(float x, float y, float z) = 0;
 
+
     /**
      * @brief method which read all the sensors of the morphology and return in the following order :
      *              - the proximity sensors values : distance to the nearest object detected

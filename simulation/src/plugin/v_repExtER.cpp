@@ -155,7 +155,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::Property::Ptr properties(new are_sett::Property);
     ERVREP->set_properties(properties);
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
-    if(seed < 0){
+    if(seed == -1){
         std::random_device rd;
         seed = rd();
         are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));

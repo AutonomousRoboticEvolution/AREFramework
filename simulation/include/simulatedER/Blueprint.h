@@ -20,6 +20,12 @@ private:
     std::vector<std::vector<float>> organPosList;
     std::vector<std::vector<float>> organOriList;
 public:
+    Blueprint(){
+        organTypes.resize(0);
+        organPosList.resize(0);
+        organOriList.resize(0);
+    }
+
     void createBlueprint(std::vector<Organ> organList)
     {
         for (std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++) {

@@ -1,7 +1,7 @@
-#experimentName,string,physical_corridor
+#experimentName,string,physical_410
 #expPluginName,string,/usr/local/lib/libphysical_melai.so
 #verbose,bool,1
-#repository,string,/home/le_goff/are-logs/
+#repository,string,/home/leni/are-logs/
 #seed,int,-1
 
 #simMode,bool,1
@@ -13,13 +13,15 @@
 #flatFloor,bool,1
 #maxVelocity,double,6.
 #scenes,sequence_string,corridor_ridges.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
+
 
 #startFromRandomPop,bool,0
 #populationSize,int,5
 #nbrOfOffsprings,int,5
 #tournamentSize,int,2
 
-#maxEvalTime,float,30
+#maxEvalTime,float,60
 #timeStep,float,0.05
 
 #archiveAddingProbability,double,0.4
@@ -27,7 +29,7 @@
 
 #cameraPipe,string,tcp://127.0.0.1:5557
 #target,sequence_double,0.75;0.75;0.12
-#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
 #isWheel,bool,1
 #isSensor,bool,1
 #isJoint,bool,1
@@ -36,7 +38,7 @@
 #isLeg,bool,1
 
 #envType,int,0
-#nbrWaypoints,int,30
+#nbrWaypoints,int,60
 #arenaSize,double,2.
 #loadLastLearnerState,bool,1
 #loadExistingControllers,bool,1
@@ -48,6 +50,7 @@
 #NNType,int,2
 #nbrHiddenNeurons,int,6
 #jointControllerType,int,2
+#jointPositionsAsInputs,bool,0
 
 #cmaesSmallNbrEval,int,100
 #cmaesLargeNbrEval,int,100
@@ -56,8 +59,8 @@
 #CMAESStep,double,0.01
 #FTarget,double,0.05
 #elitistRestart,bool,0
-#withRestart,bool,1
-#incrPop,bool,1
+#withRestart,bool,0
+#incrPop,bool,0
 #lengthOfStagnation,int,20
 #populationStagnationThreshold,float,0.05
 #kValue,int,15
@@ -72,9 +75,7 @@
 #reloadController,bool,0
 #saveBlueprint,bool,1
 
-#organsVersion,int,3
-
-#useArucoAsInput,bool,0
+#useArucoAsInput,bool,1
 
 #debugDisplayOnPi,bool,1
 #debugLEDsOnPi,bool,0

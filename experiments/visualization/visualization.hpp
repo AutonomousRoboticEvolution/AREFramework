@@ -48,9 +48,13 @@ public:
     std::string to_string() override;
     void from_string(const std::string &str) override;
 
+    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+
 private:
     void createMorphology() override;
     void createController() override;
+    std::vector<waypoint> trajectory;
 
 };
 
@@ -64,6 +68,7 @@ public:
 
     void init() override;
     bool is_finish() override;
+    bool update(const Environment::Ptr&) override;
     void load_per_gen_ind(int indIdx, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
     void load_per_id(int id, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
 
