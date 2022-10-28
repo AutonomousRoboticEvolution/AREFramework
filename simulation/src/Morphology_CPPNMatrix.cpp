@@ -336,10 +336,9 @@ void Morphology_CPPNMatrix::create()
     destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
-        int loadInd = morph_id;; /// \todo EB: We might need to remove this or change it!
-        exportRobotModel(loadInd);
-    }
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value)
+        exportRobotModel(morph_id);
+
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
@@ -382,6 +381,8 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
         std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
     }
     setPosition(x,y,z);
+    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
+    simSetObjectOrientation(mainHandle,-1,orientation.data());
 }
 
 void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
@@ -587,7 +588,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     // Export blueprint
 
     std::stringstream sst_blueprint;
-    sst_blueprint << "/blueprint_" << "0" << ".csv";
+    sst_blueprint << "/blueprint_" << indNum << ".csv";
     std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
     if(!ofs_blueprint)
     {
@@ -617,7 +618,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     indicesSizesMesh[0] = skeletonListIndices.size();
 
     std::stringstream filepath_mesh;
-    filepath_mesh << Logging::log_folder << "/mesh_" << "0" << ".stl";
+    filepath_mesh << Logging::log_folder << "/mesh_" << indNum << ".stl";
 
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format

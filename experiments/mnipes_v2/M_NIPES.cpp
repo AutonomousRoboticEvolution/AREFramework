@@ -80,24 +80,15 @@ void M_NIPESIndividual::createMorphology(){
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     int i = rewards.size();
-//    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    if(ctrlGenome->get_type() != "empty_genome"){
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+
+    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+    if(ctrlGenome->get_type() != "empty_genome")
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setLoadRobot();
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-//        if(!(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() ==
-//                std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc())){
-//            bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-//            if(verbose)
-//                std::cerr << "Morphology does not correspond to the precedent one. Drop this robot." << std::endl;
-//            drop_learning = true; //set it directly to 50 to stop the learning.
-//        }
-    }
-    else{
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+    else
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setDecodeRobot();
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    }
+
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
+    assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
@@ -520,7 +511,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else{//if this robot has no actuator, it is not included in the genomes pool and it is replaced by a new random one.
+            }else if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
+                     std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
+                //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
                 learner.ctrl_learner.to_be_erased();
                 EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
                 NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));

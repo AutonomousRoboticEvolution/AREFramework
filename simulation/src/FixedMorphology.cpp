@@ -71,7 +71,8 @@ void FixedMorphology::create()
 //    float orientation[3];
 //    simGetObjectOrientation(mainHandle,mainHandle,orientation);
 //    orientation[0] = robotOrient;
-//    simSetObjectOrientation(mainHandle,mainHandle,orientation);
+    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
+    simSetObjectOrientation(mainHandle,-1,orientation.data());
 
     std::cout << "Robot Created" << std::endl;
 }
