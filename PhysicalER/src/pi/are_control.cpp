@@ -6,7 +6,7 @@ using namespace are::pi;
 AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
     _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
-    _time_step = settings::getParameter<settings::Float>(parameters,"#ctrlUpdateFrequency").value * 1000.0; // in milliseconds
+    _time_step = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value * 1000.0; // in milliseconds
     std::cout<<"Target timestep: "<<_time_step<<" ms"<<std::endl;
 
     // initilise the camera
@@ -33,36 +33,45 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
         std::string organType = thisLine.substr(0, thisLine.find(","));
         // NOTE! the string of the address value in the string (from the list_of_organs file) is in decimal, e.g. 0x63 = "99"
         std::string addressValue = thisLine.substr(thisLine.find(",")+1);
+		u_int8_t organAddress = 0x0;
+		if (addressValue.rfind("0x") == 0 || addressValue.rfind("0X") == 0) {
+			// exadecimal parsing
+			organAddress = std::stoi(addressValue, nullptr, 16);
+		} else {
+			// decimal parsing
+			organAddress = std::stoi(addressValue);
+		}
+
         switch (stoi(organType)) {
         case 0: //head
             //do nothing
             break;
 
         case 1: //wheel
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding wheel to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( new MotorOrgan( std::stoi(addressValue) ) ); // add a new wheel to the list, with the i2c address just extracted from the line
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Adding wheel to list, address is "<<organAddress<<std::dec<<std::endl;
+            listOfOrgans.push_back( new MotorOrgan( organAddress ) ); // add a new wheel to the list, with the i2c address just extracted from the line
             static_cast<MotorOrgan*> (listOfOrgans.back()) ->setCurrentLimit( wheel_current_limit ); // set the current limit
             numberOfWheels++;
             break;
 
         case 2: //sensor
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP)std::cout<<"Adding sensor to list, address is "<<addressValue<<std::endl;
-            listOfOrgans.push_back( new SensorOrgan( std::stoi(addressValue) ) ); // add a new sensor to the list, with the i2c address just extracted from the line
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Adding sensor to list, address is "<<organAddress<<std::dec<<std::endl;
+            listOfOrgans.push_back( new SensorOrgan( organAddress ) ); // add a new sensor to the list, with the i2c address just extracted from the line
             numberOfSensors++;
             break;
 
         case 3: //leg - made up of two joints
-            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) printf("Setting up a leg, addresses: 0x%02X and 0x%02X\n", std::stoi(addressValue), std::stoi(addressValue)+1);
+            if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<std::hex<<"Setting up a leg, addresses: "<<organAddress<<" and "<<organAddress+1<<std::dec<<std::endl;
 
             // proximal joint of this leg:
-            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue) ) ); // add a new joint to the list, with the i2c address just extracted from the line
+            listOfOrgans.push_back( new JointOrgan( organAddress ) ); // add a new joint to the list, with the i2c address just extracted from the line
             daughterBoards->turnOn( findDaughterBoardForOrgan(listOfOrgans.back()) ) ; // turn on the correct daughterboard
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( proximal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = true; // this is a proximal joint
 
 
             // distal joint of this leg:
-            listOfOrgans.push_back( new JointOrgan( std::stoi(addressValue)+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
+            listOfOrgans.push_back( new JointOrgan( organAddress+1 ) ); // distal joint i2c address is assumed to be one more than that of the proximal joint
             static_cast<JointOrgan*> (listOfOrgans.back()) ->setCurrentLimit( distal_joint_current_limit ); // set the current limit
             static_cast<JointOrgan*> (listOfOrgans.back()) -> isProximalNotDistal = false; // this is a distal joint
 
@@ -70,7 +79,8 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
             break;
 
         case 4: //caster
-            //do nothing
+	        if(VERBOSE_DEBUG_PRINTING_AT_SETUP) std::cout<<"Ignoring caster organ"<<std::endl;
+	        //do nothing
             break;
 
         default:// shouldn't be here!
@@ -154,7 +164,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             daughterBoards->turnOn(thisOrgan->daughterBoardToEnable);
             MotorOrgan* thisWheel = static_cast<MotorOrgan *>(thisOrgan);
             thisWheel->setSpeedNormalised( values[i]);
-            logs_to_send<< thisWheel->readMeasuredCurrent()*10 <<","; //add measured current to log
+            logs_to_send<< std::to_string(thisWheel->readMeasuredCurrent()) <<","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a wheel
@@ -170,7 +180,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
             thisJoint->savedLastPositionRadians = newTargetAngle; // save the target angle for use next time
             if (!thisJoint->isProximalNotDistal){ newTargetAngle = -newTargetAngle; } // flip direction for the distal joint but not the proximal one, to match simualtion
             thisJoint->setTargetAngle(newTargetAngle * 180.0/M_PI); // convert to degrees and send the new target angle to the joint
-            logs_to_send<< float(thisJoint->readMeasuredCurrent())*10 << ","; //add measured current to log
+            logs_to_send<< std::to_string(float(thisJoint->readMeasuredCurrent())*10) << ","; //add measured current to log
             i++; // increment organ in listOfOrgans
         }
         // else: ignore anything that isn't a joint
@@ -191,7 +201,7 @@ void AREControl::sendOutputOrganCommands(std::vector<double> &values, uint32_t t
 
     // add NN outputs to log:
     for(i=0;i<values.size();i++){
-        logs_to_send<< values[i] <<","; //add NN output to log
+        logs_to_send<< std::to_string(values[i]) <<","; //add NN output to log
     }
 //    std::copy(values.begin(), values.end(), std::ostream_iterator<int>(logs_to_send, ","));
 }
@@ -263,7 +273,7 @@ void AREControl::retrieveSensorValues(std::vector<double> &sensor_vals){
 
     // append input values to log data:
     for(int i=0;i<sensor_vals.size();i++){
-        logs_to_send<< sensor_vals[i] <<","; //add NN input to log
+        logs_to_send<< std::to_string(sensor_vals[i]) <<","; //add NN input to log
     }
 }
 
@@ -285,7 +295,8 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // make the first line of the log file, a list of headers for the data to follow:
     logs_to_send<<"time (ms),";
-    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",NN_input_IR_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_TOF_"<<i<<",";}
+    for(int i=0;i<numberOfSensors;i++){logs_to_send<<"NN_input_IR_"<<i<<",";}
     if(cameraInputToNN){logs_to_send<<"NN_input_camera,";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"current_for_output_"<<i<<"(mA),";}
     for(int i=0;i<(numberOfWheels+numberOfJoints);i++){logs_to_send<<"NN_output_"<<i<<",";}
@@ -305,7 +316,7 @@ int AREControl::exec(zmq::socket_t& socket){
     // the main loop that runs the controller:
     while(this_loop_start_time-start_time <= _max_eval_time && !stop_early){
         // start a new line of log file, and add current time
-        logs_to_send<<"\n"<<this_loop_start_time-start_time<<",";
+        logs_to_send<<"\n"<<std::to_string(this_loop_start_time-start_time)<<",";
 
         // get sensor readings
         retrieveSensorValues(sensor_values);
@@ -380,6 +391,7 @@ int AREControl::exec(zmq::socket_t& socket){
 
     // send log data
     logs_to_send<<"\n"; // add a final newline
+    //std::cout<<"LOG:\n"<<logs_to_send.str()<<std::endl;
     are::phy::send_string_no_reply( logs_to_send.str() ,socket, "pi ");
     are::phy::send_string_no_reply("finished_logs",socket, "pi ");
 

@@ -1,5 +1,7 @@
 ##
 
+DEMO_FAKE_PRINTING = False
+
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 import socket # for talking to UR5 over ethernet
@@ -86,6 +88,7 @@ class UR5Robot:
     ## Low-level function to send a text string to UR5 controller
     def sendString ( self, stringToSend ):
         debugPrint("Sending string to UR5: "+stringToSend , messageVerbosity=3)
+        self.isReadyForNextCommand = False
         self.c.send ( stringToSend.encode ( 'ASCII' ) )
         time.sleep(0.01)
 
@@ -103,8 +106,6 @@ class UR5Robot:
     def waitForArmToBeReady ( self ):
         while not self.isReadyForNextCommand:  # wait for ready
             time.sleep ( 0.1 )
-            # debugPrint( "Waiting for arm to be ready..." )
-        self.isReadyForNextCommand = False
         time.sleep ( 0.1 )
 
 
@@ -214,6 +215,7 @@ class UR5Robot:
     ## returns true if the thing we were pulling (the robot) moved more than 2cm, false otherwise
     def printBedPull(self):
         startingPostition = self.getCurrentPosition()
+        self.waitForArmToBeReady()
         self.sendString("print_bed_pull")
         finishPosition = self.getCurrentPosition()
         if findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02:
@@ -233,8 +235,9 @@ class UR5Robot:
             msg = self.c.recv ( 1024 )
             debugPrint ( "Received message: " + str ( msg ) ,messageVerbosity=3)
             if msg:
-                if msg == b'UR_ready':
+                if msg == b'UR_ready' or msg.startswith(b'UR_ready'):
                     # print("UR is ready")
+                    if msg != b'UR_ready': debugPrint("WARNING possible concatenated message from UR: \"{}\"".format(msg), messageVerbosity=0)
                     self.isReadyForNextCommand = True
                     if not self.UR5isConnected:
                         self.UR5isConnected = True
@@ -470,6 +473,10 @@ class UR5Robot:
         self.moveArm(prePickupPoint)
         self.setMoveSpeed(self.speedValueNormal)  # normal
 
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+
         self.moveBetweenStations("printer_" + str(printer.number))
 
         # dropoff:
@@ -500,27 +507,30 @@ class UR5Robot:
 
         ## the Head is now in the skeleton, on the printbed
         ## wait for the bed to cool somewhat, then try pulling. If unsuccessful, wait some more and try again.
-        debugPrint("Starting bed pulling procedure",messageVerbosity=0)
-        has_pulled_off_bed = False
-        temperature_cooling_increment = 2 # degrees of cooling per pull attempt
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+        else:
+            debugPrint("Starting bed pulling procedure",messageVerbosity=0)
+            has_pulled_off_bed = False
+            temperature_cooling_increment = 2 # degrees of cooling per pull attempt
 
-        temperature_to_cool_to = 44
+            temperature_to_cool_to = 44
 
-        while not has_pulled_off_bed:
-            temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
-            self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
-            if temperature_to_cool_to<printer.defaultBedCooldownTemperature:
-                debugPrint("Waiting 30 seconds",messageVerbosity=1)
-                time.sleep(30)
-            else:
+            while not has_pulled_off_bed:
+                temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
+                self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
                 debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
                 printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
-            debugPrint("Pulling!",messageVerbosity=1)
-            self.gripper.enableServos()
-            if self.printBedPull():
-                has_pulled_off_bed=True
-            else:
-                self.moveArm(dropoffPoint)
+                debugPrint("Pulling!",messageVerbosity=1)
+                self.gripper.enableServos()
+                if self.printBedPull():
+                    has_pulled_off_bed=True
+                else:
+                    self.moveArm(dropoffPoint)
+                    if temperature_to_cool_to <= printer.defaultBedCooldownTemperature:
+                        debugPrint("WARNING! giving up on force mode to pull from bed", messageVerbosity=0)
+                        has_pulled_off_bed = True
 
         self.setMoveSpeed(self.speedValueReallySlow)
         self.moveArm(postDropoffPointUp)
@@ -529,7 +539,7 @@ class UR5Robot:
 
 
         ## Now take the robot to the Assembly Fixture (AF), and put it on:
-        assemblyFixture.setPosition(0)
+        assemblyFixture.setPosition(math.radians(180))
         AFVerticalClearanceForInsert = 0.05
         AFPostInsertExtraPushDistance = assemblyFixture.CORE_ORGAN_ATTACHMENT_Z_OFFSET
         AFDistanceForCompliantMove = 0
@@ -588,7 +598,7 @@ class UR5Robot:
         gripperOpenPositionDropoff= 0.76  # 0 = fully open, 1= fully closed
         gripperClosedPosition = 1.0
         cableOriginToGripper = makeTransformMillimetersDegrees(y=3,z=-3)
-        FLOAT_ON_INSERTS = True
+        FLOAT_ON_INSERTS = False
 
         # sense check
         if (organInRobot.organType == 0) or (assemblyFixture is None) or (organInRobot.transformOrganOriginToMaleCableSocket is None):

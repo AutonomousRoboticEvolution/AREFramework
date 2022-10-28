@@ -64,16 +64,23 @@ def plot_fitnesses(eval_nbr,fitnesses):
 	sns.lineplot(data=data,x="eval",y="fitness")
 	plt.show()
 
-def plot_trajectory(eval_nbr,trajectories):
+def plot_trajectory(eval_nbr,trajectories,robot_id=0,save_fig=False):
 	lines = trajectories[eval_nbr]
 	if(len(lines[0]) == 3):
 		data = pd.DataFrame(data=lines,columns=["x","y","z"])
 	else:
 		data = pd.DataFrame(data=lines,columns=["x","y"])
+	plt.figure()
 	ax = sns.scatterplot(data=data,x="x",y="y")
 	ax.set_xlim([-1,1])
 	ax.set_ylim([-1,1])
-	plt.show()	
+	ax.set_title("trajectory " + str(eval_nbr))
+	if(save_fig):
+		plt.savefig("traj_" + str(robot_id) + "_" + str(eval_nbr))
+	else:
+		plt.show()	
+
+
 
 def best_fitnesses(n,eval_nbr,fitnesses):
 	index_sort = np.argsort(np.array(fitnesses))
@@ -84,8 +91,9 @@ def best_fitnesses(n,eval_nbr,fitnesses):
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser()
 	parser.add_argument('filename',type=str,help="path to robot infos file")
-	parser.add_argument('-f',help="plot fitnesses")
+	parser.add_argument('-f',default=False,action="store_true",help="plot fitnesses")
 	parser.add_argument('--traj',type=int,default=0,help="plot trajectory of specific evaluation")
+	parser.add_argument('--save_all_traj',default=False,action="store_true",help="plot trajectory of specific evaluation")
 	parser.add_argument('--best',type=int,default=1,help="print N best fitnesses and corresponding eval number")
 	parser.add_argument('--ctrl',type=int,default=0,help="write ctrl genome from evaluation number ctrl")
 	args = parser.parse_args()
@@ -95,10 +103,15 @@ if __name__ == '__main__':
 		print(best_fitnesses(args.best,evals,fitnesses))
 	if(args.f):
 		plot_fitnesses(evals,fitnesses)
+	if(args.save_all_traj):
+		robot_id = int(args.filename.split("/")[-1].split("_")[-1])
+		for e in evals:
+			plot_trajectory(e,trajectories,robot_id,True)
 	if(args.traj > 0):
 		if(args.traj >= len(evals)):
-			print("Error: there is no evaluation number",args.ctrl)
+			print("Error: there is no evaluation number",args.traj)
 		else:
+			print("trajectory of controller number:",args.traj,"with fitness value =",fitnesses[args.traj])
 			plot_trajectory(args.traj,trajectories)
 	if(args.ctrl > 0):
 		if(args.ctrl >= len(evals)):

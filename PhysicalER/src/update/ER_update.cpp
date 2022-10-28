@@ -161,7 +161,8 @@ void ER::start_evaluation(){
     assert(reply == "starting");
 
     // starts the recording of the video feed:
-    std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording();
+    if(!sim_mode)
+		std::dynamic_pointer_cast<RealEnvironment>(environment)->start_recording();
 }
 
 bool ER::update_evaluation(){
@@ -198,15 +199,18 @@ bool ER::stop_evaluation(){
 
     if(verbose) std::cout << "individual " << current_id << " has finished evaluating" << std::endl;
 
-    // stop the recording, discarding the video if there was error(s):
-    if (robot_reported_error){
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
-    }else{
-        std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( std::to_string(ER::current_id)); // filename of the robot ID number
+    if(!sim_mode) { // stop the recording, discarding the video if there was error(s):
+        if (robot_reported_error){
+            std::dynamic_pointer_cast<RealEnvironment>(environment)->discard_tracking_video();
+        }else{
+            std::string video_filename = std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation());
+            std::dynamic_pointer_cast<RealEnvironment>(environment)->save_tracking_video( video_filename ); // filename of the robot ID number
+        }
     }
 
     // get any logs that the robot has gathered:
     bool getting_logs=true;
+    std::string log_to_save = "\n" + std::to_string(ER::current_id) + "_" + std::to_string(ea->get_numberEvaluation()) ;
     while(getting_logs){
         // get message:
         std::string message;
@@ -217,7 +221,8 @@ bool ER::stop_evaluation(){
             getting_logs=false;
         }else{ // otherwise, this is a log packet
             //std::cout << "got a log" << message << std::endl;
-            Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
+            log_to_save += "\n" + message;
+            //Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , message );
         }
     }
     std::vector<double> objs;
@@ -276,6 +281,7 @@ bool ER::stop_evaluation(){
 
     write_data();
     save_logs();
+    Logging::saveStringToFile( "log_file_"+ std::to_string(ER::current_id) +".txt" , log_to_save );
 
     list_ids.clear();
     choice_of_robot();

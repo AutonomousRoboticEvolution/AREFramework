@@ -15,9 +15,11 @@ def makeFile(location):
 	# location specific variables:
 	if location == "BRL":
 
-		LOG_FOLDER = "/home/robofab/are-logs/hardware_test/"
+		LOG_FOLDER = "/home/robofab/are-logs/exploration/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/parameters.csv"
+
+		ROBOFAB_WEBCAM_PIPE = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0"
 
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=69.87 , y=-570.36 , z=72.8 , rotY=0.59 , rotZ=90-0.40488).tolist()
@@ -28,6 +30,7 @@ def makeFile(location):
 		PRINTER_1_API_KEY = "change_me"
 		ORGAN_BANK_1_ORIGIN = makeTransformMillimetersDegrees( x=-400.07, y=-256.03, z=-9.49, rotX=0.24, rotY=0, rotZ=90 + 0.037 ).tolist()
 
+		gripper_TCP_FOR_CABLES = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 		gripper_TCP_A = makeTransformMillimetersDegrees(x=0.0, y=7.6, z=215, rotZ=180).tolist() # single gripper
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
@@ -42,23 +45,29 @@ def makeFile(location):
 		COPPELIASIM_FOLDER = "/home/robofab/vrep"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/evolutionary_robotics_framework/experiments/test_are_generate/parameters.csv"
 
+		ROBOFAB_WEBCAM_PIPE = "0"
+
 		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformInputFormatted([4.02 / 1000 , -0.67789 , 0.748 , math.radians(180), 0, math.radians(90)]).tolist()  # 6.315
-		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
-		PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformInputFormatted([-0.1013, 0.244 , 0.085 , 0 , 0 , 0]).tolist()
+		# ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=63.1 , y=-578.4 , z=70.9 , rotY=0 , rotZ=90).tolist()
+		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=104.9 , y= -576.4 , z=71.0 , rotZ=90).tolist()
+		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=427.8, y=160.5, z=83, rotZ = -90).tolist()
+		# PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
+		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees(x=-68.8 ,y=244.8, z=83).tolist()
+		# PRINTER_1_ORIGIN = makeTransformInputFormatted([-0.1013, 0.244 , 0.085 , 0 , 0 , 0]).tolist()
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
 		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
-		ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees( x=-374.75, y=-299.2, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.397, rotY=-0.068, rotZ=-0.345)  ).tolist() # second transform is the angle correction for not being quite level
+		# ORGAN_BANK_1_ORIGIN = (makeTransformMillimetersDegrees(x=-335.9, y=-272.5, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.408, rotY=0.019) ).tolist()
+		ORGAN_BANK_1_ORIGIN = (  makeTransformMillimetersDegrees(z=-2.5)  * makeTransformMillimetersDegrees(x=-335.9, y=-272.5, z=-8.6, rotZ=90) * makeTransformMillimetersDegrees(rotX=0.408, rotY=0.019) ).tolist()
 
-		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.7, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
-		# gripper_TCP_A = makeTransformMillimetersDegrees(x=-2, y=9.7, z=216.9, rotZ=180).tolist() # single gripper
+		gripper_TCP_A = (makeTransformMillimetersDegrees(x=0, y=9.6, z=216.9, rotZ=180) ).tolist() # single gripper
+		gripper_TCP_FOR_CABLES = (makeTransformMillimetersDegrees(x=0, y=9.6, z=216.9, rotZ=180) * makeTransformMillimetersDegrees(rotX=3) ).tolist() # single gripper
 
 
 		# define what constitutes "open" and "closed" for the servos on the gripper:
 		A_open_position = 0
 		A_closed_position = 0
 		B_open_position = 2100
-		B_closed_position = 1100
+		B_closed_position = 1080
 
 
 	else:
@@ -71,6 +80,8 @@ def makeFile(location):
 		"logDirectory":LOG_FOLDER,
 		"parametersFile":SOFTWARE_PARAMETERS_FILE,
 		"coppeliasimFolder":COPPELIASIM_FOLDER,
+
+		"RoboFabWebcamPipe":ROBOFAB_WEBCAM_PIPE,
 
 		"network":{
 			"COMPUTER_ADDRESS":"192.168.2.253", # the RoboFab PC (that runs this code)
@@ -103,6 +114,7 @@ def makeFile(location):
 			"STARTUP_MESSAGE":"a0b0",
 			"EXPECTED_STARTUP_REPLY":"I am the gripper",
 			"TCP_A": gripper_TCP_A,
+			"TCP_FOR_CABLES": gripper_TCP_FOR_CABLES,
 			# "TCP_A": (makeTransformInputFormatted( [0,0,0, math.radians(45),0,math.radians(-270)] ) * makeTransformInputFormatted([0.002,-30/1000,231/1000])).tolist(),
 			"TCP_B": (makeTransformInputFormatted([0, 0, 0, math.radians(-45), 0, math.radians(90)]) * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)]) * makeTransformInputFormatted([-2 / 1000, 19 / 1000, 261 / 1000]) * makeTransformInputFormatted([0, 0.001, 0.006])).tolist(),
 			"SUCCESS_MESSAGE":"OK",
@@ -125,7 +137,7 @@ def makeFile(location):
 				"postInsertExtraPushDistance": 0.0 / 1000, # positive for extra pushing when attaching organ to skeleton
 				"pickupExtraPushDistance": 2 / 1000, # offset in gripper frame z direction just when picking up organ
 				# "transformOrganOriginToGripper": np.linalg.inv(makeTransformInputFormatted ( [ 0, 0, 72 / 1000, 0, math.radians ( 180 ), math.radians(180) ] ) ).tolist(), # Head v0.1
-				"transformOrganOriginToGripper": (np.linalg.inv(makeTransformMillimetersDegrees (z=85 , rotX=180 )) * makeTransformMillimetersDegrees(rotX=3) ).tolist(), # Head v0.2
+				"transformOrganOriginToGripper": np.linalg.inv(makeTransformMillimetersDegrees (z=85 , rotX=180 )).tolist(), # Head v0.2
 				"transformOrganOriginToClipCentre": makeTransformInputFormatted().tolist(),
 				"transformOrganOriginToFemaleCableSocket": [
 					(makeTransformMillimetersDegrees(x=-24 , y=-34.67 , z=107.49 , rotX=180,rotZ=180)).tolist (),
@@ -153,7 +165,7 @@ def makeFile(location):
                 "transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				"gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.45,
-				"USE_FORCE_MODE":True
+				"USE_FORCE_MODE":False
 				 },
 			2: {"organType": 2,
 				"friendlyName": "Sensor organ",
@@ -166,7 +178,7 @@ def makeFile(location):
 				"transformOrganOriginToFemaleCableSocket": None, # female socket(s)
 				 "gripperOpeningFraction": 0.0,
 				"gripperClosedFraction": 0.6,
-				"USE_FORCE_MODE":True,
+				"USE_FORCE_MODE":False,
 				 },
 			3: {"organType": 3, # minimally tested!
 				"friendlyName": "Leg organ",
@@ -204,17 +216,17 @@ def makeFile(location):
 			"HOME_BETWEEN_EVERY_MOVE":False,
 			"CORE_ORGAN_ATTACHMENT_Z_OFFSET": 0/1000,
 			"EXPECTED_STARTUP_MESSAGE":"I am the Assembly Fixture",
-			"CLEAR_Z_HEIGHT": 0.42 # global coordinates z value which is guaranteed to be above all parts of the robot when it is on the assembly fixture
+			"CLEAR_Z_HEIGHT": 0.4 # global coordinates z value which is guaranteed to be above all parts of the robot when it is on the assembly fixture
 		},
 
 		"PRINTER_0":{
 		"ORIGIN":PRINTER_0_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_0_API_KEY
 		},
 		"PRINTER_1":{
 		"ORIGIN":PRINTER_1_ORIGIN,
-        "BED_COOLDOWN_TEMPERATURE":35,
+        "BED_COOLDOWN_TEMPERATURE":30,
 		"API_KEY":PRINTER_1_API_KEY
 		},
 

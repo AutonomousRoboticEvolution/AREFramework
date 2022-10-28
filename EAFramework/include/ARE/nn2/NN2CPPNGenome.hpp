@@ -112,7 +112,7 @@ public:
         are::nn2_cppn_t cppn_child;
         are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child);
-        *child = NN2CPPNGenome(cppn_child);
+        *std::dynamic_pointer_cast<NN2CPPNGenome>(child) = NN2CPPNGenome(cppn_child);
         child->set_parameters(parameters);
         child->set_randNum(randomNum);
         std::dynamic_pointer_cast<NN2CPPNGenome>(child)->set_parents_ids({_id,partner->id()});
@@ -123,8 +123,8 @@ public:
         are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<NN2CPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child1);
         cppn_partner.crossover(cppn,cppn_child2);
-        *child1 = NN2CPPNGenome(cppn_child1);
-        *child2 = NN2CPPNGenome(cppn_child2);
+	    *std::dynamic_pointer_cast<NN2CPPNGenome>(child1) = NN2CPPNGenome(cppn_child1);
+	    *std::dynamic_pointer_cast<NN2CPPNGenome>(child2) = NN2CPPNGenome(cppn_child2);
         child1->set_parameters(parameters);
         child2->set_parameters(parameters);
         child1->set_randNum(randomNum);

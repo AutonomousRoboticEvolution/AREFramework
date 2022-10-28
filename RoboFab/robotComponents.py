@@ -57,7 +57,8 @@ class Organ:
                 wrist_position = self.positionTransformWithinBankOrRobot * np.linalg.inv(self.transformOrganOriginToClipCentre) * self.transformOrganOriginToMaleCableSocket * cableOriginToGripper * np.linalg.inv(gripper_TCP) *makeTransformMillimetersDegrees(z=-300)
             x = wrist_position[0, 3]
             y = wrist_position[1, 3]
-            return math.atan2(x, y) + math.radians(-15)
+            # return math.atan2(x, y) + math.radians(-15)
+            return math.atan2(x, y) + math.radians(180 + 15)
 
             # if angleFromVertical < math.radians(30):
                 # # coming in from above, rotate so the position of organ is off to the side
@@ -281,10 +282,11 @@ class Robot:
 
     # creates a pdf that shows what organs the robot has; their layout; their i2c addresses
     def drawRobot(self,saveDirectory):
+        plt.figure()  # start new figure
         for i,organ in enumerate(self.organsList):
+            # x and y are the clip position for this organ
             x= ( organ.positionTransformWithinBankOrRobot * np.linalg.inv( organ.transformOrganOriginToClipCentre ) )[0,3]
             y= ( organ.positionTransformWithinBankOrRobot * np.linalg.inv( organ.transformOrganOriginToClipCentre ) )[1,3]
-            # print("{}: x: {}, y: {}".format( organ.friendlyName,x,y ))
 
             if not organ.friendlyName.upper().startswith("HEAD"):
                 plt.plot(x, y, "bo")
