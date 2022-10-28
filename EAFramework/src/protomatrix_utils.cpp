@@ -123,6 +123,10 @@ void protomatrix::retrieve_matrices_from_cppn(nn2_cppn_t cppn,std::vector<std::v
                 input[3] = static_cast<double>(sqrt(pow(i,2)+pow(j,2)+pow(k,2)));
                 cppn.step(input);
                 output = cppn.outf();
+                for(auto& o: output)
+                    if(std::isnan(o))
+                        o = 0;
+
                 matrix_4d.at(0).push_back(output.at(0));
                 matrix_4d.at(1).push_back((output.at(1) > 0.0) ? 1.0 : -1.0);
                 matrix_4d.at(2).push_back(output.at(2));

@@ -196,7 +196,8 @@ void ER::endOfSimulation()
                 std::cout << "Evolution is Finished" << std::endl;
                 std::cout << "---------------------" << std::endl;
             }
-            exit(0);
+            simQuitSimulator(true);
+            return;
         }
     }
     else if(instanceType == settings::INSTANCE_SERVER){

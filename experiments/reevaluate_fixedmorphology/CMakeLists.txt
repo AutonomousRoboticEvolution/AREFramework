@@ -15,6 +15,7 @@ add_library(reevaluateFixed SHARED
     ${VREP_SRC}
     reevaluateFixed.cpp
     factories.cpp
+    ../common/obstacleAvoidance.cpp
     )
 target_include_directories(reevaluateFixed PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

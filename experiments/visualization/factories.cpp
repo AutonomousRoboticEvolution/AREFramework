@@ -37,4 +37,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
 
+    are::TrajectoryLog<are::VisuInd>::Ptr trajlog(new are::TrajectoryLog<are::VisuInd>);
+    logs.push_back(trajlog);
 }

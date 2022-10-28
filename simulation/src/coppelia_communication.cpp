@@ -166,6 +166,7 @@ void sim::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, st
     std::vector<std::string> splitted_name;
     for(int i = 0; i < nbrObj ; i++){
         name = simGetObjectName(handles[i]);
+        std::cout << name << std::endl;
         boost::split(splitted_name,name,boost::is_any_of("_"));
         if(splitted_name[0] == "Proximity")
             proxHandles.push_back(handles[i]);
