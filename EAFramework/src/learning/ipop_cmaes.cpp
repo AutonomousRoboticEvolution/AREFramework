@@ -160,7 +160,7 @@ void IPOPCMAStrategy::tell()
     best_fitnesses.push_back(best_fitness(best_sample));
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
-    if(best_seen_solution.objectives.empty() || best_fitnesses.back() > 1-best_seen_solution.objectives[0])
+    if(best_seen_solution.objectives.empty() || best_fitnesses.back() < 1-best_seen_solution.objectives[0])
         best_seen_solution = best_sample;
     inc_iter();
 }
