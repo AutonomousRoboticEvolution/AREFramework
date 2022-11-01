@@ -252,7 +252,8 @@ bool ER::stop_evaluation(){
 
     // if the robot reported an error, we automatically re-do this evaulation
     if (robot_reported_error){
-        std::cout<<"============================\n= Robot reported an error! =\n=== Repeating evaluation ===\n============================"<<std::endl;
+        std::cout<<"============================\n= Robot reported an error! =\n=== Repeating evaluation ===\n== Press enter when ready ==\n============================"<<std::endl;
+        std::cin.get();
         return true;
     }
 
