@@ -116,6 +116,8 @@ void ControllersLog::saveLog(EA::Ptr &ea){
         if(!learner.ctrl_learner.is_learning_finish())
             continue;
 
+        if(learner.ctrl_learner.get_archive().empty())
+            continue;
         std::stringstream filename;
         filename << "controllers_" << learner.morph_genome.id();
         if(!openOLogFile(logFileStream, filename.str()))

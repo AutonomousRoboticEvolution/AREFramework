@@ -191,9 +191,9 @@ void IPOPCMAStrategy::reset_search_state()
 }
 
 double IPOPCMAStrategy::best_fitness(individual_t &best_sample){
-    double bf = 0;
+    double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf < ind.objectives[0]){
+        if(bf > 1 - ind.objectives[0]){
             bf = 1 - ind.objectives[0];
             best_sample = ind;
         }

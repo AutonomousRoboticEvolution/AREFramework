@@ -50,6 +50,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::BestGenomesArchiveLog::Ptr bgilog(new are::BestGenomesArchiveLog(bgi_log_file));
     logs.push_back(bgilog);
 
+    are::ControllersLog::Ptr ctrlslog(new are::ControllersLog());
+    logs.push_back(ctrlslog);
+
+
     bool use_ctrl_arch = are::settings::getParameter<are::settings::Boolean>(param,"#useControllerArchive").value;
     if(use_ctrl_arch){
         are::ControllerArchiveLog::Ptr calog(new are::ControllerArchiveLog());
