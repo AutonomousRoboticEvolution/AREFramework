@@ -160,7 +160,7 @@ void IPOPCMAStrategy::tell()
     best_fitnesses.push_back(best_fitness(best_sample));
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
-    if(best_seen_solution.objectives.empty() || best_fitnesses.back() > 1-best_seen_solution.objectives[0])
+    if(best_seen_solution.objectives.empty() || best_fitnesses.back() < 1-best_seen_solution.objectives[0])
         best_seen_solution = best_sample;
     inc_iter();
 }
@@ -191,9 +191,9 @@ void IPOPCMAStrategy::reset_search_state()
 }
 
 double IPOPCMAStrategy::best_fitness(individual_t &best_sample){
-    double bf = 0;
+    double bf = 1.;
     for(const auto& ind : _pop){
-        if(bf < ind.objectives[0]){
+        if(bf > 1 - ind.objectives[0]){
             bf = 1 - ind.objectives[0];
             best_sample = ind;
         }
