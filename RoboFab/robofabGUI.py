@@ -321,7 +321,12 @@ class RobofabGUI:
             self.robotID_loaded[printer_number])
 
         # change status:
-        self.label_printerStatus[printer_number]["text"] = "Robot selected\n"
+        self.label_printerStatus [ printer_number ] [ "text" ] = "Robot selected\n"
+        if not f"blueprint_{self.robotID_loaded[printer_number]}" in os.listdir(f"{self.logDirectory}/waiting_to_be_built"):
+            self.label_printerStatus [ printer_number ] [ "text" ] = "WARNING: blueprint not present\n"
+        if not f"mesh_{self.robotID_loaded[printer_number]}" in os.listdir(f"{self.logDirectory}/waiting_to_be_built"):
+            self.label_printerStatus [ printer_number ] [ "text" ] = "WARNING: mesh file not present\n"
+
         self.printingDone[printer_number]=False
 
     # NO LONGER USED ("generate" button removed)
