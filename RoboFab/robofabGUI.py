@@ -21,7 +21,6 @@ class RobofabGUI:
         # extract information from configuration data:
         self.configurationData = configurationData
         self.logDirectory = configurationData["logDirectory"]
-        self.parametersFileForGenerate = configurationData["parametersFile"]
         self.coppeliasimFolder = configurationData["coppeliasimFolder"]
 
         # start setup of main window:
@@ -41,7 +40,6 @@ class RobofabGUI:
         self.button_slice = []
         self.button_print = []
         self.button_assemble = []
-        # self.button_generate = []
         self.label_robotID = []
         self.entry_robotID = []
         self.robotID_loaded = []
@@ -76,9 +74,7 @@ class RobofabGUI:
             self.button_assemble.append(
                 tk.Button(text="Assemble", width=20, height=2, command=lambda i=i: self.handlerButtonAssemble(i),
                           master=printer_frame[i]))
-            # self.button_generate.append(
-            #     tk.Button(text="Run are-generate", width=20, height=2, command=lambda i=i: self.buttonHandlerRunGenerate(i),
-            #               master=printer_frame[i]))
+
 
             printer_frame[i].grid(row=2, column=i)  # arrange this frame in the overall window
             # pack frame:
@@ -87,7 +83,6 @@ class RobofabGUI:
             self.label_robotID[i].pack()
             self.entry_robotID[i].pack()
             self.button_printerLoadFile[i].pack()
-            # self.button_generate[i].pack()
             self.button_initPrinter[i].pack()
             self.button_slice[i].pack()
             self.button_print[i].pack()
@@ -204,7 +199,6 @@ class RobofabGUI:
                 else:
                     # printing is still ongoing, grey out all buttons:
                     self.button_printerLoadFile[i]["bg"]="grey"
-                    # self.button_generate[i]["bg"]="grey"
                     self.button_initPrinter[i]["bg"]="grey"
                     self.button_slice[i]["bg"]="grey"
                     self.button_print[i]["bg"]="grey"
@@ -224,16 +218,6 @@ class RobofabGUI:
                 else:
                     #  the selected robot ID does not exist in the waiting_to_be_built folder
                     self.button_printerLoadFile[i]["bg"] = "red"
-
-                # # find colour for are-generate button:
-                # if "blueprint_{}.csv".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-                #     # have made the blueprint already
-                #     self.button_generate[i]["bg"] = "green"
-                # elif "morphGenome_{}".format(self.robotID_loaded[i]) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-                #     # no blueprint, but there is a morphGenome, so this button needs pressing:
-                #     self.button_generate[i]["bg"] = "yellow"
-                # else:
-                #     self.button_generate[i]["bg"] = "grey"
 
                 # find colour for init printer button:
                 if self.printerObjects[i] is None:
@@ -339,30 +323,6 @@ class RobofabGUI:
 
         self.printingDone[printer_number]=False
 
-    # NO LONGER USED ("generate" button removed)
-    def buttonHandlerRunGenerate(self, printer_number):
-        # self.robotIDLoadedGenerate = self.entryIDForGenerate.get()  # get and save the new robot ID
-        # self.entryIDForGenerate.delete(0, tk.END)  # clear the text input
-        robotID = self.robotID_loaded[printer_number]
-
-        # check the morphGenome exists:
-        if not "morphGenome_{}".format(robotID) in os.listdir("{}/waiting_to_be_built".format(self.logDirectory)):
-            self.label_printerStatus[printer_number]["text"] = "error!\nmorphGenome_{} does not exist".format(
-                robotID)
-            return 1
-        self.label_printerStatus[printer_number]["text"] = "generating {}\nplease wait...".format(robotID)
-        self.mainWindow.update()
-
-        setIndividualToLoadInParametersFileForGenerate(self.parametersFileForGenerate, robotID)
-        runAreGenerate(self.coppeliasimFolder, self.parametersFileForGenerate)
-
-        if not "blueprint_{}.csv".format(robotID) in [x for x in os.listdir(
-                "{}/waiting_to_be_built".format(self.logDirectory)) if x.startswith("blueprint_")]:
-            self.label_printerStatus[printer_number]["text"] = "ran generate for {}\nbut blueprint not generated".format(
-                robotID)
-        else:
-            self.label_printerStatus[printer_number]["text"] = "Generated blueprint for {}\nsuccess".format(robotID)
-
     def organBankManager(self):
         if self.robofabObject is None:
             print("UR5 not initialised, can't manage organ bank")
@@ -454,37 +414,6 @@ class RobofabGUI:
 
         with open("organBankContents.txt","w") as outputFile:
             outputFile.write(string_to_save)
-
-# NO LONGER USED ("generate" button removed)
-def setIndividualToLoadInParametersFileForGenerate(filepath, robotID="0_0"):
-    genToLoad = robotID.split("_")[0]
-    indToLoad = robotID.split("_")[1]
-    print("Changing the file: {}\n to use the robot from generation: {}, individual: {}".format(filepath,
-                                                                                                robotID.split("_")[0],
-                                                                                                robotID.split("_")[1]))
-
-    os.rename(filepath, filepath + "_bak")
-    string_to_write = ""
-    with open(filepath + "_bak", "r") as file:
-        for line in file:
-            if line.startswith("#genToLoad"):
-                string_to_write = string_to_write + "#genToLoad,int," + str(genToLoad) + "\n"
-            elif line.startswith("#indToLoad"):
-                string_to_write = string_to_write + "#indToLoad,int," + str(indToLoad) + "\n"
-            else:
-                string_to_write = string_to_write + line
-    with open(filepath, "w") as file:
-        file.write(string_to_write)
-
-# NO LONGER USED ("generate" button removed)
-def runAreGenerate(coppeliasimFolder, parametersFilepath):
-    print("Trying to run ARE-generate...")
-    terminalCommand = "./are_sim.sh generate -h -g{}".format(parametersFilepath)
-    output = str(
-        subprocess.check_output(terminalCommand, cwd="{}".format(coppeliasimFolder), shell=True,
-                                stderr=subprocess.STDOUT))
-    # print("Output from command was:\n{}".format(output))
-
 
 if __name__ == "__main__":
     # Make the settings file then extract the settings from it

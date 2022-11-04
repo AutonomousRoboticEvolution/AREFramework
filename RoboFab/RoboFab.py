@@ -131,7 +131,7 @@ class RoboFab_host:
                     thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLES )
                 else: # use the defined gripper location to pick up the organ
                     thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
-                self.timer.add("finished organ of type {}".format(thisOrgan.friendlyName))
+                self.timer.add("finished organ of type {}, address {}".format(thisOrgan.friendlyName, thisOrgan.I2CAddress))
                 self.save_log_files() # calling this after every organ ensures that if the program crashes, we at least have the log for the progress so far
 
         else:
