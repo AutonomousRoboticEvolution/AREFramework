@@ -147,10 +147,11 @@ class RoboFab_host:
         self.save_log_files()
         self.move_files()
 
-        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/assembly_videos/assembly_{}".format( self.logDirectory, self.robotID ) )
+        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/logs/assembly_{}".format( self.logDirectory, self.robotID ) )
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
         self.UR5.gripper.disableServos()
+        print("Assembly done")
 
     def save_log_files( self ):
 
