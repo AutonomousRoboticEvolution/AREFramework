@@ -4,7 +4,7 @@ from cv2 import aruco
 import os
 
 show_fps = False
-verbose_messages = True
+verbose_messages = False
 
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()

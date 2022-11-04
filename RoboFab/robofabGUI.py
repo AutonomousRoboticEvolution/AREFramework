@@ -113,11 +113,15 @@ class RobofabGUI:
         self.button_organBankManager = tk.Button(text="Organ Bank Manager", width=20, height=2,
                                              command=self.organBankManager,
                                              master=frame_startupUR5)
+        self.button_releaseGripper = tk.Button(text="Release gripper", width=20, height=2,
+                                             command=self.buttonHandlerReleaseGripper,
+                                             master=frame_startupUR5)
 
         # arrange withing UR5 startup section frame:
         self.button_startupUR5.pack()
         self.label_ur5Status.pack()
         self.button_organBankManager.pack()
+        self.button_releaseGripper.pack()
 
         # print in terminal the available robots:
         os.makedirs("{}/waiting_to_be_built".format(self.logDirectory), exist_ok=True)  # make folder if it doesn't already exist
@@ -168,6 +172,12 @@ class RobofabGUI:
             return
         else:
             self.robofabObject = RoboFab_host ( self.configurationData )
+
+    def buttonHandlerReleaseGripper(self):
+        if self.robofabObject is None:
+            print("Can't release gripper since UR5 not initialised")
+        else:
+            self.robofabObject.UR5.gripper.disableServos()
 
 
     def updateButtonColours( self ):
@@ -356,7 +366,6 @@ class RobofabGUI:
     def organBankManager(self):
         if self.robofabObject is None:
             print("UR5 not initialised, can't manage organ bank")
-            self.globalErrorText["text"]="UR5 not initialised, can't manage organ bank"
             return 1
 
         # print("Manage organ bank...")
