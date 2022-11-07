@@ -113,6 +113,8 @@ public:
     int nbr_iter() const{return _generation;}
     int nbr_eval() const{return _nbr_eval;}
 
+    const archive_t &get_archive() const{return _archive;}
+
     std::string print_info() const{return _cma_strat->print_info();}
 
     std::string to_string() const;

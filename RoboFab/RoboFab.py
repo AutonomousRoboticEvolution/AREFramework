@@ -26,7 +26,6 @@ DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
 DO_ORGAN_INSERTIONS = 1
 DO_GO_HOME_AT_FINISH = 1
 DO_TURN_MAGNETS_OFF = 1
-DO_EXPORT_ORGANS_LIST = 1
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -61,6 +60,7 @@ class RoboFab_host:
         self.robotID = None
 
         self.logDirectory = configurationData["logDirectory"]
+        self.timer=Timer()
 
 
     ## just makes the "robot" object within the code
@@ -105,8 +105,7 @@ class RoboFab_host:
 
         if DO_RECORD_VIDEO: self.webcam.start_recording()
 
-        timer=Timer()
-        timer.start()
+        self.timer.start()
         self.UR5.moveBetweenStations("home")
         self.AF.homeStepperMotor ()  # need to re-home after a period being disabled, in case it moved. Will automatically enable if not already enabled.
 
@@ -117,7 +116,8 @@ class RoboFab_host:
         else:
             self.AF.turnElectromagnetsOn() # grip the robot
         self.myRobot.origin = self.AF.currentPosition # update the origin position of the robot now that it is on the assembly fixture
-        timer.add("Finished Head Insert")
+        self.timer.add("Finished Head Insert")
+        self.save_log_files()  # calling this after every organ ensures that if the program crashes, we at least have the log for the progress so far
 
 
         # attach each organ in turn
@@ -131,26 +131,33 @@ class RoboFab_host:
                     thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLES )
                 else: # use the defined gripper location to pick up the organ
                     thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
+                self.timer.add("finished organ of type {}, address {}".format(thisOrgan.friendlyName, thisOrgan.I2CAddress))
+                self.save_log_files() # calling this after every organ ensures that if the program crashes, we at least have the log for the progress so far
 
         else:
             debugPrint( "Organ insertions skipped" )
-        timer.add("Finished Organs Insert")
+        self.timer.add("Finished all organs")
 
 
         if DO_GO_HOME_AT_FINISH:
             self.UR5.moveBetweenStations("home")
-        timer.finish()
+        self.timer.finish()
 
-        if DO_EXPORT_ORGANS_LIST:
-            self.save_log_files()
-            self.myRobot.drawRobot(self.logDirectory) # re-draw now that the organs have their i2c addresses assigned
-            timer.save(self.logDirectory, self.robotID)
-        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/assembly_videos/assembly_{}".format( self.logDirectory, self.robotID ) )
+
+        self.save_log_files()
+        self.move_files()
+
+        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/logs/assembly_{}".format( self.logDirectory, self.robotID ) )
 
         self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
         self.UR5.gripper.disableServos()
+        print("Assembly done")
 
     def save_log_files( self ):
+
+        self.myRobot.drawRobot(self.logDirectory)  # re-draw with all known organ i2c addresses included
+        self.timer.save(self.logDirectory, self.robotID)
+
         # write list_of_organs file
         os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
         file = open ( "{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) , "w" )
@@ -159,8 +166,10 @@ class RoboFab_host:
             # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
         file.close ()
 
+    def move_files(self):
+        os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the archive folder if it doesn't already exists
+
         # move the mesh file to "archive" folder
-        os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
         mesh_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","mesh_{}.stl".format(self.robotID))
         if os.path.exists(mesh_old_path):
             mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))

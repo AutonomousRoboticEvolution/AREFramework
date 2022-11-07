@@ -58,7 +58,7 @@ class Organ:
             x = wrist_position[0, 3]
             y = wrist_position[1, 3]
             # return math.atan2(x, y) + math.radians(-15)
-            return math.atan2(x, y) + math.radians(180 + 15)
+            return math.atan2(x, y) + math.radians(-15)
 
             # if angleFromVertical < math.radians(30):
                 # # coming in from above, rotate so the position of organ is off to the side
@@ -318,7 +318,7 @@ class Robot:
         plt.title("Robot ID: {}".format(self.ID))
 
         # save as pdf
-        filepath = "{}/waiting_to_be_evaluated/plan_{}.pdf".format(saveDirectory,self.ID)
+        filepath = "{}/logs/plan_{}.pdf".format(saveDirectory,self.ID)
         if os.path.exists(filepath): os.remove(filepath)  # delete it if it already exists to avoid errors
         pdf = PdfPages ( filepath )
         pdf.savefig ( plt.gcf() )

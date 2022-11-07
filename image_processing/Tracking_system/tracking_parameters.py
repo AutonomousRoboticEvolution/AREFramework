@@ -4,7 +4,7 @@ from cv2 import aruco
 import os
 
 show_fps = False
-verbose_messages = True
+verbose_messages = False
 
 #blob detection parameters
 blob_detection_parameters = cv2.SimpleBlobDetector_Params()
@@ -56,7 +56,7 @@ if location == "bristol":
 
     pixel_scale = 380.55555555555554
     centre_reference = (943, 574)
-    crop_rectangle = [521, 156, 845, 837]
+    crop_rectangle = [525, 160, 830, 830]
 
 elif location == "york":
     pipe = 0
