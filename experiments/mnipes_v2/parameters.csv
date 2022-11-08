@@ -13,29 +13,33 @@
 #modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
 #repository,string,/home/leni/are-logs
 #vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
-#expFolder,string,/home/leni/git/evolutionary_robotics_framework/experiments/mnipes_v2/
-#xvfb,bool,0
 
+#seedMorphGenome,string,/home/leni/git/robotlibrary/exploration/morph_45/morph_genome_45
+#oldExperimentFolder,string,None
 #bootstrapFolder,string,None
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,1
-#isScreenshotEnable,bool,0
+#isScreenshotEnable,bool,1
+#imageRepository,string,images
+#imagesInLogFolder,bool,1
 #isCPPNGenome,bool,1
 
 #fitnessFile,string,fitnesses.csv
 #genomesPoolFile,string,genomes_pool.csv
 
-#envType,int,3
+#envType,int,1
 #envListFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/gradual_env_test
 #scenes,sequence_string,shapes_exploration.ttt
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.75;0.75;0.12
 #targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
 #initPosition,sequence_double,0;0;0.2
+#robotOrientation,sequence_float,-1.5708;0;-1.5708
 
-#noiseLevel,double,0.
+#outputNoiseLevel,double,0.
+#inputNoiseLevel,double,0.
 #maxVelocity,double,6.
 #MaxWeight,float,1.0
 #NNType,int,2
@@ -45,11 +49,11 @@
 #reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,4
+#populationSize,int,25
 #maxEvalTime,float,60
 #timeStep,float,0.02
 #ctrlUpdateFrequency,double,0.1
-#maxNbrEval,int,20000
+#maxNbrEval,int,0.
 #fitnessType,int,0
 #withCrossover,bool,1
 
@@ -83,7 +87,7 @@
 #isLeg,bool,1
 #isCaster,bool,1
 #manufacturabilityMethod,int,1
-#saveBlueprint,bool,0
+#saveBlueprint,bool,1
 
 #isCPPNGenome,bool,1
 

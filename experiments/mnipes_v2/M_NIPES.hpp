@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <boost/optional.hpp>
+#include <map>
 
 #include "ARE/learning/controller_archive.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -19,6 +20,8 @@
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
 
+
+
 typedef enum task_t{
     MAZE = 0,
     OBSTACLES = 1,
@@ -27,6 +30,8 @@ typedef enum task_t{
     BARREL = 4,
     GRADUAL = 5
 } task_t;
+
+
 
 typedef struct learner_t{
 
@@ -292,6 +297,10 @@ private:
     void incr_gradual_scene();
 
     void bootstrap_evolution(const std::string &folder);
+    void load_experiment(const std::string &folder);
+    void seed_experiment(const std::string &folder);
+
+
 
     std::vector<int> corr_indexes;
 
@@ -304,6 +313,8 @@ private:
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
     int highest_age = 0;
+
+    nn2_cppn_t seed_cppn;
 
     float current_ind_past_pos[3];
     int move_counter = 0;
