@@ -586,25 +586,27 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     ///
 
     // Export blueprint
-
-    std::stringstream sst_blueprint;
-    sst_blueprint << "/blueprint_" << indNum << ".csv";
-    std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
-    if(!ofs_blueprint)
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
     {
-        std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
-        return;
-    }
-    std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
-    std::vector<std::vector<float>> tempOrganPos = blueprint.getOrganPosList();
-    std::vector<std::vector<float>> tempOrganOri = blueprint.getOrganOriList();
-    for (int i = 0; i < tempOrganTypes.size(); i++) {
-        ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
-                      << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
-                      << tempOrganPos.at(i).at(2) << ","
-                      << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
-                      << tempOrganOri.at(i).at(2) << ","
-                      << std::endl;
+        std::stringstream sst_blueprint;
+        sst_blueprint << "/blueprint_" << indNum << ".csv";
+        std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
+        if(!ofs_blueprint)
+        {
+            std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
+            return;
+        }
+        std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
+        std::vector<std::vector<float>> tempOrganPos = blueprint.getOrganPosList();
+        std::vector<std::vector<float>> tempOrganOri = blueprint.getOrganOriList();
+        for (int i = 0; i < tempOrganTypes.size(); i++) {
+            ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
+                          << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
+                          << tempOrganPos.at(i).at(2) << ","
+                          << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
+                          << tempOrganOri.at(i).at(2) << ","
+                          << std::endl;
+        }
     }
 
     // Export mesh file
