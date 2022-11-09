@@ -315,12 +315,15 @@ private:
     int highest_age = 0;
 
     nn2_cppn_t seed_cppn;
+    NN2CPPNGenome::Ptr seed_morph_genome;
 
     float current_ind_past_pos[3];
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
     bool is_multi_target = false;
+
+    double evolvability_score = 0.0;
 
     //attribute for gradual tasks
     int nbr_of_successful_solution = 0;

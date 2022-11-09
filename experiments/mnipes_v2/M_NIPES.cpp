@@ -406,8 +406,13 @@ bool M_NIPES::is_finish(){
     bool fullfil_all_tasks = false;
     if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
         fullfil_all_tasks = current_gradual_scene > environments_info.size();
-    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks)
+    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks){
+        if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+            int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+            std::cout << "evolvability: " << evolvability_score/static_cast<double>(pop_size) << std::endl;
+        }
         return true;
+    }
     return false;
 }
 
@@ -506,7 +511,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
         if(!op_learner){ //learner was not found so erase this individual
             population.erase(population.begin() + corr_indexes[currentIndIndex]);
             population.shrink_to_fit();
-
             corr_indexes[currentIndIndex] = -1;
             for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
                 corr_indexes[i]--;
@@ -515,6 +519,18 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner_t& learner = *op_learner;
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
+            //compute evolvability
+            if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+                if(morph_id == 0)
+                    seed_morph_genome = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome());
+                else{
+                    Eigen::VectorXd desc1 = seed_morph_genome->get_organ_position_desc().getCartDesc();
+                    Eigen::VectorXd desc2 = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc().getCartDesc();
+                    double dist = Novelty::distance_fcts::positional(desc1,desc2);
+                    std::cout << "distance between " <<seed_morph_genome->id() << ";" << morph_id << " is " << dist << std::endl;
+                    evolvability_score += dist;
+                }
+            }
             learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
             int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
             int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
@@ -549,6 +565,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     i--;
                 corr_indexes.push_back(corr_indexes[i] + 1);
             }
+
         }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
             learner.ctrl_learner.to_be_erased();
         }else{
@@ -1039,6 +1056,22 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
     mifs.close();
 
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(seed_cppn));
+
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        population.push_back(ind);
+        corr_indexes.push_back(0);
+    }
     for(int i = 0; i < pop_size; i++){
         nn2_cppn_t new_cppn = seed_cppn;
 
@@ -1060,8 +1093,14 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
             init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
-        corr_indexes.push_back(i);
+        if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value)
+            corr_indexes.push_back(i+1);
+        else
+            corr_indexes.push_back(i);
     }
+
+    //Compute evolvability
+    settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value;
 
 }
 
