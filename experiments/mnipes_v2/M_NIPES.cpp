@@ -1059,6 +1059,10 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
     if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(seed_cppn));
 
+        learner_t new_learner(*morphgenome.get());
+        new_learner.ctrl_learner.set_parameters(parameters);
+        learning_pool.push_back(new_learner);
+
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
         ind->set_parameters(parameters);
