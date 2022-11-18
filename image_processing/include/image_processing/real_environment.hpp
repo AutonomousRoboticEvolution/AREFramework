@@ -53,6 +53,8 @@ private:
     zmq::socket_t robot_pos_subs;
     zmq::socket_t tags_pos_subs;
 
+    bool robot_ever_seen; // for detecting if we are at the start of a new trajectory, but have never detected the robot
+
 };
 
 } //are
