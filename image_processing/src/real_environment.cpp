@@ -155,6 +155,7 @@ void RealEnvironment::update_info(double time){
 
     if(robot_position_string != "None"){ // tracking found a robot position, else the robot wasn't seen, so we will not update the current_position variable
         robot_seen=true;
+        robot_ever_seen=true;
         // parse the string, expected format is [x, y]
         boost::erase_all(robot_position_string, "[");
         boost::erase_all(robot_position_string, "]");
@@ -214,8 +215,13 @@ void RealEnvironment::update_info(double time){
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(time >= interval*trajectory.size()){
         waypoint wp;
-        wp.position[0] = current_position[0];
-        wp.position[1] = current_position[1];
+        if (robot_ever_seen){
+            wp.position[0] = current_position[0];
+            wp.position[1] = current_position[1];
+        }else{
+            wp.position[0] = initial_position[0];
+            wp.position[1] = initial_position[1];
+        }
         wp.position[2] = 0;
         wp.orientation[0] = 0;
         wp.orientation[1] = 0;
