@@ -13,10 +13,13 @@ def load_fitness_values(foldername):
         with open(foldername + "/" + folder + "/fitnesses.csv") as file :
             csv_data = csv.reader(file,delimiter=',')
             for row in csv_data:
-                if(float(row[3]) == 1.0):
-                    fits.append([folder,int(row[0]),0.,int(row[1]),int(row[2])])
+                k = 3
+                if(len(row) == 3):
+                    k = 1
+                if(float(row[k]) == 1.0):
+                    fits.append([folder,int(row[0]),0.])
                 else:
-                    fits.append([folder,int(row[0]),float(row[3]),int(row[1]),int(row[2])])
+                    fits.append([folder,int(row[0]),float(row[k])])
         i+=1
     return fits
 
