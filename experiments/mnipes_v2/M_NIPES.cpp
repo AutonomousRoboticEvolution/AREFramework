@@ -329,6 +329,8 @@ void M_NIPES::init_morph_pop(){
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
+    if(corr_indexes.size() < currentIndIndex)
+        return true;
     if(corr_indexes[currentIndIndex] < 0)
         return true;
 
@@ -447,7 +449,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     clean_learning_pool();
-
+    if(corr_indexes.size() < currentIndIndex)
+        return true;
     if(corr_indexes[currentIndIndex] < 0)
         return true;
 
@@ -1103,8 +1106,6 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
             corr_indexes.push_back(i);
     }
 
-    //Compute evolvability
-    settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value;
 
 }
 

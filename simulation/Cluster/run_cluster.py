@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import subprocess
+import psutil
 import datetime
 import sys
 import time
@@ -47,7 +48,7 @@ def run_client(args):
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = "./client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen(["gdb","--ex=r","--args",
+    return subprocess.Popen([#"gdb","--args",
         args.client,
         str(args.params),
         str(args.port_start),
@@ -82,13 +83,20 @@ def kill(servers, client):
     for p in processes:
         if p.stdout is not None:
             p.stdout.close()
+        parent = psutil.Process(p.pid)
+        for child in parent.children(recursive=True):
+            child.kill()
         p.terminate()
+        p.wait()
     try:
         wait(servers, client, timeout=30)
     except subprocess.TimeoutExpired:
         for p in processes:
             p.poll()
             if p.returncode is not None:
+                parent = psutil.Process(p.pid)
+                for child in parent.children(recursive=True):
+                    child.kill()
                 p.kill()
 
 
@@ -119,7 +127,6 @@ def main():
         except KeyboardInterrupt:
             kill(servers, client)
             wait(servers, client)
-
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
