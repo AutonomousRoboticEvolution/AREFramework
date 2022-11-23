@@ -254,6 +254,8 @@ public:
     bool is_finish() override;
 
     Individual::Ptr getIndividual(size_t index) const override{
+        if(corr_indexes.size() < currentIndIndex)
+            return nullptr;
         if(corr_indexes[index] < 0)
             return nullptr;
         return population[corr_indexes[index]];
@@ -265,6 +267,8 @@ public:
         if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
+        if(corr_indexes.size() < currentIndIndex)
+            return;
         if(corr_indexes[indIndex] < 0)
             return;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
