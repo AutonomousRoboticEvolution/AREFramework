@@ -381,8 +381,8 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
         std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
     }
     setPosition(x,y,z);
-    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
-    simSetObjectOrientation(mainHandle,-1,orientation.data());
+//    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
+//    simSetObjectOrientation(mainHandle,-1,orientation.data());
 }
 
 void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
