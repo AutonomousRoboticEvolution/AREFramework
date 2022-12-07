@@ -24,7 +24,7 @@ int ER::init(int nbrOfInst, int port){
         }
     }
     currentIndVec.resize(serverInstances.size());
-    currentIndexVec.resize(serverInstances.size());
+    currentIndexVec.resize(serverInstances.size(),-1);
     eval_times.resize(serverInstances.size());
     return true;
 }
@@ -123,6 +123,7 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
     serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
+    ind_in_eval_counter++;
 }
 
 void ER::endOfSimulation(int slaveIndex){
@@ -160,7 +161,7 @@ void ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-
+    ind_in_eval_counter--;
     saveLogs(false);
 }
 
@@ -241,7 +242,7 @@ bool ER::updateSimulation()
     bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
     if(!wait_for_all_instances) all_instances_finish = true;
 
-    if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
+    if(!ind_in_eval_counter && all_instances_finish || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
         ea->epoch();
