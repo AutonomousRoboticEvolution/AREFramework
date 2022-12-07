@@ -429,11 +429,11 @@ void M_NIPES::init_next_pop(){
         reproduction();
     else{
         for(auto& learner: learning_pool)
-            if(!learner.ctrl_learner.is_learning_finish())
+            if(!learner.ctrl_learner.is_learning_finish() && learner.ctrl_learner.is_initialized())
                 init_new_ctrl_pop(learner);
         if(population.empty())
             for(auto& learner: learning_pool)
-                if(!learner.ctrl_learner.is_learning_finish())
+                if(!learner.ctrl_learner.is_learning_finish() && learner.ctrl_learner.is_initialized())
                     push_back_remaining_ctrl(learner);
     }
 
