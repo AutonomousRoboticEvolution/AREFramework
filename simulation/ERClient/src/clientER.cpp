@@ -211,6 +211,7 @@ bool ER::updateSimulation()
             else if(state == FINISH)
             {
                 endOfSimulation(slaveIdx);
+                currentIndexVec[slaveIdx] = -1;
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
                 eval_times[slaveIdx].second = hr_clock::now();
                 std::stringstream sstr;

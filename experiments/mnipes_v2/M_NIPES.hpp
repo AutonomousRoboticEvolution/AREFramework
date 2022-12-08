@@ -254,7 +254,7 @@ public:
     bool is_finish() override;
 
     Individual::Ptr getIndividual(size_t index) const override{
-        if(corr_indexes.size() < currentIndIndex)
+        if(corr_indexes.size() < index)
             return nullptr;
         if(corr_indexes[index] < 0)
             return nullptr;
