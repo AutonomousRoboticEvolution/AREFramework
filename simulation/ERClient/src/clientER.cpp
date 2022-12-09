@@ -161,7 +161,6 @@ void ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-    ind_in_eval_counter--;
     saveLogs(false);
 }
 
@@ -211,6 +210,7 @@ bool ER::updateSimulation()
             else if(state == FINISH)
             {
                 endOfSimulation(slaveIdx);
+                ind_in_eval_counter--;
                 currentIndexVec[slaveIdx] = -1;
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
                 eval_times[slaveIdx].second = hr_clock::now();

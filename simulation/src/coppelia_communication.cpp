@@ -59,8 +59,8 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
     float position_passive[4];
     int detected_object_handle;
     int det, occl;
-    std::string name;
-    std::vector<std::string> splitted_name;
+//    std::string name;
+//    std::vector<std::string> splitted_name;
     bool occlusion = false;
 
     for (int handle: handles) {
