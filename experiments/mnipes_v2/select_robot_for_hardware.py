@@ -83,10 +83,13 @@ def selection(fitnesses,descriptors,N,P):
 
 
 if __name__ == '__main__':
-    desc = load_descriptors(sys.argv[1])
-    print(len(desc))
-    fits = load_fitness_values(sys.argv[1])
-    print(len(fits))
-    _set = selection(fits,desc,5,50)
-    print(_set)
+    if(len(sys.argv) < 4):
+        print("usage\n - arg 1 path to folder containing simulation runs of mnipes_v2 experiments\n - arg 2 number of robot to select\n - arg 3 the size of the pool of robots to select from per islands")
+    else:
+        desc = load_descriptors(sys.argv[1])
+        print(len(desc))
+        fits = load_fitness_values(sys.argv[1])
+        print(len(fits))
+        _set = selection(fits,desc,int(sys.argv[2]),int(sys.argv[3]))
+        print(_set)
     
