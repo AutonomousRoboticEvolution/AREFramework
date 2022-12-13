@@ -293,10 +293,14 @@ private:
     void init_new_ctrl_pop(learner_t &gene);
     void push_back_remaining_ctrl(learner_t &gene);
     void remove_oldest_gene();
+    void remove_worst_gene();
     void remove_learner(int id);
     void increment_age();
     void clean_learning_pool();
     void reproduction();
+
+    void compute_novelty_scores();
+    void update_novelty_archive();
 
     void incr_gradual_scene();
 
@@ -317,6 +321,8 @@ private:
     std::vector<learner_t> learning_pool;
     ControllerArchive controller_archive;
     int highest_age = 0;
+
+    std::vector<Eigen::VectorXd> novelty_archive;
 
     nn2_cppn_t seed_cppn;
     NN2CPPNGenome::Ptr seed_morph_genome;

@@ -34,11 +34,13 @@ fitness_fct_t FitnessFunctions::learning_progress = [](const CMAESLearner& learn
 
 selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
 {
-    double best_fitness = gene_pool[0].objectives[0];
+    int obj_idx = settings::getParameter<settings::Integer>(gene_pool[0].morph_genome.get_parameters(),"#morphSelectionObjective").value;
+
+    double best_fitness = gene_pool[0].objectives[obj_idx];
     int best_idx = 0;
     for(int i = 1; i < gene_pool.size(); i++){
-        if(best_fitness < gene_pool[i].objectives[0]){
-            best_fitness = gene_pool[i].objectives[0];
+        if(best_fitness < gene_pool[i].objectives[obj_idx]){
+            best_fitness = gene_pool[i].objectives[obj_idx];
             best_idx = i;
         }
     }
@@ -51,14 +53,16 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
 
 selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
 {
-    double best_fitness[2] = {gene_pool[0].objectives[0],gene_pool[1].objectives[1]};
+    int obj_idx = settings::getParameter<settings::Integer>(gene_pool[0].morph_genome.get_parameters(),"#morphSelectionObjective").value;
+
+    double best_fitness[2] = {gene_pool[0].objectives[obj_idx],gene_pool[1].objectives[obj_idx]};
     int best_idx[2] = {0,1};
     for(int i = 2; i < gene_pool.size(); i++){
-        if(best_fitness[0] < gene_pool[i].objectives[0]){//Best
-            best_fitness[0] = gene_pool[i].objectives[0];
+        if(best_fitness[0] < gene_pool[i].objectives[obj_idx]){//Best
+            best_fitness[0] = gene_pool[i].objectives[obj_idx];
             best_idx[0] = i;
-        }else if(best_fitness[1] < gene_pool[i].objectives[0]){//Second Best
-            best_fitness[1] = gene_pool[i].objectives[0];
+        }else if(best_fitness[1] < gene_pool[i].objectives[obj_idx]){//Second Best
+            best_fitness[1] = gene_pool[i].objectives[obj_idx];
             best_idx[1] = i;
         }
     }
@@ -72,6 +76,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
     new_gene.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()}); //store the ids of the parents
     return new_gene;
 };
+
 
 
 void M_NIPESIndividual::createMorphology(){
@@ -658,8 +663,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //Perform survival and selection and generate a new morph gene.
                 else if(gene_pool.size() == pop_size+nbr_offsprings){
                     //remove oldest gene and increase age
-                    while(gene_pool.size() > pop_size)
-                        remove_oldest_gene();
+                    std::string survival = settings::getParameter<settings::String>(parameters,"#survivalMethod").value;
+                    while(gene_pool.size() > pop_size){
+                        if(survival == "oldest")
+                            remove_oldest_gene();
+                        else if(survival == "worst")
+                            remove_worst_gene();
+                        else std::cerr << "WARNING: Unknown survival method, so no survival applied" << std::endl;
+                    }
                     increment_age();
                     //-
                     assert(gene_pool.size() == pop_size);
@@ -684,6 +695,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
+    int obj_idx = settings::getParameter<settings::Integer>(parameters,"#morphSelectionObjective").value;
+
+    if(obj_idx == 1)
+        compute_novelty_scores();
 
     while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
@@ -738,6 +753,27 @@ void M_NIPES::reproduction(){
     }
 }
 
+void M_NIPES::compute_novelty_scores(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(gene_pool.size() < pop_size)
+        return;
+
+    std::vector<Eigen::VectorXd> genes_desc;
+    for(auto& gene :gene_pool)
+        genes_desc.push_back(gene.morph_genome.get_organ_position_desc().getCartDesc());
+    for(auto& gene :gene_pool){
+        Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+        std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional_normalized);
+        gene.objectives.resize(2);
+        gene.objectives[1] = Novelty::sparseness(dists);
+        Novelty::update_archive(desc,gene.objectives[1],novelty_archive,randomNum);
+    }
+
+
+}
+
+
+
 boost::optional<genome_t&> M_NIPES::find_gene(int id){
     for(auto& gene: gene_pool)
         if(gene.morph_genome.id() == id)
@@ -783,6 +819,26 @@ void M_NIPES::remove_oldest_gene(){
 
     //then erase one selected randomly among the oldest.
     gene_pool.erase(gene_pool.begin() + oldest_gene_idx[randomNum->randInt(0,oldest_gene_idx.size()-1)]);
+}
+
+void M_NIPES::remove_worst_gene(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(gene_pool.size() <= pop_size)
+        return;
+
+    //find lowest fitness value in the genome pool
+    double lowest_obj = gene_pool[0].objectives[0];
+    size_t worst_gene_idx = 0;
+    for(size_t i = 1; i < gene_pool.size(); i++){
+        if(lowest_obj < gene_pool[i].objectives[0]){
+            lowest_obj = gene_pool[i].objectives[0];
+            worst_gene_idx = i;
+        }
+    }
+    //-
+
+    //then erase the worst one.
+    gene_pool.erase(gene_pool.begin() + worst_gene_idx);
 }
 
 void M_NIPES::increment_age(){
