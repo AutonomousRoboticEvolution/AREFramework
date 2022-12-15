@@ -45,6 +45,18 @@ typedef enum desc_type_t{
 
 struct CartDesc
 {
+    CartDesc(){}
+    CartDesc(const CartDesc& cd):
+        robotWidth(cd.robotWidth),
+        robotDepth(cd.robotDepth),
+        robotHeight(cd.robotHeight),
+        voxelNumber(cd.voxelNumber),
+        wheelNumber(cd.wheelNumber),
+        sensorNumber(cd.sensorNumber),
+        casterNumber(cd.casterNumber),
+        jointNumber(cd.jointNumber)
+    {}
+
     float robotWidth = 0; // X
     float robotDepth = 0; // Y
     float robotHeight = 0; // Z
@@ -143,6 +155,15 @@ inline bool operator ==(const CartDesc& cd1, const CartDesc& cd2){
 
 struct OrganPositionDesc
 {
+    OrganPositionDesc(){}
+    OrganPositionDesc(const OrganPositionDesc& opd)
+    {
+        for(int k = 0; k < morph_const::real_matrix_size; k++)
+            for(int j = 0; j < morph_const::real_matrix_size; j++)
+                for(int i = 0; i < morph_const::real_matrix_size; i++)
+                    organ_matrix[i][j][k] = opd.organ_matrix[i][j][k];
+    }
+
     int organ_matrix[morph_const::real_matrix_size][morph_const::real_matrix_size][morph_const::real_matrix_size] = {{{0}}};
     Eigen::VectorXd getCartDesc() const{
         Eigen::VectorXd organ_position_descriptor((morph_const::real_matrix_size)*(morph_const::real_matrix_size)*(morph_const::real_matrix_size));

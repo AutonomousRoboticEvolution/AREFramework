@@ -764,7 +764,7 @@ void M_NIPES::compute_novelty_scores(){
         genes_desc.push_back(gene.morph_genome.get_organ_position_desc().getCartDesc());
     for(auto& gene :gene_pool){
         Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
-        std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional_normalized);
+        std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional);
         gene.objectives.resize(2);
         gene.objectives[1] = Novelty::sparseness(dists);
         Novelty::update_archive(desc,gene.objectives[1],novelty_archive,randomNum);

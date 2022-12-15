@@ -84,7 +84,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
 
 Novelty::distance_fct_t Novelty::distance_fcts::positional_normalized = [](Eigen::VectorXd v,Eigen::VectorXd w) -> double {
     double dist = Novelty::distance_fcts::positional(v,w);
-    int dim = v.rows()/3;
+    double dim = v.rows()/3;
     return dist/(dim*dim*dim*dim);
 };
 
