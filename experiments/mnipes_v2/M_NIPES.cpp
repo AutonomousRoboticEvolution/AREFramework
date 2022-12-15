@@ -541,6 +541,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 }
             }
             learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+            learner.morph_genome.set_organ_position_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc());
             int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
             int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
             int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
