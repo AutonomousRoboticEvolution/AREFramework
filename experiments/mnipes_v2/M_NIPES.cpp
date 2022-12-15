@@ -427,6 +427,7 @@ void M_NIPES::init_next_pop(){
     if(population.empty()){
         corr_indexes.clear();
         corr_indexes.shrink_to_fit();
+        currentIndIndex = 0;
     }
     clean_learning_pool();
 
@@ -830,7 +831,7 @@ void M_NIPES::remove_worst_gene(){
     double lowest_obj = gene_pool[0].objectives[0];
     size_t worst_gene_idx = 0;
     for(size_t i = 1; i < gene_pool.size(); i++){
-        if(lowest_obj < gene_pool[i].objectives[0]){
+        if(lowest_obj > gene_pool[i].objectives[0]){
             lowest_obj = gene_pool[i].objectives[0];
             worst_gene_idx = i;
         }
