@@ -76,7 +76,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
         const auto & dist = distances[i][0]; //get the pair with the smallest distance
         int j = L.second[dist[1]][0] + L.second[dist[1]][1]*dim + L.second[dist[1]][2]*dim*dim;
         int k = S.second[dist[2]][0] + S.second[dist[2]][1]*dim + S.second[dist[2]][2]*dim*dim;
-        sum += dist[0] + (L.first(j) == S.first(k) ? dim : 0);
+        sum += dist[0] + (L.first(j) != S.first(k) ? dim : 0);
     }
 
     return sum;
