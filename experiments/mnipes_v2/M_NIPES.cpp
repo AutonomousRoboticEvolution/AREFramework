@@ -79,6 +79,7 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
 
 
 
+
 void M_NIPESIndividual::createMorphology(){
     individual_id = morphGenome->id();
     morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
@@ -238,6 +239,10 @@ void M_NIPESIndividual::compute_fitness(){
     objectives[0] = fitness;
     copy_rewards = rewards;
 }
+
+int M_NIPES::novelty_params::k_value = 15;
+double M_NIPES::novelty_params::archive_adding_prob = 0.4;
+double M_NIPES::novelty_params::novelty_thr = 14641;
 
 M_NIPES::M_NIPES(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) : EA(rn, param){
     settings::defaults::parameters->emplace("#tournamentSize",new settings::Integer(4));
@@ -767,8 +772,15 @@ void M_NIPES::compute_novelty_scores(){
         Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
         std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional);
         gene.objectives.resize(2);
-        gene.objectives[1] = Novelty::sparseness(dists);
-        Novelty::update_archive(desc,gene.objectives[1],novelty_archive,randomNum);
+        gene.objectives[1] = novelty::sparseness<novelty_params>(dists);
+
+    }
+    bool with_archive = settings::getParameter<settings::Boolean>(parameters,"#morphNoveltyWithArchive").value;
+    if(with_archive){
+        for(auto& gene :gene_pool){
+            Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+            novelty::update_archive<novelty_params>(desc,gene.objectives[1],novelty_archive,randomNum);
+        }
     }
 
 

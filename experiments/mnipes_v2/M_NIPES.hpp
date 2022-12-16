@@ -235,6 +235,13 @@ private:
 class M_NIPES: public EA
 {
 public:
+
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
     typedef std::unique_ptr<M_NIPES> Ptr;
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 

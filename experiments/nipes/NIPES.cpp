@@ -42,6 +42,10 @@ void NIPESIndividual::from_string(const std::string &str){
     morphGenome->set_randNum(randNum);
 }
 
+int NIPES::novelty_params::k_value = 15;
+double NIPES::novelty_params::archive_adding_prob = 0.4;
+double NIPES::novelty_params::novelty_thr = 0.9;
+
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -55,9 +59,9 @@ void NIPES::init(){
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
 
-    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+    novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
@@ -163,9 +167,9 @@ void NIPES::epoch(){
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
-        if(Novelty::k_value >= population.size())
-            Novelty::k_value = population.size()/2;
-        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+        if(novelty_params::k_value >= population.size())
+            novelty_params::k_value = population.size()/2;
+        else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
         std::vector<Eigen::VectorXd> pop_desc;
         for(const auto& ind : population)
@@ -173,7 +177,7 @@ void NIPES::epoch(){
         //compute novelty
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc = ind->descriptor();
-            double ind_nov = Novelty::sparseness(Novelty::distances(ind_desc,archive,pop_desc));
+            double ind_nov = novelty::sparseness<novelty_params>(Novelty::distances(ind_desc,archive,pop_desc));
             std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(ind_nov);
         }
 
@@ -181,7 +185,7 @@ void NIPES::epoch(){
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc = ind->descriptor();
             double ind_nov = ind->getObjectives().back();
-            Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
+            novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /**/

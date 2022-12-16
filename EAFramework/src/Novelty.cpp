@@ -2,9 +2,9 @@
 
 using namespace are;
 
-int Novelty::k_value = 15;
-double Novelty::novelty_thr = 0.9;
-double Novelty::archive_adding_prob = 0.4;
+int Novelty::default_params::k_value = 15;
+double Novelty::default_params::novelty_thr = 0.9;
+double Novelty::default_params::archive_adding_prob = 0.4;
 
 Novelty::distance_fct_t Novelty::distance_fcts::euclidian = [](Eigen::VectorXd v,Eigen::VectorXd w) -> double {
     return (w-v).norm();
@@ -76,7 +76,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
         const auto & dist = distances[i][0]; //get the pair with the smallest distance
         int j = L.second[dist[1]][0] + L.second[dist[1]][1]*dim + L.second[dist[1]][2]*dim*dim;
         int k = S.second[dist[2]][0] + S.second[dist[2]][1]*dim + S.second[dist[2]][2]*dim*dim;
-        sum += dist[0] + L.first(j) == S.first(k) ? dim : 0;
+        sum += dist[0] + (L.first(j) == S.first(k) ? dim : 0);
     }
 
     return sum;
@@ -88,17 +88,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional_normalized = [](Eigen
     return dist/(dim*dim*dim*dim);
 };
 
-double Novelty::sparseness(const std::vector<double> &dist){
-    double sum = 0;
-    if(dist.size() >  k_value + 1){
-        for(int i = 0; i < k_value; i++)
-            sum += dist[i];
-    }
-    if(std::isnan(sum/static_cast<double>(k_value))){
-        std::cerr << "NaN found" << std::endl;
-    }
-    return sum/static_cast<double>(k_value);
-}
+
 
 std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                                        const std::vector<Eigen::VectorXd> &archive,
@@ -121,7 +111,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
                       [&](tbb::blocked_range<size_t> r){
         for(size_t i = r.begin(); i != r.end(); i++){
             if(pop[i] == ind_desc)
-                dist[i+archive.size()] = 1.;
+                dist[i+archive.size()] = 0;
             else
                 dist[i+archive.size()] = dist_fct(pop[i],ind_desc);
         }
@@ -158,7 +148,7 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
         for(size_t i = r.begin(); i != r.end(); i++){
             sorted_pop_indexes[i] = i;
             if(pop[i] == ind_desc)
-                pop_dist[i] = 1.;
+                pop_dist[i] = 0;
             else
                 pop_dist[i] = dist_fct(pop[i],ind_desc);
             dist[i+archive.size()] = pop_dist[i];
@@ -174,13 +164,5 @@ std::vector<double> Novelty::distances(const Eigen::VectorXd &ind_desc,
     return dist;
 }
 
-void Novelty::update_archive(const Eigen::VectorXd &ind_desc,
-                             double ind_nov,
-                             std::vector<Eigen::VectorXd> &archive,
-                             const misc::RandNum::Ptr &rn){
 
-   if(ind_nov > novelty_thr || rn->randFloat(0,1) < archive_adding_prob){
-        archive.push_back(ind_desc);
-    }
 
-}

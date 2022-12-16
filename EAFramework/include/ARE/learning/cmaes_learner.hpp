@@ -21,6 +21,13 @@ using rnn_t = nn2::Rnn<neuron_t,connection_t>;
 class CMAESLearner : public Learner
 {
 public:
+
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
     typedef std::shared_ptr<CMAESLearner> Ptr;
     typedef std::shared_ptr<const CMAESLearner> ConstPtr;
 
