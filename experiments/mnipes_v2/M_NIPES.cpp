@@ -553,8 +553,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
-                     std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
+            }else{ //if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
+                  //   std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
                 //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
                 learner.ctrl_learner.to_be_erased();
                 EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
@@ -773,7 +773,6 @@ void M_NIPES::compute_novelty_scores(){
         std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional);
         gene.objectives.resize(2);
         gene.objectives[1] = novelty::sparseness<novelty_params>(dists);
-
     }
     bool with_archive = settings::getParameter<settings::Boolean>(parameters,"#morphNoveltyWithArchive").value;
     if(with_archive){
