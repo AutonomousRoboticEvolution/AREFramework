@@ -1,6 +1,9 @@
 #include "cmaes_learner.hpp"
 
 using namespace are;
+int CMAESLearner::novelty_params::k_value = 15;
+double CMAESLearner::novelty_params::archive_adding_prob = 0.4;
+double CMAESLearner::novelty_params::novelty_thr = 0.9;
 
 void CMAESLearner::init(std::vector<double> initial_point){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
@@ -52,9 +55,9 @@ void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::
 void CMAESLearner::iterate(){
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
-        if(Novelty::k_value >= _population.size())
-            Novelty::k_value = _population.size()/2;
-        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+        if(novelty_params::k_value >= _population.size())
+            novelty_params::k_value = _population.size()/2;
+        else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
         std::vector<Eigen::VectorXd> pop_desc;
         for(const auto& ind : _cma_strat->get_population()){
@@ -69,7 +72,7 @@ void CMAESLearner::iterate(){
             for(int i = 0; i < ind.descriptor.size(); i++)
                 ind_desc(i) = ind.descriptor[i];
 
-            double ind_nov = Novelty::sparseness(Novelty::distances(ind_desc,_novelty_archive,pop_desc));
+            double ind_nov = novelty::sparseness<novelty_params>(Novelty::distances(ind_desc,_novelty_archive,pop_desc));
             ind.objectives.push_back(ind_nov);
         }
 
@@ -79,7 +82,7 @@ void CMAESLearner::iterate(){
             for(int i = 0; i < ind.descriptor.size(); i++)
                 ind_desc(i) = ind.descriptor[i];
             double ind_nov = ind.objectives.back();
-            Novelty::update_archive(ind_desc,ind_nov,_novelty_archive,_rand_num);
+            novelty::update_archive<novelty_params>(ind_desc,ind_nov,_novelty_archive,_rand_num);
         }
     }
     /**/

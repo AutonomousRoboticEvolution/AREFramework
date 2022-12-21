@@ -1,7 +1,9 @@
 #include "BodyPlanTesting.h"
 
 using namespace are;
-
+int BODYPLANTESTING::novelty_params::k_value = 15;
+double BODYPLANTESTING::novelty_params::archive_adding_prob = 0.4;
+double BODYPLANTESTING::novelty_params::novelty_thr = 0.9;
 void BODYPLANTESTING::init()
 {
     params = NEAT::Parameters();
@@ -54,8 +56,8 @@ void BODYPLANTESTING::init()
 
     initPopulation();
 
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
+    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
 }
 
 void BODYPLANTESTING::initPopulation()
@@ -88,9 +90,9 @@ void BODYPLANTESTING::epoch(){
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
-        if(Novelty::k_value >= population.size())
-            Novelty::k_value = population.size()/2;
-        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+        if(novelty_params::k_value >= population.size())
+            novelty_params::k_value = population.size()/2;
+        else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
         std::vector<Eigen::VectorXd> pop_desc;
         for (size_t i = 0; i < population_size; i++) { // Body plans
@@ -107,7 +109,7 @@ void BODYPLANTESTING::epoch(){
             std::vector<double> distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes);
 
             //Compute novelty
-            double ind_nov = Novelty::sparseness(distances);
+            double ind_nov = novelty::sparseness<novelty_params>(distances);
 
             //set the objetives
             std::vector<double> objectives = {ind_nov / 2.64}; /// \todo EB: define 2.64 as constant. This constants applies only for cartesian descriptor!
@@ -122,7 +124,7 @@ void BODYPLANTESTING::epoch(){
             ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getMorphDesc();;
 
             double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population.at(i))->getObjectives().back();
-            Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
+            novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /** MultiNEAT **/
