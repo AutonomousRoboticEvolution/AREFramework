@@ -17,8 +17,9 @@ using eostrat_t = cma::ESOStrategy<cma::CMAParameters<geno_pheno_t>,cma::CMASolu
 namespace are {
 
 /**
- * @brief IPOP-CMAES : Increasing POPulation Covariance Matrix Evolutionary Strategy with custom restart mechanism and possibility to add novelty as special objective
- * WARNING : This learner minimize fitnesses between 0 and 1.
+ * @brief IPOPCMAStrategy : Increasing POPulation Covariance Matrix Evolutionary Strategy with custom restart mechanism and possibility to add novelty as special objective.
+ * This class uses the libcmaes implementation of  ipop cmaes. It basicly an interface of libcmaes code to this framework with some custom changes.
+ * WARNING : This learner minimizes the objective function between 0 and 1.
  *
  */
 class IPOPCMAStrategy : public ipop_cmaes_t

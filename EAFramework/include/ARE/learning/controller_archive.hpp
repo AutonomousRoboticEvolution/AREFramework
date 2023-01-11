@@ -33,7 +33,15 @@ struct ControllerArchive{
      */
     void reset_fitnesses();
 
+    /**
+     * @brief return a string describing the archive
+     * @return
+     */
     std::string to_string() const;
+
+    /**
+     * @brief fill the archive from a string
+     */
     void from_file(const std::string&);
 
     template<class archive_t>
