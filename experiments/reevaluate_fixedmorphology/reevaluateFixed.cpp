@@ -19,7 +19,7 @@ void ReevaluateFixed::init(){
     std::vector<int> gen_index;
     if(ind >= 0){
         std::stringstream sstr;
-        sstr << folder << "/ctrlGenome_" << generation << "_" << ind;
+        sstr << folder << "/ctrl_genome_" << generation << "_" << ind;
         gen_files.push_back(sstr.str());
         gen_index.push_back(0);
     }
@@ -30,7 +30,7 @@ void ReevaluateFixed::init(){
             filename = dirit.path().string();
             boost::split(split_str,filename,boost::is_any_of("/"));
             boost::split(split_str,split_str.back(),boost::is_any_of("_"));
-            if(split_str[0] == "ctrlGenome" &&
+            if(split_str[0] == "ctrl_genome" &&
                     std::stoi(split_str[1]) == generation){
 
                 gen_files.push_back(filename);

@@ -1,17 +1,17 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles.ttt
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#folderToLoad,string,/home/leni/are-logs/mnipes2_27_9_10-4-10-72-2968550977/
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#robotPath,string,None
-#idToLoad,int,164
-#genToLoad,int,3
-#indToLoad,int,3
+#folderToLoad,string,/home/le_goff/are-logs/nipes_pretraining_explo_gen_0/morph_32/nipes_12_11_14-44-57-7260-4244680536/
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#robotPath,string,/home/le_goff/git/robotlibrary/exploration/morph_32/model_32.ttm
+#idToLoad,int,-1
+#genToLoad,int,94
+#indToLoad,int,1
 #maxEvalTime,float,60
-#numberOfGeneration,int,1
+#numberOfGeneration,int,94
 #populationSize,int,25
-#repository,string,/home/leni/are-logs
+#repository,string,/home/le_goff/are-logs
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -53,8 +53,8 @@
 
 #reloadController,bool,1
 #isScreenshotEnable,bool,0
-#imageRepository,string,/home/leni/are-logs/mnipes_gradual/mnipes2_16_4_12-39-1-1770-405870621/selection/
 #imagesInLogFolder,bool,0
+#imageRepository,string,/home/le_goff/are-logs/mnipes2_part_runs_explo/mnipes2_23_8_15-7-56-6101-959661848/images/
 #nbrWaypoints,int,180
 
 #isNEATGenome,bool,0

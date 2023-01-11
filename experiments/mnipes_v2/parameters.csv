@@ -4,24 +4,25 @@
 #instanceType,int,1
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
-#waitForAllInstances,bool,0
+#waitForAllInstances,bool,1
 #seed,int,-1
-#evaluationOrder,int,3
+#evaluationOrder,int,0
 #synchronicity,float,0.
 
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arena.ttt
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/leni/are-logs
-#vrepFolder,string,/home/leni/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
+#repository,string,/home/le_goff/are-logs
+#vrepFolder,string,/home/le_goff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/
 
-#seedMorphGenome,string,/home/leni/git/robotlibrary/exploration/morph_45/morph_genome_45
+#computeEvolvability,bool,1
+#seedMorphGenome,string,/home/le_goff/git/robotlibrary/exploration/morph_463/morph_genome_463
 #oldExperimentFolder,string,None
 #bootstrapFolder,string,None
 
 #morphDescFile,string,MD_Cart_WDH.csv
 #bootstrapFile,string,CLRNrobotList.csv
 #isExportModel,bool,1
-#isScreenshotEnable,bool,1
+#isScreenshotEnable,bool,0
 #imageRepository,string,images
 #imagesInLogFolder,bool,1
 #isCPPNGenome,bool,1
@@ -35,7 +36,7 @@
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.75;0.75;0.12
 #targets,sequence_double,0.75;0.75;0.12;-0.75;-0.75;0.12;0.75;-0.75;0.12
-#initPosition,sequence_double,0;0;0.2
+#initPosition,sequence_double,0.6;-0.6;0.2
 #robotOrientation,sequence_float,-1.5708;0;-1.5708
 
 #outputNoiseLevel,double,0.
@@ -49,17 +50,17 @@
 #reloadController,bool,0
 #jointControllerType,int,2
 
-#populationSize,int,25
+#populationSize,int,100
 #maxEvalTime,float,60
 #timeStep,float,0.02
 #ctrlUpdateFrequency,double,0.1
-#maxNbrEval,int,0.
+#maxNbrEval,int,0
 #fitnessType,int,0
 #withCrossover,bool,1
 
-#cmaesSmallNbrEval,int,200
-#cmaesLargeNbrEval,int,400
-#cmaesPopSize,int,20
+#cmaesSmallNbrEval,int,20
+#cmaesLargeNbrEval,int,20
+#cmaesPopSize,int,10
 #cmaesMaxPopSize,int,40
 #CMAESStep,double,1.
 #FTarget,double,0.05
