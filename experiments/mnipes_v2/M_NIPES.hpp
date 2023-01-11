@@ -228,6 +228,7 @@ private:
     bool drop_learning = false;
     int current_gradual_scene = 0;
 
+
 };
 
 
@@ -341,6 +342,7 @@ private:
     bool is_multi_target = false;
 
     double evolvability_score = 0.0;
+    int highest_morph_id=0;
 
     //attribute for gradual tasks
     int nbr_of_successful_solution = 0;

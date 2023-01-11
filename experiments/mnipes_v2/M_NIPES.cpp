@@ -258,7 +258,6 @@ void M_NIPES::init(){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
-
         int fitness_type = settings::getParameter<settings::Integer>(parameters,"#fitnessType").value;
 
         if(fitness_type == BEST_FIT)
@@ -318,6 +317,7 @@ void M_NIPES::init_morph_pop(){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
         morphgenome->random();
+        morphgenome->set_id(highest_morph_id++);
 
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
@@ -559,12 +559,15 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 learner.ctrl_learner.to_be_erased();
                 EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
                 NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-                if(settings::getParameter<settings::String>(parameters,"#seedMorphGenome").value == "None")
+                if(settings::getParameter<settings::String>(parameters,"#seedMorphGenome").value == "None"){
                     morphgenome->random();
+                    morphgenome->set_id(highest_morph_id++);
+                }
                 else{
                     nn2_cppn_t new_cppn = seed_cppn;
                     new_cppn.mutate();
                     morphgenome->set_cppn(new_cppn);
+                    morphgenome->set_id(highest_morph_id++);
                 }
 
                 learner_t new_learner(*(morphgenome.get()));
@@ -729,6 +732,7 @@ void M_NIPES::reproduction(){
         for(const int &idx: random_indexes)
             gene_subset.push_back(gene_pool[idx]);
         NN2CPPNGenome new_morph_gene = selection_fct(gene_subset);
+        new_morph_gene.set_id(highest_morph_id++);
         new_morph_gene.set_parameters(parameters);
         new_morph_gene.set_randNum(randomNum);
         learner_t new_learner(new_morph_gene);
@@ -1066,7 +1070,7 @@ void M_NIPES::load_experiment(const std::string &folder){
     }
     fit_ifs.close();
 
-    are::static_id = fitnesses.rbegin()->first;
+    highest_morph_id = fitnesses.rbegin()->first;
 
     for(const std::string &id : ids){
         //Load morph genome

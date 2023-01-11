@@ -209,7 +209,7 @@ public:
      * @brief number evaluation processed by the learner so far
      * @return
      */
-    int nbr_eval(){return _nbr_eval;}
+    int nbr_eval() const{return _nbr_eval;}
 
     int get_nbr_inputs() const{return _nn_inputs;}
     int get_nbr_outputs() const{return _nn_outputs;}
