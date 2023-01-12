@@ -1016,7 +1016,9 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         boost::archive::text_iarchive iarch(ifs);
         iarch >> cppn;
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(cppn));
-
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
@@ -1136,7 +1138,9 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(seed_cppn));
-
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
@@ -1159,7 +1163,9 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
 
         new_cppn.mutate();
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(new_cppn));
-
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
