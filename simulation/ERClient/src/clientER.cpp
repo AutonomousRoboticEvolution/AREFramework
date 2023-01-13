@@ -123,7 +123,6 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
     serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
-    ind_in_eval_counter++;
 }
 
 void ER::endOfSimulation(int slaveIndex){
@@ -136,6 +135,8 @@ void ER::endOfSimulation(int slaveIndex){
         currentIndVec[slaveIndex]->from_string(message);
     }catch(boost::archive::archive_exception& e){
         std::cerr << e.what() << std::endl;
+        serverInstances[slaveIndex]->disconnect();
+        serverInstances[slaveIndex]->connect(5000);
         return;
     }
 
@@ -210,7 +211,6 @@ bool ER::updateSimulation()
             else if(state == FINISH)
             {
                 endOfSimulation(slaveIdx);
-                ind_in_eval_counter--;
                 currentIndexVec[slaveIdx] = -1;
                 serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
                 eval_times[slaveIdx].second = hr_clock::now();
@@ -243,7 +243,7 @@ bool ER::updateSimulation()
     bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
     if(!wait_for_all_instances) all_instances_finish = true;
 
-    if(!ind_in_eval_counter && all_instances_finish || ea->get_population().size() == 0)
+    if(indToEval.empty() && all_instances_finish || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
         ea->epoch();

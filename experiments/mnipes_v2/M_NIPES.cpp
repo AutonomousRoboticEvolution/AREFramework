@@ -622,13 +622,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     best_ctrl_gen.set_nbr_output(nbr_outputs);
                     best_ctrl_gen.set_nbr_hidden(nbr_hidden);
                     best_ctrl_gen.set_nn_type(nn_type);
+                    //update the archive
+                    if(use_ctrl_arch){
+                        CartDesc morph_desc = learner.morph_genome.get_cart_desc();
+                        controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                    }
+                    //-
                 }
-                //update the archive
-                if(use_ctrl_arch){
-                    CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
-                }
-                //-
+
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
@@ -663,7 +664,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                 //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
-                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
+                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully asynchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
                     warming_up = false;
                     increment_age();
