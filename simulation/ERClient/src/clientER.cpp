@@ -135,8 +135,6 @@ void ER::endOfSimulation(int slaveIndex){
         currentIndVec[slaveIndex]->from_string(message);
     }catch(boost::archive::archive_exception& e){
         std::cerr << e.what() << std::endl;
-        serverInstances[slaveIndex]->disconnect();
-        serverInstances[slaveIndex]->connect(5000);
         return;
     }
 
