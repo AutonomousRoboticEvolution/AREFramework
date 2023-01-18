@@ -166,6 +166,7 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
     else message = "";
     if(ret_value){
         std::cerr << "simxGetStringSignal returned with the following error value: " << ret_value << std::endl;
+        std::cerr << "the message recieved is of length " << length << " and is " << message << std::endl;
     }
 //    }else{
 //        std::cerr << "simxGetStringSignal did not finish properly." << std::endl;
