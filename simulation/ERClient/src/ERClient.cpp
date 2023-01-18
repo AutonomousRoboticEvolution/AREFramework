@@ -62,6 +62,8 @@ int main(int argc, char* argv[])
 {
     signal(SIGSEGV,handler);
     signal(SIGABRT,handler);
+    signal(SIGILL,handler);
+    signal(SIGFPE,handler);
 
     srand(time(NULL));
 

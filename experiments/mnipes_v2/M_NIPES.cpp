@@ -689,7 +689,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     assert(learning_pool.size() == pop_size);
                 }
                 //-
-            }else if(is_ctrl_next_gen){ //if the NIPES goes for a next gen
+            }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
                 init_new_ctrl_pop(learner);
             }
         }
