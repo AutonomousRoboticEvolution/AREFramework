@@ -125,9 +125,9 @@ void ER::startOfSimulation(int slaveIndex){
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
 }
 
-void ER::endOfSimulation(int slaveIndex){
+bool ER::endOfSimulation(int slaveIndex){
     if(currentIndexVec[slaveIndex] < 0)
-        return;
+        return true;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
@@ -135,7 +135,7 @@ void ER::endOfSimulation(int slaveIndex){
         currentIndVec[slaveIndex]->from_string(message);
     }catch(boost::archive::archive_exception& e){
         std::cerr << e.what() << std::endl;
-        return;
+        return false;
     }
 
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
@@ -161,6 +161,7 @@ void ER::endOfSimulation(int slaveIndex){
     //        if(evalIsFinish)
     //            currentIndIndex++;
     saveLogs(false);
+    return true;
 }
 
 bool ER::updateSimulation()
@@ -208,9 +209,10 @@ bool ER::updateSimulation()
             }
             else if(state == FINISH)
             {
-                endOfSimulation(slaveIdx);
-                currentIndexVec[slaveIdx] = -1;
-                serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+                if(endOfSimulation(slaveIdx)){
+                    currentIndexVec[slaveIdx] = -1;
+                    serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+                }
                 eval_times[slaveIdx].second = hr_clock::now();
                 std::stringstream sstr;
                 sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
