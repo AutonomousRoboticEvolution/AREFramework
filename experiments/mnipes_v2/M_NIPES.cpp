@@ -1067,9 +1067,12 @@ void M_NIPES::load_experiment(const std::string &folder){
     }
     std::vector<std::string> split_line;
     std::map<int,float> fitnesses;
+    highest_morph_id = 0;
     while(std::getline(fit_ifs,line)){
         misc::split_line(line,",",split_line);
         fitnesses.emplace(std::stoi(split_line[0]),std::stof(split_line[3]));
+        if(std::stoi(split_line[0]) > highest_morph_id)
+            highest_morph_id = std::stoi(split_line[0]);
     }
     fit_ifs.close();
 
