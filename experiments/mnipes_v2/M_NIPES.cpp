@@ -1076,8 +1076,6 @@ void M_NIPES::load_experiment(const std::string &folder){
     }
     fit_ifs.close();
 
-    highest_morph_id = fitnesses.rbegin()->first;
-
     for(const std::string &id : ids){
         //Load morph genome
         nn2_cppn_t cppn;
