@@ -1122,6 +1122,11 @@ void M_NIPES::load_experiment(const std::string &folder){
         //-
     }
 
+    //load controller archive
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    if(use_ctrl_arch)
+        controller_archive.from_file(folder + "/controller_archive");
+
 }
 
 void M_NIPES::seed_experiment(const std::string &morph_file){
