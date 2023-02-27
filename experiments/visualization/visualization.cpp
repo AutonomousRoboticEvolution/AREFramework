@@ -8,6 +8,15 @@ namespace st = settings;
 void VisuInd::createMorphology(){
     std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
+
+    if(manual_design != "None"){
+        morphology.reset(new CPPNMorph(parameters));
+        morphology->set_randNum(randNum);
+        std::dynamic_pointer_cast<CPPNMorph>(morphology)->set_list_of_voxels(std::dynamic_pointer_cast<ManualDesign>(morphGenome)->list_of_voxels);
+        std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+        return;
+    }
 
     if(fixed_morph_path == "None"){
         bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
@@ -160,17 +169,29 @@ void Visu::init(){
     bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
     bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
     std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
     Genome::Ptr morph_gen;
     Genome::Ptr ctrl_gen;
     std::vector<std::string> ctrl_gen_files;
     std::vector<std::string> morph_gen_files;
+
+    if(manual_design != "None"){
+        std::vector<std::vector<int>> list_of_voxel;
+        sim::Morphology_CPPNMatrix::load_manual_design(manual_design,list_of_voxel);
+        morph_gen.reset(new ManualDesign(list_of_voxel));
+        ctrl_gen.reset(new EmptyGenome);
+        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+        return;
+    }
+
     if(id >= 0)
         load_per_id(id,morph_gen_files,ctrl_gen_files);
     else load_per_gen_ind(indIdx,morph_gen_files,ctrl_gen_files);
 
     if(fixed_morph_path == "None"){
-
-
         //load morphology genome
         for(size_t i = 0; i < morph_gen_files.size(); i++){
             if(is_neat_genome){

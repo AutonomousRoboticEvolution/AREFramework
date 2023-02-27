@@ -257,7 +257,7 @@ void GenomeDecoder::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &skeletonM
 
 //generates a list surface coordinates
 // recures through each direction
-void GenomeDecoder::exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+void GenomeDecoder::exploreSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                     PolyVox::RawVolume<bool> &visitedVoxels, int32_t posX, int32_t posY,
                                     int32_t posZ, int surfaceCounter, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
@@ -359,7 +359,7 @@ void GenomeDecoder::removeOverhangs(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
             }}} // end of loop through every voxel
 }
 
-void GenomeDecoder::findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
+void GenomeDecoder::findSkeletonSurface(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
     // This matrix stores the visited elements.
     PolyVox::RawVolume<bool > visitedVoxels(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2), PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));

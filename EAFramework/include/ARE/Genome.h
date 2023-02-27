@@ -94,9 +94,9 @@ class EmptyGenome : public Genome
 {
 public:
     EmptyGenome() {type = "empty_genome";}
-    Genome::Ptr clone() const{return nullptr;}
-    void init(){}
-    void mutate(){}
+    Genome::Ptr clone() const override{return nullptr;}
+    void init() override{}
+    void mutate() override{}
     std::string to_string() const override{return "";}
     void from_string(const std::string &) override{}
 

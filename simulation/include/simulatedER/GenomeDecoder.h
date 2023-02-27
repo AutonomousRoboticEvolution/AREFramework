@@ -23,6 +23,8 @@ struct AREVoxel{
     uint8_t caster;
 };
 
+typedef PolyVox::RawVolume<uint8_t> skeleton_matrix_t;
+
 class GenomeDecoder{
 private:
     std::vector<std::vector<std::vector<int>>> skeletonRegionCoord;
@@ -121,7 +123,7 @@ public:
      * @param surfaceCounter - Number of surfaces.
      * @param skeletonSurfaceCoord
      */
-    void exploreSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+    static void exploreSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                                 PolyVox::RawVolume<bool> &visitedVoxels, int32_t posX, int32_t posY,
                                                 int32_t posZ, int surfaceCounter, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
     /**
@@ -140,7 +142,7 @@ public:
      * @param skeletonMatrix - Main skeleton matrix.
      * @param skeletonSurfaceCoord -
      */
-    void findSkeletonSurface(PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
+    static void findSkeletonSurface(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord);
 
     /**
      * @brief find any overhangs greater than one voxel and remove the overhanging voxels
