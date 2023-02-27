@@ -113,7 +113,7 @@ void Morphology_CPPNMatrix::create()
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-           if(convexHandle >= 0)
+            if(convexHandle >= 0)
                 convexDecompositionSuccess = true;
             //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
             // The issue come from a mismatch between the mass computed by verp and the one expected.
@@ -163,7 +163,7 @@ void Morphology_CPPNMatrix::create()
             // Create organs
             for(auto & i : organList){
                 // Limit number of legs to 4
-                if(i.getOrganType() == 3 && joints_number == 4){
+                if(i.getOrganType() == 3 && joints_number == 4 && manual_design == "None"){
                     i.set_organ_removed(true);
                     i.set_organ_checked(true);
                     continue;
@@ -552,7 +552,6 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                   {
                       return a[2] < b[2];
                   });
-        // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
@@ -786,18 +785,19 @@ void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vecto
 void Morphology_CPPNMatrix::generateFromManualDesign(skeleton_matrix_t &skeleton_matrix, std::vector<Organ> &organs_list, const std::vector<std::vector<int>> &list_of_voxels){
 
 
-    const int &xhul =  morph_const::xHeadUpperLimit;
-    const int &xhll =  morph_const::xHeadLowerLimit;
-    const int &yhul =  morph_const::yHeadUpperLimit;
-    const int &yhll =  morph_const::yHeadLowerLimit;
-    const int &vrs =  morph_const::voxel_real_size;
+    const int &xhul =  mc::xHeadUpperLimit;
+    const int &xhll =  mc::xHeadLowerLimit;
+    const int &yhul =  mc::yHeadUpperLimit;
+    const int &yhll =  mc::yHeadLowerLimit;
+    const float vrs =  mc::voxel_real_size;
+    const float hms =  mc::matrix_size/2;
     std::vector<std::vector<int>> organ_voxel_coords;
 
     //Creating the skeleton matrix
     //Convert list of voxel to skeleton matrix 11*11*11
     for(const auto& voxel: list_of_voxels){
         if(voxel[3] == 1 && //there is a shunk of plastic
-                (voxel[0] >= xhul || xhll >= voxel[0]) || (voxel[1] >= yhul || yhll >= voxel[1])) // and it is outside of the brain slot
+                ((voxel[0] >= xhul || xhll >= voxel[0]) || (voxel[1] >= yhul || yhll >= voxel[1]))) // and it is outside of the brain slot
             skeleton_matrix.setVoxel(voxel[0],voxel[1],voxel[2]-5,morph_const::filled_voxel);
         else skeleton_matrix.setVoxel(voxel[0],voxel[1],voxel[2]-5,morph_const::empty_voxel);
         if(voxel[3] > 1)
@@ -820,12 +820,12 @@ void Morphology_CPPNMatrix::generateFromManualDesign(skeleton_matrix_t &skeleton
                 const auto& organ_coord = organ_voxel_coords[i];
                 const auto& surface_coord = skeleton_surface[m][n];
                 //If there is an organ here add a new organ in the organs list with the coordinate of this surface voxel, and go to the next voxel.
-                if(organ_coord[0] == surface_coord[0] &&
-                   organ_coord[1] == surface_coord[1] &&
-                   organ_coord[2]-5 == surface_coord[2]){
+                if(organ_coord[0] == surface_coord[0] + surface_coord[3] &&
+                   organ_coord[1] == surface_coord[1] + surface_coord[4] &&
+                   organ_coord[2]-5 == surface_coord[2] + surface_coord[5]){
                     std::vector<float> position = {static_cast<float>(surface_coord[0])*vrs,
                                                    static_cast<float>(surface_coord[1])*vrs,
-                                                   static_cast<float>(surface_coord[2])*vrs};
+                                                   static_cast<float>(surface_coord[2] + hms)*vrs};
                     std::vector<float> orientation(3);
                     generateOrientations(surface_coord.at(3), surface_coord.at(4), surface_coord.at(5), orientation);
                     Organ new_organ(organ_coord[3]-1,position,orientation,parameters);
