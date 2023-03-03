@@ -46,6 +46,12 @@ void NN2Individual::createController(){
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
     }
+    else if(nn_type == st::nnType::CPG){
+        control.reset(new NN2Control<cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+    }
     else {
         std::cerr << "ERROR: unknown type of neural network" << std::endl;
         return;
