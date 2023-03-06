@@ -215,8 +215,11 @@ void NIPES::epoch(){
 
         _cma_strat->capture_best_solution(best_run);
 
-        if(incrPop)
-            _cma_strat->lambda_inc();
+        if(incrPop){
+            int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
+            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size)
+                _cma_strat->lambda_inc();
+        }
 
         _cma_strat->reset_search_state();
         if(!elitist_restart){
