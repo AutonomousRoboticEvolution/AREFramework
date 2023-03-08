@@ -59,6 +59,7 @@ void VisuInd::createController(){
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
     int wheel_nbr,joint_nbr,sensor_nbr;
     if(fixed_morph_path == "None"){
         wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
@@ -80,6 +81,10 @@ void VisuInd::createController(){
         NN2Control<rnn_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<elman_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
+    else if(nn_type == settings::nnType::ELMAN_CPG)
+        NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
+    else if(nn_type == settings::nnType::CPG)
+        NN2Control<cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -107,6 +112,18 @@ void VisuInd::createController(){
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
+    }
+    else if(nn_type == st::nnType::ELMAN_CPG){
+        control.reset(new NN2Control<elman_cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
+    }
+    else if(nn_type == st::nnType::CPG){
+        control.reset(new NN2Control<cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;

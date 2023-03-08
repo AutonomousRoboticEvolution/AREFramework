@@ -58,6 +58,7 @@ void NIPES::init(){
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+    std::string fit_stagnation_method = settings::getParameter<settings::String>(parameters,"#fitStagnationMethod").value;
 
     novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
     novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
@@ -112,6 +113,7 @@ void NIPES::init(){
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat->set_fit_stagnation_method(fit_stagnation_method);
 
     if(bootstrapCtrl == "None"){
         std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
