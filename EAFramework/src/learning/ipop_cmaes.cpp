@@ -93,6 +93,32 @@ bool IPOPCMAStrategy::pop_fit_stagnation(){
     }else return false;
 }
 
+bool IPOPCMAStrategy::mean_fitness_stagnation(){
+    if(mean_fitnesses.size() < len_of_stag)
+        return false;
+    double mean = 0.0;
+    for(size_t i = mean_fitnesses.size() - len_of_stag
+        ; i < mean_fitnesses.size(); i++){
+        mean += mean_fitnesses[i];
+    }
+    mean = mean/static_cast<float>(len_of_stag);
+    double stddev = 0.0;
+    for(size_t i = mean_fitnesses.size() - len_of_stag
+        ; i < mean_fitnesses.size(); i++){
+        stddev += (mean_fitnesses[i] - mean)*(mean_fitnesses[i] - mean);
+    }
+    stddev = sqrt(stddev/static_cast<float>(len_of_stag-1));
+
+    if(stddev <= 0.05){
+        std::stringstream sstr;
+        sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
+        log_stopping_criterias.push_back(sstr.str());
+        cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
+        return true;
+    }else return false;
+}
+
+
 bool IPOPCMAStrategy::best_sol_stagnation(){
     if(best_fitnesses.size() < len_of_stag)
         return false;
@@ -170,14 +196,18 @@ bool IPOPCMAStrategy::stop()
     reached_ft = reach_ftarget();
     bool ipop_stop = ipop_cmaes_t::stop();
     bool pop_stag = pop_desc_stagnation();
-    bool best_sol_stag = false;
-    if(len_of_stag > 0)
-        best_sol_stag = best_sol_stagnation();
+    bool sol_stag = false;
+    if(len_of_stag > 0){
+        if(fit_stagnation_method == "best")
+            sol_stag = best_sol_stagnation();
+        else if(fit_stagnation_method == "mean")
+            sol_stag = mean_fitness_stagnation();
+    }
 
     if(ipop_stop){
         log_stopping_criterias.push_back(scriterias[_solutions.run_status()]);
     }
-    return  pop_stag || best_sol_stag  || ipop_stop;
+    return  pop_stag || sol_stag  || ipop_stop;
 }
 
 void IPOPCMAStrategy::reset_search_state()
@@ -192,12 +222,15 @@ void IPOPCMAStrategy::reset_search_state()
 
 double IPOPCMAStrategy::best_fitness(individual_t &best_sample){
     double bf = 1.;
+    double mean = 0;
     for(const auto& ind : _pop){
+        mean+=ind.objectives[0];
         if(bf > 1 - ind.objectives[0]){
             bf = 1 - ind.objectives[0];
             best_sample = ind;
         }
     }
+    mean_fitnesses.push_back(mean/static_cast<double>(_pop.size()));
     return bf;
 }
 
