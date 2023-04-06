@@ -2,11 +2,12 @@
 #expPluginName,string,/usr/local/lib/libvisualization.so
 #scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#folderToLoad,string,/home/le_goff/are-logs/nipes_pretraining_explo_gen_0/morph_32/nipes_12_11_14-44-57-7260-4244680536/
+#folderToLoad,string,/home/le_goff/are-logs/nipes_cpg_explo_without_restart/nipes_7_2_18-39-22-2385-1312396431/
 #modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
-#robotPath,string,/home/le_goff/git/robotlibrary/exploration/morph_32/model_32.ttm
+#robotPath,string,None
+#manualDesignFile,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/robots/goxel/are_two_legged_sensors.txt
 #idToLoad,int,-1
-#genToLoad,int,94
+#genToLoad,int,198
 #indToLoad,int,1
 #maxEvalTime,float,60
 #numberOfGeneration,int,94
@@ -31,16 +32,17 @@
 #targetPosition,sequence_double,0.775;0.025;0.2;
 #robotOrientation,sequence_float,-1.5708;0;-1.5708
 #MaxWeight,float,1.0
-#NNType,int,2
+#NNType,int,4
 #NbrHiddenNeurones,int,6
+#jointSubs,sequence_int,-1;-1;0;1
 #UseInternalBias,bool,1
 #genType,int,2
 #withBeacon,bool,1
 #withTiles,bool,1
 #flatFloor,bool,1
 #jointControllerType,int,2
-#randomOrientation,bool,1
-#emptyCtrlGenome,bool,0
+#randomOrientation,bool,0
+#emptyCtrlGenome,bool,1
 #loadAllMorphGenome,bool,0
 
 #isWheel,bool,1
@@ -52,9 +54,9 @@
 #isSegmentedRobot,bool,0
 
 #reloadController,bool,1
-#isScreenshotEnable,bool,0
+#isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,0
-#imageRepository,string,/home/le_goff/are-logs/mnipes2_part_runs_explo/mnipes2_23_8_15-7-56-6101-959661848/images/
+#imageRepository,string,/home/le_goff/git/robotlibrary/wide_corridor/morph_56/
 #nbrWaypoints,int,180
 
 #isNEATGenome,bool,0

@@ -15,7 +15,7 @@ def makeFile(location):
 	# location specific variables:
 	if location == "BRL":
 
-		LOG_FOLDER = "/home/robofab/are-logs/exploration/"
+		LOG_FOLDER = "/home/robofab/are-logs/final_exploration_hybrid/"
 		COPPELIASIM_FOLDER = "/home/robofab/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04"
 		SOFTWARE_PARAMETERS_FILE = "/home/robofab/parameters.csv"
 
@@ -52,7 +52,7 @@ def makeFile(location):
 		ASSEMBLY_FIXTURE_ORIGIN = makeTransformMillimetersDegrees(x=104.9 , y= -576.4 , z=71.0 , rotZ=90).tolist()
 		PRINTER_0_ORIGIN = makeTransformMillimetersDegrees(x=427.8, y=160.5, z=83, rotZ = -90).tolist()
 		# PRINTER_0_ORIGIN = makeTransformInputFormatted([0.390 , 0.1561 , 0.085 , 0 , 0 , math.radians(-90)]) .tolist()
-		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees(x=-68.8 ,y=244.8, z=83).tolist()
+		PRINTER_1_ORIGIN = makeTransformMillimetersDegrees(x=--73.1 ,y=355.2, z=83).tolist()
 		# PRINTER_1_ORIGIN = makeTransformInputFormatted([-0.1013, 0.244 , 0.085 , 0 , 0 , 0]).tolist()
 		PRINTER_0_API_KEY = "9B987FFCEE3540F796014AA3C96D2CE4"
 		PRINTER_1_API_KEY = "FA8E62EF85C74861A40D67EF75E09764"
