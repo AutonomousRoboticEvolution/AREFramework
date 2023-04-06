@@ -14,6 +14,8 @@ using namespace are::sim;
 
 void Morphology_CPPNMatrix::create()
 {
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
+
     int meshHandle = -1;
     mainHandle = -1;
     int convexHandle, brainHandle;
@@ -24,14 +26,18 @@ void Morphology_CPPNMatrix::create()
     createHead();
     PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     PolyVox::RawVolume<uint8_t> skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
-    // Decoding CPPN
-    GenomeDecoder genomeDecoder;
-    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value){
-        if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-        else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+
+    if(manual_design != "None"){
+        generateFromManualDesign(skeletonMatrix,organList,list_of_voxels);
+    }else{
+        GenomeDecoder genomeDecoder;
+        if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value){// Decoding CPPN
+            if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+            else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        }
+        else//Decoding protomatrix
+            genomeDecoder.genomeDecoder(matrix_4d,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
     }
-    else
-        genomeDecoder.genomeDecoder(matrix_4d,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
 
     // Create mesh for skeleton
     auto mesh = PolyVox::extractMarchingCubesMesh(&skeletonMatrix, skeletonMatrix.getEnclosingRegion());
@@ -44,7 +50,8 @@ void Morphology_CPPNMatrix::create()
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
-        generateOrgans(skeletonSurfaceCoord);
+        if(manual_design != "None")
+            generateOrgans(skeletonSurfaceCoord);
         skeletonSurfaceCoord.clear();
         skeletonSurfaceCoord.shrink_to_fit();
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
@@ -106,7 +113,7 @@ void Morphology_CPPNMatrix::create()
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
-           if(convexHandle >= 0)
+            if(convexHandle >= 0)
                 convexDecompositionSuccess = true;
             //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
             // The issue come from a mismatch between the mass computed by verp and the one expected.
@@ -156,14 +163,15 @@ void Morphology_CPPNMatrix::create()
             // Create organs
             for(auto & i : organList){
                 // Limit number of legs to 4
-                if(i.getOrganType() == 3 && joints_number == 4){
+                if(i.getOrganType() == 3 && joints_number == 4 && manual_design == "None"){
                     i.set_organ_removed(true);
                     i.set_organ_checked(true);
                     continue;
                 }
 
-                if(i.getOrganType() != 0)
-                    setOrganOrientation(i); // Along z-axis relative to the organ itself
+                if(manual_design == "None")
+                    if(i.getOrganType() != 0)
+                        setOrganOrientation(i); // Along z-axis relative to the organ itself
                 i.createOrgan(mainHandle);
                 if(i.getOrganType() != 0){
                     if(i.getOrganType() == 1)
@@ -322,7 +330,7 @@ void Morphology_CPPNMatrix::create()
         }
     }
 //    usleep(1000000);
-    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value)
+    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value && manual_design == "None")
         retrieve_matrices_from_cppn();
     // Get info from body plan for body plan descriptors or logging.
     if(indVerResult || convexDecompositionSuccess){
@@ -381,8 +389,8 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
         std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
     }
     setPosition(x,y,z);
-    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
-    simSetObjectOrientation(mainHandle,-1,orientation.data());
+//    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
+//    simSetObjectOrientation(mainHandle,-1,orientation.data());
 }
 
 void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
@@ -544,7 +552,6 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                   {
                       return a[2] < b[2];
                   });
-        // Generate organs every two voxels.
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
             input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
             input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
@@ -586,25 +593,27 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     ///
 
     // Export blueprint
-
-    std::stringstream sst_blueprint;
-    sst_blueprint << "/blueprint_" << indNum << ".csv";
-    std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
-    if(!ofs_blueprint)
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
     {
-        std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
-        return;
-    }
-    std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
-    std::vector<std::vector<float>> tempOrganPos = blueprint.getOrganPosList();
-    std::vector<std::vector<float>> tempOrganOri = blueprint.getOrganOriList();
-    for (int i = 0; i < tempOrganTypes.size(); i++) {
-        ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
-                      << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
-                      << tempOrganPos.at(i).at(2) << ","
-                      << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
-                      << tempOrganOri.at(i).at(2) << ","
-                      << std::endl;
+        std::stringstream sst_blueprint;
+        sst_blueprint << "/blueprint_" << indNum << ".csv";
+        std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
+        if(!ofs_blueprint)
+        {
+            std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
+            return;
+        }
+        std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
+        std::vector<std::vector<float>> tempOrganPos = blueprint.getOrganPosList();
+        std::vector<std::vector<float>> tempOrganOri = blueprint.getOrganOriList();
+        for (int i = 0; i < tempOrganTypes.size(); i++) {
+            ofs_blueprint << "0" << "," << tempOrganTypes.at(i) << ","
+                          << tempOrganPos.at(i).at(0) << "," << tempOrganPos.at(i).at(1) << ","
+                          << tempOrganPos.at(i).at(2) << ","
+                          << tempOrganOri.at(i).at(0) << "," << tempOrganOri.at(i).at(1) << ","
+                          << tempOrganOri.at(i).at(2) << ","
+                          << std::endl;
+        }
     }
 
     // Export mesh file
@@ -770,4 +779,97 @@ void Morphology_CPPNMatrix::generateOrientations(int x, int y, int z, std::vecto
         std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
                   << y << " " << z << std::endl;
     }
+}
+
+
+void Morphology_CPPNMatrix::generateFromManualDesign(skeleton_matrix_t &skeleton_matrix, std::vector<Organ> &organs_list, const std::vector<std::vector<int>> &list_of_voxels){
+
+
+    const int &xhul =  mc::xHeadUpperLimit;
+    const int &xhll =  mc::xHeadLowerLimit;
+    const int &yhul =  mc::yHeadUpperLimit;
+    const int &yhll =  mc::yHeadLowerLimit;
+    const float vrs =  mc::voxel_real_size;
+    const float hms =  mc::matrix_size/2;
+    std::vector<std::vector<int>> organ_voxel_coords;
+
+    //Creating the skeleton matrix
+    //Convert list of voxel to skeleton matrix 11*11*11
+    for(const auto& voxel: list_of_voxels){
+        if(voxel[3] == 1 && //there is a shunk of plastic
+                ((voxel[0] >= xhul || xhll >= voxel[0]) || (voxel[1] >= yhul || yhll >= voxel[1]))) // and it is outside of the brain slot
+            skeleton_matrix.setVoxel(voxel[0],voxel[1],voxel[2]-5,morph_const::filled_voxel);
+        else skeleton_matrix.setVoxel(voxel[0],voxel[1],voxel[2]-5,morph_const::empty_voxel);
+        if(voxel[3] > 1)
+            organ_voxel_coords.push_back(voxel);
+    }
+
+
+    //Generating the skeleton surface coordinate list
+    matrix_int_t skeleton_surface;
+    GenomeDecoder::findSkeletonSurface(skeleton_matrix,skeleton_surface);
+
+
+    //Filling the organs list.
+    //Browse through the skeleton surface coordinate
+    for(int m = 0; m < skeleton_surface.size(); m++) {
+        for(int n = 0; n < skeleton_surface[m].size(); n++) {
+            std::vector<int> index_to_keep;
+            //For this particular surface coordinate, check if there is an organ there.
+            for(int i = 0; i < organ_voxel_coords.size(); i++){
+                const auto& organ_coord = organ_voxel_coords[i];
+                const auto& surface_coord = skeleton_surface[m][n];
+                //If there is an organ here add a new organ in the organs list with the coordinate of this surface voxel, and go to the next voxel.
+                if(organ_coord[0] == surface_coord[0] + surface_coord[3] &&
+                   organ_coord[1] == surface_coord[1] + surface_coord[4] &&
+                   organ_coord[2]-5 == surface_coord[2] + surface_coord[5]){
+                    std::vector<float> position = {static_cast<float>(surface_coord[0])*vrs,
+                                                   static_cast<float>(surface_coord[1])*vrs,
+                                                   static_cast<float>(surface_coord[2] + hms)*vrs};
+                    std::vector<float> orientation(3);
+                    generateOrientations(surface_coord.at(3), surface_coord.at(4), surface_coord.at(5), orientation);
+                    Organ new_organ(organ_coord[3]-1,position,orientation,parameters);
+                    organs_list.push_back(new_organ);
+                    continue;
+
+                }else index_to_keep.push_back(i); //else mark this organ to be look out on the next surface voxel.
+            }
+            if(index_to_keep.empty()) break;
+            auto tmp = organ_voxel_coords;
+            organ_voxel_coords.clear();
+            for(const int& i: index_to_keep){
+                organ_voxel_coords.push_back(tmp[i]);
+            }
+        }
+    }
+}
+
+void Morphology_CPPNMatrix::load_manual_design(const std::string &filename, std::vector<std::vector<int> > &list_of_voxels){
+    std::ifstream logFileStream;
+    logFileStream.open(filename);
+    if(!logFileStream){
+        std::cerr << "Morphology_CPPNMatrix -- Unable to open manual design " << filename << std::endl;
+        return;
+    }
+
+    std::string line;
+    std::vector<std::string> splitted;
+    while(std::getline(logFileStream,line)){
+        misc::split_line(line," ",splitted);
+        if(splitted[0] == "#")
+            continue;
+        std::vector<int> voxel = {std::stoi(splitted[0]),std::stoi(splitted[1]),std::stoi(splitted[2])};
+        if(splitted[3] == "ffffff") //HEXA for white, bone
+            voxel.push_back(1);
+        else if(splitted[3] == "ff0000") //HEXA for red, wheel
+            voxel.push_back(2);
+        else if(splitted[3] == "00ff00") //HEXA for green, sensor
+            voxel.push_back(3);
+        else if(splitted[3] == "0000ff") //HEXA for blue, leg
+            voxel.push_back(4);
+        else if(splitted[3] == "000000") //HEXA for black, caster
+            voxel.push_back(5);
+        list_of_voxels.push_back(voxel);
+    }
+
 }

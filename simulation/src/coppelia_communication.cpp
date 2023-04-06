@@ -59,19 +59,19 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
     float position_passive[4];
     int detected_object_handle;
     int det, occl;
-    std::string name;
-    std::vector<std::string> splitted_name;
+//    std::string name;
+//    std::vector<std::string> splitted_name;
     bool occlusion = false;
 
     for (int handle: handles) {
 
         occlusion_detector = simGetObjectChild(handle, 0);
-        det = simReadProximitySensor(handle, position_passive, &detected_object_handle, norm);
+        int beacon_handle = simGetObjectHandle("IRBeacon_0");
+        det = simCheckProximitySensor(handle,beacon_handle,position_passive);
         // calculates distance to object
         float dist = norm_L2(position_passive[0], position_passive[1], position_passive[2]);
         // Did the sensor detected something?
         if (det > 0) {
-            name = simGetObjectName(detected_object_handle);
             float ref_euler[3];
             if (position_passive[0] == 0) position_passive[1] += 1e-3; // small inaccuracy in case of x = 0;
             float euler[3] = {static_cast<float>(std::atan2(position_passive[2], position_passive[1]) - M_PI / 2.f),
@@ -84,10 +84,9 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
             if (occl > 0) {
                 occlusion = norm_L2(position_occlusion[0], position_occlusion[1], position_occlusion[2]) < dist;
             } else occlusion = false;
-            boost::split(splitted_name, name, boost::is_any_of("_"));
 
             // Only detects IR beacon
-            if (splitted_name[0] == "IRBeacon" && !occlusion) {
+            if (!occlusion) {
 
                 //corrects to center of beacon as 5cm further away
                 float x_pos = sqrt(position_passive[1] * position_passive[1] + position_passive[0] * position_passive[0]);
@@ -106,13 +105,15 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
                 // For high reading return true value
                 if (IR_reading >= lookup_table::threshold) {
                     sensorValues.push_back(1);
-                } else sensorValues.push_back(0);
-
-            } else // Beacon not found
+                } else {
+                    sensorValues.push_back(0);
+                }
+            } else{// Beacon not found
                 sensorValues.push_back(0);
-
-        } else if (det <= 0) // Nothing found
+            }
+        } else if (det <= 0) { // Nothing found
             sensorValues.push_back(0);
+        }
 
     }
 }

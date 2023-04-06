@@ -184,9 +184,9 @@ void M_NIPESIndividual::from_string(const std::string &str){
 void M_NIPES::init(){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     //Novelty parameters
-    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+    CMAESLearner::novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    CMAESLearner::novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    CMAESLearner::novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
     bool start_from_exp = settings::getParameter<settings::Boolean>(parameters,"#loadPrevExperiment").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     int fitness_type = settings::getParameter<settings::Integer>(parameters,"#fitnessType").value;

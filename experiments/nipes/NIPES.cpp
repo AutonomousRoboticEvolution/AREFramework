@@ -42,6 +42,10 @@ void NIPESIndividual::from_string(const std::string &str){
     morphGenome->set_randNum(randNum);
 }
 
+int NIPES::novelty_params::k_value = 15;
+double NIPES::novelty_params::archive_adding_prob = 0.4;
+double NIPES::novelty_params::novelty_thr = 0.9;
+
 void NIPES::init(){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -54,10 +58,11 @@ void NIPES::init(){
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+    std::string fit_stagnation_method = settings::getParameter<settings::String>(parameters,"#fitStagnationMethod").value;
 
-    Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+    novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
@@ -72,9 +77,10 @@ void NIPES::init(){
         NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
     else if(nn_type == settings::nnType::ELMAN)
         NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN_CPG){
+    else if(nn_type == settings::nnType::ELMAN_CPG)
         NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-    }
+    else if(nn_type == settings::nnType::CPG)
+        NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -107,6 +113,7 @@ void NIPES::init(){
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat->set_fit_stagnation_method(fit_stagnation_method);
 
     if(bootstrapCtrl == "None"){
         std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
@@ -163,9 +170,9 @@ void NIPES::epoch(){
 
     /** NOVELTY **/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
-        if(Novelty::k_value >= population.size())
-            Novelty::k_value = population.size()/2;
-        else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+        if(novelty_params::k_value >= population.size())
+            novelty_params::k_value = population.size()/2;
+        else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
         std::vector<Eigen::VectorXd> pop_desc;
         for(const auto& ind : population)
@@ -173,7 +180,7 @@ void NIPES::epoch(){
         //compute novelty
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc = ind->descriptor();
-            double ind_nov = Novelty::sparseness(Novelty::distances(ind_desc,archive,pop_desc));
+            double ind_nov = novelty::sparseness<novelty_params>(Novelty::distances(ind_desc,archive,pop_desc));
             std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(ind_nov);
         }
 
@@ -181,7 +188,7 @@ void NIPES::epoch(){
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc = ind->descriptor();
             double ind_nov = ind->getObjectives().back();
-            Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
+            novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
         }
     }
     /**/
@@ -210,8 +217,11 @@ void NIPES::epoch(){
 
         _cma_strat->capture_best_solution(best_run);
 
-        if(incrPop)
-            _cma_strat->lambda_inc();
+        if(incrPop){
+            int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
+            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size)
+                _cma_strat->lambda_inc();
+        }
 
         _cma_strat->reset_search_state();
         if(!elitist_restart){

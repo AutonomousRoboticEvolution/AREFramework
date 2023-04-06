@@ -17,8 +17,9 @@ using eostrat_t = cma::ESOStrategy<cma::CMAParameters<geno_pheno_t>,cma::CMASolu
 namespace are {
 
 /**
- * @brief IPOP-CMAES : Increasing POPulation Covariance Matrix Evolutionary Strategy with custom restart mechanism and possibility to add novelty as special objective
- * WARNING : This learner minimize fitnesses between 0 and 1.
+ * @brief IPOPCMAStrategy : Increasing POPulation Covariance Matrix Evolutionary Strategy with custom restart mechanism and possibility to add novelty as special objective.
+ * This class uses the libcmaes implementation of  ipop cmaes. It basicly an interface of libcmaes code to this framework with some custom changes.
+ * WARNING : This learner minimizes the objective function between 0 and 1.
  *
  */
 class IPOPCMAStrategy : public ipop_cmaes_t
@@ -76,6 +77,7 @@ public:
     bool pop_desc_stagnation();
     bool pop_fit_stagnation();
     bool best_sol_stagnation();
+    bool mean_fitness_stagnation();
     bool reach_ftarget();
 
     dMat ask()
@@ -124,6 +126,7 @@ public:
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
     void set_novelty_decr(double nd){novelty_decr = nd;}
     void set_pop_stag_thres(float pst){pop_stag_thres = pst;}
+    void set_fit_stagnation_method(const std::string &method){fit_stagnation_method = method;}
     const individual_t &get_best_seen_solution(){return best_seen_solution;}
 
     bool have_reached_ftarget(){return reached_ft;}
@@ -155,6 +158,8 @@ private:
     std::vector<individual_t> _pop;
     bool elitist_restart = false;
     std::vector<double> best_fitnesses;
+    std::vector<double> mean_fitnesses;
+    std::string fit_stagnation_method = "best";
     individual_t best_seen_solution;
     int len_of_stag = 20;
     float pop_stag_thres = 0.05;

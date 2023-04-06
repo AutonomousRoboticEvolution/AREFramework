@@ -56,8 +56,8 @@ public:
 
     //Getters & Setters
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
-    const settings::ParametersMapPtr &get_parameters(){return parameters;}
-    const settings::Property::Ptr &get_properties(){return properties;}
+    const settings::ParametersMapPtr &get_parameters() const {return parameters;}
+    const settings::Property::Ptr &get_properties() const {return properties;}
     void set_properties(const settings::Property::Ptr& prop){properties = prop;}
     virtual void set_randNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
     const std::string& get_type(){return type;}
@@ -94,9 +94,9 @@ class EmptyGenome : public Genome
 {
 public:
     EmptyGenome() {type = "empty_genome";}
-    Genome::Ptr clone() const{return nullptr;}
-    void init(){}
-    void mutate(){}
+    Genome::Ptr clone() const override{return nullptr;}
+    void init() override{}
+    void mutate() override{}
     std::string to_string() const override{return "";}
     void from_string(const std::string &) override{}
 

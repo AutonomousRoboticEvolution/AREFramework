@@ -24,7 +24,7 @@ int ER::init(int nbrOfInst, int port){
         }
     }
     currentIndVec.resize(serverInstances.size());
-    currentIndexVec.resize(serverInstances.size());
+    currentIndexVec.resize(serverInstances.size(),-1);
     eval_times.resize(serverInstances.size());
     return true;
 }
@@ -125,9 +125,9 @@ void ER::startOfSimulation(int slaveIndex){
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
 }
 
-void ER::endOfSimulation(int slaveIndex){
+bool ER::endOfSimulation(int slaveIndex){
     if(currentIndexVec[slaveIndex] < 0)
-        return;
+        return true;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     serverInstances[slaveIndex]->getStringSignal("currentInd",message);
@@ -135,7 +135,7 @@ void ER::endOfSimulation(int slaveIndex){
         currentIndVec[slaveIndex]->from_string(message);
     }catch(boost::archive::archive_exception& e){
         std::cerr << e.what() << std::endl;
-        return;
+        return false;
     }
 
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
@@ -160,8 +160,8 @@ void ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-
     saveLogs(false);
+    return true;
 }
 
 bool ER::updateSimulation()
@@ -209,8 +209,10 @@ bool ER::updateSimulation()
             }
             else if(state == FINISH)
             {
-                endOfSimulation(slaveIdx);
-                serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+                if(endOfSimulation(slaveIdx)){
+                    currentIndexVec[slaveIdx] = -1;
+                    serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
+                }
                 eval_times[slaveIdx].second = hr_clock::now();
                 std::stringstream sstr;
                 sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
@@ -329,7 +331,7 @@ void ER::updateSimulatorList(){
     std::vector<int> newCurrentIndexVec;
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
-            std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
+            std::cerr << "V-REP instance " << idx << " is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
             bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
             if(update_sim_list)
                 serverInstances[idx].reset();

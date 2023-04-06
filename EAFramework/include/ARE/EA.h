@@ -16,6 +16,9 @@ namespace are{
 
 typedef std::chrono::high_resolution_clock hr_clock;
 
+/**
+ * @brief Base class for all the EA algorithms in the framework. non copyable
+ */
 class EA
 {
 public:
@@ -24,6 +27,9 @@ public:
     typedef std::unique_ptr<const EA> ConstPtr;
     typedef EA::Ptr (Factory)(const misc::RandNum::Ptr&,const settings::ParametersMapPtr&);
 
+    /**
+     * @brief default constructor
+     */
     EA(){}
     EA(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
     //non copyable object
@@ -40,7 +46,9 @@ public:
     virtual ~EA();
 
 
-    /// This method sets the fitness value of an individual
+    /**
+     * @brief This method sets the fitness value of an individual
+     */
     virtual void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         currentIndIndex = indIndex;

@@ -9,7 +9,9 @@
 #include "simLib.h"
 #endif
 using namespace are;
-
+int MorphNeuro::novelty_params::k_value = 15;
+double MorphNeuro::novelty_params::archive_adding_prob = 0.4;
+double MorphNeuro::novelty_params::novelty_thr = 0.9;
 void MorphNeuro::init()
 {
     ////Initiate parameters
@@ -119,8 +121,8 @@ void MorphNeuro::init()
 
     initPopulation();
 
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
+    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
 
 }
 
@@ -231,9 +233,9 @@ void MorphNeuro::epoch() {
             // Novelty
             double linearCombAlpha = settings::getParameter<settings::Double>(parameters, "#linearCombAlpha").value;
             if (settings::getParameter<settings::Double>(parameters, "#noveltyRatio").value > 0.) {
-                if (Novelty::k_value >= pop_size)
-                    Novelty::k_value = pop_size / 2;
-                else Novelty::k_value = settings::getParameter<settings::Integer>(parameters, "#kValue").value;
+                if (novelty_params::k_value >= pop_size)
+                    novelty_params::k_value = pop_size / 2;
+                else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters, "#kValue").value;
 
 
                 std::vector<Eigen::VectorXd> pop_desc;
@@ -256,7 +258,7 @@ void MorphNeuro::epoch() {
                     std::vector<double> distances = Novelty::distances(ind_desc, archive, pop_desc, pop_indexes);
 
                     //Compute novelty
-                    double ind_nov = Novelty::sparseness(distances);
+                    double ind_nov = Novelty::sparseness<novelty_params>(distances);
 
                     /** Linear Combination **/
                     double fitScore = ind->getObjectives()[0];//std::dynamic_pointer_cast<CPPNIndividual>(ind)->getManScore();
@@ -278,7 +280,7 @@ void MorphNeuro::epoch() {
 
                     double ind_nov = new_obj[pop_count].back();//ind->getObjectives().back();
                     pop_count += 1;
-                    Novelty::update_archive(ind_desc, ind_nov, archive, randomNum);
+                    Novelty::update_archive<novelty_params>(ind_desc, ind_nov, archive, randomNum);
                 }
             }
         }
@@ -481,9 +483,9 @@ void MorphNeuro::epoch() {
                 // Novelty
                 double linearCombAlpha = settings::getParameter<settings::Double>(parameters, "#linearCombAlpha").value;
                 if (settings::getParameter<settings::Double>(parameters, "#noveltyRatio").value > 0.) {
-                    if (Novelty::k_value >= pop_size)
-                        Novelty::k_value = pop_size / 2;
-                    else Novelty::k_value = settings::getParameter<settings::Integer>(parameters, "#kValue").value;
+                    if (novelty_params::k_value >= pop_size)
+                        novelty_params::k_value = pop_size / 2;
+                    else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters, "#kValue").value;
 
 
                     std::vector<Eigen::VectorXd> pop_desc;
@@ -506,7 +508,7 @@ void MorphNeuro::epoch() {
                         std::vector<double> distances = Novelty::distances(ind_desc, archive, pop_desc, pop_indexes);
 
                         //Compute novelty
-                        double ind_nov = Novelty::sparseness(distances);
+                        double ind_nov = Novelty::sparseness<novelty_params>(distances);
 
                         /** Linear Combination **/
                         double fitScore = ind->getObjectives()[0];//std::dynamic_pointer_cast<CPPNIndividual>(ind)->getManScore();
@@ -528,7 +530,7 @@ void MorphNeuro::epoch() {
 
                         double ind_nov = new_obj[pop_count].back();//ind->getObjectives().back();
                         pop_count += 1;
-                        Novelty::update_archive(ind_desc, ind_nov, archive, randomNum);
+                        Novelty::update_archive<novelty_params>(ind_desc, ind_nov, archive, randomNum);
                     }
                 }
             }

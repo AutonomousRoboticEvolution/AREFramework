@@ -11,21 +11,39 @@ fi
 
 if [[ $1 == 'generate' ]]
 then
-	mv -f $directory/lib$sim'ExtER.so' $directory/lib$sim'ExtER.old'
-	mv -f $directory/lib$sim'ExtUpdateServer.so' $directory/lib$sim'ExtUpdateServer.old'
-	mv -f $directory/lib$sim'ExtGenerate.old' $directory/lib$sim'ExtGenerate.so'
+	if [[ -f $directory/lib$sim'ExtER.so' ]]; then
+		mv -f $directory/lib$sim'ExtER.so' $directory/lib$sim'ExtER.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtUpdateServer.so' ]]; then
+		mv -f $directory/lib$sim'ExtUpdateServer.so' $directory/lib$sim'ExtUpdateServer.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtGenerate.old' ]]; then
+		mv -f $directory/lib$sim'ExtGenerate.old' $directory/lib$sim'ExtGenerate.so'
+	fi
 	rm -f $directory/lib$sim'ExtGenerate.old'
 elif [[ $1 == 'simulation' ]]
 then
-	mv -f $directory/lib$sim'ExtGenerate.so' $directory/lib$sim'ExtGenerate.old'
-	mv -f $directory/lib$sim'ExtUpdateServer.so' $directory/lib$sim'ExtUpdateServer.old'
-	mv -f $directory/lib$sim'ExtER.old' $directory/lib$sim'ExtER.so'
+	if [[ -f $directory/lib$sim'ExtGenerate.so' ]]; then
+		mv -f $directory/lib$sim'ExtGenerate.so' $directory/lib$sim'ExtGenerate.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtUpdateServer.so' ]]; then
+		mv -f $directory/lib$sim'ExtUpdateServer.so' $directory/lib$sim'ExtUpdateServer.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtER.old' ]]; then
+		mv -f $directory/lib$sim'ExtER.old' $directory/lib$sim'ExtER.so'
+	fi
 	rm -f $directory/lib$sim'ExtER.old'
 elif [[ $1 == 'update' ]]
 then
-	mv -f $directory/lib$sim'ExtGenerate.so' $directory/lib$sim'ExtGenerate.old'
-	mv -f $directory/lib$sim'ExtER.so' $directory/lib$sim'ExtER.old'
-	mv -f $directory/lib$sim'ExtUpdateServer.old' $directory/lib$sim'ExtUpdateServer.so'
+	if [[ -f $directory/lib$sim'ExtGenerate.so' ]]; then
+		mv -f $directory/lib$sim'ExtGenerate.so' $directory/lib$sim'ExtGenerate.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtER.so' ]]; then
+		mv -f $directory/lib$sim'ExtER.so' $directory/lib$sim'ExtER.old'
+	fi
+	if [[ -f $directory/lib$sim'ExtUpdateServer.old' ]]; then
+		mv -f $directory/lib$sim'ExtUpdateServer.old' $directory/lib$sim'ExtUpdateServer.so'
+	fi
 	rm -f $directory/lib$sim'ExtUpdateServer.old'
 
 else

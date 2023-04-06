@@ -14,6 +14,12 @@ namespace are {
 class BODYPLANTESTING : public NSGA2<CPPNIndividual>
 {
 public:
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
     BODYPLANTESTING() : NSGA2<CPPNIndividual>(){}
     BODYPLANTESTING(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : NSGA2<CPPNIndividual>(rn, param){}
     ~BODYPLANTESTING() override {}

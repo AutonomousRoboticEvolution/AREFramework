@@ -150,6 +150,7 @@ void RealEnvironment::update_info(double time){
         trajectory.clear();
 
     // update position of robot
+    std::vector<double> tmp_current_position;
     std::string robot_position_string;
     phy::send_string(robot_position_string,"position",zmq_tracking_camera_requester_socket,"Robot:");
 
@@ -162,7 +163,7 @@ void RealEnvironment::update_info(double time){
         std::vector<std::string> robot_position_split_string;
         boost::split(robot_position_split_string, robot_position_string, boost::is_any_of(","));
 
-        current_position = { std::stod(robot_position_split_string[0]) , std::stod(robot_position_split_string[1]) };
+        tmp_current_position = { std::stod(robot_position_split_string[0]) , std::stod(robot_position_split_string[1]) };
     }
 
 
@@ -198,13 +199,13 @@ void RealEnvironment::update_info(double time){
     int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
 
     // (for exploration task) compute which grid zone the robot is in:
-    std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
+    std::pair<int,int> indexes = real_coordinate_to_matrix_index(tmp_current_position);
     if(env_type == 2){
         auto L2 = [](std::pair<int,int> p1, std::pair<int,int> p2)-> int {
             return floor(sqrt((p1.first - p2.first)*(p1.first - p2.first) + (p1.second - p2.second)*(p1.second - p2.second)));
         };
         std::pair<int,int> init_indexes = real_coordinate_to_matrix_index(initial_position);
-        std::pair<int,int> indexes = real_coordinate_to_matrix_index(current_position);
+        std::pair<int,int> indexes = real_coordinate_to_matrix_index(tmp_current_position);
         grid_zone(indexes.first,indexes.second) = L2(init_indexes,indexes);
     }
     else grid_zone(indexes.first,indexes.second) = 1;
@@ -213,6 +214,23 @@ void RealEnvironment::update_info(double time){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
     float interval = evalTime/static_cast<float>(nbr_wp);
+
+    //if targeted locomotion check if the robot has reached the targete within the tolerance threshold.
+    //if yes the robot has already reach the target don't update the current_position, otherwise update the current_position
+    if(env_type == 0 && !target_reached){
+        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        double max_dist = sqrt(2*arena_size*arena_size);
+        double fitness_target = settings::getParameter<settings::Double>(parameters,"#fTarget").value;
+        auto distance = [](std::vector<double> a,std::vector<double> b) -> double
+        {
+            return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                (a[1] - b[1])*(a[1] - b[1]));
+        };
+        if(1 - distance(tmp_current_position,target_position)/max_dist > fitness_target)
+            target_reached = true;
+        current_position = tmp_current_position;
+    }else if(env_type != 0) current_position = tmp_current_position;
+
     if(time >= interval*trajectory.size()){
         waypoint wp;
         if (robot_ever_seen){

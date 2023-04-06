@@ -21,6 +21,13 @@ namespace are{
 class NIPES : public EA
 {
 public:
+
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
     NIPES() : EA(){}
     NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
     ~NIPES(){

@@ -44,6 +44,8 @@ private:
     const int grid_zone_size = 8;
     Eigen::MatrixXi grid_zone;
 
+    bool target_reached = false;
+
     bool usingIPCamera;
 
 

@@ -34,11 +34,13 @@ fitness_fct_t FitnessFunctions::learning_progress = [](const CMAESLearner& learn
 
 selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
 {
-    double best_fitness = gene_pool[0].objectives[0];
+    int obj_idx = settings::getParameter<settings::Integer>(gene_pool[0].morph_genome.get_parameters(),"#morphSelectionObjective").value;
+
+    double best_fitness = gene_pool[0].objectives[obj_idx];
     int best_idx = 0;
     for(int i = 1; i < gene_pool.size(); i++){
-        if(best_fitness < gene_pool[i].objectives[0]){
-            best_fitness = gene_pool[i].objectives[0];
+        if(best_fitness < gene_pool[i].objectives[obj_idx]){
+            best_fitness = gene_pool[i].objectives[obj_idx];
             best_idx = i;
         }
     }
@@ -51,14 +53,16 @@ selection_fct_t SelectionFunctions::best_of_subset = [](const std::vector<genome
 
 selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<genome_t>& gene_pool) -> NN2CPPNGenome
 {
-    double best_fitness[2] = {gene_pool[0].objectives[0],gene_pool[1].objectives[1]};
+    int obj_idx = settings::getParameter<settings::Integer>(gene_pool[0].morph_genome.get_parameters(),"#morphSelectionObjective").value;
+
+    double best_fitness[2] = {gene_pool[0].objectives[obj_idx],gene_pool[1].objectives[obj_idx]};
     int best_idx[2] = {0,1};
     for(int i = 2; i < gene_pool.size(); i++){
-        if(best_fitness[0] < gene_pool[i].objectives[0]){//Best
-            best_fitness[0] = gene_pool[i].objectives[0];
+        if(best_fitness[0] < gene_pool[i].objectives[obj_idx]){//Best
+            best_fitness[0] = gene_pool[i].objectives[obj_idx];
             best_idx[0] = i;
-        }else if(best_fitness[1] < gene_pool[i].objectives[0]){//Second Best
-            best_fitness[1] = gene_pool[i].objectives[0];
+        }else if(best_fitness[1] < gene_pool[i].objectives[obj_idx]){//Second Best
+            best_fitness[1] = gene_pool[i].objectives[obj_idx];
             best_idx[1] = i;
         }
     }
@@ -72,6 +76,8 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
     new_gene.set_parents_ids({gene_pool[best_idx[0]].morph_genome.id(),gene_pool[best_idx[1]].morph_genome.id()}); //store the ids of the parents
     return new_gene;
 };
+
+
 
 
 void M_NIPESIndividual::createMorphology(){
@@ -88,7 +94,6 @@ void M_NIPESIndividual::createMorphology(){
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setDecodeRobot();
 
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
     setMorphDesc();
@@ -235,6 +240,10 @@ void M_NIPESIndividual::compute_fitness(){
     copy_rewards = rewards;
 }
 
+int M_NIPES::novelty_params::k_value = 15;
+double M_NIPES::novelty_params::archive_adding_prob = 0.4;
+double M_NIPES::novelty_params::novelty_thr = 14641;
+
 M_NIPES::M_NIPES(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) : EA(rn, param){
     settings::defaults::parameters->emplace("#tournamentSize",new settings::Integer(4));
     settings::defaults::parameters->emplace("#useControllerArchive",new settings::Boolean(true));
@@ -249,7 +258,6 @@ void M_NIPES::init(){
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
 
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
-
         int fitness_type = settings::getParameter<settings::Integer>(parameters,"#fitnessType").value;
 
         if(fitness_type == BEST_FIT)
@@ -267,8 +275,16 @@ void M_NIPES::init(){
 
 
         std::string bootstrap_folder = settings::getParameter<settings::String>(parameters,"#bootstrapFolder").value;
-        if(bootstrap_folder != "None")
+        std::string experiment_folder = settings::getParameter<settings::String>(parameters,"#oldExperimentFolder").value;
+        std::string seed_file = settings::getParameter<settings::String>(parameters,"#seedMorphGenome").value;
+
+        if(experiment_folder != "None")
+            load_experiment(experiment_folder);
+        else if(seed_file != "None")
+            seed_experiment(seed_file);
+        else if(bootstrap_folder != "None")
             bootstrap_evolution(bootstrap_folder);
+
 
         if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
             std::string filename = settings::getParameter<settings::String>(parameters,"#envListFile").value;
@@ -279,7 +295,10 @@ void M_NIPES::init(){
         bool with_crossover = settings::getParameter<settings::Boolean>(parameters,"#withCrossover").value;
         if(with_crossover) selection_fct = SelectionFunctions::two_best_of_subset;
         else selection_fct = SelectionFunctions::best_of_subset;
-        init_morph_pop();
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        if(gene_pool.size() < pop_size)
+            init_morph_pop();
+        else reproduction();
 
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
@@ -294,10 +313,11 @@ void M_NIPES::init(){
 
 void M_NIPES::init_morph_pop(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    for (size_t i = population.size(); i < population_size; i++){ // Body plans
+    for (size_t i = population.size(); i < population_size - gene_pool.size(); i++){ // Body plans
         EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
         morphgenome->random();
+        morphgenome->set_id(highest_morph_id++);
 
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
@@ -319,6 +339,8 @@ void M_NIPES::init_morph_pop(){
 
 bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
+    if(corr_indexes.size() < currentIndIndex)
+        return true;
     if(corr_indexes[currentIndIndex] < 0)
         return true;
 
@@ -396,8 +418,13 @@ bool M_NIPES::is_finish(){
     bool fullfil_all_tasks = false;
     if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
         fullfil_all_tasks = current_gradual_scene > environments_info.size();
-    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks)
+    if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks){
+        if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+            int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+            std::cout << "evolvability: " << evolvability_score/static_cast<double>(pop_size) << std::endl;
+        }
         return true;
+    }
     return false;
 }
 
@@ -405,6 +432,7 @@ void M_NIPES::init_next_pop(){
     if(population.empty()){
         corr_indexes.clear();
         corr_indexes.shrink_to_fit();
+        currentIndIndex = 0;
     }
     clean_learning_pool();
 
@@ -412,11 +440,11 @@ void M_NIPES::init_next_pop(){
         reproduction();
     else{
         for(auto& learner: learning_pool)
-            if(!learner.ctrl_learner.is_learning_finish())
+            if(!learner.ctrl_learner.is_learning_finish() && learner.ctrl_learner.is_initialized())
                 init_new_ctrl_pop(learner);
         if(population.empty())
             for(auto& learner: learning_pool)
-                if(!learner.ctrl_learner.is_learning_finish())
+                if(!learner.ctrl_learner.is_learning_finish() && learner.ctrl_learner.is_initialized())
                     push_back_remaining_ctrl(learner);
     }
 
@@ -432,7 +460,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     clean_learning_pool();
-
+    if(corr_indexes.size() < currentIndIndex)
+        return true;
     if(corr_indexes[currentIndIndex] < 0)
         return true;
 
@@ -496,7 +525,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
         if(!op_learner){ //learner was not found so erase this individual
             population.erase(population.begin() + corr_indexes[currentIndIndex]);
             population.shrink_to_fit();
-
             corr_indexes[currentIndIndex] = -1;
             for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
                 corr_indexes[i]--;
@@ -505,20 +533,42 @@ bool M_NIPES::update(const Environment::Ptr &env){
         learner_t& learner = *op_learner;
         learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
         if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
+            //compute evolvability
+            if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+                if(morph_id == 0)
+                    seed_morph_genome = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome());
+                else{
+                    Eigen::VectorXd desc1 = seed_morph_genome->get_organ_position_desc().getCartDesc();
+                    Eigen::VectorXd desc2 = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc().getCartDesc();
+                    double dist = Novelty::distance_fcts::positional(desc1,desc2);
+                    std::cout << "distance between " <<seed_morph_genome->id() << ";" << morph_id << " is " << dist << std::endl;
+                    evolvability_score += dist;
+                }
+            }
             learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+            learner.morph_genome.set_organ_position_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc());
             int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
             int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
             int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
             if(wheel_nbr > 0 || joint_nbr > 0){
                 init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                 init_new_ctrl_pop(learner);
-            }else if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
-                     std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
+            }else{ //if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
+                  //   std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
                 //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
                 learner.ctrl_learner.to_be_erased();
                 EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
                 NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-                morphgenome->random();
+                if(settings::getParameter<settings::String>(parameters,"#seedMorphGenome").value == "None"){
+                    morphgenome->random();
+                    morphgenome->set_id(highest_morph_id++);
+                }
+                else{
+                    nn2_cppn_t new_cppn = seed_cppn;
+                    new_cppn.mutate();
+                    morphgenome->set_cppn(new_cppn);
+                    morphgenome->set_id(highest_morph_id++);
+                }
 
                 learner_t new_learner(*(morphgenome.get()));
                 new_learner.ctrl_learner.set_parameters(parameters);
@@ -533,6 +583,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     i--;
                 corr_indexes.push_back(corr_indexes[i] + 1);
             }
+
         }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
             learner.ctrl_learner.to_be_erased();
         }else{
@@ -571,13 +622,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     best_ctrl_gen.set_nbr_output(nbr_outputs);
                     best_ctrl_gen.set_nbr_hidden(nbr_hidden);
                     best_ctrl_gen.set_nn_type(nn_type);
+                    //update the archive
+                    if(use_ctrl_arch){
+                        CartDesc morph_desc = learner.morph_genome.get_cart_desc();
+                        controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                    }
+                    //-
                 }
-                //update the archive
-                if(use_ctrl_arch){
-                    CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
-                }
-                //-
+
 
                 //add new gene in gene_pool
                 genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
@@ -612,7 +664,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                 //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
                 int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
-                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully synchronous
+                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully asynchronous
                 if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
                     warming_up = false;
                     increment_age();
@@ -622,8 +674,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                 //Perform survival and selection and generate a new morph gene.
                 else if(gene_pool.size() == pop_size+nbr_offsprings){
                     //remove oldest gene and increase age
-                    while(gene_pool.size() > pop_size)
-                        remove_oldest_gene();
+                    std::string survival = settings::getParameter<settings::String>(parameters,"#survivalMethod").value;
+                    while(gene_pool.size() > pop_size){
+                        if(survival == "oldest")
+                            remove_oldest_gene();
+                        else if(survival == "worst")
+                            remove_worst_gene();
+                        else std::cerr << "WARNING: Unknown survival method, so no survival applied" << std::endl;
+                    }
                     increment_age();
                     //-
                     assert(gene_pool.size() == pop_size);
@@ -631,7 +689,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     assert(learning_pool.size() == pop_size);
                 }
                 //-
-            }else if(is_ctrl_next_gen){ //if the NIPES goes for a next gen
+            }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
                 init_new_ctrl_pop(learner);
             }
         }
@@ -648,6 +706,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
 void M_NIPES::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
+    int obj_idx = settings::getParameter<settings::Integer>(parameters,"#morphSelectionObjective").value;
+
+    if(obj_idx == 1)
+        compute_novelty_scores();
 
     while(learning_pool.size() < pop_size){ //create offspring until refilling entirely the learning pool
         //Random selection of indexes without duplicate
@@ -671,6 +733,7 @@ void M_NIPES::reproduction(){
         for(const int &idx: random_indexes)
             gene_subset.push_back(gene_pool[idx]);
         NN2CPPNGenome new_morph_gene = selection_fct(gene_subset);
+        new_morph_gene.set_id(highest_morph_id++);
         new_morph_gene.set_parameters(parameters);
         new_morph_gene.set_randNum(randomNum);
         learner_t new_learner(new_morph_gene);
@@ -701,6 +764,33 @@ void M_NIPES::reproduction(){
         //-
     }
 }
+
+void M_NIPES::compute_novelty_scores(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(gene_pool.size() < pop_size)
+        return;
+
+    std::vector<Eigen::VectorXd> genes_desc;
+    for(auto& gene :gene_pool)
+        genes_desc.push_back(gene.morph_genome.get_organ_position_desc().getCartDesc());
+    for(auto& gene :gene_pool){
+        Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+        std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional);
+        gene.objectives.resize(2);
+        gene.objectives[1] = novelty::sparseness<novelty_params>(dists);
+    }
+    bool with_archive = settings::getParameter<settings::Boolean>(parameters,"#morphNoveltyWithArchive").value;
+    if(with_archive){
+        for(auto& gene :gene_pool){
+            Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+            novelty::update_archive<novelty_params>(desc,gene.objectives[1],novelty_archive,randomNum);
+        }
+    }
+
+
+}
+
+
 
 boost::optional<genome_t&> M_NIPES::find_gene(int id){
     for(auto& gene: gene_pool)
@@ -747,6 +837,26 @@ void M_NIPES::remove_oldest_gene(){
 
     //then erase one selected randomly among the oldest.
     gene_pool.erase(gene_pool.begin() + oldest_gene_idx[randomNum->randInt(0,oldest_gene_idx.size()-1)]);
+}
+
+void M_NIPES::remove_worst_gene(){
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(gene_pool.size() <= pop_size)
+        return;
+
+    //find lowest fitness value in the genome pool
+    double lowest_obj = gene_pool[0].objectives[0];
+    size_t worst_gene_idx = 0;
+    for(size_t i = 1; i < gene_pool.size(); i++){
+        if(lowest_obj > gene_pool[i].objectives[0]){
+            lowest_obj = gene_pool[i].objectives[0];
+            worst_gene_idx = i;
+        }
+    }
+    //-
+
+    //then erase the worst one.
+    gene_pool.erase(gene_pool.begin() + worst_gene_idx);
 }
 
 void M_NIPES::increment_age(){
@@ -900,14 +1010,16 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         misc::split_line(filepath,"/",split_str);
         filename = split_str.back();
         misc::split_line(filename,"_",split_str);
-        if(split_str.front() != "morph")
+        if(split_str.front() != "morph" || split_str[1] != "genome" )
             continue;
         nn2_cppn_t cppn;
         std::ifstream ifs(filepath);
         boost::archive::text_iarchive iarch(ifs);
         iarch >> cppn;
         NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(cppn));
-
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
         learner_t new_learner(*morphgenome.get());
         new_learner.ctrl_learner.set_parameters(parameters);
         learning_pool.push_back(new_learner);
@@ -933,6 +1045,156 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         filename = folder + std::string("/controller_archive");
         controller_archive.from_file(filename);
     }
+}
+
+void M_NIPES::load_experiment(const std::string &folder){
+    std::ifstream ifs(folder + "/genomes_pool.csv");
+    if(!ifs){
+        std::cerr << "unable to open file " << folder << "/genomes_pool.csv" << std::endl;
+        exit(1);
+    }
+    std::string line;
+    std::vector<std::string> ids;
+    while(std::getline(ifs,line))
+        misc::split_line(line,",",ids);
+    ifs.close();
+
+    //load fitness file
+    std::ifstream fit_ifs(folder + "/fitnesses.csv");
+    if(!fit_ifs){
+        std::cerr << "unable to open file " << folder << "/fitnesses.csv" << std::endl;
+        exit(1);
+    }
+    std::vector<std::string> split_line;
+    std::map<int,float> fitnesses;
+    highest_morph_id = 0;
+    while(std::getline(fit_ifs,line)){
+        misc::split_line(line,",",split_line);
+        fitnesses.emplace(std::stoi(split_line[0]),std::stof(split_line[3]));
+        if(std::stoi(split_line[0]) > highest_morph_id)
+            highest_morph_id = std::stoi(split_line[0]);
+    }
+    fit_ifs.close();
+
+    for(const std::string &id : ids){
+        //Load morph genome
+        nn2_cppn_t cppn;
+        std::string morph_file = folder + "/morph_genome_" + id;
+        std::ifstream mifs(morph_file);
+        if(!mifs){
+            std::cerr << "unable to open file " << morph_file << std::endl;
+            exit(1);
+        }
+        boost::archive::text_iarchive miarch(mifs);
+        miarch >> cppn;
+        mifs.close();
+        NN2CPPNGenome morph_genome(cppn);
+        morph_genome.set_id(std::stoi(id));
+        morph_genome.set_randNum(randomNum);
+        morph_genome.set_parameters(parameters);
+
+        //Load ctrl genome
+        std::string ctrl_file = folder + "/ctrl_genome_" + id;
+        NNParamGenome ctrl_genome;
+        ctrl_genome.from_file(ctrl_file);
+        ctrl_genome.set_randNum(randomNum);
+        ctrl_genome.set_parameters(parameters);
+
+
+        //load the trajectory.
+        std::string traj_file = folder + "/traj_" + id + "_0";
+        std::ifstream tifs(traj_file);
+        if(!tifs){
+            std::cerr << "unable to open file " << traj_file << std::endl;
+            exit(1);
+        }
+        std::vector<waypoint> trajectory;
+        while(std::getline(tifs,line)){
+            waypoint wp;
+            wp.from_string(line);
+            trajectory.push_back(wp);
+        }
+        tifs.close();
+
+        //add new gene in gene_pool
+        genome_t new_gene(morph_genome,ctrl_genome,{fitnesses[std::stoi(id)]});
+        new_gene.trajectories = {trajectory};
+        gene_pool.push_back(new_gene);
+        //-
+    }
+
+    //load controller archive
+    bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
+    if(use_ctrl_arch)
+        controller_archive.from_file(folder + "/controller_archive");
+
+}
+
+void M_NIPES::seed_experiment(const std::string &morph_file){
+
+    //Load morph genome
+    std::ifstream mifs(morph_file);
+    if(!mifs){
+        std::cerr << "unable to open file " << morph_file << std::endl;
+        exit(1);
+    }
+    boost::archive::text_iarchive miarch(mifs);
+    miarch >> seed_cppn;
+    mifs.close();
+
+    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+    if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
+        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(seed_cppn));
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
+        learner_t new_learner(*morphgenome.get());
+        new_learner.ctrl_learner.set_parameters(parameters);
+        learning_pool.push_back(new_learner);
+
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        population.push_back(ind);
+        corr_indexes.push_back(0);
+    }
+    for(int i = 0; i < pop_size; i++){
+        nn2_cppn_t new_cppn = seed_cppn;
+
+        new_cppn.mutate();
+        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(new_cppn));
+        morphgenome->set_id(highest_morph_id++);
+        morphgenome->set_randNum(randomNum);
+        morphgenome->set_parameters(parameters);
+        learner_t new_learner(*morphgenome.get());
+        new_learner.ctrl_learner.set_parameters(parameters);
+        learning_pool.push_back(new_learner);
+
+        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+        M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        std::vector<double> init_pos;
+        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
+            init_pos = environments_info[current_gradual_scene].init_position;
+        else
+            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
+        population.push_back(ind);
+        if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value)
+            corr_indexes.push_back(i+1);
+        else
+            corr_indexes.push_back(i);
+    }
+
+
 }
 
 void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){

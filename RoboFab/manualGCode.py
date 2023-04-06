@@ -134,9 +134,9 @@ def main():
                         help='ID of the robot to process')
     parser.add_argument('--config', type=str,
                         help='override default config with a json config file')
-    parser.add_argument('--stl', action=argparse.BooleanOptionalAction, default=False,
+    parser.add_argument('--stl', action="store_true", default=False,
                         help='generate ready-to-print STL for slicer program')
-    parser.add_argument('--gcode', action=argparse.BooleanOptionalAction, default=False,
+    parser.add_argument('--gcode', action="store_true", default=False,
                         help='generate gcode, implies STL generation as well')
     args = parser.parse_args()
 

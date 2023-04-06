@@ -42,7 +42,7 @@ public:
     int init(int nbrOfInst,int port = 19997);
     void initialize();
     void startOfSimulation(int slaveIndex);
-    void endOfSimulation(int slaveIndex);
+    bool endOfSimulation(int slaveIndex);
     bool updateSimulation();
     bool execute();
 

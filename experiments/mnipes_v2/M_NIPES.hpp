@@ -3,6 +3,7 @@
 
 #include <functional>
 #include <boost/optional.hpp>
+#include <map>
 
 #include "ARE/learning/controller_archive.hpp"
 #include "simulatedER/Morphology_CPPNMatrix.h"
@@ -19,6 +20,8 @@
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
 
+
+
 typedef enum task_t{
     MAZE = 0,
     OBSTACLES = 1,
@@ -27,6 +30,8 @@ typedef enum task_t{
     BARREL = 4,
     GRADUAL = 5
 } task_t;
+
+
 
 typedef struct learner_t{
 
@@ -223,6 +228,7 @@ private:
     bool drop_learning = false;
     int current_gradual_scene = 0;
 
+
 };
 
 
@@ -230,6 +236,13 @@ private:
 class M_NIPES: public EA
 {
 public:
+
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
     typedef std::unique_ptr<M_NIPES> Ptr;
     typedef std::unique_ptr<const M_NIPES> ConstPtr;
 
@@ -249,6 +262,8 @@ public:
     bool is_finish() override;
 
     Individual::Ptr getIndividual(size_t index) const override{
+        if(corr_indexes.size() < index)
+            return nullptr;
         if(corr_indexes[index] < 0)
             return nullptr;
         return population[corr_indexes[index]];
@@ -260,6 +275,8 @@ public:
         if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
+        if(corr_indexes.size() < currentIndIndex)
+            return;
         if(corr_indexes[indIndex] < 0)
             return;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
@@ -284,14 +301,22 @@ private:
     void init_new_ctrl_pop(learner_t &gene);
     void push_back_remaining_ctrl(learner_t &gene);
     void remove_oldest_gene();
+    void remove_worst_gene();
     void remove_learner(int id);
     void increment_age();
     void clean_learning_pool();
     void reproduction();
 
+    void compute_novelty_scores();
+    void update_novelty_archive();
+
     void incr_gradual_scene();
 
     void bootstrap_evolution(const std::string &folder);
+    void load_experiment(const std::string &folder);
+    void seed_experiment(const std::string &folder);
+
+
 
     std::vector<int> corr_indexes;
 
@@ -305,11 +330,19 @@ private:
     ControllerArchive controller_archive;
     int highest_age = 0;
 
+    std::vector<Eigen::VectorXd> novelty_archive;
+
+    nn2_cppn_t seed_cppn;
+    NN2CPPNGenome::Ptr seed_morph_genome;
+
     float current_ind_past_pos[3];
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
     bool is_multi_target = false;
+
+    double evolvability_score = 0.0;
+    int highest_morph_id=0;
 
     //attribute for gradual tasks
     int nbr_of_successful_solution = 0;

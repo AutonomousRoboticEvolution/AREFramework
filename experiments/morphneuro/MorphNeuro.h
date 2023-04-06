@@ -16,6 +16,11 @@ namespace are {
     class MorphNeuro : public EA
     {
     public:
+        struct novelty_params{
+            static int k_value;
+            static double novelty_thr;
+            static double archive_adding_prob;
+        };
         MorphNeuro() : EA(){}
         MorphNeuro(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
         ~MorphNeuro() override {}

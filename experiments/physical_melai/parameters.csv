@@ -3,17 +3,18 @@
 #verbose,bool,1
 #repository,string,/home/leni/are-logs/
 #seed,int,-1
+#ZMQPort,int,6666
 
 #simMode,bool,1
 #autoMode,bool,1
 #initPosition,sequence_double,-0.625;0.025;0.20
-#targetPosition,sequence_double,0.775;0.025;0.12
+#target,sequence_double,0.775;0.025;0.12
 #withTiles,bool,1
 #withBeacon,bool,1
 #flatFloor,bool,1
 #maxVelocity,double,6.
 #scenes,sequence_string,corridor_ridges.ttt
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
+#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/corridor_ridges.ttt
 
 
 #startFromRandomPop,bool,0
@@ -37,7 +38,7 @@
 #isCPPNGenome,bool,1
 #isLeg,bool,1
 
-#envType,int,0
+#envType,int,2
 #nbrWaypoints,int,60
 #arenaSize,double,2.
 #loadLastLearnerState,bool,1
@@ -66,14 +67,16 @@
 #kValue,int,15
 #noveltyThreshold,double,0.9
 #archiveAddingProb,double,0.4
-#noveltyRatio,double,0.
-#noveltyDecrement,double,0.05
+#noveltyRatio,double,0
+#noveltyDecrement,double,0.1
 #MaxWeight,float,1.
 
 #isSegmentedRobot,bool,0
 #isExportModel,bool,0
 #reloadController,bool,0
 #saveBlueprint,bool,1
+
+#useArucoAsInput,bool,1
 
 #useArucoAsInput,bool,1
 

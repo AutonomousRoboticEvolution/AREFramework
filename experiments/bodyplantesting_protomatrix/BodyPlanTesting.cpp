@@ -29,8 +29,8 @@ void BODYPLANTESTING::init()
 
     initPopulation();
 
-    Novelty::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
-    Novelty::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProbability").value;
+    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
 }
 
 void BODYPLANTESTING::initPopulation()
@@ -87,9 +87,9 @@ void BODYPLANTESTING::epoch(){
     }
 
     /** NOVELTY **/
-    if(Novelty::k_value >= population.size())
-        Novelty::k_value = population.size()/2;
-    else Novelty::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+    if(novelty_params::k_value >= population.size())
+        novelty_params::k_value = population.size()/2;
+    else novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
 
     std::vector<Eigen::VectorXd> pop_desc;
     for (size_t i = 0; i < population_size; i++) { // Body plans
@@ -111,7 +111,7 @@ void BODYPLANTESTING::epoch(){
             distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::positional);
 
         //Compute novelty
-        double ind_nov = Novelty::sparseness(distances);
+        double ind_nov = novelty::sparseness<novelty_params>(distances);
         if(descriptor == CART_DESC)
             ind_nov /= 2.64;
         //set the objetives
@@ -127,7 +127,7 @@ void BODYPLANTESTING::epoch(){
         ind_desc = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->descriptor();;
 
         double ind_nov = std::dynamic_pointer_cast<CPPNIndividual>(population[i])->getObjectives().back();
-        Novelty::update_archive(ind_desc,ind_nov,archive,randomNum);
+        novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
     }
 
     NSGA2::epoch();

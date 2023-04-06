@@ -1,6 +1,7 @@
 #ifndef Morphology_CPPNMatrix_H
 #define Morphology_CPPNMatrix_H
 
+#include <vector>
 #include "simulatedER/Morphology.h"
 #include "simulatedER/Organ.h"
 #include "simulatedER/GenomeDecoder.h"
@@ -18,7 +19,10 @@ using mc = are::morph_const;
 
 namespace are {
 
+typedef std::vector<std::vector<std::vector<int>>> matrix_int_t;
+
 namespace sim {
+
 
 class Morphology_CPPNMatrix : public Morphology
 {
@@ -128,6 +132,27 @@ public:
      */
     int get_organ_from_cppn(std::vector<double> input);
 
+
+    /**
+     * @brief generate the skeleton matrix and organs_list from a list of coordinate and component type.
+     * @param skeleton_matrix
+     * @param organs_list
+     * @param list_of_voxels obtained by using load_manual_design.
+     */
+    void generateFromManualDesign(skeleton_matrix_t &skeleton_matrix, std::vector<Organ> &organs_list, const std::vector<std::vector<int>> &list_of_voxels);
+
+    /**
+     * @brief Read a text file exported for goxel containing list of voxels with color values in hexa.
+     *        ffffff white => 1 bone
+     *        ff0000 red => 2 wheel
+     *        00ff00 green => 3 sensor
+     *        0000ff blue => 4 leg
+     *        000000 black => 5 caster
+     * @param filename
+     * @param list_of_voxels
+     */
+    static void load_manual_design(const std::string& filename, std::vector<std::vector<int>> &list_of_voxels);
+
     ///////////////////////////////
     ///// Setters and getters /////
     ///////////////////////////////
@@ -168,6 +193,8 @@ public:
     const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
     const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;}
+
+    void set_list_of_voxels(const std::vector<std::vector<int>> &lov){list_of_voxels = lov;}
 
 private:
     ///////////////////////
@@ -254,6 +281,7 @@ private:
     bool use_neat=false;
     NEAT::NeuralNetwork cppn;
     nn2_cppn_t nn2_cppn;
+    std::vector<std::vector<int>> list_of_voxels;
 
     unsigned int id = 0;
     // Variables used to contain handles.

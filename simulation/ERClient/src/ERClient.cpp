@@ -23,6 +23,8 @@
 #include <ctime>
 #include <boost/filesystem.hpp>
 #include <random>
+#include <execinfo.h>
+#include <signal.h>
 
 using namespace are;
 
@@ -40,8 +42,28 @@ void saveLog(int counter) {
     logFile.close();
 }
 
+/**
+ * @brief signal handler to generate a stacktrace after getting a segfault signal.
+ * @param sig
+ */
+void handler(int sig) {
+  void *array[10];
+  size_t size;
+
+  // get void*'s for all entries on the stack
+  size = backtrace(array, 10);
+
+  // print out all the frames to stderr
+  fprintf(stderr, "Error: signal %d:\n", sig);
+  backtrace_symbols_fd(array, size, STDERR_FILENO);
+  exit(1);
+}
 int main(int argc, char* argv[])
 {
+    signal(SIGSEGV,handler);
+    signal(SIGABRT,handler);
+    signal(SIGILL,handler);
+    signal(SIGFPE,handler);
 
     srand(time(NULL));
 
