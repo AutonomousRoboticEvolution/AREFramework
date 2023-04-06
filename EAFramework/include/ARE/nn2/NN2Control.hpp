@@ -20,7 +20,7 @@
 namespace are {
 namespace control{
 using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
-using direct_neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfDirect<>>;
+using cpg_neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::Af_cpg<>>;
 using connection_t = nn2::Connection<double>;
 }
 using ffnn_t = nn2::Mlp<control::neuron_t,control::connection_t>;
@@ -28,7 +28,7 @@ using elman_t = nn2::Elman<control::neuron_t,control::connection_t>;
 using rnn_t = nn2::Rnn<control::neuron_t,control::connection_t>;
 using fcp_t = nn2::Fcp<control::neuron_t,control::connection_t>;
 using elman_cpg_t = nn2::ElmanCPG<control::neuron_t,control::connection_t>;
-using cpg_t = nn2::CPG<control::direct_neuron_t,control::connection_t>;
+using cpg_t = nn2::CPG<control::cpg_neuron_t,control::connection_t>;
 
 template<class nn_t>
 class NN2Control : public Control
