@@ -730,4 +730,6 @@ class UR5Robot:
 
         self.moveBetweenStations("AF")
 
+        return organInRobot
+
 

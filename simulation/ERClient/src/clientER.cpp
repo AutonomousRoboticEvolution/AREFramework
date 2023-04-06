@@ -331,7 +331,7 @@ void ER::updateSimulatorList(){
     std::vector<int> newCurrentIndexVec;
     for(size_t idx = 0; idx < serverInstances.size();idx++){
         if(serverInstances[idx]->get_reconnection_trials() > loadingTrials){
-            std::cerr << "One V-REP instance is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
+            std::cerr << "V-REP instance " << idx << " is faulty since I tried to connect to it for more than " << loadingTrials <<  " times." << std::endl;
             bool update_sim_list = settings::getParameter<settings::Boolean>(parameters,"#updateSimulatorList").value;
             if(update_sim_list)
                 serverInstances[idx].reset();

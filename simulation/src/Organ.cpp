@@ -101,11 +101,11 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectOrientation(organHandle, -1, tempOrganOri);
     simSetObjectOrientation(connectorHandle,-1,tempOrganOri);
     // If the organ is not brain rotate along x-axis relative to the organ itself.
-    if(organType != 0){
-        tempOrganOri[0] = organOri.at(3); tempOrganOri[1] = 0.0; tempOrganOri[2] = 0.0;
-        simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
-        simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
-    }
+//    if(organType != 0){
+//        tempOrganOri[0] = organOri.at(3); tempOrganOri[1] = 0.0; tempOrganOri[2] = 0.0;
+//        simSetObjectOrientation(forceSensor, forceSensor, tempOrganOri);
+//        simSetObjectOrientation(organHandle, organHandle, tempOrganOri);
+//    }
     /// \todo EB: These two lines work but I don't understand why with the previous method no.
     simGetObjectOrientation(organHandle, -1, tempOrganOri);
     organOri.at(0) = tempOrganOri[0]; organOri.at(1) = tempOrganOri[1]; organOri.at(2) = tempOrganOri[2];
