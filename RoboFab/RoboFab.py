@@ -3,27 +3,29 @@
 
 ## Software to talk to all the various parts of the RoboFab
 ## goes from a single blueprint file to a single physical robot
-
+import os
+import shutil # for file copying
+import time
 from typing import List
 import math
-import csv # for loading blueprints
 import json # for reading the configuration file
 import numpy as np
 
 from makeConfigurationFile import makeFile as makeConfigurationFile
-from helperFunctions import debugPrint, makeTransform
+from helperFunctions import debugPrint, makeTransformInputFormatted, makeTransformMillimetersDegrees, Timer
 from RoboFabComponents import AssemblyFixture, Bank
-from robotComponents import Robot, Organ, Cable
+from robotComponents import Robot, Organ, Cable, makeOrganFromBlueprintData
 from UR5_host import UR5Robot
 from robotConnection import RobotConnection
+from printer import Printer
+from video_recorder import VideoRecorder
 
 # debugging flags, human switchable to turn parts of the process on/off
-DO_CORE_ORGAN_INSERT = 0
-DO_MOVE_FROM_PRINTER_TO_ASSEMBLY_FIXTURE = 0 # requires DO_CORE_ORGAN_INSERT
-DO_ORGAN_INSERTIONS = 0
-DO_CABLE_INSERTIONS = 0
-DO_SEND_CONTROLLER_TO_ROBOT = 0
-DO_GO_HOME_AT_FINISH = 0
+DO_RECORD_VIDEO = 1
+DO_CORE_ORGAN_INSERT = 1 #finishes with head and skeleton on assembly fixture
+DO_ORGAN_INSERTIONS = 1
+DO_GO_HOME_AT_FINISH = 1
+DO_TURN_MAGNETS_OFF = 1
 
 
 ## top-level class. Call RoboFab.setupRobotObject(blueprint_file_name), then RoboFab.buildRobot()
@@ -35,21 +37,12 @@ class RoboFab_host:
         # Defines properties of each organ type, set in the configuration file
         self.dictionaryOfOrganTypes = configurationData["dictionaryOfOrganTypes"]
 
-        # set up / connect to printer(s)
-        self.printerLocation =  np.matrix ( configurationData [ "PRINTER_1" ] [ "ORIGIN" ] ) #todo: class for talking to printer
-        self.skeletonPositionOnPrintbed =  np.matrix ( configurationData [ "PRINTER_1" ] [ "skeletonPositionOnPrintbed" ] ) #todo: class for talking to printer
-
-        # Define the two gripper TCPs. This is a transform from the tool flange to the tip of each gripper
+        # Define the gripper TCP(s). This is a transform from the tool flange to the tip of the gripper
         self.gripperTCP_A = np.matrix( ( configurationData [ "gripper" ] [ "TCP_A" ] ) )
-        self.gripperTCP_B = np.matrix( ( configurationData [ "gripper" ] [ "TCP_B" ] ) )
+        self.gripperTCP_FOR_CABLES = np.matrix( ( configurationData [ "gripper" ] [ "TCP_FOR_CABLES" ] ) )
 
         # define the organ bank
         self.organBank = Bank ( configurationData [ "ORGAN_BANK_1" ] , configurationData["dictionaryOfOrganTypes"] )
-        print(self.organBank.organsList)
-
-        # define cable bank
-        self.cableBank = Bank ( configurationData [ "CABLE_BANK_1" ] )
-
 
         # connect to assembly fixture
         self.AF = AssemblyFixture ( configurationData ["ASSEMBLY_FIXTURE"] )
@@ -59,208 +52,193 @@ class RoboFab_host:
         self.UR5 = UR5Robot( configurationData )
         debugPrint("Connected to UR5")
 
+        # connect to the local webcam which will record the assembly process:
+        if DO_RECORD_VIDEO: self.webcam = VideoRecorder( configurationData ["RoboFabWebcamPipe"] )
+
         # initialise a robot object (will be filled in setupRobotObject)
-        self.myRobot = Robot( origin=self.printerLocation * self.skeletonPositionOnPrintbed )
+        self.myRobot = None
         self.robotID = None
 
-    def setupRobotObject(self, robotID:str):
+        self.logDirectory = configurationData["logDirectory"]
+        self.timer=Timer()
+
+
+    ## just makes the "robot" object within the code
+    def setupRobotObject(self, robotID:str, printer:Printer):
 
         self.robotID = robotID
+        self.myRobot = Robot ( origin=printer.origin * printer.skeletonPositionOnPrintbed, ID=robotID )
 
-        # open blueprint and parse basic organ data
-        debugPrint ( "making blueprintList list from the blueprint file: BP" + robotID , messageVerbosity=1 )
-        blueprintList = []
-        with open ( './blueprints/BP'+robotID+'.csv', newline='' ) as blueprintFile:
-            blueprintReader = csv.reader ( blueprintFile, delimiter=' ', quotechar='|' )
-            for rowString in blueprintReader:
-                rowAsListOfStrings = rowString [ 0 ].split ( ',' )
-                #Does read data on organs and converts to correct format
-                #i = 0,1 type & parent ID,  i = 2-4 position in m, i = 5-7 rotation in radians
-                blueprintRowToAppend: List[float] = [ int(i) for i in rowAsListOfStrings[0:2] ] + \
-                                       [float(i) for i in rowAsListOfStrings[2:5]] + \
-                                       [float(i) for i in rowAsListOfStrings[5:]]
-                
-                blueprintList.append(blueprintRowToAppend) # converted to meters & radians
-        debugPrint( 'organ locations are: ' + str( blueprintList ) ,messageVerbosity=1 )
+        self.myRobot.createOrgansFromBlueprint('{}/waiting_to_be_built/blueprint_'.format(self.logDirectory)+robotID+'.csv', self.dictionaryOfOrganTypes, self.gripperTCP_A)
 
+        self.myRobot.drawRobot(self.logDirectory)
 
-        # define all the required organs and cables to the robot object:
-        debugPrint( "Defining the organs" ,messageVerbosity=1)
-        for organ_raw_data in blueprintList: # n.b. the first row must be the core organ
-            debugPrint ( "adding an organ of type " + str( organ_raw_data[1 ] ) ,messageVerbosity=2)
-            self.myRobot.addOrgan (Organ ( organ_raw_data , self.dictionaryOfOrganTypes) )
-                
-            if not organ_raw_data[1] ==0: # not a core organ, so add a pull point
-                self.myRobot.addPrintbedPullPoint(makeTransform(organ_raw_data[1:7]))
+    # returns true if the bank has enough organs to provide all those required by the loaded robot
+    def checkBankHasEnoughOrgans(self):
+        # count the organs we need:
+        organs_in_robot = {}
+        for organ in self.myRobot.organsList:
+            if organ.organType in organs_in_robot:
+                organs_in_robot[organ.organType] += 1
+            else:
+                organs_in_robot[organ.organType] = 1
 
-        # currently manually define the fixture rotation desired for each motor organ
-        # todo: compute these properly
-        self.myRobot.organsList[1].requiredAssemblyFixtureRotationRadians = math.radians(30)
-        self.myRobot.organsList[1].flipGripperOrientation = True
-        self.myRobot.organsList[1].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(1.5)
-        self.myRobot.organsList[2].requiredAssemblyFixtureRotationRadians = math.radians(30)
-        self.myRobot.organsList[2].flipGripperOrientation = True
-        self.myRobot.organsList[2].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
+        # count the organs we have in the bank:
+        organs_in_bank = self.organBank.countOrgansAvailable()
 
-        self.myRobot.organsList[3].requiredAssemblyFixtureRotationRadians = math.radians(120)
-        self.myRobot.organsList[3].flipGripperOrientation = False
-        self.myRobot.organsList[3].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(-2)
-        self.myRobot.organsList[4].requiredAssemblyFixtureRotationRadians = math.radians(-60)
-        self.myRobot.organsList[4].flipGripperOrientation = False
-        self.myRobot.organsList[4].AssemblyFixtureRotationOffsetFudgeAngle = math.radians(0)
+        # determine if there is enough of every type
+        enoughOrgansAvailable=True
+        for organType in organs_in_robot:
+            if organType not in organs_in_bank: # this type of organ doesn't exist in the bank
+                enoughOrgansAvailable=False
+                debugPrint("Bank does not contain any organs of type {} (robot needs {})".format(organType,organs_in_robot[organType]))
+            else:
+                debugPrint("Organs type: {}, bank has: {}, robot needs {}".format(organType,organs_in_bank[organType],organs_in_robot[organType]))
+                if organs_in_robot[organType] > organs_in_bank[organType]: # this type of organ exists in the bank, but more are needed than are in the bank
+                    enoughOrgansAvailable=False
+                    debugPrint("Bank does not contain enough organs of type {} (bank has {}, robot needs {})".format(organType,organs_in_bank[organType],organs_in_robot[organType]))
+        return enoughOrgansAvailable
 
 
-        #information on where the cables need to go - currently manually defined.
-        # todo: create a method for self.myRobot.addCableBetween( Organ1, Organ2). This will need the organ object to include information on where the cable connection sites are, and keep track of which have been used already
-        if DO_CABLE_INSERTIONS:
-            debugPrint ( "manually defining some cables" ,messageVerbosity=1 )
-            self.myRobot.addCable ( # sensor 2
-                Cable (
-                    transforms = [self.myRobot.organsList[0].positionTransformWithinBankOrRobot * self.myRobot.organsList[0].transformOrganOriginToCableSocket[0], # in core
-                                  self.myRobot.organsList[4].positionTransformWithinBankOrRobot * np.linalg.inv(self.myRobot.organsList[4].transformOrganOriginToClipCentre) * self.myRobot.organsList[4].transformOrganOriginToCableSocket[0]],
-                      gripPoint= configurationData["CABLE_BANK_1"]["CABLE_GRIP_POINT"]
-                )
-            )
-            self.myRobot.addCable( # motor 1
-                Cable(transforms = [self.myRobot.organsList[0].positionTransformWithinBankOrRobot * self.myRobot.organsList[0].transformOrganOriginToCableSocket[1], # in core
-                                    self.myRobot.organsList[1].positionTransformWithinBankOrRobot * np.linalg.inv(self.myRobot.organsList[1].transformOrganOriginToClipCentre) * self.myRobot.organsList[1].transformOrganOriginToCableSocket[0]],
-                      gripPoint= configurationData["CABLE_BANK_1"]["CABLE_GRIP_POINT"]
-                      )
-            )
-            self.myRobot.addCable ( # motor 2
-                Cable (
-                    transforms = [self.myRobot.organsList[0].positionTransformWithinBankOrRobot * self.myRobot.organsList[0].transformOrganOriginToCableSocket[2], # in core
-                                  self.myRobot.organsList[2].positionTransformWithinBankOrRobot * np.linalg.inv(self.myRobot.organsList[2].transformOrganOriginToClipCentre) * self.myRobot.organsList[2].transformOrganOriginToCableSocket[0]],
-                      gripPoint= configurationData["CABLE_BANK_1"]["CABLE_GRIP_POINT"]
-                )
-            )
-            self.myRobot.addCable ( # sensor 1
-                Cable (
-                    transforms = [self.myRobot.organsList[0].positionTransformWithinBankOrRobot * self.myRobot.organsList[0].transformOrganOriginToCableSocket[3], # in core
-                                  self.myRobot.organsList[3].positionTransformWithinBankOrRobot * np.linalg.inv(self.myRobot.organsList[3].transformOrganOriginToClipCentre) * self.myRobot.organsList[3].transformOrganOriginToCableSocket[0]],
-                      gripPoint= configurationData["CABLE_BANK_1"]["CABLE_GRIP_POINT"]
-                )
-            )
+    ## physically construct the robot
+    def buildRobot( self, printer:Printer ):
 
-        
+        if DO_RECORD_VIDEO: self.webcam.start_recording()
 
-    def buildRobot( self ):
+        self.timer.start()
+        self.UR5.moveBetweenStations("home")
+        self.AF.homeStepperMotor ()  # need to re-home after a period being disabled, in case it moved. Will automatically enable if not already enabled.
 
-        # do the printing
-        #todo: implement talking to the printer. For now, printer should be run manually in advance
-
-        # attach the FIRST organ only, i.e. the core organ (which MUST be the first row of the blueprint file).
-        # n.b. assemblyFixture=None because the robot is on printer at this point
+        # attach the FIRST organ only, i.e. the head organ (which MUST be the first row of the blueprint file).
         if DO_CORE_ORGAN_INSERT:
             debugPrint( "Core organ insert..." )
-            actualCoreInsertedPosition = self.UR5.insertOrgan ( bank=self.organBank, robot=self.myRobot, assemblyFixture=None, gripperTCP=self.gripperTCP_A)
+            self.UR5.insertHeadOrgan ( bank=self.organBank, printer=printer, robot=self.myRobot, gripperTCP=self.gripperTCP_A, assemblyFixture=self.AF )
         else:
-            self.myRobot.organInsertionTrackingList[0]=True # pretend we have done the core organ insert
+            self.AF.turnElectromagnetsOn() # grip the robot
+        self.myRobot.origin = self.AF.currentPosition # update the origin position of the robot now that it is on the assembly fixture
+        self.timer.add("Finished Head Insert")
+        self.save_log_files()  # calling this after every organ ensures that if the program crashes, we at least have the log for the progress so far
 
-        # remove from printbed, move to assembly fixture
-        if DO_MOVE_FROM_PRINTER_TO_ASSEMBLY_FIXTURE:
-            debugPrint( "Remove from printbed..." )
-            self.UR5.removeRobotFromPrinter(self.myRobot,assemblyFixture=self.AF , gripperTCP=self.gripperTCP_A , actualDropoffPosition=actualCoreInsertedPosition)
-        else:
-            self.AF.turnElectromagnetsOn()
-        self.myRobot.origin = self.AF.currentPosition
 
         # attach each organ in turn
         if DO_ORGAN_INSERTIONS:
             debugPrint( "Doing organ insertions" )
-            while self.myRobot.hasOrgansNeedingInsertion:
-                self.UR5.insertOrgan ( bank = self.organBank, robot=self.myRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A )
+            while not all ( [x.hasBeenInserted for x in self.myRobot.organsByLimbList[0]] ) :
+                nextOrganFromRobot = self.myRobot.getNextOrganToInsert()
+                #if nextOrganFromRobot.transformOrganOriginToMaleCableSocket is None: # no cable to insert
+                if nextOrganFromRobot.transformOrganOriginToGripper is None:
+                    # use male cable to insert the organ
+                    thisOrgan = self.UR5.insertOrganWithCable ( bank = self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_FOR_CABLES )
+                else: # use the defined gripper location to pick up the organ
+                    thisOrgan = self.UR5.insertOrganUsingGripperFeature(bank=self.organBank, organInRobot=nextOrganFromRobot, assemblyFixture=self.AF, gripperTCP=self.gripperTCP_A)
+                self.timer.add("finished organ of type {}, address {}".format(thisOrgan.friendlyName, thisOrgan.I2CAddress))
+                self.save_log_files() # calling this after every organ ensures that if the program crashes, we at least have the log for the progress so far
+
         else:
             debugPrint( "Organ insertions skipped" )
+        self.timer.add("Finished all organs")
 
-
-        if DO_CABLE_INSERTIONS:
-            if not DO_ORGAN_INSERTIONS:
-                import time
-                time.sleep(3)
-            self.AF.setPosition(0)
-            self.UR5.setGripperPosition(self.cableBank.GripperPowerForOpenPosition,"A")
-            self.UR5.setGripperPosition(self.cableBank.GripperPowerForOpenPosition,"B")
-            while self.myRobot.hasCablesNeedingInsertion:
-                debugPrint( "Doing a cable insertion..." )
-                self.UR5.insertCable( self.cableBank, self.myRobot, self.AF, self.gripperTCP_A, self.gripperTCP_B , postInsertExtraPushDistanceA = 1.0/1000 , postInsertExtraPushDistanceB = 4.0/1000 )
-        else:
-            debugPrint( "Cable insertions skipped" )
 
         if DO_GO_HOME_AT_FINISH:
-         self.UR5.moveBetweenStations("home")
-
-        if DO_SEND_CONTROLLER_TO_ROBOT:
-            debugPrint("Trying to connect")
-            connection= RobotConnection("192.168.20.101")
-            print(" ---------------- Robot ready  ---------------- ")
-            input("Press any key to start controller")
-            connection.robotStart('genome220')
+            self.UR5.moveBetweenStations("home")
+        self.timer.finish()
 
 
-            print(" ---------------- Robot running  ---------------- ")
-            input("Press any key to stop controller")
-            # input()
-            import time
-            # time.sleep(30)
-            connection.closePort()
-            print("done")
+        self.save_log_files()
+        self.move_files()
 
-        # self.UR5.moveBetweenStations("organ_bank")
-        # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.organBank.origin * makeTransform([0,0,0 , math.pi, 0 ,0]) )
-        # self.UR5.moveBetweenStations("printer")
-        # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( makeTransform([0,0,0.2]) * self.printerLocation * makeTransform([0,0,0 , math.pi, 0 ,0]) )
+        if DO_RECORD_VIDEO: self.webcam.save_recording( "{}/logs/assembly_{}".format( self.logDirectory, self.robotID ) )
 
-        # # Code for simple coiled cable demo:
-        # pickup_point = makeTransform([0.1445,-0.3691,-0.002 , math.radians(180),0,0])
-        # dropoff_point = makeTransform([0.0095,-0.36906,0.00387 , math.radians(180),0,0]) * makeTransform([0,0,0,0,0,math.radians(90)])
-        # self.UR5.moveBetweenStations("AF")
-        # self.UR5.setTCP(self.gripperTCP_A)
-        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.1]) )
-        # self.UR5.setGripperPosition(0.35)
-        # self.UR5.moveArm( pickup_point )
-        # self.UR5.setGripperPosition(1.0)
-        # self.UR5.moveArm( pickup_point * makeTransform([0,0,-0.125]) )
-        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
-        # self.UR5.setMoveSpeed(self.UR5.speedValueSlow)
-        # self.UR5.moveArm( dropoff_point )
-        # self.UR5.setGripperPosition(0.0)
-        # self.UR5.setMoveSpeed(self.UR5.speedValueNormal)
-        # self.UR5.moveArm( dropoff_point * makeTransform([0,0,-0.02]) )
-        #
-        # self.UR5.moveBetweenStations("AF")
+        self.AF.disableStepperMotor ()  # prevent stepper wasting energy and getting hot while waiting, e.g. for the next print
+        self.UR5.gripper.disableServos()
+        print("Assembly done")
 
-        return 0
+    def save_log_files( self ):
+
+        self.myRobot.drawRobot(self.logDirectory)  # re-draw with all known organ i2c addresses included
+        self.timer.save(self.logDirectory, self.robotID)
+
+        # write list_of_organs file
+        os.makedirs("{}/waiting_to_be_evaluated".format ( self.logDirectory ), exist_ok=True) # create the folder if it doesn't already exists
+        file = open ( "{}/waiting_to_be_evaluated/list_of_organs_{}.csv".format ( self.logDirectory, self.robotID ) , "w" )
+        for organ in self.myRobot.organsList:
+            file.write ( "{},{}\n".format(organ.organType, organ.I2CAddress) )
+            # NOTE! the string of the address value saved into list_of_organs file is in decimal, e.g. 0x63 = "99"
+        file.close ()
+
+    def move_files(self):
+        os.makedirs("{}/blueprint_archive".format ( self.logDirectory ), exist_ok=True) # create the archive folder if it doesn't already exists
+
+        # move the mesh file to "archive" folder
+        mesh_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","mesh_{}.stl".format(self.robotID))
+        if os.path.exists(mesh_old_path):
+            mesh_new_path = os.path.join(self.logDirectory,"blueprint_archive","mesh_{}.stl".format(self.robotID))
+            if os.path.exists(mesh_new_path): os.remove(mesh_new_path) # delete it if it already exists to avoid errors
+            shutil.move(mesh_old_path, mesh_new_path)
+        else:
+            debugPrint("WARNING: {} does not exist".format(mesh_old_path),messageVerbosity=0)
+
+        # move the blueprint file to "archive" folder
+        blueprint_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","blueprint_{}.csv".format(self.robotID))
+        if os.path.exists(blueprint_old_path):
+            blueprint_new_path = os.path.join(self.logDirectory,"blueprint_archive","blueprint_{}.csv".format(self.robotID))
+            if os.path.exists(blueprint_new_path): os.remove(blueprint_new_path) # delete it if it already exists to avoid errors
+            shutil.move(blueprint_old_path, blueprint_new_path)
+        else:
+            debugPrint("WARNING: {} does not exist".format(blueprint_old_path),messageVerbosity=0)
+
+        # move the morphology genome from waiting_to_be_built to waiting_to_be_evaluated:
+        genome_old_path = os.path.join(self.logDirectory,"waiting_to_be_built","morph_genome_{}".format(self.robotID))
+        if os.path.exists(genome_old_path):
+            genome_new_path = os.path.join(self.logDirectory,"waiting_to_be_evaluated","morph_genome_{}".format(self.robotID))
+            if os.path.exists(genome_new_path): os.remove(genome_new_path)
+            shutil.move(genome_old_path, genome_new_path)
+        else:
+            debugPrint("WARNING: {} does not exist".format(genome_old_path),messageVerbosity=0)
 
     def disconnectAll( self ):
         self.UR5.stopArm()
         self.AF.disableStepperMotor()
+        if DO_RECORD_VIDEO: self.webcam.disconnect()
 
 
 ## Run an example
 if __name__ == "__main__":
+
+    timestamp_start = time.time()
+
     debugPrint("Running a demonstration of RoboFab",messageVerbosity=0)
 
     # Make the settings file then extract the settings from it
-    makeConfigurationFile(location="BRL") # <--- change this depending on if you're in York or BRL
-    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    with open('location.txt') as f:
+        location = f.read().replace("\n", "")
+        print("location: {}".format(location))
+    makeConfigurationFile(location=location) # <--- change this depending on if you're in York or BRL
+    configurationData = json.load(open('configuration_{}.json'.format(location)))  # <--- change this depending on if you're in York or BRL
+
+    printer_number=0 #set which printer to use
+
+    if DO_CORE_ORGAN_INSERT:
+        printer=Printer( configurationData["network"]["PRINTER{}_IP_ADDRESS".format(printer_number)], configurationData, printer_number=printer_number )
+    else:
+        printer=Printer(None, configurationData, printer_number=printer_number)
 
     # startup
     RoboFab = RoboFab_host (configurationData)
 
-
     # open blueprint file
-    # RoboFab.setupRobotObject ( robotID= "14104" )
-    RoboFab.setupRobotObject ( robotID= "temp" )
+    RoboFab.setupRobotObject ( robotID= "test0" , printer=printer)
+
+    if not RoboFab.checkBankHasEnoughOrgans():
+        raise RuntimeError("Bank does not have enough organs")
 
     # make robot:
-    RoboFab.buildRobot()
-
-
-    debugPrint("RoboFab completed")
+    RoboFab.buildRobot(printer)
 
     # disconnect gracefully:
     RoboFab.UR5.disableServoOnFinish=True # as we have reached the end of the code, should be safe to release the gripper
     RoboFab.disconnectAll()
+
+    timestamp_finish = time.time()
+    print("total time: {}\n=======".format(timestamp_finish-timestamp_start))
+    debugPrint("RoboFab completed")

@@ -1,0 +1,112 @@
+#ifndef NIPES_HPP
+#define NIPES_HPP
+
+
+#if defined (VREP)
+#include "v_repLib.h"
+#elif defined (COPPELIASIM)
+#include "simLib.h"
+#endif
+
+#include "simulatedER/mazeEnv.h"
+#include "ARE/learning/ipop_cmaes.hpp"
+#include "ARE/learning/Novelty.hpp"
+#include "simulatedER/nn2/NN2Individual.hpp"
+#include "ARE/Settings.h"
+#include "obstacleAvoidance.hpp"
+#include "exploration.hpp"
+
+namespace are{
+
+
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
+
+class NIPESIndividual : public sim::NN2Individual
+{
+public:
+    NIPESIndividual() : sim::NN2Individual(){}
+    NIPESIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
+        : sim::NN2Individual(morph_gen,ctrl_gen){}
+    NIPESIndividual(const NIPESIndividual& ind)
+        : sim::NN2Individual(ind),
+          visited_zones(ind.visited_zones),
+          descriptor_type(ind.descriptor_type){}
+
+    std::string to_string();
+    void from_string(const std::string&);
+    Eigen::VectorXd descriptor() override;
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & ctrlGenome;
+        arch & final_position;
+        arch & visited_zones;
+        arch & descriptor_type;
+      //  arch & energy_cost;
+        arch & trajectory;
+      //  arch & sim_time;
+    }
+
+private:
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
+};
+
+class NIPES : public EA
+{
+public:
+    struct novelty_params{
+        static int k_value;
+        static double novelty_thr;
+        static double archive_adding_prob;
+    };
+
+    NIPES() : EA(){}
+    NIPES(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param) : EA(rn, param){}
+    ~NIPES(){
+        _cma_strat.reset();
+    }
+
+    void init() override;
+    void epoch() override;
+    void init_next_pop() override;
+    bool update(const Environment::Ptr&) override;
+
+    void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
+
+    bool is_finish() override;
+    bool finish_eval(const Environment::Ptr& env) override;
+
+    bool restarted(){return !_cma_strat->log_stopping_criterias.empty();}
+    std::string pop_stopping_criterias(){
+        std::string res = _cma_strat->log_stopping_criterias.back();
+        _cma_strat->log_stopping_criterias.pop_back();
+        return res;
+    }
+    const std::vector<Eigen::VectorXd> &get_archive(){return archive;}
+    void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
+
+    const IPOPCMAStrategy::Ptr &get_cma_strat(){return _cma_strat;}
+    void set_cma_strat(const IPOPCMAStrategy::Ptr& cmas){_cma_strat = cmas;}
+
+protected:
+    IPOPCMAStrategy::Ptr _cma_strat;
+    cma::CMASolutions best_run;
+    bool _is_finish = false;
+    std::vector<Eigen::VectorXd> archive;
+    int reevaluated = 0;
+};
+
+}
+
+#endif //NIPES_HPP
+
+

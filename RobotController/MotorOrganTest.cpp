@@ -8,7 +8,7 @@
 #include "I2CBus.hpp"
 #include "MotorOrgan.hpp"
 
-#define MOTOR_ADDRESS 0x68
+#define MOTOR_ADDRESS 0x67
 
 int main(void) {
 
@@ -17,7 +17,7 @@ int main(void) {
 	i2cBus1.openBus();
 
 	//Create a motor organ
-	MotorOrgan motor1(&i2cBus1, MOTOR_ADDRESS);
+	MotorOrgan motor1(MOTOR_ADDRESS);
 
 	//TEST Set motor speed from console
 	int8_t spd = 0;
@@ -46,7 +46,7 @@ int main(void) {
 				printf("FAULTREG: %02X\n", motor1.readFaultReg());
 				break;
 		}
-		printf("FAULTREG: %02X\n", motor1.readFaultReg());
+		//printf("FAULTREG: %02X\n", motor1.readFaultReg());
 	} while (c != 'x');
 
 	return 1;

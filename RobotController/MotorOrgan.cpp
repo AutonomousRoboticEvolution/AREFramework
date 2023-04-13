@@ -7,8 +7,11 @@
 #include "MotorOrgan.hpp"
 
 //Constructor
-MotorOrgan::MotorOrgan(uint8_t address) : I2CDevice(address){
+MotorOrgan::MotorOrgan(uint8_t address) : Organ(address){
 	//Just uses the I2CDevice constructor
+
+    // record organ type:
+    organType = WHEEL;
 }
 
 //Speed input is a signed 8-bit integer where -ve value denotes reverse direction
@@ -20,15 +23,23 @@ void MotorOrgan::setSpeed(int8_t speed) {
 	currentSpeed = abs(speed);
 
 	//Constrain to maximum representable value (6 bits; 2^6 = 63)
-	//Speeds correspond to fixed voltages (independent of source voltage)
-	//hence if the source voltage is < 5.06v then motor will reach maximum rpm
-	//at a value lower than the representable maximum of 63
+    //Speeds correspond to target velocity, which the wheel organ firmware will attempt to achieve.
 	if (currentSpeed > 63) {
 		currentSpeed = 63;
 	}
 
 	//Write current values to control register
 	writeControlReg();
+}
+
+//Speed input is a signed float, where -1 is maximum reverse and +1 is maximum forward
+void MotorOrgan::setSpeedNormalised(float speed) {
+    // constain the value to be within the expected range of -1 to +1:
+    if (speed>1.0){speed=1.0;}
+    else if(speed<-1.0){speed=-1.0;}
+
+    setSpeed(speed*MAXIMUM_TARGET_VELOICTY);
+
 }
 
 //Stop the motor using the braking feature
@@ -53,29 +64,27 @@ void MotorOrgan::standby() {
 	writeControlReg();
 }
 
-//Read the contents of the FAULT register
-/* FAULT REG BIT MEANINGS
-________________________________________
- CLEAR --- --- ILIMIT OTS UVLO OCP FAULT
-   7	  6   5     4    3    2   1    0
-
- CLEAR: Write '1' to this to clear fault reg
- ILIMIT: Current limit exceeded event
- OTS: Overtemperature shutdown
- UVLO: Undervoltage lockout
- OCP: Overcurrent protection
- FAULT: Set if any fault condition exists
-*/
-uint8_t MotorOrgan::readFaultReg() {
-	//Read and return the contents of the fault register
-	return read8From(DRV_FAULT_REG_ADDR);
+//NOTE: Must have a delay between using this function and further writes to I2C, therefore this function includes a sleep of 100ms.
+//I2C to the joint organ is disabled while this executes, and if interrupted can lead to loss of comms
+void MotorOrgan::setCurrentLimit(uint8_t tensOfMilliamps){
+    write8To(CURRENT_LIMIT_REGISTER, tensOfMilliamps);
+    usleep(100000);
 }
 
-//Clear the contents of the FAULT register
-void MotorOrgan::clearFaultReg()  {
-	//Write '1' to bit [7] of the fault register to clear it
-	uint8_t clear = 0x80; //1000000
-	write8To(DRV_FAULT_REG_ADDR, clear);
+int8_t MotorOrgan::readMeasuredCurrent() {
+    // Matt: I'm not sure why, but the wheel will sometimes (inconsistantly) stop responding after a read8From request for the current value.
+    //       It seems to be fixed by instead doing separate writ8() and read() commands. I don't know why, but it seems to work...
+    write8(GET_MEASURED_CURRENT_REGISTER);
+    return read8();
+//    return read8From(GET_MEASURED_CURRENT_REGISTER);
+}
+
+int8_t MotorOrgan::readMeasuredVelocity() {
+    return read8From(GET_MEASURED_VELOCITY_REGISTER);
+}
+
+float MotorOrgan::readMeasuredVelocityRPM() {
+    return float(this->readMeasuredVelocity())*CONVERT_ENCODER_TICKS_PER_TIMESTEP_TO_REV_PER_MINUTE;
 }
 
 /**PRIVATE FUNCTIONS ***/

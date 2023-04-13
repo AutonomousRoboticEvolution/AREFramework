@@ -1,0 +1,113 @@
+ Program
+   Robot Program
+     has_command≔ False 
+     move_speed≔200
+     home_joint_pos≔get_actual_joint_positions()
+     Loop has_command≟ False 
+       has_command≔socket_open("192.168.2.253",30000)
+       Wait: 0.5
+     socket_send_string("starting_point")
+     Wait: 0.1
+     socket_send_string(to_str(get_actual_tcp_pose()))
+     Wait: 0.1
+     socket_send_string("UR_ready")
+     Wait: 0.1
+     keep_looping≔ True 
+     Loop keep_looping
+       has_command≔ False 
+       Loop has_command≟ False 
+         cmd_str≔socket_read_string()
+         If  not cmd_str≟""
+           has_command≔ True 
+       If cmd_str≟"movel"
+         Wait: 0.01
+         'linear move requested'
+         data_in≔socket_read_ascii_float(6)
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.1
+           data_in≔socket_read_ascii_float(6)
+         tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         movel(tgt_position, a=0.75, v=move_speed/1000)
+       ElseIf cmd_str≟"move_j"
+         Wait: 0.01
+         'move to pose, motion linear in joint space'
+         data_in≔socket_read_ascii_float(6)
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.01
+           data_in≔socket_read_ascii_float(6)
+         tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         movej(tgt_position, a=0.75, v=move_speed/150)
+       ElseIf cmd_str≟"move_j_joints"
+         Wait: 0.01
+         'move to pose, motion linear in joint space'
+         data_in≔socket_read_ascii_float(6)
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.01
+           data_in≔socket_read_ascii_float(6)
+         tgt_joints≔[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         movej(tgt_joints, a=0.75, v=move_speed/150)
+       ElseIf cmd_str≟"set_tcp"
+         'change the tool centre point (tcp)'
+         data_in≔socket_read_ascii_float(6)
+         Wait: 0.1
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.1
+           data_in≔socket_read_ascii_float(6)
+         tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         set_tcp(tgt_position)
+       ElseIf cmd_str≟"move_insert"
+         'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'
+         data_in≔socket_read_ascii_float(6)
+         Wait: 0.1
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.1
+           data_in≔socket_read_ascii_float(6)
+         tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         Force
+           movel(tgt_position, a=0.75, v=move_speed/1000)
+       ElseIf cmd_str≟"force_mode_float"
+         '"floating" for 2 seconds, appliying zero force in x,y,z'
+         Wait: 0.2
+         Force
+           Wait: 2.0
+         Wait: 0.2
+       ElseIf cmd_str≟"move_bed_removal"
+         'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'
+         data_in≔socket_read_ascii_float(6)
+         Wait: 0.1
+         Loop data_in[0]≟0
+           'still waiting for data'
+           Wait: 0.1
+           data_in≔socket_read_ascii_float(6)
+         tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+         Force
+           movel(tgt_position, a=0.75, v=move_speed/1000)
+       ElseIf cmd_str≟"stop"
+         keep_looping≔ False 
+       ElseIf cmd_str≟"set_move_speed"
+         data_in_speed≔socket_read_ascii_float(1)
+         Wait: 0.1
+         If data_in_speed[0]≟0
+           'still waiting for data'
+           Wait: 1.0
+           data_in_speed≔socket_read_ascii_float(1)
+         Else
+           move_speed≔data_in_speed[1]
+       ElseIf cmd_str≟"request_pose"
+         Wait: 0.1
+         socket_send_string("sending_pose")
+         Wait: 0.1
+         socket_send_string(to_str(get_actual_tcp_pose()))
+         Wait: 0.1
+       ElseIf cmd_str≟"nothing"
+         Wait: 0.1
+       ElseIf cmd_str≟"print_bed_pull"
+         Force
+           Wait: 5.0
+       socket_send_string("UR_ready")
+     socket_close()

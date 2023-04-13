@@ -1,7 +1,0 @@
-add_subdirectory(hyperneat)
-if(WITH_NN2)
-add_subdirectory(neuroEvolution)
-add_subdirectory(nslc)
-endif()
-add_subdirectory(lc_nsms)
-install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

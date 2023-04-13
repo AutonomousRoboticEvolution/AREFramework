@@ -1,0 +1,115 @@
+Intructions
+
+Webpage: https://wiki.york.ac.uk/display/RHPC/
+
+Commands:
+
+- ssh viking.york.ac.uk
+- scp -r VikingInstructions.txt viking.york.ac.uk:~/scratch/
+- (Optional) wget http://www.coppeliarobotics.com/files/V-REP_PRO_EDU_V3_5_0_Linux.tar.gz
+- tar xvf V-REP_PRO_EDU_V3_5_0_Linux.tar.gz
+- cd V-REP_PRO_EDU_V3_5_0_Linux
+- ./vrep.sh
+- nautilus
+- xvfb-run -a -s "-screen 0 1024x768x24" ./vrep.sh -h -g/users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/experiments/morphology/parameters.csv
+
+- sbatch exampleJob.job
+- squeue -u ebb505
+
+Modules:
+module load devel/CMake/3.12.1
+module load vis/OpenCV
+module load toolchain/foss/2018b
+module load tools/nano 
+module load devel/Boost/1.77.0-GCC-11.2.0
+module load math/Eigen/3.3.4
+module load lib/tbb/2019_U9-intel-2018b
+module load compiler/GCCcore/9.3.0
+
+module load math/Eigen/3.3.7
+/////////////////////////////// To compile
+module load devel/CMake
+module load vis/OpenCV
+module load toolchain/foss
+module load tools/nano 
+module load devel/Boost/1.77.0-GCC-11.2.0
+module load math/Eigen/3.3.4
+module load lib/tbb
+module load compiler/GCCcore
+module load math/Eigen/3.3.7
+module load compiler/GCCcore
+//////////////////////////// To run
+module load toolchain/foss/2018b
+module load tools/nano
+module load devel/CMake
+module load devel/Boost/1.66.0-foss-2018a
+module load math/Eigen/3.3.4
+module load lib/tbb/2019_U9-intel-2018b
+module load compiler/GCCcore/9.3.0
+module load math/Eigen
+
+///////////////////////////////
+Git:
+git clone https://github.com/ci-group/MultiNEAT.git
+git clone https://edgarbuchanan@bitbucket.org/volumesoffun/polyvox.git
+git clone https://github.com/m-renaud/libdlibxx.git
+git clone https://github.com/beniz/libcmaes
+
+Modules:
+export MultiNEAT=/users/ebb505/scratch/MultiNEAT/
+export PolyVox_DIR=/users/ebb505/scratch/polyvox/build/include
+
+CMake/Install
+- cmake -DCMAKE_INSTALL_PREFIX=/users/ebb505/scratch/include/libdlibxx ..
+- wget https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz
+- cmake -DONLY_SIMULATION=1 -DWITH_NN2=TRUE -DLIMBO_FOLDER=/users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/modules/limbo/ -DCMAKE_INSTALL_PREFIX=/users/ebb505/scratch/vrep -DVREP_FOLDER=/users/ebb505/scratch/vrep ..
+
+cmake -DONLY_SIMULATION=1 -DWITH_NN2=TRUE -DLIMBO_FOLDER=/users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/modules/limbo/ -DCMAKE_INSTALL_PREFIX=/users/ebb505/scratch/vrep -DVREP_FOLDER=/users/ebb505/scratch/vrep ..
+
+cmake -DONLY_SIMULATION=1 -DVREP_FOLDER=/users/ebb505/scratch/coppeliasim -DCMAKE_INSTALL_PREFIX=/users/ebb505/scratch/coppeliasim -DLIMBO_FOLDER=/users/ebb505/scratch/evolutionary_robotics_framework/modules/limbo -DWITH_NN2=1 ..
+
+
+Target
+(Install everything in a single directory)
+"/users/ebb505/scratch/include"
+
+Modify in CMake
+- "/users/ebb505/scratch/include" (In target_include_directories)
+- -Linclude/libdlibxx/lib (In both target_link_libraries)
+
+To run:
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/users/ebb505/scratch/vrep:/users/ebb505/scratch/vrep/lib:/users/ebb505/scratch/include
+xvfb-run -a -s "-screen 0 1024x768x24" ./vrep.sh -h -g/users/ebb505/scratch/evolutionary_robotics_framework/EvolutionVREP/experiments/morphology/parameters.csv
+----
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/users/ebb505/scratch/vrep:/users/ebb505/scratch/vrep/lib:/users/ebb505/scratch/include
+export XDG_RUNTIME_DIR=/users/ebb505/scratch/vrep
+export QT_QPA_PLATFORM='offscreen'
+
+xvfb-run -a -s "-screen 0 1024x768x24" ./coppeliaSim.sh -h -g/users/ebb505/scratch/evolutionary_robotics_framework/experiments/bodyplantesting_nn2/parameters.csv
+python3 /users/ebb505/scratch/evolutionary_robotics_framework/simulation/Cluster/run_cluster.py 4 --vrep /users/ebb505/scratch/coppeliasim/coppeliaSim --client /users/ebb505/scratch/evolutionary_robotics_framework/build/simulation/ERClient/are-client --params /users/ebb505/scratch/evolutionary_robotics_framework/experiments/bodyplantesting_nn2/parameters.csv --port-start 20000 --xvfb 0 &
+
+----
+module load toolchain/foss/2018b
+module load devel/Boost/1.66.0-foss-2018a
+module load lang/Python/3.7.2-GCCcore-8.2.0
+module load compiler/GCCcore/9.3.0
+module load math/Eigen
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/users/ebb505/scratch/vrep:/users/ebb505/scratch/vrep/lib:/users/ebb505/scratch/include
+export XDG_RUNTIME_DIR=/users/ebb505/scratch/vrep
+export QT_QPA_PLATFORM='offscreen'
+
+xvfb-run -a -s "-screen 0 1024x768x24" ./vrep.sh -h -g/users/ebb505/scratch/evolutionary_robotics_framework/experiments/object_multitarget/parameters0.csv
+
+python3 /users/ebb505/scratch/evolutionary_robotics_framework/simulation/Cluster/run_cluster.py 10 --vrep /users/ebb505/scratch/vrep/vrep.sh --client /users/ebb505/scratch/evolutionary_robotics_framework/build/simulation/ERClient/are-client --params /users/ebb505/scratch/evolutionary_robotics_framework/experiments/object_multitarget/parameters9.csv --port-start 20000 --xvfb 0
+
+
+
+change seed
+sed -i '/\#seed,int,/ s/$/1/' parameters.csv 
+
+Copy specific files
+rsync -va --prune-empty-dirs --include '*/' --include 'parameters.csv' --exclude "*" ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/BL/ BL/
+rsync -va --prune-empty-dirs --include '*/' --include 'fitnesses.csv' --exclude "*" ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/BL/ BL/
+rsync -va --prune-empty-dirs --include '*/' --include 'MD_Cart_WDH.csv' --exclude "*" ebb505@viking.york.ac.uk:/users/ebb505/scratch/are-logs/BL/ BL/
+

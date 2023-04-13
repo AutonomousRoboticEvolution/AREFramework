@@ -1,6 +1,9 @@
 /Documentation/
 /configuration*.json
 /blueprints/
+/controllers/
+/gcode/
 
 /.idea/
 /__pycache__/
+location.txt

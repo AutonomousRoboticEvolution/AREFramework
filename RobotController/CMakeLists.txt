@@ -1,41 +1,11 @@
-# Locate libraries and headers
+find_package(OpenCV REQUIRED) # for camera
+include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-set (CMAKE_CXX_STANDARD 14)
+file(GLOB SRC robot_tester.cpp)
 
-add_executable(robot_controller_are
-		main.cpp
-		I2CDevice.cpp
-		MotorOrgan.cpp
-		SensorOrgan.cpp
-		Sensors.cpp
+set(CTRL_SRC ./I2CDevice.cpp ./Organ.cpp ./JointOrgan.cpp ./MotorOrgan.cpp ./SensorOrgan.cpp ./DaughterBoards.cpp ./LedDriver.cpp ./Camera.cpp ./BatteryMonitor.cpp ./Fan.cpp)
+add_executable(robot_tester ${SRC} ${CTRL_SRC})
+target_include_directories(robot_tester PUBLIC
+    "./")
+target_link_libraries(robot_tester piARE zmq  ${Boost_LIBRARIES} wiringPi ${OpenCV_LIBS})
 
-		# From VREP
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/control/FixedStructreANN.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/NeuronFactory.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/control/ANN.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/control/ANN.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/control/Control.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/RandNum.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/Settings.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/Neuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/InputNeuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/OutputNeuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/CPGNeuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/FunctionNeuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/PatternNeuron.cpp"
-		"${PROJECT_SOURCE_DIR}/vrepPluggin/Evolution/ERFiles/neuron/SimpleNeuron.cpp"
-		)
-
-find_package(Threads REQUIRED)
-
-if (OFF)
-	# this works
-	find_package(WiringPi REQUIRED
-			HINTS "${PROJECT_SOURCE_DIR}/vrepPluggin/cmake"
-			)
-	target_link_libraries(robot_controller_are WiringPi::WiringPi)
-else()
-	target_link_libraries(robot_controller_are wiringPi)
-endif()
-
-target_link_libraries(robot_controller_are ${CMAKE_THREAD_LIBS_INIT})

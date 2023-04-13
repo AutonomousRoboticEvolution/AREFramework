@@ -1,0 +1,64 @@
+{
+    "id": "LulzBot_TAZ6",
+    "name": "LulzBot TAZ 6",
+    "inherits": "lulzbot_taz_base",
+    "version": 2,
+    "metadata":
+    {
+        "machine_extruder_trains":
+        {
+            "0": "lulzbot_taz6_extruder"
+        },
+        "platform": "lulzbot_taz6.stl",
+        "platform_offset":
+        [
+            0,
+            0,
+            0
+        ],
+        "visible": true,
+        "printer_info_link": "https://www.lulzbot.com/store/printers/lulzbot-taz-6",
+        "toolhead_info_link": "https://www.lulzbot.com/store/tool-heads/lulzbot-taz-single-extruder-tool-head-v21",
+        "base_machine": "lulzbot_taz_6",
+        "firmware_toolhead_name": "SingleExtruder"
+    },
+    "overrides":
+    {
+        "machine_name":
+        {
+            "default_value": "LulzBot TAZ 6"
+        },
+        "machine_width":
+        {
+            "default_value": 280
+        },
+        "machine_depth":
+        {
+            "default_value": 280
+        },
+        "machine_height":
+        {
+            "default_value": 250
+        },
+        "machine_start_gcode":
+        {
+            "default_value_from_file": "lulzbot_taz6_start"
+        },
+        "machine_end_gcode":
+        {
+            "default_value_from_file": "lulzbot_taz6_end"
+        },
+        "machine_wipe_gcode":
+        {
+            "default_value_from_file": "lulzbot_taz6_wipe"
+        },
+        "machine_baudrate":
+        {
+            "default_value": "250000"
+        },
+        "firmware_machine_type":
+        {
+            "resolve": "'LulzBot TAZ 6'"
+        }
+    }
+}

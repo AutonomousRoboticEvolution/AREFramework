@@ -58,6 +58,8 @@ void loop() {
   // for the servo microsecond (typically 1000-2000) signal values:
   int valA;
   int valB;
+
+  //example serial command "a900b1500" range from 900-2100
   
   if (Serial.available() > 0) {
     while (Serial.available() == 0) {} // wait for new values from PC via serial:

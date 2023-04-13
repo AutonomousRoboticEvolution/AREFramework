@@ -9,12 +9,12 @@ class GripperHandler:
 
     def __init__ ( self, configurationData ):
 
-        self.MIN_SERVO_VALUE = float ( configurationData["gripper"][ "min_servo_value" ] )  # absolute lowest the servo will accept
-        self.MAX_SERVO_VALUE = float ( configurationData ["gripper"][ "max_servo_value" ] )  # absolute highest the servo will accept
-        self.gripperAOpen = float ( configurationData ["gripper"][ "A_open_position" ] )
-        self.gripperAClosed = float ( configurationData ["gripper"][ "A_closed_position" ] )
-        self.gripperBOpen = float ( configurationData ["gripper"][ "B_open_position" ] )
-        self.gripperBClosed = float ( configurationData ["gripper"][ "B_closed_position" ] )
+        self.MIN_SERVO_VALUE = int ( configurationData["gripper"][ "min_servo_value" ] )  # absolute lowest the servo will accept
+        self.MAX_SERVO_VALUE = int ( configurationData ["gripper"][ "max_servo_value" ] )  # absolute highest the servo will accept
+        self.gripperAOpen = int ( configurationData ["gripper"][ "A_open_position" ] )
+        self.gripperAClosed = int ( configurationData ["gripper"][ "A_closed_position" ] )
+        self.gripperBOpen = int ( configurationData ["gripper"][ "B_open_position" ] )
+        self.gripperBClosed = int ( configurationData ["gripper"][ "B_closed_position" ] )
 
         self.currentPowerGripperA = 0.5
         self.currentPowerGripperB = 0.5
@@ -30,11 +30,11 @@ class GripperHandler:
         self.sock = socket.socket()
         self.sock.settimeout(10)
 
-        debugPrint("attempting to connect...",messageVerbosity=2)
+        debugPrint("attempting to connect to gripper, at {} port {}...".format(UR5Address,gripperPort),messageVerbosity=2)
         self.sock.connect((UR5Address,gripperPort))
 
     ## quick helper function. Returns the input value is it is in the range between MIN_SERVO_VALUE and MAX_SERVO_VALUE, otherwise returns the relevant MIN or MAX value.
-    def saturate ( self, val ):
+    def saturate ( self, val:int ):
         if val > self.MAX_SERVO_VALUE:
             return self.MAX_SERVO_VALUE
         elif val < self.MIN_SERVO_VALUE:
@@ -46,6 +46,12 @@ class GripperHandler:
     def disableServos(self):
         self.isEnabled = False
         self.updateSerial()
+        time.sleep(0.1)
+    ## turns the servo motors back on from "idle"
+    def enableServos(self):
+        self.isEnabled = True
+        self.updateSerial()
+        time.sleep(1)
 
     ## close the socket that connects to the gripper via UR5
     def stop(self):
@@ -56,13 +62,11 @@ class GripperHandler:
     def updateSerial ( self ):
         debugPrint("Updating Gripper",messageVerbosity=2)
         if self.isEnabled:
-            rawServoValueA = self.saturate (
-                int ( self.gripperAOpen + self.currentPowerGripperA * (self.gripperAClosed - self.gripperAOpen) ) )
-            rawServoValueB = self.saturate(
-                int(self.gripperBOpen + self.currentPowerGripperB * (self.gripperBClosed - self.gripperBOpen)))
+            rawServoValueA:int = self.saturate (int( self.gripperAOpen + self.currentPowerGripperA * (self.gripperAClosed - self.gripperAOpen) ) )
+            rawServoValueB:int = self.saturate (int( self.gripperBOpen + self.currentPowerGripperB * (self.gripperBClosed - self.gripperBOpen) ) )
         else: # sending zero causes the servos to turn off (and stop buzzing!)
-            rawServoValueA = 0
-            rawServoValueB = 0
+            rawServoValueA:int = 0
+            rawServoValueB:int = 0
 
         debugPrint ( "Raw Servo A: " + str ( rawServoValueA ) ,messageVerbosity=3)
         debugPrint ( "Raw Servo B: " + str ( rawServoValueB ) ,messageVerbosity=3 )
@@ -78,7 +82,7 @@ class GripperHandler:
 
 
     ## Used to set a value to a gripper. The input newGripperPower: 0.0 = fully open, 1.0 = fully closed
-    def setGripperPosition (self, newGripperPower:float, AorB:str = 'A'):
+    def setGripperPosition (self, newGripperPower:float, AorB:str = 'B'):
         if AorB == 'A':
             self.currentPowerGripperA = newGripperPower
         elif AorB == 'B':
@@ -95,29 +99,22 @@ if __name__ == "__main__":
     # Make the settings file then extract the settings from it
     from makeConfigurationFile import makeFile as makeConfigurationFile
     import json
-    makeConfigurationFile(location="BRL")
-    configurationData = json.load(open('configuration_BRL.json'))  # <--- change this depending on if you're in York or BRL
+    makeConfigurationFile(location="YRK")
+    configurationData = json.load(open('configuration_YRK.json'))  # <--- change this depending on if you're in York or BRL
 
     gripper = GripperHandler(configurationData)
 
     time.sleep(0.1)
-    print("1...")
-    gripper.setGripperPosition(1.0,"A")
-    gripper.setGripperPosition(1.0,"B")
+    # gripper.setGripperPosition(1.0 ,"B")
+    # time.sleep(1)
 
-    time.sleep(1)
-    print("2...")
-    gripper.setGripperPosition(0.0,"A")
-    gripper.setGripperPosition(0.0,"B")
+    # time.sleep(1)
+    # gripper.setGripperPosition(0.0,"B")
+    #
+    # time.sleep(1)
+    # gripper.setGripperPosition(1.0,"B")
 
-
-    time.sleep(1)
-    print("3...")
-    gripper.setGripperPosition(0.5, "A")
-    gripper.setGripperPosition(0.5, "B")
-
-
-    time.sleep(1)
+    # time.sleep(1)
     gripper.disableServos()
-    gripper.stop()
+    # gripper.stop()
     print("done")

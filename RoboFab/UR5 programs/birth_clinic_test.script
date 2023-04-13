@@ -1,0 +1,300 @@
+def birth_clinic_test():
+  set_gravity([0.0, 0.0, 9.82])
+  set_safety_mode_transition_hardness(1)
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  set_runstate_tool_digital_output_to_value(0, 3)
+  set_runstate_tool_digital_output_to_value(1, 3)
+  set_tool_communication(True, 9600, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(1)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(24)
+  set_tcp(p[0.0,0.0076,0.215,0.0,0.0,3.141592653589793])
+  set_payload(0.49,[0.006,-0.011,0.055])
+  # begin: URCap Installation Node
+  #   Source: rs485, 1.0.0, FZI Research Center for Information Technology
+  #   Type: RS485
+  global rs485=rpc_factory("xmlrpc", "http://127.0.0.1:40404/RPC2")
+  # end: URCap Installation Node
+  while (True):
+    $ 1 "Robot Program"
+    $ 2 "has_command≔ False "
+    global has_command=  False  
+    $ 3 "move_speed≔200"
+    global move_speed=200
+    $ 4 "home_joint_pos≔get_actual_joint_positions()"
+    global home_joint_pos=get_actual_joint_positions()
+    $ 5 "Loop has_command≟ False "
+    while (has_command ==   False  ):
+      $ 6 "has_command≔socket_open('192.168.2.253',30000)"
+      global has_command=socket_open("192.168.2.253",30000)
+      $ 7 "Wait: 0.5"
+      sleep(0.5)
+    end
+    $ 8 "socket_send_string('starting_point')"
+    socket_send_string("starting_point")
+    $ 9 "Wait: 0.1"
+    sleep(0.1)
+    $ 10 "socket_send_string(to_str(get_actual_tcp_pose()))"
+    socket_send_string(to_str(get_actual_tcp_pose()))
+    $ 11 "Wait: 0.1"
+    sleep(0.1)
+    $ 12 "socket_send_string('UR_ready')"
+    socket_send_string("UR_ready")
+    $ 13 "Wait: 0.1"
+    sleep(0.1)
+    $ 14 "keep_looping≔ True "
+    global keep_looping=  True  
+    $ 15 "Loop keep_looping"
+    while (keep_looping):
+      $ 16 "has_command≔ False "
+      global has_command=  False  
+      $ 17 "Loop has_command≟ False "
+      while (has_command ==   False  ):
+        $ 18 "cmd_str≔socket_read_string()"
+        global cmd_str=socket_read_string()
+        $ 19 "If  not cmd_str≟''"
+        if (  not  cmd_str == ""):
+          $ 20 "has_command≔ True "
+          global has_command=  True  
+        end
+      end
+      $ 21 "If cmd_str≟'movel'"
+      if (cmd_str == "movel"):
+        $ 22 "Wait: 0.01"
+        sleep(0.01)
+        $ 23 "'linear move requested'"
+        # 'linear move requested'
+        $ 24 "data_in≔socket_read_ascii_float(6)"
+        global data_in=socket_read_ascii_float(6)
+        $ 25 "Loop data_in[0]≟0"
+        while (data_in[0] == 0):
+          $ 26 "'still waiting for data'"
+          # 'still waiting for data'
+          $ 27 "Wait: 0.1"
+          sleep(0.1)
+          $ 28 "data_in≔socket_read_ascii_float(6)"
+          global data_in=socket_read_ascii_float(6)
+        end
+        $ 29 "tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+        global tgt_position=p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+        $ 30 "movel(tgt_position, a=0.75, v=move_speed/1000)"
+        movel(tgt_position, a=0.75, v=move_speed/1000)
+      else:
+        $ 31 "ElseIf cmd_str≟'move_j'"
+        if (cmd_str == "move_j"):
+          $ 32 "Wait: 0.01"
+          sleep(0.01)
+          $ 33 "'move to pose, motion linear in joint space'"
+          # 'move to pose, motion linear in joint space'
+          $ 34 "data_in≔socket_read_ascii_float(6)"
+          global data_in=socket_read_ascii_float(6)
+          $ 35 "Loop data_in[0]≟0"
+          while (data_in[0] == 0):
+            $ 36 "'still waiting for data'"
+            # 'still waiting for data'
+            $ 37 "Wait: 0.01"
+            sleep(0.01)
+            $ 38 "data_in≔socket_read_ascii_float(6)"
+            global data_in=socket_read_ascii_float(6)
+          end
+          $ 39 "tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+          global tgt_position=p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+          $ 40 "movej(tgt_position, a=0.75, v=move_speed/150)"
+          movej(tgt_position, a=0.75, v=move_speed/150)
+        else:
+          $ 41 "ElseIf cmd_str≟'move_j_joints'"
+          if (cmd_str == "move_j_joints"):
+            $ 42 "Wait: 0.01"
+            sleep(0.01)
+            $ 43 "'move to pose, motion linear in joint space'"
+            # 'move to pose, motion linear in joint space'
+            $ 44 "data_in≔socket_read_ascii_float(6)"
+            global data_in=socket_read_ascii_float(6)
+            $ 45 "Loop data_in[0]≟0"
+            while (data_in[0] == 0):
+              $ 46 "'still waiting for data'"
+              # 'still waiting for data'
+              $ 47 "Wait: 0.01"
+              sleep(0.01)
+              $ 48 "data_in≔socket_read_ascii_float(6)"
+              global data_in=socket_read_ascii_float(6)
+            end
+            $ 49 "tgt_joints≔[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+            global tgt_joints=[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+            $ 50 "movej(tgt_joints, a=0.75, v=move_speed/150)"
+            movej(tgt_joints, a=0.75, v=move_speed/150)
+          else:
+            $ 51 "ElseIf cmd_str≟'set_tcp'"
+            if (cmd_str == "set_tcp"):
+              $ 52 "'change the tool centre point (tcp)'"
+              # 'change the tool centre point (tcp)'
+              $ 53 "data_in≔socket_read_ascii_float(6)"
+              global data_in=socket_read_ascii_float(6)
+              $ 54 "Wait: 0.1"
+              sleep(0.1)
+              $ 55 "Loop data_in[0]≟0"
+              while (data_in[0] == 0):
+                $ 56 "'still waiting for data'"
+                # 'still waiting for data'
+                $ 57 "Wait: 0.1"
+                sleep(0.1)
+                $ 58 "data_in≔socket_read_ascii_float(6)"
+                global data_in=socket_read_ascii_float(6)
+              end
+              $ 59 "tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+              global tgt_position=p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+              $ 60 "set_tcp(tgt_position)"
+              set_tcp(tgt_position)
+            else:
+              $ 61 "ElseIf cmd_str≟'move_insert'"
+              if (cmd_str == "move_insert"):
+                $ 62 "'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'"
+                # 'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'
+                $ 63 "data_in≔socket_read_ascii_float(6)"
+                global data_in=socket_read_ascii_float(6)
+                $ 64 "Wait: 0.1"
+                sleep(0.1)
+                $ 65 "Loop data_in[0]≟0"
+                while (data_in[0] == 0):
+                  $ 66 "'still waiting for data'"
+                  # 'still waiting for data'
+                  $ 67 "Wait: 0.1"
+                  sleep(0.1)
+                  $ 68 "data_in≔socket_read_ascii_float(6)"
+                  global data_in=socket_read_ascii_float(6)
+                end
+                $ 69 "tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+                global tgt_position=p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+                sleep(0.02)
+                zero_ftsensor()
+                force_mode(tool_pose(), [1, 1, 0, 0, 0, 1], [0.0, 0.0, 10.0, 0.25, 1.0, 0.0], 2, [0.15, 0.15, 0.1, 0.3490658503988659, 0.3490658503988659, 1.0471975511965976])
+                $ 70 "Force"
+                $ 71 "movel(tgt_position, a=0.75, v=move_speed/1000)"
+                movel(tgt_position, a=0.75, v=move_speed/1000)
+                end_force_mode()
+                stopl(5.0)
+              else:
+                $ 72 "ElseIf cmd_str≟'force_mode_float'"
+                if (cmd_str == "force_mode_float"):
+                  $ 73 "''floating' for 2 seconds, appliying zero force in x,y,z'"
+                  # '"floating" for 2 seconds, appliying zero force in x,y,z'
+                  $ 74 "Wait: 0.2"
+                  sleep(0.2)
+                  sleep(0.02)
+                  zero_ftsensor()
+                  force_mode(tool_pose(), [1, 1, 1, 1, 1, 1], [0.0, 0.0, 0.0, 0.0, 0.0, 0.0], 2, [0.15, 0.15, 0.15, 1.0471975511965976, 1.0471975511965976, 1.0471975511965976])
+                  $ 75 "Force"
+                  $ 76 "Wait: 2.0"
+                  sleep(2.0)
+                  end_force_mode()
+                  stopl(5.0)
+                  $ 77 "Wait: 0.2"
+                  sleep(0.2)
+                else:
+                  $ 78 "ElseIf cmd_str≟'move_bed_removal'"
+                  if (cmd_str == "move_bed_removal"):
+                    $ 79 "'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'"
+                    # 'insert move requested. This does a movel but slowly and with compliance in  tool frame x and y'
+                    $ 80 "data_in≔socket_read_ascii_float(6)"
+                    global data_in=socket_read_ascii_float(6)
+                    $ 81 "Wait: 0.1"
+                    sleep(0.1)
+                    $ 82 "Loop data_in[0]≟0"
+                    while (data_in[0] == 0):
+                      $ 83 "'still waiting for data'"
+                      # 'still waiting for data'
+                      $ 84 "Wait: 0.1"
+                      sleep(0.1)
+                      $ 85 "data_in≔socket_read_ascii_float(6)"
+                      global data_in=socket_read_ascii_float(6)
+                    end
+                    $ 86 "tgt_position≔p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]"
+                    global tgt_position=p[data_in[1],data_in[2],data_in[3],data_in[4],data_in[5],data_in[6]]
+                    sleep(0.02)
+                    zero_ftsensor()
+                    force_mode(tool_pose(), [0, 0, 0, 0, 1, 0], [0.0, 0.0, 20.0, 0.25, 1.0, 0.0], 2, [0.1, 0.1, 0.1, 0.3490658503988659, 0.17453292519943295, 0.3490658503988659])
+                    $ 87 "Force"
+                    $ 88 "movel(tgt_position, a=0.75, v=move_speed/1000)"
+                    movel(tgt_position, a=0.75, v=move_speed/1000)
+                    end_force_mode()
+                    stopl(5.0)
+                  else:
+                    $ 89 "ElseIf cmd_str≟'stop'"
+                    if (cmd_str == "stop"):
+                      $ 90 "keep_looping≔ False "
+                      global keep_looping=  False  
+                    else:
+                      $ 91 "ElseIf cmd_str≟'set_move_speed'"
+                      if (cmd_str == "set_move_speed"):
+                        $ 92 "data_in_speed≔socket_read_ascii_float(1)"
+                        global data_in_speed=socket_read_ascii_float(1)
+                        $ 93 "Wait: 0.1"
+                        sleep(0.1)
+                        $ 94 "If data_in_speed[0]≟0"
+                        if (data_in_speed[0] == 0):
+                          $ 95 "'still waiting for data'"
+                          # 'still waiting for data'
+                          $ 96 "Wait: 1.0"
+                          sleep(1.0)
+                          $ 97 "data_in_speed≔socket_read_ascii_float(1)"
+                          global data_in_speed=socket_read_ascii_float(1)
+                        else:
+                          $ 98 "Else"
+                          $ 99 "move_speed≔data_in_speed[1]"
+                          global move_speed=data_in_speed[1]
+                        end
+                      else:
+                        $ 100 "ElseIf cmd_str≟'request_pose'"
+                        if (cmd_str == "request_pose"):
+                          $ 101 "Wait: 0.1"
+                          sleep(0.1)
+                          $ 102 "socket_send_string('sending_pose')"
+                          socket_send_string("sending_pose")
+                          $ 103 "Wait: 0.1"
+                          sleep(0.1)
+                          $ 104 "socket_send_string(to_str(get_actual_tcp_pose()))"
+                          socket_send_string(to_str(get_actual_tcp_pose()))
+                          $ 105 "Wait: 0.1"
+                          sleep(0.1)
+                        else:
+                          $ 106 "ElseIf cmd_str≟'nothing'"
+                          if (cmd_str == "nothing"):
+                            $ 107 "Wait: 0.1"
+                            sleep(0.1)
+                          else:
+                            $ 108 "ElseIf cmd_str≟'print_bed_pull'"
+                            if (cmd_str == "print_bed_pull"):
+                              sleep(0.02)
+                              zero_ftsensor()
+                              force_mode(tool_pose(), [0, 0, 1, 0, 0, 0], [0.0, 0.0, 50.0, 0.0, 0.0, 0.0], 2, [0.1, 0.1, 0.01, 0.3490658503988659, 0.3490658503988659, 0.3490658503988659])
+                              $ 109 "Force"
+                              $ 110 "Wait: 5.0"
+                              sleep(5.0)
+                              end_force_mode()
+                              stopl(5.0)
+                            end
+                          end
+                        end
+                      end
+                    end
+                  end
+                end
+              end
+            end
+          end
+        end
+      end
+      $ 111 "socket_send_string('UR_ready')"
+      socket_send_string("UR_ready")
+    end
+    $ 112 "socket_close()"
+    socket_close()
+  end
+end

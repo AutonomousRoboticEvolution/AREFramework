@@ -1,21 +1,18 @@
 ##
 
+DEMO_FAKE_PRINTING = False
+
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
-
 import socket # for talking to UR5 over ethernet
 import serial # for talking to arduino to connect to RF gripper
 import time
 import threading
 import math
 import numpy as np
-from helperFunctions import debugPrint, makeTransform, connect2USB, convertPoseToTransform, convertTransformToPose, findAngleBetweenTransforms
+from helperFunctions import debugPrint, makeTransformInputFormatted, convertPoseToTransform, convertTransformToPose, findAngleBetweenTransforms, makeTransform, makeTransformMillimetersDegrees, changeCoordinateValue, applyCeiling, findDisplacementBetweenTransforms
 from toolSerialCommunication import GripperHandler
 
-# temporary, experimental settings - may be incorporated into config file later
-USE_FORCE_FOR_ASSEMBLY_FIXTURE_ATTACHMENT = False
-GRIPPER_OPEN_POSITION_FOR_CLIPS = 0.5 # 1=fully closed, 0=fully open
-DO_PULL_ON_EACH_CLIP = False
 
 ## Class to handle the communication with the UR5
 #
@@ -49,7 +46,7 @@ class UR5Robot:
 
 
         self.poseDataReceived = [ 0.0 ] * 6
-        self.homePosition = makeTransform()
+        self.homePosition = makeTransformInputFormatted()
         self.isReadyForNextCommand = False  # flag to make sure previous command is finished
         # flags for managing the receipt of pose data:
         self.__isExpectingHomePosition = False
@@ -70,14 +67,13 @@ class UR5Robot:
         debugPrint("UR5 is setup and ready")
         self.setMoveSpeed ( self.speedValueNormal )
         debugPrint("UR5 set up, going to home")
-        self.moveArmToJointAngles( self.HOME_POSITIONS[ "home" ] )
-        debugPrint("Home")
+        # self.moveArmToJointAngles( self.HOME_POSITIONS[ "home" ] )
 
     ## function to make the large movements between different areas ("stations"), e.g. printer, assembly fixture, bank etc.
     # This will do a joni-space move between the pre-defined home positions for each station (defined as joint values in the config file)
     # The input should be a string, the name of the station to move to, as defined in the config file
     def moveBetweenStations( self , stationToMoveTo="home" ):
-        debugPrint("moving from station "+str(self.currentStation)+" to station "+str(stationToMoveTo))
+        debugPrint("moving from station "+str(self.currentStation)+" to station "+str(stationToMoveTo),messageVerbosity=1)
 
         currentStationCrouched =  [self.HOME_POSITIONS[self.currentStation][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[self.currentStation][5]]
         destinationStationCrouched =  [self.HOME_POSITIONS[stationToMoveTo][0]] + self.HOME_POSITIONS["home"][1:5] + [self.HOME_POSITIONS[stationToMoveTo][5]]
@@ -92,6 +88,7 @@ class UR5Robot:
     ## Low-level function to send a text string to UR5 controller
     def sendString ( self, stringToSend ):
         debugPrint("Sending string to UR5: "+stringToSend , messageVerbosity=3)
+        self.isReadyForNextCommand = False
         self.c.send ( stringToSend.encode ( 'ASCII' ) )
         time.sleep(0.01)
 
@@ -109,8 +106,7 @@ class UR5Robot:
     def waitForArmToBeReady ( self ):
         while not self.isReadyForNextCommand:  # wait for ready
             time.sleep ( 0.1 )
-            # debugPrint( "Waiting for arm to be ready..." )
-        self.isReadyForNextCommand = False
+        time.sleep ( 0.1 )
 
 
     ## Linear movement
@@ -160,6 +156,12 @@ class UR5Robot:
         time.sleep ( 0.1 )  # prevents the two packages getting merged
         self.sendString ( "(" + str ( poseToSend ) [ 1:-1 ] + ")" )
 
+    ##"floating" for a few (2) seconds with force mode used to apply zero force in x,y,z.
+    #  this could be useful just after attaching/inserting something, to allow it to settle into its natural position
+    def forceModeFloat(self):
+        self.waitForArmToBeReady ()
+        self.sendString("force_mode_float")  # command for "floating"
+
     ## Force mode movement designed for bed removal
     #  Executes a "movel" URScript command in force mode with a force in z and torque about x and/or y axes
     # The forces/torques to be applied need to be set in the polyscope program
@@ -192,8 +194,10 @@ class UR5Robot:
 
     ## Set newGripperPower: 0.0 = fully open, 1.0 = fully closed.
     # This function just passes the values down to the gripper, after ensuring the UR5 is in position using the sendNothingToArm() function
-    def setGripperPosition (self, newGripperPower:float, AorB:str = 'A'):
+    def setGripperPosition (self, newGripperPower:float, AorB:str = 'B'):
+        time.sleep(0.1)
         self.sendNothingToArm()
+        time.sleep(0.1)
         self.gripper.setGripperPosition (newGripperPower,AorB)
 
     ## Get the current end effector position as a transform matrix (from UR base frame)
@@ -207,16 +211,33 @@ class UR5Robot:
         self.requestedPoseIsReady = False  # reset for next time
         return self.requestedPose
 
+    ## pull back (negative z TCP frame) with a set force, intended to pull the skeleton off the print bed
+    ## returns true if the thing we were pulling (the robot) moved more than 2cm, false otherwise
+    def printBedPull(self):
+        startingPostition = self.getCurrentPosition()
+        self.waitForArmToBeReady()
+        self.sendString("print_bed_pull")
+        finishPosition = self.getCurrentPosition()
+        if findDisplacementBetweenTransforms(startingPostition, finishPosition)["magnitude"] > 0.02:
+            # has moved, so assume it has released from bed
+            return True
+        else:
+            # hasn't moved (much), so return to the starting position
+            self.moveArm(startingPostition)
+            return False
+
+
     ##  Handles receipt of messages from the UR5.
     #  Should be started as a thread after the socket has been set up.
     def __threadedListener ( self ):
         self.UR5isConnected = False # start not connected
         while True:
             msg = self.c.recv ( 1024 )
-            debugPrint ( "Received message: " + str ( msg ) ,messageVerbosity=2)
+            debugPrint ( "Received message: " + str ( msg ) ,messageVerbosity=3)
             if msg:
-                if msg == b'UR_ready':
+                if msg == b'UR_ready' or msg.startswith(b'UR_ready'):
                     # print("UR is ready")
+                    if msg != b'UR_ready': debugPrint("WARNING possible concatenated message from UR: \"{}\"".format(msg), messageVerbosity=0)
                     self.isReadyForNextCommand = True
                     if not self.UR5isConnected:
                         self.UR5isConnected = True
@@ -251,117 +272,8 @@ class UR5Robot:
                 self.UR5isConnected = False
                 self.isRunning=False
                 self.stopArm()
+                # raise RuntimeError("Disconnected from UR arm")
                 break
-
-    # core organ should already be inserted when this is called
-    def removeRobotFromPrinter( self , robot, assemblyFixture ,gripperTCP ,actualDropoffPosition ):
-        coreOrgan = robot.organsList[0]
-        verticalClearanceBeforePickingUp = 0.120
-        verticalClearanceForPostPickup = 0.025
-        bedRemovalPullUpAngle = math.radians( 30 )
-        postInsertExtraPushDistance = assemblyFixture.CORE_ORGAN_ATTACHMENT_Z_OFFSET
-        heightAboveClipApproach = 20.0/1000
-        clipPullGripTransform = makeTransform([0,0,0 , math.radians(90),0,0]) # todo: work this out!
-        useForceModeForBedRemoval = False
-        pushBackIntoBedAfterPickup = True
-        pushBackIntoBedPosition = robot.origin * coreOrgan.positionTransformWithinBankOrRobot * makeTransform([0,0,-coreOrgan.postInsertExtraPushDistance])
-        distanceForCompliantMove = 10/1000 if USE_FORCE_FOR_ASSEMBLY_FIXTURE_ATTACHMENT else 0
-
-        assemblyFixture.setPosition(0)
-        assemblyFixtureLocation = assemblyFixture.currentPosition
-
-        # self.moveBetweenStations("printer")
-
-        ## todo: pull on each pull location?
-        if DO_PULL_ON_EACH_CLIP:
-            self.setTCP ( clipPullGripTransform )
-            self.setGripperPosition (GRIPPER_OPEN_POSITION_FOR_CLIPS)
-            for i in range(len(robot.printbedPullPoints)):
-                clipPosition = robot.origin*robot.printbedPullPoints[i]
-                self.moveArm(makeTransform([0,0,verticalClearanceBeforePickingUp]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
-                self.moveArm( clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back
-                self.moveArm( clipPosition ) #clip position
-                self.setGripperPosition(1.0)
-                self.moveCompliant( makeTransform([0,0,heightAboveClipApproach]) * clipPosition ) #straght up
-                self.moveArm( clipPosition ) # back to starting (theoretical) clip position
-                self.setGripperPosition(GRIPPER_OPEN_POSITION_FOR_CLIPS)
-                self.moveArm( clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back
-                self.moveArm(makeTransform([0,0,verticalClearanceBeforePickingUp]) * clipPosition * makeTransform([0,0,-heightAboveClipApproach]) ) #back and above
-
-        ## pick up by the core organ and take to assembly fixture:
-        gripPosition = np.linalg.inv(coreOrgan.transformOrganOriginToGripper) * coreOrgan.transformOrganOriginToClipCentre
-        if gripPosition is None:
-            raise Exception("gripPosition has not been set")
-        # self.setGripperPosition (coreOrgan.gripperOpenPosition)
-
-        # compute all relevant locations. The "prePickup" and "preDropoff" are so the end effector approaches from the right direction.
-        # note these are all transform matrices (not poses) and the desired position of the organ origin at these points
-        pickupPoint = actualDropoffPosition
-        prePickupPoint = makeTransform (
-            [ 0, 0, verticalClearanceBeforePickingUp ] ) * pickupPoint  # point above pickup point by verticalClearanceBeforePickingUp
-        # postPickupPoint = makeTransform(
-        #     [0, -verticalClearanceBeforePickingUp*math.tan(bedRemovalPullUpAngle), verticalClearanceBeforePickingUp]) * pickupPoint  # point move to just after grabbing - defined to pull up at an angle
-        postPickupPoint = pickupPoint * makeTransform([verticalClearanceForPostPickup*math.tan(bedRemovalPullUpAngle) , -verticalClearanceForPostPickup*math.tan(bedRemovalPullUpAngle) , verticalClearanceForPostPickup])# point move to just after grabbing - designed to pull up at an angle
-        dropoffPoint = assemblyFixtureLocation * coreOrgan.positionTransformWithinBankOrRobot * makeTransform (
-            [ 0, 0, -postInsertExtraPushDistance ] )
-        preDropoffPoint = dropoffPoint * makeTransform (
-            [ 0, 0, verticalClearanceBeforePickingUp ] )  # point back from (in organ frame) final position
-        postDropoffPoint = makeTransform ([ 0, 0, -verticalClearanceBeforePickingUp ] )  * dropoffPoint # linear move back toward the "safe" position
-        preForceModePoint = dropoffPoint * makeTransform (
-            [ 0, 0,
-              distanceForCompliantMove + postInsertExtraPushDistance ] )  # point back from final position from which to start force mode
-
-        # pickup:
-        # self.setTCP ( gripperTCP * np.linalg.inv ( gripPosition ) )
-        # self.moveArm ( prePickupPoint )  # move to new TCP
-        # self.setMoveSpeed ( self.speedValueSlow )  # slow
-        # self.moveArm ( pickupPoint )  # pickup point
-        # self.setGripperPosition(coreOrgan.gripperClosedPosition) # close
-        self.setMoveSpeed ( self.speedValueReallySlow )  # really slow for peeling off bed
-        if useForceModeForBedRemoval:
-            self.moveWithForceForBedRemoval ( postPickupPoint )
-        self.moveArm ( postPickupPoint )
-        if pushBackIntoBedAfterPickup:
-            self.moveArm(pickupPoint*makeTransform([0,0,verticalClearanceForPostPickup]))
-            self.moveArm(pushBackIntoBedPosition)
-        self.setTCP ( gripperTCP * gripPosition )
-        self.moveArm(prePickupPoint)
-
-        self.setMoveSpeed ( self.speedValueNormal )  # normal
-
-        # go to to AF
-        self.moveBetweenStations("AF_core")
-        # now on the Assembly fixture, turn on the magnets
-        self.sendNothingToArm()
-        assemblyFixture.turnElectromagnetsOn()
-
-        # dropoff:
-        self.moveArmLinearInJointSpace ( preDropoffPoint )  # above (or below, in real world...) dropoff
-        self.setMoveSpeed ( self.speedValueSlow )  # slow
-
-        # force mode:
-        if USE_FORCE_FOR_ASSEMBLY_FIXTURE_ATTACHMENT:
-            self.moveArm ( preForceModePoint )
-            self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
-            self.moveCompliant (dropoffPoint )  # "force mode" compliant move for last section to dropoff point
-
-        else:
-            self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
-            self.moveArm ( dropoffPoint )
-
-
-        self.setMoveSpeed ( self.speedValueNormal )
-        actualDropoffPosition = self.getCurrentPosition ()  # for seeing how far off the expected position we were
-        self.setGripperPosition (coreOrgan.gripperOpenPosition)
-        self.moveArm ( postDropoffPoint)  # back off
-
-        # go to "home"
-        self.moveBetweenStations("home")
-        self.setGripperPosition(0.0) # open
-
-        misalignment = [ a_i - b_i for a_i, b_i in zip ( convertTransformToPose ( actualDropoffPosition ),
-                                                         convertTransformToPose ( dropoffPoint ) ) ]
-        return misalignment
 
 
     ## Pickup an organ and insert it
@@ -371,20 +283,20 @@ class UR5Robot:
     #  Takes inputs:
     #  bank: where to search for the organ
     #  robot: the robot class being inserted into
-    def insertOrgan ( self, bank, robot, assemblyFixture, gripperTCP ):
-        # assemblyFixture is None when inserting into the printer, ie the core organ
-        vertical_clearance = 0.10  if assemblyFixture is None else -0.20 # how high vertically above the pickup and preDropoff to for pre-pickup and abovePreDropoff
+    def insertOrganUsingGripperFeature (self, organInRobot, bank, assemblyFixture, gripperTCP):
 
-        organInRobot = robot.getNextOrganToInsert ()  ## get the next organ which needs to be inserted
-        # if organInRobot.organType in ORGANS_TO_ACTUALLY_DO:
+        vertical_clearance = 0.20 # how high vertically above the pickup and preDropoff to be for pre-pickup and abovePreDropoff
+        preDropoffDistanceUp = 0.04 # how far back in the end effector frame to go just before pushing in the organ
+        FLOAT_ON_INSERTS = True
+
+        # organInRobot = robot.getNextOrganToInsert ()  ## get the next organ which needs to be inserted
+        if (organInRobot.organType == 0) or (assemblyFixture is None):
+            raise Exception("This function cannot be used for the Head organ")
 
         if organInRobot.flipGripperOrientation:
-            gripperTCP = gripperTCP * makeTransform([0,0,0,0,0,math.radians(180)])
-
-        preDropoffDistanceUp = 0.02 # how far back in the end effector frame to go just before pushing in the organ
+            gripperTCP = gripperTCP * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)])
 
         debugPrint ( "Inserting organ of type: " + str (organInRobot.friendlyName) ,messageVerbosity=2)
-        useForceMode=organInRobot.useForceMode
 
         distanceForCompliantMove = organInRobot.forceModeTravelDistance  # distance at end of insertion for which "force mode" is used on UR5
         postInsertExtraPushDistance = organInRobot.postInsertExtraPushDistance
@@ -396,31 +308,30 @@ class UR5Robot:
         self.moveBetweenStations("organ_bank")
         self.setGripperPosition (organInRobot.gripperOpenPosition)
 
-        # rotate assembly fixure
-        if assemblyFixture is None:
-            originPosition = robot.origin # no assembly fixture, ie. robot still on printer bed, use the saved origin position
-        else:
-            debugPrint("In insert organ, trying to turn AF to: "+str(organInRobot.requiredAssemblyFixtureRotationRadians),messageVerbosity=2)
-            assemblyFixture.setPosition(organInRobot.requiredAssemblyFixtureRotationRadians)
-            originPosition = assemblyFixture.currentPosition * makeTransform([0,0,0,0,0, organInRobot.AssemblyFixtureRotationOffsetFudgeAngle ])
+        # rotate assembly fixture
+        assemblyFixture.setPosition(organInRobot.requiredAssemblyFixtureRotationRadians)
+        originPosition = assemblyFixture.currentPosition * makeTransform( rotZ= organInRobot.AssemblyFixtureRotationOffsetFudgeAngle)
 
         # first we need to find a suitable organ in the bank.
-        organFromBank = bank.findAnOrgan ( organInRobot.organType )
+        organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
         organInRobot.I2CAddress = organFromBank.I2CAddress   # transfer over the i2c address
 
         # compute all relevant locations. The "prePickup" and "preDropoff" are so the end effector approaches from the right direction.
         # note these are all transform matrices (not poses) and the desired position of the organ origin at these points
-        pickupPoint = bank.origin * organFromBank.positionTransformWithinBankOrRobot * makeTransform([0,0,organFromBank.pickupExtraPushDistance])
-        prePickupPoint = makeTransform ([ 0, 0, abs(vertical_clearance) ] ) * pickupPoint  # point above pickup point by vertical_clearance
-        dropoffPoint =  originPosition * organInRobot.positionTransformWithinBankOrRobot
-        dropoffPointWithExtraPush =  originPosition * organInRobot.positionTransformWithinBankOrRobot * makeTransform( [ 0, 0, -postInsertExtraPushDistance ] )
-        preDropoffPoint = dropoffPoint * makeTransform ( [ 0, 0, preDropoffDistanceUp ] )  # point back from (in organ clip frame) final position so we approach from right direction
-        preForceModePoint = dropoffPoint * makeTransform (
-            [ 0, 0, distanceForCompliantMove ] )  # point back from final position from which to start force mode
-        abovePreDropoffPoint = makeTransform ( [ 0, 0,vertical_clearance ] ) * preDropoffPoint  # point above (in world frame) predropoff point by vertical_clearance
+        pickupPoint = bank.origin * organFromBank.positionTransformWithinBankOrRobot * organInRobot.transformOrganOriginToGripper * makeTransform(z=organFromBank.pickupExtraPushDistance)
+        prePickupPoint = makeTransform (z=vertical_clearance) * pickupPoint  # point above pickup point by vertical_clearance
+        dropoffPoint = originPosition * organInRobot.positionTransformWithinBankOrRobot *makeTransformMillimetersDegrees(z=-2) *np.linalg.inv(organInRobot.transformOrganOriginToClipCentre) * organInRobot.transformOrganOriginToGripper # note positionTransformWithinBankOrRobot is the position specified in the blueprint, i.e. the clip centre position not organ origin position
+        dropoffPointWithExtraPush = dropoffPoint * makeTransformInputFormatted([0, 0, postInsertExtraPushDistance])
+        preDropoffPoint = dropoffPoint * makeTransform(z=-preDropoffDistanceUp)  # point back from (in gripper's frame) final position so we approach from right direction
+        preForceModePoint = dropoffPoint * makeTransform (z=-distanceForCompliantMove )  # point back from final position from which to start force mode
+        abovePreDropoffPoint = makeTransform (z=vertical_clearance) * preDropoffPoint  # point above (in world frame) predropoff point by vertical_clearance
+
+        self.setTCP(gripperTCP)
 
         # pickup:
-        self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper))  # TCP for pickup is organ origin
+        # self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper))  # TCP for pickup is organ origin
         debugPrint("move to prePickupPoint",messageVerbosity=2)
         self.moveArm ( prePickupPoint )  # move to new TCP
         self.setMoveSpeed ( self.speedValueSlow )  # slow
@@ -432,23 +343,20 @@ class UR5Robot:
         self.moveArm ( prePickupPoint )
         self.setMoveSpeed ( self.speedValueNormal )  # normal
 
-        if assemblyFixture is None: # robot is still on printer
-            self.moveBetweenStations("printer")
-            dropoffPointWithExtraPush = dropoffPointWithExtraPush * makeTransform([0, 0, 0, 0, math.radians(1), 0])
-        else:
-            self.moveBetweenStations("AF")
+        self.moveBetweenStations("AF")
+
         # dropoff:
-        self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) * organInRobot.transformOrganOriginToClipCentre)  # TCP for pickup is centre of clip
+        # self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) * organInRobot.transformOrganOriginToClipCentre)  # TCP for insertion is centre of clip
         self.setMoveSpeed ( self.speedValueSlow )  # slow
         debugPrint("move to abovePreDropoffPoint",messageVerbosity=2)
-        self.moveArmLinearInJointSpace ( abovePreDropoffPoint )  # above dropoff
-        # self.moveArm ( abovePreDropoffPoint )  # above dropoff
+        # self.moveArmLinearInJointSpace ( abovePreDropoffPoint )  # above dropoff
+        self.moveArm ( abovePreDropoffPoint )  # above dropoff
         debugPrint("move to preDropoffPoint",messageVerbosity=2)
         self.moveArm ( preDropoffPoint )
 
         # force mode:
-        debugPrint("insertion")
-        if useForceMode:
+        debugPrint("Organ insertion",messageVerbosity=1)
+        if organInRobot.useForceMode:
             self.moveArm ( preForceModePoint )
             self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
             debugPrint("move to dropoffPointWithExtraPush (force mode)",messageVerbosity=2)
@@ -460,176 +368,368 @@ class UR5Robot:
             self.moveArm(dropoffPointWithExtraPush )
 
         debugPrint("move to dropoffPoint",messageVerbosity=2)
-        self.moveCompliant ( dropoffPoint )
-        actualDropoffPosition = self.getCurrentPosition ()  # for seeing how far off the expected position we were
-        if assemblyFixture is None: # core
-            # self.moveArm(actualDropoffPosition)
-            pass
-        else:
-            self.setGripperPosition (organInRobot.gripperOpenPosition)
-            self.setMoveSpeed ( self.speedValueSlow )  # slow
-            debugPrint("move to preDropoffPoint",messageVerbosity=2)
-            self.moveArm ( preDropoffPoint )  # back off
-            self.moveArm ( abovePreDropoffPoint  )  # up to clear height
-            self.setMoveSpeed ( self.speedValueNormal )
+        # self.moveArm ( dropoffPoint )
+        if FLOAT_ON_INSERTS:
+            self.forceModeFloat()
+        organInRobot.actualDropoffPosition=self.getCurrentPosition ()  # for seeing how far off the expected position we were
 
-            debugPrint("Open gripper",messageVerbosity=2)
-            self.setGripperPosition(0.0) # open
+        self.setGripperPosition (organInRobot.gripperOpenPosition)
+        self.setMoveSpeed ( self.speedValueSlow )  # slow
+        self.moveArm ( preDropoffPoint )  # back off
+        self.moveArm ( abovePreDropoffPoint  )  # up to clear height
+        self.setMoveSpeed ( self.speedValueNormal )
+
+        debugPrint("Open gripper",messageVerbosity=2)
+        self.setGripperPosition(0.0) # open
 
         # insertionMeasuredMisalignment = convertTransformToPose(actualDropoffPosition) - convertTransformToPose(dropoffPoint) # how far from the expected dropoffpoint we ended up - a measure of how misaligned things were
         # misalignment = [ a_i - b_i for a_i, b_i in zip ( convertTransformToPose ( actualDropoffPosition ),
         #                                                  convertTransformToPose ( dropoffPoint ) ) ]
-        return actualDropoffPosition
+        return organInRobot
 
         # else:
         #     debugPrint("Organ insert skipped",messageVerbosity=1)
 
-    ## equivalent of insertOrgan for cables
-    def insertCable( self, bank, robot, assemblyFixture, gripperTCP_A, gripperTCP_B, postInsertExtraPushDistanceA =0 , postInsertExtraPushDistanceB =0 ):
+    ## Pickup the Head organ and insert it
+    #
+    #  Will find a suitable organ in the bank, pick it up, insert it into the skeleton onf the printbed
+    #  Takes inputs:
+    #  bank: where to search for the organ
+    #  robot: the robot class being inserted into
+    def insertHeadOrgan(self, bank, printer, robot, gripperTCP , assemblyFixture):
+
+        verticalClearancePreInsert = 0.28  # how high vertically above the pickup and preDropoff to for pre-pickup
+        insertRotation = math.radians(20) # the amount of rotation needed for the Head clipping mechanism
+        postInsertExtraRotation = math.radians(8)
+        BedPullUpDistance = 50/1000
+        postBedRemovalSidewaysClearance = 0.1 # after pulling the skeleton off the bed, we should move horizontally out to avoid the skeleton hitting the frame of the printer
+
+        organInRobot = robot.organsList[0]  ## get the Head, which is always first object in organsList
+        organInRobot.hasBeenInserted=True
+        if not(organInRobot.organType == 0):
+            raise Exception("Was expecting the Head organ. The insertHeadOrgan function has either been called erroneously, or the first organ in the organList in robot is not the Head.")
+
+        if organInRobot.flipGripperOrientation:
+            gripperTCP = gripperTCP * makeTransformInputFormatted([0, 0, 0, 0, 0, math.radians(180)])
 
 
-        gripperOpenPosition = bank.GripperPowerForOpenPosition  # 0 = fully open, 1= fully closed
-        cableFromBank = bank.findACable ()
-        cableIntoRobot = robot.getNextCableToInsert ()
-        gripPosition =cableIntoRobot.gripPoint
+        debugPrint("Inserting organ of type: " + str(organInRobot.friendlyName), messageVerbosity=2)
+        useForceMode = organInRobot.useForceMode
+
+        distanceForCompliantMove = organInRobot.forceModeTravelDistance  # distance at end of insertion for which "force mode" is used on UR5
+        postInsertExtraPushDistance = organInRobot.postInsertExtraPushDistance
+        debugPrint("postInsertExtraPushDistance: " + str(postInsertExtraPushDistance), messageVerbosity=3)
 
 
-        # pickup a cable end from the bank
-        # will approach from the side, so first goes to a point sideways-and-bank, then to sideways, then the pickupPoint itself, then back from pickup point
-        def pickup(pickupPoint,gripper_letter):
-            # some settings:
-            sidewaysClearanceForPrePickup = 5/1000
-            backwardsClearance =  60/1000
-            self.setMoveSpeed ( self.speedValueSlow )  # slow
-
-            # compute the positions:
-            prePickupPoint = pickupPoint * makeTransform([0, sidewaysClearanceForPrePickup, 0])  # sideways from pickup point
-            backFromPrePickupPoint = prePickupPoint * makeTransform([0,0,backwardsClearance])
-            postPickupPoint = pickupPoint * makeTransform([0,0,backwardsClearance])
-
-            # do the movements:
-            self.moveArm(backFromPrePickupPoint)
-            self.moveArm(prePickupPoint)
-            self.moveArm(pickupPoint)
-            self.setGripperPosition(1.02,gripper_letter)
-            self.moveArm(postPickupPoint)
-
-        def computeAngleToRotate(dropoffTransform):
-            # first, project the global coordinates into the frame of the dropoff point:
-            globalCoordinatesInLocalFrame = np.linalg.inv(dropoffTransform)
-
-            # extract the global x-axis, projected onto the xy plane of the local frame
-            xAxisInLocalXYPLane = np.row_stack ( (globalCoordinatesInLocalFrame[0:2,0] ,np.zeros([1,1]))  )
-            xAxisInLocalXYPLane = xAxisInLocalXYPLane / np.linalg.norm(xAxisInLocalXYPLane) # make unit vector
-            localXAxis = np.matrix( [1,0,0] )
-
-            # find the angle between this and the local x-axis
-            dotProduct = np.dot(localXAxis, xAxisInLocalXYPLane)
-            magnitudeOfAngle = float(np.arccos(np.clip(dotProduct, -1.0, 1.0)))
-            if xAxisInLocalXYPLane[1] > 0:
-                return magnitudeOfAngle
-            else:
-                return -magnitudeOfAngle
-
-        def dropoff(dropoffPoint,preDropoffPointPoint,gripper_letter,gripperOpenPower ,postInsertExtraPushDistance,distanceForCompliantMove):
-            ## Find the angle which we should rotate, around the z axis, to bring the x axis as close to parallel as possible with the global x axis.
-            ## This should make the gripper position more consistent
+        # first we need to find a suitable organ in the bank.
+        organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
 
 
-            # some settings:
-            useForceMode=True
+        organInRobot.I2CAddress = organFromBank.I2CAddress  # since this is the Head, this is actually the IP address not at I2C address
+        print("IP address: {}".format(organInRobot.I2CAddress))
 
-            # compute the positions:
-            # preDropoffPointPoint = dropoffPoint * makeTransform([0, 0, preDropoffDistance])
-            postDropoffPointPoint = makeTransform([0,0,-0.02])*preDropoffPointPoint
+        # compute all relevant locations. The "prePickup" and "preDropoff" are so the end effector approaches from the right direction.
+        # note these are all transform matrices (not poses) and the desired position of the organ origin at these points
+        pickupPoint = bank.origin * organFromBank.positionTransformWithinBankOrRobot * makeTransformInputFormatted(
+            [0, 0, -organFromBank.pickupExtraPushDistance])
+        prePickupPoint = makeTransformInputFormatted(
+            [0, 0, verticalClearancePreInsert]) * pickupPoint  # point above pickup point by verticalClearancePreInsert
+        dropoffPoint = robot.origin * organInRobot.positionTransformWithinBankOrRobot * makeTransformInputFormatted([0, 0, -postInsertExtraPushDistance])
+        dropoffWithExtraRotation = dropoffPoint * makeTransform(rotZ=postInsertExtraRotation)
+        dropoffPointPreRotation = dropoffPoint * makeTransformInputFormatted([0, 0, 0, 0, 0, -insertRotation])
+        preDropoffPoint = dropoffPointPreRotation * makeTransformInputFormatted([0, 0, verticalClearancePreInsert])  # point back from (in organ clip frame) final position so we approach from right direction
+        preForceModePoint = dropoffPointPreRotation * makeTransformInputFormatted([0, 0, distanceForCompliantMove])  # point back from final position from which to start force mode
+        postDropoffPointUp = dropoffPoint * makeTransformInputFormatted([0, 0, BedPullUpDistance])
+        postDropoffPointUpAndOut = postDropoffPointUp * makeTransform(y=-postBedRemovalSidewaysClearance)
 
-            # do the movements:
-            self.moveArm(preDropoffPointPoint)
-            if useForceMode:
-                self.moveArm(dropoffPoint * makeTransform([0, 0, distanceForCompliantMove])) # point back from final position from which to start force mode
-                self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow for compliant move
-                self.moveCompliant(dropoffPoint * makeTransform([0, 0,-postInsertExtraPushDistance]))  # "force mode" compliant move for last section to dropoff point
-                self.moveCompliant(dropoffPoint )  # "force mode" compliant move for last section to dropoff point
-                self.setMoveSpeed ( self.speedValueSlow )  # slow
-                # self.moveArm(dropoffPoint)
-            else:  # NO FORCE MODE
-                self.moveArm(dropoffPoint * makeTransform([0, 0, -postInsertExtraPushDistance]))
-                self.moveArm(dropoffPoint)
-            self.setGripperPosition(gripperOpenPower,gripper_letter)
-            self.moveArm(postDropoffPointPoint)
+        ## sequence:
+        # [move to organ bank station]
+        # -> prePickupPoint
+        # -> pickupPoint
+        # -> [close gripper]
+        # -> prePickupPoint
+        # -> [move to printer station]
+        # -> preDropoffPoint
+        # -> (if using force mode) preForceModePoint
+        # -> dropoffPointPreRotation
+        # -> dropoffPoint
+        # -> postDropoffPointUp (pull skeleton off bed)
+        # -> postDropoffPointUpAndOut (clear printer)
 
-        ## prepare to pickup cable
-        debugPrint("preparing to pickup cable",messageVerbosity=2)
-        self.moveBetweenStations("cable_bank")
-        self.setMoveSpeed ( self.speedValueSlow )  # slow
-        # self.setGripperPosition (gripperOpenPosition, "A")
-        # self.setGripperPosition (gripperOpenPosition, "B")
+        # pickup:
+        self.moveBetweenStations("organ_bank")
+        self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper))  # TCP for pickup is organ origin
+        debugPrint("move to prePickupPoint", messageVerbosity=2)
+        self.moveArm(prePickupPoint)  # move to new TCP
+        self.setMoveSpeed(self.speedValueSlow)  # slow
+        debugPrint("move to pickupPoint", messageVerbosity=2)
+        self.moveArm(pickupPoint)  # pickup point
+        debugPrint("close gripper", messageVerbosity=2)
+        self.setGripperPosition(organInRobot.gripperClosedPosition)
+        debugPrint("move to prePickupPoint", messageVerbosity=2)
+        self.moveArm(prePickupPoint)
+        self.setMoveSpeed(self.speedValueNormal)  # normal
+
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+
+        self.moveBetweenStations("printer_" + str(printer.number))
+
+        # dropoff:
+        self.setTCP(gripperTCP * np.linalg.inv(organInRobot.transformOrganOriginToGripper) )  # TCP for insertion is centre of clip
+        # debugPrint("move to abovePreDropoffPoint", messageVerbosity=2)
+        # self.moveArmLinearInJointSpace(abovePreDropoffPoint)  # above dropoff
+        # self.moveArm ( PreDropoffPoint )  # above dropoff
+        debugPrint("move to preDropoffPoint", messageVerbosity=2)
+        self.moveArm(preDropoffPoint)
+
+        # force mode:
+        debugPrint("Organ insertion", messageVerbosity=1)
+        if useForceMode:
+            self.moveArm(preForceModePoint)
+            self.setMoveSpeed(self.speedValueReallySlow)  # dead slow
+            debugPrint("move to dropoffPoint (force mode)", messageVerbosity=2)
+            self.moveCompliant(
+                dropoffPointPreRotation)  # "force mode" compliant move for last section to dropoff point, and a bit beyond to get a good "seat"
+        else:
+            self.setMoveSpeed(self.speedValueReallySlow)  # dead slow
+            debugPrint("move to dropoffPoint", messageVerbosity=2)
+            self.moveArm(dropoffPointPreRotation)
+
+        self.moveArm(dropoffWithExtraRotation)
+        self.moveArm(dropoffPoint)
+        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
+        organInRobot.actualDropoffPosition = actualDropoffPosition
+
+        ## the Head is now in the skeleton, on the printbed
+        ## wait for the bed to cool somewhat, then try pulling. If unsuccessful, wait some more and try again.
+        if DEMO_FAKE_PRINTING:
+            input("===========================\n= PRESS ENTER TO CONTINUE =\n===========================")
+            print("continuing...")
+        else:
+            debugPrint("Starting bed pulling procedure",messageVerbosity=0)
+            has_pulled_off_bed = False
+            temperature_cooling_increment = 2 # degrees of cooling per pull attempt
+
+            temperature_to_cool_to = 44
+
+            while not has_pulled_off_bed:
+                temperature_to_cool_to =temperature_to_cool_to - temperature_cooling_increment
+                self.gripper.disableServos() # we could be waiting a while, so turn off the gripper servo to prevent it overheating
+                debugPrint("Cooling to {}".format(temperature_to_cool_to),messageVerbosity=1)
+                printer.coolBed(temperature_to_cool_to) # turns off bed heater and waits until it is cooled
+                debugPrint("Pulling!",messageVerbosity=1)
+                self.gripper.enableServos()
+                if self.printBedPull():
+                    has_pulled_off_bed=True
+                else:
+                    self.moveArm(dropoffPoint)
+                    if temperature_to_cool_to <= printer.defaultBedCooldownTemperature:
+                        debugPrint("WARNING! giving up on force mode to pull from bed", messageVerbosity=0)
+                        has_pulled_off_bed = True
+
+        self.setMoveSpeed(self.speedValueReallySlow)
+        self.moveArm(postDropoffPointUp)
+        self.setMoveSpeed(self.speedValueNormal)
+        self.moveArm(postDropoffPointUpAndOut)
 
 
-        ## pickup end2, gripperB
-        debugPrint("Pickup end 2, using Gripper B",messageVerbosity=2)
-        self.setTCP(gripperTCP_B * gripPosition * makeTransform([0,0,0,0,0,math.radians(180)])) # the second grip position is 180deg from the first - this prevent the whole gripper having to flip over between picking up the first and second ends
-        pickup( bank.origin * cableFromBank.transformEnd2 *makeTransform([0,0,0,0,0,math.radians(180)]),"B")
+        ## Now take the robot to the Assembly Fixture (AF), and put it on:
+        assemblyFixture.setPosition(math.radians(180))
+        AFVerticalClearanceForInsert = 0.05
+        AFPostInsertExtraPushDistance = assemblyFixture.CORE_ORGAN_ATTACHMENT_Z_OFFSET
+        AFDistanceForCompliantMove = 0
 
-        ## pickup end1, gripperA
-        debugPrint("Pickup end 1, using Gripper A",messageVerbosity=2)
-        self.setTCP(gripperTCP_A * gripPosition)
-        pickup( bank.origin * cableFromBank.transformEnd1 *makeTransform([0,0,0,0,0,math.radians(180)]) ,"A")
+        AFDropoffPoint = assemblyFixture.currentPosition * organInRobot.positionTransformWithinBankOrRobot * makeTransformInputFormatted(
+            [0, 0, -AFPostInsertExtraPushDistance])
+        AFPreDropoffPoint = AFDropoffPoint * makeTransformInputFormatted([0, 0, AFVerticalClearanceForInsert])  # point back from (in organ frame) final position
+        AFPreForceModePoint = AFDropoffPoint * makeTransformInputFormatted(
+            [0, 0, AFDistanceForCompliantMove + AFPostInsertExtraPushDistance])  # point back from final position from which to start force mode
 
-        ## insertion settings
-        preDropoffDistance = 20.0 / 1000
-        belowPreDropoffDistance = 80.0/1000
-        belowPostDropoffDistance = 60.0/1000
-        horizontalOffsetForPreparation = -350.0 / 1000
-        horizontalOffsetForRotationBetweenAandB = -30.0 / 1000
-        belowPostSecondDropoffDistance = 0.2
+        # go to to AF
+        self.setMoveSpeed(self.speedValueNormal)
+        self.moveBetweenStations("AF")
+        # now on the Assembly fixture, turn on the magnets
+        self.sendNothingToArm()
+        assemblyFixture.turnElectromagnetsOn()
 
-        ## prepare to insert into robot
-        debugPrint("preparing to insert cable into robot",messageVerbosity=2)
+        # dropoff:
+        self.moveArmLinearInJointSpace(AFPreDropoffPoint)  # above dropoff
+        self.setMoveSpeed(self.speedValueSlow)  # slow
+
+        # force mode:
+        if AFDistanceForCompliantMove>0:
+            self.moveArm(AFPreForceModePoint)
+            self.setMoveSpeed(self.speedValueReallySlow)  # dead slow
+            self.moveCompliant(AFDropoffPoint)  # "force mode" compliant move for last section to dropoff point
+
+        else:
+            self.setMoveSpeed(self.speedValueReallySlow)  # dead slow
+            self.moveArm(AFDropoffPoint)
+
+        self.setMoveSpeed(self.speedValueNormal)
+        #self.setGripperPosition(organInRobot.gripperOpenPosition)
+        self.setGripperPosition(0.2)
+        self.forceModeFloat()
+        self.setTCP(gripperTCP) # reset to the standard gripper TCP
+        actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
+        # linear move up out of the way of robot :
+        self.moveArm(
+            changeCoordinateValue( self.getCurrentPosition() , "z", assemblyFixture.CLEAR_Z_HEIGHT)
+        )
+
+
+        return organInRobot
+
+
+    ## equivalent of insertOrganWithoutCable for cables
+    ## modified for use with the coiled cable built into the organ
+    def insertOrganWithCable(self, organInRobot, bank, assemblyFixture, gripperTCP):
+
+        vertical_clearance = 0.20  # how high vertically above the pickup and preDropoff to be for pre-pickup and abovePreDropoff
+        preDropoffDistanceUpForOrgan = 0.30 # how far back in the end effector frame to go just before pushing in the organ
+        postInsertExtraPushDistance=0.001
+        CABLE_FORCE_MODE_DISTANCE = 16/1000
+        gripperOpenPositionPickup = 0.5  # 0 = fully open, 1= fully closed
+        gripperOpenPositionDropoff= 0.76  # 0 = fully open, 1= fully closed
+        gripperClosedPosition = 1.0
+        cableOriginToGripper = makeTransformMillimetersDegrees(y=3,z=-3)
+        FLOAT_ON_INSERTS = False
+
+        # sense check
+        if (organInRobot.organType == 0) or (assemblyFixture is None) or (organInRobot.transformOrganOriginToMaleCableSocket is None):
+            raise Exception("This function cannot be used for the Head organ or organ without cable")
+
+        debugPrint ( "Inserting organ of type: " + str (organInRobot.friendlyName) ,messageVerbosity=2)
+        distanceForCompliantMove = organInRobot.forceModeTravelDistance  # distance at end of insertion for which "force mode" is used on UR5
+
+        self.moveBetweenStations("organ_bank")
+        assemblyFixture.setPosition(organInRobot.requiredAssemblyFixtureRotationRadians)
+        originPosition = assemblyFixture.currentPosition * makeTransform(rotZ=organInRobot.AssemblyFixtureRotationOffsetFudgeAngle)
+        self.setGripperPosition (gripperOpenPositionPickup)
+        self.setTCP(gripperTCP)
+
+        # first we need to find a suitable organ in the bank.
+        organFromBank = bank.findAnOrgan(organInRobot.organType)
+        if organFromBank is None:
+            raise (RuntimeError("Bank does not contain an organ of type " + str(organInRobot.organType)+ ": " + str ( organInRobot.friendlyName ) ))
+        organInRobot.I2CAddress = organFromBank.I2CAddress   # transfer over the i2c address
+
+
+        self.setTCP ( gripperTCP )
+
+        pickupPoint = bank.origin * organFromBank.positionTransformWithinBankOrRobot * \
+                      organInRobot.transformOrganOriginToMaleCableSocket * cableOriginToGripper
+        dropoffCablePoint = assemblyFixture.currentPosition \
+                       * organInRobot.cableDestination \
+                       * makeTransform(z=postInsertExtraPushDistance) \
+                       * cableOriginToGripper
+        dropoffOrganPoint = originPosition \
+                            * organInRobot.positionTransformWithinBankOrRobot * \
+                            makeTransformMillimetersDegrees(z=-2) * \
+                            np.linalg.inv(organInRobot.transformOrganOriginToClipCentre) * \
+                            organInRobot.transformOrganOriginToMaleCableSocket * \
+                            cableOriginToGripper
+        # note positionTransformWithinBankOrRobot is the position specified in the blueprint, i.e. the clip centre position not organ origin position
+
+        # sequence is as follows:
+        # abovePrePickupPoint
+        # prePickupPoint
+        # pickupPoint
+        # postPickupPoint (force mode)
+        # abovePostPickupPoint
+        # aboveDropoffPoint
+        # preDropoffPoint
+        # preForceModeDropoffPoint
+        # dropoffCablePoint (force mode)
+        # postDropoffPoint
+
+        prePickupPoint = makeTransform(z=vertical_clearance) * pickupPoint  # point above pickup point by vertical_clearance
+
+        dropoffOrganPointWithExtraPush = dropoffOrganPoint * makeTransformInputFormatted([0, 0, organInRobot.postInsertExtraPushDistance])
+        preDropoffOrganPoint = dropoffOrganPoint * makeTransform(z=-preDropoffDistanceUpForOrgan)  # point back from (in gripper's frame) final position so we approach from right direction
+        preDropoffOrganPoint = applyCeiling(preDropoffOrganPoint, assemblyFixture.CLEAR_Z_HEIGHT)
+        abovePreDropoffOrganPoint = changeCoordinateValue(preDropoffOrganPoint, "z", assemblyFixture.CLEAR_Z_HEIGHT)
+        preForceModeOrganPoint = dropoffOrganPoint * makeTransform(z=-distanceForCompliantMove)  # point back from final position from which to start force mode
+
+        cablePullOutPoint = dropoffOrganPoint * makeTransform(z=-preDropoffDistanceUpForOrgan)
+        cablePullOutPoint = applyCeiling(cablePullOutPoint, assemblyFixture.CLEAR_Z_HEIGHT)
+        # aboveCablePullOutPoint = changeCoordinateValue(cablePullOutPoint,"z",assemblyFixture.CLEAR_Z_HEIGHT)
+        aboveDropoffPoint = changeCoordinateValue(dropoffCablePoint,"z",assemblyFixture.CLEAR_Z_HEIGHT)
+        aboveCablePullOutPoint = changeCoordinateValue(aboveDropoffPoint,"x",cablePullOutPoint[0,3])
+        aboveCablePullOutPoint = changeCoordinateValue(aboveCablePullOutPoint,"y",cablePullOutPoint[1,3])
+
+        preForceModeDropoffPoint = dropoffCablePoint * makeTransform(z=-CABLE_FORCE_MODE_DISTANCE)
+        postDropoffPoint = changeCoordinateValue(dropoffCablePoint,"z",assemblyFixture.CLEAR_Z_HEIGHT)
+        dropoffPointNoExtra = dropoffCablePoint*makeTransform(z=-postInsertExtraPushDistance)
+
+
+        # # rotate dropoff point so that the cable points back towards the organ (experimental!)
+        # from helperFunctions import findDisplacementBetweenTransforms
+        # displacement = findDisplacementBetweenTransforms( np.linalg.inv(dropoffCablePoint) * pickupPoint )
+        # if organInRobot.flipGripperOrientation:
+            # dropoffCablePoint = dropoffCablePoint * makeTransformInputFormatted([0,0,0,0,0 , displacement["direction_about_z"] ]) # rotated towards the organ
+            # dropoffCablePoint = dropoffCablePoint * makeTransformInputFormatted([0,0,0,0,0 , math.radians(-90) ])
+        # else:
+            # dropoffCablePoint = dropoffCablePoint * makeTransformInputFormatted([0,0,0,0,0 , math.pi + displacement["direction_about_z"] ]) # rotated towards the organ
+            # dropoffCablePoint = dropoffCablePoint * makeTransformInputFormatted([0,0,0,0,0 , math.radians(90) ])
+
+
+
         self.setMoveSpeed ( self.speedValueNormal )  # normal
-        self.moveBetweenStations("cable_preparation")
-        self.setMoveSpeed ( self.speedValueSlow )  # slow
 
+        # grab male
+        self.setGripperPosition(gripperOpenPositionPickup)
+        self.moveArm(prePickupPoint)
+        self.moveArm( pickupPoint )
+        self.setGripperPosition(gripperClosedPosition)
+        self.moveArm(prePickupPoint)
 
+        self.moveBetweenStations("AF")
 
-        ## dropoff end1, gripperA
-        dropoffPoint = assemblyFixture.currentPosition * cableIntoRobot.transformEnd1 * makeTransform([0,0,0,0,0,math.radians(-90)])
-        # dropoffPoint = dropoffPoint * makeTransform([0, 0, 0, 0, 0, computeAngleToRotate(dropoffPoint)]) * makeTransform([0,0,0,0,0,math.radians(90)]) # rotate to align with global frame, so that the gripper is always in the same orientation
-        preDropoffPoint = dropoffPoint * makeTransform([0,0,preDropoffDistance])
-        belowPreDropoffPoint = makeTransform([0,0,-belowPreDropoffDistance]) * preDropoffPoint
-        postDropoffSidewaysAndDown = makeTransform([horizontalOffsetForRotationBetweenAandB,0,-belowPostDropoffDistance]) * preDropoffPoint
-        belowPreDropoffPointRotated = dropoffPoint * makeTransform([0, 0, 0, 0, 0, computeAngleToRotate(dropoffPoint)])
-        preparationPosition = makeTransform([horizontalOffsetForPreparation,0,0]) * belowPreDropoffPoint
-        self.setTCP(gripperTCP_A * gripPosition)
-        self.moveArm(preparationPosition)
-        self.moveArm(belowPreDropoffPoint)
-        self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
-        dropoff(dropoffPoint , preDropoffPoint , "A", gripperOpenPosition, postInsertExtraPushDistanceA, cableIntoRobot.forceModeTravelDistance)
-        self.setMoveSpeed ( self.speedValueSlow )  # slow
-        self.moveArm(postDropoffSidewaysAndDown)
+        # attach organ to skeleton:
+        self.moveArm(abovePreDropoffOrganPoint)  # above dropoff
+        self.setMoveSpeed(self.speedValueSlow)  # slow
+        self.moveArm(preDropoffOrganPoint)  # back from dropoff
+        if organInRobot.useForceMode:
+            self.moveArm ( preForceModeOrganPoint )
+            self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
+            debugPrint("move to dropoffPointWithExtraPush (force mode)",messageVerbosity=2)
+            # "force mode" compliant move for last section to dropoff point, and a bit beyond to get a good "seat":
+            self.moveCompliant ( dropoffOrganPointWithExtraPush )
+        else:
+            self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
+            debugPrint("move to dropoffPointWithExtraPush",messageVerbosity=2)
+            self.moveArm(dropoffOrganPointWithExtraPush )
+        if FLOAT_ON_INSERTS:
+            self.forceModeFloat()
+        organInRobot.actualDropoffPosition = self.getCurrentPosition()  # for seeing how far off the expected position we were
 
-
-        ## dropoff end2, gripperB
-        # gripperRotationPosition = makeTransform([horizontalOffsetForRotationBetweenAandB,0,0]) * belowPreDropoffPoint
-        gripperRotationPosition = postDropoffSidewaysAndDown * makeTransform([0, 0, 0, 0, 0, computeAngleToRotate(dropoffPoint)])
-        self.moveArm(gripperRotationPosition) # move back slightly to allow gripper to be rotated
-        self.setTCP(gripperTCP_B * gripPosition * makeTransform([0,0,0,0,0,math.radians(-90)])) # the second grip position is 180deg from the first - this prevent the whole gripper having to flip over between picking up the first and second ends
-        self.moveArm(gripperRotationPosition) # just rotate to the new TCP
-        dropoffPoint = assemblyFixture.currentPosition * cableIntoRobot.transformEnd2
-        dropoffPoint = dropoffPoint * makeTransform([0, 0, 0, 0, 0, computeAngleToRotate(dropoffPoint)])
-        preDropoffPoint = dropoffPoint * makeTransform([0,0,preDropoffDistance])
-        belowPreDropoffPoint = makeTransform([0,0,-belowPreDropoffDistance]) * preDropoffPoint
-        belowPostDropoffPoint = makeTransform([0,0,-belowPostSecondDropoffDistance]) * dropoffPoint
-        postInsertionReturnPosition = makeTransform([-0.25,0.1,-0.08]) * assemblyFixture.originNoRotation * makeTransform([0,0,0,0,math.radians(-90),0])
-        self.moveArm(belowPreDropoffPoint)
-        self.setMoveSpeed ( self.speedValueReallySlow )  # dead slow
-        dropoff(dropoffPoint, preDropoffPoint , "B", gripperOpenPosition, postInsertExtraPushDistanceB, cableIntoRobot.forceModeTravelDistance)
-        self.setMoveSpeed ( self.speedValueSlow )  # slow
-        self.moveArm(belowPostDropoffPoint)
-        self.moveArm(postInsertionReturnPosition)
-
-
+        # pull out cable
+        # self.moveCompliant(postPickupPoint)
+        self.setMoveSpeed(self.speedValueSlow)  # slow
+        self.moveArm(cablePullOutPoint)
         self.setMoveSpeed ( self.speedValueNormal )
+        self.moveArmLinearInJointSpace( aboveCablePullOutPoint )
 
+        # put cable into Head:
+        self.moveArm( aboveDropoffPoint )
+        self.moveArm( preForceModeDropoffPoint )
+        self.setMoveSpeed ( self.speedValueSlow )  # dead slow
+        self.moveCompliant( dropoffCablePoint )
+        self.moveArm( dropoffPointNoExtra )
+        if FLOAT_ON_INSERTS:
+            self.forceModeFloat()
+        self.setGripperPosition(gripperOpenPositionDropoff)
+        self.setMoveSpeed ( self.speedValueNormal )
+        self.moveArm( postDropoffPoint )
+
+        self.moveBetweenStations("AF")
+
+        return organInRobot
 
 
