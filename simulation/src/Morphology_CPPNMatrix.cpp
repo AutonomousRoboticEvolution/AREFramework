@@ -50,8 +50,7 @@ void Morphology_CPPNMatrix::create()
     bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
-        if(manual_design != "None")
-            generateOrgans(skeletonSurfaceCoord);
+        generateOrgans(skeletonSurfaceCoord);
         skeletonSurfaceCoord.clear();
         skeletonSurfaceCoord.shrink_to_fit();
         meshHandle = simCreateMeshShape(2, 20.0f * 3.1415f / 180.0f, skeletonListVertices.data(), skeletonListVertices.size(), skeletonListIndices.data(),
@@ -395,7 +394,7 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 
 void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
 {
-    float robotPos[3];
+    simFloat robotPos[3];
     robotPos[0] = x;
     robotPos[1] = y;
     robotPos[2] = z;
