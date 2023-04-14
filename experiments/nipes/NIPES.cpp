@@ -282,18 +282,11 @@ bool NIPES::update(const Environment::Ptr & env){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
         std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-        if(env->get_name() == "obstacle_avoidance"){
+        if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-
-	}
-	else if(env->get_name() == "exploration"){
-            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::Exploration>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
         }
     }
-
-
 
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
 //    if(reevaluated < nbReEval)

@@ -39,7 +39,7 @@ public:
         settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
 
     }
-    NN2Control(const NN2Control& ctrl) : Control(ctrl){
+    NN2Control(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
         settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
         settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
     }
@@ -59,8 +59,8 @@ public:
                 sv = randomNum->normalDist(sv,input_noise_lvl);
             }
         }
-        nn.step(inputs,evalTime);
-        std::vector<double> output = nn.outf();
+        _nn.step(inputs,evalTime);
+        std::vector<double> output = _nn.outf();
 
         if(output_noise_lvl > 0.0){
             for(double &o : output){
@@ -75,26 +75,26 @@ public:
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases){
-        nn = nn_t(nb_input,nb_hidden,nb_output);
-        if(nn.get_nb_connections() != weights.size() || nn.get_nb_neurons() != biases.size()){
+        _nn = nn_t(nb_input,nb_hidden,nb_output);
+        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        nn.set_all_weights(weights);
-        nn.set_all_biases(biases);
-        nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
-        nn.init();
+        _nn.set_all_weights(weights);
+        _nn.set_all_biases(biases);
+        _nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        _nn.init();
     }
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
-        nn = nn_t(nb_input,nb_hidden,nb_output, joint_subs);
-        if(nn.get_nb_connections() != weights.size() || nn.get_nb_neurons() != biases.size()){
+        _nn = nn_t(nb_input,nb_hidden,nb_output, joint_subs);
+        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        nn.set_all_weights(weights);
-        nn.set_all_biases(biases);
-        nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
-        nn.init();
+        _nn.set_all_weights(weights);
+        _nn.set_all_biases(biases);
+        _nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        _nn.init();
     }
 
     static void nbr_parameters(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases){
@@ -109,7 +109,7 @@ public:
         nbr_biases = nn.get_nb_neurons();
     }
 
-    nn_t nn;
+    nn_t _nn;
 
 };
 
@@ -122,7 +122,7 @@ public:
         settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
 
     }
-    NN2Control<cpg_t>(const NN2Control& ctrl) : Control(ctrl){
+    NN2Control<cpg_t>(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
         settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
         settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
     }
@@ -142,8 +142,8 @@ public:
                 sv = randomNum->normalDist(sv,input_noise_lvl);
             }
         }
-        nn.step(inputs,evalTime);
-        std::vector<double> output = nn.outf();
+        _nn.step(inputs,evalTime);
+        std::vector<double> output = _nn.outf();
 
         if(output_noise_lvl > 0.0){
             for(double &o : output){
@@ -158,14 +158,14 @@ public:
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
-        nn = cpg_t(nb_input,nb_hidden,nb_output, joint_subs);
-        if(nn.get_nb_connections() != weights.size() || nn.get_nb_neurons() != biases.size()){
+        _nn = cpg_t(nb_input,nb_hidden,nb_output, joint_subs);
+        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        nn.set_all_weights(weights);
-        nn.set_all_biases(biases);
-        nn.init();
+        _nn.set_all_weights(weights);
+        _nn.set_all_biases(biases);
+        _nn.init();
     }
 
     static void nbr_parameters_cpg(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases, const std::vector<int> &joint_subs){
@@ -173,7 +173,7 @@ public:
         nbr_weights = nn.get_nb_connections();
         nbr_biases = nn.get_nb_neurons();
     }
-    cpg_t nn;
+    cpg_t _nn;
 
 };
 

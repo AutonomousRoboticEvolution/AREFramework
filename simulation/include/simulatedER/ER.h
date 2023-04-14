@@ -1,4 +1,3 @@
-#pragma once
 #ifndef ER_H
 #define ER_H
 
@@ -137,8 +136,6 @@ protected:
     int clientID = 0;
 
     bool evalIsFinish;
-
-
 
     hr_clock::time_point reference_time;
     hr_clock::time_point start_eval_time;
