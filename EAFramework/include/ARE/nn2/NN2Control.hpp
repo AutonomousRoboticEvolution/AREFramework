@@ -16,7 +16,6 @@
 #include "nn2/elman_cpg.hpp"
 #include "nn2/cpg.hpp"
 
-
 namespace are {
 namespace control{
 using neuron_t = nn2::Neuron<nn2::PfWSum<double>,nn2::AfSigmoidSigned<std::vector<double>>>;
@@ -59,8 +58,8 @@ public:
                 sv = randomNum->normalDist(sv,input_noise_lvl);
             }
         }
-        _nn.step(inputs,evalTime);
-        std::vector<double> output = _nn.outf();
+        _nn->step(inputs,evalTime);
+        std::vector<double> output = _nn->outf();
 
         if(output_noise_lvl > 0.0){
             for(double &o : output){
@@ -75,26 +74,27 @@ public:
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases){
-        _nn = nn_t(nb_input,nb_hidden,nb_output);
-        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
+        _nn = std::make_shared<nn_t>(nb_input,nb_hidden,nb_output);
+        if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        _nn.set_all_weights(weights);
-        _nn.set_all_biases(biases);
-        _nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
-        _nn.init();
+        _nn->set_all_weights(weights);
+        _nn->set_all_biases(biases);
+        _nn->set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        _nn->init();
     }
+
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
-        _nn = nn_t(nb_input,nb_hidden,nb_output, joint_subs);
-        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
+        _nn = std::make_shared<nn_t>(nb_input,nb_hidden,nb_output, joint_subs);
+        if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        _nn.set_all_weights(weights);
-        _nn.set_all_biases(biases);
-        _nn.set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
-        _nn.init();
+        _nn->set_all_weights(weights);
+        _nn->set_all_biases(biases);
+        _nn->set_all_afparams(std::vector<std::vector<double>>(biases.size(),{1,0}));
+        _nn->init();
     }
 
     static void nbr_parameters(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases){
@@ -109,7 +109,7 @@ public:
         nbr_biases = nn.get_nb_neurons();
     }
 
-    nn_t _nn;
+    std::shared_ptr<nn_t> _nn;
 
 };
 
@@ -142,8 +142,8 @@ public:
                 sv = randomNum->normalDist(sv,input_noise_lvl);
             }
         }
-        _nn.step(inputs,evalTime);
-        std::vector<double> output = _nn.outf();
+        _nn->step(inputs,evalTime);
+        std::vector<double> output = _nn->outf();
 
         if(output_noise_lvl > 0.0){
             for(double &o : output){
@@ -158,14 +158,14 @@ public:
     void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
 
     void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
-        _nn = cpg_t(nb_input,nb_hidden,nb_output, joint_subs);
-        if(_nn.get_nb_connections() != weights.size() || _nn.get_nb_neurons() != biases.size()){
+        _nn = std::make_shared<cpg_t>(nb_input,nb_hidden,nb_output, joint_subs);
+        if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
             return;
         }
-        _nn.set_all_weights(weights);
-        _nn.set_all_biases(biases);
-        _nn.init();
+        _nn->set_all_weights(weights);
+        _nn->set_all_biases(biases);
+        _nn->init();
     }
 
     static void nbr_parameters_cpg(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases, const std::vector<int> &joint_subs){
@@ -173,7 +173,7 @@ public:
         nbr_weights = nn.get_nb_connections();
         nbr_biases = nn.get_nb_neurons();
     }
-    cpg_t _nn;
+    std::shared_ptr<cpg_t> _nn;
 
 };
 
