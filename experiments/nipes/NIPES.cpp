@@ -42,6 +42,15 @@ void NIPESIndividual::from_string(const std::string &str){
     morphGenome->set_randNum(randNum);
 }
 
+void NIPESIndividual::compute_fitness(){
+    double fitness = 0;
+    for(const auto &r : rewards)
+        fitness += r;
+    fitness /= static_cast<double>(rewards.size());
+    objectives[0] = fitness;
+//    copy_rewards = rewards;
+}
+
 int NIPES::novelty_params::k_value = 15;
 double NIPES::novelty_params::archive_adding_prob = 0.4;
 double NIPES::novelty_params::novelty_thr = 0.9;
@@ -81,6 +90,8 @@ void NIPES::init(){
         NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
     else if(nn_type == settings::nnType::CPG)
         NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+    else if(nn_type == settings::nnType::FF_CPG)
+        NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -285,6 +296,17 @@ bool NIPES::update(const Environment::Ptr & env){
         if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+        }else if(env->get_name() == "multi_target_maze"){
+            int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+            if(std::dynamic_pointer_cast<NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
+                return false;
+            }else{
+                std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+                std::dynamic_pointer_cast<NIPESIndividual>(ind)->compute_fitness();
+                std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
+    //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+                std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
+            }
         }
     }
 
@@ -303,9 +325,6 @@ bool NIPES::is_finish(){
 }
 
 bool NIPES::finish_eval(const Environment::Ptr & env){
-
-    if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration")
-        return false;
 
     std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
     float t_pos[3] = {target[0],target[1],target[2]};

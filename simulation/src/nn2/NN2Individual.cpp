@@ -35,6 +35,7 @@ void NN2Individual::createController(){
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
     else if(nn_type == st::nnType::FCP){
+
         control.reset(new NN2Control<fcp_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->set_randonNum(randNum);
@@ -48,6 +49,12 @@ void NN2Individual::createController(){
     }
     else if(nn_type == st::nnType::CPG){
         control.reset(new NN2Control<cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+    }
+    else if(nn_type == st::nnType::FF_CPG){
+        control.reset(new NN2Control<ff_cpg_t>());
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
@@ -80,6 +87,7 @@ void NN2Individual::update(double delta_time){
     }
 
     energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
+
     sim_time = delta_time;
 }
 
@@ -92,6 +100,7 @@ void NN2Individual::crossover(const Individual::Ptr &partner, Individual* child)
     *static_cast<NN2Individual*>(child) = NN2Individual(empty_gen,std::dynamic_pointer_cast<NNParamGenome>(child_genome));
     child->set_randNum(randNum);
     child->set_parameters(parameters);
+
 }
 
 void NN2Individual::symmetrical_crossover(const Individual::Ptr &partner, Individual* child1, Individual* child2){

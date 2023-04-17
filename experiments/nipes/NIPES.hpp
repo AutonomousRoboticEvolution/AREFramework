@@ -15,6 +15,7 @@
 #include "ARE/Settings.h"
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
+#include "multiTargetMaze.hpp"
 
 namespace are{
 
@@ -54,10 +55,19 @@ public:
       //  arch & sim_time;
     }
 
+
+    int get_number_times_evaluated(){return rewards.size();}
+    void reset_rewards(){rewards.clear();}
+    void compute_fitness();
+    void add_reward(double reward){rewards.push_back(reward);}
+
 private:
 
     Eigen::MatrixXi visited_zones;
     DescriptorType descriptor_type = FINAL_POSITION;
+
+    std::vector<double> rewards;
+
 };
 
 class NIPES : public EA
@@ -103,6 +113,7 @@ protected:
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
     int reevaluated = 0;
+
 };
 
 }

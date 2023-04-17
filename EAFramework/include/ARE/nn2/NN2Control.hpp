@@ -15,6 +15,7 @@
 #include "nn2/fcp.hpp"
 #include "nn2/elman_cpg.hpp"
 #include "nn2/cpg.hpp"
+#include "nn2/ff_cpg.hpp"
 
 namespace are {
 namespace control{
@@ -28,6 +29,7 @@ using rnn_t = nn2::Rnn<control::neuron_t,control::connection_t>;
 using fcp_t = nn2::Fcp<control::neuron_t,control::connection_t>;
 using elman_cpg_t = nn2::ElmanCPG<control::neuron_t,control::connection_t>;
 using cpg_t = nn2::CPG<control::cpg_neuron_t,control::connection_t>;
+using ff_cpg_t = nn2::Ffcpg<nn2::ffcpg::neuron_t,nn2::ffcpg::connection_t>;
 
 template<class nn_t>
 class NN2Control : public Control

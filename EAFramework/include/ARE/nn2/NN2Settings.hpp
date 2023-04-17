@@ -11,7 +11,8 @@ typedef enum nnType{
     ELMAN = 2,
     ELMAN_CPG = 3,
     CPG = 4,
-    FCP = 5
+    FCP = 5,
+    FF_CPG = 6
 } nnType;
 
 }

@@ -22,6 +22,9 @@ extern "C" are::Environment::Ptr environmentFactory
         env.reset(new are::sim::BarrelTask(param));
     else if(env_type == 3)
         env.reset(new are::sim::Exploration(param));
+    else if(env_type == 4)
+        env.reset(new are::sim::MultiTargetMaze(param));
+
 
     return env;
 }

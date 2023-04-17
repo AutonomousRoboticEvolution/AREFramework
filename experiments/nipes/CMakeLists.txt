@@ -31,6 +31,7 @@ add_library(NIPES SHARED
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
+    ../common/multiTargetMaze.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
