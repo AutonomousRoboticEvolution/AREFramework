@@ -179,6 +179,70 @@ public:
 
 };
 
+template<>
+class NN2Control<ff_cpg_t> : public Control
+{
+public:
+    NN2Control<ff_cpg_t>() : Control(){
+        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
+        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+
+    }
+    NN2Control<ff_cpg_t>(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
+        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
+        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+    }
+
+    Control::Ptr clone() const override {
+        return std::make_shared<NN2Control>(*this);
+    }
+
+    std::vector<double> update(const std::vector<double> &sensorValues){
+        double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
+        double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
+        float evalTime = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+
+        std::vector<double> inputs = sensorValues;
+        if(input_noise_lvl > 0.0){
+            for(double &sv : inputs){
+                sv = randomNum->normalDist(sv,input_noise_lvl);
+            }
+        }
+        _nn->step(inputs,evalTime);
+        std::vector<double> output = _nn->outf();
+
+        if(output_noise_lvl > 0.0){
+            for(double &o : output){
+                o = randomNum->normalDist(o,output_noise_lvl);;
+            }
+        }
+
+        return output;
+    }
+
+
+    void set_randonNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
+
+    void init_nn(int nb_input, int nb_hidden, int nb_output,const std::vector<double> &weights, const std::vector<double> &biases, const std::vector<int> &joint_subs){
+        _nn = std::make_shared<ff_cpg_t>(nb_input,nb_hidden,nb_output, joint_subs);
+        if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
+            std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            return;
+        }
+        _nn->set_all_weights(weights);
+        _nn->set_all_biases(biases);
+        _nn->init();
+    }
+
+    static void nbr_parameters_cpg(int nb_input,int nb_hidden,int nb_output, int &nbr_weights, int &nbr_biases, const std::vector<int> &joint_subs){
+        ff_cpg_t nn(nb_input,nb_hidden,nb_output,joint_subs);
+        nbr_weights = nn.get_nb_connections();
+        nbr_biases = nn.get_nb_neurons();
+    }
+    std::shared_ptr<ff_cpg_t> _nn;
+
+};
+
 inline void get_nbr_weights_biases(int nbr_inputs,int nbr_outputs, int nbr_hiddens, int nn_type, int &nbr_weights, int &nbr_biases){
     if(nn_type == settings::nnType::FFNN)
         NN2Control<ffnn_t>::nbr_parameters(nbr_inputs,nbr_hiddens,nbr_outputs,nbr_weights,nbr_biases);
