@@ -10,6 +10,7 @@
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
+#include "simulatedER/mazeEnv.h"
 #include "obstacleAvoidance.hpp"
 #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"

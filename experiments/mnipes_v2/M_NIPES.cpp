@@ -348,7 +348,9 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     if(population[corr_indexes[currentIndIndex]]->get_ctrl_genome()->get_type() == "empty_genome")
         return true;
 
+    //- Check stopping criteria -
 
+    //Check if the robot is moving
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[corr_indexes[currentIndIndex]]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
@@ -373,40 +375,43 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     if(drop_eval)
         std::dynamic_pointer_cast<M_NIPESIndividual>(population[corr_indexes[currentIndIndex]])->incr_nbr_dropped_eval();
 
-    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 
-    float tPos[3];
-    tPos[0] = static_cast<float>(target[0]);
-    tPos[1] = static_cast<float>(target[1]);
-    tPos[2] = static_cast<float>(target[2]);
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    //Check if the fitness target has been reached
+    std::vector<double> fitness;
+    if(env->get_name() == "mazeEnv")
+        fitness = std::dynamic_pointer_cast<sim::MazeEnv>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
+    else if(env->get_name() == "obstacle_avoidance")
+        fitness = std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
+    else if(env->get_name() == "exploration")
+        fitness = std::dynamic_pointer_cast<sim::Exploration>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
+    else if(env->get_name() == "gradual_tasks")
+        fitness = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
+    else if(env->get_name() == "multi_target_maze")
+        fitness = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
+    else if(env->get_name() == "barrel_task")
+        fitness = std::dynamic_pointer_cast<sim::BarrelTask>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
 
-    auto distance = [](float* a,float* b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                (a[1] - b[1])*(a[1] - b[1]) +
-                (a[2] - b[2])*(a[2] - b[2]));
-    };
-
-    double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
-
-    int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-    bool stop = false;
-    if(env_type == GRADUAL){
-        environments_info = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_environments_info();
-        stop = dist < 1 - environments_info[current_gradual_scene].fitness_target || drop_eval || sim_time >= environments_info[current_gradual_scene].max_eval_time;
+    double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"fTarget").value;
+    if(env->get_name() == "gradual_tasks"){
+        std::vector<sim::GradualEnvironment::env_t> environments_info = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_environments_info();
+        fitness_target = environments_info[current_gradual_scene].fitness_target;
     }
-    else
-        stop = dist < fTarget || drop_eval;
+
+    bool target_reached = fitness[0] < fitness_target;
+
+    bool stop = drop_eval || target_reached;
+    if(env->get_name() == "gradual_tasks"){
+        std::vector<sim::GradualEnvironment::env_t> environments_info = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_environments_info();
+        stop = stop || sim_time >= environments_info[current_gradual_scene].max_eval_time;
+    }
 
     if(stop && verbose){
-        if(env_type == GRADUAL)
-            std::cout << "stop eval: " << "fitness target reached: " << (dist < 1 - environments_info[current_gradual_scene].fitness_target)
+        if(env->get_name() == "gradual_tasks")
+            std::cout << "stop eval: " << "fitness target reached: " << target_reached
                   << " eval dropped " << drop_eval
                   << " sim_time " << (sim_time >= environments_info[current_gradual_scene].max_eval_time) << std::endl;
         else
-            std::cout << "stop eval: " << "fitness target reached: " << (dist < fTarget)
+            std::cout << "stop eval: " << "fitness target reached: " << target_reached
                   << " eval dropped " << drop_eval;
     }
 
