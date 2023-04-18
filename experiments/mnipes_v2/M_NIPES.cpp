@@ -391,7 +391,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
     else if(env->get_name() == "barrel_task")
         fitness = std::dynamic_pointer_cast<sim::BarrelTask>(env)->fitnessFunction(population[corr_indexes[currentIndIndex]]);
 
-    double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"fTarget").value;
+    double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"FTarget").value;
     if(env->get_name() == "gradual_tasks"){
         std::vector<sim::GradualEnvironment::env_t> environments_info = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_environments_info();
         fitness_target = environments_info[current_gradual_scene].fitness_target;
