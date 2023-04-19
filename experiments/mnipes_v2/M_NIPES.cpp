@@ -397,7 +397,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         fitness_target = environments_info[current_gradual_scene].fitness_target;
     }
 
-    bool target_reached = fitness[0] < fitness_target;
+    bool target_reached = fitness[0] > fitness_target;
 
     bool stop = drop_eval || target_reached;
     if(env->get_name() == "gradual_tasks"){
@@ -412,7 +412,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
                   << " sim_time " << (sim_time >= environments_info[current_gradual_scene].max_eval_time) << std::endl;
         else
             std::cout << "stop eval: " << "fitness target reached: " << target_reached
-                  << " eval dropped " << drop_eval;
+                  << " eval dropped " << drop_eval << std::endl;
     }
 
     return stop;
