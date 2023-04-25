@@ -85,6 +85,8 @@ void VisuInd::createController(){
         NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
     else if(nn_type == settings::nnType::CPG)
         NN2Control<cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
+    else if(nn_type == settings::nnType::FF_CPG)
+        NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
     else {
         std::cerr << "unknown type of neural network" << std::endl;
         return;
@@ -124,6 +126,12 @@ void VisuInd::createController(){
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
+    }
+    else if(nn_type == st::nnType::FF_CPG){
+        control.reset(new NN2Control<ff_cpg_t>());
+        control->set_parameters(parameters);
+        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->set_randonNum(randNum);
+        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
