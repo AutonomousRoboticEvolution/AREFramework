@@ -160,16 +160,19 @@ void ER::endOfSimulation()
             }
             ea->setObjectives(currentIndIndex,objectives);
             std::cout << environment << std::endl;
-            if(ea->update(environment)){
-                currentIndIndex++;
-                nbrEval = 0;
-            }
+
             end_eval_time = hr_clock::now();
             std::stringstream sstr;
             sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(start_eval_time - reference_time).count()
                  << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_eval_time - reference_time).count() << std::endl;
             Logging::saveStringToFile("times.csv",sstr.str());
-            saveLogs(false);
+            if(ea->update(environment)){
+                currentIndIndex++;
+                nbrEval = 0;
+                saveLogs(false);
+            }
+            else return;
+
         }
 
         if(currentIndIndex >= ea->get_population().size())

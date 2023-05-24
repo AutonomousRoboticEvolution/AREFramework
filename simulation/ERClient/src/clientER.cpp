@@ -160,7 +160,8 @@ bool ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-    saveLogs(false);
+    if(evalIsFinish)
+        saveLogs(false);
     return true;
 }
 
