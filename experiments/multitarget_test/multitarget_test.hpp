@@ -28,7 +28,10 @@ public:
     {
     }
     MultiTargetInd(const MultiTargetInd& ind) :
-        Individual(ind)
+        Individual(ind),
+        rewards(ind.rewards),
+        trajectories(ind.trajectories),
+        id(ind.id)
     {}
     Individual::Ptr clone() override{
         return std::make_shared<MultiTargetInd>(*this);
@@ -44,6 +47,9 @@ public:
         arch & morphGenome;
         arch & individual_id;
         arch & generation;
+        arch & rewards;
+        arch & trajectories;
+        arch & id;
     }
 
     std::string to_string() override;
