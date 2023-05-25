@@ -294,8 +294,11 @@ bool MultiTargetTest::is_finish(){
 
 
 void MultiTargetTest::setObjectives(size_t indIdx, const std::vector<double> &objectives){
-    std::dynamic_pointer_cast<MultiTargetInd>(population[indIdx])->add_reward(objectives[0]);
-    population[indIdx]->setObjectives(objectives);
+    currentIndIndex = indIdx;
+    if(simulator_side){
+        std::dynamic_pointer_cast<MultiTargetInd>(population[indIdx])->add_reward(objectives[0]);
+        population[indIdx]->setObjectives(objectives);
+    }
 }
 
 void MultiTargetTest::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){
