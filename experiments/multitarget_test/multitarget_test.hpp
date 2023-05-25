@@ -97,6 +97,8 @@ public:
 
     void load_per_gen_ind(int indIdx, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
     void load_per_id(int id, std::vector<std::string> &morph_gen_files, std::vector<std::string> &ctrl_gen_files);
+private:
+    int nbr_ind_tested = 0;
 
 };
 

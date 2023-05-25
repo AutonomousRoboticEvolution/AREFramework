@@ -285,11 +285,12 @@ bool MultiTargetTest::update(const Environment::Ptr &env){
             //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
         }
     }
+    nbr_ind_tested++;
     return true;
 }
 
 bool MultiTargetTest::is_finish(){
-    return currentIndIndex >= population.size() - 1;
+    return nbr_ind_tested >= population.size() - 1;
 }
 
 
