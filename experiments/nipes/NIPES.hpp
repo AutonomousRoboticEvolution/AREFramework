@@ -34,7 +34,8 @@ public:
     NIPESIndividual(const NIPESIndividual& ind)
         : sim::NN2Individual(ind),
           visited_zones(ind.visited_zones),
-          descriptor_type(ind.descriptor_type){}
+          descriptor_type(ind.descriptor_type),
+          rewards(ind.rewards){}
 
     std::string to_string();
     void from_string(const std::string&);
@@ -50,6 +51,7 @@ public:
         arch & final_position;
         arch & visited_zones;
         arch & descriptor_type;
+        arch & rewards;
       //  arch & energy_cost;
         arch & trajectory;
       //  arch & sim_time;

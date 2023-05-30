@@ -307,7 +307,7 @@ bool NIPES::update(const Environment::Ptr & env){
             }else{
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_final_position(env->get_final_position());
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->compute_fitness();
-                std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
+                //std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
     //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
             }
