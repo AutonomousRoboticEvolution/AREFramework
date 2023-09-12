@@ -15,36 +15,7 @@ using namespace are::sim;
 
 // makes just the skeleton not the organs
 
-// 3 different decodeGenome which is actually a sub-function for of the 3 genomeDecoder
-// decodeGenome generates the voxel cubes
-void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, NEAT::NeuralNetwork &cppn)
-{
-    std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
-    AREVoxel areVoxel;
-    // Generate voxel matrix
-    auto region = areMatrix.getEnclosingRegion();
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                input[0] = static_cast<double>(x);
-                input[1] = static_cast<double>(y);
-                input[2] = static_cast<double>(z);
-                input[3] = static_cast<double>(sqrt(pow(x,2)+pow(y,2)+pow(z,2)));
-                // Set inputs to NN
-                cppn.Input(input);
-                // Activate NN
-                cppn.Activate();
-                // Take output from NN and store it.
-                areVoxel.bone = morph_const::empty_voxel;
 
-                if(cppn.Output()[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
-                    areVoxel.bone = morph_const::filled_voxel;
-                }
-                areMatrix.setVoxel(x, y, z, areVoxel);
-            }
-        }
-    }
-}
 
 void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn)
 {
@@ -79,26 +50,7 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
     }
 }
 
-void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, std::vector<std::vector<double>> &matrix_4d)
-{
-    AREVoxel areVoxel;
-    int cell_counter = 0;
-    // Generate voxel matrix
-    auto region = areMatrix.getEnclosingRegion();
-    for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-                // Take output from NN and store it.
-                areVoxel.bone = morph_const::empty_voxel;
-                if(matrix_4d.at(1).at(cell_counter) > 0.00001) { // Sometimes values are very close to zero and these causes problems.
-                    areVoxel.bone = morph_const::filled_voxel;
-                }
-                areMatrix.setVoxel(x, y, z, areVoxel);
-                cell_counter++;
-            }
-        }
-    }
-}
+
 
 //checks skeleton is connected to start and not in the head
 void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
@@ -381,21 +333,7 @@ void GenomeDecoder::findSkeletonSurface(const PolyVox::RawVolume<uint8_t> &skele
 }
 
 
-// following 3 functions call all the above stuff in order
-void GenomeDecoder::genomeDecoder(NEAT::NeuralNetwork &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
-                                 PolyVox::RawVolume<uint8_t> &skeletonMatrix,
-                                 std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
-                                 int &numSkeletonVoxels)
-{
-    decodeGenome(areMatrix, cppn);
-    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
-    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
-    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
-    skeletonRegionCounter(skeletonMatrix);
-    removeSkeletonRegions(skeletonMatrix);
-    removeOverhangs(skeletonMatrix);
-    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
-}
+
 
 void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
@@ -412,17 +350,4 @@ void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
-void GenomeDecoder::genomeDecoder(std::vector<std::vector<double>> &matrix_4d, PolyVox::RawVolume<AREVoxel> &areMatrix,
-                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
-                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
-                                  int &numSkeletonVoxels)
-{
-    decodeGenome(areMatrix, matrix_4d);
-    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
-    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
-    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
-    skeletonRegionCounter(skeletonMatrix);
-    removeSkeletonRegions(skeletonMatrix);
-    removeOverhangs(skeletonMatrix);
-    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
-}
+

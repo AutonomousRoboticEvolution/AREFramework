@@ -149,15 +149,15 @@ bool BODYPLANTESTING::is_finish()
     return get_generation() > maxGenerations;
 }
 
-NEAT::Genome BODYPLANTESTING::loadInd(short genomeID)
-{
-    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
-    std::cout << "Loading genome: " << genomeID << "!" << std::endl;
-    std::stringstream filepath;
-    filepath << loadExperiment << "/morphGenome" << genomeID;
-    NEAT::Genome indGenome(filepath.str().c_str());
-    return indGenome;
-}
+//NEAT::Genome BODYPLANTESTING::loadInd(short genomeID)
+//{
+//    std::string loadExperiment = settings::getParameter<settings::String>(parameters,"#loadExperiment").value;
+//    std::cout << "Loading genome: " << genomeID << "!" << std::endl;
+//    std::stringstream filepath;
+//    filepath << loadExperiment << "/morphGenome" << genomeID;
+//    NEAT::Genome indGenome(filepath.str().c_str());
+//    return indGenome;
+//}
 
 std::vector<int> BODYPLANTESTING::listInds()
 {

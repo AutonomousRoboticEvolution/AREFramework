@@ -31,12 +31,8 @@ void Morphology_CPPNMatrix::create()
         generateFromManualDesign(skeletonMatrix,organList,list_of_voxels);
     }else{
         GenomeDecoder genomeDecoder;
-        if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value){// Decoding CPPN
-            if(use_neat) genomeDecoder.genomeDecoder(cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-            else genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-        }
-        else//Decoding protomatrix
-            genomeDecoder.genomeDecoder(matrix_4d,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+
     }
 
     // Create mesh for skeleton
@@ -508,28 +504,8 @@ void Morphology_CPPNMatrix::setOrganOrientation(Organ &organ)
     input[2] = static_cast<int>(std::round(organ.organPos[2]/mc::voxel_real_size));
     input[2] -= mc::matrix_size/2;
     input[3] = static_cast<double>(sqrt(pow(input[0],2)+pow(input[1],2)+pow(input[2],2)));
-    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value) {
-        if (use_neat) {
-            // Set inputs to NN
-            cppn.Input(input);
-            // Activate NN
-            cppn.Activate();
-            output = cppn.Output();
-        } else {
-            nn2_cppn.step(input);
-            output = nn2_cppn.outf();
-        }
-    } else{
-        int pos_x = input.at(0) + 5;
-        int pos_y = input.at(1) + 5;
-        int pos_z = input.at(2) + 5;
-        // If no thereshold it crashes for joints because the coordinates is out boundaries
-        if(pos_x > 10) pos_x = 10; if(pos_y > 10) pos_y = 10; if(pos_z > 10) pos_z = 10;
-        int pos_in_vector = pos_x * 121 + pos_y * 11 + pos_z;
-        output.push_back(matrix_4d.at(0).at(pos_in_vector));
-
-    }
-
+    nn2_cppn.step(input);
+    output = nn2_cppn.outf();
     for(auto& o: output)
         if(std::isnan(o))
             o = 0;
@@ -708,33 +684,11 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
 {
     int organ_type = -1;
     std::vector<double> output;
-    if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value) {
-        if (use_neat) {
-            // Set inputs to NN
-            cppn.Input(input);
-            // Activate NN
-            cppn.Activate();
-            output = cppn.Output();
-        } else {
-            nn2_cppn.step(input);
-            output = nn2_cppn.outf();
-            for(auto& o: output)
-                if(std::isnan(o))
-                    o = 0;
-
-        }
-    } else{
-        int pos_x = input.at(0) + 5;
-        int pos_y = input.at(1) + 5;
-        int pos_z = input.at(2) + 5;
-        int pos_in_vector = pos_x * 121 + pos_y * 11 + pos_z;
-        output.push_back(0); output.push_back(0);
-        output.push_back(matrix_4d.at(2).at(pos_in_vector));
-        output.push_back(matrix_4d.at(3).at(pos_in_vector));
-        output.push_back(matrix_4d.at(4).at(pos_in_vector));
-        output.push_back(matrix_4d.at(5).at(pos_in_vector));
-
-    }
+    nn2_cppn.step(input);
+    output = nn2_cppn.outf();
+    for(auto& o: output)
+        if(std::isnan(o))
+            o = 0;
     // Is there an organ?
     organ_type = -1;
     int max_element = -1;

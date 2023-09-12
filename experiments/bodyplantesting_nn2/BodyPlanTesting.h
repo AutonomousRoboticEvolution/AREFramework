@@ -32,7 +32,8 @@ public:
     void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
     bool update(const Environment::Ptr&);
 
-    NEAT::Genome loadInd(short int genomeID);
+
+    //NEAT::Genome loadInd(short int genomeID); TODO replace NN2Genome
     std::vector<int> listInds();
 
 private:

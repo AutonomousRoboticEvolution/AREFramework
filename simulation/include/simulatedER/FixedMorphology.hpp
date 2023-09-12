@@ -4,16 +4,11 @@
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 #include "simulatedER/Morphology.h"
-#include <multineat/Substrate.h>
 
 namespace are {
 
 namespace sim {
 
-struct subtrates{
-    static NEAT::Substrate are_puck;
-    static NEAT::Substrate epuck;
-};
 
 /**
  * @brief Fixed morphology class. To use a robot from a model saved in .ttm file.
@@ -22,9 +17,7 @@ class FixedMorphology : public Morphology
 {
 public:
     FixedMorphology(const settings::ParametersMapPtr &param) : Morphology(param){}
-    FixedMorphology(const FixedMorphology& fm) : Morphology(fm),
-        substrate(fm.substrate)
-        {}
+    FixedMorphology(const FixedMorphology& fm) : Morphology(fm){}
 
     are::Morphology::Ptr clone() const override
         {return std::make_shared<FixedMorphology>(*this);}
@@ -44,21 +37,10 @@ public:
      */
     void createAtPosition(float x,float y,float z) override;
 
-
-
-
     /**
      * @brief load the model of the robot. The path of the model is written in the parameter file as #robotPath
      */
     void loadModel();
-
-    /**
-     * @brief set the neural network substrate of the robot. This is specific to hyperNEAT.
-     * @param subtrate
-     */
-    void setSubstrate(NEAT::Substrate sub){
-        substrate = sub;
-    }
 
     /**
      * @brief set the position of the morphology with a random orientation
@@ -68,12 +50,6 @@ public:
     //GETTERS
 
     double get_energy_cost(){return energy_cost;}
-    const NEAT::Substrate &get_substrate(){return substrate;}
-
-
-private:
-    NEAT::Substrate substrate;
-
 };
 
 }//sim

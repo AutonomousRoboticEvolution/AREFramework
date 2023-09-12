@@ -28,11 +28,8 @@ class Morphology_CPPNMatrix : public Morphology
 {
 public:
     Morphology_CPPNMatrix(const settings::ParametersMapPtr &param) : Morphology(param){
-        matrix_4d.resize(0);
     }
     Morphology_CPPNMatrix(const Morphology_CPPNMatrix& mcm): Morphology(mcm),
-        use_neat(mcm.use_neat),
-        cppn(mcm.cppn),
         nn2_cppn(mcm.nn2_cppn),
         id(mcm.id),
         organList(mcm.organList),
@@ -42,7 +39,8 @@ public:
         blueprint(mcm.blueprint),
         skeletonListVertices(mcm.skeletonListVertices),
         skeletonListIndices(mcm.skeletonListIndices),
-        matrix_4d(mcm.matrix_4d){}
+        matrix_4d(mcm.matrix_4d)
+        {}
 
     ~Morphology_CPPNMatrix(){
     }
@@ -157,15 +155,10 @@ public:
     ///// Setters and getters /////
     ///////////////////////////////
     std::vector<bool> getRobotManRes(){return robotManRes.getResVector();}
-    const NEAT::NeuralNetwork &getNEATCPPN(){return cppn;}
     const nn2_cppn_t &getNN2CPPN(){return nn2_cppn;}
 
-    void setNEATCPPN(const NEAT::NeuralNetwork &genome){
-        use_neat = true;
-        cppn = genome;
-    }
+
     void setNN2CPPN(const nn2_cppn_t &nn){
-        use_neat = false;
         nn2_cppn = nn;
     }
 
@@ -273,13 +266,7 @@ private:
         }
     };
 
-public:
-    //NEAT::Substrate get_substrate() { return substrate;}
-    //void set_substrate(NEAT::Substrate sub){substrate = sub;}
-
 private:
-    bool use_neat=false;
-    NEAT::NeuralNetwork cppn;
     nn2_cppn_t nn2_cppn;
     std::vector<std::vector<int>> list_of_voxels;
 
@@ -293,7 +280,6 @@ private:
     std::vector<float> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     bool isRobotModel = 0;
-    //NEAT::Substrate substrate;
 
     std::vector<std::vector<double>> matrix_4d;
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;

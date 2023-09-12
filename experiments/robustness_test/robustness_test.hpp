@@ -8,7 +8,6 @@
 #include "ARE/Individual.h"
 #include "ARE/NNParamGenome.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
-#include "ARE/CPPNGenome.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "obstacleAvoidance.hpp"
 
@@ -21,7 +20,7 @@ class RobustInd : public Individual
 public:
 
     RobustInd() : Individual(){}
-    RobustInd(const CPPNGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
+    RobustInd(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
         : Individual(morph_gen,ctrl_gen)
     {
     }

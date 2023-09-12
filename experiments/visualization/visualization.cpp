@@ -19,22 +19,15 @@ void VisuInd::createMorphology(){
     }
 
     if(fixed_morph_path == "None"){
-        bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
 
 
         morphology.reset(new CPPNMorph(parameters));
         morphology->set_randNum(randNum);
 
-        if(is_neat_genome){
-            NEAT::Genome gen =
-                    std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
-            NEAT::NeuralNetwork nn;
-            gen.BuildPhenotype(nn);
-            std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNEATCPPN(nn);
-        }else{
-            nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-            std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
-        }
+
+        nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
+
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
     }else{
         morphology.reset(new sim::FixedMorphology(parameters));
@@ -163,7 +156,6 @@ std::string VisuInd::to_string()
     oarch.register_type<VisuInd>();
     oarch.register_type<NNParamGenome>();
     oarch.register_type<NN2CPPNGenome>();
-    oarch.register_type<CPPNGenome>();
     oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
@@ -176,7 +168,6 @@ void VisuInd::from_string(const std::string &str){
     iarch.register_type<VisuInd>();
     iarch.register_type<NNParamGenome>();
     iarch.register_type<NN2CPPNGenome>();
-    iarch.register_type<CPPNGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
@@ -191,7 +182,6 @@ void Visu::init(){
     int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
     generation = settings::getParameter<settings::Integer>(parameters,"#genToLoad").value;
     int indIdx = settings::getParameter<settings::Integer>(parameters,"#indToLoad").value;
-    bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
     bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
     std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
@@ -219,23 +209,16 @@ void Visu::init(){
     if(fixed_morph_path == "None"){
         //load morphology genome
         for(size_t i = 0; i < morph_gen_files.size(); i++){
-            if(is_neat_genome){
-                NEAT::Genome neat_gen(morph_gen_files[i].c_str());
-                morph_gen.reset(new CPPNGenome(neat_gen));
-                std::vector<std::string> split_str;
-                misc::split_line(morph_gen_files[i],"_",split_str);
-                morph_gen->set_id(std::stoi(split_str[split_str.size()-2])*std::stoi(split_str.back()));
-            }
-            else{
-                nn2_cppn_t cppn;
-                std::ifstream ifs(morph_gen_files[i]);
-                boost::archive::text_iarchive iarch(ifs);
-                iarch >> cppn;
-                morph_gen.reset(new NN2CPPNGenome(cppn));
-                std::vector<std::string> split_str;
-                misc::split_line(morph_gen_files[i],"_",split_str);
-                morph_gen->set_id(std::stoi(split_str.back()));
-            }
+
+            nn2_cppn_t cppn;
+            std::ifstream ifs(morph_gen_files[i]);
+            boost::archive::text_iarchive iarch(ifs);
+            iarch >> cppn;
+            morph_gen.reset(new NN2CPPNGenome(cppn));
+            std::vector<std::string> split_str;
+            misc::split_line(morph_gen_files[i],"_",split_str);
+            morph_gen->set_id(std::stoi(split_str.back()));
+
             morph_gen->set_randNum(randomNum);
             morph_gen->set_parameters(parameters);
 

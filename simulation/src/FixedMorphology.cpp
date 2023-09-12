@@ -2,50 +2,6 @@
 
 using namespace are::sim;
 
-NEAT::Substrate subtrates::are_puck([]() -> NEAT::Substrate {
-                                        NEAT::Substrate sub;
-                                        sub.m_input_coords = {{1,M_PI/2.}, {1,M_PI/4.},
-                                                              {1,3.*M_PI/4.},{1,3.*M_PI/2.}};
-
-                                        sub.m_output_coords = {{1,0},{1,M_PI}};
-                                        sub.m_hidden_coords = {{0,0},
-                                                               {0.5,0},{0.5,M_PI/6.},
-                                                               {0.5,M_PI/3.},{0.5,M_PI/2.},
-                                                               {0.5,2.*M_PI/3.},{0.5,5.*M_PI/6.},
-                                                               {0.5,M_PI},{0.5,-5.*M_PI/6.},
-                                                               {0.5,-2.*M_PI/3.},{0.5,-M_PI/2.},
-                                                               {0.5,-M_PI/3.},{0.5,-M_PI/6.}};
-
-                                        sub.m_allow_hidden_hidden_links = true;
-                                        sub.m_query_weights_only = true;
-                                        return sub;
-                                    }());
-
-
-NEAT::Substrate subtrates::epuck([]() -> NEAT::Substrate {
-                                     NEAT::Substrate sub;
-                                     sub.m_input_coords = {//Proximity center
-                                                           {1,M_PI},{1,5.*M_PI/6.},
-                                                           {1,2.*M_PI/3.},{1,M_PI/3.},
-                                                           {1,M_PI/6.},{1,0},
-                                                           {1,-M_PI/3.},{1,-2.*M_PI/3.}};
-                                     //                                //Front Camera average RGB
-                                     //                                {1,M_PI/2.}, //R
-                                     //                                {1,5.*M_PI/12.}, //G
-                                     //                                {1,7.*M_PI/12.}}; //B
-                                     sub.m_output_coords = {{0.8,0},{0.8,M_PI}};
-                                     sub.m_hidden_coords = {{0,0},
-                                                            {0.5,0},{0.5,M_PI/6.},
-                                                            {0.5,M_PI/3.},{0.5,M_PI/2.},
-                                                            {0.5,2.*M_PI/3.},{0.5,5.*M_PI/6.},
-                                                            {0.5,M_PI},{0.5,-5.*M_PI/6.},
-                                                            {0.5,-2.*M_PI/3.},{0.5,-M_PI/2.},
-                                                            {0.5,-M_PI/3.},{0.5,-M_PI/6.}};
-
-                                     sub.m_allow_hidden_hidden_links = true;
-                                     sub.m_query_weights_only = true;
-                                     return sub;
-                                 }());
 
 void FixedMorphology::create()
 {

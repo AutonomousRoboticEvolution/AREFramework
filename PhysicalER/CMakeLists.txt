@@ -142,8 +142,6 @@ else()
 
 
     find_package(PolyVox REQUIRED)
-    find_package(MultiNEAT REQUIRED)
-
 
     if(VREP_FOUND)
         SET(LIB_EXT v_repExtGenerate)

@@ -33,8 +33,6 @@ if (RASPBERRY)
     target_link_libraries(piARE ${Boost_LIBRARIES})
 else()
 
-    find_package(MultiNEAT REQUIRED)
-    message("MultiNEAT Folder : ${MultiNEAT_DIR}")
 
 
 if(WITH_NN2)
@@ -59,7 +57,7 @@ target_include_directories(ARE PUBLIC
     "/usr/local/include/"
     "../modules"
 )
-target_link_libraries(ARE MultiNEAT::MultiNEAT cmaes tbb ${Boost_LIBRARIES})
+target_link_libraries(ARE cmaes tbb ${Boost_LIBRARIES})
 
 add_executable(nn2_cppn_serial_to_dot tools/nn2_cppn_serial_to_dot.cpp)
 target_include_directories(nn2_cppn_serial_to_dot PUBLIC

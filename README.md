@@ -10,7 +10,6 @@ After, having successfully installed the framework, you can refer to the next tu
 
 * Preferably use Ubuntu 18.04 as OS. Works also with Ubuntu 20.04
 * V-REP 3.6.2 18.04 - [link](https://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04.tar.xz).
-* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
 * Boost (apt package libboost-all-dev)
@@ -36,16 +35,6 @@ These instructions are specific to Ubuntu (preferably 18.04).
 First, install the libraries available via aptitude :
 ```
 sudo apt install libboost-all-dev libeigen3-dev 
-```
-
-Install MutliNEAT :
-```
-git clone https://github.com/ci-group/MultiNEAT.git
-cd MultiNEAT
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/install/path  ..
-make 
-make install # add sudo before the command if the install prefix is /usr/local (default value)
 ```
 
 Install Polyvox :
