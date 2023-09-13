@@ -1,12 +1,39 @@
 #include "homeokinesis_controller.hpp"
 
+using namespace are;
 
 void Homeokinesis::init(int nb_inputs, int nb_outputs){
 
 }
 
 std::vector<double> Homeokinesis::update(const std::vector<double> &sensorValues){
+        //step 1: learn
+        //step 2: step
+}
 
+void step(const std::vector<double> &sensors,  std::vector<double> &motors){
+    misc::stdvect_to_eigenvect(sensors,x);
+
+    // averaging over the last s4avg values of x_buffer
+    conf.steps4Averaging = ::clip(conf.steps4Averaging,1,buffersize-1);
+    if(conf.steps4Averaging > 1) //TODO: restart from there.
+      x_smooth += (x - x_smooth)*(1.0/conf.steps4Averaging);
+    else
+      x_smooth = x;
+
+    x_buffer[t%buffersize] = x_smooth; // we store the smoothed sensor value
+
+    // calculate controller values based on current input values (smoothed)
+    Matrix y =   (C*(x_smooth + (v_avg*creativity)) + h).map(g);
+
+    // Put new output vector in ring buffer y_buffer
+    y_buffer[t%buffersize] = y;
+
+    // convert y to motor*
+    y.convertToBuffer(y_, number_motors);
+
+    // update step counter
+    t++;
 }
 
 void learn(){
@@ -14,7 +41,7 @@ void learn(){
 
     // the effective x/y is (actual-steps4delay) element of buffer
     int s4delay = ::clip(conf.steps4Delay,1,buffersize-1);
-    const Matrix& x       = x_buffer[(t - max(s4delay,1) + buffersize) % buffersize];
+    const Vector& x       = x_buffer[(t - max(s4delay,1) + buffersize) % buffersize];
     const Matrix& y_creat = y_buffer[(t - max(s4delay,1) + buffersize) % buffersize];
     const Matrix& x_fut   = x_buffer[t% buffersize]; // future sensor (with respect to x,y)
 
@@ -75,4 +102,19 @@ void learn(){
         intern_isTeaching    = false;
       }
     }
+}
+
+void set_default_config(){
+    _conf.initFeedbackStrength = 1.0;
+    _conf.useExtendedModel     = true;
+    _conf.useTeaching          = false;
+    _conf.steps4Averaging      = 1;
+    _conf.steps4Delay          = 1;
+    _conf.someInternalParams   = false;
+    _conf.onlyMainParameters   = true;
+    _conf.buffersize = 10;
+
+    _conf.factorS              = 1;
+    _conf.factorb              = 1;
+    _conf.factorh              = 1;
 }
