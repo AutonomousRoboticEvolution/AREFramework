@@ -148,10 +148,14 @@ void VisuInd::update(double delta_time){
     double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
     if( diff < 0.1){
         std::vector<double> inputs = morphology->update();
+        std::cout << "inputs: ";
         for(const double& i : inputs)
             std::cout << i << ";";
-        std::cout << std::endl;
         std::vector<double> outputs = control->update(inputs);
+        std::cout << "outputs: ";
+        for(const double& o : outputs)
+            std::cout << o << ";";
+        std::cout << std::endl;
         morphology->command(outputs);
     }
 }

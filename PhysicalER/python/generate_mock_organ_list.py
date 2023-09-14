@@ -12,7 +12,7 @@ def read_blueprint(filename):
     return organ_type_list
 
 def print_organ_list(filename,organ_list):
-    with open(filename,"access_mode") as file:
+    with open(filename,"w") as file:
         for o in organ_list:
             if(o == "4"):
                 continue

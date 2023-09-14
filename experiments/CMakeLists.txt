@@ -60,6 +60,7 @@ else()
     endif()
     add_subdirectory(test_are_generate)
     #add_subdirectory(bodyplantesting)
+    add_subdirectory(intrinsic_motivation)
 
 endif()
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
