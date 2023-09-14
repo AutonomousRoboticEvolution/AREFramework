@@ -150,7 +150,7 @@ void RealEnvironment::update_info(double time){
         trajectory.clear();
 
     // update position of robot
-    std::vector<double> tmp_current_position;
+    std::vector<double> tmp_current_position = {0,0};
     std::string robot_position_string;
     phy::send_string(robot_position_string,"position",zmq_tracking_camera_requester_socket,"Robot:");
 
@@ -165,7 +165,6 @@ void RealEnvironment::update_info(double time){
 
         tmp_current_position = { std::stod(robot_position_split_string[0]) , std::stod(robot_position_split_string[1]) };
     }
-
 
     // update position of barrel
     std::string aruco_tags_string;
@@ -246,6 +245,8 @@ void RealEnvironment::update_info(double time){
         wp.orientation[2] = 0;
 
         trajectory.push_back(wp);
+        std::cout << "robot position: " << wp.position[0] << "," << wp.position[1] << std::endl;
+
     }
 
     // keep count of the number of frames:
