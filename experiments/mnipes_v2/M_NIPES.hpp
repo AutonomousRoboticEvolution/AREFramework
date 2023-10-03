@@ -281,6 +281,10 @@ public:
         if(corr_indexes[indIndex] < 0)
             return;
         population[corr_indexes[indIndex]]->setObjectives(objectives);
+        newly_evaluated.push_back(corr_indexes[indIndex]);
+        corr_indexes[currentIndIndex] = -1;
+        for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
+            corr_indexes[i]--;
     }
 
     void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
@@ -317,9 +321,8 @@ private:
     void load_experiment(const std::string &folder);
     void seed_experiment(const std::string &folder);
 
-
-
     std::vector<int> corr_indexes;
+    std::vector<int> newly_evaluated;
 
     fitness_fct_t fitness_fct;
 

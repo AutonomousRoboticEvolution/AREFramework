@@ -17,12 +17,6 @@ extern "C" are::Environment::Ptr environmentFactory
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
     else if(env_type == are::MULTI_TARGETS)
         env = std::make_shared<are::sim::MultiTargetMaze>(param);
-    else if(env_type == are::EXPLORATION)
-        env = std::make_shared<are::sim::Exploration>(param);
-    else if(env_type == are::BARREL)
-        env = std::make_shared<are::sim::BarrelTask>(param);
-    else if(env_type == are::GRADUAL)
-        env = std::make_shared<are::sim::GradualEnvironment>(param);
     return env;
 }
 

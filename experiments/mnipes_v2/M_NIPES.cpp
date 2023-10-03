@@ -464,247 +464,176 @@ bool M_NIPES::update(const Environment::Ptr &env){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
+
     clean_learning_pool();
-    if(corr_indexes.size() < currentIndIndex)
-        return true;
-    if(corr_indexes[currentIndIndex] < 0)
-        return true;
 
-    Individual::Ptr ind = population[corr_indexes[currentIndIndex]];
-    if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
-        if(env->get_name() == "obstacle_avoidance"){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-        }
-        else if(env->get_name() == "multi_target_maze"){
-            int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
-                return false;
-            }else{
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-            }
-        }
-        else if(env->get_name() == "exploration"){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::Exploration>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-            int number_of_scenes = std::dynamic_pointer_cast<sim::Exploration>(env)->get_number_of_scenes();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_scenes && ind->get_morph_genome()->get_type() != "empty_genome"){
-                return false;
-            }else{
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::Exploration>(env)->get_trajectories());
-            }
-        }else if(env->get_name() == "mazeEnv"){
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
-        }else if(env->get_name() == "barrel_task"){
-            int number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
-            if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
-                return false;
-            }else{
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
-                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
-            }
-        }else if(env->get_name() == "gradual_tasks"){
-            const auto &current_scene = std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_current_scene();
-            if(current_scene.fitness_fct == sim::GradualEnvironment::EXPLORATION)
+    for(int index : newly_evaluated){
+        //if(corr_indexes.size() < currentIndIndex)
+         //   return true;
+        //if(corr_indexes[currentIndIndex] < 0)
+//            return true;
+
+        Individual::Ptr ind = population[index];
+        if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_final_position(env->get_final_position());
+            if(env->get_name() == "obstacle_avoidance"){
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
                 std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-            else std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(FINAL_POSITION);
-            //TODO add case for foraging
-            std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->set_current_scene(
-			                            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_current_gradual_scene());
-            std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::GradualEnvironment>(env)->get_trajectories());
-
+            }
+            else if(env->get_name() == "multi_target_maze"){
+                int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+                if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets && ind->get_morph_genome()->get_type() != "empty_genome"){
+                    return false;
+                }else{
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->compute_fitness();
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->reset_rewards();
+                    std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+                }
+            }else if(env->get_name() == "mazeEnv"){
+                std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
+            }else{
+                std::cerr << "task unknown" << std::endl;
+                exit(1);
+            }
         }
-    }
 
-    //If on the client or just sequential mode
-    if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
-        auto op_learner = find_learner(morph_id);
-        if(!op_learner){ //learner was not found so erase this individual
+        //If on the client or just sequential mode
+        if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+            int morph_id = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->id();
+            auto op_learner = find_learner(morph_id);
+            if(!op_learner){ //learner was not found so erase this individual
+                population.erase(population.begin() + index);
+                population.shrink_to_fit();
+                return true;
+            }
+            learner_t& learner = *op_learner;
+            learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
+            if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
+                learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+                learner.morph_genome.set_organ_position_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc());
+                int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
+                int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
+                int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
+                if(wheel_nbr > 0 || joint_nbr > 0){
+                    init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
+                    init_new_ctrl_pop(learner);
+                }else{ //if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
+                    //   std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
+                    //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
+                    learner.ctrl_learner.to_be_erased();
+                    EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
+                    NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+                    morphgenome->random();
+                    morphgenome->set_id(highest_morph_id++);
+
+                    learner_t new_learner(*(morphgenome.get()));
+                    new_learner.ctrl_learner.set_parameters(parameters);
+                    learning_pool.push_back(new_learner);
+
+                    M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
+                    ind->set_parameters(parameters);
+                    ind->set_randNum(randomNum);
+                    population.push_back(ind);
+                    int i = corr_indexes.size()-1;
+                    while(corr_indexes[i] < 0)
+                        i--;
+                    corr_indexes.push_back(corr_indexes[i] + 1);
+                }
+
+            }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
+                learner.ctrl_learner.to_be_erased();
+            }else{
+                numberEvaluation++;
+                nbr_eval_current_task++;
+                //update learner
+                auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
+                learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor(),trajs);
+                bool is_ctrl_next_gen = learner.ctrl_learner.step();
+                //-
+
+                if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
+                    //Update Controller Archive
+                    std::vector<double> weights;
+                    std::vector<double> biases;
+                    NNParamGenome best_ctrl_gen;
+                    auto &best_controller = learner.ctrl_learner.get_best_solution();
+
+                    int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
+                    int nbr_biases = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_biases().size();
+                    int nbr_inputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input();
+                    int nbr_outputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output();
+                    int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
+                    int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
+
+                    if(!best_controller.genome.empty() && best_controller.genome.size() == nbr_weights + nbr_biases){
+                        weights.resize(nbr_weights);
+                        for(size_t i = 0; i < nbr_weights; i++)
+                            weights[i] = best_controller.genome[i];
+                        biases.resize(nbr_biases);
+                        for(size_t i = nbr_weights; i < best_controller.genome.size(); i++)
+                            biases[i-nbr_weights] = best_controller.genome[i];
+                        best_ctrl_gen.set_weights(weights);
+                        best_ctrl_gen.set_biases(biases);
+                        best_ctrl_gen.set_nbr_input(nbr_inputs);
+                        best_ctrl_gen.set_nbr_output(nbr_outputs);
+                        best_ctrl_gen.set_nbr_hidden(nbr_hidden);
+                        best_ctrl_gen.set_nn_type(nn_type);
+                        //update the archive
+                        if(use_ctrl_arch){
+                            CartDesc morph_desc = learner.morph_genome.get_cart_desc();
+                            controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                        }
+                        //-
+                    }
+
+
+                    //add new gene in gene_pool
+                    genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
+                    new_gene.trajectories = best_controller.trajectories;
+                    misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
+                    new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
+                    gene_pool.push_back(new_gene);
+                    //-
+
+                    //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
+                    int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
+                    if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully asynchronous
+                    if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
+                        warming_up = false;
+                        increment_age();
+                        reproduction();
+                        assert(learning_pool.size() == pop_size);
+                    }
+                    //Perform survival and selection and generate a new morph gene.
+                    else if(gene_pool.size() == pop_size+nbr_offsprings){
+                        //remove oldest gene and increase age
+                        std::string survival = settings::getParameter<settings::String>(parameters,"#survivalMethod").value;
+                        while(gene_pool.size() > pop_size){
+                            if(survival == "oldest")
+                                remove_oldest_gene();
+                            else if(survival == "worst")
+                                remove_worst_gene();
+                            else std::cerr << "WARNING: Unknown survival method, so no survival applied" << std::endl;
+                        }
+                        increment_age();
+                        //-
+                        assert(gene_pool.size() == pop_size);
+                        reproduction();
+                        assert(learning_pool.size() == pop_size);
+                    }
+                    //-
+                }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
+                    init_new_ctrl_pop(learner);
+                }
+            }
             population.erase(population.begin() + corr_indexes[currentIndIndex]);
             population.shrink_to_fit();
             corr_indexes[currentIndIndex] = -1;
             for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
                 corr_indexes[i]--;
-            return true;
         }
-        learner_t& learner = *op_learner;
-        learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
-        if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-            //compute evolvability
-            if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
-                if(morph_id == 0)
-                    seed_morph_genome = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome());
-                else{
-                    Eigen::VectorXd desc1 = seed_morph_genome->get_organ_position_desc().getCartDesc();
-                    Eigen::VectorXd desc2 = std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc().getCartDesc();
-                    double dist = Novelty::distance_fcts::positional(desc1,desc2);
-                    std::cout << "distance between " <<seed_morph_genome->id() << ";" << morph_id << " is " << dist << std::endl;
-                    evolvability_score += dist;
-                }
-            }
-            learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
-            learner.morph_genome.set_organ_position_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc());
-            int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
-            int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
-            int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
-            if(wheel_nbr > 0 || joint_nbr > 0){
-                init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
-                init_new_ctrl_pop(learner);
-            }else{ //if(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[0] == -1 &&
-                  //   std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
-                //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
-                learner.ctrl_learner.to_be_erased();
-                EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-                NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
-                if(settings::getParameter<settings::String>(parameters,"#seedMorphGenome").value == "None"){
-                    morphgenome->random();
-                    morphgenome->set_id(highest_morph_id++);
-                }
-                else{
-                    nn2_cppn_t new_cppn = seed_cppn;
-                    new_cppn.mutate();
-                    morphgenome->set_cppn(new_cppn);
-                    morphgenome->set_id(highest_morph_id++);
-                }
-
-                learner_t new_learner(*(morphgenome.get()));
-                new_learner.ctrl_learner.set_parameters(parameters);
-                learning_pool.push_back(new_learner);
-
-                M_NIPESIndividual::Ptr ind(new M_NIPESIndividual(morphgenome,ctrl_gen));
-                ind->set_parameters(parameters);
-                ind->set_randNum(randomNum);
-                population.push_back(ind);
-                int i = corr_indexes.size()-1;
-                while(corr_indexes[i] < 0)
-                    i--;
-                corr_indexes.push_back(corr_indexes[i] + 1);
-            }
-
-        }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
-            learner.ctrl_learner.to_be_erased();
-        }else{
-            numberEvaluation++;
-            nbr_eval_current_task++;
-            //update learner
-            auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
-            learner.ctrl_learner.update_pop_info(ind->getObjectives(),ind->descriptor(),trajs);
-            bool is_ctrl_next_gen = learner.ctrl_learner.step();
-            //-
-
-            if(learner.ctrl_learner.is_learning_finish()){//learning is finished for this body plan
-                //Update Controller Archive
-                std::vector<double> weights;
-                std::vector<double> biases;
-                NNParamGenome best_ctrl_gen;
-                auto &best_controller = learner.ctrl_learner.get_best_solution();
-
-                int nbr_weights = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_weights().size();
-                int nbr_biases = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_biases().size();
-                int nbr_inputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_input();
-                int nbr_outputs = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_output();
-                int nbr_hidden = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nbr_hidden();
-                int nn_type = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_nn_type();
-
-                if(!best_controller.genome.empty() && best_controller.genome.size() == nbr_weights + nbr_biases){
-                    weights.resize(nbr_weights);
-                    for(size_t i = 0; i < nbr_weights; i++)
-                        weights[i] = best_controller.genome[i];
-                    biases.resize(nbr_biases);
-                    for(size_t i = nbr_weights; i < best_controller.genome.size(); i++)
-                        biases[i-nbr_weights] = best_controller.genome[i];
-                    best_ctrl_gen.set_weights(weights);
-                    best_ctrl_gen.set_biases(biases);
-                    best_ctrl_gen.set_nbr_input(nbr_inputs);
-                    best_ctrl_gen.set_nbr_output(nbr_outputs);
-                    best_ctrl_gen.set_nbr_hidden(nbr_hidden);
-                    best_ctrl_gen.set_nn_type(nn_type);
-                    //update the archive
-                    if(use_ctrl_arch){
-                        CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                        controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
-                    }
-                    //-
-                }
-
-
-                //add new gene in gene_pool
-                genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)});
-                new_gene.trajectories = best_controller.trajectories;
-                misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
-                new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
-                gene_pool.push_back(new_gene);
-                //-
-
-                //If gradual task change the task if conditions are met.
-                if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
-                    int nbr_eval_per_task = settings::getParameter<settings::Integer>(parameters,"#nbrEvalPerTask").value;
-                    int nss_threshold = settings::getParameter<settings::Integer>(parameters,"#nbrOfSuccessfullSolutions").value;
-                    if(best_controller.objectives[0] >= environments_info[current_gradual_scene].fitness_target || nbr_eval_current_task >= nbr_eval_per_task){
-                        if(verbose)
-                            std::cout << "fitness: " << best_controller.objectives[0] << " >= " << environments_info[current_gradual_scene].fitness_target
-                                      << " evaluations " << numberEvaluation << " >= " << nbr_eval_per_task << " - new successful solution";
-                        nbr_of_successful_solution++;
-                        new_gene.environment = environments_info[current_gradual_scene].scene_path;
-                        new_gene.task = sim::GradualEnvironment::fitness_fcts_name(environments_info[current_gradual_scene].fitness_fct);
-                        best_gene_archive.push_back(new_gene);
-                        if(nbr_of_successful_solution >= nss_threshold || nbr_eval_current_task >= nbr_eval_per_task){
-                            if(verbose) std::cout << " - change task" << std::endl;
-                            incr_gradual_scene();
-                            nbr_eval_per_task = 0;
-                            nbr_of_successful_solution = 0;
-                        }
-                        else if(verbose) std::cout << std::endl;
-
-                    }
-                }
-
-                //level of synchronicity. 1.0 fully synchrone, 0.0 fully asynchrone. Result to the number of offsprings to be evaluated before generating new offsprings
-                int nbr_offsprings = static_cast<int>(pop_size*settings::getParameter<settings::Float>(parameters,"#synchronicity").value);
-                if(nbr_offsprings == 0) nbr_offsprings = 1; //Fully asynchronous
-                if(warming_up && gene_pool.size() == pop_size){// Warming up phase finished.
-                    warming_up = false;
-                    increment_age();
-                    reproduction();
-                    assert(learning_pool.size() == pop_size);
-                }
-                //Perform survival and selection and generate a new morph gene.
-                else if(gene_pool.size() == pop_size+nbr_offsprings){
-                    //remove oldest gene and increase age
-                    std::string survival = settings::getParameter<settings::String>(parameters,"#survivalMethod").value;
-                    while(gene_pool.size() > pop_size){
-                        if(survival == "oldest")
-                            remove_oldest_gene();
-                        else if(survival == "worst")
-                            remove_worst_gene();
-                        else std::cerr << "WARNING: Unknown survival method, so no survival applied" << std::endl;
-                    }
-                    increment_age();
-                    //-
-                    assert(gene_pool.size() == pop_size);
-                    reproduction();
-                    assert(learning_pool.size() == pop_size);
-                }
-                //-
-            }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
-                init_new_ctrl_pop(learner);
-            }
-        }
-        population.erase(population.begin() + corr_indexes[currentIndIndex]);
-        population.shrink_to_fit();
-        corr_indexes[currentIndIndex] = -1;
-        for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
-            corr_indexes[i]--;
     }
-
     return true;
 }
 
