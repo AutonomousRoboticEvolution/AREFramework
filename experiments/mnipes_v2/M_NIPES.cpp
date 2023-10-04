@@ -462,7 +462,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
 
     clean_learning_pool();
@@ -627,11 +626,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     init_new_ctrl_pop(learner);
                 }
             }
-            population.erase(population.begin() + corr_indexes[currentIndIndex]);
+            population.erase(population.begin() + index);
             population.shrink_to_fit();
-            corr_indexes[currentIndIndex] = -1;
-            for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
-                corr_indexes[i]--;
         }
     }
     return true;
