@@ -30,8 +30,6 @@ float cppn_params::evo_float::mutation_rate = 0.1f;
 
 
 void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
-    int generation = ea->get_generation();
-
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;

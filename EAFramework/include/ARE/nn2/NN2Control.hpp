@@ -36,13 +36,13 @@ class NN2Control : public Control
 {
 public:
     NN2Control() : Control(){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<const settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<const settings::Double>(0));
 
     }
     NN2Control(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<const settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<const settings::Double>(0));
     }
 
     Control::Ptr clone() const override {
@@ -120,13 +120,13 @@ class NN2Control<cpg_t> : public Control
 {
 public:
     NN2Control<cpg_t>() : Control(){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<settings::Double>(0));
 
     }
     NN2Control<cpg_t>(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<settings::Double>(0));
     }
 
     Control::Ptr clone() const override {
@@ -184,13 +184,13 @@ class NN2Control<ff_cpg_t> : public Control
 {
 public:
     NN2Control<ff_cpg_t>() : Control(){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<const settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<settings::Double>(0));
 
     }
     NN2Control<ff_cpg_t>(const NN2Control& ctrl) : Control(ctrl), _nn(ctrl._nn){
-        settings::defaults::parameters->emplace("#UseInternalBias",new settings::Boolean(1));
-        settings::defaults::parameters->emplace("#noiseLevel",new settings::Double(0));
+        settings::defaults::parameters->emplace("#UseInternalBias",std::make_shared<settings::Boolean>(1));
+        settings::defaults::parameters->emplace("#noiseLevel",std::make_shared<settings::Double>(0));
     }
 
     Control::Ptr clone() const override {

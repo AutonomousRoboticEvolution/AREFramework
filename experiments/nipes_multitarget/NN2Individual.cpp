@@ -16,32 +16,32 @@ void NN2Individual::createController(){
 
 
     if(nn_type == st::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
 
     }
     else if(nn_type == st::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
     else if(nn_type == st::nnType::FCP){
-        control.reset(new NN2Control<fcp_t>());
+        control = std::make_shared<NN2Control<fcp_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN_CPG){
-        control.reset(new NN2Control<elman_cpg_t>());
+        control = std::make_shared<NN2Control<elman_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
@@ -54,7 +54,7 @@ void NN2Individual::createController(){
 }
 
 void NN2Individual::createMorphology(){
-    morphology.reset(new sim::FixedMorphology(parameters));
+    morphology = std::make_shared<sim::FixedMorphology>(parameters);
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
     morphology->set_randNum(randNum);
 
@@ -76,8 +76,8 @@ void NN2Individual::update(double delta_time){
 }
 
 void NN2Individual::crossover(const Individual::Ptr &partner, Individual* child){
-    Genome::Ptr child_genome(new NNParamGenome);
-    EmptyGenome::Ptr empty_gen(new EmptyGenome);
+    Genome::Ptr child_genome = std::make_shared<NNParamGenome>();
+    EmptyGenome::Ptr empty_gen = std::make_shared<EmptyGenome>();
     std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->crossover(partner->get_ctrl_genome(),child_genome);
     child_genome->set_parameters(parameters);
     child_genome->set_randNum(randNum);
@@ -87,9 +87,9 @@ void NN2Individual::crossover(const Individual::Ptr &partner, Individual* child)
 }
 
 void NN2Individual::symmetrical_crossover(const Individual::Ptr &partner, Individual* child1, Individual* child2){
-    Genome::Ptr child_genome1(new NNParamGenome);
-    Genome::Ptr child_genome2(new NNParamGenome);
-    EmptyGenome::Ptr empty_gen(new EmptyGenome);
+    Genome::Ptr child_genome1 = std::make_shared<NNParamGenome>();
+    Genome::Ptr child_genome2 = std::make_shared<NNParamGenome>();
+    EmptyGenome::Ptr empty_gen = std::make_shared<EmptyGenome>();
     std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->symmetrical_crossover(partner->get_ctrl_genome(),child_genome1,child_genome2);
     child_genome1->set_parameters(parameters);
     child_genome2->set_parameters(parameters);

@@ -79,7 +79,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << id << ",";
     for(const double& obj: genome.objectives)
         fitness_file_stream << obj << ",";
-    fitness_file_stream << genome.nbr_eval;
+    fitness_file_stream << genome.nbr_eval << "," << genome.learning_progress;
 
     fitness_file_stream << "\n";
     fitness_file_stream.close();
@@ -261,7 +261,7 @@ void BestGenomesArchiveLog::saveLog(EA::Ptr &ea){
         fofs << id << ",";
     for(const double& obj: genome.objectives)
         fofs << obj << ",";
-    fofs << genome.nbr_eval;
+    fofs << genome.nbr_eval << "," << genome.learning_progress;
     fofs << "\n";
     fofs.close();
     //-

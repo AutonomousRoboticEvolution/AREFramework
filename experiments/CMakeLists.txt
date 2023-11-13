@@ -18,6 +18,8 @@ elseif(ONLY_SIMULATION)
         add_definitions(-DCOPPELIASIM)
     endif()
 
+    #add_subdirectory(intrinsic_motivation)
+
     if(WITH_NN2)
         add_subdirectory(nipes)
         add_subdirectory(bodyplantesting_nn2)

@@ -76,15 +76,15 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::unique_ptr<client::ER> client(new client::ER);
+    std::unique_ptr<client::ER> client = std::make_unique<client::ER>();
     std::vector<std::string> arguments(argv + 1, argv + argc);
     std::string parameters_file = argv[1];
     int port = atoi(argv[2]);
     int nbInst = atoi(argv[3]);
 
-    settings::defaults::parameters->emplace("#killWhenNotConnected",new settings::Boolean(false));
-    settings::defaults::parameters->emplace("#shouldReopenConnections",new settings::Boolean(false));
-    settings::defaults::parameters->emplace("#evaluationOrder",new settings::Integer(1)); //Default first in last out
+    settings::defaults::parameters->emplace("#killWhenNotConnected",std::make_shared<const settings::Boolean>(false));
+    settings::defaults::parameters->emplace("#shouldReopenConnections",std::make_shared<const settings::Boolean>(false));
+    settings::defaults::parameters->emplace("#evaluationOrder",std::make_shared<const settings::Integer>(1)); //Default first in last out
 
     //Load the parameters
     settings::ParametersMapPtr parameters = std::make_shared<settings::ParametersMap>(
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     if(seed < 0){
         std::random_device rd;
         seed = rd();
-        settings::random::parameters->emplace("#seed",new settings::Integer(seed));
+        settings::random::parameters->emplace("#seed",std::make_shared<const settings::Integer>(seed));
     }
     misc::RandNum rn(seed);
     client->set_randNum(std::make_shared<misc::RandNum>(rn));

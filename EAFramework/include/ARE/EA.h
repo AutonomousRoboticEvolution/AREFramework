@@ -10,6 +10,7 @@
 #include "ARE/exp_plugin_loader.hpp"
 #include "ARE/Individual.h"
 #include "ARE/Environment.h"
+#include "ARE/population.hpp"
 
 
 namespace are{
@@ -126,7 +127,7 @@ public:
     const Individual::Ptr & get_current_ind() const {return population[currentIndIndex];}
     virtual size_t get_pop_size() const {return population.size();}
 
-    const std::vector<Individual::Ptr> &get_population() const {return population;}
+    const Population &get_population() const {return population;}
     const settings::ParametersMapPtr &get_parameters() const {return parameters;}
     const misc::RandNum::Ptr get_randomNum() const {return randomNum;}
     void set_randomNum(const misc::RandNum::Ptr& rn){randomNum = rn;}
@@ -155,7 +156,7 @@ protected:
     virtual void crossover(){}  // crossover
     virtual void end(){}		// last call to the EA, when simulation stops
 
-    std::vector<Individual::Ptr> population;
+    Population population;
     ///set the environment type, evolution type...
     settings::ParametersMapPtr parameters;
     ///random number generator for EA

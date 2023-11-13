@@ -84,7 +84,7 @@ void load_morph_genomes(const std::string &folder,
         if(!load)
             continue;
 
-        std::shared_ptr<genome_t> genome(new genome_t);
+        std::shared_ptr<genome_t> genome = std::make_shared<genome_t>();
         genome->from_file(filepath);
         genomes.emplace(id,genome);
     }

@@ -116,7 +116,7 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
-    are_sett::defaults::parameters->emplace("#evaluationOrder",new are_sett::Integer(1)); //Default first in last out
+    are_sett::defaults::parameters->emplace("#evaluationOrder",std::make_shared<are_sett::Integer>(1)); //Default first in last out
 
 
     simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
@@ -150,7 +150,7 @@ SIM_DLLEXPORT unsigned char simStart(void* reservedPointer, int reservedInt)
     if(seed < 0){
         std::random_device rd;
         seed = rd();
-        are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));
+        are_sett::random::parameters->emplace("#seed",std::make_shared<are_sett::Integer>(seed));
     }
 
 

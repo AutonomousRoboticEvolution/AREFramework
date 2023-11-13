@@ -2,7 +2,6 @@
 #define M_NIPES_HPP
 
 #include <functional>
-#include <boost/optional.hpp>
 #include <map>
 
 #include "ARE/learning/controller_archive.hpp"
@@ -62,8 +61,8 @@ typedef struct genome_t{
         nbr_eval(g.nbr_eval),
         environment(g.environment),
         task(g.task){}
-    genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj) :
-        morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0){}
+    genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj,double lp = 0) :
+        morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0), learning_progress(lp){}
     NN2CPPNGenome morph_genome;
     NNParamGenome ctrl_genome;
     std::vector<double> objectives;
@@ -73,6 +72,7 @@ typedef struct genome_t{
     int nbr_eval=0;
     std::string environment;
     std::string task;
+    double learning_progress;
 }genome_t;
 
 typedef std::function<NN2CPPNGenome(const std::vector<genome_t>&)> selection_fct_t;
@@ -122,7 +122,8 @@ public:
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
         descriptor_type(ind.descriptor_type),
-        init_position(ind.init_position)
+        init_position(ind.init_position),
+        visited_zones(ind.visited_zones)
     {}
 
     Individual::Ptr clone() override {
@@ -262,29 +263,14 @@ public:
     bool finish_eval(const Environment::Ptr &env) override;
     bool is_finish() override;
 
-    Individual::Ptr getIndividual(size_t index) const override{
-        if(corr_indexes.size() < index)
-            return nullptr;
-        if(corr_indexes[index] < 0)
-            return nullptr;
-        return population[corr_indexes[index]];
-    }
-
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
         if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
-        if(corr_indexes.size() < currentIndIndex)
-            return;
-        if(corr_indexes[indIndex] < 0)
-            return;
-        population[corr_indexes[indIndex]]->setObjectives(objectives);
-        newly_evaluated.push_back(corr_indexes[indIndex]);
-        corr_indexes[currentIndIndex] = -1;
-        for(int i = currentIndIndex+1; i < corr_indexes.size(); i++)
-            corr_indexes[i]--;
+        population[indIndex]->setObjectives(objectives);
+        newly_evaluated.push_back(indIndex);
     }
 
     void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
@@ -295,10 +281,14 @@ public:
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
     const ControllerArchive& get_controller_archive_obj() const {return controller_archive;}
 
-    size_t get_pop_size() const override {return corr_indexes.size();}
+    size_t get_pop_size() const override {return population.size();}
 
-    boost::optional<genome_t&> find_gene(int id);
-    boost::optional<learner_t&> find_learner(int id);
+    genome_t& find_gene(int id);
+    learner_t& find_learner(int id);
+
+    const Population& get_population() const {return population;}
+
+//    void update_pools();
 
 private:
 
@@ -321,7 +311,6 @@ private:
     void load_experiment(const std::string &folder);
     void seed_experiment(const std::string &folder);
 
-    std::vector<int> corr_indexes;
     std::vector<int> newly_evaluated;
 
     fitness_fct_t fitness_fct;

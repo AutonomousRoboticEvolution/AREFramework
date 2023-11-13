@@ -14,7 +14,8 @@ Eigen::VectorXd NIPESIndividual::descriptor()
         Eigen::MatrixXd vz = visited_zones.cast<double>();
         Eigen::VectorXd desc(Eigen::Map<Eigen::VectorXd>(vz.data(),vz.cols()*vz.rows()));
         return desc;
-    }
+    }else throw std::invalid_argument("NIPESIndvidual::descriptor(): descriptor type unknown");
+
 }
 
 std::string NIPESIndividual::to_string()
@@ -118,7 +119,7 @@ void NIPES::init(){
     cmaParam.set_quiet(!verbose);
 
 
-    _cma_strat.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
     _cma_strat->set_elitist_restart(elitist_restart);
     _cma_strat->set_length_of_stagnation(lenStag);
     _cma_strat->set_novelty_ratio(novelty_ratio);
@@ -145,15 +146,15 @@ void NIPES::init(){
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
             biases[w-nbr_weights] = init_samples(w,u);
 
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+        NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
         ctrl_gen->set_nbr_output(nb_output);
         ctrl_gen->set_nbr_input(nb_input);
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nn_type(nn_type);
-        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
+        Individual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -265,15 +266,15 @@ void NIPES::init_next_pop(){
         for(int j = nbr_weights; j < nbr_weights+nbr_bias; j++)
             biases[j-nbr_weights] = new_samples(j,i);
 
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+        NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
         ctrl_gen->set_nbr_output(nb_output);
         ctrl_gen->set_nbr_input(nb_input);
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nn_type(nn_type);
-        Individual::Ptr ind(new NIPESIndividual(morph_gen,ctrl_gen));
+        Individual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -331,11 +332,11 @@ bool NIPES::is_finish(){
 bool NIPES::finish_eval(const Environment::Ptr & env){
 
     std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
-    float t_pos[3] = {target[0],target[1],target[2]};
+    double t_pos[3] = {target[0],target[1],target[2]};
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
-    auto distance = [](float* a,float* b) -> double
+    auto distance = [](double* a,double* b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                          (a[1] - b[1])*(a[1] - b[1]) +
@@ -345,7 +346,12 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
     float pos[3];
     simGetObjectPosition(handle,-1,pos);
-    double dist = distance(pos,t_pos)/sqrt(2*arenaSize*arenaSize);
+    double posd[3];
+    posd[0] = static_cast<double>(pos[0]);
+    posd[1] = static_cast<double>(pos[1]);
+    posd[2] = static_cast<double>(pos[2]);
+
+    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
 
     if(dist < fTarget){
         std::cout << "STOP !" << std::endl;

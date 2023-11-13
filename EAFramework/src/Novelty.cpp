@@ -38,12 +38,12 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
     //If one of the robot does not have any more organs
     //then just return sum of _dim_ of the number of extra organs of the other robot.
     if(v_coord.empty()){
-        for(int i = 0; i < w_coord.size(); i++)
+        for(size_t i = 0; i < w_coord.size(); i++)
             sum+=dim;
         return sum;
     }
     else if(w_coord.empty()){
-        for(int i = 0; i < v_coord.size(); i++)
+        for(size_t i = 0; i < v_coord.size(); i++)
             sum+=dim;
         return sum;
     }

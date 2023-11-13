@@ -29,6 +29,6 @@ add_library(intrinsic_motivation SHARED
 target_include_directories(intrinsic_motivation PUBLIC ${INCLUDES})
 target_link_libraries(intrinsic_motivation ARE simulatedER cmaes tbb)
 
-install(TARGETS M_NIPES2 DESTINATION lib)
+install(TARGETS intrinsic_motivation DESTINATION lib)
 install(DIRECTORY . DESTINATION include/intrinsic_motivation FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

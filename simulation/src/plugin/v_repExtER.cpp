@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "v_repLib.h"
+#include "remoteApi/extApi.h"
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -125,7 +126,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
-    are_sett::defaults::parameters->emplace("#evaluationOrder",new are_sett::Integer(1)); //Default first in last out
+    are_sett::defaults::parameters->emplace("#evaluationOrder",std::make_shared<are_sett::Integer>(1)); //Default first in last out
 
     simChar* parameters_filepath = simGetStringParameter(sim_stringparam_app_arg1);
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
@@ -152,19 +153,17 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         std::cout << "loading experiment : " << are_sett::getParameter<are_sett::String>(parameters,"#expPluginName").value << std::endl;
         std::cout << "---------------------------------" << std::endl;
     }
-    are_sett::Property::Ptr properties(new are_sett::Property);
-    ERVREP->set_properties(properties);
+
     ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
     if(seed == -1){
         std::random_device rd;
         seed = rd();
-        are_sett::random::parameters->emplace("#seed",new are_sett::Integer(seed));
+        are_sett::random::parameters->emplace("#seed",std::make_shared<are_sett::Integer>(seed));
     }
     are::misc::RandNum rn(seed);
     ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
     ERVREP->initialize();
     simulationState = CLEANUP;
-    properties.reset();
 
     if(instance_type == are_sett::INSTANCE_REGULAR){
         //Write parameters in the log folder.

@@ -57,7 +57,10 @@ target_include_directories(ARE PUBLIC
     "/usr/local/include/"
     "../modules"
 )
+
+
 target_link_libraries(ARE cmaes tbb ${Boost_LIBRARIES})
+
 
 add_executable(nn2_cppn_serial_to_dot tools/nn2_cppn_serial_to_dot.cpp)
 target_include_directories(nn2_cppn_serial_to_dot PUBLIC

@@ -55,12 +55,16 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
         stddev(i) = sqrt(stddev(i)/static_cast<double>(descriptors.size() - 1));
 
     bool stop = true;
-    for(int i = 0; i < stddev.rows(); i++)
+    float sum = 0;
+    for(int i = 0; i < stddev.rows(); i++){
         stop = stop && stddev(i) <= pop_stag_thres;
+        sum += stddev(i);
+    }
+    sum /= sum/static_cast<float>(stddev.rows());
 
     if(stop){
         std::stringstream sstr;
-        sstr << "Stopping : standard deviation of the descriptor population is smaller than " << pop_stag_thres << " : " << stddev;
+        sstr << "Stopping : standard deviation of the descriptor population is smaller than " << pop_stag_thres << " : " << sum;
         log_stopping_criterias.push_back(sstr.str());
         cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
     }
@@ -184,6 +188,8 @@ void IPOPCMAStrategy::tell()
     ipop_cmaes_t::tell();
     individual_t best_sample;
     best_fitnesses.push_back(best_fitness(best_sample));
+    if(initial_fitness == 0)
+        initial_fitness = 1 - best_fitnesses[0];
     if(novelty_ratio > 0)
         novelty_ratio -= novelty_decr;
     if(best_seen_solution.objectives.empty() || best_fitnesses.back() < 1-best_seen_solution.objectives[0])

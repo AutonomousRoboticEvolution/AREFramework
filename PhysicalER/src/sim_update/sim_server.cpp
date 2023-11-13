@@ -230,7 +230,7 @@ VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customD
             morph_gen = std::make_shared<are::NN2CPPNGenome>(ERVREP->get_randNum(),parameters);
         else
             morph_gen = std::make_shared<are::ProtomatrixGenome>(ERVREP->get_randNum(),parameters);
-        are::NNParamGenome::Ptr ctrl_gen(new are::NNParamGenome(ERVREP->get_randNum(),parameters));
+        are::NNParamGenome::Ptr ctrl_gen = std::make_shared<are::NNParamGenome>(ERVREP->get_randNum(),parameters);
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply,"pi ");
         std::string id = str_ctrl.substr(0,str_ctrl.find("\n"));

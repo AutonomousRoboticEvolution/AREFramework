@@ -94,23 +94,23 @@ void NNParamGenome::mutate(){
     double mutation_rate = settings::getParameter<settings::Double>(parameters,"#mutationRate").value;
     double max_weight = settings::getParameter<settings::Double>(parameters,"#maxWeight").value;
     std::vector<double> genome = get_full_genome();
-    if(mutation_type = mutators::type::UNIFORM)
+    if(mutation_type == mutators::type::UNIFORM)
     {
         double param[3] {mutation_rate,max_weight,-max_weight};
         mutators::uniform(genome,param,randomNum);
-    }else if(mutation_type = mutators::type::GAUSSIAN){
+    }else if(mutation_type == mutators::type::GAUSSIAN){
         double mutation_param = settings::getParameter<settings::Double>(parameters,"#mutationParam").value;
         double param[4] {mutation_rate,mutation_param,max_weight,-max_weight};
         mutators::gaussian(genome,param,randomNum);
-    }else if(mutation_type = mutators::type::POLYNOMIAL){
+    }else if(mutation_type == mutators::type::POLYNOMIAL){
         double mutation_param = settings::getParameter<settings::Double>(parameters,"#mutationParam").value;
         double param[4] {mutation_rate,mutation_param,max_weight,-max_weight};
         mutators::polynomial(genome,param,randomNum);
     }
 
-    for(int i = 0; i < weights.size(); i++)
+    for(size_t i = 0; i < weights.size(); i++)
         weights[i] = genome[i];
-    for(int i = 0; i < biases.size(); i++)
+    for(size_t i = 0; i < biases.size(); i++)
         biases[i] = genome[i + weights.size()];
 }
 

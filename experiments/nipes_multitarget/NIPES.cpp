@@ -56,7 +56,7 @@ void NIPES::init(){
     cmaParam.set_quiet(!verbose);
 
 
-    cmaStrategy.reset(new IPOPCMAStrategy([](const double*,const int&)->double{},cmaParam));
+    cmaStrategy = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
     cmaStrategy->set_elitist_restart(elitist_restart);
     cmaStrategy->set_length_of_stagnation(lenStag);
     cmaStrategy->set_novelty_ratio(novelty_ratio);
@@ -75,15 +75,15 @@ void NIPES::init(){
         for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
             biases[w-nbr_weights] = init_samples(w,u);
 
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+        NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nbr_input(nb_input);
         ctrl_gen->set_nbr_output(nb_output);
 
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
+        Individual::Ptr ind = std::make_shared<sim::NN2Individual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -191,15 +191,15 @@ void NIPES::init_next_pop(){
         for(int j = nbr_weights; j < nbr_weights+nbr_bias; j++)
             biases[j-nbr_weights] = new_samples(j,i);
 
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+        EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+        NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nbr_input(nb_input);
         ctrl_gen->set_nbr_output(nb_output);
 
         ctrl_gen->set_weights(weights);
         ctrl_gen->set_biases(biases);
-        Individual::Ptr ind(new sim::NN2Individual(morph_gen,ctrl_gen));
+        Individual::Ptr ind = std::make_shared<sim::NN2Individual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);

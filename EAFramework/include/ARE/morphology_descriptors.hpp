@@ -189,6 +189,7 @@ struct OrganPositionDesc
                 }
             }
         }
+        return sstr.str();
     }
 
     void from_string(const std::string& str){

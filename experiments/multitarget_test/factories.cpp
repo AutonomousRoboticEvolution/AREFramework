@@ -13,20 +13,17 @@ extern "C" are::Environment::Ptr environmentFactory
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
-    are::EA::Ptr ea;
-
-    ea.reset(new are::MultiTargetTest(rn,st));
-    return ea;
+    return std::make_unique<are::MultiTargetTest>(rn,st);
 }
 
 extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
 
-    are::MultiTrajectoriesLog::Ptr trajlog(new are::MultiTrajectoriesLog);
+    are::MultiTrajectoriesLog::Ptr trajlog = std::make_shared<are::MultiTrajectoriesLog>();
     logs.push_back(trajlog);
 
     std::string fit_log_file = are::settings::getParameter<are::settings::String>(param,"#rewardFile").value;
-    are::RewardsLog::Ptr fitlog(new are::RewardsLog(fit_log_file));
+    are::RewardsLog::Ptr fitlog = std::make_shared<are::RewardsLog>(fit_log_file);
     logs.push_back(fitlog);
 }

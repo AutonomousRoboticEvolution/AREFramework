@@ -41,26 +41,26 @@ void BODYPLANTESTING::initPopulation()
     rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
-        EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-        NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+        EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
+        NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
         if(cppn_fixed)
             morphgenome->fixed_structure();
         else
             morphgenome->random();
-        CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+        CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }else{
         const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
         for (size_t i = 0; i < population_size; i++){ // Body plans
-            EmptyGenome::Ptr ctrl_gen(new EmptyGenome);
-            NN2CPPNGenome::Ptr morphgenome(new NN2CPPNGenome(randomNum,parameters));
+            EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
+            NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
             if(cppn_fixed)
                 morphgenome->fixed_structure();
             else
                 morphgenome->random();
-            CPPNIndividual::Ptr ind(new CPPNIndividual(morphgenome,ctrl_gen));
+            CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);

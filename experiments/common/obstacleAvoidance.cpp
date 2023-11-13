@@ -12,9 +12,9 @@ ObstacleAvoidance::ObstacleAvoidance(const settings::ParametersMapPtr& params)
     name = "obstacle_avoidance";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
-    settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
-    settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<settings::Double>(2.));
+    settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<settings::Integer>(2));
+    settings::defaults::parameters->emplace("#flatFloor",std::make_shared<settings::Boolean>(true));
 }
 
 void ObstacleAvoidance::init(){

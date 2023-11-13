@@ -13,23 +13,16 @@ void MultiTargetInd::createMorphology(){
     if(fixed_morph_path == "None"){
         bool is_neat_genome = settings::getParameter<settings::Boolean>(parameters,"#isNEATGenome").value;
 
-
-        morphology.reset(new CPPNMorph(parameters));
+        morphology = std::make_shared<CPPNMorph>(parameters);
         morphology->set_randNum(randNum);
 
-        if(is_neat_genome){
-            NEAT::Genome gen =
-                    std::dynamic_pointer_cast<CPPNGenome>(morphGenome)->get_neat_genome();
-            NEAT::NeuralNetwork nn;
-            gen.BuildPhenotype(nn);
-            std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNEATCPPN(nn);
-        }else{
-            nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-            std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
-        }
+        nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
+
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
     }else{
-        morphology.reset(new sim::FixedMorphology(parameters));
+        morphology.reset();
+        morphology = std::make_shared<sim::FixedMorphology>(parameters);
         std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
         morphology->set_randNum(randNum);
 
@@ -108,19 +101,19 @@ void MultiTargetInd::createController(){
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN_CPG){
-        control.reset(new NN2Control<elman_cpg_t>());
+        control = std::make_shared<NN2Control<elman_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::CPG){
-        control.reset(new NN2Control<cpg_t>());
+        control = std::make_shared<NN2Control<cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::FF_CPG){
-        control.reset(new NN2Control<ff_cpg_t>());
+        control.reset = std::make_shared<NN2Control<ff_cpg_t>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);

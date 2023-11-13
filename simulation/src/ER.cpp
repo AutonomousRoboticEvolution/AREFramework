@@ -88,7 +88,7 @@ void ER::initIndividual(){
     }
     std::string mess(message);
     mess.resize(length);
-    currentInd = ea->getIndividual(0);
+    currentInd = ea->get_population()[0];
     if(nbrEval == 0)
         currentInd->from_string(mess);
     currentInd->init();

@@ -15,7 +15,6 @@
 #include <boost/archive/text_oarchive.hpp>
 
 namespace are {
-
 class Individual
 {
 public:
@@ -29,8 +28,8 @@ public:
         objectives(ind.objectives),
         morphology(ind.morphology),
         control(ind.control),
-        parameters(ind.parameters),
         learner(ind.learner),
+        parameters(ind.parameters),
         randNum(ind.randNum),
         individual_id(ind.individual_id),
         generation(ind.generation)
@@ -103,14 +102,14 @@ public:
 protected:
     std::vector<double> outputs;
     std::vector<double> objectives;
-    Genome::Ptr morphGenome = nullptr;
-    Genome::Ptr ctrlGenome = nullptr;
-    Morphology::Ptr morphology = nullptr;
-    Control::Ptr control = nullptr;
-    Learner::Ptr learner = nullptr;
+    Genome::Ptr morphGenome;
+    Genome::Ptr ctrlGenome;
+    Morphology::Ptr morphology;
+    Control::Ptr control;
+    Learner::Ptr learner;
 
-    settings::ParametersMapPtr parameters = nullptr;
-    misc::RandNum::Ptr randNum = nullptr;
+    settings::ParametersMapPtr parameters;
+    misc::RandNum::Ptr randNum;
 
     bool isEval;
 

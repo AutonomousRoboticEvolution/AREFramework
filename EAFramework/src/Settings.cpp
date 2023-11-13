@@ -5,23 +5,23 @@ using namespace are;
 settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<settings::ParametersMap>(
             []() -> settings::ParametersMap{
                 settings::ParametersMap parameters;
-                parameters.emplace("#experimentName",new settings::String("neuroEvolution"));
-                parameters.emplace("#expPluginName",new settings::String("/usr/local/lib/libneuroEvolution.so"));
-                parameters.emplace("#scenePath",new settings::String("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt"));
-                parameters.emplace("#repository",new settings::String("~/are-logs"));
-                parameters.emplace("#populationSize",new settings::Integer(50));
-                parameters.emplace("#maxEvalTime",new settings::Float(60));
-                parameters.emplace("#numberOfGeneration",new settings::Float(1000));
-                parameters.emplace("#maxEvalTime",new settings::Float(60));
-                parameters.emplace("#timeStep",new settings::Float(0.05));
-                parameters.emplace("#verbose",new settings::Boolean(0));
-                parameters.emplace("#instanceType",new settings::Integer(0));
-                parameters.emplace("#seed",new settings::Integer(-1));
-                parameters.emplace("#debugDisplayOnPi",new settings::Boolean(0));
+                parameters.emplace("#experimentName",std::make_shared<settings::String>("neuroEvolution"));
+                parameters.emplace("#expPluginName",std::make_shared<settings::String>("/usr/local/lib/libneuroEvolution.so"));
+                parameters.emplace("#scenePath",std::make_shared<settings::String>("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt"));
+                parameters.emplace("#repository",std::make_shared<settings::String>("~/are-logs"));
+                parameters.emplace("#populationSize",std::make_shared<settings::Integer>(50));
+                parameters.emplace("#maxEvalTime",std::make_shared<settings::Float>(60));
+                parameters.emplace("#numberOfGeneration",std::make_shared<settings::Float>(1000));
+                parameters.emplace("#maxEvalTime",std::make_shared<settings::Float>(60));
+                parameters.emplace("#timeStep",std::make_shared<settings::Float>(0.05));
+                parameters.emplace("#verbose",std::make_shared<settings::Boolean>(0));
+                parameters.emplace("#instanceType",std::make_shared<settings::Integer>(0));
+                parameters.emplace("#seed",std::make_shared<settings::Integer>(-1));
+                parameters.emplace("#debugDisplayOnPi",std::make_shared<settings::Boolean>(0));
                 return parameters;
             }());
 
-settings::ParametersMapPtr settings::random::parameters(new settings::ParametersMap());
+settings::ParametersMapPtr settings::random::parameters(std::make_shared<settings::ParametersMap>());
 
 settings::Type::Ptr settings::buildType(const std::string &name)
 {

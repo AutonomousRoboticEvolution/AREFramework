@@ -57,8 +57,8 @@ public:
 
     Environment(){}
     Environment(const Environment& env) :
-        parameters(env.parameters),
         name(env.name),
+        parameters(env.parameters),
         randNum(env.randNum){}
 
     ~Environment(){}

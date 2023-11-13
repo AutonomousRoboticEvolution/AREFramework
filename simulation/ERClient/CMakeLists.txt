@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 find_package(Threads REQUIRED)
 
+add_compile_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
+add_link_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
+
 FILE(GLOB_RECURSE SOURCES
     "src/*"
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
@@ -19,11 +22,13 @@ target_include_directories(are-client PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/>
 )
+
 target_link_libraries(are-client
     simulatedER ARE
     ${CMAKE_DL_LIBS} #dlopen library
     ${CMAKE_THREAD_LIBS_INIT}
 )
+
 target_compile_definitions(are-client PUBLIC
     "NON_MATLAB_PARSING"
     "MAX_EXT_API_CONNECTIONS=255"

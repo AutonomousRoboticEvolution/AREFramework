@@ -133,6 +133,7 @@ target_compile_definitions(${LIB_EXT} PUBLIC
 #    POSITION_INDEPENDENT_CODE ON
 #)
 #message("${COPPELIASIM_LIBRARIES}")
+
 target_link_libraries(${LIB_EXT}
     dlibxx dl #rt
     ${Boost_LIBRARIES}
@@ -140,9 +141,13 @@ target_link_libraries(${LIB_EXT}
     simulatedER
 )
 
+
+
 target_include_directories(${LIB_EXT}
     PRIVATE
     ${PolyVox_INCLUDE_DIRS}
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/>
     "modules/"
 )
 install(TARGETS  simulatedER DESTINATION lib)

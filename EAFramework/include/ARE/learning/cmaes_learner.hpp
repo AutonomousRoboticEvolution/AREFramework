@@ -88,7 +88,7 @@ public:
      * @param fitness target value
      * @param initial point in the search space. The mean of the normal distributionn will be set at this point
      */
-    void init(double ftarget, std::vector<double> initial_point = std::vector<double>());
+    void init(double ftarget, std::vector<double> initial_point = std::vector<double>(), double initial_fit = 0);
 
     /**
      * @brief step the algorithm:

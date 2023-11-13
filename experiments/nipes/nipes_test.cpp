@@ -25,37 +25,37 @@ int main(int argc, char** argv)
 
 
     are_set::ParametersMap parameters;
-    parameters.emplace("#populationSize",new are_set::Integer(10));
-    parameters.emplace("#MaxWeight",new are_set::Float(5.));
-    parameters.emplace("#verbose",new are_set::Boolean(true));
-    parameters.emplace("#kValue",new are_set::Integer(15));
-    parameters.emplace("#noveltyThreshold", new are_set::Double(0.9));
-    parameters.emplace("#archiveAddingProb", new are_set::Double(0.4));
-    parameters.emplace("#NNType",new are_set::Integer(are_set::nnType::FFNN));
-    parameters.emplace("#NbrInputNeurones",new are_set::Integer(1));
-    parameters.emplace("#NbrHiddenNeurones",new are_set::Integer(0));
-    parameters.emplace("#NbrOutputNeurones",new are_set::Integer(1));
+    parameters.emplace("#populationSize",std::make_shared<are_set::Integer>(10));
+    parameters.emplace("#MaxWeight",std::make_shared<are_set::Float>(5.));
+    parameters.emplace("#verbose",std::make_shared<are_set::Boolean>(true));
+    parameters.emplace("#kValue",std::make_shared<are_set::Integer>(15));
+    parameters.emplace("#noveltyThreshold",std::make_shared<are_set::Double>(0.9));
+    parameters.emplace("#archiveAddingProb",std::make_shared<are_set::Double>(0.4));
+    parameters.emplace("#NNType",std::make_shared<are_set::Integer>(are_set::nnType::FFNN));
+    parameters.emplace("#NbrInputNeurones",std::make_shared<are_set::Integer>(1));
+    parameters.emplace("#NbrHiddenNeurones",std::make_shared<are_set::Integer>(0));
+    parameters.emplace("#NbrOutputNeurones",std::make_shared<are_set::Integer>(1));
 
 
-    parameters.emplace("#lengthOfStagnation",new are_set::Integer(100));
-    parameters.emplace("#CMAESStep",new are_set::Double(1));
-    parameters.emplace("#FTarget",new are_set::Double(0.01));
-    parameters.emplace("#elitistRestart",new are_set::Boolean(false));
-    parameters.emplace("#noveltyRatio",new are_set::Double(0.));
-    parameters.emplace("#noveltyDecrement",new are_set::Double(0.05));
-    parameters.emplace("#populationStagnationThreshold",new are_set::Float(0.));
-    parameters.emplace("#arenaSize",new are_set::Double(2.));
-    parameters.emplace("#withRestart",new are_set::Boolean(true));
-    parameters.emplace("#incrPop",new are_set::Boolean(true));
+    parameters.emplace("#lengthOfStagnation",std::make_shared<are_set::Integer>(100));
+    parameters.emplace("#CMAESStep",std::make_shared<are_set::Double>(1));
+    parameters.emplace("#FTarget",std::make_shared<are_set::Double>(0.01));
+    parameters.emplace("#elitistRestart",std::make_shared<are_set::Boolean>(false));
+    parameters.emplace("#noveltyRatio",std::make_shared<are_set::Double>(0.));
+    parameters.emplace("#noveltyDecrement",std::make_shared<are_set::Double>(0.05));
+    parameters.emplace("#populationStagnationThreshold",std::make_shared<are_set::Float>(0.));
+    parameters.emplace("#arenaSize",std::make_shared<are_set::Double>(2.));
+    parameters.emplace("#withRestart",std::make_shared<are_set::Boolean>(true));
+    parameters.emplace("#incrPop",std::make_shared<are_set::Boolean>(true));
 
 
     std::random_device rd;
     int seed = rd();
-    are::misc::RandNum::Ptr rngen (new are::misc::RandNum(seed));
+    are::misc::RandNum::Ptr rngen = std::make_shared<are::misc::RandNum>(seed);
     if(argc > 1){
-        parameters.emplace("#startFromExistingLearner",new are_set::Boolean(true));
-        parameters.emplace("#learnerFile",new are_set::String(argv[1]));
-    }else parameters.emplace("#startFromExistingLearner",new are_set::Boolean(false));
+        parameters.emplace("#startFromExistingLearner",std::make_shared<are_set::Boolean>(true));
+        parameters.emplace("#learnerFile",std::make_shared<are_set::String>(argv[1]));
+    }else parameters.emplace("#startFromExistingLearner",std::make_shared<are_set::Boolean>(false));
 
     are::NIPES nipes(rngen,std::make_shared<are_set::ParametersMap>(parameters));
     nipes.init();
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 //        nipes.init_next_pop();
 //    }
 
-    std::vector<are::Individual::Ptr> pop;
+    are::Population pop;
     int gen_size = std::dynamic_pointer_cast<are::NNParamGenome>(nipes.get_population()[0]->get_ctrl_genome())->get_full_genome().size();
     std::vector<double> zeros(0,gen_size);
     std::cout << "target value : " << rastrigin(10,zeros) << std::endl;

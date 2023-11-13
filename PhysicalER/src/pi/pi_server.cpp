@@ -23,10 +23,10 @@ int main(int argc, char** argv) {
 
     settings::ParametersMapPtr parameters;
     
-    misc::RandNum::Ptr randomNumber(new misc::RandNum(0));
+    misc::RandNum::Ptr randomNumber = std::make_shared<misc::RandNum>(0);
 
-    EmptyGenome::Ptr empy_gen(new EmptyGenome);
-    NNParamGenome::Ptr ctrl_gen(new NNParamGenome);
+    EmptyGenome::Ptr empy_gen = std::make_shared<EmptyGenome>();
+    NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
 
     std::string str_ctrl, str_organs_list, str_param;
 

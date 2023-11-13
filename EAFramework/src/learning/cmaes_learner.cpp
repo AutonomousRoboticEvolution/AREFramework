@@ -7,7 +7,7 @@ double CMAESLearner::novelty_params::archive_adding_prob = 0.4;
 double CMAESLearner::novelty_params::novelty_thr = 0.9;
 
 
-void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
+void CMAESLearner::init(double ftarget, std::vector<double> initial_point, double initial_fit){
     int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesPopSize").value;
     float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
@@ -17,6 +17,7 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+
 
     double lb[_dimension], ub[_dimension];
     for(int i = 0; i < _dimension; i++){
@@ -34,14 +35,16 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point){
     cmaParam.set_ftarget(ftarget);
     cmaParam.set_quiet(!verbose);
 
-    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
+    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{return 0;},cmaParam);
     _cma_strat->set_elitist_restart(elitist_restart);
     _cma_strat->set_length_of_stagnation(lenStag);
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat->set_initial_fitness(initial_fit);
     next_pop();
     initialized = true;
+
 }
 
 
@@ -50,8 +53,9 @@ void CMAESLearner::update_pop_info(const std::vector<double> &obj, const Eigen::
         return;
     int idx = _cma_strat->get_population().size();
     IPOPCMAStrategy::individual_t ind;
+    ind.genome.resize(_population[idx].rows());
     for(unsigned i = 0; i < _population[idx].rows(); i++)
-        ind.genome.push_back(_population[idx](i));
+        ind.genome[i] = _population[idx](i);
     ind.objectives = obj;
     ind.trajectories = trajs;
     ind.descriptor.resize(desc.rows());
@@ -81,19 +85,22 @@ std::pair<std::vector<double>,std::vector<double>> CMAESLearner::update_ctrl(Con
     }
 
     if(nn_type == settings::nnType::FFNN){
-        control.reset(new NN2Control<ffnn_t>());
+        control.reset();
+        control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(_rand_num);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::ELMAN){
-        control.reset(new NN2Control<elman_t>());
+        control.reset();
+        control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(_rand_num);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
     }
     else if(nn_type == settings::nnType::RNN){
-        control.reset(new NN2Control<rnn_t>());
+        control.reset();
+        control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(_rand_num);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(_nn_inputs,nb_hidden,_nn_outputs,weights,bias);
@@ -117,14 +124,14 @@ void CMAESLearner::iterate(){
         std::vector<Eigen::VectorXd> pop_desc;
         for(const auto& ind : _cma_strat->get_population()){
             Eigen::VectorXd desc(ind.descriptor.size());
-            for(int i = 0; i < ind.descriptor.size(); i++)
+            for(size_t i = 0; i < ind.descriptor.size(); i++)
                 desc(i) = ind.descriptor[i];
             pop_desc.push_back(desc);
         }
         //compute novelty
         for(auto& ind : _cma_strat->access_population()){
             Eigen::VectorXd ind_desc(ind.descriptor.size());
-            for(int i = 0; i < ind.descriptor.size(); i++)
+            for(size_t i = 0; i < ind.descriptor.size(); i++)
                 ind_desc(i) = ind.descriptor[i];
 
             double ind_nov = novelty::sparseness<novelty_params>(Novelty::distances(ind_desc,_novelty_archive,pop_desc));
@@ -134,7 +141,7 @@ void CMAESLearner::iterate(){
         //update archive
         for(const auto& ind : _cma_strat->get_population()){
             Eigen::VectorXd ind_desc(ind.descriptor.size());
-            for(int i = 0; i < ind.descriptor.size(); i++)
+            for(size_t i = 0; i < ind.descriptor.size(); i++)
                 ind_desc(i) = ind.descriptor[i];
             double ind_nov = ind.objectives.back();
             novelty::update_archive<novelty_params>(ind_desc,ind_nov,_novelty_archive,_rand_num);
@@ -146,7 +153,8 @@ void CMAESLearner::iterate(){
     _cma_strat->tell();
     _best_solution = _cma_strat->get_best_seen_solution();
     bool stop = _cma_strat->stop();
-    _is_finish = _cma_strat->have_reached_ftarget();
+    double lp_target = settings::getParameter<settings::Double>(parameters,"#learningProgressTarget").value;
+    _is_finish = _cma_strat->have_reached_ftarget() || _cma_strat->learning_progress() >= lp_target;
     if(stop){
         bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
         bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
@@ -187,7 +195,7 @@ bool CMAESLearner::step(){
 //        return true;
 
     iterate();
-    _archive.emplace(_generation,_cma_strat->get_population());
+   // _archive.emplace(_generation,_cma_strat->get_population());
 
     next_pop();
 

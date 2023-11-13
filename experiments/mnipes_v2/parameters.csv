@@ -6,7 +6,7 @@
 #shouldReopenConnections,bool,0
 #waitForAllInstances,bool,1
 #seed,int,-1
-#evaluationOrder,int,3
+#evaluationOrder,int,0
 #synchronicity,float,0.
 
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
@@ -56,13 +56,14 @@
 #survivalMethod,string,worst
 
 
-#populationSize,int,100
-#maxEvalTime,float,60
+#populationSize,int,50
+#maxEvalTime,float,30
 #timeStep,float,0.02
 #ctrlUpdateFrequency,double,0.1
-#maxNbrEval,int,400000
+#maxNbrEval,int,100000
 #fitnessType,int,0
 #withCrossover,bool,1
+#morphSelectionObjective,int,0
 
 #cmaesSmallNbrEval,int,200
 #cmaesLargeNbrEval,int,200
@@ -70,6 +71,7 @@
 #cmaesMaxPopSize,int,40
 #CMAESStep,double,1.
 #FTarget,double,0.05
+#learningProgressTarget,double,1.
 #elitistRestart,bool,0
 #withRestart,bool,1
 #incrPop,bool,1

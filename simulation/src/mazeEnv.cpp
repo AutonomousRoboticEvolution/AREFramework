@@ -11,13 +11,13 @@ MazeEnv::MazeEnv()
     name = "mazeEnv";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#targetPosition",new settings::Sequence<double>({0.,0.,0.1}));
-    settings::defaults::parameters->emplace("#initPosition",new settings::Sequence<double>({0.,0.,0.1}));
-    settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
-    settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
-    settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
-    settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
-    settings::defaults::parameters->emplace("#withTiles",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#targetPosition",std::make_shared<const settings::Sequence<double>>(std::vector<double>({0.,0.,0.1})));
+    settings::defaults::parameters->emplace("#initPosition",std::make_shared<const settings::Sequence<double>>(std::vector<double>({0.,0.,0.1})));
+    settings::defaults::parameters->emplace("#withBeacon",std::make_shared<const settings::Boolean>(true));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<const settings::Double>(2.));
+    settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<const settings::Integer>(2));
+    settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
+    settings::defaults::parameters->emplace("#withTiles",std::make_shared<const settings::Boolean>(true));
 
 }
 

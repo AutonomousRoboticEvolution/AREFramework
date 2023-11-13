@@ -160,8 +160,9 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
     simxInt length;
     int ret_value = simxGetStringSignal(this->_clientID, signalName.c_str(), &states, &length, simx_opmode_blocking);
     if(ret_value == 0){
-        message = (char*)states;
+        message = std::string((char*)states,length);
         message.resize(length);
+        //simxSetIntegerSignal(this->_clientID,"receptAck",0,)
     }
     else
     {

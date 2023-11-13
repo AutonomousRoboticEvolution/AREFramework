@@ -41,6 +41,7 @@ public:
 
     int init(int nbrOfInst,int port = 19997);
     void initialize();
+    void individuals_distribution();
     void startOfSimulation(int slaveIndex);
     bool endOfSimulation(int slaveIndex);
     bool updateSimulation();
@@ -52,6 +53,10 @@ public:
     void reopenConnections();
     bool confirmConnections();
     void updateSimulatorList();
+
+    bool isAllInstancesFinished();
+
+    std::string sim_state_to_string(int state);
 
 private:
     std::vector<std::unique_ptr<SlaveConnection>> serverInstances;
