@@ -9,8 +9,8 @@
 #include "ARE/NNParamGenome.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "simulatedER/FixedMorphology.hpp"
-#include "ARE/Settings.h"'
-#include "obstacleAvoidance.hpp"
+#include "ARE/Settings.h"
+#include "simulatedER/obstacleAvoidance.hpp"
 
 namespace are {
 
@@ -22,9 +22,9 @@ public:
     ~ReevaluateFixed(){
     }
 
-    void init();
+    void init() override;
     bool update(const Environment::Ptr &) override;
-    void setObjectives(size_t indIdx, const std::vector<double> &objectives);
+    void setObjectives(size_t indIdx, const std::vector<double> &objectives) override;
 
 private:
     int currentIndIndex;

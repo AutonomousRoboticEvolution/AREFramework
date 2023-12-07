@@ -2,7 +2,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 #include <stdio.h>
 #include "simulatedER/coppelia_communication.hpp"
@@ -58,11 +58,11 @@ void Morphology_CPPNMatrix::create()
         std::ostringstream name;
         name.str("VoxelBone");
         name << id;
-        simSetObjectName(meshHandle, name.str().c_str());
+        simSetObjectAlias(meshHandle, name.str().c_str(),0);
         /// \todo EB: Since the bounding box for each shape changes the origin changes as well Therefore, an offset is needed.
-        simFloat currentObjectPosition[3];
+        double currentObjectPosition[3];
         simGetObjectPosition(meshHandle,-1,currentObjectPosition);
-        simFloat nextObjectPosition[3];
+        double nextObjectPosition[3];
         nextObjectPosition[0] = currentObjectPosition[0] - 0.11879;
         nextObjectPosition[1] = currentObjectPosition[1] - 0.11879;
         nextObjectPosition[2] = currentObjectPosition[2];
@@ -105,7 +105,7 @@ void Morphology_CPPNMatrix::create()
 //            floatParams[7]: V-HACD: beta (0.0-1.0, 0.05 is default).
 //            floatParams[8]: V-HACD: gamma (0.0-1.0, 0.00125 is default).
 //            floatParams[9]: V-HACD: min. volume per convex hull (0.0-0.01, 0.0001 is default).
-            float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
+            double conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                                   0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
             convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
@@ -115,19 +115,16 @@ void Morphology_CPPNMatrix::create()
             // The issue come from a mismatch between the mass computed by verp and the one expected.
             //Call this to compute the approximate moment of inertia and center of mass
             simComputeMassAndInertia(convexHandle, 84); //kg.m-3
-            float skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
-            float mass;
-            float inertiaMatrix[9];
-            float centerOfMass[3];
-            simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
-            simSetShapeMassAndInertia(convexHandle,skeletonMass,inertiaMatrix,centerOfMass,nullptr);
+            double skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
+            simSetShapeMass(convexHandle,skeletonMass);
             //*/
 
             mainHandle = convexHandle;
             // Create brain primitive
-            float brainSize[3] = {0.084,0.084,0.11};
-            brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
-            float brainPos[3] = {0.0,0.0,0.06};
+            double brainSize[3] = {0.084,0.084,0.11};
+            brainHandle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,brainSize,0);
+            simSetShapeMass(brainHandle,0.503); //Head organ weighs 503g
+            double brainPos[3] = {0.0,0.0,0.06};
             simSetObjectPosition(brainHandle,-1,brainPos);
             // Group primitives
             int groupHandles[2] = {convexHandle, brainHandle};
@@ -141,13 +138,13 @@ void Morphology_CPPNMatrix::create()
 #ifndef ISROBOTSTATIC
             std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+            simSetObjectInt32Param(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
             simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
-            simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
+            simSetObjectInt32Param(mainHandle, sim_shapeintparam_respondable, 1);
             //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
-            simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
+            simSetObjectInt32Param(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
 
         } catch (std::exception &e) {
             //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
@@ -218,25 +215,26 @@ void Morphology_CPPNMatrix::create()
             if (organList.at(i).getOrganType() == 3 && !organList.at(i).isOrganRemoved() && organList.at(i).isOrganChecked()) {
 
                 int childSkeletonHandle;
-                float sizeCuboid[3] = {0.025, 0.025, 0.025};
-                childSkeletonHandle = simCreatePureShape(0, 0, sizeCuboid, 250, nullptr);
+                double sizeCuboid[3] = {0.025, 0.025, 0.025};
+                childSkeletonHandle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,sizeCuboid,0);
+                simSetShapeMass(childSkeletonHandle,250);
                 simSetObjectSpecialProperty(childSkeletonHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                                   sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
 #ifndef ISROBOTSTATIC
                 std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-                simSetObjectInt32Parameter(childSkeletonHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+                simSetObjectInt32Param(childSkeletonHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
                 simSetObjectInt32Parameter(childSkeletonHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
-                simSetObjectInt32Parameter(childSkeletonHandle, sim_shapeintparam_respondable, 1);
-                simSetObjectInt32Parameter(childSkeletonHandle,sim_objintparam_visibility_layer, 1); // This hides convex decomposition.
+                simSetObjectInt32Param(childSkeletonHandle, sim_shapeintparam_respondable, 1);
+                simSetObjectInt32Param(childSkeletonHandle,sim_objintparam_visibility_layer, 1); // This hides convex decomposition.
                 simComputeMassAndInertia(childSkeletonHandle, 0.5f);
 
                 // Allign everything
                 /// \todo EB: is this step really needed?
-                float position[3] = {0.0,0.0,0.0};
-                float orientation[3] = {0.0,0.0,0.0};
+                double position[3] = {0.0,0.0,0.0};
+                double orientation[3] = {0.0,0.0,0.0};
                 simSetObjectPosition(childSkeletonHandle, -1, position);
                 simSetObjectOrientation(childSkeletonHandle, -1, orientation);
 
@@ -247,11 +245,12 @@ void Morphology_CPPNMatrix::create()
                 int handles[2] = {childSkeletonHandle,organList.at(i).objectHandles[1]};
 
                 // Get final position of the cube and use it as reference when creating organ.
-                float tempPosition[3];
+                double tempPosition[3];
                 simGetObjectPosition(childSkeletonHandle, -1, tempPosition);
 
                 int childSkeletonVisualHandle;
-                childSkeletonVisualHandle = simCreatePureShape(0, 0, sizeCuboid, 250, nullptr);
+                childSkeletonVisualHandle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,sizeCuboid,0);
+                simSetShapeMass(childSkeletonVisualHandle, 250);
                 float color[3] = {0,1,0};
                 simSetShapeColor(childSkeletonVisualHandle, nullptr, sim_colorcomponent_ambient_diffuse, color);
 
@@ -260,7 +259,7 @@ void Morphology_CPPNMatrix::create()
                 simSetObjectSpecialProperty(childSkeletonVisualHandle,0); // Non-collidable, non-detectable, etc.
                 simSetObjectProperty(childSkeletonVisualHandle,sim_modelproperty_not_dynamic);
                 simSetObjectProperty(childSkeletonVisualHandle,sim_modelproperty_not_respondable);
-                simSetObjectInt32Parameter(childSkeletonVisualHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+                simSetObjectInt32Param(childSkeletonVisualHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 
                 simSetObjectPosition(childSkeletonVisualHandle, organList.at(i).objectHandles.at(1), position);
                 simSetObjectOrientation(childSkeletonVisualHandle,organList.at(i).objectHandles.at(1), orientation);
@@ -299,14 +298,15 @@ void Morphology_CPPNMatrix::create()
                             setOrganOrientation(organ); // Along z-axis relative to the organ itself
                         // Create dummy just to get orientation
                         /// \todo EB: This is not the best way to do it. Find something else!
-                        int tempDummy = simCreateDummy(0.01, nullptr);
-                        float tempOri[3] = {0,0,0};
-                        simSetObjectOrientation(tempDummy,organList.at(i).objectHandles[1],tempOri);
-                        simGetObjectOrientation(tempDummy,-1,tempOri);
+                        int tempDummy[1];
+                        tempDummy[0] = simCreateDummy(0.01, nullptr);
+                        double tempOri[3] = {0,0,0};
+                        simSetObjectOrientation(tempDummy[0],organList.at(i).objectHandles[1],tempOri);
+                        simGetObjectOrientation(tempDummy[0],-1,tempOri);
                         organ.organOri[0] += tempOri[0];
                         organ.organOri[1] += tempOri[1];
                         organ.organOri[2] += tempOri[2];
-                        simRemoveObject(tempDummy);
+                        simRemoveObjects(tempDummy,1);
                         organ.createOrgan(organList.at(i).objectHandles[1]);
 
                         if(organ.getOrganType() == 1)
@@ -347,7 +347,7 @@ void Morphology_CPPNMatrix::create()
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
 
 void Morphology_CPPNMatrix::load(){
@@ -359,7 +359,7 @@ void Morphology_CPPNMatrix::load(){
     if(handle == -1)
     {
         std::cerr << "unable to load robot model" << std::endl;
-        simChar* lastError = simGetLastError();
+        char* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
         exit(1);
@@ -378,10 +378,8 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose){
-        float mass;
-        float inertiaMatrix[9];
-        float centerOfMass[3];
-        simGetShapeMassAndInertia(mainHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+        double mass;
+        simGetShapeMass(mainHandle,&mass);
         std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
     }
     setPosition(x,y,z);
@@ -391,7 +389,7 @@ void Morphology_CPPNMatrix::createAtPosition(float x, float y, float z)
 
 void Morphology_CPPNMatrix::setPosition(float x, float y, float z)
 {
-    simFloat robotPos[3];
+    double robotPos[3];
     robotPos[0] = x;
     robotPos[1] = y;
     robotPos[2] = z;
@@ -453,8 +451,8 @@ void Morphology_CPPNMatrix::createHead()
 void Morphology_CPPNMatrix::createGripper(std::vector<int>& gripperHandles)
 {
     gripperHandles.resize(4);
-    float gripperPosition[3];
-    float gripperOrientation[3];
+    double gripperPosition[3];
+    double gripperOrientation[3];
     int tempGripperHandle = -1;
     std::string models_path = settings::getParameter<settings::String>(parameters,"#modelsPath").value;
     std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
@@ -487,7 +485,7 @@ void Morphology_CPPNMatrix::createGripper(std::vector<int>& gripperHandles)
 #ifndef ISROBOTSTATIC
         std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Param(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
         simSetObjectInt32Parameter(i, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
@@ -593,10 +591,10 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     }
 
     // Export mesh file
-    const auto **verticesMesh = new const simFloat *[2];
-    const auto **indicesMesh = new const simInt *[2];
-    auto *verticesSizesMesh = new simInt[2];
-    auto *indicesSizesMesh = new simInt[2];
+    const double **verticesMesh = new const double *[2];
+    const int **indicesMesh = new const int *[2];
+    int *verticesSizesMesh = new int[2];
+    int *indicesSizesMesh = new int[2];
     verticesMesh[0] = skeletonListVertices.data();
     verticesSizesMesh[0] = skeletonListVertices.size();
     indicesMesh[0] = skeletonListIndices.data();
@@ -608,6 +606,9 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
     simExportMesh(3, filepath_mesh.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
+
+    simReleaseBuffer(verticesMesh[0]);
+    simReleaseBuffer(indicesMesh[0]);
 
     delete[] verticesMesh;
     delete[] verticesSizesMesh;

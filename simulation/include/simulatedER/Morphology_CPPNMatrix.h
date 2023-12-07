@@ -183,7 +183,7 @@ public:
     std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();}
     std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();}
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
-    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<double> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
     const std::vector<std::vector<double>> &get_matrix_4d() const {return matrix_4d;}
 
@@ -277,7 +277,7 @@ private:
     Descriptors indDesc;
     std::vector<int> skeletonHandles;
     Blueprint blueprint;
-    std::vector<float> skeletonListVertices;
+    std::vector<double> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     bool isRobotModel = 0;
 

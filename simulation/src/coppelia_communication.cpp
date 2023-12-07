@@ -31,7 +31,7 @@ void sim::readProximitySensors(const std::vector<int> handles, std::vector<doubl
     {return std::sqrt(x*x + y*y + z*z);};
     
     // variables for proximity sensor function
-    float pos[4], norm[3];
+    double pos[4], norm[3];
     int detected_object_handle;
     int det;
     // for all proximity sensors reads there vaule
@@ -54,9 +54,9 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
     int occlusion_detector;
 
     // variables for proximity sensor function
-    float norm[3];
-    float position_occlusion[4];
-    float position_passive[4];
+    double norm[3];
+    double position_occlusion[4];
+    double position_passive[4];
     int detected_object_handle;
     int det, occl;
 //    std::string name;
@@ -66,15 +66,15 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
     for (int handle: handles) {
 
         occlusion_detector = simGetObjectChild(handle, 0);
-        int beacon_handle = simGetObjectHandle("IRBeacon_0");
+        int beacon_handle = simGetObject("IRBeacon_0",-1,-1,1);
         det = simCheckProximitySensor(handle,beacon_handle,position_passive);
         // calculates distance to object
         float dist = norm_L2(position_passive[0], position_passive[1], position_passive[2]);
         // Did the sensor detected something?
         if (det > 0) {
-            float ref_euler[3];
+            double ref_euler[3];
             if (position_passive[0] == 0) position_passive[1] += 1e-3; // small inaccuracy in case of x = 0;
-            float euler[3] = {static_cast<float>(std::atan2(position_passive[2], position_passive[1]) - M_PI / 2.f),
+            double euler[3] = {static_cast<float>(std::atan2(position_passive[2], position_passive[1]) - M_PI / 2.f),
                               static_cast<float>(std::asin(position_passive[0] / dist)),
                               0};
             // Rotates the
@@ -89,12 +89,12 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
             if (!occlusion) {
 
                 //corrects to center of beacon as 5cm further away
-                float x_pos = sqrt(position_passive[1] * position_passive[1] + position_passive[0] * position_passive[0]);
-                float angle = atan2(x_pos, position_passive[2]);
-                float r = std::sqrt(position_passive[2] * position_passive[2] + x_pos * x_pos);
+                double x_pos = sqrt(position_passive[1] * position_passive[1] + position_passive[0] * position_passive[0]);
+                double angle = atan2(x_pos, position_passive[2]);
+                double r = std::sqrt(position_passive[2] * position_passive[2] + x_pos * x_pos);
                 r = r + 0.05;//adds radius of beacon
                 x_pos = r * std::sin(angle);
-                float z_pos = r * std::cos(angle);
+                double z_pos = r * std::cos(angle);
                 // Calculate z and x coordinate in demimeters
                 int int_z = round(z_pos * 10.);
                 int int_x = round(x_pos * 10.);
@@ -127,7 +127,7 @@ void sim::readCamera(const int camera_handle, std::vector<double> &sensorValues)
     std::string name;
     std::vector<std::string> splitted_name;
     for(int i = 0; i < nbrObj ; i++){
-        name = simGetObjectName(handles[i]);
+        name = simGetObjectAlias(handles[i],-1);
         boost::split(splitted_name,name,boost::is_any_of("_"));
         if(splitted_name[0] == "aruco"){
             if(std::stoi(splitted_name[1]) < 4)
@@ -136,13 +136,13 @@ void sim::readCamera(const int camera_handle, std::vector<double> &sensorValues)
                 small_corner_handles.push_back(handles[i]);
         }
     }
-    simReleaseBuffer((simChar*)handles);
+    simReleaseBuffer(handles);
     if(big_corner_handles.size() < 1 || big_corner_handles.size() < 1){
         sensorValues.push_back(0);
         return;
     }
 
-    float pos[3];
+    double pos[3];
     int big_result= -1;
     int small_result= -1;
     for(int i = 0; i < big_corner_handles.size(); i++){
@@ -166,7 +166,7 @@ void sim::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, st
     std::string name;
     std::vector<std::string> splitted_name;
     for(int i = 0; i < nbrObj ; i++){
-        name = simGetObjectName(handles[i]);
+        name = simGetObjectAlias(handles[i],-1);
         std::cout << name << std::endl;
         boost::split(splitted_name,name,boost::is_any_of("_"));
         if(splitted_name[0] == "Proximity")
@@ -180,14 +180,14 @@ void sim::retrieveOrganHandles(int mainHandle, std::vector<int> &proxHandles, st
     handles = simGetObjectsInTree(mainHandle,sim_object_joint_type,1,&nbrObj);
 
     for(int i = 0; i < nbrObj ; i++){
-        name = simGetObjectName(handles[i]);
+        name = simGetObjectAlias(handles[i],-1);
         boost::split(splitted_name,name,boost::is_any_of("_"));
         if(splitted_name[0] == "Motor")
             wheelHandles.push_back(handles[i]);
         else jointHandles.push_back(handles[i]);
     }
 
-    simReleaseBuffer((simChar*)handles);
+    simReleaseBuffer(handles);
 }
 
 void sim::sentCommandToJointsDirect(const std::vector<int>& handles,const std::vector<double>& commands){
@@ -198,10 +198,10 @@ void sim::sentCommandToJointsDirect(const std::vector<int>& handles,const std::v
 void sim::sentCommandToJointsProportional(const std::vector<int>& handles, const std::vector<double>& commands, double P){
 
     for (size_t i = 0; i < handles.size(); i++){
-        float currentPos;
+        double currentPos;
         simGetJointPosition(handles[i],&currentPos);
-        float e = P*(commands[i]*M_PI/2. - currentPos);
-        simSetJointTargetPosition(handles[i],static_cast<float>((e+currentPos)));
+        double e = P*(commands[i]*M_PI/2. - currentPos);
+        simSetJointTargetPosition(handles[i],(e+currentPos));
     }
 }
 
@@ -209,25 +209,25 @@ void sim::sentCommandToJointsOscillatory(const std::vector<int> &handles, const 
 {
     double simulationTime = simGetSimulationTime();
     for (size_t i = 0; i < handles.size(); i++){
-        float actual_pos;
+        double actual_pos;
 //        simGetJointPosition(handles[i], &actual_pos);
         simGetJointTargetPosition(handles[i], &actual_pos);
         double next_pos = misc::get_next_joint_position(commands[i], simulationTime, actual_pos);
-        simSetJointTargetPosition(handles[i],static_cast<float>(next_pos));
+        simSetJointTargetPosition(handles[i],next_pos);
     }
 }
 
 void sim::getJointsPosition(const std::vector<int>& handles,std::vector<double>& positions){
-    float pos;
+    double pos;
     for(const int& handle : handles){
         simGetJointPosition(handle,&pos);
-        positions.push_back(static_cast<double>(pos));
+        positions.push_back(pos);
     }
 }
 
 void sim::sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity){
     for (size_t i = 0; i < handles.size(); i++)
-        simSetJointTargetVelocity(handles[i],static_cast<float>(commands[i]*max_velocity));
+        simSetJointTargetVelocity(handles[i],commands[i]*max_velocity);
 }
 
 void sim::printSimulatorState(int simState){
@@ -259,47 +259,47 @@ void sim::robotScreenshot(int ind_id, std::string repository)
     const int resX = 1152, resY = 1152;
     const float nearClippingPlane = 0.02, farClippingPlane = 2.0, camAngle = M_PI_4, xSize = 0.01, ySize = 0.01, zSize = 0.01;
     int intParams[4] = {resX, resY, 0, 0};
-    float floatParams[11] = {nearClippingPlane, farClippingPlane, camAngle, xSize, ySize, zSize, 0.0, 0.0, 0.0, 0.0, 0.0};
+    double floatParams[11] = {nearClippingPlane, farClippingPlane, camAngle, xSize, ySize, zSize, 0.0, 0.0, 0.0, 0.0, 0.0};
     int handleVisionSensor = simCreateVisionSensor(1, intParams, floatParams, NULL);
     int generalCamera;
     for(int i = 0; i<4; i++){
         if(i == 0)
-            generalCamera = simGetObjectHandle("Camera0");
+            generalCamera = simGetObject("Camera0",-1,-1,1);
         else if(i == 1)
-            generalCamera = simGetObjectHandle("Camera1");
+            generalCamera = simGetObject("Camera1",-1,-1,1);
         else if(i == 2)
-            generalCamera = simGetObjectHandle("Camera2");
+            generalCamera = simGetObject("Camera2",-1,-1,1);
         else if(i == 3)
-            generalCamera = simGetObjectHandle("Camera3");
+            generalCamera = simGetObject("Camera3",-1,-1,1);
         else
             abort();
 
-        float identityMatrix[12];
+        double identityMatrix[12];
         simBuildIdentityMatrix(identityMatrix);
         simSetObjectMatrix(handleVisionSensor, generalCamera, identityMatrix);
         simSetObjectParent(handleVisionSensor, generalCamera, true);
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_resolution_x,resX);
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_resolution_y,resY);
-        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_perspective_angle,camAngle*M_PI_2);
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_resolution_x,resX);
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_resolution_y,resY);
+        simSetObjectFloatParam(handleVisionSensor,sim_visionfloatparam_perspective_angle,camAngle*M_PI_2);
 
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_pov_focal_blur,1);
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_pov_focal_blur,1);
         const float focalDistance = 2.0, aperture = 0.5;
         const int blurSamples = 10;
-        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_pov_blur_distance,focalDistance);
-        simSetObjectFloatParameter(handleVisionSensor,sim_visionfloatparam_pov_aperture,aperture);
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_pov_blur_sampled,blurSamples);
+        simSetObjectFloatParam(handleVisionSensor,sim_visionfloatparam_pov_blur_distance,focalDistance);
+        simSetObjectFloatParam(handleVisionSensor,sim_visionfloatparam_pov_aperture,aperture);
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_pov_blur_sampled,blurSamples);
 
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_render_mode,0);
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_render_mode,0);
         /// \todo Double-check this
-        simInt savedVisibilityMask = 0;
-        simGetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,&savedVisibilityMask);
-        simSetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,0);
+        int savedVisibilityMask = 0;
+        simGetObjectInt32Param(generalCamera,sim_objintparam_visibility_layer,&savedVisibilityMask);
+        simSetObjectInt32Param(generalCamera,sim_objintparam_visibility_layer,0);
 
         int newAttr = sim_displayattribute_renderpass +  sim_displayattribute_forvisionsensor + sim_displayattribute_ignorerenderableflag;
-        simSetObjectInt32Parameter(handleVisionSensor,sim_visionintparam_rendering_attributes,newAttr);
-        float* auxValues=nullptr;
+        simSetObjectInt32Param(handleVisionSensor,sim_visionintparam_rendering_attributes,newAttr);
+        double* auxValues=nullptr;
         int* auxValuesCount=nullptr;
-        float averageColor[3]={0.0f,0.0f,0.0f};
+        double averageColor[3]={0.0f,0.0f,0.0f};
         if (simHandleVisionSensor(handleVisionSensor,&auxValues,&auxValuesCount)>=0)
         {
             if ((auxValuesCount[0]>0)||(auxValuesCount[1]>=15))
@@ -308,20 +308,18 @@ void sim::robotScreenshot(int ind_id, std::string repository)
                 averageColor[1]=auxValues[12];
                 averageColor[2]=auxValues[13];
             }
-            simReleaseBuffer((char*)auxValues);
-            simReleaseBuffer((char*)auxValuesCount);
+            simReleaseBuffer(auxValues);
+            simReleaseBuffer(auxValuesCount);
         }
 
-        simSetObjectInt32Parameter(generalCamera,sim_objintparam_visibility_layer,savedVisibilityMask);
-        int resolutionX, resolutionY;
-        const simUChar* image_buf_char = simGetVisionSensorCharImage(handleVisionSensor, &resolutionX, &resolutionY);
+        simSetObjectInt32Param(generalCamera,sim_objintparam_visibility_layer,savedVisibilityMask);
+        int resolution[2];
+        const unsigned char* image_buf_char = simGetVisionSensorImg(handleVisionSensor,0,0,nullptr,nullptr,resolution);
         std::stringstream filepath;
         filepath << repository << "/robot" << "_" << ind_id << "_" << i << ".png";
         const std::string temp = filepath.str();
 
-        simInt res[2];
-        simGetVisionSensorResolution(handleVisionSensor,res);
-        simSaveImage(image_buf_char,res,0,temp.c_str(),-1, nullptr);
-        simReleaseBuffer((simChar*)image_buf_char);
+        simSaveImage(image_buf_char,resolution,0,temp.c_str(),-1, nullptr);
+        simReleaseBuffer(image_buf_char);
     }
 }

@@ -4,7 +4,7 @@ add_definitions(-DEIGEN3_ENABLED)
 
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_INCLUDE_DIR}>
     "../../simulation/include"
     "../../EAFramework/include"
     "../common/"
@@ -13,13 +13,9 @@ set(INCLUDES
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c>
     )
 
 add_library(M_NIPES2 SHARED 
@@ -27,11 +23,6 @@ add_library(M_NIPES2 SHARED
    factories.cpp
    M_NIPES.cpp 
    MNIPESLoggings.cpp
-   ../common/obstacleAvoidance.cpp
-   ../common/multiTargetMaze.cpp
-   ../common/barrelTask.cpp
-   ../common/exploration.cpp
-   ../common/gradual_env.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES2 ARE simulatedER cmaes tbb)

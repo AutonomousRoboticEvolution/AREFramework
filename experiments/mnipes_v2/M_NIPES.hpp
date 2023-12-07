@@ -10,11 +10,7 @@
 #include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "simulatedER/mazeEnv.h"
-#include "obstacleAvoidance.hpp"
-#include "multiTargetMaze.hpp"
-#include "barrelTask.hpp"
-#include "exploration.hpp"
-#include "gradual_env.hpp"
+#include "simulatedER/obstacleAvoidance.hpp"
 #include "boost/filesystem.hpp"
 
 namespace are {
@@ -165,7 +161,6 @@ public:
         arch & descriptor_type;
         arch & copy_rewards;
         arch & drop_learning;
-        arch & current_gradual_scene;
         arch & init_position;
         arch & visited_zones;
     }
@@ -196,9 +191,6 @@ public:
 
     bool is_learning_dropped(){return drop_learning;}
 
-    void incr_gradual_scene(){current_gradual_scene++;}
-    int get_current_gradual_scene(){return current_gradual_scene;}
-    void set_current_gradual_scene(int cgs){current_gradual_scene = cgs;}
 
 private:
     void createMorphology() override;
@@ -228,7 +220,6 @@ private:
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
     bool drop_learning = false;
-    int current_gradual_scene = 0;
 
 
 };
@@ -305,7 +296,6 @@ private:
     void compute_novelty_scores();
     void update_novelty_archive();
 
-    void incr_gradual_scene();
 
     void bootstrap_evolution(const std::string &folder);
     void load_experiment(const std::string &folder);
@@ -328,7 +318,7 @@ private:
     nn2_cppn_t seed_cppn;
     NN2CPPNGenome::Ptr seed_morph_genome;
 
-    float current_ind_past_pos[3];
+    double current_ind_past_pos[3];
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.
@@ -337,11 +327,6 @@ private:
     double evolvability_score = 0.0;
     int highest_morph_id=0;
 
-    //attribute for gradual tasks
-    int nbr_of_successful_solution = 0;
-    int current_gradual_scene = 0;
-    int nbr_eval_current_task = 0;
-    std::vector<sim::GradualEnvironment::env_t> environments_info;
 
     std::string _task_name(are::task_t task);
 };

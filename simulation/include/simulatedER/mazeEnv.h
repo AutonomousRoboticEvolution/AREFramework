@@ -6,7 +6,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "simulatedER/VirtualEnvironment.hpp"
@@ -37,7 +37,6 @@ namespace are {
 
             const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
-            void build_tiled_floor(std::vector<int> &tiles_handles);
 
         private:
             std::vector<double> target_position;

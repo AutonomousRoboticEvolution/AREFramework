@@ -2,11 +2,7 @@
 // Created by ebb505 on 12/03/2021.
 //
 #include "simulatedER/Organ.h"
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
-#include "simLib.h"
-#endif
+
 
 #define ISROBOTSTATIC 0
 
@@ -42,37 +38,35 @@ void Organ::createOrgan(int skeletonHandle)
 
     /// \todo: EB: Maybe we should move this to a method
     // Get object handles for collision detection
-    simAddObjectToSelection(sim_handle_tree, organHandle);
-    int selectionSize = simGetObjectSelectionSize();
-    // store all these objects (max 10 shapes)
-    int shapesStorage[10]; // stores up to 10 shapes
-    simGetObjectSelection(shapesStorage);
-    for (int i = 0; i < selectionSize; i++) {
+    int* selectionSize;
+    int* obj_handles = simGetObjectsInTree(organHandle,sim_handle_all,2,selectionSize);
+    for (int i = 0; i < *selectionSize; i++) {
         char* componentName;
-        componentName = simGetObjectName(shapesStorage[i]);
+        componentName = simGetObjectAlias(obj_handles[i],-1);
         if('P' == componentName[0]){
-            objectHandles.push_back(shapesStorage[i]);
+            objectHandles.push_back(obj_handles[i]);
         }
         simReleaseBuffer(componentName);
     }
-    simRemoveObjectFromSelection(sim_handle_all, organHandle);
+    simReleaseBuffer(obj_handles);
+    simReleaseBuffer(selectionSize);
 
     // For force sensor
     int fsParams[5];
     fsParams[0] = 0; fsParams[1] = 1; fsParams[2] = 1; fsParams[3] = 0; fsParams[4] = 0;
-    float fsFParams[5];
+    double fsFParams[5];
     // EB: Calibrating this values is very important. They define when a sensor is broken.
     fsFParams[0] = 0.005; fsFParams[1] = 1000000; fsFParams[2] = 10000000; fsFParams[3] = 0; fsFParams[4] = 0;
     int forceSensor = simCreateForceSensor(3, fsParams, fsFParams, nullptr);
     // Set organPos
-    float tempOrganPos[3];
+    double tempOrganPos[3];
     tempOrganPos[0] = organPos.at(0); tempOrganPos[1] = organPos.at(1); tempOrganPos[2] = organPos.at(2);
     simSetObjectPosition(forceSensor,-1,tempOrganPos);
     simSetObjectPosition(organHandle, -1, tempOrganPos);
 
     // Create connector and offset by some distance relative to the organ itself
     /// \todo EB: This offset shouldn't be here.
-    float tempConnectorPos[3];
+    double tempConnectorPos[3];
     tempConnectorPos[0] = tempOrganPos[0]; tempConnectorPos[1] = tempOrganPos[1]; tempConnectorPos[2] = tempOrganPos[2];
     if(organType == 0) // Brain
         tempConnectorPos[2] = tempOrganPos[2] + 0.02;
@@ -95,7 +89,7 @@ void Organ::createOrgan(int skeletonHandle)
     simSetObjectPosition(connectorHandle,-1,tempConnectorPos);
 
     // Set organOri
-    float tempOrganOri[3];
+    double tempOrganOri[3];
     tempOrganOri[0] = organOri.at(0); tempOrganOri[1] = organOri.at(1); tempOrganOri[2] = organOri.at(2);
     simSetObjectOrientation(forceSensor, -1, tempOrganOri);
     simSetObjectOrientation(organHandle, -1, tempOrganOri);
@@ -139,9 +133,9 @@ void Organ::createOrgan(int skeletonHandle)
     organPos.at(1) = tempOrganPos[1];
     organPos.at(2) = tempOrganPos[2];
     // Position of connector after rotation
-    float newConnectorPos[3];
+    double newConnectorPos[3];
     simGetObjectPosition(connectorHandle, -1, newConnectorPos);
-    float newConnectorOri[3];
+    double newConnectorOri[3];
     simGetObjectOrientation(connectorHandle, -1, newConnectorOri);
 
     /// \todo EB: Resize vector might be better way to do this.
@@ -155,9 +149,9 @@ void Organ::createOrgan(int skeletonHandle)
 #ifndef ISROBOTSTATIC
     std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
 #elif ISROBOTSTATIC == 0
-    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+    simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
-    simSetObjectInt32Parameter(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+    simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
     connector_frame_pos.resize(3);
     if(organType != 0)
@@ -168,9 +162,9 @@ void Organ::createOrgan(int skeletonHandle)
 
 void Organ::createMaleConnector()
 {
-    float tempConnectorPosition[3];
-    float tempConnectorOrientation[3];
-    float temp_connector_frame_pos[3];
+    double tempConnectorPosition[3];
+    double tempConnectorOrientation[3];
+    double temp_connector_frame_pos[3];
     int temp_physics_connector_handle;
     int temp_visual_connector_handle = -1;
 
@@ -234,7 +228,9 @@ void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHa
 void Organ::repressOrgan()
 {
     if(organInsideSkeleton || organColliding || !organGripperAccess){
-        simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
+        int parent_handle[1];
+        parent_handle[0] = simGetObjectParent(organHandle);
+        simRemoveObjects(parent_handle,1); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(physics_connector_handle);
         organRemoved = true;
@@ -293,8 +289,8 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
 
 void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList)
 {
-    float gripperPosition[3];
-    float gripperOrientation[3];
+    double gripperPosition[3];
+    double gripperOrientation[3];
     /// \todo EB: would it be better to use the frame of the organ? It's easy change
     gripperPosition[0] = connectorPos[0]; gripperPosition[1] = connectorPos[1]; gripperPosition[2] = connectorPos[2];
     gripperOrientation[0] = connectorOri[0]; gripperOrientation[1] = connectorOri[1]; gripperOrientation[2] = connectorOri[2];

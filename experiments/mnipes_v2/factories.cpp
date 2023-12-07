@@ -1,6 +1,6 @@
 #include "simulatedER/mazeEnv.h"
 #include "barrelTask.hpp"
-#include "obstacleAvoidance.hpp"
+#include "simulatedER/obstacleAvoidance.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 

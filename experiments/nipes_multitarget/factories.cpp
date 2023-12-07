@@ -1,4 +1,4 @@
-#include "multiTargetMaze.hpp"
+#include "simulatedER/multiTargetMaze.hpp"
 #include "NIPES.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"

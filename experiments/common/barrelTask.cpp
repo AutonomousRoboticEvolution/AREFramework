@@ -13,10 +13,10 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
     name = "barrel_task";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#withBeacon",new settings::Boolean(true));
-    settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
-    settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
-    settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#withBeacon",std::make_shared<const settings::Boolean>(true));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<const settings::Double>(2.));
+    settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<const settings::Integer>(2));
+    settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
 
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
     for(int i = 0; i < targets.size();i+=3)
@@ -40,7 +40,7 @@ void BarrelTask::init(){
         std::cout << "Loaded scene : " << scenePath << std::endl;
         std::cout << "Objects in the scene : " << std::endl;
         while((handle = simGetObjects(i,sim_handle_all)) >= 0){
-            std::cout << simGetObjectName(handle) << std::endl;
+            std::cout << simGetObjectAlias(handle,0) << std::endl;
             i++;
         }
     }
@@ -49,11 +49,12 @@ void BarrelTask::init(){
     // Beacon
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
     if(withBeacon){
-        float bSize[3] = {0.1f,0.1f,0.1f};
-        barrel_handle = simCreatePureShape(2,0,bSize,0.05f,nullptr); //create a sphere as beacon;
+        double bSize[3] = {0.1f,0.1f,0.1f};
+        barrel_handle = simCreatePrimitiveShape(sim_primitiveshape_cylinder,bSize,0);
+        simSetShapeMass(barrel_handle,0.05f); //create a sphere as beacon;
 
-        simSetObjectName(barrel_handle,"IRBeacon_0");
-        const float tPos[3] = {static_cast<float>(barrel_initial_positions[current_target][0]),
+        simSetObjectAlias(barrel_handle,"IRBeacon_0",0);
+        const double tPos[3] = {static_cast<float>(barrel_initial_positions[current_target][0]),
                          static_cast<float>(barrel_initial_positions[current_target][1]),
                          static_cast<float>(barrel_initial_positions[current_target][2])};
 
@@ -65,7 +66,7 @@ void BarrelTask::init(){
 //        simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
         simSetObjectSpecialProperty(barrel_handle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                    sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
-        simSetObjectInt32Parameter(barrel_handle, sim_shapeintparam_respondable, 1);
+        simSetObjectInt32Param(barrel_handle, sim_shapeintparam_respondable, 1);
         simComputeMassAndInertia(barrel_handle, 0.162f);
         float color[3] = {0.1f,1.0f,0.1f};
         simSetShapeColor(barrel_handle, nullptr, sim_colorcomponent_ambient_diffuse, color);
@@ -73,20 +74,21 @@ void BarrelTask::init(){
     trajectory.clear();
 
     // Create target
-    float aruco_square_size[3] = {0.013f,0.013f,0.005f};
+    double aruco_square_size[3] = {0.013f,0.013f,0.005f};
     std::vector<int> handles;
     float aruco_color[3] = {0.0f,0.0f,0.0f};
-    float aruco_pos[3];
-    float aruco_ori[3] = {0.,M_PI_2,0.};
+    double aruco_pos[3];
+    double aruco_ori[3] = {0.,M_PI_2,0.};
     aruco_pos[0] = static_cast<float>(target_position.at(0));
     aruco_pos[1] = static_cast<float>(target_position.at(1));
     aruco_pos[2] = static_cast<float>(target_position.at(2));
     /// \todo: Eb - Hard coded values
-    float pos_y[8] = {0.07,0.07,-0.07,-0.07,0.02,0.02,-0.02,-0.02};
-    float pos_z[8] = {0.07,-0.07,-0.07,0.07,0.02,-0.02,-0.02,0.02};
-    float temp_pos[3];
+    double pos_y[8] = {0.07,0.07,-0.07,-0.07,0.02,0.02,-0.02,-0.02};
+    double pos_z[8] = {0.07,-0.07,-0.07,0.07,0.02,-0.02,-0.02,0.02};
+    double temp_pos[3];
     for(int i = 0; i < 8; i++){
-        handles.push_back(simCreatePureShape(0,0,aruco_square_size,0.05f,nullptr));
+        handles.push_back(simCreatePrimitiveShape(sim_primitiveshape_cuboid,aruco_square_size,0));
+        simSetShapeMass(handles.back(),0.05f);
         temp_pos[0] = aruco_pos[0];
         temp_pos[1] = pos_y[i] + aruco_pos[1];
         if(i < 4) /// \todo: Eb - Hard coded values
@@ -97,9 +99,9 @@ void BarrelTask::init(){
         simSetObjectPosition(handles.at(i),-1,temp_pos);
         simSetShapeColor(handles.at(i), nullptr, sim_colorcomponent_ambient_diffuse, aruco_color);
         std::string string = "aruco_" + std::to_string(i);
-        simSetObjectName(handles.at(i),string.c_str());
+        simSetObjectAlias(handles.at(i),string.c_str(),0);
         simSetObjectOrientation(handles.at(i),handles.at(i),aruco_ori);
-        simSetObjectInt32Parameter(handles.at(i), sim_shapeintparam_static, 1);
+        simSetObjectInt32Param(handles.at(i), sim_shapeintparam_static, 1);
         simSetObjectSpecialProperty(handles.at(i), sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                    sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
     }
@@ -179,29 +181,5 @@ float BarrelTask::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     return 0;
 }
 
-void BarrelTask::build_tiled_floor(std::vector<int> &tiles_handles){
-    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
-
-    float tile_size[3] = {0.249f,0.249f,0.01f};
-    float tile_increment = 0.25;
-    float starting_pos[3] = {-0.875f,-0.875f,0.005f};
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            tiles_handles.push_back(simCreatePureShape(0,8,tile_size,0.05f,nullptr));
-            std::stringstream name;
-            name << "tile_" << i << j;
-            simSetObjectName(tiles_handles.back(),name.str().c_str());
-            float height = -0.004;
-            if(!flatFloor){
-                height = randNum->randFloat(-0.005,-0.001);
-            }
-            float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
-            simSetObjectPosition(tiles_handles.back(),-1,pos);
-            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,1000);//randNum->randFloat(0,1000));
-            simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
-            simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
-        }
-    }
-}
 
 

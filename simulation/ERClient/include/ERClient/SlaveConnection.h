@@ -11,10 +11,10 @@ extern "C" {
 #include "v_repLib.h"
 #include "v_repConst.h"
 #elif defined (COPPELIASIM)
-#include "simConst.h"
-#include "simLib.h"
+#include "simLib/simConst.h"
+#include "simLib/simLib.h"
 #endif
-#include "remoteApi/extApi.h"
+#include "legacyRemoteApi/remoteApi/extApi.h"
 }
 
 #define CONNECTION_TIMEOUT 5000

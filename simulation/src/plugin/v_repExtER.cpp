@@ -176,12 +176,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         simSetIntegerSignal((simChar*) "simulationState", signal[0]);  //Set the signal back to the client (ready to accecpt genome)
     }
     //cout << ER->ea->populationGenomes[0]->settings->COLOR_LSYSTEM << endl;
-    return(7); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
-    // version 1 was for V-REP versions before V-REP 2.5.12
-    // version 2 was for V-REP versions before V-REP 2.6.0
-    // version 5 was for V-REP versions before V-REP 3.1.0
-    // version 6 is for V-REP versions after V-REP 3.1.3
-    // version 7 is for V-REP versions after V-REP 3.2.0 (completely rewritten)
+    return(1); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
+    // version 1 for VRep 3.6.2
+    // version 2 for coppeliaSim 4.5 and above
 }
 
 // Release the v-rep lib

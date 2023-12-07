@@ -1,14 +1,14 @@
 #experimentName,string,nipes
 #expPluginName,string,/usr/local/lib/libNIPES.so
-#envType,int,3
-#scenePath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#envType,int,1
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#robotPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/robots/are_blind_ant/model_0.ttm
-#modelsPath,string,/home/le_goff/git/evolutionary_robotics_framework/simulation/models/
-#repository,string,/home/le_goff/are-logs/
+#robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_blind_ant/model_0.ttm
+#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
+#repository,string,/home/leni/are-logs/
 
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #updateSimulatorList,bool,0
@@ -21,7 +21,7 @@
 #realTimeSim,bool,0
 #ctrlUpdateFrequency,double,0.1
 #populationSize,int,10
-#maxEvalTime,float,10
+#maxEvalTime,float,60
 #maxNbrEval,int,10000
 #numberOfGeneration,int,2
 
@@ -43,7 +43,7 @@
 #initPosition,sequence_double,-0.6;0.6;0.2
 #withTiles,bool,1
 #flatFloor,bool,1
-#robotOrientation,sequence_float,-1.57;0;-1.57
+#robotOrientation,sequence_double,-1.57;0;-1.57
 
 #MaxWeight,float,1.0
 
@@ -74,5 +74,5 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #reloadController,bool,0
-
+#isScreenshotEnable,bool,0
 

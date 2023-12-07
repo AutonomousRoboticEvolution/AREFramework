@@ -6,7 +6,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "simulatedER/VirtualEnvironment.hpp"
@@ -36,8 +36,6 @@ public:
     float timeCheck = 0.0;
 
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
-
-    void build_tiled_floor(std::vector<int> &tiles_handles);
 
     int get_number_of_targets(){return barrel_initial_positions.size();}
     const std::vector<double> &get_current_target(){return barrel_initial_positions[current_target];}

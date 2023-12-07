@@ -3,9 +3,9 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
-#include "obstacleAvoidance.hpp"
+#include "simulatedER/obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
-#include "exploration.hpp"
+#include "simulatedER/exploration.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)

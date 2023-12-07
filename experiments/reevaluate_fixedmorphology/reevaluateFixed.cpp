@@ -60,11 +60,11 @@ void ReevaluateFixed::init(){
 
     population.resize(gen_files.size());
     for(size_t i = 0; i < gen_files.size(); i++){
-        EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        NNParamGenome::Ptr genome(new NNParamGenome(randomNum,parameters));
+        EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+        NNParamGenome::Ptr genome = std::make_shared<NNParamGenome>(randomNum,parameters);
         genome->from_file(gen_files[i]);
 
-        Individual::Ptr ind(new sim::NN2Individual(morph_gen,genome));
+        Individual::Ptr ind = std::make_shared<sim::NN2Individual>(morph_gen,genome);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population[gen_index[i]] = ind;

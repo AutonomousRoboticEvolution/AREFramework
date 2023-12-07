@@ -5,7 +5,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "simulatedER/mazeEnv.h"
@@ -13,9 +13,9 @@
 #include "ARE/learning/Novelty.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/Settings.h"
-#include "obstacleAvoidance.hpp"
-#include "exploration.hpp"
-#include "multiTargetMaze.hpp"
+#include "simulatedER/obstacleAvoidance.hpp"
+#include "simulatedER/exploration.hpp"
+#include "simulatedER/multiTargetMaze.hpp"
 
 namespace are{
 

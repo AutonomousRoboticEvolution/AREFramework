@@ -74,6 +74,10 @@ public:
     std::vector<int> get_IRHandles(){return IRHandles;}
     std::vector<int> get_wheelHandles(){return wheelHandles;}
 
+    //wrapper of coppeliasim function
+    std::vector<double> get_position();
+    std::vector<double> get_orientation();
+
 protected:
     int mainHandle;
     int morph_id;

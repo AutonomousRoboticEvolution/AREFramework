@@ -16,8 +16,8 @@
 namespace are {
 
 struct waypoint{
-    float position[3];
-    float orientation[3];
+    double position[3];
+    double orientation[3];
 
     std::string to_string() const{
         std::stringstream sstr;

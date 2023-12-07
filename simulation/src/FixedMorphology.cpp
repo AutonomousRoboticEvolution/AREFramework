@@ -27,7 +27,7 @@ void FixedMorphology::create()
 //    float orientation[3];
 //    simGetObjectOrientation(mainHandle,mainHandle,orientation);
 //    orientation[0] = robotOrient;
-    std::vector<float> orientation = settings::getParameter<settings::Sequence<float>>(parameters,"#robotOrientation").value;
+    std::vector<double> orientation = settings::getParameter<settings::Sequence<double>>(parameters,"#robotOrientation").value;
     simSetObjectOrientation(mainHandle,-1,orientation.data());
 
     std::cout << "Robot Created" << std::endl;
@@ -43,7 +43,7 @@ void FixedMorphology::loadModel(){
     if(handle == -1)
     {
         std::cerr << "unable to load robot model" << std::endl;
-        simChar* lastError = simGetLastError();
+        char* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
         exit(1);
@@ -61,7 +61,7 @@ void FixedMorphology::createAtPosition(float x, float y, float z)
 
 void FixedMorphology::setPosition(float x, float y, float z)
 {
-    float robotPos[3];
+    double robotPos[3];
     robotPos[0] = x;
     robotPos[1] = y;
     robotPos[2] = z;

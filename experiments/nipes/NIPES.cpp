@@ -332,11 +332,10 @@ bool NIPES::is_finish(){
 bool NIPES::finish_eval(const Environment::Ptr & env){
 
     std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
-    double t_pos[3] = {target[0],target[1],target[2]};
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
-    auto distance = [](double* a,double* b) -> double
+    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                          (a[1] - b[1])*(a[1] - b[1]) +
@@ -344,14 +343,10 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     };
 
     int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
-    float pos[3];
-    simGetObjectPosition(handle,-1,pos);
-    double posd[3];
-    posd[0] = static_cast<double>(pos[0]);
-    posd[1] = static_cast<double>(pos[1]);
-    posd[2] = static_cast<double>(pos[2]);
 
-    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
+    std::vector<double> pos = std::dynamic_pointer_cast<sim::VirtualEnvironment>(env)->get_object_position(handle);
+
+    double dist = distance(pos,target)/sqrt(2*arenaSize*arenaSize);
 
     if(dist < fTarget){
         std::cout << "STOP !" << std::endl;

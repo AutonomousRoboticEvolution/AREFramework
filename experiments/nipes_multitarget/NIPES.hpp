@@ -5,10 +5,10 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
-#include "multiTargetMaze.hpp"
+#include "simulatedER/multiTargetMaze.hpp"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
 #include "NN2Individual.hpp"

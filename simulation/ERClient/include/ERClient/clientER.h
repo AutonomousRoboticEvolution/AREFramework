@@ -12,10 +12,10 @@ extern "C" {
 #if defined (VREP)
 #include "v_repConst.h"
 #elif defined (COPPELIASIM)
-#include "simConst.h"
+#include "simLib/simConst.h"
 #endif
-#include "remoteApi/extApiPlatform.h"
-#include "remoteApi/extApi.h"
+#include "legacyRemoteApi/remoteApi/extApiPlatform.h"
+#include "legacyRemoteApi/remoteApi/extApi.h"
 }
 
 namespace are {
