@@ -4,7 +4,7 @@
 
 
 # Import the necessary packages
-
+import sys
 import time
 import cv2
 
@@ -17,7 +17,7 @@ else:
     #'http://192.168.2.248/img/video.mjpeg'
     #pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"
     #pipe = "/dev/v4l/by-id/usb-046d_Logitech_Webcam_C930e_86CF445E-video-index0" # usb webcam
-    pipe = 0
+    pipe = sys.argv[1]
 
 
     

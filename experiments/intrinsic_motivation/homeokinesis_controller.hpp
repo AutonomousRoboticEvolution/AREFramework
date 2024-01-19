@@ -56,9 +56,11 @@ public:
 
     std::vector<double> update(const std::vector<double> &sensorValues) override;
 
+
     void step(const Matrix &x, Matrix &y);
 
     void learn();
+
 
 private:
 
@@ -122,6 +124,8 @@ private:
         return res;
     }
 
+
+    config_t _conf;
 
 };
 
