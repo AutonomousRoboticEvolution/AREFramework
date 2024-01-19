@@ -25,6 +25,7 @@ SET(VREP_SRC
 add_library(intrinsic_motivation SHARED 
     ${VREP_SRC}
     homeokinesis_controller.cpp
+    meim.cpp
   )
 target_include_directories(intrinsic_motivation PUBLIC ${INCLUDES})
 target_link_libraries(intrinsic_motivation ARE simulatedER cmaes tbb)

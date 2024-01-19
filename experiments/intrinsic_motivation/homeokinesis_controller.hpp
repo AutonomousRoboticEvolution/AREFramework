@@ -2,9 +2,10 @@
 #define HOMEOKINESIS_CONTROLLER_HPP
 
 #include <eigen3/Eigen/Core>
+#include <eigen3/Eigen/QR>
 #include <ARE/Control.h>
 #include <ARE/utilities.h>
-
+#include <algorithm>
 
 namespace are{
 
@@ -13,17 +14,17 @@ namespace hk{
 
 /// configuration object for Sox controller. Use Sox::getDefaultConf().
 typedef struct config_t {
-  constexpr double initFeedbackStrength = ;  ///< initial strength of sensor to motor connection
+  double initFeedbackStrength;  ///< initial strength of sensor to motor connection
   bool   useExtendedModel;      ///< if true, the extended model (S matrix) is used
   /// if true the controller can be taught see teachable interface
   bool   useTeaching;
   /// # of steps the sensors are averaged (1 means no averaging)
-  int    steps4Averaging;
+  size_t    steps4Averaging;
   /// # of steps the motor values are delayed (1 means no delay)
-  int    steps4Delay;
+  size_t    steps4Delay;
   bool   someInternalParams;    ///< if true only some internal parameters are exported
   bool   onlyMainParameters;    ///< if true only some configurable parameters are exported
-  int buffersize; ///< the maximum size of the memory buffer
+  size_t buffersize; ///< the maximum size of the memory buffer
 
   double factorS;             ///< factor for learning rate of S
   double factorb;             ///< factor for learning rate of b
@@ -37,8 +38,8 @@ class Homeokinesis: public are::Control {
 public:
     using Matrix = Eigen::MatrixXd;
     using Vector = Eigen::VectorXd;
-    typedef std::shared_ptr<Homeokinesis> Ptr;
-    typedef std::shared_ptr<const Homeokinesis> ConstPtr;
+//    typedef std::shared_ptr<Homeokinesis> Ptr;
+//    typedef std::shared_ptr<const Homeokinesis> ConstPtr;
 
     Homeokinesis(): Control(){
         _set_default_config();
@@ -49,23 +50,22 @@ public:
     }
     Homeokinesis(const Homeokinesis& ctrl): Control(ctrl){}
 
-    void init(int nb_inputs, int nb_outputs){}
+    void init(int nb_inputs, int nb_outputs);
 
     Control::Ptr clone() const override;
 
     std::vector<double> update(const std::vector<double> &sensorValues) override;
 
-    void step();
+    void step(const Matrix &x, Matrix &y);
 
     void learn();
-
 
 private:
 
     void _set_default_config();
 
     int _nbr_inputs;
-    int _nnr_outputs;
+    int _nbr_outputs;
 
     Matrix A; //Forward model
     Matrix S; //extenstion of forward model to integrate the current state
@@ -75,8 +75,53 @@ private:
     Matrix L;
     Matrix v_avg;
     Matrix R; //Sensitivity?
+    Matrix A_native;
+    Matrix C_native;
+    Matrix y_teaching;
+    Matrix x;
+    Matrix x_smooth;
+    std::vector<Matrix> x_buffer;
+    std::vector<Matrix> y_buffer;
 
     config_t _conf;
+    int t=0;
+
+    double causeaware;
+    double sense;
+    double creativity;
+    double harmony;
+    double causeaware;
+    int pseudo;
+    double epsC;
+    double epsA;
+    double damping;
+    double gamma;          // teaching strength
+    bool loga;
+    bool intern_isTeaching;
+
+    inline void _tanh_diff(Matrix& m){
+        m = m.array().tanh();
+        m = m*m;
+        m = 1.0f - m.array();
+    }
+
+    /// function that clips the second argument to the interval [-first,first]
+    static double clip(double r, double x){
+      return std::min(std::max(x,-r),r);
+    }
+    /// calculates the inverse the argument (useful for Matrix::map)
+    static double one_over(double x){
+      return 1/x;
+    }
+
+    template<typename Fct>
+    Matrix _matrix_map(const Matrix &M, Fct f){
+        Matrix res = M;
+        for(size_t i = 0; i < res.array().size(); i++)
+            res.array()[i] = f(res.array()[i]);
+        return res;
+    }
+
 
 };
 
