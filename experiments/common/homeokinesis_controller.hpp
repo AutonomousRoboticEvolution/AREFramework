@@ -4,7 +4,7 @@
 #include <eigen3/Eigen/Core>
 #include <eigen3/Eigen/QR>
 #include <ARE/Control.h>
-#include <ARE/utilities.h>
+#include <ARE/misc/utilities.h>
 #include <algorithm>
 
 namespace are{
@@ -38,8 +38,8 @@ class Homeokinesis: public are::Control {
 public:
     using Matrix = Eigen::MatrixXd;
     using Vector = Eigen::VectorXd;
-//    typedef std::shared_ptr<Homeokinesis> Ptr;
-//    typedef std::shared_ptr<const Homeokinesis> ConstPtr;
+    typedef std::shared_ptr<Homeokinesis> Ptr;
+    typedef std::shared_ptr<const Homeokinesis> ConstPtr;
 
     Homeokinesis(): Control(){
         _set_default_config();
@@ -52,7 +52,9 @@ public:
 
     void init(int nb_inputs, int nb_outputs);
 
-    Control::Ptr clone() const override;
+    Control::Ptr clone() const override{
+        return std::make_shared<Homeokinesis>(*this);
+    }
 
     std::vector<double> update(const std::vector<double> &sensorValues) override;
 
@@ -92,7 +94,6 @@ private:
     double sense;
     double creativity;
     double harmony;
-    double causeaware;
     int pseudo;
     double epsC;
     double epsA;
@@ -120,13 +121,9 @@ private:
     Matrix _matrix_map(const Matrix &M, Fct f){
         Matrix res = M;
         for(size_t i = 0; i < res.array().size(); i++)
-            res.array()[i] = f(res.array()[i]);
+            res.array()(i) = f(res.array()(i));
         return res;
     }
-
-
-    config_t _conf;
-
 };
 
 }//hk

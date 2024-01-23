@@ -97,7 +97,7 @@ void Homeokinesis::learn(){
     const Matrix& chi    = Lplus.transpose() * v;
 
     const Matrix& mu     = A.transpose().cwiseProduct(g_prime) * chi;
-    const Matrix& epsrel = (mu.array().colwise() * (C * v).array()) * (sense * 2);
+    const Matrix& epsrel = (mu * (C * v).asDiagonal()) * (sense * 2);
 
     const Matrix& v_hat = v + x * harmony;
     auto clip_01 = [](double x)->double{return clip(0.1,x);};
@@ -122,10 +122,10 @@ void Homeokinesis::learn(){
         b += _matrix_map<double(double)>(xi * (epsb) + (b *  -damping), clip_01);
     }
     if(epsC > 0){
-      C += _matrix_map<double(double)>(((mu * v_hat.transpose()).array() - (epsrel.array().colwise() * y.array()) * x.transpose().array())   * (EE * epsC), clip_01);
+      C += _matrix_map<double(double)>(((mu * v_hat.transpose()) - (epsrel * y.asDiagonal()) * x.transpose())   * (EE * epsC), clip_01);
       if(damping)
         C += _matrix_map<double(double)>(_matrix_map<double(double)>(C_native-C,power3)*damping, clip_005);
-      h += _matrix_map<double(double)>(((mu*harmony).array() - (epsrel.array().colwise() * y.array())) * (EE * epsC * _conf.factorh),clip_005);
+      h += _matrix_map<double(double)>(((mu*harmony) - (epsrel * y.asDiagonal())) * (EE * epsC * _conf.factorh),clip_005);
 
       if(intern_isTeaching && gamma > 0){
         // scale of the additional terms
@@ -133,7 +133,7 @@ void Homeokinesis::learn(){
 
         const Matrix& y      = y_buffer[(t-1)% _conf.buffersize];
         const Matrix& xsi    = y_teaching - y;
-        const Matrix& delta  = xsi.array().colwise() * g_prime.array();
+        const Matrix& delta  = xsi * g_prime.asDiagonal();
         C += _matrix_map<double(double)>((metric * delta*(x.transpose()) ) * (gamma * epsC),clip_005);
         h += _matrix_map<double(double)>((metric * delta)        * (gamma * epsC * _conf.factorh),clip_005);
         // after we applied teaching signal it is switched off until new signal is given
