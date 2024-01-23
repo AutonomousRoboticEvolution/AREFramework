@@ -241,25 +241,34 @@ void Visu::init(){
         }
 
     }else{
-        for(const std::string& path: ctrl_gen_files){
-
+        if(empty_ctrl_gen){
             morph_gen = std::make_shared<EmptyGenome>();
-            if(empty_ctrl_gen)
-                ctrl_gen.reset(new EmptyGenome);
-            else{
-                ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
-                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
-            }
-
+            ctrl_gen = std::make_shared<EmptyGenome>();
             Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
+        }else{
+            for(const std::string& path: ctrl_gen_files){
+
+                ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
+                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
+
+                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+            }
         }
     }
 
     morph_gen.reset();
     ctrl_gen.reset();
+
+    if(population.empty()){
+        std::cerr << "ERROR: Population is empty" << std::endl;
+        exit(1);
+    }
 }
 
 bool Visu::update(const Environment::Ptr &env){

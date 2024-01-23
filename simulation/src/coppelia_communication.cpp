@@ -225,6 +225,14 @@ void sim::getJointsPosition(const std::vector<int>& handles,std::vector<double>&
     }
 }
 
+void sim::getWheelsPosition(const std::vector<int>& handles,std::vector<double>& positions){
+    float pos;
+    for(const int& handle : handles){
+        simGetJointPosition(handle,&pos);
+        positions.push_back(static_cast<double>(pos));
+    }
+}
+
 void sim::sentCommandToWheels(const std::vector<int>& handles, const std::vector<double>& commands, double max_velocity){
     for (size_t i = 0; i < handles.size(); i++)
         simSetJointTargetVelocity(handles[i],static_cast<float>(commands[i]*max_velocity));

@@ -27,10 +27,20 @@ void MEIMIndividual::createController(){
 }
 
 void MEIMIndividual::update(double delta_time){
-    std::vector<double> inputs = morphology->update();
-    std::vector<double> outputs = control->update(inputs);
-    morphology->command(outputs);
-
+    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
+    if( diff < 0.1){
+        std::vector<double> inputs = morphology->update();
+        std::cout << "inputs: ";
+        for(const double& i : inputs)
+            std::cout << i << ";";
+        std::vector<double> outputs = control->update(inputs);
+        std::cout << "outputs: ";
+        for(const double& o : outputs)
+            std::cout << o << ";";
+        std::cout << std::endl;
+        morphology->command(outputs);
+    }
     //sim_time = delta_time;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
     float position[3];
@@ -121,14 +131,11 @@ void MEIM::reproduction(){
         //Add it to the population
         NN2CPPNGenome::Ptr morph_genome = std::make_shared<NN2CPPNGenome>(new_morph_gene);
         EmptyGenome::Ptr ctrl_genome = std::make_shared<EmptyGenome>();
-        M_NIPESIndividual::Ptr ind = std::make_shared<M_NIPESIndividual>(morph_genome,ctrl_genome);
+        MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_genome,ctrl_genome);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         //-
@@ -154,10 +161,18 @@ bool MEIM::update(const Environment::Ptr &env){
             }
         }
         if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-
+            //add new gene in gene_pool
+            genome_t new_gene(learner.morph_genome,best_ctrl_gen,{fitness_fct(learner.ctrl_learner)},learner.ctrl_learner.learning_progress());
+            new_gene.trajectories = best_controller.trajectories;
+            misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
+            gene_pool.push_back(new_gene);
+            //-
         }
-        }
+    }
 
+
+    if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+        reproduction();
     }
 
 }

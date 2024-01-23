@@ -10,6 +10,18 @@ std::vector<double> Morphology::update(){
     return sensorValues;
 }
 
+std::vector<double> Morphology::get_joints_positions(){
+    std::vector<double> joint_positions;
+    getJointsPosition(jointHandles,joint_positions);
+    return joint_positions;
+}
+
+std::vector<double> Morphology::get_wheels_positions(){
+    std::vector<double> positions;
+    getWheelsPosition(wheelHandles,positions);
+    return positions;
+}
+
 void Morphology::command(const std::vector<double> &ctrl_com){
     assert(ctrl_com.size() == wheelHandles.size() + jointHandles.size());
     if(ctrl_com.empty())
