@@ -1,10 +1,10 @@
 #experimentName,string,homeokinesis
 #expPluginName,string,/usr/local/lib/libhomeokinesis.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/robots/are_four_legged/model_32767.ttm
-#maxEvalTime,float,60
+#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
+#robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
+#maxEvalTime,float,1200
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
 #instanceType,int,0
@@ -24,7 +24,7 @@
 #withBeacon,bool,1
 #withTiles,bool,1
 #flatFloor,bool,1
-#jointControllerType,int,1
+#jointControllerType,int,0
 #proportionalGain,float,1
 #randomOrientation,bool,0
 #loadAllMorphGenome,bool,0
@@ -38,6 +38,9 @@
 #isExportModel,bool,0
 #saveBlueprint,bool,0
 #isSegmentedRobot,bool,0
+
+#inputNoiseLevel,double,0.01
+#outputNoiseLevel,double,0.01
 
 #reloadController,bool,1
 #isScreenshotEnable,bool,0

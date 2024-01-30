@@ -26,6 +26,9 @@ typedef struct config_t {
   bool   onlyMainParameters;    ///< if true only some configurable parameters are exported
   size_t buffersize; ///< the maximum size of the memory buffer
 
+  double epsA;
+  double epsC;
+
   double factorS;             ///< factor for learning rate of S
   double factorb;             ///< factor for learning rate of b
   double factorh;             ///< factor for learning rate of h
@@ -45,10 +48,40 @@ public:
         _set_default_config();
     }
     Homeokinesis(int nb_inputs, int nb_outputs): Control(){
-        init(nb_inputs,nb_outputs);
         _set_default_config();
+        init(nb_inputs,nb_outputs);
     }
-    Homeokinesis(const Homeokinesis& ctrl): Control(ctrl){}
+    Homeokinesis(const Homeokinesis& ctrl):
+        Control(ctrl),
+        _nbr_inputs(ctrl._nbr_inputs),
+        _nbr_outputs(ctrl._nbr_outputs),
+        x_buffer(ctrl.x_buffer),
+        y_buffer(ctrl.y_buffer),
+        _conf(ctrl._conf),
+        causeaware(ctrl.causeaware),
+        sense(ctrl.sense),
+        creativity(ctrl.creativity),
+        harmony(ctrl.harmony),
+        pseudo(ctrl.pseudo),
+        damping(ctrl.damping),
+        gamma(ctrl.gamma),
+        loga(ctrl.loga),
+        intern_isTeaching(ctrl.intern_isTeaching)
+    {
+        A = ctrl.A;
+        S = ctrl.S;
+        C = ctrl.C;
+        b = ctrl.b;
+        h = ctrl.h;
+        L = ctrl.L;
+        v_avg = ctrl.v_avg;
+        R = ctrl.R;
+        A_native = ctrl.A_native;
+        C_native = ctrl.C_native;
+        y_teaching = ctrl.y_teaching;
+        x = ctrl.x;
+        x_smooth = ctrl.x_smooth;
+    }
 
     void init(int nb_inputs, int nb_outputs);
 
@@ -95,8 +128,6 @@ private:
     double creativity;
     double harmony;
     int pseudo;
-    double epsC;
-    double epsA;
     double damping;
     double gamma;          // teaching strength
     bool loga;
@@ -104,7 +135,7 @@ private:
 
     inline void _tanh_diff(Matrix& m){
         m = m.array().tanh();
-        m = m*m;
+        m = m.array()*m.array();
         m = 1.0f - m.array();
     }
 

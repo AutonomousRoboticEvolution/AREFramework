@@ -8,16 +8,11 @@ namespace st = settings;
 void HomeoInd::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
-
-
     morphology.reset(new sim::FixedMorphology(parameters));
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
     morphology->set_randNum(randNum);
 
-
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);;
-
-
 
     //    float pos[3];
     //    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);
@@ -30,30 +25,43 @@ void HomeoInd::createController(){
 
     if(!settings::getParameter<settings::Boolean>(parameters,"#withSensors").value)
         nb_sensors = 0;
-    int nb_inputs = nb_sensors + nb_joints*2 + nb_wheels;
-    int nb_outputs = nb_joints*2 + nb_joints;
+    int nb_inputs = nb_sensors + nb_joints + nb_wheels;
+    int nb_outputs = nb_joints + nb_wheels;
     control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
+    control->set_parameters(parameters);
+    control->set_random_number(randNum);
 }
 
 void HomeoInd::update(double delta_time){
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
     double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
+    double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
+    double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
     if( diff < 0.1){
         std::vector<double> sensors = morphology->update();
         std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
+
+        for(double i = 0; i < joints.size(); i++)
+            joints[i] = 2.*joints[i]/M_PI;
+        for(double& v: joints)
+            v = randNum->normalDist(v,input_noise_lvl);
+
         std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
         std::vector<double> inputs;
         inputs.insert(inputs.begin(),sensors.begin(),sensors.begin() + nb_sensors);
         inputs.insert(inputs.end(),joints.begin(),joints.end());
         inputs.insert(inputs.end(),wheels.begin(),wheels.end());
-        std::cout << "inputs: ";
-        for(const double& i : inputs)
-            std::cout << i << ";";
+//        std::cout << "inputs: ";
+//        for(const double& i : inputs)
+//            std::cout << i << ";";
         std::vector<double> outputs = control->update(inputs);
-        std::cout << "outputs: ";
-        for(const double& o : outputs)
-            std::cout << o << ";";
-        std::cout << std::endl;
+        for(double &o: outputs)
+            o = randNum->normalDist(o,output_noise_lvl);
+
+//        std::cout << "outputs: ";
+//        for(const double& o : outputs)
+//            std::cout << o << ";";
+//        std::cout << std::endl;
         morphology->command(outputs);
     }
 }

@@ -7,30 +7,30 @@ void Homeokinesis::init(int nb_inputs, int nb_outputs){
     _nbr_inputs = nb_inputs;
     _nbr_outputs = nb_outputs;
 
-    A.Identity(nb_inputs,nb_outputs);
-    S.Identity(nb_inputs,nb_inputs);
-    C.Identity(nb_outputs,nb_inputs);
-    b.Zero(nb_inputs,1);
-    h.Zero(nb_outputs,1);
-    L.Zero(nb_inputs,nb_inputs);
-    v_avg.Zero(nb_inputs,1);
-    A_native.Identity(nb_inputs,nb_outputs);
-    C_native.Identity(nb_outputs,nb_inputs);
+    A = Eigen::MatrixXd::Identity(nb_inputs,nb_outputs);
+    S = Eigen::MatrixXd::Identity(nb_inputs,nb_inputs);
+    C = Eigen::MatrixXd::Identity(nb_outputs,nb_inputs);
+    b = Eigen::MatrixXd::Zero(nb_inputs,1);
+    h = Eigen::MatrixXd::Zero(nb_outputs,1);
+    L = Eigen::MatrixXd::Zero(nb_inputs,nb_inputs);
+    v_avg = Eigen::MatrixXd::Zero(nb_inputs,1);
+    A_native = Eigen::MatrixXd::Identity(nb_inputs,nb_outputs);
+    C_native = Eigen::MatrixXd::Identity(nb_outputs,nb_inputs);
 
-    R.Zero(nb_inputs,nb_inputs);
+    R = Eigen::MatrixXd::Zero(nb_inputs,nb_inputs);
 
     C*=_conf.initFeedbackStrength;
     S*=0.05f;
     C_native*=1.2f;
 
-    y_teaching.Zero(nb_outputs,1);
-    x.Zero(nb_inputs,1);
-    x_smooth.Zero(nb_inputs,1);
+    y_teaching = Eigen::MatrixXd::Zero(nb_outputs,1);
+    x = Eigen::MatrixXd::Zero(nb_inputs,1);
+    x_smooth = Eigen::MatrixXd::Zero(nb_inputs,1);
     x_buffer.resize(_conf.buffersize);
     y_buffer.resize(_conf.buffersize);
     for (size_t k = 0; k < _conf.buffersize; k++) {
-        x_buffer[k].Zero(nb_inputs,1);
-        y_buffer[k].Zero(nb_outputs,1);
+        x_buffer[k] = Eigen::MatrixXd::Zero(nb_inputs,1);
+        y_buffer[k] = Eigen::MatrixXd::Zero(nb_outputs,1);
     }
 
 }
@@ -43,7 +43,7 @@ std::vector<double> Homeokinesis::update(const std::vector<double> &sensorValues
     Matrix y;
     step(x,y);
     std::vector<double> ctrl_cmd;
-    //misc::eigenmat_to_stdvect(y,ctrl_cmd);
+    misc::eigenvect_to_stdvect(y,ctrl_cmd);
     return ctrl_cmd;
 }
 
@@ -86,7 +86,7 @@ void Homeokinesis::learn(){
     Matrix g_prime = z;
     _tanh_diff(g_prime);
 
-    L = A * C.cwiseProduct(g_prime) + S;
+    L = A * (g_prime.asDiagonal() * C) + S;
     R = A * C+S; // this is only used for visualization
 
     const Matrix& eta    = A.completeOrthogonalDecomposition().pseudoInverse() * xi;
@@ -96,8 +96,8 @@ void Homeokinesis::learn(){
     const Matrix& v      = Lplus * xi;
     const Matrix& chi    = Lplus.transpose() * v;
 
-    const Matrix& mu     = A.transpose().cwiseProduct(g_prime) * chi;
-    const Matrix& epsrel = (mu * (C * v).asDiagonal()) * (sense * 2);
+    const Matrix& mu     = (A * g_prime.asDiagonal()).transpose() * chi;
+    const Matrix& epsrel = ((C * v).asDiagonal() * mu) * (sense * 2);
 
     const Matrix& v_hat = v + x * harmony;
     auto clip_01 = [](double x)->double{return clip(0.1,x);};
@@ -110,10 +110,10 @@ void Homeokinesis::learn(){
     if(loga){
       EE = .1/(v.squaredNorm() + .001); // logarithmic error (E = log(v^T v))
     }
-    if(epsA > 0){
-        double epsS=epsA*_conf.factorS;
-        double epsb=epsA*_conf.factorb;
-        A += _matrix_map<double(double)>(xi * (y_hat.transpose()) * epsA,clip_01);
+    if(_conf.epsA > 0){
+        double epsS=_conf.epsA*_conf.factorS;
+        double epsb=_conf.epsA*_conf.factorb;
+        A += _matrix_map<double(double)>(xi * (y_hat.transpose()) * _conf.epsA,clip_01);
         if(damping)
             A += _matrix_map<double(double)>(_matrix_map<double(double)>(A_native-A,power3)*damping,clip_01);
 
@@ -121,11 +121,11 @@ void Homeokinesis::learn(){
             S += _matrix_map<double(double)>(xi * (x.transpose())     * (epsS)+ (S *  -damping*10),clip_01);
         b += _matrix_map<double(double)>(xi * (epsb) + (b *  -damping), clip_01);
     }
-    if(epsC > 0){
-      C += _matrix_map<double(double)>(((mu * v_hat.transpose()) - (epsrel * y.asDiagonal()) * x.transpose())   * (EE * epsC), clip_01);
+    if(_conf.epsC > 0){
+      C += _matrix_map<double(double)>(((mu * v_hat.transpose()) - (y.asDiagonal() * epsrel) * x.transpose())   * (EE * _conf.epsC), clip_01);
       if(damping)
         C += _matrix_map<double(double)>(_matrix_map<double(double)>(C_native-C,power3)*damping, clip_005);
-      h += _matrix_map<double(double)>(((mu*harmony) - (epsrel * y.asDiagonal())) * (EE * epsC * _conf.factorh),clip_005);
+      h += _matrix_map<double(double)>(((mu*harmony) - (y.asDiagonal() * epsrel)) * (EE * _conf.epsC * _conf.factorh),clip_005);
 
       if(intern_isTeaching && gamma > 0){
         // scale of the additional terms
@@ -133,24 +133,29 @@ void Homeokinesis::learn(){
 
         const Matrix& y      = y_buffer[(t-1)% _conf.buffersize];
         const Matrix& xsi    = y_teaching - y;
-        const Matrix& delta  = xsi * g_prime.asDiagonal();
-        C += _matrix_map<double(double)>((metric * delta*(x.transpose()) ) * (gamma * epsC),clip_005);
-        h += _matrix_map<double(double)>((metric * delta)        * (gamma * epsC * _conf.factorh),clip_005);
+        const Matrix& delta  = g_prime.asDiagonal() * xsi;
+        C += _matrix_map<double(double)>((metric * delta*(x.transpose()) ) * (gamma * _conf.epsC),clip_005);
+        h += _matrix_map<double(double)>((metric * delta)        * (gamma * _conf.epsC * _conf.factorh),clip_005);
         // after we applied teaching signal it is switched off until new signal is given
         intern_isTeaching    = false;
       }
     }
+    std::cout << "Controller matrix: " << C << std::endl;
+    std::cout << "Bias: " << h << std::endl;
 }
 
 void Homeokinesis::_set_default_config(){
-    _conf.initFeedbackStrength = 1.0;
-    _conf.useExtendedModel     = true;
+    _conf.initFeedbackStrength = 1.5;
+    _conf.useExtendedModel     = false;
     _conf.useTeaching          = false;
-    _conf.steps4Averaging      = 1;
-    _conf.steps4Delay          = 1;
+    _conf.steps4Averaging      = 10;
+    _conf.steps4Delay          = 10;
     _conf.someInternalParams   = false;
     _conf.onlyMainParameters   = true;
     _conf.buffersize = 10;
+
+    _conf.epsA = 0.3;
+    _conf.epsC = 0.3;
 
     _conf.factorS              = 1;
     _conf.factorb              = 1;
