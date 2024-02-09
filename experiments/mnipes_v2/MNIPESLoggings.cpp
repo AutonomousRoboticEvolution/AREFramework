@@ -7,14 +7,16 @@ using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
-    if(static_cast<M_NIPES*>(ea.get())->get_gene_pool().empty())
+    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
+
+    if(static_cast<M_NIPES*>(ea.get())->get_gene_pool().size() < pop_size)
         return;
-    const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
+    for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_gene_pool()){
     //Log the morph genome
     std::stringstream morph_filepath;
     morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();
     if(boost::filesystem::exists(morph_filepath.str()))
-        return;
+        continue;
 
     std::ofstream mofstr(morph_filepath.str());
     boost::archive::text_oarchive oarch(mofstr);
@@ -91,6 +93,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         return;
     neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
     neofs.close();
+    }
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)

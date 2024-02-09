@@ -1,12 +1,17 @@
 #include "simulatedER/Morphology.h"
 
+
 using namespace are::sim;
 
+
 std::vector<double> Morphology::update(){
+
     std::vector<double> sensorValues;
     readProximitySensors(proxHandles,sensorValues);
-    readPassivIRSensors(IRHandles, sensorValues);
-    readCamera(camera_handle,sensorValues);
+    if(settings::getParameter<settings::Boolean>(parameters,"#useIR").value)
+        readPassivIRSensors(IRHandles, sensorValues);
+    if(settings::getParameter<settings::Boolean>(parameters,"#useCamera").value)
+        readCamera(camera_handle,sensorValues);
     return sensorValues;
 }
 
