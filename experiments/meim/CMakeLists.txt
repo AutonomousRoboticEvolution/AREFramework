@@ -22,14 +22,24 @@ SET(VREP_SRC
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
     )
 
-add_library(intrinsic_motivation SHARED 
+add_library(meim SHARED
     ${VREP_SRC}
     ../common/homeokinesis_controller.cpp
+    ../common/obstacleAvoidance.cpp
+    factories.cpp
     meim.cpp
+    meim_logging.cpp
   )
-target_include_directories(intrinsic_motivation PUBLIC ${INCLUDES})
-target_link_libraries(intrinsic_motivation ARE simulatedER cmaes tbb)
+target_include_directories(meim PUBLIC ${INCLUDES}
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+    "../../simulation/include"
+    "../../EAFramework/include"
+    "../common/"
+    "/usr/include/eigen3"
+    "../../modules")
+target_link_libraries(meim ARE simulatedER cmaes tbb)
 
-install(TARGETS intrinsic_motivation DESTINATION lib)
+install(TARGETS meim DESTINATION lib)
 install(DIRECTORY . DESTINATION include/intrinsic_motivation FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
