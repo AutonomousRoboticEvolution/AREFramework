@@ -101,7 +101,7 @@ void M_NIPESIndividual::createMorphology(){
 }
 
 void M_NIPESIndividual::createController(){
-
+    sum_ctrl_freq = 0;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
@@ -159,8 +159,9 @@ void M_NIPESIndividual::update(double delta_time){
     }
 
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
-    if( diff < 0.1){
+    std::cout << sum_ctrl_freq << " - " << delta_time << std::endl;
+    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
+        sum_ctrl_freq = 0;
         //- Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
 
@@ -179,14 +180,13 @@ void M_NIPESIndividual::update(double delta_time){
         energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
         if(std::isnan(energy_cost))
             energy_cost = 0;
+        int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
+        float position[3];
+        simGetObjectPosition(morphHandle, -1, position);
+        std::cout << "current position: " << position[0] << " "  << position[1] << " " << position[2] << std::endl;
     }
 
-    sim_time = delta_time;
-    int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
-    float position[3];
-    simGetObjectPosition(morphHandle, -1, position);
-    //std::cout << "current position: " << position[0] << " "  << position[1] << " " << position[2] << std::endl;
-
+    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 }
 
 void M_NIPESIndividual::setMorphDesc()
