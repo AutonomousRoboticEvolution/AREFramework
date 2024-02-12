@@ -60,7 +60,8 @@ typedef struct genome_t{
         behavioral_descriptor(g.behavioral_descriptor),
         nbr_eval(g.nbr_eval),
         environment(g.environment),
-        task(g.task){}
+        task(g.task),
+        learning_progress(g.learning_progress){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj,double lp = 0) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0), learning_progress(lp){}
     NN2CPPNGenome morph_genome;

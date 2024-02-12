@@ -938,7 +938,7 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
         ctrl_gen->set_nbr_output(learner.ctrl_learner.get_nbr_outputs());
-        ctrl_gen->set_nbr_input(learner.ctrl_learner.get_nbr_inputs()); // Two per multi-sensor + 1 camera
+        ctrl_gen->set_nbr_input(learner.ctrl_learner.get_nbr_inputs());
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind = std::make_shared<M_NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
@@ -966,8 +966,8 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
-        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
+        ctrl_gen->set_nbr_output(learner.ctrl_learner.get_nbr_outputs());
+        ctrl_gen->set_nbr_input(learner.ctrl_learner.get_nbr_inputs());
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind = std::make_shared<M_NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
