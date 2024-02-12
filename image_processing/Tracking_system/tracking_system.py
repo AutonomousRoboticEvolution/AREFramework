@@ -135,9 +135,9 @@ class TrackingSystem:
         if show_frames:
             kp_image = cv2.drawKeypoints(mask,keypoints,None,color=(0,0,255),flags= cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
-            # cv2.imshow("cropped",self.cropped_image)
-            # cv2.imshow("Mask",mask)
-            # cv2.imshow("Blob",kp_image)
+            #cv2.imshow("cropped",self.cropped_image)
+            #cv2.imshow("Mask",mask)
+            #cv2.imshow("Blob",kp_image)
             factor=2
             cv2.imshow( "image", cv2.resize( self.cropped_image , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
             cv2.imshow( "masked", cv2.resize( cv2.bitwise_and(self.cropped_image, image, mask=mask) , (round(self.save_resolution[0]/factor),round(self.save_resolution[1]/factor)) ) )
@@ -209,7 +209,7 @@ class TrackingSystem:
                 self.robot = self.robot_location(self.cropped_image, brainMin, brainMax)
 
                 # compute tag locations
-                self.aruco_tags = self.aruco_locations(self.cropped_image)
+            #    self.aruco_tags = self.aruco_locations(self.cropped_image)
 
             else:
                 warnings.warn("OpenCV read() failed")

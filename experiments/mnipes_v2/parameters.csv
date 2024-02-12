@@ -65,6 +65,11 @@
 #withCrossover,bool,1
 #morphSelectionObjective,int,0
 
+#useIR,bool,1
+#useCamera,bool,0
+#useJointFeedback,bool,1
+#useWheelFeedback,bool,1
+
 #cmaesSmallNbrEval,int,200
 #cmaesLargeNbrEval,int,200
 #cmaesPopSize,int,10

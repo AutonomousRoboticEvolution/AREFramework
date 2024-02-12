@@ -118,7 +118,6 @@ public:
         final_position(ind.final_position),
         trajectories(ind.trajectories),
         energy_cost(ind.energy_cost),
-        sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
         descriptor_type(ind.descriptor_type),
@@ -139,7 +138,6 @@ public:
     void set_trajectories(const std::vector<std::vector<waypoint>>& traj){trajectories = traj;}
     const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
     double get_energy_cost(){return energy_cost;}
-    double get_sim_time(){return sim_time;}
     void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
 
     void setManRes();
@@ -158,7 +156,6 @@ public:
         arch & final_position;
 //        arch & energy_cost;
         arch & trajectories;
-//        arch & sim_time;
         arch & controller_archive;
         arch & morphDesc;
         arch & nbr_dropped_eval;
@@ -214,9 +211,10 @@ private:
     bool no_sensors = false;
 
 
-    double energy_cost;
+    double energy_cost = 0;
     std::vector<std::vector<waypoint>> trajectories;
-    double sim_time;
+
+    double sum_ctrl_freq = 0;
     std::vector<double> final_position;
     std::vector<double> init_position;
     int nbr_dropped_eval = 0;
@@ -229,6 +227,8 @@ private:
     std::vector<double> copy_rewards;
     bool drop_learning = false;
     int current_gradual_scene = 0;
+
+
 
 
 };

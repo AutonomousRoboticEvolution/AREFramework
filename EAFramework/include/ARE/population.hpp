@@ -17,8 +17,7 @@ public:
     bool empty() const {return _individuals.empty();}
     void clear(){_individuals.clear();
                     _indexes.clear();}
-    void resize(size_t s){_individuals.resize(s);
-                          _indexes.resize(s);}
+    void resize(size_t s);
 
     auto begin(){return _individuals.begin();}
     auto end(){return _individuals.end();}

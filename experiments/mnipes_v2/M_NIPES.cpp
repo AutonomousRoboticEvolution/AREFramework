@@ -101,7 +101,7 @@ void M_NIPESIndividual::createMorphology(){
 }
 
 void M_NIPESIndividual::createController(){
-
+    sum_ctrl_freq = 0;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(ctrlGenome->get_type() == "empty_genome" || drop_learning)
@@ -148,6 +148,8 @@ void M_NIPESIndividual::createController(){
 
 void M_NIPESIndividual::update(double delta_time){
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
     if(ctrlGenome->get_type() == "empty_genome" || drop_learning || control.get() == nullptr){
         if(verbose)
             std::cout << "drop update : " << ctrlGenome->get_type()
@@ -157,22 +159,34 @@ void M_NIPESIndividual::update(double delta_time){
     }
 
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double diff = sim_time/ctrl_freq - std::trunc(sim_time/ctrl_freq);
-    if( diff < 0.1){
+    std::cout << sum_ctrl_freq << " - " << delta_time << std::endl;
+    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
+        sum_ctrl_freq = 0;
+        //- Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
+
+        if(use_joint_feedback){
+            std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
+            for(double &j: joints)
+                j = 2.*j/M_PI;
+            inputs.insert(inputs.end(),joints.begin(),joints.end());
+        }
+        if(use_wheel_feedback){
+            std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+            inputs.insert(inputs.end(),wheels.begin(),wheels.end());
+        }
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);
         energy_cost += std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_energy_cost();
         if(std::isnan(energy_cost))
             energy_cost = 0;
+        int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
+        float position[3];
+        simGetObjectPosition(morphHandle, -1, position);
+        std::cout << "current position: " << position[0] << " "  << position[1] << " " << position[2] << std::endl;
     }
 
-    sim_time = delta_time;
-    int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
-    float position[3];
-    simGetObjectPosition(morphHandle, -1, position);
-    //std::cout << "current position: " << position[0] << " "  << position[1] << " " << position[2] << std::endl;
-
+    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 }
 
 void M_NIPESIndividual::setMorphDesc()
@@ -614,9 +628,9 @@ bool M_NIPES::update(const Environment::Ptr &env){
                                 }
                                 increment_age();
                                 //-
-                                assert(gene_pool.size() == pop_size);
+                               // assert(gene_pool.size() == pop_size);
                                 reproduction();
-                                assert(learning_pool.size() == pop_size);
+                               // assert(learning_pool.size() == pop_size);
                             }
                             //-
                         }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
@@ -864,7 +878,16 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
     bool use_ctrl_arch = settings::getParameter<settings::Boolean>(parameters,"#useControllerArchive").value;
-    int nn_inputs = sensor_nbr * 2 + 1; // Two per multi-sensor + 1 camera
+    bool use_camera = settings::getParameter<settings::Boolean>(parameters,"#useCamera").value;
+    bool use_ir = settings::getParameter<settings::Boolean>(parameters,"#useIR").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+    int nn_inputs = sensor_nbr + //proximity sensors
+            (use_ir ? sensor_nbr : 0) + // IR sensors
+            (use_joint_feedback ? joint_nbr : 0) + // joint positions
+            (use_wheel_feedback ? wheel_nbr : 0) + // wheel positions
+            (use_camera ? 1 : 0); // camera
+
     int nn_outputs = wheel_nbr + joint_nbr;
 
     int nbr_weights, nbr_bias;
@@ -914,8 +937,8 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ctrl_gen->set_weights(wb.first);
         ctrl_gen->set_biases(wb.second);
         ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nbr_output(learner.morph_genome.get_cart_desc().wheelNumber + learner.morph_genome.get_cart_desc().jointNumber);
-        ctrl_gen->set_nbr_input(learner.morph_genome.get_cart_desc().sensorNumber*2+1); // Two per multi-sensor + 1 camera
+        ctrl_gen->set_nbr_output(learner.ctrl_learner.get_nbr_outputs());
+        ctrl_gen->set_nbr_input(learner.ctrl_learner.get_nbr_inputs()); // Two per multi-sensor + 1 camera
         ctrl_gen->set_nn_type(nn_type);
         Individual::Ptr ind = std::make_shared<M_NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);

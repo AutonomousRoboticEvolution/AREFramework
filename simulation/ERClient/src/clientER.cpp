@@ -191,8 +191,8 @@ bool ER::endOfSimulation(int slaveIndex){
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
-    if(evalIsFinish)
-        saveLogs(false);
+  //  if(evalIsFinish)
+  //      saveLogs(false);
     return true;
 }
 
@@ -303,8 +303,10 @@ bool ER::updateSimulation()
                 }
             }});
         //}
+	
         ea->update(environment);
-        if(!indToEval.empty() && ea->get_population().get_index(ea->get_pop_size()-1) != indToEval.back() && !ea->is_finish()){
+        
+       	if(!indToEval.empty() && ea->get_population().get_index(ea->get_pop_size()-1) != indToEval.back() && !ea->is_finish()){
             int s = 0;
             for(;s < ea->get_pop_size(); s++)
                 if(ea->get_population().get_index(s) == indToEval.back())
@@ -314,7 +316,7 @@ bool ER::updateSimulation()
             population_size = ea->get_pop_size();
         }
     }
-
+    saveLogs(false);
 //    bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
 //    if(!wait_for_all_instances) all_instances_finish = true;
 

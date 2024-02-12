@@ -44,10 +44,22 @@ void misc::stdvect_to_eigenvect(const std::vector<double>& std_v, Eigen::VectorX
         eigen_v(i) = std_v[i];
 }
 
+void misc::stdvect_to_eigenmat(const std::vector<double>& std_v, Eigen::MatrixXd &eigen_v){
+    eigen_v = Eigen::MatrixXd::Zero(std_v.size(),1);
+    for(size_t i = 0; i < std_v.size(); i++)
+        eigen_v(i,0) = std_v[i];
+}
+
 void misc::eigenvect_to_stdvect(const Eigen::VectorXd &eigen_v, std::vector<double>& std_v){
     std_v.resize(eigen_v.rows());
     for(long i = 0; i < eigen_v.rows(); i++)
         std_v[i] = eigen_v[i];
+}
+
+void misc::eigenvect_to_stdvect(const Eigen::MatrixXd &eigen_v, std::vector<double>& std_v){
+    std_v.resize(eigen_v.rows());
+    for(long i = 0; i < eigen_v.rows(); i++)
+        std_v[i] = eigen_v(i,0);
 }
 
 double misc::sinusoidal(double amplitude, double time, double frequency, double time_offset, double position_offset){

@@ -60,3 +60,11 @@ bool Population::check_doublons(){
     }
     return false;
 }
+
+void Population::resize(size_t s){
+    _individuals.resize(s);
+    _indexes.resize(s);
+    int counter = 0;
+    for(int &i: _indexes)
+        i = counter++;
+}

@@ -31,4 +31,4 @@ target_include_directories(visualization PUBLIC
     )
 target_link_libraries(visualization ARE simulatedER)
 install(TARGETS visualization DESTINATION lib)
-install(DIRECTORY . DESTINATION include/visu_population  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+install(DIRECTORY . DESTINATION include/visualization  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
