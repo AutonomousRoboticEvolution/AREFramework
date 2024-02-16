@@ -592,6 +592,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                             misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
                             new_gene.nbr_eval =  learner.ctrl_learner.get_nbr_eval();
                             gene_pool.push_back(new_gene);
+                            new_genes.push_back(new_gene);
                             //-
 
                             if(verbose){
@@ -920,8 +921,7 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
             learner.init(ftarget);
         else{
             std::vector<double> init_pt = std::dynamic_pointer_cast<NNParamGenome>(starting_gen)->get_full_genome();
-            double starting_fit = controller_archive.archive[wheel_nbr][joint_nbr][sensor_nbr].second;
-            learner.init(ftarget,init_pt,starting_fit);
+            learner.init(ftarget,init_pt);
         }
     }else learner.init(ftarget);
 }

@@ -9,9 +9,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
     int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
 
-    if(static_cast<M_NIPES*>(ea.get())->get_gene_pool().size() < pop_size)
-        return;
-    for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_gene_pool()){
+    for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_new_genes()){
         //Log the morph genome
         std::stringstream morph_filepath;
         morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();
@@ -94,6 +92,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
         neofs.close();
     }
+    static_cast<M_NIPES*>(ea.get())->clear_new_genes();
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
@@ -148,16 +147,26 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
 }
 
 void GenomesPoolLog::saveLog(EA::Ptr &ea){
+    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
+
     const std::vector<genome_t>& genomes = static_cast<M_NIPES*>(ea.get())->get_gene_pool();
-    if(genomes.empty())
+    if(genomes.size() < pop_size)
+        return;
+    std::ifstream ifs(Logging::log_folder + std::string("/")  + logFile);
+    std::string line;
+    if(ifs)
+        while(std::getline(ifs,line));
+
+    std::stringstream sstr;
+    sstr << genomes.front().morph_genome.id();
+    for(size_t i = 1; i < genomes.size(); i++)
+        sstr << "," << genomes.at(i).morph_genome.id();
+    if(!line.empty() && sstr.str() == line) //genome pool didn't change
         return;
     std::ofstream ofs;
     if(!openOLogFile(ofs))
         return;
-    ofs << genomes.front().morph_genome.id();
-    for(size_t i = 1; i < genomes.size(); i++)
-        ofs << "," << genomes.at(i).morph_genome.id();
-    ofs << std::endl;
+    ofs << sstr.str() << std::endl;
     ofs.close();
 }
 
