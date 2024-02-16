@@ -65,8 +65,8 @@ public:
         pseudo(ctrl.pseudo),
         damping(ctrl.damping),
         gamma(ctrl.gamma),
-        loga(ctrl.loga),
-        intern_isTeaching(ctrl.intern_isTeaching)
+        loga(ctrl.loga)
+       // intern_isTeaching(ctrl.intern_isTeaching)
     {
         A = ctrl.A;
         S = ctrl.S;
@@ -96,6 +96,9 @@ public:
 
     void learn();
 
+    void set_epsA(double e){_conf.epsA = e;}
+    void set_epsC(double e){_conf.epsC = e;}
+
 
 private:
 
@@ -123,15 +126,15 @@ private:
     config_t _conf;
     int t=0;
 
-    double causeaware;
-    double sense;
-    double creativity;
-    double harmony;
-    int pseudo;
-    double damping;
-    double gamma;          // teaching strength
-    bool loga;
-    bool intern_isTeaching;
+    double causeaware = 0.01;
+    double sense = 1;
+    double creativity = 0.1;
+    double harmony = 0.1;
+    int pseudo = 0;
+    double damping = 0.00001;
+    double gamma = 0.01;          // teaching strength
+    bool loga = true;
+ //   bool intern_isTeaching = false;
 
     inline void _tanh_diff(Matrix& m){
         m = m.array().tanh();

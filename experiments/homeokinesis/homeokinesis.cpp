@@ -24,13 +24,15 @@ void HomeoInd::createController(){
     nb_sensors = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
 
     nb_sensors = 0;
-    if(!settings::getParameter<settings::Boolean>(parameters,"#withSensors").value)
-        nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();;
+    if(settings::getParameter<settings::Boolean>(parameters,"#withSensors").value)
+        nb_sensors = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
     int nb_inputs = nb_sensors + nb_joints + nb_wheels;
     int nb_outputs = nb_joints + nb_wheels;
     control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
     control->set_parameters(parameters);
     control->set_random_number(randNum);
+    std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_epsA(settings::getParameter<settings::Double>(parameters,"#epsilonA").value);
+    std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_epsC(settings::getParameter<settings::Double>(parameters,"#epsilonC").value);
 }
 
 void HomeoInd::update(double delta_time){
@@ -42,13 +44,12 @@ void HomeoInd::update(double delta_time){
         std::vector<double> sensors = morphology->update();
         std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
 
-        for(double i = 0; i < joints.size(); i++)
-            joints[i] = 2.*joints[i]/M_PI;
-
+        for(double &j: joints)
+            j = 2.*j/M_PI;
 
         std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
         std::vector<double> inputs;
-        inputs.insert(inputs.begin(),sensors.begin(),sensors.begin() + nb_sensors);
+        inputs.insert(inputs.begin(),sensors.begin(),sensors.end());
         inputs.insert(inputs.end(),joints.begin(),joints.end());
         inputs.insert(inputs.end(),wheels.begin(),wheels.end());
         for(double& v: inputs)

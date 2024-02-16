@@ -127,25 +127,25 @@ void Homeokinesis::learn(){
         C += _matrix_map<double(double)>(_matrix_map<double(double)>(C_native-C,power3)*damping, clip_005);
       h += _matrix_map<double(double)>(((mu*harmony) - (y.asDiagonal() * epsrel)) * (EE * _conf.epsC * _conf.factorh),clip_005);
 
-      if(intern_isTeaching && gamma > 0){
-        // scale of the additional terms
-        const Matrix& metric = (A.transpose()) * (Lplus.transpose()*Lplus) * A;
+//      if(intern_isTeaching && gamma > 0){
+//        // scale of the additional terms
+//        const Matrix& metric = (A.transpose()) * (Lplus.transpose()*Lplus) * A;
 
-        const Matrix& y      = y_buffer[(t-1)% _conf.buffersize];
-        const Matrix& xsi    = y_teaching - y;
-        const Matrix& delta  = g_prime.asDiagonal() * xsi;
-        C += _matrix_map<double(double)>((metric * delta*(x.transpose()) ) * (gamma * _conf.epsC),clip_005);
-        h += _matrix_map<double(double)>((metric * delta)        * (gamma * _conf.epsC * _conf.factorh),clip_005);
-        // after we applied teaching signal it is switched off until new signal is given
-        intern_isTeaching    = false;
-      }
+//        const Matrix& y      = y_buffer[(t-1)% _conf.buffersize];
+//        const Matrix& xsi    = y_teaching - y;
+//        const Matrix& delta  = g_prime.asDiagonal() * xsi;
+//        C += _matrix_map<double(double)>((metric * delta*(x.transpose()) ) * (gamma * _conf.epsC),clip_005);
+//        h += _matrix_map<double(double)>((metric * delta)        * (gamma * _conf.epsC * _conf.factorh),clip_005);
+//        // after we applied teaching signal it is switched off until new signal is given
+//        intern_isTeaching    = false;
+//      }
     }
-    std::cout << "Controller matrix: " << C << std::endl;
-    std::cout << "Bias: " << h << std::endl;
+    //std::cout << "Controller matrix: " << C << std::endl;
+    //std::cout << "Bias: " << h << std::endl;
 }
 
 void Homeokinesis::_set_default_config(){
-    _conf.initFeedbackStrength = 1.5;
+    _conf.initFeedbackStrength = 1.1;
     _conf.useExtendedModel     = false;
     _conf.useTeaching          = false;
     _conf.steps4Averaging      = 10;
@@ -154,8 +154,8 @@ void Homeokinesis::_set_default_config(){
     _conf.onlyMainParameters   = true;
     _conf.buffersize = 10;
 
-    _conf.epsA = 0.3;
-    _conf.epsC = 0.3;
+    _conf.epsA = 0.1;
+    _conf.epsC = 0.05;
 
     _conf.factorS              = 1;
     _conf.factorb              = 1;
