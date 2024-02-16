@@ -153,9 +153,11 @@ void GenomesPoolLog::saveLog(EA::Ptr &ea){
     if(genomes.size() < pop_size)
         return;
     std::ifstream ifs(Logging::log_folder + std::string("/")  + logFile);
-    std::string line;
+    std::string l,line;
     if(ifs)
-        while(std::getline(ifs,line));
+        while(std::getline(ifs,l))
+		line = l;
+	
 
     std::stringstream sstr;
     sstr << genomes.front().morph_genome.id();
