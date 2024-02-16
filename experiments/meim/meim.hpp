@@ -3,7 +3,7 @@
 
 #include <ARE/EA.h>
 #include <ARE/nn2/NN2CPPNGenome.hpp>
-#include <simulatedER/Morphology_CPPNMatrix.h>#
+#include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
 
@@ -79,6 +79,8 @@ public:
 
     void setObjectives(size_t index, const std::vector<double> &objs) override;
     const std::vector<genome_t> &get_parent_pool() const {return parent_pool;}
+    const std::vector<genome_t> &get_new_genes() const {return new_genes;}
+    void clear_new_genes(){new_genes.clear();}
 
    void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
 
@@ -87,6 +89,7 @@ public:
 private:
    std::vector<int> newly_evaluated;
    std::vector<genome_t> parent_pool;
+   std::vector<genome_t> new_genes;
    int highest_morph_id = 0;
 
    void reproduction();

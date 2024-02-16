@@ -14,6 +14,14 @@ public:
 	void saveLog(EA::Ptr & ea);
 	void loadLog(const std::string& logFile){}
 };
-}
 
+
+class ParentsPoolLog : public Logging
+{
+public:
+    ParentsPoolLog(const std::string &file) : Logging(file, false){}
+    void saveLog(EA::Ptr &ea) override;
+    void loadLog(const std::string &file = std::string()) override{}
+};
+}
 #endif //MEIM_LOGGING_HPP

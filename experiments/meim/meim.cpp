@@ -198,38 +198,39 @@ void MEIM::reproduction(){
 bool MEIM::update(const Environment::Ptr &env){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-//    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-	Individual::Ptr ind = population[currentIndIndex];    
-	std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_final_position(env->get_final_position());
-            if(env->get_name() == "obstacle_avoidance"){
-                std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-                std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory({env->get_trajectory()});
-            }else{
-                std::cerr << "task unknown" << std::endl;
-                exit(1);
-            }
+    //    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+        Individual::Ptr ind = population[currentIndIndex];
+        std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_final_position(env->get_final_position());
+        if(env->get_name() == "obstacle_avoidance"){
+            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory({env->get_trajectory()});
+        }else{
+            std::cerr << "task unknown" << std::endl;
+            exit(1);
         }
-else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+    }
+    else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
-    for(int &index : newly_evaluated){
-        Individual::Ptr ind = population[index];
-        
-           //add new gene in gene_pool
+        for(int &index : newly_evaluated){
+            Individual::Ptr ind = population[index];
+
+            //add new gene in gene_pool
             genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
                               std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                               ind->getObjectives());
             //new_gene.trajectories = best_controller.trajectories;
             //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
             parent_pool.push_back(new_gene);
+            new_genes.push_back(new_gene);
             //-
-	    remove_worst_parent();
-	    population.erase(index);
-    }	
-		
-    newly_evaluated.clear();
-	if(parent_pool.size() >= pop_size)
-        	reproduction();
+            remove_worst_parent();
+            population.erase(index);
+        }
+
+        newly_evaluated.clear();
+        if(parent_pool.size() >= pop_size)
+            reproduction();
     }
     return true;
 }

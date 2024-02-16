@@ -27,4 +27,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::GenomeInfoLog::Ptr gilog = std::make_shared<are::GenomeInfoLog>(fit_log_file);
     logs.push_back(gilog);
 
+    std::string gp_log_file = are::settings::getParameter<are::settings::String>(param,"#parentsPoolFile").value;
+    are::ParentsPoolLog::Ptr gplog = std::make_shared<are::ParentsPoolLog>(gp_log_file);
+    logs.push_back(gplog);
 }
