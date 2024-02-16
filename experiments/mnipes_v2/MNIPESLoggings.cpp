@@ -7,8 +7,6 @@ using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
-    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
-
     for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_new_genes()){
         //Log the morph genome
         std::stringstream morph_filepath;
