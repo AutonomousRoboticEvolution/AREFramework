@@ -61,7 +61,7 @@ typedef struct genome_t{
         nbr_eval(g.nbr_eval),
         environment(g.environment),
         task(g.task),
-        learning_progress(g.learning_progress){}
+	learning_progress(g.learning_progress){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj,double lp = 0) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0), learning_progress(lp){}
     NN2CPPNGenome morph_genome;
@@ -277,6 +277,9 @@ public:
     void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
 
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
+    const std::vector<genome_t>& get_new_genes() const {return new_genes;}
+    void clear_new_genes(){new_genes.clear();}
+
     const std::vector<genome_t>& get_best_gene_archive() const {return best_gene_archive;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
@@ -318,6 +321,7 @@ private:
 
     selection_fct_t selection_fct;
 
+    std::vector<genome_t> new_genes; //for logging
     std::vector<genome_t> gene_pool;
     std::vector<genome_t> best_gene_archive;
     std::vector<learner_t> learning_pool;
