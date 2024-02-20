@@ -204,7 +204,7 @@ bool MEIM::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_final_position(env->get_final_position());
         if(env->get_name() == "obstacle_avoidance"){
             std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory({env->get_trajectory()});
+            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory(env->get_trajectory());
         }else{
             std::cerr << "task unknown" << std::endl;
             exit(1);
@@ -219,7 +219,7 @@ bool MEIM::update(const Environment::Ptr &env){
             genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
                               std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                               ind->getObjectives());
-            //new_gene.trajectories = best_controller.trajectories;
+            new_gene.trajectory = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_trajectory();
             //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
             parent_pool.push_back(new_gene);
             new_genes.push_back(new_gene);

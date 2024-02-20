@@ -162,7 +162,7 @@ public:
     const CartDesc& get_cart_desc() const {return cart_desc;}
     void set_cart_desc(const CartDesc& md){cart_desc = md;}
 
-    const OrganPositionDesc& get_organ_position_desc(){return organ_position_desc;}
+    const OrganPositionDesc& get_organ_position_desc() const {return organ_position_desc;}
     void set_organ_position_desc(const OrganPositionDesc& opd){organ_position_desc = opd;}
 
     const std::vector<int>& get_parents_ids() const {return parents_ids;}
