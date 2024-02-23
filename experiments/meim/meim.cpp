@@ -213,7 +213,6 @@ bool MEIM::update(const Environment::Ptr &env){
     else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
         for(int &index : newly_evaluated){
-            numberEvaluation++;
             Individual::Ptr ind = population[index];
 
             //if indivdual's morphology has no actuactors, generate another morphology randomly and it back to the population
@@ -234,7 +233,8 @@ bool MEIM::update(const Environment::Ptr &env){
 
                 population.push_back(new_ind);
             }else{ // otherwise add this new individual to the parent pool and perform replacement
-                //add new gene in gene_pool
+                numberEvaluation++;
+                //add new gene in gene_pool                
                 genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
                                   std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                                   ind->getObjectives());
@@ -244,6 +244,8 @@ bool MEIM::update(const Environment::Ptr &env){
                 new_genes.push_back(new_gene);
                 //-
                 remove_worst_parent();
+                if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
+                    std::cout << numberEvaluation << " evaluations over " << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << std::endl;
             }
             population.erase(index);
         }
