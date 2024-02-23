@@ -213,6 +213,7 @@ bool MEIM::update(const Environment::Ptr &env){
     else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
         for(int &index : newly_evaluated){
+            numberEvaluation++;
             Individual::Ptr ind = population[index];
 
             //if indivdual's morphology has no actuactors, generate another morphology randomly and it back to the population
