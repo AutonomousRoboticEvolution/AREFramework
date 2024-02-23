@@ -2,9 +2,6 @@
 
 using namespace are;
 
-
-
-
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
     for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_new_genes()){
@@ -20,17 +17,33 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         mofstr.close();
         //-
 
-        //Log descriptor
-        std::ofstream mdofs;
-        if(!openOLogFile(mdofs,"/morph_descriptors.csv"))
+        //- Log morph features <width,depth,height,voxels,wheels,sensor,joint,caster>
+        std::ofstream mfofs;
+        if(!openOLogFile(mfofs,"/morph_features.csv"))
             return;
-        mdofs << genome.morph_genome.id() << ",";
-        Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
-        for(int j = 0; j < morphDesc.size(); j++){
-            mdofs << morphDesc(j) << ",";
+        mfofs << genome.morph_genome.id() << ",";
+        Eigen::VectorXd morph_feat = genome.morph_genome.get_cart_desc().getCartDesc();
+        mfofs << morph_feat(0);
+        for(int j = 1; j < morph_feat.size(); j++){
+            mfofs << "," << morph_feat(j);
+        }
+        mfofs << std::endl;
+        mfofs.close();
+        //-
+
+        //- Log morph organ position descriptor: matrix of 11x11x11
+        std::ofstream mdofs;
+        if(!openOLogFile(mdofs,"/morph_descriptor.csv"))
+            return;
+        mdofs << genome.morph_genome.id() << "," << morphology_constants::real_matrix_size << ",";
+        Eigen::VectorXd morph_desc = genome.morph_genome.get_organ_position_desc().getCartDesc();
+        mdofs << morph_desc(0);
+        for(int j = 1; j < morph_desc.size(); j++){
+            mdofs << "," <<  morph_desc(j);
         }
         mdofs << std::endl;
         mdofs.close();
+        //-
 
         //Log the ctrl genome
         if(!genome.ctrl_genome.get_weights().empty()){

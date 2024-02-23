@@ -13,9 +13,15 @@ namespace are{
 typedef struct genome_t{
     genome_t(NN2CPPNGenome::Ptr mg,hk::Homeokinesis::Ptr ctrl, std::vector<double> objs):
         morph_genome(mg),controller(ctrl),objectives(objs){}
+    genome_t(const genome_t &g) :
+        morph_genome(g.morph_genome),
+        controller(g.controller),
+        objectives(g.objectives),
+        trajectory(g.trajectory){}
     NN2CPPNGenome::Ptr morph_genome;
     hk::Homeokinesis::Ptr controller;
     std::vector<double> objectives;
+    std::vector<waypoint> trajectory;
 } genome_t;
 
 

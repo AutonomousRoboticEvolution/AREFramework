@@ -204,7 +204,7 @@ bool MEIM::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_final_position(env->get_final_position());
         if(env->get_name() == "obstacle_avoidance"){
             std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
-            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory({env->get_trajectory()});
+            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_trajectory(env->get_trajectory());
         }else{
             std::cerr << "task unknown" << std::endl;
             exit(1);
