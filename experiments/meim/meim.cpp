@@ -24,7 +24,7 @@ void MEIMIndividual::createController(){
         nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
     int nb_inputs = nb_sensors + nb_joints + nb_wheels;
     int nb_outputs = nb_joints + nb_wheels;
-    if(nb_inputs == 0 || nb_outputs == 0)
+    if(nb_outputs == 0)
         return;
     control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
     control->set_parameters(parameters);
@@ -215,16 +215,35 @@ bool MEIM::update(const Environment::Ptr &env){
         for(int &index : newly_evaluated){
             Individual::Ptr ind = population[index];
 
-            //add new gene in gene_pool
-            genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
-                              std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
-                              ind->getObjectives());
-            //new_gene.trajectories = best_controller.trajectories;
-            //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
-            parent_pool.push_back(new_gene);
-            new_genes.push_back(new_gene);
-            //-
-            remove_worst_parent();
+            //if indivdual's morphology has no actuactors, generate another morphology randomly and it back to the population
+            int nb_joints = std::dynamic_pointer_cast<CPPNMorph>(ind->get_morphology())->get_jointNumber();
+            int nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(ind->get_morphology())->get_wheelNumber();
+            if(nb_joints == 0 && nb_wheels == 0){
+                NN2CPPNGenome::Ptr morph_gen = std::make_shared<NN2CPPNGenome>();
+                morph_gen->random();
+                morph_gen->set_id(highest_morph_id++);
+                Genome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
+
+                Individual::Ptr new_ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
+                new_ind->set_parameters(parameters);
+                new_ind->set_randNum(randomNum);
+
+                morph_gen.reset();
+                ctrl_gen.reset();
+
+                population.push_back(new_ind);
+            }else{ // otherwise add this new individual to the parent pool and perform replacement
+                //add new gene in gene_pool
+                genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
+                                  std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
+                                  ind->getObjectives());
+                //new_gene.trajectories = best_controller.trajectories;
+                //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
+                parent_pool.push_back(new_gene);
+                new_genes.push_back(new_gene);
+                //-
+                remove_worst_parent();
+            }
             population.erase(index);
         }
 
