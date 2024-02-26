@@ -6,6 +6,7 @@
 #include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
+#include "ARE/misc/eigen_boost_serialization.hpp"
 
 
 namespace are{
@@ -52,6 +53,27 @@ public:
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
     void set_trajectory(const std::vector<waypoint> traj){trajectory = traj;}
     const std::vector<waypoint> &get_trajectory() const {return trajectory;}
+
+    int get_nb_sensors() const {return nb_sensors;}
+    int get_nb_joints() const {return nb_joints;}
+    int get_nb_wheels() const {return nb_wheels;}
+
+
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & objectives;
+        arch & ctrlGenome;
+        arch & morphGenome;
+        arch & individual_id;
+        arch & generation;
+        arch & trajectory;
+        arch & visited_zones;
+        arch & final_position;
+        arch & nb_sensors;
+        arch & nb_joints;
+        arch & nb_wheels;
+    }
 
 private:
     void createMorphology() override;

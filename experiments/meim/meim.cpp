@@ -216,8 +216,8 @@ bool MEIM::update(const Environment::Ptr &env){
             Individual::Ptr ind = population[index];
 
             //if indivdual's morphology has no actuactors, generate another morphology randomly and it back to the population
-            int nb_joints = std::dynamic_pointer_cast<CPPNMorph>(ind->get_morphology())->get_jointNumber();
-            int nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(ind->get_morphology())->get_wheelNumber();
+            int nb_joints = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_nb_joints();
+            int nb_wheels = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_nb_wheels();
             if(nb_joints == 0 && nb_wheels == 0){
                 NN2CPPNGenome::Ptr morph_gen = std::make_shared<NN2CPPNGenome>();
                 morph_gen->random();
