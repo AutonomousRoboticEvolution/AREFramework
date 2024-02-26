@@ -9,7 +9,6 @@ After, having successfully installed the framework, you can refer to the next tu
 ## Required software
 
 * Preferably use Ubuntu 22.04
-* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
 * Boost (apt package libboost-all-dev)
@@ -18,9 +17,8 @@ After, having successfully installed the framework, you can refer to the next tu
 
 Dependencies for Morphogenesis and Hyperneat
 
-* Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
-* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
-
+* Polyvox - [link](https://github.com/portaloffreedom/polyvox)
+  
 Dependencies for learning 
 
 * LIBCMAES - [link](https://github.com/beniz/libcmaes)
@@ -37,15 +35,6 @@ First, install the libraries available via aptitude :
 sudo apt install libboost-all-dev libeigen3-dev 
 ```
 
-Install MutliNEAT :
-```
-git clone https://github.com/ci-group/MultiNEAT.git
-cd MultiNEAT
-mkdir build && cd build
-cmake -DCMAKE_INSTALL_PREFIX=/install/path  ..
-make 
-make install # add sudo before the command if the install prefix is /usr/local (default value)
-```
 
 Install Polyvox :
 ```
