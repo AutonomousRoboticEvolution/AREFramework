@@ -8,8 +8,7 @@ After, having successfully installed the framework, you can refer to the next tu
 
 ## Required software
 
-* Preferably use Ubuntu 18.04 as OS. Works also with Ubuntu 20.04
-* V-REP 3.6.2 18.04 - [link](https://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04.tar.xz).
+* Preferably use Ubuntu 22.04
 * MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
