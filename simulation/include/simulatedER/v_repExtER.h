@@ -9,6 +9,7 @@
 #define V_REPEXTER_H
 
 #include <ctime>
+#include <chrono>
 #include <memory>
 #include "simulatedER/ER.h"
 #include "ARE/exp_plugin_loader.hpp"
@@ -22,7 +23,7 @@ int timeCount = 0;
 bool timerOn = false;
 double timeElapsed;
 bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
-clock_t sysTime; // Measure simulation time.
+std::chrono::time_point<std::chrono::system_clock> sysTime; // Measure simulation time.
 
 enum SimulationState {
     INITIALIZING,
