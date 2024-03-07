@@ -28,10 +28,7 @@ add_library(M_NIPES2 SHARED
    M_NIPES.cpp 
    MNIPESLoggings.cpp
    ../common/obstacleAvoidance.cpp
-   ../common/multiTargetMaze.cpp
-   ../common/barrelTask.cpp
-   ../common/exploration.cpp
-   ../common/gradual_env.cpp
+   ../common/locomotion.cpp
     )
 target_include_directories(M_NIPES2 PUBLIC ${INCLUDES})
 target_link_libraries(M_NIPES2 ARE simulatedER cmaes tbb)

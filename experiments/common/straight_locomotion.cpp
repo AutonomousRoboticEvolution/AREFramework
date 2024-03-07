@@ -1,4 +1,4 @@
-#include "straightLineEnv.hpp"
+#include "straight_locomotion.hpp"
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
@@ -10,11 +10,11 @@
 using namespace are;
 using namespace are::sim;
 
-StraightLine::StraightLine(const settings::ParametersMapPtr& params)
+StraightLocomotion::StraightLocomotion(const settings::ParametersMapPtr& params)
 {
     parameters = params;
     final_position.resize(3);
-    name = "straight_line";
+    name = "straight_locomotion";
 
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
@@ -23,7 +23,7 @@ StraightLine::StraightLine(const settings::ParametersMapPtr& params)
 
 }
 
-void StraightLine::init(){
+void StraightLocomotion::init(){
 
     VirtualEnvironment::init();
 
@@ -39,7 +39,7 @@ void StraightLine::init(){
     move_counter = 0;
 }
 
-std::vector<double> StraightLine::fitnessFunction(const Individual::Ptr &ind){
+std::vector<double> StraightLocomotion::fitnessFunction(const Individual::Ptr &ind){
 
     std::vector<double> d(1);
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
@@ -65,13 +65,17 @@ std::vector<double> StraightLine::fitnessFunction(const Individual::Ptr &ind){
         localError += distance(tempTarget, lineTarget);
         lineTarget.clear();
     }
-     d[0] = 1 - localError/trajectory.size();    //////////////////////////////////////////////////////////////////////////////
+    std::vector<double> init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+    double max_distance = settings::getParameter<settings::Double>(parameters,"#maxDistance").value;
+    double distance_covered = distance(final_position,init_position);
+
+     d[0] = ((1 - localError/trajectory.size()) + distance_covered/max_distance)/2.; //straight line + distance covered
 
     return d;
 }
 
 
-float StraightLine::updateEnv(float simulationTime, const Morphology::Ptr &morph){
+float StraightLocomotion::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morph)->getMainHandle();
@@ -96,7 +100,7 @@ float StraightLine::updateEnv(float simulationTime, const Morphology::Ptr &morph
     return 0;
 }
 
-void StraightLine::build_tiled_floor(std::vector<int> &tiles_handles){
+void StraightLocomotion::build_tiled_floor(std::vector<int> &tiles_handles){
     bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
 
     float tile_size[3] = {0.249f,0.249f,0.01f};

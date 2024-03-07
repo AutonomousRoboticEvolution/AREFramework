@@ -1,5 +1,5 @@
-#ifndef STRAIGHT_LINE_ENV_HPP
-#define STRAIGHT_LINE_ENV_HPP
+#ifndef LOCOMOTION_ENV_HPP
+#define LOCOMOTION_ENV_HPP
 
 #include <cmath>
 #include "simulatedER/VirtualEnvironment.hpp"
@@ -9,16 +9,16 @@ namespace are {
 
 namespace sim{
 
-class StraightLine : public VirtualEnvironment
+class Locomotion : public VirtualEnvironment
 {
 public:
 
-    typedef std::shared_ptr<StraightLine> Ptr;
-    typedef std::shared_ptr<const StraightLine> ConstPtr;
+    typedef std::shared_ptr<Locomotion> Ptr;
+    typedef std::shared_ptr<const Locomotion> ConstPtr;
 
-    StraightLine(const settings::ParametersMapPtr& params);
+    Locomotion(const settings::ParametersMapPtr& params);
 
-    ~StraightLine(){}
+    ~Locomotion(){}
     void init() override;
 
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
@@ -37,4 +37,4 @@ private:
 
 } //are
 
-#endif //STRAIGHT_LINE_ENV_HPP
+#endif //LOCOMOTION_ENV_HPP
