@@ -83,21 +83,19 @@ def kill(servers, client):
     for p in processes:
         if p.stdout is not None:
             p.stdout.close()
-       # parent = psutil.Process(p.pid)
-       # for child in parent.children(recursive=True):
-       #     child.kill()
         p.terminate()
         p.wait()
-    try:
-        wait(servers, client, timeout=30)
-    except subprocess.TimeoutExpired:
-        for p in processes:
-            p.poll()
-            if p.returncode is not None:
-               # parent = psutil.Process(p.pid)
-               # for child in parent.children(recursive=True):
-               #     child.kill()
-                p.kill()
+       
+    #try:
+    #    wait(servers, client, timeout=30)
+    #except subprocess.TimeoutExpired:
+    #    for p in processes:
+    #        p.poll()
+    #        if p.returncode is not None:
+    #            parent = psutil.Process(p.pid)
+    #            for child in parent.children(recursive=True):
+    #                child.kill()
+    #            p.kill()
 
 
 def main():
@@ -152,3 +150,5 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     main()
+    if(args.xvfb):
+        subprocess.call(["killall","-9","Xvfb"])

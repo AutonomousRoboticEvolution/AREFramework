@@ -28,19 +28,6 @@
 
 using namespace are;
 
-clock_t tStart;
-clock_t sysTime;
-
-void saveLog(int counter) {
-    std::ofstream logFile;
-    logFile.open("files/timeLog.csv", std::ios::app);
-    std::clock_t now = std::clock();
-    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time after generation " << counter << " = ," << deltaSysTime  << "," << std::endl;
-    sysTime = clock();
-    logFile.close();
-}
 
 /**
  * @brief signal handler to generate a stacktrace after getting a segfault signal.
@@ -132,7 +119,7 @@ int main(int argc, char* argv[])
     while (client->execute()) usleep(5000);
 
     extApi_sleepMs(5000);
-    client->quitSimulation();
+//client->quitSimulation();
     parameters.reset();
     client.reset();
     extApi_sleepMs(8000);

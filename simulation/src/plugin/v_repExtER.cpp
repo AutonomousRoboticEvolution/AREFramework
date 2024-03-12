@@ -54,19 +54,7 @@ extern "C" {
 
 LIBRARY simLib;
 
-///save time log
-void saveLog(int num)
-{
-    std::ofstream logFile;
-    logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
-    clock_t now = clock();
-    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
-    sysTime = clock();
-    counter = 0;
-    logFile.close();
-}
+
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
@@ -287,25 +275,27 @@ void clientMessageHandler(int message){
 
     // client and v-rep plugin communicates using signal and remote api
     int clientState[1] = {10111};
-    simGetIntegerSignal((simChar*) "clientState", clientState);
+    int ret = simGetIntegerSignal((simChar*) "clientState", clientState);
 
-    if (simulationState == FREE
-            && simGetSimulationState() == sim_simulation_stopped)
+
+    if (simulationState == FREE || ret < 1)
+            //&& simGetSimulationState() == sim_simulation_stopped)
     {
         simSetIntegerSignal("simulationState",are_c::IDLE);
 
         // time out when not receiving commands for 5 minutes.
         if (!timerOn) {
-            sysTime = clock();
+            sysTime = std::chrono::system_clock::now();
             timeElapsed = 0;
             timerOn = true;
         } else {
             // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
-            if (timeElapsed > 300)
+            timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - sysTime).count();
+            if (timeElapsed > 60)
             {
-                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+                std::cout << "Didn't receive a signal for 1 minute. Shutting down server " << std::endl;
                 simQuitSimulator(true);
+                exit(0);
             }
         }
 
@@ -368,17 +358,28 @@ void clientMessageHandler(int message){
        }
     }
 
+    if (simulationState == CLEANUP) {
+        timeCount++;  //need to wait a few time steps to start a new simulation
+    }
+
+    if (simulationState == CLEANUP && timeCount > 10) {
+        simulationState = FREE;
+        timeCount = 0;
+    }
+
+
     if (clientState[0] == are_c::IDLE)
     {
-        timerOn = false;
         simulationState = STARTING;
         simSetIntegerSignal("simulationState",are_c::READY);
     }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
+        timerOn = false;
         simStartSimulation();
     }
     else if(clientState[0] == 99){
         std::cout << "Stop Instance !" << std::endl;
         simQuitSimulator(true);
+        exit(0);
     }
 
 }

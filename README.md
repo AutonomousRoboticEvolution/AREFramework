@@ -8,23 +8,20 @@ After, having successfully installed the framework, you can refer to the next tu
 
 ## Required software
 
-* Preferably use Ubuntu 18.04 as OS. Works also with Ubuntu 20.04
-* V-REP 3.6.2 18.04 - [link](https://www.coppeliarobotics.com/files/CoppeliaSim_Edu_V4_2_0_Ubuntu18_04.tar.xz).
+* Preferably use Ubuntu 22.04
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
 * libdlibxx - [link](https://github.com/m-renaud/libdlibxx)
-* Boost (apt package libboost-all-dev)
+* Boost 1.77 - [link](https://www.boost.org/users/history/version_1_77_0.html)
 * Eigen 3 (apt package libeigen3-dev)
 * TBB - (apt package libtbb-dev)
 
 Dependencies for Morphogenesis and Hyperneat
 
 * Polyvox - [link](https://github.com/portaloffreedom/polyvox) 
-* MultiNEAT -  [link](https://github.com/ci-group/MultiNEAT)
 
 Dependencies for learning 
 
 * LIBCMAES - [link](https://github.com/beniz/libcmaes)
-* NN2 (please put this code in modules) - [link](https://github.com/LeniLeGoff/nn2)
 
 ## Installation
 
@@ -67,12 +64,6 @@ cmake -DCMAKE_INSTALL_PREFIX=/usr/local  .. # you can install somewhere else if 
 make
 sudo make install
 ```
-
-Install Limbo
-```
-git clone https://github.com/resibots/limbo.git
-```
-This library has headers only, so there is no need to be compiled or installed. 
 
 Install NN2
 ```

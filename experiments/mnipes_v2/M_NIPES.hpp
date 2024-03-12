@@ -11,10 +11,7 @@
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "simulatedER/mazeEnv.h"
 #include "obstacleAvoidance.hpp"
-#include "multiTargetMaze.hpp"
-#include "barrelTask.hpp"
-#include "exploration.hpp"
-#include "gradual_env.hpp"
+#include "locomotion.hpp"
 #include "boost/filesystem.hpp"
 
 namespace are {
@@ -28,7 +25,8 @@ typedef enum task_t{
     MULTI_TARGETS = 2,
     EXPLORATION = 3,
     BARREL = 4,
-    GRADUAL = 5
+    GRADUAL = 5,
+    LOCOMOTION = 6
 } task_t;
 
 
@@ -346,7 +344,6 @@ private:
     int nbr_of_successful_solution = 0;
     int current_gradual_scene = 0;
     int nbr_eval_current_task = 0;
-    std::vector<sim::GradualEnvironment::env_t> environments_info;
 
     std::string _task_name(are::task_t task);
 };

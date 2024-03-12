@@ -1,6 +1,7 @@
 #include "simulatedER/mazeEnv.h"
 #include "barrelTask.hpp"
 #include "obstacleAvoidance.hpp"
+#include "locomotion.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 
@@ -15,6 +16,8 @@ extern "C" are::Environment::Ptr environmentFactory
     }
     else if(env_type == are::OBSTACLES)
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
+    else if(env_type == are::LOCOMOTION)
+        env = std::make_shared<are::sim::Locomotion>(param);
     return env;
 }
 

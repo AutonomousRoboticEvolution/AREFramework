@@ -66,7 +66,7 @@ bool ER::execute()
     }
 
     confirmConnections();
-    updateSimulatorList();
+   // updateSimulatorList();
     if(serverInstances.empty())
         return false;
 
@@ -159,18 +159,22 @@ bool ER::endOfSimulation(int slaveIndex){
         //try{
         if(message != "")
             currentIndVec[slaveIndex]->from_string(message);
-        timeout_counter++;
 
+        timeout_counter++;
         //}catch(boost::archive::archive_exception& e){
           //  std::cerr << e.what() << std::endl;
            // return false;
         //}
+        //std::cout << currentIndVec[slaveIndex]->getObjectives().empty() << std::endl;
+    }while((currentIndVec[slaveIndex]->getObjectives().empty() || message == "") && timeout_counter < 20);
+    //std::cout << "server " << slaveIndex << " Number of trials: " << timeout_counter << std::endl;
 
-    }while((currentIndVec[slaveIndex]->getObjectives().empty() || message == "") && timeout_counter < 10);
 
     //quick and dirty fix on lost individual with the simulator. To be change to reask to the simulator the individual
-    if(timeout_counter >= 10)
+    if(timeout_counter >= 20){
+        std::cout << message << std::endl;
         currentIndVec[slaveIndex]->setObjectives({0});
+    }
 
 
 
@@ -273,13 +277,14 @@ bool ER::updateSimulation()
                 }
                 else if(state == FINISH)
                 {
+                    int tmp_idx = currentIndexVec[slaveIdx];
                     if(endOfSimulation(slaveIdx)){
                         currentIndexVec[slaveIdx] = -1;
                         serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
                     }
                     eval_times[slaveIdx].second = hr_clock::now();
                     std::stringstream sstr;
-                    sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
+                    sstr << "eval," << tmp_idx << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
                          << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].second - reference_time).count() << std::endl;
                     Logging::saveStringToFile("times.csv",sstr.str());
                 }

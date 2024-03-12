@@ -300,12 +300,6 @@ void M_NIPES::init(){
             bootstrap_evolution(bootstrap_folder);
 
 
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL){
-            std::string filename = settings::getParameter<settings::String>(parameters,"#envListFile").value;
-            std::string scenes_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value + "/scenes/";
-            sim::GradualEnvironment::load_environments_list(filename,scenes_folder,environments_info);
-        }
-
         bool with_crossover = settings::getParameter<settings::Boolean>(parameters,"#withCrossover").value;
         if(with_crossover) selection_fct = SelectionFunctions::two_best_of_subset;
         else selection_fct = SelectionFunctions::best_of_subset;
@@ -340,10 +334,7 @@ void M_NIPES::init_morph_pop(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
     }
@@ -389,7 +380,8 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         fitness = std::dynamic_pointer_cast<sim::MazeEnv>(env)->fitnessFunction(population[currentIndIndex]);
     else if(env->get_name() == "obstacle_avoidance")
         fitness = std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->fitnessFunction(population[currentIndIndex]);
-
+    else if(env->get_name() == "locomotion")
+        fitness = std::dynamic_pointer_cast<sim::Locomotion>(env)->fitnessFunction(population[currentIndIndex]);
 
 
     double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"#FTarget").value;
@@ -410,8 +402,6 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
 bool M_NIPES::is_finish(){
     int max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
     bool fullfil_all_tasks = false;
-    if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-        fullfil_all_tasks = current_gradual_scene > environments_info.size();
     if(numberEvaluation >= max_nbr_eval  || fullfil_all_tasks){
         if(settings::getParameter<settings::Boolean>(parameters,"#computeEvolvability").value){
             int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
@@ -461,7 +451,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                     std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
                     std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
                 }
-                else if(env->get_name() == "mazeEnv"){
+                else if(env->get_name() == "mazeEnv" || env->get_name() == "locomotion"){
                     std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories({env->get_trajectory()});
                 }else{
                     std::cerr << "task unknown" << std::endl;
@@ -498,10 +488,10 @@ bool M_NIPES::update(const Environment::Ptr &env){
                             new_learner.ctrl_learner.set_parameters(parameters);
                             learning_pool.push_back(new_learner);
 
-                            M_NIPESIndividual::Ptr ind = std::make_shared<M_NIPESIndividual>(morphgenome,ctrl_gen);
-                            ind->set_parameters(parameters);
-                            ind->set_randNum(randomNum);
-                            population.push_back(ind);
+                            M_NIPESIndividual::Ptr new_ind = std::make_shared<M_NIPESIndividual>(morphgenome,ctrl_gen);
+                            new_ind->set_parameters(parameters);
+                            new_ind->set_randNum(randomNum);
+                            population.push_back(new_ind);
                         }
 
                     }else if(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->is_learning_dropped()){
@@ -729,10 +719,7 @@ void M_NIPES::reproduction(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         //-
@@ -890,9 +877,7 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     learner.set_randNum(randomNum);
 
     double ftarget;
-    if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-        ftarget = 1 - environments_info[current_gradual_scene].fitness_target;
-    else ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+    ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
 
     if(use_ctrl_arch){
@@ -926,12 +911,9 @@ void M_NIPES::init_new_ctrl_pop(learner_t &learner){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
     }
@@ -954,24 +936,16 @@ void M_NIPES::push_back_remaining_ctrl(learner_t &learner){
         Individual::Ptr ind = std::make_shared<M_NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_current_gradual_scene(current_gradual_scene);
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_ctrl_archive(controller_archive);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
 
         population.push_back(ind);
     }
 }
 
-void M_NIPES::incr_gradual_scene(){
-    current_gradual_scene++;
-    for(auto& ind : population)
-        std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->incr_gradual_scene();
-}
 
 
 void M_NIPES::bootstrap_evolution(const std::string &folder){
@@ -1003,10 +977,8 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
         i++;
@@ -1130,10 +1102,8 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
     }
@@ -1153,10 +1123,8 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
-        if(settings::getParameter<settings::Integer>(parameters,"#envType").value == GRADUAL)
-            init_pos = environments_info[current_gradual_scene].init_position;
-        else
-            init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+        init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
     }
@@ -1182,6 +1150,8 @@ std::string M_NIPES::_task_name(are::task_t task){
         return "barrel";
     else if(task == GRADUAL)
         return "gradual";
+    else if(task == LOCOMOTION)
+        return "locomotion";
     else{
         std::cerr << "Error: task unknow" << std::endl;
         return "None";

@@ -19,9 +19,7 @@ void MEIMIndividual::createMorphology(){
 void MEIMIndividual::createController(){
     nb_joints = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
     nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
-    nb_sensors = 0;
-    if(settings::getParameter<settings::Boolean>(parameters,"#withSensors").value)
-        nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
+    nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
     int nb_inputs = nb_sensors + nb_joints + nb_wheels;
     int nb_outputs = nb_joints + nb_wheels;
     if(nb_outputs == 0)
@@ -41,10 +39,13 @@ void MEIMIndividual::update(double delta_time){
     if( diff < 0.1){
         //- Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
+        assert(nb_sensors == inputs.size());
         std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
+        assert(nb_joints == joints.size());
         for(double &j: joints)
             j = 2.*j/M_PI;
         std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+        assert(wheels.size() == nb_wheels);
         inputs.insert(inputs.end(),joints.begin(),joints.end());
         inputs.insert(inputs.end(),wheels.begin(),wheels.end());
         //- add noise to the inputs
@@ -238,6 +239,7 @@ bool MEIM::update(const Environment::Ptr &env){
                 genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
                                   std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                                   ind->getObjectives());
+                new_gene.trajectory = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_trajectory();
                 //new_gene.trajectories = best_controller.trajectories;
                 //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
                 parent_pool.push_back(new_gene);
