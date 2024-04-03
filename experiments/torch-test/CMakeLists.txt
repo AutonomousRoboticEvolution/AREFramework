@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18 FATAL_ERROR)
 project(example-app)
 
-set(LIBTORCH_FOLDER "/home/leni/Downloads/libtorch/")
+#set(LIBTORCH_FOLDER "/home/leni/Downloads/libtorch/")
 set(c10_LIBRARY "${LIBTORCH_FOLDER}/lib/")
 set(kineto_LIBRARY "${LIBTORCH_FOLDER}/lib/")
 set(Torch_DIR "${LIBTORCH_FOLDER}/share/cmake/Torch/")

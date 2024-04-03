@@ -20,15 +20,13 @@ int main( int argc, char** argv) {
 
     torch::Tensor x = torch::tensor(std::vector({std::stod(argv[1]),std::stod(argv[2])}));
     torch::Tensor y;
-    for(int i = 0; i < 3; i++){
-         y = ff_nn.forward(x);
-         std::cout << "output : " << y << std::endl;
-         for(const auto& param : ff_nn.parameters()){
-             std::cout << param << std::endl;
-         }
-         ff_nn._linear1->weight = ff_nn.parameters()[0];
-         ff_nn._linear1->bias = ff_nn.parameters()[1];
+    y = ff_nn.forward(x);
+    std::cout << "output : " << y << std::endl;
+    for(const auto& param : ff_nn.parameters()){
+        std::cout << param << std::endl;
     }
+
+
 
 
     return 0;

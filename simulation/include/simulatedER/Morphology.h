@@ -56,6 +56,7 @@ public:
 
     std::vector<double> get_joints_positions();
     std::vector<double> get_wheels_positions();
+    std::vector<double> get_position();
 
     /**
      * @brief Sends command to the actuators of the robot with the following order : wheel commands and joints commands.

@@ -24,6 +24,8 @@ public:
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
     float updateEnv(float simulationTime, const Morphology::Ptr &morph) override;
 
+    static std::vector<double> instant_reward(const Individual::Ptr &ind);
+
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 

@@ -59,6 +59,25 @@ std::vector<double> Locomotion::fitnessFunction(const Individual::Ptr &ind){
     return d;
 }
 
+std::vector<double> Locomotion::instant_reward(const Individual::Ptr &ind){
+    std::vector<double> d(1);
+    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
+    {
+        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+                         (a[1] - b[1])*(a[1] - b[1]) +
+                         (a[2] - b[2])*(a[2] - b[2]));
+    };
+
+
+    std::vector<double> init_position = settings::getParameter<settings::Sequence<double>>(ind->get_parameters(),"#initPosition").value;
+    std::vector<double> curr_position = std::dynamic_pointer_cast<sim::Morphology>(ind->get_morphology())->get_position();
+    double max_distance = settings::getParameter<settings::Double>(ind->get_parameters(),"#maxDistance").value;
+    double distance_covered = distance(curr_position,init_position);
+
+     d[0] = distance_covered/max_distance;
+
+    return d;
+}
 
 float Locomotion::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
