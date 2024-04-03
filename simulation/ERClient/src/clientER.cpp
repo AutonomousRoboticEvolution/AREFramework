@@ -265,14 +265,13 @@ bool ER::updateSimulation()
                 }
                 else if(state == FINISH || (state == IDLE && serverInstances[slaveIdx]->state() == SlaveConnection::EVALUATING))
                 {
-                    int tmp_idx = currentIndexVec[slaveIdx];
                     if(endOfSimulation(slaveIdx)){
                         currentIndexVec[slaveIdx] = -1;
                         serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
                     }
                     eval_times[slaveIdx].second = hr_clock::now();
                     std::stringstream sstr;
-                    sstr << "eval," << tmp_idx << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
+                    sstr << "eval," << currentIndVec[slaveIdx]->get_morph_genome()->id() << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].first - reference_time).count()
                          << "," << std::chrono::duration_cast<std::chrono::microseconds>(eval_times[slaveIdx].second - reference_time).count() << std::endl;
                     Logging::saveStringToFile("times.csv",sstr.str());
                    serverInstances[slaveIdx]->setState(SlaveConnection::FREE);
