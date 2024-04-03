@@ -210,6 +210,7 @@ bool MEIM::update(const Environment::Ptr &env){
             std::cerr << "task unknown" << std::endl;
             exit(1);
         }
+        std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
     else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
