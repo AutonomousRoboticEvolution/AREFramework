@@ -119,7 +119,7 @@ std::vector<double> BarrelTask::fitnessFunction(const Individual::Ptr &ind){
                          (a[2] - b[2])*(a[2] - b[2]));
     };
     std::vector<double> d(1);
-    d[0] = 1 - (distance(final_position,barrel_current_position)/max_dist)/2 - (distance(target_position,barrel_current_position)/max_dist)/2;
+    d[0] = 1 - (distance(target_position,barrel_current_position)/max_dist);///2 - (distance(final_position,barrel_current_position)/max_dist)/2;
 
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f) || f < 0)
