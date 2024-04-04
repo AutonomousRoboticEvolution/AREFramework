@@ -504,7 +504,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         //update learner
                         auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
                         int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
-                        if(env_type == are::OBSTACLES && ind->descriptor().rows() != 64){
+                        if(env_type == are::sim::OBSTACLES && ind->descriptor().rows() != 64){
                             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
                             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_visited_zones(Eigen::MatrixXi::Zero(8,8));
                         }
@@ -1135,25 +1135,4 @@ void M_NIPES::seed_experiment(const std::string &morph_file){
 void M_NIPES::fill_ind_to_eval(std::vector<int> &ind_to_eval){
     for(int i = 0; i < population.size(); i++)
         ind_to_eval.push_back(population.get_index(i));
-}
-
-std::string M_NIPES::_task_name(are::task_t task){
-    if(task == MAZE)
-        return "maze";
-    else if(task == OBSTACLES)
-        return "obstacles";
-    else if(task == MULTI_TARGETS)
-        return "multi targets";
-    else if(task == EXPLORATION)
-        return "exploration";
-    else if(task == BARREL)
-        return "barrel";
-    else if(task == GRADUAL)
-        return "gradual";
-    else if(task == LOCOMOTION)
-        return "locomotion";
-    else{
-        std::cerr << "Error: task unknow" << std::endl;
-        return "None";
-    }
 }

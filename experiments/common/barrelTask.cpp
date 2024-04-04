@@ -128,7 +128,7 @@ std::vector<double> BarrelTask::fitnessFunction(const Individual::Ptr &ind){
 
     //Go to next target
     current_target+=1;
-    if(current_target >= barrel_current_position.size())
+    if(current_target >= barrel_initial_positions.size())
         current_target=0;
 
     return d;

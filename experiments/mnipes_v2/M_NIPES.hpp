@@ -13,21 +13,14 @@
 #include "obstacleAvoidance.hpp"
 #include "locomotion.hpp"
 #include "boost/filesystem.hpp"
+#include "env_settings.hpp"
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 
 
-typedef enum task_t{
-    MAZE = 0,
-    OBSTACLES = 1,
-    MULTI_TARGETS = 2,
-    EXPLORATION = 3,
-    BARREL = 4,
-    GRADUAL = 5,
-    LOCOMOTION = 6
-} task_t;
+
 
 
 
@@ -265,7 +258,7 @@ public:
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-        if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
+        if(simulator_side && (env_type == sim::MULTI_TARGETS || env_type == sim::EXPLORATION))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[indIndex]->setObjectives(objectives);
@@ -345,7 +338,6 @@ private:
     int current_gradual_scene = 0;
     int nbr_eval_current_task = 0;
 
-    std::string _task_name(are::task_t task);
 };
 
 
