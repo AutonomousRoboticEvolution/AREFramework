@@ -32,6 +32,7 @@ add_library(NIPES SHARED
     ../common/barrelTask.cpp
     ../common/exploration.cpp
     ../common/multiTargetMaze.cpp
+    ../common/locomotion.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
