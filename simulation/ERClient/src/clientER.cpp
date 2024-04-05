@@ -153,7 +153,7 @@ void ER::startOfSimulation(int slaveIndex){
 bool ER::endOfSimulation(int slaveIndex){
     if(currentIndexVec[slaveIndex] < 0)
         return true;
-    //bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
     // std::cout << "slave " << slaveIndex << " waiting to receive ind" << std::endl;
     if(!receive_string_no_reply(message, serverInstances[slaveIndex]->get_ind_channel(),"ind ")){
@@ -166,8 +166,8 @@ bool ER::endOfSimulation(int slaveIndex){
 
     evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
 
-   // if(verbose)
-   //     std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " with morphology " << currentIndVec[slaveIndex]->get_morph_genome()->id() <<" is evaluated" << std::endl;
+     if(verbose)
+         std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " with objective " << currentIndVec[slaveIndex]->getObjectives()[0] <<" is evaluated" << std::endl;
 
     std::vector<double> objectives = currentIndVec[slaveIndex]->getObjectives();
    // if(verbose){
@@ -177,7 +177,7 @@ bool ER::endOfSimulation(int slaveIndex){
 //        std::cout << std::endl;
 //    }
     ea->setObjectives(currentIndexVec[slaveIndex],objectives);
-
+    ea->update_individual(currentIndexVec[slaveIndex],currentIndVec[slaveIndex]);
 
     //        if(evalIsFinish)
     //            currentIndIndex++;
@@ -227,7 +227,7 @@ bool ER::updateSimulation()
                     continue;
 
                 int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
-                // std::cout << "Slave " << slaveIdx << "in state: " << sim_state_to_string(state) << std::endl;
+              //  std::cout << "Slave " << slaveIdx << " in state: " << sim_state_to_string(state) << std::endl;
                // if(verbose)
                //     std::cout << "Slave : " << slaveIdx << " " << sim_state_to_string(state) << std::endl;
                // all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
@@ -237,7 +237,7 @@ bool ER::updateSimulation()
                 if(state == IDLE && serverInstances[slaveIdx]->state() != SlaveConnection::EVALUATING)
                 {
                     serverInstances[slaveIdx]->setIntegerSignal("clientState",IDLE);
-                    currentIndexVec[slaveIdx] = -1;
+                   // currentIndexVec[slaveIdx] = -1;
                 }
                 else if(state == READY && currentIndexVec[slaveIdx] >= 0)
                 {
@@ -314,12 +314,12 @@ bool ER::updateSimulation()
 //    bool wait_for_all_instances = settings::getParameter<settings::Boolean>(parameters,"#waitForAllInstances").value;
 //    if(!wait_for_all_instances) all_instances_finish = true;
 
-    if(indToEval.empty() && !ea->get_population().empty() && isAllInstancesFinished()){
-        ea->fill_ind_to_eval(indToEval);
-        return true;
-    }
+//    if(indToEval.empty() && !ea->get_population().empty() && isAllInstancesFinished()){
+//        ea->fill_ind_to_eval(indToEval);
+//        return true;
+//    }
 
-    if(indToEval.empty() && isAllInstancesFinished() || ea->get_population().size() == 0)
+    if((indToEval.empty() && isAllInstancesFinished()) || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
         ea->epoch();

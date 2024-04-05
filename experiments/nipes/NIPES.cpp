@@ -164,6 +164,8 @@ void NIPES::init(){
 
 void NIPES::epoch(){
 
+    std::cout << numberEvaluation << "/" << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << " evaluations" << std::endl;
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
@@ -287,12 +289,18 @@ void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
         std::dynamic_pointer_cast<NIPESIndividual>(population[indIdx])->add_reward(objectives[0]);
     }
     population[indIdx]->setObjectives(objectives);
+    newly_evaluated.push_back(indIdx);
 }
 
 
 bool NIPES::update(const Environment::Ptr & env){
-    numberEvaluation++;
-    reevaluated++;
+
+    for(const int& idx :newly_evaluated)
+    {
+        numberEvaluation++;
+        reevaluated++;
+    }
+
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
@@ -314,6 +322,7 @@ bool NIPES::update(const Environment::Ptr & env){
             }
         }
     }
+    newly_evaluated.clear();
 
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
 //    if(reevaluated < nbReEval)
@@ -325,7 +334,6 @@ bool NIPES::update(const Environment::Ptr & env){
 
 bool NIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-
     return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 

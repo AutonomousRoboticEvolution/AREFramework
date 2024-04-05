@@ -115,6 +115,7 @@ protected:
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
     int reevaluated = 0;
+    std::vector<int> newly_evaluated;
 
 };
 
