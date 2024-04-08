@@ -16,6 +16,8 @@
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
 #include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
+#include "env_settings.hpp"
 
 namespace are{
 

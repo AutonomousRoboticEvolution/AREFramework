@@ -86,10 +86,15 @@ void ER::startOfSimulation()
 }
 
 void ER::initIndividual(){
-
+    if(ind_received){
+        currentInd->init();
+        return;
+    }
     std::string message;
     receive_string_no_reply(message,_individual_channel,"ind ");
     std::cout << "received individual" << std::endl;
+    ind_received = true;
+    
 
 
     //int length;
@@ -98,12 +103,14 @@ void ER::initIndividual(){
         std::cerr << "No individual received" << std::endl;
         return;
     }
+    
 //    std::string mess(message);
 //    mess.resize(length);
     currentInd = ea->get_population()[0];
     if(nbrEval == 0)
         currentInd->from_string(message);
     currentInd->init();
+    
     int ind_id = currentInd->get_morph_genome()->id();
     evalIsFinish = false;
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
@@ -224,9 +231,10 @@ void ER::endOfSimulation()
         }
         ea->setObjectives(currentIndIndex,objectives);
         evalIsFinish = ea->update(environment);
-        if(evalIsFinish)
+        if(evalIsFinish){
             nbrEval = 0;
-
+            ind_received = false;
+        }
         simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }

@@ -164,7 +164,7 @@ bool ER::endOfSimulation(int slaveIndex){
         currentIndVec[slaveIndex]->from_string(message);
     }
 
-    evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
+    //evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");
 
      if(verbose)
          std::cout << "Slave : " << slaveIndex << " individual " << currentIndexVec[slaveIndex] << " with objective " << currentIndVec[slaveIndex]->getObjectives()[0] <<" is evaluated" << std::endl;
@@ -227,7 +227,7 @@ bool ER::updateSimulation()
                     continue;
 
                 int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
-              //  std::cout << "Slave " << slaveIdx << " in state: " << sim_state_to_string(state) << std::endl;
+               
                // if(verbose)
                //     std::cout << "Slave : " << slaveIdx << " " << sim_state_to_string(state) << std::endl;
                // all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
@@ -255,14 +255,15 @@ bool ER::updateSimulation()
                     //            float simTime = slave->getFloatSignal("simulationTime");
                     //            serverInstances[slaveIdx]->setIntegerSignal("clientState",BUSY);
                 }
-                else if(state == RESTART){
-                    currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
-                    send_string_no_reply(currentIndVec[slaveIdx]->to_string(),serverInstances[slaveIdx]->get_ind_channel(),"ind ");
+//                 else if(state == RESTART){
+//                     endOfSimulation(slaveIdx);
+//                     currentIndVec[slaveIdx]->set_client_id(serverInstances[slaveIdx]->get_clientID());
+//                     send_string_no_reply(currentIndVec[slaveIdx]->to_string(),serverInstances[slaveIdx]->get_ind_channel(),"ind ");
 
-//                    serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
-                    serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
-                    std::cout << "Restart simulator " << slaveIdx << std::endl;
-                }
+// //                    serverInstances[slaveIdx]->setStringSignal("currentInd",currentIndVec[slaveIdx]->to_string());
+//                     serverInstances[slaveIdx]->setIntegerSignal("clientState",READY);
+//                     std::cout << "Restart simulator " << slaveIdx << std::endl;
+//                 }
                 else if(state == FINISH || (state == IDLE && serverInstances[slaveIdx]->state() == SlaveConnection::EVALUATING))
                 {
                     if(endOfSimulation(slaveIdx)){

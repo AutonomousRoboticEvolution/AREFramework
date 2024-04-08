@@ -139,7 +139,9 @@ protected:
     bool client = false;
     int clientID = 0;
 
-    bool evalIsFinish;
+    bool evalIsFinish = false;
+    bool ind_received = false; //for server mode
+
 
     hr_clock::time_point reference_time;
     hr_clock::time_point start_eval_time;

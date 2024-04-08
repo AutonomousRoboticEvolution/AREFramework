@@ -362,11 +362,11 @@ void clientMessageHandler(int message){
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simSetIntegerSignal("simulationState",are_c::BUSY);
             simulationState = RESTART;
-            std::string indString = ERVREP->get_currentInd()->to_string();
-            std::string req;
-            are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
+            //std::string indString = ERVREP->get_currentInd()->to_string();
+           // std::string req;
+          //  are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
            // simSetStringSignal("currentInd",indString.c_str(),indString.size());
             loadingPossible = true;  // start another simulation
             return;
