@@ -60,7 +60,7 @@ bool IPOPCMAStrategy::pop_desc_stagnation(){
         stop = stop && stddev(i) <= pop_stag_thres;
         sum += stddev(i);
     }
-    sum /= sum/static_cast<float>(stddev.rows());
+    sum = sum/static_cast<float>(stddev.rows());
 
     if(stop){
         std::stringstream sstr;
@@ -138,7 +138,6 @@ bool IPOPCMAStrategy::best_sol_stagnation(){
         stddev += (best_fitnesses[i] - mean)*(best_fitnesses[i] - mean);
     }
     stddev = sqrt(stddev/static_cast<float>(len_of_stag-1));
-
     if(stddev <= 0.05){
         std::stringstream sstr;
         sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
