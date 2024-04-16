@@ -9,7 +9,8 @@ int ER::init(int nbrOfInst, int port){
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::make_unique<SlaveConnection>("127.0.0.1", i + port);
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
-        if (new_slave->connect(5000)) {
+        float max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
+        if (new_slave->connect(max_eval_time + 60000)) {
             // new_slave->setState(SlaveConnection::State::FREE);
            // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
           //  new_slave->setIntegerSignal("clientState",IDLE);
@@ -155,11 +156,12 @@ bool ER::endOfSimulation(int slaveIndex){
         return true;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
-    // std::cout << "slave " << slaveIndex << " waiting to receive ind" << std::endl;
+    std::cout << "slave " << slaveIndex << " waiting to receive ind" << std::endl;
     if(!receive_string_no_reply(message, serverInstances[slaveIndex]->get_ind_channel(),"ind ")){
-        std::cerr << "Slave " << slaveIndex << " message not received" << std::endl;
+        //std::cerr << "Slave " << slaveIndex << " message not received" << std::endl;
         currentIndVec[slaveIndex]->setObjectives({0});
         serverInstances[slaveIndex]->reset_ind_channel();
+
     }else{
         currentIndVec[slaveIndex]->from_string(message);
     }

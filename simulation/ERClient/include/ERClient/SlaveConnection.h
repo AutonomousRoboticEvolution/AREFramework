@@ -45,6 +45,7 @@ private:
 
     zmq::context_t _context;
     zmq::socket_t _individual_channel;
+    int zmq_timeout = 100000;
 
 public:
     explicit SlaveConnection(const std::string& address, int port);

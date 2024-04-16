@@ -8,7 +8,9 @@ const Individual::Ptr& Population::at(size_t idx) const
     for(size_t i = 0; i < _indexes.size(); i++)
         if(idx == _indexes[i])
             return _individuals.at(i);
-    throw std::invalid_argument("Population::at - index not found");
+    std::stringstream sstr;
+    sstr << "const Population::at - index " << idx << " not found";
+    throw std::invalid_argument(sstr.str());
 }
 
 Individual::Ptr& Population::operator[](size_t idx)
@@ -16,7 +18,9 @@ Individual::Ptr& Population::operator[](size_t idx)
     for(size_t i = 0; i < _indexes.size(); i++)
         if(idx == _indexes[i])
             return _individuals[i];
-    throw std::invalid_argument("Population::[] - index not found");
+    std::stringstream sstr;
+    sstr << "const Population::[] - index " << idx << " not found";
+    throw std::invalid_argument(sstr.str());
 
 }
 
@@ -25,7 +29,9 @@ const Individual::Ptr& Population::operator[](size_t idx) const
     for(size_t i = 0; i < _indexes.size(); i++)
         if(idx == _indexes[i])
             return _individuals.at(i);
-    throw std::invalid_argument("const Population::[] - index not found");
+    std::stringstream sstr;
+    sstr << "const Population::[] - index " << idx << " not found";
+    throw std::invalid_argument(sstr.str());
 
 }
 
