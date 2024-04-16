@@ -4,13 +4,15 @@ if(RASPBERRY)
     find_package(OpenCV REQUIRED) # for camera
     include_directories( ${OpenCV_INCLUDE_DIRS} )
 
-    file(GLOB SRC src/pi/* src/pi_communication.cpp src/pi_individual.cpp)
+    file(GLOB SRC src/pi/* src/pi_communication.cpp src/pi_individual.cpp src/controller.cpp experiments/physical_homeokinesis/hk_controller.cpp )
     set(CTRL_SRC ../RobotController/I2CDevice.cpp ../RobotController/Organ.cpp ../RobotController/JointOrgan.cpp ../RobotController/MotorOrgan.cpp ../RobotController/SensorOrgan.cpp ../RobotController/DaughterBoards.cpp ../RobotController/LedDriver.cpp ../RobotController/Camera.cpp ../RobotController/BatteryMonitor.cpp ../RobotController/Fan.cpp)
     add_executable(are-pi-server ${SRC} ${CTRL_SRC})
     target_include_directories(are-pi-server PUBLIC
         "include"
         "../EAFramework/include"
-        "../RobotController/")
+        "../RobotController/"
+        "../experiments/"
+        )
     target_link_libraries(are-pi-server piARE zmq  ${Boost_LIBRARIES} wiringPi ${OpenCV_LIBS})
 
 else()
@@ -64,7 +66,7 @@ else()
 
     #Compilation of update
     file(GLOB SRC_UPDATE src/update/*)
-    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/pi_individual.cpp ../image_processing/src/real_environment.cpp)
+    add_executable(are-update ${SRC_UPDATE}  src/pi_communication.cpp src/controller.cpp ../image_processing/src/real_environment.cpp)
     target_include_directories(are-update PUBLIC
         # ${OpenCV_INCLUDE_DIRS}
         "include"

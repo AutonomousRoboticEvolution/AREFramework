@@ -18,6 +18,7 @@ set(INCLUDES
 add_library(physical_update SHARED
    factories.cpp
    random_controller.cpp
+   ../../PhysicalER/src/nn2_individual.cpp
     )
 
 target_include_directories(physical_update PUBLIC ${INCLUDES})

@@ -13,7 +13,7 @@
 #include "ARE/Logging.h"
 #include "ARE/Environment.h"
 #include "ARE/misc/RandNum.h"
-#include "physicalER/pi_individual.hpp"
+#include "ARE/Individual.h"
 
 namespace are {
 namespace phy {

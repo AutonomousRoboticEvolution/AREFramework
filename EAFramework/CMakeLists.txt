@@ -10,6 +10,7 @@ if (RASPBERRY)
             "src/Genome.cpp"
             "src/NNParamGenome.cpp"
             "src/Logging.cpp"
+            "src/population.cpp"
             "src/misc/*"
             "src/nn2/*")
     else()
@@ -19,6 +20,7 @@ if (RASPBERRY)
             "src/Genome.cpp"
             "src/Logging.cpp"
             "src/NNParamGenome.cpp"
+            "src/population.cpp"
             "src/misc/*")
     endif()
 

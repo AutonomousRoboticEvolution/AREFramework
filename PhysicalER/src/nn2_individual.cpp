@@ -1,4 +1,4 @@
-#include "physicalER/pi_individual.hpp"
+#include "physicalER/nn2_individual.hpp"
 
 
 using namespace are::phy;
@@ -39,9 +39,6 @@ void NN2Individual::createController(){
 }
 
 
-void NN2Individual::update(double delta_time){
-   outputs = control->update(inputs);
-}
 
 
 std::string NN2Individual::to_string()

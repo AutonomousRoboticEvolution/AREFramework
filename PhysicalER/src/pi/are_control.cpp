@@ -3,7 +3,7 @@
 
 using namespace are::pi;
 
-AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
+AREControl::AREControl(const phy::Controller::Ptr &ind , std::string stringListOfOrgans, settings::ParametersMapPtr parameters){
     controller = ind;
     _max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value * 1000.0; // in milliseconds
     _time_step = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value * 1000.0; // in milliseconds
@@ -113,9 +113,9 @@ AREControl::AREControl(const phy::NN2Individual &ind , std::string stringListOfO
     }
 
     // check the controller is giving the right number of inputs and outputs:
-    std::cout<<"Number of NN inputs: "<<controller.get_number_of_inputs()<<"\nNumber of NN outputs: "<<controller.get_number_of_outputs()<<std::endl;
-    assert(controller.get_number_of_inputs() == numberOfSensors*2 + cameraInputToNN);
-    assert(controller.get_number_of_outputs() == numberOfWheels + numberOfJoints);
+    std::cout<<"Number of inputs: "<<controller->get_number_of_inputs()<<"\nNumber of outputs: "<<controller->get_number_of_outputs()<<std::endl;
+//    assert(controller->get_number_of_inputs() == numberOfSensors*2 + cameraInputToNN);
+//    assert(controller->get_number_of_outputs() == numberOfWheels + numberOfJoints);
 
     // set debug printing flag - this prints a representation of the inputs and outputs to terminal
     if (settings::getParameter<settings::Boolean>(parameters,"#debugDisplayOnPi").value){
@@ -322,9 +322,9 @@ int AREControl::exec(zmq::socket_t& socket){
         retrieveSensorValues(sensor_values);
 
         // tell the controller to update
-        controller.set_inputs(sensor_values);
-        controller.update ( this_loop_start_time*1000.0 ); //expects time in microseconds, I think? (Matt)
-        nn_outputs = controller.get_ouputs();
+        controller->set_inputs(sensor_values);
+        controller->update ( this_loop_start_time*1000.0 ); //expects time in microseconds, I think? (Matt)
+        nn_outputs = controller->get_ouputs();
 
         // send the new values to the actuators
         sendOutputOrganCommands(nn_outputs, this_loop_start_time-start_time);

@@ -1,7 +1,7 @@
 #ifndef PI_INDIVIDUAL_HPP
 #define PI_INDIVIDUAL_HPP
 
-#include "ARE/Individual.h"
+#include "controller.hpp"
 #include "ARE/NNParamGenome.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/nn2/NN2Control.hpp"
@@ -24,25 +24,20 @@ using fcp_t = nn2::Fcp<neuron_t,connection_t>;
 /**
  * @brief class Individual meant to be running on a Raspberry Pi using NN implementation of nn2 module
  */
-class NN2Individual : public Individual
+class NN2Individual : public Controller
 {
 public:
 
     typedef std::shared_ptr<NN2Individual> Ptr;
     typedef std::shared_ptr<const NN2Individual> ConstPtr;
 
-    NN2Individual() : Individual(){}
-    NN2Individual(const EmptyGenome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
-        Individual(morph_gen,ctrl_gen){}
+    NN2Individual() : Controller(){}
+    NN2Individual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
+        Controller(morph_gen,ctrl_gen){}
     NN2Individual(const NN2Individual& ind) :
-        Individual(ind),
+        Controller(ind),
         energy_cost(ind.energy_cost)
     {}
-
-    void init() override{
-        isEval = false;
-        createController();
-    }
 
     Individual::Ptr clone() override {
         return std::make_shared<NN2Individual>(*this);
@@ -66,27 +61,12 @@ public:
     }
 
     //GETTERS & SETTERS
-    double get_energy_cost(){return energy_cost;}
-    void set_inputs(const std::vector<double>& in){inputs=in;}
-    const std::vector<double>& get_ouputs(){return outputs;}
 
-    int get_number_of_inputs(){return nb_input;}
-    int get_number_of_outputs(){return nb_output;}
 
-    void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
-    const std::vector<waypoint>& get_trajectory(){return trajectory;}
 
 protected:
-    void createMorphology() override{}
     void createController() override;
 
-    std::vector<double> inputs;
-    std::vector<double> outputs;
-
-    std::vector<waypoint> trajectory;
-
-    int nb_input;
-    int nb_output;
     int nb_hidden;
     int nn_type;
 

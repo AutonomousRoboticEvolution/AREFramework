@@ -2,11 +2,16 @@
 #include <string>
 #include <iostream>
 
-#include "physicalER/pi_individual.hpp"
+#include "ARE/NNParamGenome.hpp"
+//#include "physicalER/controller.hpp"
+#include "physicalER/nn2_individual.hpp"
 #include "physicalER/pi_communication.hpp"
 #include "physicalER/pi/are_control.hpp"
+#include "physicalER/pi/pi_server.hpp"
 #include "ARE/Settings.h"
 #include "ARE/misc/RandNum.h"
+#include "physical_homeokinesis/hk_controller.hpp"
+
 using namespace are;
 //TODO implement other orders like abort
 
@@ -25,10 +30,10 @@ int main(int argc, char** argv) {
     
     misc::RandNum::Ptr randomNumber = std::make_shared<misc::RandNum>(0);
 
-    EmptyGenome::Ptr empy_gen = std::make_shared<EmptyGenome>();
-    NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
+    Genome::Ptr ctrl_gen;
+    phy::Controller::Ptr ctrl;
 
-    std::string str_ctrl, str_organs_list, str_param;
+    std::string ctrl_type, str_ctrl, str_organs_list, str_param;
 
     while(1){
         //receive parameters
@@ -39,20 +44,30 @@ int main(int argc, char** argv) {
         phy::receive_string(str_organs_list,"organ_addresses_received",reply,"pi ");
         std::cout<<"Organs list received: \n"<<str_organs_list<<std::endl;
         
+        //retreive controller type
+        phy::receive_string(ctrl_type,"ctrl_type",reply,"pi ");
 
         // this generates the neural network controller ind
         phy::receive_string(str_ctrl,"starting",reply,"pi ");
-        std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
+        //std::cout<<"NN Genome as string:\n"<<str_ctrl<<std::endl;
         str_ctrl.erase(0, str_ctrl.find("\n") + 1);
-	    ctrl_gen->from_string(str_ctrl);
-        phy::NN2Individual ind(empy_gen,ctrl_gen);
-        ind.set_parameters(parameters);
-        ind.set_randNum(randomNumber);
-        ind.init();
+        if(ctrl_type == "nn"){
+            ctrl_gen = std::make_shared<NNParamGenome>(randomNumber,parameters);
+            ctrl_gen->from_string(str_ctrl);
+            ctrl = pi::controller_instanciation<phy::NN2Individual>(ctrl_gen,parameters,randomNumber);
+        }else if(ctrl_type == "hk"){
+            ctrl_gen = std::make_shared<phy::HKGenome>(randomNumber,parameters);
+            ctrl_gen->from_string(str_ctrl);
+            ctrl = pi::controller_instanciation<phy::HKController>(ctrl_gen,parameters,randomNumber);
+        }else{
+           std::cerr << "unknown controller type" << std::endl;
+           continue;
+        }
+
 
         // run controller
         std::cout<<"running a controller"<<std::endl;        
-        pi::AREControl AREController(ind, str_organs_list, parameters);
+        pi::AREControl AREController(ctrl, str_organs_list, parameters);
         AREController.exec(publisher);
         std::cout<<"finished running the controller"<<std::endl;
 

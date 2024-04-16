@@ -6,7 +6,7 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
-#include "physicalER/pi_individual.hpp"
+#include "physicalER/controller.hpp"
 #include "physicalER/pi_communication.hpp"
 #include "MotorOrgan.hpp"
 #include "JointOrgan.hpp"
@@ -26,7 +26,7 @@ namespace pi {
 class AREControl{
 public:
 
-    AREControl(const phy::NN2Individual& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
+    AREControl(const phy::Controller::Ptr& ind , std::string stringListOfOrgans , settings::ParametersMapPtr parameters);
     ~AREControl(){
         for(auto &o: listOfOrgans)
             delete o;
@@ -35,7 +35,7 @@ public:
     int exec( zmq::socket_t& socket);
 
 private:
-    phy::NN2Individual controller;
+    phy::Controller::Ptr controller;
     u_int32_t _max_eval_time ; // millieconds
     float _time_step ; // milliseconds
 

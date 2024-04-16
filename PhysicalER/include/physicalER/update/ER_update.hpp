@@ -9,7 +9,7 @@
 #include "ARE/Environment.h"
 #include "ARE/misc/RandNum.h"
 #include "physicalER/pi_communication.hpp"
-#include "physicalER/pi_individual.hpp"
+#include "physicalER/controller.hpp"
 #include "physicalER/io_helpers.hpp"
 #include "../image_processing/include/image_processing/real_environment.hpp"
 
