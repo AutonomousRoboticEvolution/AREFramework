@@ -36,16 +36,30 @@ bool are::send_string_no_reply(const std::string &message_string, zmq::socket_t 
 
 bool are::receive_string_no_reply(std::string &message_string, zmq::socket_t &socket, const std::string &topic){
     zmq::message_t message;
-    
     if(socket.recv(&message)){
         message_string.assign(static_cast<char*>(message.data()),message.size());
-//    message_string.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
+        //    message_string.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
 
-    // remove topic prefix:
+        // remove topic prefix:
         if (message_string.substr(0,topic.size())==topic){
             message_string=message_string.substr(topic.size(),message_string.size());
         }
         return true;
     }
+
+    std::cerr << "message not received : ";
+    if(errno == EAGAIN)
+        std::cerr << "EAGAIN" << std::endl;
+    else if(errno == ENOTSUP)
+        std::cerr << "ENOTSUP" << std::endl;
+    else if(errno == EFSM)
+        std::cerr << "EFSM" << std::endl;
+    else if(errno == ENOTSOCK)
+        std::cerr << "ENOTSOCK" << std::endl;
+    else if(errno == EINTR)
+        std::cerr << "EINTR" << std::endl;
+    else
+        std::cerr << "unknown errno: " << errno << std::endl;
+
     return false;
 }

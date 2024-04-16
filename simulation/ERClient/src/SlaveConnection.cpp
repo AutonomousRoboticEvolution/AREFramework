@@ -70,8 +70,8 @@ bool SlaveConnection::connect(int connectionTimeoutMs)
     //setup zmq communication channel to retrieve the individual
     std::stringstream zmq_address;
     zmq_address << "tcp://" << this->_address << ":" << this->_port << "1" ;
-    int timeout = 10000;
-    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&timeout,sizeof(timeout));
+//    int timeout = 100000;
+//    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&timeout,sizeof(timeout));
     _individual_channel.connect(zmq_address.str());
 
     if (result == -1) {
@@ -118,8 +118,8 @@ void SlaveConnection::reset_ind_channel(){
     _individual_channel.close();
     _individual_channel = zmq::socket_t(_context,ZMQ_REQ);
     
-    int timeout = 10000;
-    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&timeout,sizeof(timeout));
+//    int timeout = 100000;
+//    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&timeout,sizeof(timeout));
     
     std::stringstream zmq_address;
     zmq_address << "tcp://" << this->_address << ":" << this->_port << "1" ;
