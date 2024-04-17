@@ -10,7 +10,7 @@ int ER::init(int nbrOfInst, int port){
         auto new_slave = std::make_unique<SlaveConnection>("127.0.0.1", i + port);
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
         float max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
-        if (new_slave->connect(max_eval_time + 60000)) {
+        if (new_slave->connect(max_eval_time*1000 + 60000)) {
             // new_slave->setState(SlaveConnection::State::FREE);
            // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
           //  new_slave->setIntegerSignal("clientState",IDLE);
