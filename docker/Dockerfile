@@ -59,14 +59,3 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep
 #RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DLIMBO_FODLER=/are/limbo -DONLY_SIMULATION=1 .. && make -j ${N_CPU} && make install
 
 WORKDIR /are
-
-# Buid
-# $ cd docker
-# $ sudo docker build --build-arg="N_CPU=20" -t are_framework:melai .  
-# Run in your host machine to allow GUI
-# $ sudo xhost +local:docker
-# Example to run after successfull built
-# tmp is where we will store the logs
-# DISPLAY, x11-unix and net are only required if using the graphic interface
-# docker run --rm -it --env DISPLAY=$DISPLAY --volume /tmp/.X11-uni:/tmp/.X11-unix --volume /tmp:/tmp --volume host_path/AREFramework:/are/AREFramework --net=host are_framework:melai /bin/bash
-# $ run_cluster.py --xvfb 1 --params /are/AREFramework/experiments/homeokinesis/parameters.csv --client are-client --port-start 10000 --vrep /are/AREFramework/vrep-3.6.2/are_sim.sh 48
