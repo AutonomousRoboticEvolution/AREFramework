@@ -14,6 +14,7 @@
 #include "simulatedER/ER.h"
 #include "ARE/exp_plugin_loader.hpp"
 #include "ERClient/sim_state.h"
+#include "simulatedER/zmq_com.hpp"
 
 /// an unique pointer to ER_VREP class
 are::sim::ER::Ptr ERVREP;

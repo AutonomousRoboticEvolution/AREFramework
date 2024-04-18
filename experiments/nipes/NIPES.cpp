@@ -164,6 +164,8 @@ void NIPES::init(){
 
 void NIPES::epoch(){
 
+    std::cout << numberEvaluation << "/" << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << " evaluations" << std::endl;
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
@@ -283,16 +285,22 @@ void NIPES::init_next_pop(){
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
     int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-    if(env_type == 4 && simulator_side){//MultiTargetMaze
+    if((env_type == sim::MULTI_TARGETS || env_type == sim::BARREL) && simulator_side){//MultiTargetMaze and Barrel task
         std::dynamic_pointer_cast<NIPESIndividual>(population[indIdx])->add_reward(objectives[0]);
     }
     population[indIdx]->setObjectives(objectives);
+    newly_evaluated.push_back(indIdx);
 }
 
 
 bool NIPES::update(const Environment::Ptr & env){
-    numberEvaluation++;
-    reevaluated++;
+
+    for(const int& idx :newly_evaluated)
+    {
+        numberEvaluation++;
+        reevaluated++;
+    }
+
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
@@ -301,8 +309,12 @@ bool NIPES::update(const Environment::Ptr & env){
         if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-        }else if(env->get_name() == "multi_target_maze"){
-            int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+        }else if(env->get_name() == "multi_target_maze" || env->get_name() == "barrel_task"){
+            int number_of_targets = 0;
+            if(env->get_name() == "multi_target_maze")
+                number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+            else if(env->get_name() == "barrel_task")
+                number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
             if(std::dynamic_pointer_cast<NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
                 return false;
             }else{
@@ -314,6 +326,7 @@ bool NIPES::update(const Environment::Ptr & env){
             }
         }
     }
+    newly_evaluated.clear();
 
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
 //    if(reevaluated < nbReEval)
@@ -325,7 +338,6 @@ bool NIPES::update(const Environment::Ptr & env){
 
 bool NIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-
     return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 

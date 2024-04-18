@@ -86,7 +86,7 @@ target_compile_definitions(simulatedER PUBLIC
 )
 target_link_libraries(simulatedER
     dlibxx dl rt
-    ${Boost_LIBRARIES} tbb cmaes
+    ${Boost_LIBRARIES} tbb cmaes zmq
     ARE
     )
 

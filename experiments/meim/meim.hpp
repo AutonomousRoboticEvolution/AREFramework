@@ -45,6 +45,8 @@ public:
 
     void update(double delta_time) override;
 
+    void reset_control(){control.reset();}
+
     std::string to_string() override;
     void from_string(const std::string &) override;
 
@@ -62,7 +64,7 @@ public:
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
     {
-        arch & objectives;
+        arch & objectives; 
         arch & ctrlGenome;
         arch & morphGenome;
         arch & individual_id;

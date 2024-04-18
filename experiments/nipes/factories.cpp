@@ -3,28 +3,31 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
+#include "env_settings.hpp"
 #include "obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
+#include "locomotion.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
-    if(env_type == 0){
+    if(env_type == are::sim::MAZE){
         env = std::make_shared<are::sim::MazeEnv>();
         env->set_parameters(param);
     }
-    else if(env_type == 1)
+    else if(env_type == are::sim::OBSTACLES)
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
-    else if(env_type == 2)
-        env = std::make_shared<are::sim::BarrelTask>(param);
-    else if(env_type == 3)
-        env = std::make_shared<are::sim::Exploration>(param);
-    else if(env_type == 4)
+    else if(env_type == are::sim::MULTI_TARGETS)
         env = std::make_shared<are::sim::MultiTargetMaze>(param);
-
+    else if(env_type == are::sim::EXPLORATION)
+        env = std::make_shared<are::sim::Exploration>(param);
+    else if(env_type == are::sim::BARREL)
+        env = std::make_shared<are::sim::BarrelTask>(param);
+    else if(env_type == are::sim::LOCOMOTION)
+        env = std::make_shared<are::sim::Locomotion>(param);
 
     return env;
 }

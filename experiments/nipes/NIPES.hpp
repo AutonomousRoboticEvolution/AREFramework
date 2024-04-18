@@ -16,6 +16,8 @@
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
 #include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
+#include "env_settings.hpp"
 
 namespace are{
 
@@ -115,6 +117,7 @@ protected:
     bool _is_finish = false;
     std::vector<Eigen::VectorXd> archive;
     int reevaluated = 0;
+    std::vector<int> newly_evaluated;
 
 };
 

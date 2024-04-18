@@ -80,6 +80,7 @@ public:
 protected:
     void createMorphology() override;
     void createController() override;
+    double sum_ctrl_freq = 0;
 
     std::vector<double> final_position;
     std::vector<waypoint> trajectory;

@@ -10,13 +10,13 @@ extern "C" are::Environment::Ptr environmentFactory
 {
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
-    if(env_type == are::MAZE){
+    if(env_type == are::sim::MAZE){
         env = std::make_shared<are::sim::MazeEnv>();
         env->set_parameters(param);
     }
-    else if(env_type == are::OBSTACLES)
+    else if(env_type == are::sim::OBSTACLES)
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
-    else if(env_type == are::LOCOMOTION)
+    else if(env_type == are::sim::LOCOMOTION)
         env = std::make_shared<are::sim::Locomotion>(param);
     return env;
 }

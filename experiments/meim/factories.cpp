@@ -20,9 +20,6 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
 
-    are::TrajectoryLog<are::MEIMIndividual>::Ptr trajlog = std::make_shared<are::TrajectoryLog<are::MEIMIndividual>>();
-    logs.push_back(trajlog);
-
     std::string fit_log_file = are::settings::getParameter<are::settings::String>(param,"#fitnessFile").value;
     are::GenomeInfoLog::Ptr gilog = std::make_shared<are::GenomeInfoLog>(fit_log_file);
     logs.push_back(gilog);

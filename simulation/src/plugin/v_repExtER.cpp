@@ -53,7 +53,7 @@ extern "C" {
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 LIBRARY simLib;
-
+int timeout = 60;
 
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
@@ -104,6 +104,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
         return(0); // Means error, V-REP will unload this plugin
     }
 
+
     // Check the V-REP version:
     int vrepVer;
     simGetIntegerParameter(sim_intparam_program_version, &vrepVer);
@@ -123,6 +124,14 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
     bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
+    timeout += are_sett::getParameter<are_sett::Float>(parameters,"#maxEvalTime").value;
+
+    //get simulator port
+    std::string argument = simGetStringParameter(sim_stringparam_app_arg2);
+    std::vector<std::string> split_arg;
+    are::misc::split_line(argument,"_",split_arg);
+    std::cout << split_arg[1] << std::endl;
+    parameters->emplace("#port",std::make_shared<are_sett::String>(split_arg[1]));
 
     if(verbose){
         if(instance_type == are_sett::INSTANCE_REGULAR)
@@ -291,9 +300,9 @@ void clientMessageHandler(int message){
         } else {
             // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
             timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - sysTime).count();
-            if (timeElapsed > 60)
+            if (timeElapsed > timeout)
             {
-                std::cout << "Didn't receive a signal for 1 minute. Shutting down server " << std::endl;
+                std::cout << "Didn't receive a signal for " << timeout <<  " seconds. Shutting down server " << std::endl;
                 simQuitSimulator(true);
                 exit(0);
             }
@@ -336,7 +345,12 @@ void clientMessageHandler(int message){
         if(ERVREP->get_evalIsFinish()){
 
             std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            std::cout << "size of message sent " << indString.size() << std::endl;
+            std::string req;
+            are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
+            std::cout << "send individual" << std::endl;
+
+//            std::cout << "return value from simsetstringsignal " << simSetStringSignal("currentInd",indString.c_str(),indString.size()) << std::endl;
             simSetIntegerSignal("simulationState",are_c::FINISH);
 
             //loadingPossible = true;  // start another simulation
@@ -349,10 +363,12 @@ void clientMessageHandler(int message){
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simSetIntegerSignal("simulationState",are_c::BUSY);
             simulationState = RESTART;
-            std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            //std::string indString = ERVREP->get_currentInd()->to_string();
+           // std::string req;
+          //  are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
+           // simSetStringSignal("currentInd",indString.c_str(),indString.size());
             loadingPossible = true;  // start another simulation
             return;
        }

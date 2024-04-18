@@ -78,15 +78,36 @@ void NN2Individual::createMorphology(){
 }
 
 void NN2Individual::update(double delta_time){
+
+    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
-    if( diff < 0.1){
+
+    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
+        sum_ctrl_freq = 0;
+        //- Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
+
+        if(use_joint_feedback){
+            std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
+            for(double &j: joints)
+                j = 2.*j/M_PI;
+            inputs.insert(inputs.end(),joints.begin(),joints.end());
+        }
+        if(use_wheel_feedback){
+            std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+            inputs.insert(inputs.end(),wheels.begin(),wheels.end());
+        }
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);
+        energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
+        if(std::isnan(energy_cost))
+            energy_cost = 0;
     }
+    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 
-    energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
 
     sim_time = delta_time;
 }

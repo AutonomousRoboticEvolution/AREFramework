@@ -1,5 +1,5 @@
-#ifndef VISU_POP_HPP
-#define VISU_POP_HPP
+#ifndef HOMEOKINESIS_HPP
+#define HOMEOKINESIS_HPP
 
 #include <boost/filesystem.hpp>
 #include <boost/algorithm/string.hpp>
@@ -14,24 +14,6 @@
 
 
 namespace are {
-
-using CPPNMorph = sim::Morphology_CPPNMatrix;
-
-class ManualDesign: public Genome{
-public:
-    ManualDesign(std::vector<std::vector<int>> lov){
-        list_of_voxels = lov;
-    }
-    ManualDesign(const ManualDesign& md):
-        list_of_voxels(md.list_of_voxels){}
-    Genome::Ptr clone() const override{return nullptr;}
-    void init() override{}
-    void mutate() override{}
-    std::string to_string() const override{return "";}
-    void from_string(const std::string &) override{}
-
-    std::vector<std::vector<int>> list_of_voxels;
-};
 
 class HomeoInd : public Individual
 {
@@ -91,4 +73,4 @@ public:
 };
 
 }
-#endif //VISU_POP_HPP
+#endif //HOMEOKINESIS_HPP
