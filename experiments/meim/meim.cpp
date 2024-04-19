@@ -17,6 +17,7 @@ void MEIMIndividual::createMorphology(){
 }
 
 void MEIMIndividual::createController(){
+    bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
     nb_joints = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
     nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
     nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
@@ -24,7 +25,12 @@ void MEIMIndividual::createController(){
     int nb_outputs = nb_joints + nb_wheels;
     if(nb_outputs == 0)
         return;
-    control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
+    if(use_fixed_control){
+        control = std::make_shared<FixedController>();
+        std::dynamic_pointer_cast<FixedController>(control)->init_nn(nb_inputs,6,nb_outputs,weight,bias); //initiate a Feedforward Neural Network with constant weights and biases
+    }else{
+        control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
+    }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
 }
@@ -121,6 +127,13 @@ NN2CPPNGenome MEIM::best_of_subset(const std::vector<genome_t> gene_list){
 void MEIM::init(){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
+        bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
+        if(use_fixed_control){
+            weight = randomNum->randDouble(-0.2,0.2);
+            bias = randomNum->randDouble(-0.2,0.2);
+            parameters->emplace("#weight",std::make_shared<settings::Double>(weight));
+            parameters->emplace("#bias",std::make_shared<settings::Double>(bias));
+        }
         //- init random population of morphologies.
         int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
         population.resize(pop_size);
@@ -133,6 +146,10 @@ void MEIM::init(){
             ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
+
+            if(use_fixed_control)
+                std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_weight_bias(weight,bias);
+
 
             morph_gen.reset();
             ctrl_gen.reset();
@@ -155,6 +172,7 @@ void MEIM::init_next_pop(){
 void MEIM::reproduction(){
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     int tournament_size = settings::getParameter<settings::Integer>(parameters,"#tournamentSize").value;
+    bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
 
     while(population.size() < pop_size){
         //Random selection of indexes without duplicate
@@ -188,6 +206,8 @@ void MEIM::reproduction(){
         MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_genome,ctrl_genome);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
+        if(use_fixed_control)
+            std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_weight_bias(weight,bias);
         std::vector<double> init_pos;
         init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_init_position(init_pos);
@@ -215,6 +235,7 @@ bool MEIM::update(const Environment::Ptr &env){
     else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
         for(int &index : newly_evaluated){
+            std::cout << "update for individual indexed " << index << std::endl;
             Individual::Ptr ind = population[index];
 
             //if indivdual's morphology has no actuactors, generate another morphology randomly and it back to the population
@@ -279,6 +300,7 @@ void MEIM::setObjectives(size_t index, const std::vector<double> &objs){
     //if(population[index]->get_control() == nullptr){
     //    currentIndIndex = index;
     //   population[index]->setObjectives({0});
+    std::cout << "set objectives of individual indexed " << index << std::endl;
     EA::setObjectives(index,objs);
     newly_evaluated.push_back(index);
     if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)

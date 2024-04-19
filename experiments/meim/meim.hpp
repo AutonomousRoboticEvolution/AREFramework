@@ -5,6 +5,7 @@
 #include <ARE/nn2/NN2CPPNGenome.hpp>
 #include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
+#include "fixed_controller.hpp"
 #include "obstacleAvoidance.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 
@@ -77,6 +78,10 @@ public:
         arch & nb_wheels;
     }
 
+    void set_weight_bias(double w, double b){weight = w; bias = b;}
+    double get_weight(){return weight;}
+    double get_bias(){return bias;}
+
 private:
     void createMorphology() override;
     void createController() override;
@@ -90,6 +95,9 @@ private:
     int nb_joints;
     int nb_wheels;
 
+    //in case of fixed controller
+    double weight = 0;
+    double bias = 0;
 };
 
 class MEIM: public EA
@@ -125,6 +133,9 @@ private:
    void reproduction();
    void remove_worst_parent();
    NN2CPPNGenome best_of_subset(const std::vector<genome_t>);
+
+   double weight = 0;
+   double bias = 0;
 
 };
 }
