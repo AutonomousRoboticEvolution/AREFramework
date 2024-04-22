@@ -121,7 +121,7 @@ def load_descriptor(filename) :
         for row in file.readlines():
             row = row.split(',')
             desc = [int(row[0])] 
-            for r in row[1:-1] :
+            for r in row[1:] :
                 desc.append(float(r))
             descriptors.append(desc + [la.norm(desc[1:])])
         return descriptors
