@@ -340,8 +340,13 @@ void Morphology_CPPNMatrix::create()
     destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value)
-        exportRobotModel(morph_id);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        std::string model_folder = settings::getParameter<settings::String>(parameters,"#modelRepository").value;
+        if(model_folder.empty())
+            exportRobotModel(morph_id);
+        else
+            exportRobotModel(morph_id,model_folder);
+    }
 
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
@@ -550,12 +555,12 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     }
 }
 
-void Morphology_CPPNMatrix::exportRobotModel(int indNum)
+void Morphology_CPPNMatrix::exportRobotModel(int indNum, const std::string &folder)
 {
     simSetObjectProperty(mainHandle,sim_objectproperty_selectmodelbaseinstead);
 
     std::stringstream filepath;
-    filepath << Logging::log_folder << "/model_" << indNum << ".ttm";
+    filepath << folder << "/model_" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;
@@ -573,10 +578,10 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     {
         std::stringstream sst_blueprint;
         sst_blueprint << "/blueprint_" << indNum << ".csv";
-        std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
+        std::ofstream ofs_blueprint(folder + "/" + sst_blueprint.str());
         if(!ofs_blueprint)
         {
-            std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
+            std::cerr << "unable to open : " << folder + "/" + sst_blueprint.str() << std::endl;
             return;
         }
         std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
@@ -603,7 +608,7 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     indicesSizesMesh[0] = skeletonListIndices.size();
 
     std::stringstream filepath_mesh;
-    filepath_mesh << Logging::log_folder << "/mesh_" << indNum << ".stl";
+    filepath_mesh << folder << "/mesh_" << indNum << ".stl";
 
     //fileformat: the fileformat to export to:
     //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format

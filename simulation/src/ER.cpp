@@ -47,9 +47,11 @@ void ER::initialize()
 
     libhandler->close();
 
-    //setup zmq communication channel to send individual
-    std::string port = settings::getParameter<settings::String>(parameters,"#port").value;
-    _individual_channel.bind("tcp://*:"+ port + "1");
+    if(instance_type == settings::INSTANCE_SERVER){
+        //setup zmq communication channel to send individual
+        std::string port = settings::getParameter<settings::String>(parameters,"#port").value;
+        _individual_channel.bind("tcp://*:"+ port + "1");
+    }
 
 }
 

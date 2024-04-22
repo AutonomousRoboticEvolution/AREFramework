@@ -128,10 +128,12 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     //get simulator port
     std::string argument = simGetStringParameter(sim_stringparam_app_arg2);
-    std::vector<std::string> split_arg;
-    are::misc::split_line(argument,"_",split_arg);
-    std::cout << split_arg[1] << std::endl;
-    parameters->emplace("#port",std::make_shared<are_sett::String>(split_arg[1]));
+    if(!argument.empty()){
+        std::vector<std::string> split_arg;
+        are::misc::split_line(argument,"_",split_arg);
+        std::cout << split_arg[1] << std::endl;
+        parameters->emplace("#port",std::make_shared<are_sett::String>(split_arg[1]));
+    }
 
     if(verbose){
         if(instance_type == are_sett::INSTANCE_REGULAR)
