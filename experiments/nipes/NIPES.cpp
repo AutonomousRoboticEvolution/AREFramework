@@ -285,7 +285,7 @@ void NIPES::init_next_pop(){
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
     int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-    if((env_type == sim::MULTI_TARGETS || env_type == sim::BARREL) && simulator_side){//MultiTargetMaze and Barrel task
+    if((env_type == sim::MULTI_TARGETS || env_type == sim::BARREL) && simulator_side){//MultiTargetMaze
         std::dynamic_pointer_cast<NIPESIndividual>(population[indIdx])->add_reward(objectives[0]);
     }
     population[indIdx]->setObjectives(objectives);

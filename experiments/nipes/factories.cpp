@@ -22,12 +22,9 @@ extern "C" are::Environment::Ptr environmentFactory
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
     else if(env_type == are::sim::MULTI_TARGETS)
         env = std::make_shared<are::sim::MultiTargetMaze>(param);
-    else if(env_type == are::sim::EXPLORATION)
-        env = std::make_shared<are::sim::Exploration>(param);
-    else if(env_type == are::sim::BARREL)
-        env = std::make_shared<are::sim::BarrelTask>(param);
-    else if(env_type == are::sim::LOCOMOTION)
+    else if(env_type == are::LOCOMOTION)
         env = std::make_shared<are::sim::Locomotion>(param);
+
 
     return env;
 }
