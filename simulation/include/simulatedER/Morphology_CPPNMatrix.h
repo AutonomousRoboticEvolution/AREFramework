@@ -118,7 +118,7 @@ public:
      * @brief Export the robot as ttm model
      * \todo EB: We might not want this method here and this should be in logging instead.
      */
-    void exportRobotModel(int indNum);
+    void exportRobotModel(int indNum, const std::string &folder = Logging::log_folder);
     /**
      * @brief Retrieve matrices
      */
