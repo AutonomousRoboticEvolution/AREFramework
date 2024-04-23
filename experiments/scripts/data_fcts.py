@@ -51,12 +51,14 @@ def load_parent_pool(filename):
 def filter_to_parent_pool(data,parent_ids):
     filtered = []
     data = {d[0]: d[1:] for d in data}
+    prev_ids = []
     iter = 0
     for ids in parent_ids:
         if(len(ids) != len(parent_ids[0])):
             continue
         for _id in ids:
-            filtered.append([iter,_id] + data[_id])
+            filtered.append([iter,_id,len(list(set(ids)-set(prev_ids)))] + data[_id])
+        prev_ids = ids
         iter+=1
 
     return filtered
@@ -65,11 +67,17 @@ def load_comp_time(filename):
     eval_times = []
     with open(filename) as file:
         lines = file.read().splitlines()
-        start_0 = float(lines[0].split(",")[1])
+        start_0 = float(lines[0].split(",")[2])
         for line in lines:
             line = line.split(",")
-            start = float(line[1])
-            end = float(line[2])
+            if(len(line) == 0):
+                continue
+            if(len(line) < 4):
+                start = float(line[1])
+                end = float(line[2])
+            else:
+                start = float(line[2])
+                end = float(line[3])
             eval_times.append([end - start,end-start_0]) #eval duration, date
         return eval_times
 
@@ -81,7 +89,7 @@ def add_comp_time(fitnesses,eval_times):
         for i in range(int(fit[4])):
             comp_time += eval_times[i + position][0]
         T = max(eval_times[position:position+int(fit[4])][1])
-        fit += [comp_time,T,int(T/(60*10e6))]
+        fit += [comp_time,T,600*round(T/(600*10e6))]
         position += int(fit[4])
     return fitnesses
         
