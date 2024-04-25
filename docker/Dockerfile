@@ -21,6 +21,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
 
 # x11-apps only to test GUI xclock within docker
 
+ENV LD_LIBRARY_PATH=/usr/local/lib
+
 # Boost 1.77
 WORKDIR /are
 RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.gz \
@@ -58,4 +60,5 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep
 #If using Limbo
 #RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DLIMBO_FODLER=/are/limbo -DONLY_SIMULATION=1 .. && make -j ${N_CPU} && make install
 
+## export LD_LIBRARY_PATH=/usr/local/lib
 WORKDIR /are
