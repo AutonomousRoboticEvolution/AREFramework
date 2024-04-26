@@ -335,8 +335,10 @@ bool NIPES::update(const Environment::Ptr & env){
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->compute_fitness();
                 //std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
     //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-                std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-            }
+                if(env->get_name() == "multi_target_maze")
+                    std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+                else if(env->get_name() == "multi_target_maze")
+                    std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());            }
         }
     }
     newly_evaluated.clear();

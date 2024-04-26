@@ -19,9 +19,6 @@ void StopCritLog::saveLog(EA::Ptr &ea)
     logFileStream.close();
 }
 
-
-
-
 void BestIndividualLog::saveLog(EA::Ptr &ea){
     int generation = ea->get_generation();
     auto &best_ind = static_cast<NIPES*>(ea.get())->get_best_individual();
@@ -39,15 +36,36 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
     ctrl_ofs.close();
 
     //log trajectory
-    std::vector<are::waypoint> traj = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectory();
-    std::ofstream traj_ofs;
-    std::stringstream filepath;
-    filepath << "/traj_" << generation << "_" << best_ind.first;
-    logFile = filepath.str();
+    int env_type = settings::getParameter<settings::Integer>(ea->get_parameters(),"#envType").value;
+    if(env_type == sim::MAZE || env_type == sim::LOCOMOTION || env_type == sim::OBSTACLES){
+        std::vector<are::waypoint> traj = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectory();
+        std::ofstream traj_ofs;
+        std::stringstream filepath;
+        filepath << "/traj_" << generation << "_" << best_ind.first;
+        logFile = filepath.str();
 
-    if(!openOLogFile(traj_ofs))
-        return;
-    for(const are::waypoint& wp: traj)
-        traj_ofs << wp.to_string() << std::endl;
-    traj_ofs.close();
+        if(!openOLogFile(traj_ofs))
+            return;
+        for(const are::waypoint& wp: traj)
+            traj_ofs << wp.to_string() << std::endl;
+        traj_ofs.close();
+    }
+    else if(env_type == sim::MULTI_TARGETS || env_type == sim::BARREL){
+        std::vector<std::vector<are::waypoint>> trajs = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectories();
+        int i = 0;
+        for(auto &traj : trajs){
+            std::ofstream traj_ofs;
+            std::stringstream filepath;
+            filepath << "/traj_" << generation << "_" << best_ind.first << "_" << i;
+            logFile = filepath.str();
+
+            if(!openOLogFile(traj_ofs))
+                return;
+            for(const are::waypoint& wp: traj)
+                traj_ofs << wp.to_string() << std::endl;
+            traj_ofs.close();
+            i++;
+        }
+    }
+
 }

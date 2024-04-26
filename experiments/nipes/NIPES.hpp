@@ -65,12 +65,17 @@ public:
     void compute_fitness();
     void add_reward(double reward){rewards.push_back(reward);}
 
+    void set_trajectories(const std::vector<std::vector<waypoint>> &trajs){trajectories=trajs;}
+    const std::vector<std::vector<waypoint>> &get_trajectories() const {return trajectories;}
+
 private:
 
     Eigen::MatrixXi visited_zones;
     DescriptorType descriptor_type = FINAL_POSITION;
 
     std::vector<double> rewards;
+
+    std::vector<std::vector<waypoint>> trajectories;
 
 };
 

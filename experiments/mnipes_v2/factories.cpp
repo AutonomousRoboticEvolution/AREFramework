@@ -2,6 +2,8 @@
 #include "barrelTask.hpp"
 #include "obstacleAvoidance.hpp"
 #include "locomotion.hpp"
+#include "barrelTask.hpp"
+#include "env_settings.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
 
@@ -16,8 +18,15 @@ extern "C" are::Environment::Ptr environmentFactory
     }
     else if(env_type == are::sim::OBSTACLES)
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
+    else if(env_type == are::sim::MULTI_TARGETS)
+        env = std::make_shared<are::sim::MultiTargetMaze>(param);
     else if(env_type == are::sim::LOCOMOTION)
         env = std::make_shared<are::sim::Locomotion>(param);
+    else if(env_type == are::sim::BARREL)
+        env = std::make_shared<are::sim::BarrelTask>(param);
+    else
+        std::cerr << "factory env: unknown environement" << std::endl;
+
     return env;
 }
 

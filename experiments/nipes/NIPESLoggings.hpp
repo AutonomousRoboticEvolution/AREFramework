@@ -3,6 +3,7 @@
 
 #include <memory>
 #include "ARE/Logging.h"
+#include "env_settings.hpp"
 #include "NIPES.hpp"
 
 namespace are {

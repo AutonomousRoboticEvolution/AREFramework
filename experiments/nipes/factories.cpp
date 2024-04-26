@@ -24,7 +24,10 @@ extern "C" are::Environment::Ptr environmentFactory
         env = std::make_shared<are::sim::MultiTargetMaze>(param);
     else if(env_type == are::sim::LOCOMOTION)
         env = std::make_shared<are::sim::Locomotion>(param);
-
+    else if(env_type == are::sim::BARREL)
+        env = std::make_shared<are::sim::BarrelTask>(param);
+    else
+        std::cerr << "factory env: unknown environement" << std::endl;
 
     return env;
 }

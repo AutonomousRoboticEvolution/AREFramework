@@ -12,17 +12,13 @@
 #include "simulatedER/mazeEnv.h"
 #include "obstacleAvoidance.hpp"
 #include "locomotion.hpp"
+#include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
 #include "boost/filesystem.hpp"
 #include "env_settings.hpp"
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
-
-
-
-
-
-
 
 typedef struct learner_t{
 
@@ -258,7 +254,7 @@ public:
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-        if(simulator_side && (env_type == sim::MULTI_TARGETS || env_type == sim::EXPLORATION))
+        if(simulator_side && (env_type == sim::MULTI_TARGETS || env_type == sim::EXPLORATION || env_type == sim::BARREL))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[indIndex]->setObjectives(objectives);
