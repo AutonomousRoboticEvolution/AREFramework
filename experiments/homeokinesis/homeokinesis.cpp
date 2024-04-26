@@ -33,6 +33,12 @@ void HomeoInd::createController(){
     control->set_random_number(randNum);
     std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_epsA(settings::getParameter<settings::Double>(parameters,"#epsilonA").value);
     std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_epsC(settings::getParameter<settings::Double>(parameters,"#epsilonC").value);
+    if (settings::getParameter<settings::Boolean>(parameters, "#add_noise").value)
+        std::dynamic_pointer_cast<hk::Homeokinesis>(control)->add_noise(
+            settings::getParameter<settings::Double>(parameters, "#noise_strength").value);
+    std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_creativity(settings::getParameter<settings::Double>(parameters,"#creativity").value);
+
+
 }
 
 void HomeoInd::update(double delta_time){
@@ -112,6 +118,7 @@ void Homeokinesis::init(){
 bool Homeokinesis::update(const Environment::Ptr &env){
     Individual::Ptr ind = population[currentIndIndex];
     std::dynamic_pointer_cast<HomeoInd>(ind)->set_trajectory(env->get_trajectory());
+    return 0;
 }
 
 bool Homeokinesis::is_finish(){

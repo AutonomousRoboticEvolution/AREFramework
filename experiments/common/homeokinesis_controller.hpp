@@ -98,6 +98,8 @@ public:
 
     void set_epsA(double e){_conf.epsA = e;}
     void set_epsC(double e){_conf.epsC = e;}
+    void add_noise(double e);
+    void set_creativity(double e){creativity = e;}
 
 
 private:
