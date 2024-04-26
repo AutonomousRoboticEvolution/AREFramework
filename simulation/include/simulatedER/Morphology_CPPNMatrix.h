@@ -204,12 +204,11 @@ private:
                 if(!it->isOrganRemoved() && it->isOrganChecked()) {
                     if (it->getOrganType() == 1)
                         cartDesc.wheelNumber++;
-                    if (it->getOrganType() == 2)
+                    else if (it->getOrganType() == 2)
                         cartDesc.sensorNumber++;
-                    if (it->getOrganType() == 3) {
-                        cartDesc.jointNumber++;
-                        cartDesc.jointNumber++;
-                    }if (it->getOrganType() == 4)
+                    else if (it->getOrganType() == 3)
+                        cartDesc.jointNumber+=2;
+                    else if (it->getOrganType() == 4)
                         cartDesc.casterNumber++;
                 }
 
@@ -233,7 +232,7 @@ private:
                         minZ = i.connectorPos.at(2);
                 }
             }
-            // Get dimmensions
+            // Get dimensions
             cartDesc.robotWidth = fabs(maxX - minX);
             cartDesc.robotDepth = fabs(maxY - minY);
             cartDesc.robotHeight = fabs(maxZ - minZ);

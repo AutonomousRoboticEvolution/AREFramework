@@ -19,6 +19,7 @@ add_library(visualization SHARED
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
+    ../common/locomotion.cpp
     )
 target_include_directories(visualization PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

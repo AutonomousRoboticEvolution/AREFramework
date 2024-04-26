@@ -12,7 +12,7 @@ void HomeoInd::createMorphology(){
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
     morphology->set_randNum(randNum);
 
-    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);;
+    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
 
     //    float pos[3];
     //    simGetObjectPosition(std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMainHandle(),-1,pos);

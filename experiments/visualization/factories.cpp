@@ -4,22 +4,26 @@
 #include "obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
+#include "locomotion.hpp"
+#include "env_settings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
-    if(env_type == 0){
+    if(env_type == are::sim::MAZE){
         env.reset(new are::sim::MazeEnv);
         env->set_parameters(param);
     }
-    else if(env_type == 1)
+    else if(env_type == are::sim::OBSTACLES)
         env.reset(new are::sim::ObstacleAvoidance(param));
-    else if(env_type == 2)
+    else if(env_type == are::sim::BARREL)
         env.reset(new are::sim::BarrelTask(param));
-    else if(env_type == 3)
+    else if(env_type == are::sim::EXPLORATION)
         env.reset(new are::sim::Exploration(param));
+    else if(env_type == are::sim::LOCOMOTION)
+        env.reset(new are::sim::Locomotion(param));
     return env;
 }
 

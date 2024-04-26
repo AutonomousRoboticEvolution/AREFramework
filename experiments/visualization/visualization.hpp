@@ -70,6 +70,8 @@ private:
     void createMorphology() override;
     void createController() override;
     std::vector<waypoint> trajectory;
+    double sum_ctrl_freq = 0;
+
 
 };
 
