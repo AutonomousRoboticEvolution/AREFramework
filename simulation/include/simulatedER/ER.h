@@ -126,6 +126,7 @@ protected:
     std::vector<Logging::Ptr> logs;
 
     void saveLogs(bool endOfGen = true);
+    void saveEndLogs();
 
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)

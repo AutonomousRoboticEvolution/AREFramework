@@ -181,8 +181,9 @@ void NIPES::epoch(){
             std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
         }
     }
+    /**/
 
-    /** NOVELTY **/
+    /**NOVELTY**/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
         if(novelty_params::k_value >= population.size())
             novelty_params::k_value = population.size()/2;
@@ -205,6 +206,18 @@ void NIPES::epoch(){
             novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
         }
     }
+    /**/
+
+    /**Get best individual**/
+    double best_fit = population[0]->getObjectives()[0];
+    size_t best_idx = 0;
+    for(size_t i = 1; i < population.size(); i++){
+        if(population[i]->getObjectives()[0] > best_fit){
+            best_fit = population[i]->getObjectives()[0];
+            best_idx = i;
+        }
+    }
+    best_individual = std::make_pair(best_idx,population[best_idx]);
     /**/
 
     std::vector<IPOPCMAStrategy::individual_t> pop;

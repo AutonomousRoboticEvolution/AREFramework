@@ -111,6 +111,8 @@ public:
     const IPOPCMAStrategy::Ptr &get_cma_strat(){return _cma_strat;}
     void set_cma_strat(const IPOPCMAStrategy::Ptr& cmas){_cma_strat = cmas;}
 
+    const std::pair<int,Individual::Ptr> &get_best_individual() const {return best_individual;}
+
 protected:
     IPOPCMAStrategy::Ptr _cma_strat;
     cma::CMASolutions best_run;
@@ -118,6 +120,7 @@ protected:
     std::vector<Eigen::VectorXd> archive;
     int reevaluated = 0;
     std::vector<int> newly_evaluated;
+    std::pair<int,Individual::Ptr> best_individual;
 
 };
 

@@ -214,6 +214,7 @@ void ER::endOfSimulation()
         }
 
         if(ea->is_finish()){
+            saveEndLogs();
             if(verbose)
             {
                 std::cout << "---------------------" << std::endl;
@@ -245,6 +246,14 @@ void ER::saveLogs(bool endOfGen)
 {
     for(const auto &log : logs){
         if(log->isEndOfGen() == endOfGen){
+            log->saveLog(ea);
+        }
+    }
+}
+
+void ER::saveEndLogs(){
+    for(const auto &log : logs){
+        if(log->isEndOfRun()){
             log->saveLog(ea);
         }
     }

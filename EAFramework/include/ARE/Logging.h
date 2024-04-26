@@ -23,10 +23,13 @@ public:
     typedef void (Factory) (std::vector<Logging::Ptr>&,
                             const settings::ParametersMapPtr &);
 
-    Logging() : endOfGen(true){}
-    Logging(bool eog) : endOfGen(eog){}
-    Logging(const std::string &file, bool eog) : endOfGen(eog){logFile = file;}
-    Logging(const Logging& l) : logFile(l.logFile), endOfGen(l.endOfGen){}
+    Logging() : end_of_gen(true), end_of_run(false){}
+    Logging(bool eog, bool eor = false) : end_of_gen(eog), end_of_run(eor){}
+    Logging(const std::string &file, bool eog = true) : end_of_gen(eog){logFile = file;}
+    Logging(const Logging& l) :
+        logFile(l.logFile),
+        end_of_gen(l.end_of_gen),
+        end_of_run(l.end_of_run){}
     virtual ~Logging(){}
 
     virtual void saveLog(EA::Ptr& ea) = 0;
@@ -40,12 +43,14 @@ public:
     //SETTERS && GETTERS
     const std::string &get_logFile(){return logFile;}
     void set_logFile(const std::string& file){logFile = file;}
-    bool isEndOfGen(){return endOfGen;}
-    void set_end_of_gen(bool eog){endOfGen = eog;}
+    bool isEndOfGen(){return end_of_gen;}
+    bool isEndOfRun(){return end_of_run;}
+    void set_end_of_gen(bool eog){end_of_gen = eog;}
 
 protected:
     std::string logFile;
-    bool endOfGen = true;
+    bool end_of_gen = true;
+    bool end_of_run = false;
 };
 
 class FitnessLog : public Logging
@@ -134,24 +139,32 @@ template <class ind_t>
 class TrajectoryLog : public Logging
 {
 public:
-    TrajectoryLog() : Logging(true){}
+    TrajectoryLog() : Logging(true){} //Logging at the end of the generation
+    TrajectoryLog(double ot) :
+        objective_threshold(ot),
+        Logging(true){} //Logging at the end of the generation
     void saveLog(EA::Ptr& ea){
         std::ofstream ofs;
         int generation = ea->get_generation();
         for(size_t i = 0; i < ea->get_population().size(); i++){
-            std::vector<are::waypoint> traj = std::dynamic_pointer_cast<ind_t>(ea->getIndividual(i))->get_trajectory();
-            std::stringstream filepath;
-            filepath << "/traj_" << generation << "_" << i;
-            logFile = filepath.str();
+            auto &ind = ea->get_population()[i];
+            if(ind->getObjectives()[0] > objective_threshold){
+                std::vector<are::waypoint> traj = std::dynamic_pointer_cast<ind_t>(ind)->get_trajectory();
+                std::stringstream filepath;
+                filepath << "/traj_" << generation << "_" << i;
+                logFile = filepath.str();
 
-            if(!openOLogFile(ofs))
-                return;
-            for(const are::waypoint& wp: traj)
-                ofs << wp.to_string() << std::endl;
-            ofs.close();
+                if(!openOLogFile(ofs))
+                    return;
+                for(const are::waypoint& wp: traj)
+                    ofs << wp.to_string() << std::endl;
+                ofs.close();
+            }
         }
     }
     void loadLog(const std::string &file){}
+private:
+    double objective_threshold = 0;
 };
 
 

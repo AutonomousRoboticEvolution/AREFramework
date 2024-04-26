@@ -227,9 +227,11 @@ void NNParamGenomeLog::saveLog(EA::Ptr &ea)
         filename << "ctrlGenome_" << generation << "_" << i;
         if(!openOLogFile(logFileStream, filename.str()))
             return;
-        logFileStream << std::dynamic_pointer_cast<NNParamGenome>(
-                             ea->get_population()[i]->get_ctrl_genome()
-                             )->to_string();
+        auto &ind = ea->get_population()[i];
+        if(ind->getObjectives()[0] >= objective_threshold)
+            logFileStream << std::dynamic_pointer_cast<NNParamGenome>(
+                                 ind->get_ctrl_genome())->to_string();
+
         logFileStream.close();
     }
 }

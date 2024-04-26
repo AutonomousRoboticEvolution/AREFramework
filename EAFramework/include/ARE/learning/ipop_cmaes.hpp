@@ -184,6 +184,7 @@ class CMAESStateLog : public Logging
 {
 public:
     CMAESStateLog() : Logging(){} //Logging at the end of the generation
+    CMAESStateLog(bool eog,bool eor): Logging(eog,eor){}
     void saveLog(EA::Ptr & ea){
         int gen = ea->get_generation();
         std::stringstream filename;
