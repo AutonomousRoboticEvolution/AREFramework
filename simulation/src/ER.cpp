@@ -245,7 +245,7 @@ void ER::endOfSimulation()
 void ER::saveLogs(bool endOfGen)
 {
     for(const auto &log : logs){
-        if(log->isEndOfGen() == endOfGen){
+        if(log->isEndOfGen() == endOfGen && !log->isEndOfRun()){
             log->saveLog(ea);
         }
     }
