@@ -25,6 +25,7 @@
 
 #fitnessFile,string,fitness.csv
 #parentsPoolFile,string,parents.csv
+#fixedController,bool,0
 
 #maxVelocity,double,6.
 #arenaSize,double,2.
