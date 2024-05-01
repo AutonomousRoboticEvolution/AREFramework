@@ -382,6 +382,12 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         fitness = std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->fitnessFunction(population[currentIndIndex]);
     else if(env->get_name() == "locomotion")
         fitness = std::dynamic_pointer_cast<sim::Locomotion>(env)->fitnessFunction(population[currentIndIndex]);
+    else if(env->get_name() == "multi_target_maze")
+        fitness = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->fitnessFunction(population[currentIndIndex]);
+    else if(env->get_name() == "barrel_task")
+        fitness = std::dynamic_pointer_cast<sim::BarrelTask>(env)->fitnessFunction(population[currentIndIndex]);
+    else
+        std::cerr << "M_NIPES::finish_eval : Unknown environment" << std::endl;
 
 
     double fitness_target = 1 - settings::getParameter<settings::Double>(parameters,"#FTarget").value;
