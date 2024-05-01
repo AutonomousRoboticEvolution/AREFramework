@@ -159,7 +159,6 @@ void M_NIPESIndividual::update(double delta_time){
     }
 
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    std::cout << sum_ctrl_freq << " - " << delta_time << std::endl;
     if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
         sum_ctrl_freq = 0;
         //- Retrieve sensors, joints and wheels values

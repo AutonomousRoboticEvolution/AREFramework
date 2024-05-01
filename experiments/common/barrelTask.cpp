@@ -43,6 +43,10 @@ void BarrelTask::init(){
             std::cout << simGetObjectName(handle) << std::endl;
             i++;
         }
+        std::cout << "current barrel initial position : ";
+        for(const double& t: barrel_initial_positions[current_target])
+            std::cout << t << " ";
+        std::cout << std::endl;
     }
 
     final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;

@@ -40,11 +40,17 @@ void MultiTargetMaze::init(){
             std::cout << simGetObjectName(handle) << std::endl;
             i++;
         }
+        std::cout << "current target : ";
+        for(const double& t: target_positions[current_target])
+            std::cout << t << " ";
+        std::cout << std::endl;
     }
 
     final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
+
+
 
     if(withBeacon){
         float bSize[3] = {0.1f,0.1f,0.1f};
@@ -81,16 +87,16 @@ std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind)
     std::vector<double> d(1);
     d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
 
+
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f) || f < 0)
             f = 0;
         else if(f > 1) f = 1;
-
     //Go to next target
     current_target+=1;
     if(current_target >= target_positions.size())
         current_target=0;
-
+    
     return d;
 }
 
