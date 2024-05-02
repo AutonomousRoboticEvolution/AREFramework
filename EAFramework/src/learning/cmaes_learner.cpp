@@ -17,6 +17,7 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point, doubl
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+    float gen_stag_thres = settings::getParameter<settings::Float>(parameters,"#generationalStagnationThreshold").value;
 
 
     double lb[_dimension], ub[_dimension];
@@ -41,6 +42,7 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point, doubl
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat->set_pop_stag_thres(gen_stag_thres);
     _cma_strat->set_initial_fitness(initial_fit);
     next_pop();
     initialized = true;

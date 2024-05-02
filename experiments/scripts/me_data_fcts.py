@@ -50,14 +50,17 @@ def load_parent_pool(filename):
 
 def filter_to_parent_pool(data,parent_ids):
     filtered = []
-    data = {d[0]: d[1:] for d in data}
+    data_dict = {d[0]: d[1:] for d in data}
     prev_ids = []
     iter = 0
+    ind_idx = 0
     for ids in parent_ids:
         if(len(ids) != len(parent_ids[0])):
             continue
+        ind_idx = len(data[:max(ids)])
+        disc_idx = round(ind_idx/50)*50
         for _id in ids:
-            filtered.append([iter,_id,len(list(set(ids)-set(prev_ids)))] + data[_id])
+            filtered.append([iter,_id,disc_idx,ind_idx,len(list(set(ids)-set(prev_ids)))] + data_dict[_id])
         prev_ids = ids
         iter+=1
 
@@ -119,7 +122,7 @@ def compute_generation(ids,parents):
         generation[i] = compute_gen_rec(parents[i],ids,parents)
     return generation
 
-def load_descriptor(filename) :
+def load_feature_descriptor(filename) :
     '''
     Load a list of descriptor from a file
     Trait descriptor: <width,depth,height,voxels,wheels,sensor,joint,caster>
@@ -132,6 +135,23 @@ def load_descriptor(filename) :
             for r in row[1:] :
                 desc.append(float(r))
             descriptors.append(desc + [la.norm(desc[1:])])
+        return descriptors
+
+def load_component_descriptor(filename):
+    ''' Load descriptors from morph_descriptor.csv from meim, mnipes_v2 experiments
+        output: dictionary with id: numpy.array'''
+
+    with open(filename) as file:
+        lines = file.readlines()
+        descriptors = []
+        for line in lines:
+            line = line.split(",")
+            id = int(line[0])
+            dim = int(line[1])
+            desc = [id]
+            for i in range(dim*dim*dim):
+                desc.append(int(line[i+2]))
+            descriptors.append(desc+[la.norm(desc[1:])])
         return descriptors
     
 def load_controller_archive(filename):

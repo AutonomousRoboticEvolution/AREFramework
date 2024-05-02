@@ -90,7 +90,7 @@ bool IPOPCMAStrategy::pop_fit_stagnation(){
 
     if(stddev <= pop_stag_thres){
         std::stringstream sstr;
-        sstr << "Stopping : standard deviation of the population is smaller than 0.05 : " << stddev;
+        sstr << "Stopping : standard deviation of the population is smaller than " << pop_stag_thres << " : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
         cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
         return true;
@@ -113,9 +113,9 @@ bool IPOPCMAStrategy::mean_fitness_stagnation(){
     }
     stddev = sqrt(stddev/static_cast<float>(len_of_stag-1));
 
-    if(stddev <= 0.05){
+    if(stddev <= gen_stag_thres){
         std::stringstream sstr;
-        sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
+        sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " mean fitnesses is smaller than " << gen_stag_thres << " : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
         cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
         return true;
@@ -138,9 +138,9 @@ bool IPOPCMAStrategy::best_sol_stagnation(){
         stddev += (best_fitnesses[i] - mean)*(best_fitnesses[i] - mean);
     }
     stddev = sqrt(stddev/static_cast<float>(len_of_stag-1));
-    if(stddev <= 0.05){
+    if(stddev <= gen_stag_thres){
         std::stringstream sstr;
-        sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than 0.05 : " << stddev;
+        sstr << "Stopping : standard deviation of the last " << len_of_stag <<  " best fitnesses is smaller than " << gen_stag_thres << " : " << stddev;
         log_stopping_criterias.push_back(sstr.str());
         cma::LOG_IF(cma::INFO,!_parameters.quiet()) << sstr.str() << std::endl;
         return true;
@@ -223,6 +223,7 @@ void IPOPCMAStrategy::reset_search_state()
     ipop_cmaes_t::reset_search_state();
     novelty_ratio = start_novelty_ratio;
     best_fitnesses.clear();
+    mean_fitnesses.clear();
 }
 
 double IPOPCMAStrategy::best_fitness(individual_t &best_sample){
