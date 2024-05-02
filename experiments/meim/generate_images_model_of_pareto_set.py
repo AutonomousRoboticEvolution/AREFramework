@@ -103,6 +103,8 @@ if __name__ == "__main__":
             parameters["#imageRepository"] = robot_repo
             parameters["#idToLoad"] = id
             parameters["#modelRepository"] = robot_repo
+            parameters["#scenePath"] = are_framework + "/simulation/models/scenes/ARE_arena.ttt"
+            parameters["#modelsPath"] = are_framework+ "/simulation/models/"
             write_parameters(parameters,robot_repo,"parameters_" + str(id) + ".csv")
 
         if(len(sys.argv) == 4):    
