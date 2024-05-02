@@ -31,7 +31,7 @@ def load_objective_values_agg(filename,obj=0):
             pop_size = int(line[1])
             nbr_objs = int(line[2])
             objs = np.array([float(line[i+obj]) for i in range(3,pop_size,nbr_objs)])
-            data_lines.append([gen,pop_size,objs.max(),objs.min(),np.median(objs)])
+            data_lines.append([gen,pop_size,objs.max(),objs.min(),np.median(objs),np.mean(objs)])
         return data_lines
 
 
