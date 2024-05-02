@@ -125,6 +125,9 @@ NN2CPPNGenome MEIM::best_of_subset(const std::vector<genome_t> gene_list){
 }
 
 void MEIM::init(){
+    nn2::rgen_t::gen.seed(randomNum->getSeed());
+
+
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
         bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
