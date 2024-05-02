@@ -104,9 +104,9 @@ if __name__ == "__main__":
         exp_folder = folder_name + "/" + folder
         descriptors = load_desciptors(exp_folder + "/morph_descriptor.csv")
         fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
-        fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,0.5)
+        fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))
         sparsity = compute_sparsity(descriptors,15)
         pareto_set = compute_pareto_front(sparsity,fitnesses)
-        pareto_set.to_csv(exp_folder + "/pareto_set.csv",index=False)
+        pareto_set.to_csv(exp_folder + "/" + sys.argv[2],index=False)
         print(pareto_set)
 

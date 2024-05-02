@@ -94,7 +94,7 @@ if __name__ == "__main__":
             os.makedirs(robot_repo)
 
         pareto_set = pd.read_csv(folder_name + "/" + folder + "/pareto_set.csv")
-        ori_parameters = read_parameters(are_framework + "/experiments/visualization/parameters.csv")
+        ori_parameters = read_parameters(are_framework + "/experiments/meim/parameters_visu.csv")
 
         list_ids = list(pareto_set["id"])
         for id in list_ids:
@@ -110,6 +110,9 @@ if __name__ == "__main__":
             #run visulaization to create robots images and models
             for filename in os.listdir(robot_repo):
                 if(filename.split("_")[0] != "parameters"):
+                    continue
+                robot_id = filename.split("_")[1].split(".")[0]
+                if os.path.exists(robot_repo + "/robot_" + robot_id + "_3.png"):
                     continue
                 param_file = robot_repo + "/" + filename
                 sp.run([vrep_exec, "-h", "-g" + param_file])
