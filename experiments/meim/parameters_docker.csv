@@ -5,7 +5,7 @@
 #modelsPath,string,/are/AREFramework/simulation/models/
 #robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
 #maxEvalTime,float,60
-#repository,string,/tmp/
+#repository,string,/are/logs/
 #verbose,bool,1
 #instanceType,int,1
 #killWhenNotConnected,bool,0
@@ -24,6 +24,8 @@
 #manualDesignFile,string,None
 
 #fitnessFile,string,fitness.csv
+#parentsPoolFile,string,parents.csv
+#fixedController,bool,0
 
 #maxVelocity,double,6.
 #arenaSize,double,2.
@@ -66,3 +68,9 @@
 #isLeg,bool,1
 
 #descriptor,int,0
+
+#epsilonA,double,0.12
+#epsilonC,double,0.1
+#add_noise,bool,1
+#noise_strength,double,0.4
+#creativity,double,2.0

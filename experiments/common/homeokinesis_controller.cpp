@@ -161,3 +161,16 @@ void Homeokinesis::_set_default_config(){
     _conf.factorb              = 1;
     _conf.factorh              = 1;
 }
+
+void Homeokinesis::add_noise(double e) {
+    Matrix noise_A = e * Eigen::MatrixXd::Random(_nbr_inputs, _nbr_outputs);
+    A += noise_A;
+    Matrix noise_S = e * Eigen::MatrixXd::Random(_nbr_inputs, _nbr_inputs);
+    S += noise_S;
+    Matrix noise_C = e * Eigen::MatrixXd::Random(_nbr_outputs, _nbr_inputs);
+    C += noise_C;
+    Matrix noise_b = Eigen::MatrixXd::Random(_nbr_inputs,1);
+    b += noise_b;
+    Matrix noise_h = Eigen::MatrixXd::Random(_nbr_outputs,1);
+    h += noise_h;
+}

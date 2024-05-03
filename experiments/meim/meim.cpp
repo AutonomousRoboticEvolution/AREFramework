@@ -33,6 +33,10 @@ void MEIMIndividual::createController(){
     }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
+    if (settings::getParameter<settings::Boolean>(parameters, "#add_noise").value)
+        std::dynamic_pointer_cast<hk::Homeokinesis>(control)->add_noise(
+            settings::getParameter<settings::Double>(parameters, "#noise_strength").value);
+    std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_creativity(settings::getParameter<settings::Double>(parameters,"#creativity").value);
 }
 
 void MEIMIndividual::update(double delta_time){
