@@ -59,8 +59,8 @@
 
 #descriptor,int,0
 
-#epsilonA,double,0.12
-#epsilonC,double,0.1
+#epsilonA,double,0.2
+#epsilonC,double,0.15
 #add_noise,bool,1
 #noise_strength,double,0.4
 #creativity,double,2.0
