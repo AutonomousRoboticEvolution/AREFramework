@@ -4,7 +4,7 @@
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
 #robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
-#maxEvalTime,float,60
+#maxEvalTime,float,300
 #repository,string,/are/logs/
 #verbose,bool,1
 #instanceType,int,1
@@ -17,15 +17,14 @@
 #evaluationOrder,int,0
 #seed,int,-1
 
-#populationSize,int,24
-#maxNbrEval,int,200
+#populationSize,int,100
+#maxNbrEval,int,10000
 #tournamentSize,int,4
 
 #manualDesignFile,string,None
 
+#parentsPoolFile,string,parent_pool.csv
 #fitnessFile,string,fitness.csv
-#parentsPoolFile,string,parents.csv
-#fixedController,bool,0
 
 #maxVelocity,double,6.
 #arenaSize,double,2.
@@ -36,15 +35,18 @@
 #withBeacon,bool,1
 #withTiles,bool,1
 #flatFloor,bool,1
-#jointControllerType,int,0
+#jointControllerType,int,2
 #proportionalGain,float,1
 #randomOrientation,bool,0
 #loadAllMorphGenome,bool,0
 
-#withSensors,bool,1
 
 #useCamera,bool,0
 #useIR,bool,0
+#useJointFeedback,bool,1
+#useWheelFeedback,bool,1
+
+#fixedController,bool,0
 
 #isWheel,bool,1
 #isSensor,bool,1
@@ -61,7 +63,8 @@
 #isScreenshotEnable,bool,0
 #imagesInLogFolder,bool,0
 #imageRepository,string,/home/le_goff/git/robotlibrary/wide_corridor/morph_56/
-#nbrWaypoints,int,180
+#comment1,string,'nbrWaypoints = 3 * maxEvalTime'
+#nbrWaypoints,int,900
 
 #isNEATGenome,bool,0
 #isCPPNGenome,bool,1
