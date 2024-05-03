@@ -17,7 +17,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     vim \
     libzmq5 \
     libzmq3-dev \
-    python3-pip && pip3 install psutil dlib
+    python3-pip && pip3 install psutil dlib numpy scikit-learn pandas paretoset
 
 # x11-apps only to test GUI xclock within docker
 
