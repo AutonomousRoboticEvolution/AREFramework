@@ -248,11 +248,13 @@ void NIPES::epoch(){
 
         if(incrPop){
             int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
-            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size)
+            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size){
                 _cma_strat->lambda_inc();
+                _cma_strat->reset_search_state();
+            }
         }
 
-        _cma_strat->reset_search_state();
+
         if(!elitist_restart){
             float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
             _cma_strat->get_parameters().set_x0(-max_weight,max_weight);
