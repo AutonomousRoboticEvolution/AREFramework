@@ -1,4 +1,4 @@
-#experimentName,string,meim
+#experimentName,string,meim_hk_hyperp_2
 #expPluginName,string,/usr/local/lib/libmeim.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt

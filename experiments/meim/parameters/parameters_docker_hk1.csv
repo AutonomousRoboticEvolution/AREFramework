@@ -1,4 +1,4 @@
-#experimentName,string,meim
+#experimentName,string,meim_hk_hyperp_1
 #expPluginName,string,/usr/local/lib/libmeim.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
@@ -72,8 +72,8 @@
 
 #descriptor,int,0
 
-#epsilonA,double,0.1
-#epsilonC,double,0.8
+#epsilonA,double,0.12
+#epsilonC,double,0.1
 #add_noise,bool,1
-#noise_strength,double,0.3
-#creativity,double,1.0
+#noise_strength,double,0.4
+#creativity,double,2.0
