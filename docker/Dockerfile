@@ -53,6 +53,7 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j ${N_CPU} && make insta
 #RUN git clone https://github.com/resibots/limbo.git
 
 # ARE Framework
+ARG REBUILD_ARE=0
 WORKDIR /are
 RUN git clone -b melai --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git
 WORKDIR /are/AREFramework/build

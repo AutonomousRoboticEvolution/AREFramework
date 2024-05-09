@@ -473,7 +473,7 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
                         if(env->get_name() == "multi_target_maze")
                             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-                        else if(env->get_name() == "multi_target_maze")
+                        else if(env->get_name() == "barrel_task")
                             std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());
                     }
 
