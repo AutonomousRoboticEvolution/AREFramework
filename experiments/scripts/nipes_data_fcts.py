@@ -25,13 +25,15 @@ def load_objective_values_agg(filename,obj=0):
     with open(filename) as file:
         lines = file.readlines()
         data_lines = []
+        nb_eval_tot=0
         for line in lines:
             line = line.split(',')[:-1]
             gen = int(line[0])
-            pop_size = int(line[1])
+            nb_eval = int(line[1])
+            nb_eval_tot += nb_eval
             nbr_objs = int(line[2])
-            objs = np.array([float(line[i+obj]) for i in range(3,pop_size,nbr_objs)])
-            data_lines.append([gen,pop_size,objs.max(),objs.min(),np.median(objs),np.mean(objs)])
+            objs = np.array([float(line[i+obj]) for i in range(3,nb_eval,nbr_objs)])
+            data_lines.append([gen,nb_eval,nb_eval_tot,objs.max(),objs.min(),np.median(objs),np.mean(objs)])
         return data_lines
 
 
