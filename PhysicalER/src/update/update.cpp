@@ -10,7 +10,7 @@ int main(int argc, char** argv){
         std::cout << "\targ1 - path to the parameter file" << std::endl;
     }
 
-    up::ER::Ptr er = std::make_shared<up::ER>();
+    up::ER::Ptr er = std::make_unique<up::ER>();
     are_set::ParametersMap param = are_set::loadParameters(argv[1]);
     er->set_parameters(std::make_shared<are_set::ParametersMap>(param));
     er->initialize();
