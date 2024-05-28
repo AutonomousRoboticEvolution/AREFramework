@@ -30,13 +30,14 @@ void MEIMIndividual::createController(){
         std::dynamic_pointer_cast<FixedController>(control)->init_nn(nb_inputs,6,nb_outputs,weight,bias); //initiate a Feedforward Neural Network with constant weights and biases
     }else{
         control =  std::make_shared<hk::Homeokinesis>(nb_inputs,nb_outputs);
+        if (settings::getParameter<settings::Boolean>(parameters, "#add_noise").value)
+            std::dynamic_pointer_cast<hk::Homeokinesis>(control)->add_noise(
+                settings::getParameter<settings::Double>(parameters, "#noise_strength").value);
+        std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_creativity(settings::getParameter<settings::Double>(parameters,"#creativity").value);
     }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
-    if (settings::getParameter<settings::Boolean>(parameters, "#add_noise").value)
-        std::dynamic_pointer_cast<hk::Homeokinesis>(control)->add_noise(
-            settings::getParameter<settings::Double>(parameters, "#noise_strength").value);
-    std::dynamic_pointer_cast<hk::Homeokinesis>(control)->set_creativity(settings::getParameter<settings::Double>(parameters,"#creativity").value);
+
 }
 
 void MEIMIndividual::update(double delta_time){

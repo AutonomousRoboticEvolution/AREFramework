@@ -29,7 +29,7 @@ add_library(meim SHARED
     factories.cpp
     meim.cpp
     meim_logging.cpp
-    fixed_controller.cpp
+    ../common/fixed_controller.cpp
   )
 target_include_directories(meim PUBLIC ${INCLUDES}
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
