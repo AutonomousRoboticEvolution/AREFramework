@@ -192,6 +192,8 @@ bool CMAESLearner::step(){
     _nbr_eval++;
     if(_cma_strat->get_population().size() < _population.size())
         return false;
+    if(current_nbr_ind != 0)
+        std::cerr << "WARNING current_nbr_ind is not null" << std::endl;
 
 //    if(is_learning_finish())
 //        return true;
@@ -210,10 +212,10 @@ bool CMAESLearner::is_learning_finish() const{
         max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesLargeNbrEval").value;
     else max_nbr_eval = settings::getParameter<settings::Integer>(parameters,"#cmaesSmallNbrEval").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-//if(verbose)
-       // std::cout << "INFO - CMAES: Learning ending conditions: " << current_nbr_ind << " = 0 and (nbr evals "
-        //          << _nbr_eval << " >= " << max_nbr_eval << " or reach target " << _is_finish << " or "
-         //         << "nbr dropped evals " << nbr_dropped_eval << " > 50)" << std::endl;
+if(verbose)
+        std::cout << "INFO - CMAES: Learning ending conditions: " << current_nbr_ind << " = 0 and (nbr evals "
+                  << _nbr_eval << " >= " << max_nbr_eval << " or reach target " << _is_finish << " or "
+                  << "nbr dropped evals " << nbr_dropped_eval << " > 50)" << std::endl;
     return current_nbr_ind == 0 && (_nbr_eval >= max_nbr_eval || _is_finish || nbr_dropped_eval > 50);
 
 }
@@ -237,7 +239,7 @@ std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_remaining_population(){
 
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_new_population(){
-    if(new_population_available){
+    if(new_population_available && current_nbr_ind == 0){
       std::vector<w_b_pair_t>  new_pop;
 	
       for(const auto gen: _population){
