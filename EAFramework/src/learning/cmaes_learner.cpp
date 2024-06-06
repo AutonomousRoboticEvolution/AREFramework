@@ -42,7 +42,7 @@ void CMAESLearner::init(double ftarget, std::vector<double> initial_point, doubl
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
-    _cma_strat->set_pop_stag_thres(gen_stag_thres);
+    _cma_strat->set_gen_stag_thres(gen_stag_thres);
     _cma_strat->set_initial_fitness(initial_fit);
     next_pop();
     initialized = true;
