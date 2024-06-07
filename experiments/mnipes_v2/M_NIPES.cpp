@@ -81,17 +81,26 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
 
 
 void M_NIPESIndividual::createMorphology(){
+
     individual_id = morphGenome->id();
     morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    int i = rewards.size();
+    int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
+    int i = 0;
+    if(env_type == sim::EXPLORATION)
+        i = rewards.size();
+
 
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
+    std::cout << ctrlGenome << std::endl;
+    std::cout << ctrlGenome->get_type() << std::endl;
     if(ctrlGenome->get_type() != "empty_genome")
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setLoadRobot();
     else
         std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setDecodeRobot();
+
+    init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
