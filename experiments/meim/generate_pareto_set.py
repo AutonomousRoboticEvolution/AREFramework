@@ -97,6 +97,9 @@ def density_estimation(descriptors: dict,fitnesses: dict, n: int) -> dict:
 
 
 if __name__ == "__main__":
+    if(len(sys.argv) != 4):
+        print("usage:\n - arg 1: folder path\n - arg 2: pareto file name\n - arg 3 fitness threshold")
+
     folder_name = sys.argv[1]
     for folder in os.listdir(folder_name):
         if(folder.split("_")[0] != "meim"):

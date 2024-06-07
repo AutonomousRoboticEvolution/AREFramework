@@ -83,6 +83,9 @@ def write_parameters(parameters: dict, folder: str, filename: str):
         file.write(content)
 
 if __name__ == "__main__":
+    if(len(sys.argv) != 3):
+        print("usage:\n - arg 1: folder path\n - arg 2: ARE framework path\n - arg 3 (optional) path to vrep exec")
+
     folder_name = sys.argv[1]
     are_framework = sys.argv[2]
     for folder in os.listdir(folder_name):
