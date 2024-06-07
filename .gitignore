@@ -65,3 +65,4 @@ RoboFab/temporary_output.avi
 *.dat
 vrep-3.6.2/system/settings.dat
 *.so
+__pycache__

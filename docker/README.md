@@ -77,3 +77,14 @@ To run experiment MEIM with 5 threads:
 $ cd /are/AREFramework/simulation/Cluster
 $ python3 run_cluster.py 5 --vrep ../../vrep-3.6.2/are_sim.sh --client are-client --params /are/AREFramework/experiments/meim/parameters.csv --port-start 10000 --xvfb 0
 ```
+
+
+### Checking results with Jupyter notebook
+
+On the folder /experiments/scripts/ you can find examples of Jupyter notebooks to check results. Copy one of the .ipynb, and run Jupyter from within the container:
+```
+$ jupyter notebook --no-browser --allow-root
+```
+For the local files import, Jupyter notebook has to be run from the scripts folders /are/AREFramework/experiments/scripts/
+
+You can open the Jupyter web client at localhost:8888
