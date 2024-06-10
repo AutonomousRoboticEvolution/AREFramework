@@ -5,12 +5,13 @@ using namespace are::client;
 
 int ER::init(int nbrOfInst, int port){
     initialize();
+    std::cout << "seed is " << randNum->getSeed() << std::endl;
     nbr_of_instances = nbrOfInst;
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::make_unique<SlaveConnection>("127.0.0.1", i + port);
         std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
         float max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
-        if (new_slave->connect(max_eval_time*3*1000 + 60000)) {
+        if (new_slave->connect(max_eval_time*1000 + 60000)) {
             // new_slave->setState(SlaveConnection::State::FREE);
            // while(new_slave->getIntegerSignalStreaming("simulationState")!=0);
           //  new_slave->setIntegerSignal("clientState",IDLE);
@@ -146,8 +147,9 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
 //    serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
-    // std::cout << "slave " << slaveIndex << "send ind" << std::endl;
+    std::cout << "slave " << slaveIndex << "send ind" << std::endl;
     send_string_no_reply(currentIndVec[slaveIndex]->to_string(),serverInstances[slaveIndex]->get_ind_channel(),"ind ");
+    std::cout << "slave " << slaveIndex << "ind sent" << std::endl;
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
 }
 
@@ -161,6 +163,7 @@ bool ER::endOfSimulation(int slaveIndex){
         //std::cerr << "Slave " << slaveIndex << " message not received" << std::endl;
         currentIndVec[slaveIndex]->setObjectives({0});
         serverInstances[slaveIndex]->reset_ind_channel();
+        std::cout << "slave " << slaveIndex << " ind received" << std::endl;
 
     }else{
         currentIndVec[slaveIndex]->from_string(message);
