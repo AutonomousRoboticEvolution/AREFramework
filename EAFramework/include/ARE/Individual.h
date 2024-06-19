@@ -99,6 +99,9 @@ public:
     }
    const Learner::Ptr & get_learner(){return learner;}
 
+   void set_instant_reward(const std::vector<double> &ir){instant_reward = ir;}
+   const std::vector<double> &get_instant_reward(){return instant_reward;}
+
 protected:
     std::vector<double> outputs;
     std::vector<double> objectives;
@@ -117,7 +120,8 @@ protected:
     int generation;
 
     int client_id;
-//    std::function<Genome::Factory> createGenome;
+
+    std::vector<double> instant_reward;
 
     virtual void createController() = 0;
     virtual void createMorphology() = 0;
