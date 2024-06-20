@@ -83,8 +83,9 @@ def write_parameters(parameters: dict, folder: str, filename: str):
         file.write(content)
 
 if __name__ == "__main__":
-    if(len(sys.argv) != 3):
+    if(len(sys.argv) < 3):
         print("usage:\n - arg 1: folder path\n - arg 2: ARE framework path\n - arg 3 (optional) path to vrep exec")
+        exit(0)
 
     folder_name = sys.argv[1]
     are_framework = sys.argv[2]
@@ -96,7 +97,7 @@ if __name__ == "__main__":
         if not os.path.exists(robot_repo):
             os.makedirs(robot_repo)
 
-        pareto_set = pd.read_csv(folder_name + "/" + folder + "/pareto_set.csv")
+        pareto_set = pd.read_csv(folder_name + "/" + folder + "/pareto_set_organ_dist.csv")
         ori_parameters = read_parameters(are_framework + "/experiments/meim/parameters_visu.csv")
 
         list_ids = list(pareto_set["id"])
