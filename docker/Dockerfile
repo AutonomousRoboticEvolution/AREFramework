@@ -1,6 +1,7 @@
 FROM ubuntu:22.04
 ARG N_CPU=1
 WORKDIR /are
+# TODO set versions for each library
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libeigen3-dev \
     git \
@@ -18,7 +19,8 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libzmq5 \
     libzmq3-dev \
     jupyter \
-    python3-pip && pip3 install psutil dlib numpy scikit-learn pandas paretoset matplotlib seaborn
+    fish \
+    python3-pip && pip3 install psutil dlib numpy=='1.26.4' scikit-learn=='1.5.0' pandas=='2.2.2' paretoset matplotlib=='3.9.0' seaborn=='0.13.2'
 
 # x11-apps only to test GUI xclock within docker
 
