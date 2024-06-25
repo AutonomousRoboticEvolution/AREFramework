@@ -242,7 +242,7 @@ bool MEIM::update(const Environment::Ptr &env){
         }
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
-    else if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+    if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
 
         for(int &index : newly_evaluated){
             std::cout << "update for individual indexed " << index << std::endl;
