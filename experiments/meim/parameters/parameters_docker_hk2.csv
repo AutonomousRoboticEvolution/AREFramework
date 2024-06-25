@@ -4,7 +4,7 @@
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
 #robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
-#maxEvalTime,float,300
+#maxEvalTime,float,1200
 #repository,string,/are/logs/
 #verbose,bool,1
 #instanceType,int,1
