@@ -700,19 +700,19 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
-        if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
+        //if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
             organ_type = 1;
     }
     else if(max_element == 3) { // Sensor
-        if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
+       // if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
             organ_type = 2;
     }
     else if(max_element == 4) { // Joint
-        if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
+      //  if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
             organ_type = 3;
     }
     else if(max_element == 5) { // Caster
-        if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
+//        if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
             organ_type = 4;
     } else{
         std::cerr << "We shouldn't be here: " << __func__ << " max_element: " << max_element << std::endl;
