@@ -21,7 +21,7 @@ def load_fitnesses(filename: str) -> dict:
             fitnesses[int(line[0])] = float(line[-2])
         return fitnesses
     
-def load_desciptors(filename: str) -> dict:
+def load_descriptors(filename: str) -> dict:
     ''' Load descriptors from morph_descriptor.csv from meim, mnipes_v2 experiments
         output: dictionary with id: numpy.array'''
 
@@ -154,14 +154,15 @@ if __name__ == "__main__":
     for folder in os.listdir(folder_name):
         if(folder.split("_")[0] != "meim"):
             continue
+        print(folder)
         exp_folder = folder_name + "/" + folder
-        descriptors = load_desciptors(exp_folder + "/morph_descriptor.csv")
+        descriptors = load_descriptors(exp_folder + "/morph_descriptor.csv")
         fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
         fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))
         print("Number of individuals =",len(fitnesses))
-        #L2_norm = lambda v,w: np.linalg.norm(v-w)
-        #sparsity = compute_sparsity(descriptors,15,L2_norm)
-        sparsity = compute_sparsity(descriptors,15,organ_position_distance)
+        L2_norm = lambda v,w: np.linalg.norm(v-w)
+        sparsity = compute_sparsity(descriptors,15,L2_norm)
+        #sparsity = compute_sparsity(descriptors,15,organ_position_distance)
         pareto_set = compute_pareto_front(sparsity,fitnesses)
         pareto_set.to_csv(exp_folder + "/" + sys.argv[2],index=False)
         print(pareto_set)
