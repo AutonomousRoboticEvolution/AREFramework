@@ -91,6 +91,23 @@ struct ObsClosestSample : lb::mean::BaseMean<Params> {
         return gp.observations()[i];
     }
 };
+
+template <typename Params>
+struct DistanceToTarget{
+    using result_type = double;
+    DistanceToTarget(){}
+    DistanceToTarget(const Eigen::VectorXd& target, const double max_dist) : _target(target),_max_dist(max_dist) {}
+
+    double operator()(const Eigen::VectorXd& x) const
+    {
+        return 1-(x - _target).norm()/_max_dist;
+    }
+
+protected:
+    Eigen::VectorXd _target;
+    double _max_dist;
+};
+
 //using kernel_t = lb::kernel::MaternFiveHalves<Params>;
 //using mean_t = lb::mean::Data<Params>;
 //using gp_opt_t = lb::model::gp::KernelLFOpt<Params>;
@@ -163,7 +180,7 @@ public:
 private:
     model_t _model;
     Eigen::VectorXd _target;
-    std::function<double(const Eigen::VectorXd& x)> _reward;
+    DistanceToTarget<Params> _reward;
     double _max_dist;
 };
 }//are

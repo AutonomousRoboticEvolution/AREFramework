@@ -7,7 +7,11 @@
 #include "BOIndividual.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "simulatedER/mazeEnv.h"
-
+#include "obstacleAvoidance.hpp"
+#include "exploration.hpp"
+#include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
+#include "env_settings.hpp"
 
 namespace are {
 

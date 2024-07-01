@@ -12,12 +12,29 @@ set(INCLUDE
     "../common/"
     "../../modules/")
 
+SET(VREP_SRC
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+    )
+
 add_library(BayesOpt SHARED
+    ${VREP_SRC}
     factories.cpp
     BO.cpp
     BOIndividual.cpp
     BOLoggings.cpp
     BayesianOpt.cpp
+    ../common/obstacleAvoidance.cpp
+    ../common/barrelTask.cpp
+    ../common/exploration.cpp
+    ../common/multiTargetMaze.cpp
+    ../common/locomotion.cpp
 )
 target_include_directories(BayesOpt PUBLIC ${INCLUDE})
 target_link_libraries(BayesOpt ARE simulatedER cmaes rt ${LIMBO_LIBRAIRIES})

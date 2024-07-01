@@ -73,6 +73,7 @@ void BO::init(){
         const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
         const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
         const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+        std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
         int nbr_weights, nbr_biases;
         if(nn_type == settings::nnType::FFNN)
@@ -81,6 +82,18 @@ void BO::init(){
             NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
         else if(nn_type == settings::nnType::ELMAN)
             NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
+        else if(nn_type == settings::nnType::FCP){
+            NN2Control<fcp_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases);
+        }
+        else if(nn_type == settings::nnType::ELMAN_CPG){
+            NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases,joint_subs);
+        }
+        else if(nn_type == settings::nnType::CPG){
+            NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases,joint_subs);
+        }
+        else if(nn_type == settings::nnType::FF_CPG){
+            NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_biases,joint_subs);
+        }
         else {
             std::cerr << "unknown type of neural network" << std::endl;
             return;
@@ -128,43 +141,31 @@ void BO::init(){
     //At the moment, only Genome avalaible is NNParamGenome
     for(const std::string& file: gen_files){
         EmptyGenome::Ptr morph_gen(new EmptyGenome);
-        Genome::Ptr genome;
+        NNParamGenome::Ptr genome = std::make_shared<NNParamGenome>(randomNum,parameters);
 
-        if(genType == settings::NEAT){
-            //todo
-        }
-        else if(genType == settings::NN){
-//            genome.reset(new NNGenome(randomNum,parameters));
-//            NEAT::Genome neat_genome(file.c_str());
-//            std::dynamic_pointer_cast<NNGenome>(genome)->set_nn_genome(neat_genome);
-        }else if(genType == settings::NNPARAM){
-            genome.reset(new NNParamGenome(randomNum,parameters));
-            NNParamGenome::Ptr nngenome = std::dynamic_pointer_cast<NNParamGenome>(genome);
-            std::ifstream logFileStream;
-            logFileStream.open(file);
-            std::string line;
+        std::ifstream logFileStream;
+        logFileStream.open(file);
+        std::string line;
+        std::getline(logFileStream,line);
+        int nbr_weights = std::stoi(line);
+        std::getline(logFileStream,line);
+        int nbr_bias = std::stoi(line);
+
+        std::vector<double> weights;
+        for(int i = 0; i < nbr_weights; i++){
             std::getline(logFileStream,line);
-            int nbr_weights = std::stoi(line);
-            std::getline(logFileStream,line);
-            int nbr_bias = std::stoi(line);
-
-            std::vector<double> weights;
-            for(int i = 0; i < nbr_weights; i++){
-                std::getline(logFileStream,line);
-                weights.push_back(std::stod(line));
-            }
-            nngenome->set_weights(weights);
-
-
-            std::vector<double> biases;
-            for(int i = 0; i < nbr_bias; i++){
-                std::getline(logFileStream,line);
-                biases.push_back(std::stod(line));
-            }
-            nngenome->set_biases(biases);
-
-
+            weights.push_back(std::stod(line));
         }
+        genome->set_weights(weights);
+
+
+        std::vector<double> biases;
+        for(int i = 0; i < nbr_bias; i++){
+            std::getline(logFileStream,line);
+            biases.push_back(std::stod(line));
+        }
+        genome->set_biases(biases);
+
         BOLearner::Ptr learner(new BOLearner);
         learner->set_parameters(parameters);
         Individual::Ptr ind(new BOIndividual(morph_gen,genome,learner));
@@ -190,10 +191,10 @@ void BO::epoch(){
         std::dynamic_pointer_cast<BOIndividual>(ind)->compute_model(observations,samples);
     }
 
+    std::vector<double> targetP = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+
     Eigen::VectorXd target(3);
-    target << settings::getParameter<settings::Double>(parameters,"#target_x").value,
-            settings::getParameter<settings::Double>(parameters,"#target_y").value,
-            settings::getParameter<settings::Double>(parameters,"#target_z").value;
+    target << targetP[0],targetP[1],targetP[2];
 
     std::dynamic_pointer_cast<BOIndividual>(ind)->update_learner(observations, samples,target);
     ind.reset();
@@ -208,10 +209,12 @@ bool BO::update(const Environment::Ptr & env)
     Individual::Ptr ind = population[currentIndIndex];
 
     if(simulator_side){
-        std::dynamic_pointer_cast<BOIndividual>(ind)->set_final_position(
-                    std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_final_position());
-        std::dynamic_pointer_cast<BOIndividual>(ind)->set_trajectory(
-                    std::dynamic_pointer_cast<sim::MazeEnv>(env)->get_trajectory());
+        std::dynamic_pointer_cast<BOIndividual>(ind)->set_final_position(env->get_final_position());
+        std::dynamic_pointer_cast<BOIndividual>(ind)->set_trajectory(env->get_trajectory());
+        if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
+            std::dynamic_pointer_cast<BOIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
+            std::dynamic_pointer_cast<BOIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
+        }
     }
 
     if(instance_type == settings::INSTANCE_REGULAR || !simulator_side){

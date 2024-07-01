@@ -28,8 +28,9 @@ BOLearner::BOLearner()
 }
 
 BOLearner::BOLearner(const settings::ParametersMapPtr &param){
-    Params::opt_cmaes::set_lbound(-1.);
-    Params::opt_cmaes::set_ubound(1.);
+    double max_weight = settings::getParameter<settings::Float>(param,"#MaxWeight").value;
+    Params::opt_cmaes::set_lbound(-max_weight);
+    Params::opt_cmaes::set_ubound(max_weight);
 
     Params::opt_cmaes::set_max_fun_evals(-1);
     Params::opt_cmaes::set_fun_tolerance(1);
@@ -44,40 +45,43 @@ BOLearner::BOLearner(const settings::ParametersMapPtr &param){
     double delta = settings::getParameter<settings::Double>(parameters,"#GPUCBParam").value;
     Params::acqui_gpucb::set_delta(delta);
 
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    _max_dist = sqrt(2*arena_size*arena_size);
+    double _max_dist = settings::getParameter<settings::Double>(parameters,"#maxDistance").value;
+  //  _max_dist = sqrt(2*arena_size*arena_size);
 
-    int obs_type = settings::getParameter<settings::Integer>(parameters,"#observationType").value;
+   // int obs_type = settings::getParameter<settings::Integer>(parameters,"#observationType").value;
 
-    _target.resize(3);
-    _target << settings::getParameter<settings::Double>(parameters,"#target_x").value,
-              settings::getParameter<settings::Double>(parameters,"#target_y").value,
-              settings::getParameter<settings::Double>(parameters,"#target_z").value;
 
-    if(obs_type == settings::obsType::FINAL_POS){
-        _reward = [&](const Eigen::VectorXd& x) -> double {
-            return (1-(x-_target).norm()/_max_dist);
-        };
-    }else if(obs_type == settings::obsType::TRAJECTORY || obs_type == settings::obsType::POS_TRAJ){
-        _reward = [&](const Eigen::VectorXd& x) -> double
-        {
-            int rew = 0;
-            Eigen::VectorXd pos(3);
-            for (int i = 0; i < x.rows(); i+=6) {
-                pos(0) = x(i);
-                pos(1) = x(i+1);
-                pos(2) = x(i+2);
-                rew += (1-(pos-_target).norm()/_max_dist);
-            }
-            return rew;
-        };
-    }
-    else if(obs_type == settings::obsType::OBJ){
-        _reward = [&](const Eigen::VectorXd& x) -> double
-        {
-            return x(0);
-        };
-    }
+    std::vector<double> targetP = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+    Eigen::VectorXd _target(3);
+    _target << targetP[0],targetP[1],targetP[2];
+
+    _reward = DistanceToTarget<Params>(_target,_max_dist);
+
+//    if(obs_type == settings::obsType::FINAL_POS){
+//        DistanceToTarget<Params> _reward (_target,_max_dist);
+//        _reward = [&](const Eigen::VectorXd& x) -> double {
+//            return (1-(x-_target).norm()/_max_dist);
+//        };
+//    }else if(obs_type == settings::obsType::TRAJECTORY || obs_type == settings::obsType::POS_TRAJ){
+//        _reward = [&](const Eigen::VectorXd& x) -> double
+//        {
+//            int rew = 0;
+//            Eigen::VectorXd pos(3);
+//            for (int i = 0; i < x.rows(); i+=6) {
+//                pos(0) = x(i);
+//                pos(1) = x(i+1);
+//                pos(2) = x(i+2);
+//                rew += (1-(pos-_target).norm()/_max_dist);
+//            }
+//            return rew;
+//        };
+//    }
+//    else if(obs_type == settings::obsType::OBJ){
+//        _reward = [&](const Eigen::VectorXd& x) -> double
+//        {
+//            return x(0);
+//        };
+//    }
 }
 
 void BOLearner::init_model(int input_size)

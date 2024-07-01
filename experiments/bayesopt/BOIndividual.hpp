@@ -4,6 +4,7 @@
 #include "ARE/Individual.h"
 #include "simulatedER/FixedMorphology.hpp"
 #include "BayesianOpt.hpp"
+#include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/Settings.h"
 #include "ARE/nn2/NN2Settings.hpp"
@@ -22,26 +23,28 @@ using elman_t = nn2::Elman<neuron_t,connection_t>;
 using rnn_t = nn2::Rnn<neuron_t,connection_t>;
 
 
+typedef enum DescriptorType{
+    FINAL_POSITION = 0,
+    VISITED_ZONES = 1
+}DescriptorType;
 
-class BOIndividual : public Individual
+class BOIndividual : public sim::NN2Individual
 {
 public :
 
     typedef std::shared_ptr<BOIndividual> Ptr;
     typedef std::shared_ptr<const BOIndividual> ConstPtr;
 
-    BOIndividual() : Individual(){}
-    BOIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen);
-    BOIndividual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen, const BOLearner::Ptr& l);
+    BOIndividual() : sim::NN2Individual(){}
+    BOIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen);
+    BOIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen, const BOLearner::Ptr& l);
     BOIndividual(const BOIndividual& ind) :
-        Individual(ind),
-        final_position(ind.final_position),
-        trajectory(ind.trajectory)
+        sim::NN2Individual(ind),
+        init_position(ind.init_position)
     {}
 
     Individual::Ptr clone();
 
-    void update(double delta_time);
 
     void compute_model(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl);
     void update_learner(std::vector<Eigen::VectorXd> &obs, std::vector<Eigen::VectorXd> &spl, const Eigen::VectorXd &target);
@@ -66,13 +69,17 @@ public :
         arch & final_position;
         arch & trajectory;
     }
+    Eigen::VectorXd descriptor() override;
+
+    void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
+    void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
 
 
 protected:
-    void createController() override;
-    void createMorphology() override;
-    std::vector<double> final_position;
-    std::vector<waypoint> trajectory;
+    std::vector<double> init_position;
+
+    Eigen::MatrixXi visited_zones;
+    DescriptorType descriptor_type = FINAL_POSITION;
 };
 
 }//are
