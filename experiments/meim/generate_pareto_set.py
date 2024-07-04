@@ -146,11 +146,16 @@ def density_estimation(descriptors: dict,fitnesses: dict, n: int) -> dict:
 
 
 if __name__ == "__main__":
-    if(len(sys.argv) != 4):
-        print("usage:\n - arg 1: folder path\n - arg 2: pareto file name\n - arg 3: fitness threshold")
+    if(len(sys.argv) != 5):
+        print("usage:\n - arg 1: folder path\n",
+              "- arg 2: pareto file name\n", 
+              "- arg 3: fitness threshold\n",
+              "- arg 4: distance (L2|organ_dist)")
         exit(0)
 
+
     folder_name = sys.argv[1]
+    distance = sys.argv[4]
     for folder in os.listdir(folder_name):
         if(folder.split("_")[0] != "meim"):
             continue
@@ -160,9 +165,14 @@ if __name__ == "__main__":
         fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
         fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))
         print("Number of individuals =",len(fitnesses))
-        L2_norm = lambda v,w: np.linalg.norm(v-w)
-        sparsity = compute_sparsity(descriptors,15,L2_norm)
-        #sparsity = compute_sparsity(descriptors,15,organ_position_distance)
+        if distance == "L2":
+            L2_norm = lambda v,w: np.linalg.norm(v-w)
+            sparsity = compute_sparsity(descriptors,15,L2_norm)
+        elif distance == "organ_dist":
+            sparsity = compute_sparsity(descriptors,15,organ_position_distance)
+        else:
+            print("Error - distance unkown.\ndistance available: L2 or organ_dist")
+            exit(0)
         pareto_set = compute_pareto_front(sparsity,fitnesses)
         pareto_set.to_csv(exp_folder + "/" + sys.argv[2],index=False)
         print(pareto_set)
