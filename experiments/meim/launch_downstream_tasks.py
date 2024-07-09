@@ -85,35 +85,50 @@ def write_parameters(parameters: dict, folder: str, filename: str):
         file.write(content)
 
 def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
-    loco_params = {"#envType":int(6),
+    loco_corr = {  "#experimentName":"nipes_loco_corridor", 
+                   "#envType":int(6),
                    "#maxEvalTime":np.float32(240),
                    "#nbrWaypoints":int(720),
                    "#initPosition":[5.5,0,0.2],
                    "#NbrInputNeurones":int(nbr_inputs),
                    "#NbrOutputNeurones":int(nbr_outputs),
-                   "#scenePath":are_folder + "/simulation/models/scenes/rough_terrain.ttt"}
-    mt_arena_params = {"#envType":int(2),
-                   "#maxEvalTime":np.float32(60),
-                   "#nbrWaypoints":int(180),
-                   "#initPosition":[-0.6,0.6,0.2],
-                   "#targets":[0.6,0.6,0.12,0.6,-0.6,0.12,-0.6,-0.6,0.12],
+                   "#scenePath":are_folder + "/simulation/models/scenes/long_corridor.ttt"}
+    
+    loco_rough = copy.copy(loco_corr)
+    loco_rough["experimentName"] = "nipes_loco_rough"
+    loco_rough["#scenePath"] = are_folder + "/simulation/models/scenes/rough_terrain.ttt"
+
+    push_object = copy.copy(loco_corr)
+    push_object["experimentName"] = "nipes_push_object" 
+    push_object["#envType"] = int(8)
+    push_object["#targetPosition"] = [5,0,0.05]
+
+    hill_climbing = {"experimentName":"nipes_hill_climb",
+                   "#envType":int(7),
+                   "#maxEvalTime":np.float32(120),
+                   "#nbrWaypoints":int(360),
+                   "#initPosition":[1.4,1.4,0.2],
                    "#NbrInputNeurones":int(nbr_inputs),
                    "#NbrOutputNeurones":int(nbr_outputs),
-                   "#scenePath": are_folder + "/simulation/models/scenes/ARE_arena.ttt"}
-    mt_obst_params = copy.copy(mt_arena_params)
-    mt_obst_params["#scenePath"] = are_folder + "/simulation/models/scenes/exp_side_obstacles_hard.ttt"
-    b_arena_params = copy.copy(mt_arena_params)
-    b_arena_params["#envType"] = 4
-    b_arena_params["#targets"] = [0.6,-0.6,0.12,-0.6,-0.6,0.12]
-    b_arena_params["#targetPosition"] = [0.6,0.6,0.12]
-    b_obst_params = copy.copy(b_arena_params)
-    b_obst_params["#scenePath"] = are_folder + "/simulation/models/scenes/exp_side_obstacles_hard.ttt"
+                   "#scenePath":are_folder + "/simulation/models/scenes/hill.ttt"}
 
-    return [("loco",loco_params),
-            ("mt_arena",mt_arena_params),
-            ("mt_obst",mt_obst_params),
-            ("b_arena",b_arena_params),
-            ("b_obst",b_obst_params)]
+    mt_arena = {"experimentName":"nipes_multitargets",
+                "#envType":int(2),
+                "#maxEvalTime":np.float32(60),
+                "#nbrWaypoints":int(180),
+                "#initPosition":[-0.6,0.6,0.2],
+                "#targets":[0.6,0.6,0.12,0.6,-0.6,0.12,-0.6,-0.6,0.12],
+                "#NbrInputNeurones":int(nbr_inputs),
+                "#NbrOutputNeurones":int(nbr_outputs),
+                "#scenePath": are_folder + "/simulation/models/scenes/ARE_arena.ttt"}
+
+
+    return [("lc",loco_corr),
+            ("lr",loco_corr),
+            ("hc",hill_climbing),
+            ("po",push_object),
+            ("mta",mt_arena)]
+
 
 
 def get_io_nn_from_blueprint(filename: str):
@@ -154,7 +169,7 @@ def launch_downstream_tasks(folder_name,are_framework,base_port):
             write_parameters(parameters,folder_name,"parameters_nipes_" + task[0] + "_" + str(id) + ".csv")
 
             if base_port > 0:
-                sp.run(["sbatch","--cpus-per-task=64","--job-name=" + task[0],
+                sp.run(["sbatch","--cpus-per-task=64","--job-name=" + task[0] + str(id),
                     "downstream_task.job",folder_name + "/parameters_nipes_" + task[0] + "_" + str(id) + ".csv",
                     str(base_port)])
                 base_port += 1000   
