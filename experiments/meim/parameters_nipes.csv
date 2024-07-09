@@ -41,6 +41,7 @@
 #arenaSize,double,2.
 #maxDistance,double,11.
 #maxHeight,double,0.55
+#objectWeight,float,1.
 #targetPosition,sequence_double,0.6;0.6;0.20
 #targets,sequence_double,0.6;-0.6;0.12;0.6;0.6;0.12;-0.6;-0.6;0.12
 #initPosition,sequence_double,5.5;0;0.2
