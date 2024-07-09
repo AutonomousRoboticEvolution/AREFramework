@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     folder_name = sys.argv[1]
     are_framework = sys.argv[2]
-    base_port = sys.argv[2]
+    base_port = int(sys.argv[3])
     for folder in os.listdir(folder_name):
         if folder.split("_")[0] != "meim":
             continue
