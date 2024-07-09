@@ -147,9 +147,9 @@ void ER::startOfSimulation(int slaveIndex){
     currentIndVec[slaveIndex]->set_individual_id(currentIndexVec[slaveIndex]);
     currentIndVec[slaveIndex]->set_generation(ea->get_generation());
 //    serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
-    std::cout << "slave " << slaveIndex << "send ind" << std::endl;
+//    std::cout << "slave " << slaveIndex << " send ind" << std::endl;
     send_string_no_reply(currentIndVec[slaveIndex]->to_string(),serverInstances[slaveIndex]->get_ind_channel(),"ind ");
-    std::cout << "slave " << slaveIndex << "ind sent" << std::endl;
+ //   std::cout << "slave " << slaveIndex << " ind sent" << std::endl;
     serverInstances[slaveIndex]->setIntegerSignal("clientState",READY);
 }
 
@@ -158,15 +158,15 @@ bool ER::endOfSimulation(int slaveIndex){
         return true;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string message;
-    std::cout << "slave " << slaveIndex << " waiting to receive ind" << std::endl;
+   // std::cout << "slave " << slaveIndex << " waiting to receive ind" << std::endl;
     if(!receive_string_no_reply(message, serverInstances[slaveIndex]->get_ind_channel(),"ind ")){
         //std::cerr << "Slave " << slaveIndex << " message not received" << std::endl;
         currentIndVec[slaveIndex]->setObjectives({0});
         serverInstances[slaveIndex]->reset_ind_channel();
-        std::cout << "slave " << slaveIndex << " ind received" << std::endl;
 
     }else{
         currentIndVec[slaveIndex]->from_string(message);
+       // std::cout << "slave " << slaveIndex << " ind received" << std::endl;
     }
 
     //evalIsFinish = serverInstances[slaveIndex]->getIntegerSignal("evalIsFinish");

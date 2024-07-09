@@ -124,7 +124,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
 
 
     return [("lc",loco_corr),
-            ("lr",loco_corr),
+            ("lr",loco_rough),
             ("hc",hill_climbing),
             ("po",push_object),
             ("mta",mt_arena)]

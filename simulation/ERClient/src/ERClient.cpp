@@ -25,6 +25,8 @@
 #include <random>
 #include <execinfo.h>
 #include <signal.h>
+#include <segvcatch.h>
+
 
 using namespace are;
 
@@ -53,6 +55,9 @@ int main(int argc, char* argv[])
     signal(SIGFPE,handler);
 
     srand(time(NULL));
+
+    segvcatch::init_segv(&are::misc::handle_segv);
+
 
     if(argc != 4)
     {
