@@ -95,15 +95,15 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
                    "#scenePath":are_folder + "/simulation/models/scenes/long_corridor.ttt"}
     
     loco_rough = copy.copy(loco_corr)
-    loco_rough["experimentName"] = "nipes_loco_rough"
+    loco_rough["#experimentName"] = "nipes_loco_rough"
     loco_rough["#scenePath"] = are_folder + "/simulation/models/scenes/rough_terrain.ttt"
 
     push_object = copy.copy(loco_corr)
-    push_object["experimentName"] = "nipes_push_object" 
+    push_object["#experimentName"] = "nipes_push_object" 
     push_object["#envType"] = int(8)
     push_object["#targetPosition"] = [5,0,0.05]
 
-    hill_climbing = {"experimentName":"nipes_hill_climb",
+    hill_climbing = {"#experimentName":"nipes_hill_climb",
                    "#envType":int(7),
                    "#maxEvalTime":np.float32(120),
                    "#nbrWaypoints":int(360),
@@ -112,7 +112,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
                    "#NbrOutputNeurones":int(nbr_outputs),
                    "#scenePath":are_folder + "/simulation/models/scenes/hill.ttt"}
 
-    mt_arena = {"experimentName":"nipes_multitargets",
+    mt_arena = {"#experimentName":"nipes_multitargets",
                 "#envType":int(2),
                 "#maxEvalTime":np.float32(60),
                 "#nbrWaypoints":int(180),
@@ -121,7 +121,6 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
                 "#NbrInputNeurones":int(nbr_inputs),
                 "#NbrOutputNeurones":int(nbr_outputs),
                 "#scenePath": are_folder + "/simulation/models/scenes/ARE_arena.ttt"}
-
 
     return [("lc",loco_corr),
             ("lr",loco_rough),
