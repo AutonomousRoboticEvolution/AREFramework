@@ -1,6 +1,5 @@
 #include "NIPES.hpp"
 
-
 using namespace are;
 
 Eigen::VectorXd NIPESIndividual::descriptor()
@@ -343,7 +342,10 @@ bool NIPES::update(const Environment::Ptr & env){
                     std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
                 else if(env->get_name() == "multi_target_maze")
                     std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());            }
-        }
+        }else if(env->get_name() == "push_object")
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_object_trajectory(std::dynamic_pointer_cast<sim::PushObject>(env)->get_object_trajectory());
+
+
     }
     newly_evaluated.clear();
 
@@ -362,33 +364,34 @@ bool NIPES::is_finish(){
 
 bool NIPES::finish_eval(const Environment::Ptr & env){
 
-    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
-    double t_pos[3] = {target[0],target[1],target[2]};
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+//    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+//    double t_pos[3] = {target[0],target[1],target[2]};
+//    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+//    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
-    auto distance = [](double* a,double* b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
+//    auto distance = [](double* a,double* b) -> double
+//    {
+//        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+//                         (a[1] - b[1])*(a[1] - b[1]) +
+//                         (a[2] - b[2])*(a[2] - b[2]));
+//    };
 
-    int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
-    float pos[3];
-    simGetObjectPosition(handle,-1,pos);
-    double posd[3];
-    posd[0] = static_cast<double>(pos[0]);
-    posd[1] = static_cast<double>(pos[1]);
-    posd[2] = static_cast<double>(pos[2]);
+//    int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
+//    float pos[3];
+//    simGetObjectPosition(handle,-1,pos);
+//    double posd[3];
+//    posd[0] = static_cast<double>(pos[0]);
+//    posd[1] = static_cast<double>(pos[1]);
+//    posd[2] = static_cast<double>(pos[2]);
 
-    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
+//    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
 
-    if(dist < fTarget){
-        std::cout << "STOP !" << std::endl;
-    }
+//    if(dist < fTarget){
+//        std::cout << "STOP !" << std::endl;
+//    }
 
-    return  dist < fTarget;
+//    return  dist < fTarget;
+    return false;
 }
 
 void NIPES::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){

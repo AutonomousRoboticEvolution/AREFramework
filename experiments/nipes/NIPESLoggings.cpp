@@ -37,20 +37,7 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
 
     //log trajectory
     int env_type = settings::getParameter<settings::Integer>(ea->get_parameters(),"#envType").value;
-    if(env_type == sim::MAZE || env_type == sim::LOCOMOTION || env_type == sim::OBSTACLES){
-        std::vector<are::waypoint> traj = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectory();
-        std::ofstream traj_ofs;
-        std::stringstream filepath;
-        filepath << "/traj_" << generation << "_" << best_ind.first;
-        logFile = filepath.str();
-
-        if(!openOLogFile(traj_ofs))
-            return;
-        for(const are::waypoint& wp: traj)
-            traj_ofs << wp.to_string() << std::endl;
-        traj_ofs.close();
-    }
-    else if(env_type == sim::MULTI_TARGETS || env_type == sim::BARREL){
+    if(env_type == sim::MULTI_TARGETS || env_type == sim::BARREL){
         std::vector<std::vector<are::waypoint>> trajs = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectories();
         int i = 0;
         for(auto &traj : trajs){
@@ -66,6 +53,33 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
             traj_ofs.close();
             i++;
         }
+    }
+    else if(env_type == sim::GRADUAL){}
+    else{
+        std::vector<are::waypoint> traj = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_trajectory();
+        std::ofstream traj_ofs;
+        std::stringstream filepath;
+        filepath << "/traj_" << generation << "_" << best_ind.first;
+        logFile = filepath.str();
+
+        if(!openOLogFile(traj_ofs))
+            return;
+        for(const are::waypoint& wp: traj)
+            traj_ofs << wp.to_string() << std::endl;
+        traj_ofs.close();
+    }
+    if(env_type == sim::PUSH_OBJECT){
+        std::vector<are::waypoint> traj = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_object_trajectory();
+        std::ofstream traj_ofs;
+        std::stringstream filepath;
+        filepath << "/obj_traj_" << generation << "_" << best_ind.first;
+        logFile = filepath.str();
+
+        if(!openOLogFile(traj_ofs))
+            return;
+        for(const are::waypoint& wp: traj)
+            traj_ofs << wp.to_string() << std::endl;
+        traj_ofs.close();
     }
 
 }

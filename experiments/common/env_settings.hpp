@@ -15,7 +15,9 @@ typedef enum task_t{
     EXPLORATION = 3,
     BARREL = 4,
     GRADUAL = 5,
-    LOCOMOTION = 6
+    LOCOMOTION = 6,
+    HILL_CLIMBING = 7,
+    PUSH_OBJECT = 8
 } task_t;
 
 inline std::string task_name(are::sim::task_t task){
@@ -33,6 +35,10 @@ inline std::string task_name(are::sim::task_t task){
         return "gradual";
     else if(task == sim::LOCOMOTION)
         return "locomotion";
+    else if(task == sim::HILL_CLIMBING)
+        return "hill_climbing";
+    else if(task == sim::PUSH_OBJECT)
+        return "push_object";
     else{
         std::cerr << "Error: task unknow" << std::endl;
         return "None";

@@ -17,6 +17,7 @@
 #include "exploration.hpp"
 #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"
+#include "push_object.hpp"
 #include "env_settings.hpp"
 
 namespace are{
@@ -56,6 +57,7 @@ public:
         arch & rewards;
       //  arch & energy_cost;
         arch & trajectory;
+        arch & object_trajectory;
       //  arch & sim_time;
     }
 
@@ -68,6 +70,10 @@ public:
     void set_trajectories(const std::vector<std::vector<waypoint>> &trajs){trajectories=trajs;}
     const std::vector<std::vector<waypoint>> &get_trajectories() const {return trajectories;}
 
+
+    const std::vector<waypoint> &get_object_trajectory() const {return object_trajectory;}
+    void set_object_trajectory(const std::vector<waypoint> &obj_traj){object_trajectory = obj_traj;}
+
 private:
 
     Eigen::MatrixXi visited_zones;
@@ -76,6 +82,7 @@ private:
     std::vector<double> rewards;
 
     std::vector<std::vector<waypoint>> trajectories;
+    std::vector<waypoint> object_trajectory;
 
 };
 
@@ -117,6 +124,7 @@ public:
     void set_cma_strat(const IPOPCMAStrategy::Ptr& cmas){_cma_strat = cmas;}
 
     const std::pair<int,Individual::Ptr> &get_best_individual() const {return best_individual;}
+
 
 protected:
     IPOPCMAStrategy::Ptr _cma_strat;
