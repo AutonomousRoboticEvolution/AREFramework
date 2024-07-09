@@ -170,7 +170,7 @@ def launch_downstream_tasks(folder_name,are_framework,base_port):
 
             if base_port > 0:
                 sp.run(["sbatch","--cpus-per-task=64","--job-name=" + task[0] + str(id),
-                    "downstream_task.job",folder_name + "/parameters_nipes_" + task[0] + "_" + str(id) + ".csv",
+                    are_framework + "/experiments/meim/downstream_task.job",folder_name + "/parameters_nipes_" + task[0] + "_" + str(id) + ".csv",
                     str(base_port)])
                 base_port += 1000   
 
