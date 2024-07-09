@@ -49,7 +49,7 @@ void PushObject::init(){
     }
 
     float bSize[3] = {0.1f,0.1f,0.1f};
-    object_handle = simCreatePureShape(2,0,bSize,0.05f,nullptr); //create a sphere as beacon;
+    object_handle = simCreatePureShape(0,0,bSize,0.05f,nullptr); //create a sphere as beacon;
 
     simSetObjectName(object_handle,"IRBeacon_0");
     const float tPos[3] = {static_cast<float>(object_initial_position[0]),
@@ -65,7 +65,8 @@ void PushObject::init(){
     simSetObjectSpecialProperty(object_handle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
     simSetObjectInt32Parameter(object_handle, sim_shapeintparam_respondable, 1);
-    simComputeMassAndInertia(object_handle, 0.3f);
+    float obj_weight = settings::getParameter<settings::Float>(parameters,"#objectWeight").value;
+    simComputeMassAndInertia(object_handle, obj_weight);
     float color[3] = {0.1f,1.0f,0.1f};
     simSetShapeColor(object_handle, nullptr, sim_colorcomponent_ambient_diffuse, color);
 
