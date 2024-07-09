@@ -85,6 +85,12 @@ void PushObject::init(){
 
 std::vector<double> PushObject::fitnessFunction(const Individual::Ptr &ind){
 
+    //Check if object is still in the arena
+    if((object_current_position[0] > 6 && object_current_position[0] < -6)
+       ||(object_current_position[1] > 1 && object_current_position[1] < -1)
+            ||(object_current_position[2] > 0.5 && object_current_position[2] < 0))
+        return {0};
+
     std::vector<double> d(1);
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
