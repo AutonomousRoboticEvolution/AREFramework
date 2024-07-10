@@ -88,6 +88,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 #endif /* __linux || __APPLE__ */
 
 
+
+
     simLib = loadVrepLibrary(temp.c_str());
     if (simLib == NULL)
     {
@@ -121,8 +123,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
                 are_sett::loadParameters(parameters_filepath));
     simReleaseBuffer(parameters_filepath);
-    int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
+    instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
+    verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
     timeout += are_sett::getParameter<are_sett::Float>(parameters,"#maxEvalTime").value;
 
@@ -191,25 +193,25 @@ VREP_DLLEXPORT void v_repEnd()
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
-    are_sett::ParametersMapPtr param = ERVREP->get_parameters();
+    //are_sett::ParametersMapPtr param = ERVREP->get_parameters();
     //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
-    int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
+  //  int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
-    if(instanceType == are_sett::INSTANCE_REGULAR)
+    if(instance_type == are_sett::INSTANCE_REGULAR)
     {
         localMessageHandler(message);
     }
-    else if(instanceType == are_sett::INSTANCE_SERVER)
+    else if(instance_type == are_sett::INSTANCE_SERVER)
     {
         clientMessageHandler(message);
     }
-    param.reset();
+    //param.reset();
     return NULL;
 }
 
 void localMessageHandler(int message){
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+   // are_sett::ParametersMap param = (*ERVREP->get_parameters());
+   // bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
 //    int errorModeSaved;
 //    simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
@@ -281,8 +283,8 @@ void clientMessageHandler(int message){
     if(message == sim_message_eventcallback_modelloaded)
         return;
 
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+   // are_sett::ParametersMap param = (*ERVREP->get_parameters());
+//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     // client and v-rep plugin communicates using signal and remote api
     int clientState[1] = {10111};

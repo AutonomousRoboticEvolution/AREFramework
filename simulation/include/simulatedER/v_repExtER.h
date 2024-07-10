@@ -25,6 +25,8 @@ bool timerOn = false;
 double timeElapsed;
 bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
 std::chrono::time_point<std::chrono::system_clock> sysTime; // Measure simulation time.
+int instance_type = are::settings::INSTANCE_REGULAR;
+bool verbose = true;
 
 enum SimulationState {
     INITIALIZING,
