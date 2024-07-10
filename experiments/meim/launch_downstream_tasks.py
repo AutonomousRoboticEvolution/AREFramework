@@ -89,7 +89,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
                    "#envType":int(6),
                    "#maxEvalTime":np.float32(240),
                    "#nbrWaypoints":int(720),
-                   "#initPosition":[5.5,0,0.2],
+                   "#initPosition":[5.5,0.0,0.2],
                    "#NbrInputNeurones":int(nbr_inputs),
                    "#NbrOutputNeurones":int(nbr_outputs),
                    "#scenePath":are_folder + "/simulation/models/scenes/long_arena.ttt"}
@@ -101,7 +101,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
     push_object = copy.copy(loco_corr)
     push_object["#experimentName"] = "nipes_push_object" 
     push_object["#envType"] = int(8)
-    push_object["#targetPosition"] = [5,0,0.05]
+    push_object["#targetPosition"] = [5.0,0.0,0.05]
 
     hill_climbing = {"#experimentName":"nipes_hill_climb",
                    "#envType":int(7),
