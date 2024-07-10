@@ -92,7 +92,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
                    "#initPosition":[5.5,0,0.2],
                    "#NbrInputNeurones":int(nbr_inputs),
                    "#NbrOutputNeurones":int(nbr_outputs),
-                   "#scenePath":are_folder + "/simulation/models/scenes/long_corridor.ttt"}
+                   "#scenePath":are_folder + "/simulation/models/scenes/long_arena.ttt"}
     
     loco_rough = copy.copy(loco_corr)
     loco_rough["#experimentName"] = "nipes_loco_rough"
