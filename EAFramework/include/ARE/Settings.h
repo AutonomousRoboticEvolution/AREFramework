@@ -311,9 +311,9 @@ struct random{
 template<typename T>
 T getParameter(const ParametersMapPtr &params,const std::string& name)
 {    
-//    try{
     if(params == nullptr){
-        std::cerr << "are::settings::getParamter error: params is empty" << std::endl;
+        std::cerr << "are::settings::getParamter error: params is empty - queried parameter: " << name << std::endl;
+        exit(1);
         return T();
     }
     if(params->find(name) == params->end()){
@@ -335,20 +335,11 @@ T getParameter(const ParametersMapPtr &params,const std::string& name)
     }
 
     return *(cast<T>(params->at(name)));
-    //}
-    //catch(std::exception& e){
-    //    std::cerr << e.what() << std::endl << "Bad type for parameter " << name << std::endl;
-    //    exit(1);
-    //}
-
 }
 
 template<typename T>
 T getParameter(const ParametersMap &params,const std::string& name)
 {    
-    
-    //segvcatch::init_segv(&misc::handle_segv);
-//    try{
     if(params.find(name) == params.end()){
         std::cerr << "Unable to find parameters " << name << " of type " << T().name << std::endl
                   << "You should define it in the parameters file." << std::endl;
@@ -367,11 +358,7 @@ T getParameter(const ParametersMap &params,const std::string& name)
         return T();
     }
     return *(cast<T>(params.at(name)));
-   // }
-//    catch(std::exception& e){
-//        std::cerr << e.what() << std::endl << "Bad type for parameter " << name << std::endl;
-//        exit(1);
-//    }
+
 }
 
 
