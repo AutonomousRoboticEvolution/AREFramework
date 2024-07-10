@@ -38,11 +38,7 @@ public:
     bool value = false;
     const bool& get_value() const{return value;}
     void fromString(const std::string& str){
-        try{
         value = std::stoi(str);
-        }catch(...){
-            std::cerr << "settings::Boolean: stoi failed, the parameter with value: " << value << " is of wrong type" << std::endl;
-        }
     }
     friend std::ostream & operator << (std::ostream &out, const Boolean &s){
         out << s.value;
@@ -64,11 +60,7 @@ public:
     int value = 0;
     const int& get_value() const{return value;}
     void fromString(const std::string& str){
-        try{
-            value = std::stoi(str);
-        }catch(...){
-            std::cerr << "settings::Integer: stoi failed, the parameter with value: " << value << " is of wrong type" << std::endl;
-        }
+        value = std::stoi(str);
     }
     friend std::ostream & operator << (std::ostream &out, const Integer &s){
         out << s.value;
@@ -90,11 +82,7 @@ public:
     float value = 0.0;
     const float& get_value() const{return value;}
     void fromString(const std::string& str){
-        try{
-            value = std::stof(str);
-        }catch(...){
-            std::cerr << "settings::Float: stof failed, the parameter with value: " << value << " is of wrong type" << std::endl;
-        }
+        value = std::stof(str);
     }
     friend std::ostream & operator << (std::ostream &out, const Float &s){
         out << s.value;
@@ -117,11 +105,7 @@ public:
     double value = 0.0;
     const double& get_value() const{return value;}
     void fromString(const std::string& str){
-        try{
-            value = std::stof(str);
-        }catch(...){
-            std::cerr << "settings::Double: stod failed, the parameter with value: " << value << " is of wrong type" << std::endl;
-        }
+        value = std::stof(str);
     }
     friend std::ostream & operator << (std::ostream &out, const Double &s){
         out << s.value;
@@ -181,7 +165,6 @@ public:
     }
 };
 
-//TODO: implement try catch for the sequences
 
 template<>
 class Sequence<int> : public Type
@@ -347,6 +330,7 @@ T getParameter(const ParametersMapPtr &params,const std::string& name)
 
     if(cast<T>(params->at(name)).get() == nullptr){
         std::cerr << "are::settings::getParamter error: wrong type for parameter " << name << std::endl;
+        exit(1);
         return T();
     }
 
@@ -379,6 +363,8 @@ T getParameter(const ParametersMap &params,const std::string& name)
 
     if(cast<T>(params.at(name)).get() == nullptr){
         std::cerr << "are::settings::getParamter error: wrong type for parameter " << name << std::endl;
+        exit(1);
+        return T();
     }
     return *(cast<T>(params.at(name)));
    // }
