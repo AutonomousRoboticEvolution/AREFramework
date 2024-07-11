@@ -16,8 +16,13 @@
 #include "ERClient/sim_state.h"
 #include "simulatedER/zmq_com.hpp"
 
+//class VREPPlugin
+//{
+//public:
+
+
 /// an unique pointer to ER_VREP class
-are::sim::ER::Ptr ERVREP;
+//are::sim::ER::Ptr ERVREP;
 // TODO: EB  do we need these variables? I guess they are used for client-server mode.
 int counter = 0;
 int timeCount = 0;
@@ -51,14 +56,16 @@ bool startEvolution;
 
 // The 3 required entry points of the plugin:
 
-/// Initialize v-rep plugin and starts evolution.
+// Initialize v-rep plugin and starts evolution.
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer,int reservedInt);
-/// Release the v-rep lib
+// Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd();
-/// Handle different message of simulation
+// Handle different message of simulation
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData);
 
 void localMessageHandler(int message);
 void clientMessageHandler(int message);
+
+//};
 
 #endif //V_REPEXTER_H

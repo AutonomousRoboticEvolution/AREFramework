@@ -55,6 +55,8 @@ extern "C" {
 LIBRARY simLib;
 int timeout = 60;
 
+are::sim::ER *ERVREP = NULL;
+
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
@@ -146,7 +148,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     simulationState = INITIALIZING;
     // Construct classes
-    ERVREP = std::make_unique<are::sim::ER>();   // The class used to handle the EA
+    ERVREP = new are::sim::ER();   // The class used to handle the EA
 
     if(verbose){
         std::cout << "Parameters Loaded" << std::endl;
@@ -187,7 +189,9 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
-{ // This is called just once, at the end of V-REP
+{
+    delete ERVREP;
+    // This is called just once, at the end of V-REP
     unloadVrepLibrary(simLib); // release the library
 }
 
