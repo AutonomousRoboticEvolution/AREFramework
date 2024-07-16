@@ -134,6 +134,7 @@ protected:
     int reevaluated = 0;
     std::vector<int> newly_evaluated;
     std::pair<int,Individual::Ptr> best_individual;
+    bool healthy_generation = true;
 
 };
 

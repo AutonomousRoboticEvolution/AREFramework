@@ -165,6 +165,14 @@ void NIPES::init(){
 
 void NIPES::epoch(){
 
+    healthy_generation = true;
+    for(auto &ind: population){
+        if(ind->getObjectives()[0] == 0){
+            healthy_gen = false;
+            return;
+        }
+    }
+
     std::cout << numberEvaluation << "/" << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << " evaluations" << std::endl;
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
@@ -262,6 +270,10 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+
+    if(!healthy_generation)
+        return;
+
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
     const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
