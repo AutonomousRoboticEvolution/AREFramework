@@ -168,7 +168,7 @@ void NIPES::epoch(){
     healthy_generation = true;
     for(auto &ind: population){
         if(ind->getObjectives()[0] == 0){
-            healthy_gen = false;
+            healthy_generation = false;
             return;
         }
     }
