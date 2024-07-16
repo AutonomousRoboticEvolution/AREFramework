@@ -78,9 +78,9 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 //    are::EnergyCostLog<are::sim::NN2Individual>::Ptr eclog = std::make_shared<are::EnergyCostLog<are::sim::NN2Individual>>(ec_log_file);
 //    logs.push_back(eclog);
 
-    std::string st_log_file = are::settings::getParameter<are::settings::String>(param,"#simTimeFile").value;
-    are::SimTimeLog<are::sim::NN2Individual>::Ptr stlog = std::make_shared<are::SimTimeLog<are::sim::NN2Individual>>(st_log_file);
-    logs.push_back(stlog);
+//    std::string st_log_file = are::settings::getParameter<are::settings::String>(param,"#simTimeFile").value;
+//    are::SimTimeLog<are::sim::NN2Individual>::Ptr stlog = std::make_shared<are::SimTimeLog<are::sim::NN2Individual>>(st_log_file);
+//    logs.push_back(stlog);
 
     are::CMAESStateLog<are::NIPES>::Ptr cstlog = std::make_shared<are::CMAESStateLog<are::NIPES>>(false,true); //Logging at the end of run
     logs.push_back(cstlog);

@@ -125,6 +125,7 @@ public:
 
     const std::pair<int,Individual::Ptr> &get_best_individual() const {return best_individual;}
 
+    bool is_healthy_generation(){return healthy_generation;}
 
 protected:
     IPOPCMAStrategy::Ptr _cma_strat;

@@ -20,6 +20,10 @@ void StopCritLog::saveLog(EA::Ptr &ea)
 }
 
 void BestIndividualLog::saveLog(EA::Ptr &ea){
+
+    if(!static_cast<NIPES*>(ea.get())->is_healthy_generation())
+        return;
+
     int generation = ea->get_generation();
     auto &best_ind = static_cast<NIPES*>(ea.get())->get_best_individual();
 
