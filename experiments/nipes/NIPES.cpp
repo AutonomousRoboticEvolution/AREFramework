@@ -325,8 +325,10 @@ bool NIPES::update(const Environment::Ptr & env){
 
     for(const int& idx :newly_evaluated)
     {
-        numberEvaluation++;
-        reevaluated++;
+        if(population[idx]->getObjectives()[0] > 0){
+            numberEvaluation++;
+            reevaluated++;
+        }
     }
 
 
