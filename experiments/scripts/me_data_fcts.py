@@ -5,6 +5,9 @@ import math
 import numpy as np
 import numpy.linalg as la
 from PIL import Image
+import sys
+sys.path.append("../meim/")
+import generate_pareto_set as pareto
 
 def perc_high(a):
     return np.percentile(a,q=90)
@@ -103,9 +106,10 @@ def read_parameters(filename):
     '''
     parameters = dict()
     with open(filename) as file :
-        csv_data = csv.reader(file,delimiter=',')
-        for row in csv_data:
-            parameters[row[0]] = row[2]
+        lines = file.readlines()
+        for line in lines:
+            line = line.split(",")
+            parameters[line[0]] = line[2]
     return parameters
 
 
@@ -199,11 +203,12 @@ def compute_lineage(ids,parents):
 def load_trajectory(filename):
     traj = []
     with open(filename) as file :
-        csv_data = csv.reader(file,delimiter=';')
+        lines = file.readlines()
+        
         t = 0
-        for row in csv_data:
-            position = row[0].split(',')
-            pos = [float(elt) for elt in position]
+        for line in lines:
+            line = line.split(";")[0].split(",")
+            pos = [float(elt) for elt in line]
             traj.append([t] + pos)
             t+=1
     return traj
