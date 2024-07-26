@@ -40,14 +40,9 @@ void HillClimbing::init(){
 }
 
 std::vector<double> HillClimbing::fitnessFunction(const Individual::Ptr &ind){
-
     std::vector<double> d(1);
-
-    std::vector<double> init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     double max_height = settings::getParameter<settings::Double>(parameters,"#maxHeight").value;
-    
-    d[0] = std::abs(final_position[2] - init_position[2])/max_height;
-
+    d[0] = best_height/max_height;
     return d;
 }
 
@@ -61,6 +56,8 @@ float HillClimbing::updateEnv(float simulationTime, const Morphology::Ptr &morph
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
 
+    if(wp.position[2] > best_height)
+            best_height = wp.position[2];
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-3 ||
             fabs(final_position[1] - wp.position[1]) > 1e-3)
