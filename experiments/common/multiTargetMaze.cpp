@@ -17,6 +17,7 @@ MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
+
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
     for(int i = 0; i < targets.size();i+=3)
         target_positions.push_back({targets[i],targets[i+1],targets[i+2]});
@@ -76,14 +77,15 @@ void MultiTargetMaze::init(){
 }
 
 std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPositions").value;
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                          (a[1] - b[1])*(a[1] - b[1]) +
                          (a[2] - b[2])*(a[2] - b[2]));
     };
+
+    double max_dist = distance(init_pos,target_positions[current_target]);
     std::vector<double> d(1);
     d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
 
