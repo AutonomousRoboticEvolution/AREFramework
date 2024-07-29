@@ -24,14 +24,7 @@
 /// an unique pointer to ER_VREP class
 //are::sim::ER::Ptr ERVREP;
 // TODO: EB  do we need these variables? I guess they are used for client-server mode.
-int counter = 0;
-int timeCount = 0;
-bool timerOn = false;
-double timeElapsed;
-bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
-std::chrono::time_point<std::chrono::system_clock> sysTime; // Measure simulation time.
-int instance_type = are::settings::INSTANCE_REGULAR;
-bool verbose = true;
+
 
 enum SimulationState {
     INITIALIZING,
@@ -45,7 +38,7 @@ enum SimulationState {
 SimulationState simulationState = FREE;
 
 /// This variable marks the start of evolution.
-bool startEvolution;
+//bool startEvolution;
 
 #ifdef _WIN32
 	#define VREP_DLLEXPORT extern "C" __declspec(dllexport)
