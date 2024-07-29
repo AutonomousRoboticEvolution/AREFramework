@@ -56,7 +56,16 @@ LIBRARY simLib;
 int timeout = 60;
 
 are::sim::ER *ERVREP = NULL;
-
+int counter = 0;
+int timeCount = 0;
+bool timerOn = false;
+double timeElapsed;
+bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
+std::chrono::time_point<std::chrono::system_clock> sysTime; // Measure simulation time.
+int instance_type = are::settings::INSTANCE_REGULAR;
+bool verbose = true;
+/// This variable marks the start of evolution.
+bool startEvolution;
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
