@@ -114,6 +114,7 @@ def tasks_parameters(are_folder,nbr_inputs: int, nbr_outputs: int) -> list:
 
     mt_arena = {"#experimentName":"nipes_multitargets",
                 "#envType":int(2),
+                "#envNumber":int(3),
                 "#maxEvalTime":np.float32(60),
                 "#nbrWaypoints":int(180),
                 "#initPosition":[-0.6,0.6,0.2],

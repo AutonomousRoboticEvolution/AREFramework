@@ -56,7 +56,9 @@ float HillClimbing::updateEnv(float simulationTime, const Morphology::Ptr &morph
     simGetObjectPosition(morphHandle, -1, wp.position);
     simGetObjectOrientation(morphHandle,-1,wp.orientation);
 
-    if(wp.position[2] > best_height)
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+
+    if(wp.position[2] > best_height && simulationTime > time_step)
             best_height = wp.position[2];
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-3 ||
