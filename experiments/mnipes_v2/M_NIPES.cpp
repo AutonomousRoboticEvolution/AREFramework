@@ -512,6 +512,12 @@ bool M_NIPES::update(const Environment::Ptr &env){
                             //   std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_parents_ids()[1] == -1){
                             //if this robot has no actuators and  has no parents (from first generation), it is not included in the genomes pool and it is replaced by a new random one
                             learner.ctrl_learner.to_be_erased();
+
+                            std::stringstream model_path;
+                            model_path << Logging::log_folder  << "/model_" << morph_id << ".ttm";
+                            if(boost::filesystem::exists(model_path.str()))
+                                boost::filesystem::remove(model_path.str());
+
                             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
                             NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
                             morphgenome->random();
