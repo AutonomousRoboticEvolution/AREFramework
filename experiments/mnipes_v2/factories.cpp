@@ -1,11 +1,13 @@
 #include "simulatedER/mazeEnv.h"
-#include "barrelTask.hpp"
-#include "obstacleAvoidance.hpp"
-#include "locomotion.hpp"
-#include "barrelTask.hpp"
-#include "env_settings.hpp"
 #include "M_NIPES.hpp"
 #include "MNIPESLoggings.hpp"
+#include "env_settings.hpp"
+#include "obstacleAvoidance.hpp"
+#include "barrelTask.hpp"
+#include "exploration.hpp"
+#include "locomotion.hpp"
+#include "hill_climbing.hpp"
+#include "push_object.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
@@ -24,6 +26,10 @@ extern "C" are::Environment::Ptr environmentFactory
         env = std::make_shared<are::sim::Locomotion>(param);
     else if(env_type == are::sim::BARREL)
         env = std::make_shared<are::sim::BarrelTask>(param);
+    else if(env_type == are::sim::HILL_CLIMBING)
+        env = std::make_shared<are::sim::HillClimbing>(param);
+    else if(env_type == are::sim::PUSH_OBJECT)
+        env = std::make_shared<are::sim::PushObject>(param);
     else
         std::cerr << "factory env: unknown environement" << std::endl;
 
