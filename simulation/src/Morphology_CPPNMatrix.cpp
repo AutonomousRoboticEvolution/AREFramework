@@ -595,29 +595,31 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum, const std::string &fold
                           << tempOrganOri.at(i).at(2) << ","
                           << std::endl;
         }
+
+
+
+        // Export mesh file
+        const auto **verticesMesh = new const simFloat *[2];
+        const auto **indicesMesh = new const simInt *[2];
+        auto *verticesSizesMesh = new simInt[2];
+        auto *indicesSizesMesh = new simInt[2];
+        verticesMesh[0] = skeletonListVertices.data();
+        verticesSizesMesh[0] = skeletonListVertices.size();
+        indicesMesh[0] = skeletonListIndices.data();
+        indicesSizesMesh[0] = skeletonListIndices.size();
+
+        std::stringstream filepath_mesh;
+        filepath_mesh << folder << "/mesh_" << indNum << ".stl";
+
+        //fileformat: the fileformat to export to:
+        //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
+        simExportMesh(3, filepath_mesh.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
+
+        delete[] verticesMesh;
+        delete[] verticesSizesMesh;
+        delete[] indicesMesh;
+        delete[] indicesSizesMesh;
     }
-
-    // Export mesh file
-    const auto **verticesMesh = new const simFloat *[2];
-    const auto **indicesMesh = new const simInt *[2];
-    auto *verticesSizesMesh = new simInt[2];
-    auto *indicesSizesMesh = new simInt[2];
-    verticesMesh[0] = skeletonListVertices.data();
-    verticesSizesMesh[0] = skeletonListVertices.size();
-    indicesMesh[0] = skeletonListIndices.data();
-    indicesSizesMesh[0] = skeletonListIndices.size();
-
-    std::stringstream filepath_mesh;
-    filepath_mesh << folder << "/mesh_" << indNum << ".stl";
-
-    //fileformat: the fileformat to export to:
-    //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
-    simExportMesh(3, filepath_mesh.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
-
-    delete[] verticesMesh;
-    delete[] verticesSizesMesh;
-    delete[] indicesMesh;
-    delete[] indicesSizesMesh;
 }
 
 void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix)

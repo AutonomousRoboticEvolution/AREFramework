@@ -639,6 +639,14 @@ bool M_NIPES::update(const Environment::Ptr &env){
                                // assert(learning_pool.size() == pop_size);
                             }
                             //-
+
+                            if(!settings::getParameter<settings::Boolean>(parameters,"#keepRobotModel").value){//erase model.ttm of robot if the option is to not keep
+                                std::stringstream model_path;
+                                model_path << Logging::log_folder  << "/model_" << morph_id << ".ttm";
+                                if(boost::filesystem::exists(model_path.str()))
+                                    boost::filesystem::remove(model_path.str());
+                            }
+
                         }else if(is_ctrl_next_gen){ //if NIPES goes for a next gen
                             init_new_ctrl_pop(learner);
                         }
