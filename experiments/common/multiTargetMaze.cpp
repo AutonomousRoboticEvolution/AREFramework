@@ -77,7 +77,7 @@ void MultiTargetMaze::init(){
 }
 
 std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
-    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPositions").value;
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
