@@ -81,8 +81,8 @@ std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind)
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
+                         (a[1] - b[1])*(a[1] - b[1]));// +
+                      //   (a[2] - b[2])*(a[2] - b[2]));
     };
 
     double max_dist = distance(init_pos,target_positions[current_target]);
@@ -90,10 +90,10 @@ std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind)
     d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
 
 
-    for(double& f : d)
-        if(std::isnan(f) || std::isinf(f) || f < 0)
-            f = 0;
-        else if(f > 1) f = 1;
+
+    if(std::isnan(d[0]) || std::isinf(d[0]) || d[0] < 0)
+        d[0] = 0;
+    else if(d[0] > 1) d[0] = 1;
     //Go to next target
     current_target+=1;
     if(current_target >= target_positions.size())
