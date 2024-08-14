@@ -91,7 +91,7 @@ std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind)
 
 
 
-    if(std::isnan(d[0]) || std::isinf(d[0]) || d[0] < 0)
+    if(std::isnan(d[0]) || std::isinf(d[0]))
         d[0] = 0;
     else if(d[0] > 1) d[0] = 1;
     //Go to next target
