@@ -31,6 +31,8 @@ def load_fitness(filename):
         lines = file.read().splitlines()
         for line in lines:
             line = line.split(",")
+            if(float(line[3]) > 1.5):
+                continue
             ids.append(int(line[0]))
             parents.append([int(line[1]),int(line[2])])
             fits.append(float(line[3]))
@@ -67,6 +69,14 @@ def filter_to_parent_pool(data,parent_ids):
         prev_ids = ids
         iter+=1
 
+    return filtered
+
+def filter_to_one_iteration(data,parent_ids,iter):
+    filtered = []
+    data_dict = {d[0]: d[1:] for d in data}
+    ids = parent_ids[iter]
+    for _id in ids:
+        filtered.append([_id] + data_dict[_id])
     return filtered
 
 def load_comp_time(filename):
@@ -135,10 +145,10 @@ def load_feature_descriptor(filename) :
         descriptors = []
         for row in file.readlines():
             row = row.split(',')
-            desc = [int(row[0])] 
+            desc = [row[0]] 
             for r in row[1:] :
                 desc.append(float(r))
-            descriptors.append(desc + [la.norm(desc[1:])])
+            descriptors.append(desc + [la.norm(desc[1:]),la.norm(desc[1:5]),la.norm(desc[5:])])
         return descriptors
 
 def load_component_descriptor(filename):
@@ -157,7 +167,25 @@ def load_component_descriptor(filename):
                 desc.append(int(line[i+2]))
             descriptors.append(desc+[la.norm(desc[1:])])
         return descriptors
-    
+
+def compute_sparsity(descriptors: dict,k: int, distance) -> dict:
+    sparsity = dict()
+    distances = np.full((len(descriptors),len(descriptors)),-1)
+    for (key, desc), i in zip(descriptors.items(),range(len(descriptors))):
+        for (key2, desc2), j in zip(descriptors.items(),range(len(descriptors))):
+            if((distances[i,j] != -1)):
+                continue
+            distances[i,j] = distance(desc,desc2)
+            distances[j,i] = distances[i,j]
+
+        dist = list(distances[i])
+        dist.sort()
+        dist = np.array(dist[:k])
+        sparsity[key] = dist.mean()
+        if(sparsity[key] < 0):
+            print(dist)
+    return sparsity
+
 def load_controller_archive(filename):
     lines = []
     with open(filename) as file :
