@@ -32,7 +32,7 @@ def load_objective_values_agg(filename,obj=0):
             nb_eval = int(line[1])
             nb_eval_tot += nb_eval
             nbr_objs = int(line[2])
-            objs = np.array([float(line[i+obj]) for i in range(3,nb_eval,nbr_objs)])
+            objs = np.array([float(line[i+obj]) for i in range(3,nb_eval,nbr_objs) if float(line[i+obj]) < 1.5])
             data_lines.append([gen,nb_eval,nb_eval_tot,objs.max(),objs.min(),np.median(objs),np.mean(objs)])
         return data_lines
 
