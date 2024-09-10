@@ -161,6 +161,8 @@ if __name__ == "__main__":
             continue
         print(folder)
         exp_folder = folder_name + "/" + folder
+        if os.path.exists(exp_folder + "/" + sys.argv[2]):
+            continue
         descriptors = load_descriptors(exp_folder + "/morph_descriptor.csv")
         fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
         fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))

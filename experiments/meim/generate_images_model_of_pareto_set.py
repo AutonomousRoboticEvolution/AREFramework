@@ -145,8 +145,9 @@ if __name__ == "__main__":
             for filename in os.listdir(robot_repo):
                 if(filename.split("_")[0] != "parameters" and filename.split("_")[1] != "visu"):
                     continue
-                robot_id = filename.split("_")[1].split(".")[0]
+                robot_id = filename.split("_")[2].split(".")[0]
                 if os.path.exists(robot_repo + "/robot_" + robot_id + "_3.png"):
+                    print(robot_repo,robot_id,": robot image and model already generated skip")
                     continue
                 param_file = robot_repo + "/" + filename
                 sp.run([vrep_exec, "-h", "-g" + param_file])

@@ -155,14 +155,21 @@ def get_id_list(foldername: str) -> list:
             ids.append(int(filename.split("_")[1].split(".")[0]))
     return ids
 
-def launch_downstream_tasks(folder_name,are_framework,base_port):
-    id_list = get_id_list(folder_name)
+def launch_downstream_tasks(folder_name,are_framework,base_port,rob_id = -1, ds_task = ""):
+    if(rob_id >= 0):
+        id_list = [rob_id]
+    else:
+        id_list = get_id_list(folder_name)
+
 
     for id in id_list:
         ori_parameters = read_parameters(are_framework + "/experiments/meim/parameters_nipes.csv")
         nbr_inputs, nbr_outputs = get_io_nn_from_blueprint(folder_name + "/blueprint_" + str(id) + ".csv")
         tasks_params = tasks_parameters(are_framework,nbr_inputs,nbr_outputs)
+            
         for task in tasks_params:
+            if len(ds_task) > 0 and ds_task != task:
+                continue
             parameters = copy.copy(ori_parameters)
             parameters = parameters | task[1]
             parameters["#robotPath"] = folder_name + "/model_" + str(id) + ".ttm"
@@ -174,13 +181,23 @@ def launch_downstream_tasks(folder_name,are_framework,base_port):
                     folder_name + "/parameters_nipes_" + task[0] + "_" + str(id) + ".csv",
                     str(base_port),"64"])
                 base_port += 1000   
+            
 
 if __name__ == "__main__":
     if(len(sys.argv) < 3):
         print("usage:\n - arg 1: folder path to set of robots\n",
               "- arg 2: ARE framework path\n",
-              "- arg 3: start port (optional put if you want to launch slurm jobs) ")
+              "- arg 3: start port (optional put if you want to launch slurm jobs)\n",
+              "- arg 4 (optional) task name (lc|lr|hc|po|mta)\n"
+              "- arg 5 (optional) id of robot")
         exit(0)
+    
+    id = -1
+    task = ""
+    if(len(sys.argv) == 5):
+        task = sys.argv[4]
+    if(len(sys.argv) == 6):
+        id = int(sys.argv[5])
 
     folder_name = sys.argv[1]
     are_framework = sys.argv[2]
@@ -189,4 +206,4 @@ if __name__ == "__main__":
     if len(sys.argv) == 4:
         base_port = int(sys.argv[3])
 
-    launch_downstream_tasks(folder_name,are_framework,base_port)     
+    launch_downstream_tasks(folder_name,are_framework,base_port,id,task)     
