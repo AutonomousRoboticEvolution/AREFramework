@@ -97,6 +97,23 @@ def load_comp_time(filename):
             eval_times.append([end - start,end-start_0]) #eval duration, date
         return eval_times
 
+def load_comp_time_dict(filename):
+    eval_times = {}
+    with open(filename) as file:
+        lines = file.read().splitlines()
+        start_0 = float(lines[0].split(",")[2])
+        for line in lines:
+            line = line.split(",")
+            if(len(line) == 0):
+                continue
+            if(len(line) < 4):
+                start = float(line[1])
+                end = float(line[2])
+            else:
+                start = float(line[2])
+                end = float(line[3])
+            eval_times[int(line[1])] = [end - start,end-start_0] #eval duration, total duration
+        return eval_times
 
 def add_comp_time(fitnesses,eval_times):
     position = 0
