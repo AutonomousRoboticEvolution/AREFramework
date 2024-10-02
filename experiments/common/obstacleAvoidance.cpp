@@ -13,6 +13,7 @@ ObstacleAvoidance::ObstacleAvoidance(const settings::ParametersMapPtr& params)
 
     // Definition of default values of the parameters.
     settings::defaults::parameters->emplace("#arenaSize",std::make_shared<settings::Double>(2.));
+    settings::defaults::parameters->emplace("#cellSize",std::make_shared<settings::Double>(0.25));
     settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<settings::Integer>(2));
     settings::defaults::parameters->emplace("#flatFloor",std::make_shared<settings::Boolean>(true));
 }
