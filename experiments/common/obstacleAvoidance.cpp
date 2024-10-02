@@ -37,8 +37,8 @@ void ObstacleAvoidance::init(){
 
     trajectory.clear();
 
-    float arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    float cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
+    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
     grid_size = std::round(arena_size/cell_size);
 
@@ -64,9 +64,10 @@ std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &in
 
 std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std::vector<double> &pos){
     std::pair<int,int> indexes;
+    double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
-    indexes.first = std::trunc(pos[0]/0.25 + std::round(grid_size/2));
-    indexes.second = std::trunc(pos[1]/0.25 + std::round(grid_size/2));
+    indexes.first = std::trunc(pos[0]/cell_size + std::round(grid_size/2));
+    indexes.second = std::trunc(pos[1]/cell_size + std::round(grid_size/2));
     if(indexes.first == grid_size)
         indexes.first = 7;
     if(indexes.second == grid_size)
