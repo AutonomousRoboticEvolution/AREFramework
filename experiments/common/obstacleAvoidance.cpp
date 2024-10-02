@@ -37,7 +37,12 @@ void ObstacleAvoidance::init(){
 
     trajectory.clear();
 
-    grid_zone = Eigen::MatrixXi::Zero(8,8);
+    float arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    float cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
+
+    grid_size = std::round(arena_size/cell_size);
+
+    grid_zone = Eigen::MatrixXi::Zero(grid_size,grid_size);
     number_of_collisions = 0;
 
 
@@ -53,18 +58,18 @@ void ObstacleAvoidance::init(){
 
 std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
    // if(number_of_collisions == 0)
-    return {static_cast<double>(grid_zone.sum())/64.f};
+    return {static_cast<double>(grid_zone.sum())/static_cast<double>(grid_size*grid_size)};
     //return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
 }
 
 std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std::vector<double> &pos){
     std::pair<int,int> indexes;
 
-    indexes.first = std::trunc(pos[0]/0.25 + 4);
-    indexes.second = std::trunc(pos[1]/0.25 + 4);
-    if(indexes.first == 8)
+    indexes.first = std::trunc(pos[0]/0.25 + std::round(grid_size/2));
+    indexes.second = std::trunc(pos[1]/0.25 + std::round(grid_size/2));
+    if(indexes.first == grid_size)
         indexes.first = 7;
-    if(indexes.second == 8)
+    if(indexes.second == grid_size)
         indexes.second = 7;
     return indexes;
 }
