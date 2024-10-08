@@ -245,13 +245,16 @@ def compute_lineage(ids,parents):
         lineages[_id] = compute_lineage_rec(ids,parents[i],parents)
     return lineages
 
-def load_trajectory(filename):
+def load_trajectory(filename, skip=0):
     traj = []
     with open(filename) as file :
         lines = file.readlines()
         
         t = 0
         for line in lines:
+            if skip > 0 and t%skip != 0:
+                t+=1
+                continue
             line = line.split(";")[0].split(",")
             pos = [float(elt) for elt in line]
             traj.append([t] + pos)
