@@ -2,8 +2,13 @@
 
 using namespace are;
 
+int BODYPLANTESTING::novelty_params::k_value = 15;
+double BODYPLANTESTING::novelty_params::novelty_thr = 0.9;
+double BODYPLANTESTING::novelty_params::archive_adding_prob = 0.4;
+
 void BODYPLANTESTING::init()
 {
+
     nb_obj = 1;
     max_obj = {1};
     min_obj = {0};
@@ -38,7 +43,6 @@ void BODYPLANTESTING::initPopulation()
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
 
-    rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();

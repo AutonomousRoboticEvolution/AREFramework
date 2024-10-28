@@ -37,14 +37,9 @@ public:
     std::vector<int> listInds();
 
 private:
-    std::unique_ptr<NEAT::Population> morph_population;
-
-    NEAT::Parameters params;
-
     std::vector<Eigen::VectorXd> archive;
 
 protected:
-    NEAT::RNG rng;
     int currentIndIndex;
     int repetition =0;
 

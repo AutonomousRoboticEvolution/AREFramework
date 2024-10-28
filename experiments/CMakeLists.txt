@@ -22,7 +22,7 @@ elseif(ONLY_SIMULATION)
 
     if(WITH_NN2)
        add_subdirectory(nipes)
-       # add_subdirectory(bodyplantesting_nn2)
+       add_subdirectory(bodyplantesting_nn2)
        add_subdirectory(mnipes_v2)
        add_subdirectory(visualization)
 
