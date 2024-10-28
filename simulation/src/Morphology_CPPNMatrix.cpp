@@ -15,6 +15,7 @@ using namespace are::sim;
 void Morphology_CPPNMatrix::create()
 {
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
+    bool growing_decoding = settings::getParameter<settings::Boolean>(parameters,"#growingDecoding").value;
 
     int meshHandle = -1;
     mainHandle = -1;
@@ -30,8 +31,12 @@ void Morphology_CPPNMatrix::create()
     if(manual_design != "None"){
         generateFromManualDesign(skeletonMatrix,organList,list_of_voxels);
     }else{
+
         GenomeDecoder genomeDecoder;
-        genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        if(growing_decoding)
+            genomeDecoder.genomeDecoderGrowth(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        else
+            genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
 
     }
 

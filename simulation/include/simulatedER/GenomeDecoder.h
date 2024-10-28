@@ -15,6 +15,11 @@ namespace are {
 namespace sim {
 
 struct AREVoxel{
+    AREVoxel() : bone(128),
+        wheel(128),
+        sensor(128),
+        joint(128),
+        caster(128){}
     uint8_t bone;
     uint8_t wheel;
     uint8_t sensor;
@@ -42,6 +47,10 @@ public:
     void genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                        std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
+    void genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
+
 
     /**
      * @brief Reads the cppn from nn2 and creates the regions for each organ.
@@ -49,6 +58,12 @@ public:
      * @param cppn - Body plan genome
      */
     static void decodeGenome(PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+
+    static void assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+
+    static void growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+
+    static void getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,int &numSkeletonVoxels);
 
     /**
      * @brief Creates the skeleton.
