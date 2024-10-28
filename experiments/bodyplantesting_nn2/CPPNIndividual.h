@@ -63,6 +63,8 @@ public :
     const OrganPositionDesc& get_organ_position_descriptor() const {return organ_position_descriptor;}
     void set_organ_position_descriptor();
 
+    void set_morph_id(int id){morphGenome->set_id(id);}
+
 protected:
     void createMorphology() override;
     void createController() override{}

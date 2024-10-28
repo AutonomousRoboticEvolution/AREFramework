@@ -64,6 +64,7 @@ void BODYPLANTESTING::initPopulation()
                 morphgenome->fixed_structure();
             else
                 morphgenome->random();
+            morphgenome->set_id(highest_morph_id++);
             CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -81,6 +82,9 @@ void BODYPLANTESTING::init_next_pop(){
     }
     repetition = 0;
     NSGA2::init_next_pop();
+    for(Individual::Ptr ind : population){
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_morph_id(highest_morph_id++);
+    }
 }
 
 void BODYPLANTESTING::epoch(){

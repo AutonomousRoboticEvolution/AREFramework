@@ -42,6 +42,7 @@ private:
 protected:
     int currentIndIndex;
     int repetition =0;
+    int highest_morph_id = 0;
 
 };
 
