@@ -347,7 +347,7 @@ void Morphology_CPPNMatrix::create()
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
         std::string model_folder = settings::getParameter<settings::String>(parameters,"#modelRepository").value;
-        if(model_folder.empty())
+        if(model_folder.empty() || model_folder == "None")
             exportRobotModel(morph_id);
         else
             exportRobotModel(morph_id,model_folder);
