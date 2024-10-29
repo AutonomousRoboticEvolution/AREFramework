@@ -4,7 +4,6 @@
 #include "ARE/EA.h"
 #include "CPPNIndividual.h"
 #include "eigen3/Eigen/Core"
-#include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
 
 

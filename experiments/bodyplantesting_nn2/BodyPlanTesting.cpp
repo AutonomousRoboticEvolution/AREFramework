@@ -75,27 +75,17 @@ void BODYPLANTESTING::initPopulation()
 }
 
 void BODYPLANTESTING::init_next_pop(){
-    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
-    if(repetition < nbr_rep){
-        repetition++;
-        return;
-    }
-    repetition = 0;
+
     NSGA2::init_next_pop();
-    for(Individual::Ptr ind : population){
+    for(Individual::Ptr &ind : population){
         std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_morph_id(highest_morph_id++);
     }
 }
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
     int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
 
-    if(repetition < nbr_rep){
-        std::cout << "number of repetitions : " << repetition << " over " << nbr_rep << std::endl;
-        return;
-    }
 
     /** NOVELTY **/
     if(novelty_params::k_value >= population.size())
