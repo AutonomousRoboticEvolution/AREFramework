@@ -2,6 +2,17 @@
 
 using namespace are;
 
+std::string act_obs_sample::to_string() const{
+    std::stringstream sstr;
+    sstr << observation[0];
+    for(size_t i = 1; i < observation.size(); i++)
+        sstr << "," << observation[i];
+    sstr << ";" << next_action[0];
+    for(size_t i = 1; i < next_action.size(); i++)
+        sstr << "," << next_action[i];
+    return sstr.str();
+}
+
 void MEIMIndividual::createMorphology(){
     init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     individual_id = morphGenome->id();
@@ -35,18 +46,22 @@ void MEIMIndividual::createController(){
     }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
+    ctrl_time_counter = 0;
 
 }
 
 void MEIMIndividual::update(double delta_time){
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
+    double time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    // double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
     double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
     double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
     if(control == nullptr)
         return;
-    if( diff < 0.1){
+    if( fabs(ctrl_time_counter - ctrl_freq) < 0.00001){
+        ctrl_time_counter = 0;
         //- Retrieve sensors, joints and wheels values
+        act_obs_sample aos;
         std::vector<double> inputs = morphology->update();
         assert(nb_sensors == inputs.size());
         std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
@@ -54,9 +69,12 @@ void MEIMIndividual::update(double delta_time){
         for(double &j: joints)
             j = 2.*j/M_PI;
         std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+        for(double &w: wheels)
+            w = w/M_PI;
         assert(wheels.size() == nb_wheels);
         inputs.insert(inputs.end(),joints.begin(),joints.end());
         inputs.insert(inputs.end(),wheels.begin(),wheels.end());
+        aos.observation = inputs;
         //- add noise to the inputs
         for(double& v: inputs)
             v = randNum->normalDist(v,input_noise_lvl);
@@ -65,6 +83,7 @@ void MEIMIndividual::update(double delta_time){
 //            std::cout << i << ";";
         //- get ouputs from the controller
         std::vector<double> outputs = control->update(inputs);
+        aos.next_action = outputs;
         //- add noise to the outputs
         for(double &o: outputs)
             o = randNum->normalDist(o,output_noise_lvl);
@@ -74,7 +93,9 @@ void MEIMIndividual::update(double delta_time){
 //        std::cout << std::endl;
         //- send command to the robot
         morphology->command(outputs);
+        rollout.push_back(aos);
     }
+    ctrl_time_counter += time_step;
     //sim_time = delta_time;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
     float position[3];
@@ -268,6 +289,7 @@ bool MEIM::update(const Environment::Ptr &env){
                                   std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                                   ind->getObjectives());
                 new_gene.trajectory = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_trajectory();
+                new_gene.rollout = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_rollout();
                 //new_gene.trajectories = best_controller.trajectories;
                 //misc::stdvect_to_eigenvect(best_controller.descriptor,new_gene.behavioral_descriptor);
                 parent_pool.push_back(new_gene);

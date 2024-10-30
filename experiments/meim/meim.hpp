@@ -5,12 +5,31 @@
 #include <ARE/nn2/NN2CPPNGenome.hpp>
 #include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
-#include "fixed_controller.hpp"
 #include "obstacleAvoidance.hpp"
+#include "fixed_controller.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 
-
 namespace are{
+
+/**
+ * @brief
+ */
+typedef struct act_obs_sample{
+    act_obs_sample(){}
+    act_obs_sample(const std::vector<double>& obs, const std::vector<double>& act) :
+        observation(obs), next_action(act){}
+    std::vector<double> observation;
+    std::vector<double> next_action;
+    std::string to_string() const;
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & observation;
+        arch & next_action;
+    }
+}act_obs_sample;
+typedef std::vector<act_obs_sample> rollout_t;
+
 
 typedef struct genome_t{
     genome_t(NN2CPPNGenome::Ptr mg,hk::Homeokinesis::Ptr ctrl, std::vector<double> objs):
@@ -19,16 +38,20 @@ typedef struct genome_t{
         morph_genome(g.morph_genome),
         controller(g.controller),
         objectives(g.objectives),
-        trajectory(g.trajectory){}
+        trajectory(g.trajectory),
+        rollout(g.rollout){}
     NN2CPPNGenome::Ptr morph_genome;
     hk::Homeokinesis::Ptr controller;
     std::vector<double> objectives;
     std::vector<waypoint> trajectory;
+    rollout_t rollout;
 } genome_t;
 
 
 using CPPNMorph = sim::Morphology_CPPNMatrix;
-
+/**
+ * @brief The MEIMIndividual class
+ */
 class MEIMIndividual : public Individual
 {
 public:
@@ -76,11 +99,13 @@ public:
         arch & nb_sensors;
         arch & nb_joints;
         arch & nb_wheels;
+        arch & rollout;
     }
 
     void set_weight_bias(double w, double b){weight = w; bias = b;}
     double get_weight(){return weight;}
     double get_bias(){return bias;}
+    const rollout_t &get_rollout(){return rollout;}
 
 private:
     void createMorphology() override;
@@ -98,6 +123,9 @@ private:
     //in case of fixed controller
     double weight = 0;
     double bias = 0;
+
+    rollout_t rollout;
+    double ctrl_time_counter = 0;
 };
 
 class MEIM: public EA

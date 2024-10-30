@@ -65,6 +65,15 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         fitness_file_stream << std::endl;
         fitness_file_stream.close();
         //-
+
+        //- Rollout logging
+        std::stringstream roll_filepath;
+        roll_filepath << Logging::log_folder << "/rollout_" << genome.morph_genome->id();
+        std::ofstream roll_filestream(roll_filepath.str());
+        for(const act_obs_sample& aos: genome.rollout)
+            roll_filestream << aos.to_string() << std::endl;
+        roll_filestream.close();
+        //-
     }
     static_cast<MEIM*>(ea.get())->clear_new_genes();
 
