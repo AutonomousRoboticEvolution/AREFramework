@@ -31,7 +31,7 @@ public:
     virtual Control::Ptr clone() const = 0;
 
     /**
-    @brief Take sensorInput and returns output
+    @brief Take senosry values and returns controls values.
     @param sensorValues sensor values
     */
     virtual std::vector<double> update(const std::vector<double> &sensorValues) = 0;
