@@ -22,7 +22,8 @@ public :
     CPPNIndividual(const CPPNIndividual& ind):
             Individual(ind),
             testRes(ind.testRes),
-            morphDesc(ind.morphDesc)
+            morphDesc(ind.morphDesc),
+        organ_position_descriptor(ind.organ_position_descriptor)
     {
         morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
         ctrlGenome = std::make_shared<EmptyGenome>(*std::dynamic_pointer_cast<EmptyGenome>(ind.ctrlGenome));
@@ -39,6 +40,7 @@ public :
         arch & objectives;
         arch & morphGenome;
         arch & morphDesc;
+        arch & organ_position_descriptor;
         arch & testRes;
         arch & individual_id;
         arch & generation;

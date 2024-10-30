@@ -24,12 +24,10 @@ void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox
     if(areMatrix.getVoxel(x,y,z).bone != 128)
         return;
 
-
-    std::vector<double> input{ static_cast<double>(x),
-                                   static_cast<double>(y),
-                                   static_cast<double>(z),
-                                   static_cast<double>(sqrt(pow(x,2)+pow(y,2)+pow(z,2)))
-    }; // Vector used as input of the Neural Network (NN)
+    double ix = static_cast<double>(x)/static_cast<double>(region.getUpperX());
+    double iy = static_cast<double>(y)/static_cast<double>(region.getUpperY());
+    double iz = static_cast<double>(z)/static_cast<double>(region.getUpperZ());
+    std::vector<double> input{ix, iy, iz, sqrt(ix*ix+iy*iy+iz*iz)}; // Vector used as input of the Neural Network (NN)
     cppn.step(input);
     AREVoxel voxel;
     if(cppn.outf()[1] > 0.000001){ //test if value is positive
@@ -52,17 +50,25 @@ void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox
 void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn){
     std::cout << "Growth of skeleton" << std::endl;
     PolyVox::Region region = areMatrix.getEnclosingRegion();
-    int32_t centre_x = region.getCentreX();
-    int32_t centre_y = region.getCentreY();
+    // int32_t centre_x = region.getCentreX();
+    // int32_t centre_y = region.getCentreY();
     int32_t centre_z = region.getCentreZ();
+    // start from the base skeleton.
+    for(int x = morph_const::xHeadLowerLimit - morph_const::skeletonBaseThickness; x < morph_const::xHeadUpperLimit + morph_const::skeletonBaseThickness; x++){
+        for(int y = morph_const::yHeadLowerLimit - morph_const::skeletonBaseThickness; y < morph_const::yHeadUpperLimit + morph_const::skeletonBaseThickness; y++){
+            if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit &&
+                y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit)
+                continue;
+            assignSkeletonVoxel(x,y,centre_z,areMatrix,cppn);
+        }
+    }
     //Starts from the voxels in the center:
-    assignSkeletonVoxel(centre_x,centre_y,centre_z,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x+1,centre_y,centre_z,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x-1,centre_y,centre_z,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x,centre_y+1,centre_z,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x,centre_y-1,centre_z,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x,centre_y,centre_z+1,areMatrix,cppn);
-    assignSkeletonVoxel(centre_x,centre_y,centre_z-1,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x+1,centre_y,centre_z,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x-1,centre_y,centre_z,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x,centre_y+1,centre_z,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x,centre_y-1,centre_z,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x,centre_y,centre_z+1,areMatrix,cppn);
+    // assignSkeletonVoxel(centre_x,centre_y,centre_z-1,areMatrix,cppn);
 
     std::vector<std::tuple<int32_t,int32_t,int32_t>> voxels_to_be_filled;
 
@@ -73,28 +79,30 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& 
                 AREVoxel voxel = areMatrix.getVoxel(x,y,z);
                 if(voxel.bone == 128){
                     voxel.bone = morph_const::empty_voxel;
-                    areMatrix.setVoxel(x,y,z,voxel);}
-//                }else if(voxel.bone == morph_const::empty_voxel){
-//                    int counter = 0;
-//                    if(x+1 < region.getUpperX() && areMatrix.getVoxel(x+1,y,z).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(x-1 > region.getLowerX() && areMatrix.getVoxel(x-1,y,z).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(y+1 < region.getUpperY() && areMatrix.getVoxel(x,y+1,z).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(y-1 > region.getLowerY() && areMatrix.getVoxel(x,y-1,z).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(z+1 < region.getUpperZ() && areMatrix.getVoxel(x,y,z+1).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(z-1 > region.getLowerZ() && areMatrix.getVoxel(x,y,z-1).bone == morph_const::filled_voxel)
-//                        counter++;
-//                    if(counter >= 3)
-//                        voxels_to_be_filled.push_back({x,y,z});
+                    areMatrix.setVoxel(x,y,z,voxel);
+                }else if(voxel.bone == morph_const::empty_voxel){
+                    int counter = 0;
+                    if(x+1 < region.getUpperX() && areMatrix.getVoxel(x+1,y,z).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(x-1 > region.getLowerX() && areMatrix.getVoxel(x-1,y,z).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(y+1 < region.getUpperY() && areMatrix.getVoxel(x,y+1,z).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(y-1 > region.getLowerY() && areMatrix.getVoxel(x,y-1,z).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(z+1 < region.getUpperZ() && areMatrix.getVoxel(x,y,z+1).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(z-1 > region.getLowerZ() && areMatrix.getVoxel(x,y,z-1).bone == morph_const::filled_voxel)
+                        counter++;
+                    if(counter >= 3)
+                        voxels_to_be_filled.push_back({x,y,z});
 
-//                }
+                }
             }
         }
     }
+
+
     for(const std::tuple<int32_t,int32_t,int32_t> &coord: voxels_to_be_filled){
         AREVoxel voxel;
         voxel.bone = morph_const::filled_voxel;

@@ -539,17 +539,20 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                       return a[2] < b[2];
                   });
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
-            input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
-            input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
-            input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
-            input[3] = static_cast<double>(sqrt(pow(skeletonSurfaceCoord[m][n].at(0),2)+pow(skeletonSurfaceCoord[m][n].at(1),2)+pow(skeletonSurfaceCoord[m][n].at(2),2)));
+            double x = static_cast<double>(skeletonSurfaceCoord[m][n].at(0))/static_cast<double>(mc::real_matrix_size/2);
+            double y = static_cast<double>(skeletonSurfaceCoord[m][n].at(1))/static_cast<double>(mc::real_matrix_size/2);
+            double z = static_cast<double>(skeletonSurfaceCoord[m][n].at(2))/static_cast<double>(mc::real_matrix_size/2);
+            input[0] = x;
+            input[1] = y;
+            input[2] = z;
+            input[3] = sqrt(x*x+y*y+z*z);
             organ_type = get_organ_from_cppn(input);
             // Create organ if any
             if(organ_type > 0){
                 std::vector<float> tempPosVector(3);
-                tempPosVector.at(0) = static_cast<float>(input[0] * mc::voxel_real_size);
-                tempPosVector.at(1) = static_cast<float>(input[1] * mc::voxel_real_size);
-                tempPosVector.at(2) = static_cast<float>(input[2] * mc::voxel_real_size);
+                tempPosVector.at(0) = static_cast<float>(skeletonSurfaceCoord[m][n].at(0) * mc::voxel_real_size);
+                tempPosVector.at(1) = static_cast<float>(skeletonSurfaceCoord[m][n].at(1) * mc::voxel_real_size);
+                tempPosVector.at(2) = static_cast<float>(skeletonSurfaceCoord[m][n].at(2) * mc::voxel_real_size);
                 tempPosVector.at(2) += mc::matrix_size/2 * mc::voxel_real_size;
                 std::vector<float> tempOriVector(3);
                 generateOrientations(skeletonSurfaceCoord[m][n].at(3), skeletonSurfaceCoord[m][n].at(4), skeletonSurfaceCoord[m][n].at(5), tempOriVector);
