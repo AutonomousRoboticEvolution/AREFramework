@@ -16,7 +16,7 @@ void Morphology_CPPNMatrix::create()
 {
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
     bool growing_decoding = settings::getParameter<settings::Boolean>(parameters,"#growingDecoding").value;
-
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
     int meshHandle = -1;
     mainHandle = -1;
     int convexHandle, brainHandle;
@@ -33,10 +33,15 @@ void Morphology_CPPNMatrix::create()
     }else{
 
         GenomeDecoder genomeDecoder;
-        if(growing_decoding)
-            genomeDecoder.genomeDecoderGrowth(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
-        else
-            genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        if(use_quadric){
+            genomeDecoder.superquadricsDecoder(quadric,nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        }
+        else{
+            if(growing_decoding)
+                genomeDecoder.genomeDecoderGrowth(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+            else
+                genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        }
 
     }
 
@@ -339,6 +344,7 @@ void Morphology_CPPNMatrix::create()
         indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
         indDesc.countOrgans(organList);
         indDesc.getOrganPositions(organList);
+        indDesc.getMatrixDescriptor(skeletonMatrix,organList);
     }
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);

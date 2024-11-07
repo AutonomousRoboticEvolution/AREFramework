@@ -217,6 +217,68 @@ struct OrganPositionDesc
     }
 };
 
+struct MatrixDesc
+{
+    int descriptor[morph_const::real_matrix_size][morph_const::real_matrix_size][morph_const::real_matrix_size] = {{{0}}};
+    MatrixDesc(){}
+    MatrixDesc(const MatrixDesc& opd)
+    {
+        for(int k = 0; k < morph_const::real_matrix_size; k++)
+            for(int j = 0; j < morph_const::real_matrix_size; j++)
+                for(int i = 0; i < morph_const::real_matrix_size; i++)
+                    descriptor[i][j][k] = opd.descriptor[i][j][k];
+    }
+    Eigen::VectorXd getCartDesc() const{
+        Eigen::VectorXd vect_descriptor((morph_const::real_matrix_size)*(morph_const::real_matrix_size)*(morph_const::real_matrix_size));
+        int counter = 0;
+        for(int k = 0; k < morph_const::real_matrix_size; k++){
+            for(int j = 0; j < morph_const::real_matrix_size; j++) {
+                for(int i = 0; i < morph_const::real_matrix_size; i++) {
+                    vect_descriptor(counter) = descriptor[i][j][k];
+                    counter++;
+                }
+            }
+        }
+        return vect_descriptor;
+    }
+
+    std::string to_string(){
+        std::stringstream sstr;
+        sstr << descriptor[0][0][0];
+        for(int k = 0; k < morph_const::real_matrix_size; k++){
+            for(int j = 0; j < morph_const::real_matrix_size; j++) {
+                for(int i = 1; i < morph_const::real_matrix_size; i++) {
+                    sstr << "," << descriptor[i][j][k];
+                }
+            }
+        }
+        return sstr.str();
+    }
+
+    void from_string(const std::string& str){
+        std::stringstream sstr;
+        sstr << str;
+        int i = 0, j = 0, k = 0;
+        for(std::string line; std::getline(sstr,line,',');){
+            descriptor[i][j][k] = std::stoi(line);
+            i++;
+            if(i >= morph_const::real_matrix_size){
+                i = 0;
+                j++;
+                if(j >= morph_const::real_matrix_size){
+                    j=0;
+                    k++;
+                }
+            }
+        }
+    }
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & descriptor;
+    }
+};
+
 }//are
 
 #endif //MORPHOLOGY_DESCRIPTORS_HPP

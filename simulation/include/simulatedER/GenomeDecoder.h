@@ -9,6 +9,7 @@
 #include <vector>
 #include "ARE/morphology_descriptors.hpp"
 #include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "ARE/nn2/sq_cppn_genome.hpp"
 
 namespace are {
 
@@ -50,7 +51,8 @@ public:
     void genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                        std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
-
+    void superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                              std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
     /**
      * @brief Reads the cppn from nn2 and creates the regions for each organ.
@@ -62,6 +64,8 @@ public:
     static void assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
 
     static void growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+
+    static void superquadricSkeletonGeneration(PolyVox::RawVolume<AREVoxel> &areMatrix, quadric_t<quadric_params> &quadric);
 
     static void getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,int &numSkeletonVoxels);
 

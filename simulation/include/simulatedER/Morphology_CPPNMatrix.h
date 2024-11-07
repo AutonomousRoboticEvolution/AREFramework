@@ -39,7 +39,8 @@ public:
         blueprint(mcm.blueprint),
         skeletonListVertices(mcm.skeletonListVertices),
         skeletonListIndices(mcm.skeletonListIndices),
-        matrix_4d(mcm.matrix_4d)
+        matrix_4d(mcm.matrix_4d),
+        quadric(mcm.quadric)
         {}
 
     ~Morphology_CPPNMatrix(){
@@ -161,7 +162,9 @@ public:
     void setNN2CPPN(const nn2_cppn_t &nn){
         nn2_cppn = nn;
     }
-
+    void set_quadric(const quadric_t<quadric_params> &quad){
+        quadric = quad;
+    }
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
     void setLoadRobot(){isRobotModel = true;}
     void setDecodeRobot(){isRobotModel = false;}
@@ -176,6 +179,7 @@ public:
         return Eigen::VectorXd::Zero(1);
     }
     OrganPositionDesc getOrganPosDesc() const {return indDesc.organDesc;}
+    MatrixDesc getMatrixDesc() const {return indDesc.matrixDesc;}
     CartDesc getCartDesc() const {return indDesc.cartDesc;}
     int get_wheelNumber() const {return indDesc.cartDesc.wheelNumber;}
     int get_jointNumber() const {return indDesc.cartDesc.jointNumber;}
@@ -199,6 +203,7 @@ private:
     public:
         CartDesc cartDesc;
         OrganPositionDesc organDesc;
+        MatrixDesc matrixDesc;
         void countOrgans(std::vector<Organ> organList){
             for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
                 if(!it->isOrganRemoved() && it->isOrganChecked()) {
@@ -263,10 +268,67 @@ private:
                 }
             }
         }
+        void getMatrixDescriptor(const PolyVox::RawVolume<uint8_t> & skeleton_matrix,std::vector<Organ> organList){
+            PolyVox::Region region = skeleton_matrix.getEnclosingRegion();
+
+            for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+                for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+                    for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                        int matPosX, matPosY, matPosZ;
+                        matPosX = x + 5;
+                        matPosY = y + 5;
+                        matPosZ = z + 5; // The connector is slightly up and when rounding it increases one voxel.
+                        if (matPosX > mc::real_matrix_size)
+                            matPosX = mc::real_matrix_size;
+                        if (matPosX < 0)
+                            matPosX = 0;
+                        if (matPosY > mc::real_matrix_size)
+                            matPosY = mc::real_matrix_size;
+                        if (matPosY < 0)
+                            matPosY = 0;
+                        if (matPosZ > mc::real_matrix_size)
+                            matPosZ = mc::real_matrix_size;
+                        if (matPosZ < 0)
+                            matPosZ = 0;
+                        uint8_t voxel = skeleton_matrix.getVoxel(x,y,z);
+                        if(voxel == morph_const::filled_voxel)
+                            matrixDesc.descriptor[matPosX][matPosY][matPosZ] = 1;
+                        else
+                            matrixDesc.descriptor[matPosX][matPosY][matPosZ] = 0;
+                   }
+                }
+            }
+            for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
+                if(!it->isOrganRemoved() && it->isOrganChecked()) {
+                    int voxelPosX = static_cast<int>(std::round(it->connectorPos[0] / mc::voxel_real_size));
+                    int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
+                    int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
+                    int matPosX, matPosY, matPosZ;
+                    matPosX = voxelPosX + 5;
+                    matPosY = voxelPosY + 5;
+                    matPosZ = voxelPosZ - 1; // The connector is slightly up and when rounding it increases one voxel.
+                    if (matPosX > mc::real_matrix_size)
+                        matPosX = mc::real_matrix_size;
+                    if (matPosX < 0)
+                        matPosX = 0;
+                    if (matPosY > mc::real_matrix_size)
+                        matPosY = mc::real_matrix_size;
+                    if (matPosY < 0)
+                        matPosY = 0;
+                    if (matPosZ > mc::real_matrix_size)
+                        matPosZ = mc::real_matrix_size;
+                    if (matPosZ < 0)
+                        matPosZ = 0;
+                    if(it->getOrganType() != 0)
+                        matrixDesc.descriptor[matPosX][matPosY][matPosZ] = it->getOrganType() + 1;
+                }
+            }
+        }
     };
 
 private:
     nn2_cppn_t nn2_cppn;
+    quadric_t<quadric_params> quadric;
     std::vector<std::vector<int>> list_of_voxels;
 
     unsigned int id = 0;

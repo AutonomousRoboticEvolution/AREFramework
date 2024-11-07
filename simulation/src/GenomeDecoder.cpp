@@ -111,6 +111,30 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& 
 
 }
 
+void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<AREVoxel> &areMatrix, quadric_t<quadric_params> &quadric){
+    std::cout << "superquadric decoding" << std::endl;
+    PolyVox::Region region = areMatrix.getEnclosingRegion();
+
+    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
+        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
+            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
+                double ix = static_cast<double>(x)/static_cast<double>(region.getUpperX());
+                double iy = static_cast<double>(y)/static_cast<double>(region.getUpperY());
+                double iz = static_cast<double>(z)/static_cast<double>(region.getUpperZ());
+                double output = quadric(ix,iy,iz);
+                std::cout << output << std::endl;
+                AREVoxel voxel;
+
+                if(output <= 1)
+                    voxel.bone = morph_const::filled_voxel;
+                else
+                    voxel.bone = morph_const::empty_voxel;
+                areMatrix.setVoxel(x,y,z,voxel);
+            }
+        }
+    }
+}
+
 void GenomeDecoder::getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels){
     PolyVox::Region region = areMatrix.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
@@ -118,6 +142,8 @@ void GenomeDecoder::getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> 
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
                 uint8_t voxel = static_cast<uint8_t>(areMatrix.getVoxel(x,y,z).bone);
                 skeletonMatrix.setVoxel(x,y,z,voxel);
+                if(voxel == morph_const::filled_voxel)
+                    numSkeletonVoxels++;
             }
         }
     }
@@ -449,6 +475,18 @@ void GenomeDecoder::genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<ARE
     skeletonRegionCounter(skeletonMatrix);
     removeSkeletonRegions(skeletonMatrix);
     removeOverhangs(skeletonMatrix);
+    findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
+}
+
+void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                                         std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels){
+    superquadricSkeletonGeneration(areMatrix,quadric);
+    getSkeletonFromAREMatrix(areMatrix,skeletonMatrix,numSkeletonVoxels);
+    createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
+    emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
+    skeletonRegionCounter(skeletonMatrix);
+    removeSkeletonRegions(skeletonMatrix);
+    // removeOverhangs(skeletonMatrix);
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
