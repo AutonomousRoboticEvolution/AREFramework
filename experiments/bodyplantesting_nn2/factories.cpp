@@ -22,19 +22,39 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::FitnessLog::Ptr fitlog = std::make_shared<are::FitnessLog>(fit_log_file);
     logs.push_back(fitlog);
 
-    are::nn2_cppn::NN2CPPNGenomeLog::Ptr genlog = std::make_shared<are::nn2_cppn::NN2CPPNGenomeLog>();
-    logs.push_back(genlog);
+    if(are::settings::getParameter<are::settings::Boolean>(param,"#useQuadric").value){
+        std::string quad_file = are::settings::getParameter<are::settings::String>(param,"#quadricFile").value;
+        are::sq_cppn::QuadricsLog::Ptr quad_log = std::make_shared<are::sq_cppn::QuadricsLog>(quad_file);
+        logs.push_back(quad_log);
 
-    std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
-    are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog = std::make_shared<are::nn2_cppn::NbrConnNeurLog>(ncn_file);
-    logs.push_back(ncnlog);
+        are::sq_cppn::SQCPPNGenomeLog::Ptr genlog = std::make_shared<are::sq_cppn::SQCPPNGenomeLog>();
+        logs.push_back(genlog);
 
-    std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
-    are::nn2_cppn::ParentingLog::Ptr parlog = std::make_shared<are::nn2_cppn::ParentingLog>(par_file);
-    logs.push_back(parlog);
+        std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
+        are::sq_cppn::ParentingLog::Ptr parlog = std::make_shared<are::sq_cppn::ParentingLog>(par_file);
+        logs.push_back(parlog);
 
-    are::nn2_cppn::GraphVizLog::Ptr gvlog = std::make_shared<are::nn2_cppn::GraphVizLog>();
-    logs.push_back(gvlog);
+        are::sq_cppn::GraphVizLog::Ptr gvlog = std::make_shared<are::sq_cppn::GraphVizLog>();
+        logs.push_back(gvlog);
+
+        std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
+        are::sq_cppn::NbrConnNeurLog::Ptr ncnlog = std::make_shared<are::sq_cppn::NbrConnNeurLog>(ncn_file);
+        logs.push_back(ncnlog);
+    }else{
+        are::nn2_cppn::NN2CPPNGenomeLog::Ptr genlog = std::make_shared<are::nn2_cppn::NN2CPPNGenomeLog>();
+        logs.push_back(genlog);
+
+        std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
+        are::nn2_cppn::ParentingLog::Ptr parlog = std::make_shared<are::nn2_cppn::ParentingLog>(par_file);
+        logs.push_back(parlog);
+
+        are::nn2_cppn::GraphVizLog::Ptr gvlog = std::make_shared<are::nn2_cppn::GraphVizLog>();
+        logs.push_back(gvlog);
+
+        std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
+        are::nn2_cppn::NbrConnNeurLog::Ptr ncnlog = std::make_shared<are::nn2_cppn::NbrConnNeurLog>(ncn_file);
+        logs.push_back(ncnlog);
+    }
 
     std::string tests_log_file = are::settings::getParameter<are::settings::String>(param,"#testsFile").value;
     are::TestsLog::Ptr testslog = std::make_shared<are::TestsLog>(tests_log_file);

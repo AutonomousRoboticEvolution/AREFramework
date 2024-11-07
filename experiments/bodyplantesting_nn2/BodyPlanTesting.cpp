@@ -8,7 +8,6 @@ double BODYPLANTESTING::novelty_params::archive_adding_prob = 0.4;
 
 void BODYPLANTESTING::init()
 {
-
     nb_obj = 1;
     max_obj = {1};
     min_obj = {0};
@@ -41,29 +40,38 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
-        NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-        if(cppn_fixed)
-            morphgenome->fixed_structure();
-        else
-            morphgenome->random();
+        Genome::Ptr morphgenome;
+        if(use_quadric){
+            morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+        }
+        else{
+            morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+        }
+        morphgenome->random();
         CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }else{
         const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
-            NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-            if(cppn_fixed)
-                morphgenome->fixed_structure();
-            else
-                morphgenome->random();
+
+            Genome::Ptr morphgenome;
+            if(use_quadric){
+                morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            }
+            else{
+                morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            }
+
+            morphgenome->random();
             morphgenome->set_id(highest_morph_id++);
             CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
             ind->set_parameters(parameters);
@@ -109,7 +117,7 @@ void BODYPLANTESTING::epoch(){
         if(descriptor == CART_DESC)
             distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
         else if(descriptor == ORGAN_POSITION)
-            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::positional);
+           distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
 
         //Compute novelty
         double ind_nov = novelty::sparseness<novelty_params>(distances);
