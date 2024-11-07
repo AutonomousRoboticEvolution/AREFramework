@@ -31,6 +31,8 @@ elseif(ONLY_SIMULATION)
     endif()
     add_subdirectory(meim)
     add_subdirectory(homeokinesis)
+   # add_subdirectory(reinforcement_learning)
+    #add_subdirectory(bayesopt)
 else()
 
     if(VREP_FOUND)
