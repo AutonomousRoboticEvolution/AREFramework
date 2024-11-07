@@ -52,6 +52,8 @@ public:
         assert(population.size()%4 == 0);
 
 
+        bool no_crossover = settings::getParameter<settings::Boolean>(parameters,"#noCrossover").value;
+
         //selection
         std::vector<indPtr> childrens(population.size());
 
@@ -90,10 +92,18 @@ public:
                 indPtr ind21 = tournament(parents[a2[idx]],parents[a2[i+1]]);
                 indPtr ind22 = tournament(parents[a2[idx+2]],parents[a2[i+3]]);
                 //crossover op should be symmetric, so no diff between ind11.cross(ind12) and ind12.cross(ind11)
-                indPtr child1(std::make_shared<individual_t>(*ind11)) ,child2(std::make_shared<individual_t>(*ind12)),
+                indPtr child1(std::make_shared<individual_t>(*ind11)),child2(std::make_shared<individual_t>(*ind12)),
                        child3(std::make_shared<individual_t>(*ind21)), child4(std::make_shared<individual_t>(*ind22));
-                std::dynamic_pointer_cast<individual_t>(ind11)->symmetrical_crossover(ind12,child1.get(),child2.get());
-                std::dynamic_pointer_cast<individual_t>(ind21)->symmetrical_crossover(ind22,child3.get(),child4.get());
+                if(!no_crossover){
+                    std::dynamic_pointer_cast<individual_t>(ind11)->symmetrical_crossover(ind12,child1.get(),child2.get());
+                    std::dynamic_pointer_cast<individual_t>(ind21)->symmetrical_crossover(ind22,child3.get(),child4.get());
+                }else{
+                    child1->get_morph_genome()->set_parents_ids({ind11->get_morph_genome()->id(),-1});
+                    child2->get_morph_genome()->set_parents_ids({ind12->get_morph_genome()->id(),-1});
+                    child3->get_morph_genome()->set_parents_ids({ind21->get_morph_genome()->id(),-1});
+                    child4->get_morph_genome()->set_parents_ids({ind22->get_morph_genome()->id(),-1});
+                }
+
                 childrens[idx] = child1;
                 childrens[idx+1] = child2;
                 childrens[idx+2] = child3;
@@ -101,7 +111,7 @@ public:
             }
         });
         population.clear();
-        for(const auto&ind : childrens)
+        for(const auto &ind : childrens)
             population.push_back(ind);
     }
 

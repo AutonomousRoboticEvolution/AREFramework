@@ -56,11 +56,6 @@ struct Novelty {
         static distance_fct_t positional_normalized;
     } distance_fcts;
 
-
-
-
-
-
     /**
      * @brief Compute distances of a descriptor to the archive and a population. And return the vector of distances sorted in increasing order.
      * @param descriptor
