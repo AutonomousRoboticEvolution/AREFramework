@@ -10,6 +10,8 @@ if (RASPBERRY)
             "src/Genome.cpp"
             "src/NNParamGenome.cpp"
             "src/Logging.cpp"
+            "src/genetic_operators.cpp"
+            "src/sq_cppn_genome.cpp"
             "src/misc/*"
             "src/nn2/*")
     else()
