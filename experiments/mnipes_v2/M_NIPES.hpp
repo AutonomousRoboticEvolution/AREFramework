@@ -282,7 +282,6 @@ public:
 //    void update_pools();
 
 private:
-
     void init_new_learner(CMAESLearner &learner, const int wheel_nbr, int joint_nbr, int sensor_nbr);
     void init_new_ctrl_pop(learner_t &gene);
     void push_back_remaining_ctrl(learner_t &gene);

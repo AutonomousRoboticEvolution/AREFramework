@@ -81,7 +81,6 @@ selection_fct_t SelectionFunctions::two_best_of_subset = [](const std::vector<ge
 
 
 void M_NIPESIndividual::createMorphology(){
-
     individual_id = morphGenome->id();
     morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
@@ -181,6 +180,8 @@ void M_NIPESIndividual::update(double delta_time){
         }
         if(use_wheel_feedback){
             std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+            for(double &w: wheels)
+                w = w/M_PI;
             inputs.insert(inputs.end(),wheels.begin(),wheels.end());
         }
         std::vector<double> outputs = control->update(inputs);
