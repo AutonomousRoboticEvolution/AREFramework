@@ -15,7 +15,7 @@ public:
     typedef std::shared_ptr<const RandNum> ConstPtr;
 
     RandNum(int seed); // instantiate the class and specify the initial seed.
-    RandNum(const RandNum &rn): m_seed(rn.m_seed){}
+    RandNum(const RandNum &rn): m_seed(rn.m_seed), gen(rn.gen){}
     ~RandNum();
 
     /**
