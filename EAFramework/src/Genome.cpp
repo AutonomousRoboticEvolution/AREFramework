@@ -7,6 +7,8 @@ Genome::Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &p
     _id = id;
     randomNum = rn;
     parameters = param;
+    parents_ids= std::vector<int>(2,-1);
+
 }
 
 

@@ -29,13 +29,12 @@ int cppn_params::cppn::nb_outputs = 6;
 float cppn_params::evo_float::mutation_rate = 0.1f;
 
 
+
 void NN2CPPNGenomeLog::saveLog(EA::Ptr &ea){
     std::ofstream logFileStream;
     for(size_t i = 0; i < ea->get_population().size(); i++){
         std::stringstream filename;
-        filename << "morph_genome_" << std::dynamic_pointer_cast<NN2CPPNGenome>(
-                        ea->get_population()[i]->get_morph_genome()
-                        )->id();
+        filename << "morph_genome_" << ea->get_population()[i]->get_morph_genome()->id();
         if(!openOLogFile(logFileStream, filename.str()))
             return;
         logFileStream << std::dynamic_pointer_cast<NN2CPPNGenome>(
@@ -50,7 +49,7 @@ void NbrConnNeurLog::saveLog(EA::Ptr &ea){
     if(!openOLogFile(logFileStream,logFile))
         return;
     for(size_t i = 0; i < ea->get_population().size(); i++){
-        logFileStream << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->id() << ","
+        logFileStream << ea->get_population()[i]->get_morph_genome()->id() << ","
                       << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->get_nb_neurons()
                       << ","
                       << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->get_nb_connections()
@@ -64,7 +63,7 @@ void ParentingLog::saveLog(EA::Ptr &ea){
     if(!openOLogFile(logFileStream,logFile))
         return;
     for(size_t i = 0; i < ea->get_population().size(); i++){
-        logFileStream << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->id() << ","
+        logFileStream << ea->get_population()[i]->get_morph_genome()->id() << ","
                       << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->get_parents_ids()[0]
                       << ","
                       << std::dynamic_pointer_cast<NN2CPPNGenome>(ea->get_population()[i]->get_morph_genome())->get_parents_ids()[1]

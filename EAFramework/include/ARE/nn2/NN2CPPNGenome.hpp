@@ -8,6 +8,7 @@
 #include "ARE/Genome.h"
 #include "ARE/morphology_descriptors.hpp"
 #include "ARE/Logging.h"
+#include "ARE/NNParamGenome.hpp"
 
 namespace are {
 
@@ -58,6 +59,8 @@ using connection_t = nn2::Connection<nn2::EvoFloat<1,cppn_params>>;
 using nn2_cppn_t = nn2::CPPN<cppn::neuron_t,cppn::connection_t,cppn_params>;
 
 
+
+
 class NN2CPPNGenome : public Genome
 {
 public:
@@ -69,19 +72,17 @@ public:
     NN2CPPNGenome() : Genome(){
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
-        parents_ids= std::vector<int>(2,-1);
     }
     NN2CPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
         cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
         type = "nn2_cppn_genome";
-        parents_ids= std::vector<int>(2,-1);
 
     }
     NN2CPPNGenome(const nn2_cppn_t &nn2_cppn_gen) : cppn(nn2_cppn_gen){
     }
     NN2CPPNGenome(const NN2CPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), cart_desc(gen.cart_desc), organ_position_desc(gen.organ_position_desc), parents_ids(gen.parents_ids){
+        Genome(gen), cppn(gen.cppn), cart_desc(gen.cart_desc), organ_position_desc(gen.organ_position_desc){
     }
     ~NN2CPPNGenome() override {}
 
@@ -155,7 +156,6 @@ public:
         arch & cppn;
         arch & cart_desc;
         arch & organ_position_desc;
-        arch & parents_ids;
         arch & matrix_4d;
         arch & generation;
     }
@@ -166,8 +166,7 @@ public:
     const OrganPositionDesc& get_organ_position_desc() const {return organ_position_desc;}
     void set_organ_position_desc(const OrganPositionDesc& opd){organ_position_desc = opd;}
 
-    const std::vector<int>& get_parents_ids() const {return parents_ids;}
-    void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
+
     void set_cppn(const nn2_cppn_t &c){cppn = c;}
     const nn2_cppn_t& get_cppn() const {return cppn;}
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
@@ -185,7 +184,6 @@ public:
     }
 
 private:
-    std::vector<int> parents_ids;
     nn2_cppn_t cppn;
     CartDesc cart_desc;
     OrganPositionDesc organ_position_desc;
