@@ -38,6 +38,8 @@ public:
       , _individual_channel(_context,ZMQ_REP){
         reference_time = hr_clock::now();
     }
+
+
     virtual ~ER(){
         if(parameters.get())
             parameters.reset();
