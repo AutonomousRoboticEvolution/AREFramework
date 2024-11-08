@@ -6,6 +6,7 @@
 #include "simulatedER/Organ.h"
 #include "simulatedER/GenomeDecoder.h"
 #include "ARE/Logging.h"
+#include "simulatedER/morphology_constants.hpp"
 
 #include "PolyVox/RawVolume.h"
 #include "PolyVox/MarchingCubesSurfaceExtractor.h"
@@ -193,138 +194,7 @@ public:
 
     void set_list_of_voxels(const std::vector<std::vector<int>> &lov){list_of_voxels = lov;}
 
-private:
-    ///////////////////////
-    ///// Descriptors /////
-    ///////////////////////
 
-    class Descriptors
-    {
-    public:
-        CartDesc cartDesc;
-        OrganPositionDesc organDesc;
-        MatrixDesc matrixDesc;
-        void countOrgans(std::vector<Organ> organList){
-            for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
-                if(!it->isOrganRemoved() && it->isOrganChecked()) {
-                    if (it->getOrganType() == 1)
-                        cartDesc.wheelNumber++;
-                    else if (it->getOrganType() == 2)
-                        cartDesc.sensorNumber++;
-                    else if (it->getOrganType() == 3)
-                        cartDesc.jointNumber+=2;
-                    else if (it->getOrganType() == 4)
-                        cartDesc.casterNumber++;
-                }
-
-            }
-        }
-        void getRobotDimensions(std::vector<Organ> organList){
-            float minX = 0, minY = 0, minZ = 0, maxX = 0, maxY = 0, maxZ = 0;
-            for(auto & i : organList) {
-                if (!i.isOrganRemoved() && i.isOrganChecked()) {
-                    if(i.connectorPos.at(0) > maxX)
-                        maxX = i.connectorPos.at(0);
-                    if(i.connectorPos.at(1) > maxY)
-                        maxY = i.connectorPos.at(1);
-                    if(i.connectorPos.at(2) > maxZ)
-                        maxZ = i.connectorPos.at(2);
-                    if(i.connectorPos.at(0) < minX)
-                        minX = i.connectorPos.at(0);
-                    if(i.connectorPos.at(1) < minY)
-                        minY = i.connectorPos.at(1);
-                    if(i.connectorPos.at(2) < minZ)
-                        minZ = i.connectorPos.at(2);
-                }
-            }
-            // Get dimensions
-            cartDesc.robotWidth = fabs(maxX - minX);
-            cartDesc.robotDepth = fabs(maxY - minY);
-            cartDesc.robotHeight = fabs(maxZ - minZ);
-        }
-        void getOrganPositions(std::vector<Organ> organList){
-            for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
-                if(!it->isOrganRemoved() && it->isOrganChecked()) {
-                    int voxelPosX = static_cast<int>(std::round(it->connectorPos[0] / mc::voxel_real_size));
-                    int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
-                    int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
-                    int matPosX, matPosY, matPosZ;
-                    matPosX = voxelPosX + 5;
-                    matPosY = voxelPosY + 5;
-                    matPosZ = voxelPosZ - 1; // The connector is slightly up and when rounding it increases one voxel.
-                    if (matPosX > mc::real_matrix_size)
-                        matPosX = mc::real_matrix_size;
-                    if (matPosX < 0)
-                        matPosX = 0;
-                    if (matPosY > mc::real_matrix_size)
-                        matPosY = mc::real_matrix_size;
-                    if (matPosY < 0)
-                        matPosY = 0;
-                    if (matPosZ > mc::real_matrix_size)
-                        matPosZ = mc::real_matrix_size;
-                    if (matPosZ < 0)
-                        matPosZ = 0;
-                    organDesc.organ_matrix[matPosX][matPosY][matPosZ] = it->getOrganType();
-                }
-            }
-        }
-        void getMatrixDescriptor(const PolyVox::RawVolume<uint8_t> & skeleton_matrix,std::vector<Organ> organList){
-            PolyVox::Region region = skeleton_matrix.getEnclosingRegion();
-
-            for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-                for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-                    for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                        int matPosX, matPosY, matPosZ;
-                        matPosX = x + 5;
-                        matPosY = y + 5;
-                        matPosZ = z + 5; // The connector is slightly up and when rounding it increases one voxel.
-                        if (matPosX > mc::real_matrix_size)
-                            matPosX = mc::real_matrix_size;
-                        if (matPosX < 0)
-                            matPosX = 0;
-                        if (matPosY > mc::real_matrix_size)
-                            matPosY = mc::real_matrix_size;
-                        if (matPosY < 0)
-                            matPosY = 0;
-                        if (matPosZ > mc::real_matrix_size)
-                            matPosZ = mc::real_matrix_size;
-                        if (matPosZ < 0)
-                            matPosZ = 0;
-                        uint8_t voxel = skeleton_matrix.getVoxel(x,y,z);
-                        if(voxel == morph_const::filled_voxel)
-                            matrixDesc.descriptor[matPosX][matPosY][matPosZ] = 1;
-                        else
-                            matrixDesc.descriptor[matPosX][matPosY][matPosZ] = 0;
-                   }
-                }
-            }
-            for(std::vector<Organ>::iterator it = organList.begin(); it != organList.end(); it++){
-                if(!it->isOrganRemoved() && it->isOrganChecked()) {
-                    int voxelPosX = static_cast<int>(std::round(it->connectorPos[0] / mc::voxel_real_size));
-                    int voxelPosY = static_cast<int>(std::round(it->connectorPos[1] / mc::voxel_real_size));
-                    int voxelPosZ = static_cast<int>(std::round(it->connectorPos[2] / mc::voxel_real_size));
-                    int matPosX, matPosY, matPosZ;
-                    matPosX = voxelPosX + 5;
-                    matPosY = voxelPosY + 5;
-                    matPosZ = voxelPosZ - 1; // The connector is slightly up and when rounding it increases one voxel.
-                    if (matPosX > mc::real_matrix_size)
-                        matPosX = mc::real_matrix_size;
-                    if (matPosX < 0)
-                        matPosX = 0;
-                    if (matPosY > mc::real_matrix_size)
-                        matPosY = mc::real_matrix_size;
-                    if (matPosY < 0)
-                        matPosY = 0;
-                    if (matPosZ > mc::real_matrix_size)
-                        matPosZ = mc::real_matrix_size;
-                    if (matPosZ < 0)
-                        matPosZ = 0;
-                    if(it->getOrganType() != 0)
-                        matrixDesc.descriptor[matPosX][matPosY][matPosZ] = it->getOrganType() + 1;
-                }
-            }
-        }
-    };
 
 private:
     nn2_cppn_t nn2_cppn;

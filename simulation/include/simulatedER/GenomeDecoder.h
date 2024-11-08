@@ -7,7 +7,6 @@
 
 #include "PolyVox/RawVolume.h"
 #include <vector>
-#include "ARE/morphology_descriptors.hpp"
 #include "ARE/nn2/NN2CPPNGenome.hpp"
 #include "ARE/nn2/sq_cppn_genome.hpp"
 

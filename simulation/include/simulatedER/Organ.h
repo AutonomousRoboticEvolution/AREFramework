@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ARE/Settings.h"
-#include "ARE/morphology_descriptors.hpp"
+#include "simulatedER/morphology_constants.hpp"
 
 #if defined (VREP)
 #include "v_repLib.h"

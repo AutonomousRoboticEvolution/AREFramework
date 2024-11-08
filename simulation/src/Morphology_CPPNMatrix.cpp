@@ -450,7 +450,7 @@ bool Morphology_CPPNMatrix::getIndicesVertices(PolyVox::Mesh<PolyVox::Vertex<uin
 
     for (unsigned int i=0; i < n_indices; i++) {
         skeletonListIndices.emplace_back(decodedMesh.getIndex(i));
-    }
+    }morphology_constants
 
     return true;
 }
