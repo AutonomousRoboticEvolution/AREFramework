@@ -144,7 +144,7 @@ void NN2Individual::symmetrical_crossover(const Individual::Ptr &partner, Indivi
 }
 
 
-std::string NN2Individual::to_string()
+std::string NN2Individual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);

@@ -223,7 +223,7 @@ void Organ::createMaleConnector()
     connector_frame_pos.at(2) = temp_connector_frame_pos[2] - 0.0098;
 }
 
-void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
+void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
@@ -364,7 +364,7 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     simSetObjectPosition(gripperHandle, -1, gripperPosition);
 }
 
-void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+void Organ::isOrganInsideMainSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // Transform organPos from m to voxels
     int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));

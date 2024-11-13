@@ -57,9 +57,9 @@ void VisuInd::createController(){
     const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
     int wheel_nbr,joint_nbr,sensor_nbr;
     if(fixed_morph_path == "None"){
-        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
-        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
-        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
+        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
     }else{
         wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
         joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
@@ -175,7 +175,7 @@ void VisuInd::update(double delta_time){
     sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 }
 
-std::string VisuInd::to_string()
+std::string VisuInd::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);

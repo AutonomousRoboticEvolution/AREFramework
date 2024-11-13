@@ -75,7 +75,7 @@ void HomeoInd::update(double delta_time){
     }
 }
 
-std::string HomeoInd::to_string()
+std::string HomeoInd::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);

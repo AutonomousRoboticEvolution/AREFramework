@@ -33,11 +33,11 @@ void CPPNIndividual::createMorphology()
 
     if(!use_quadric){
         if(ctrlGenome->get_type() != "empty_genome")
-            assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cart_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
-        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+            assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_feat_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
     }
 
-    morphDesc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc();
+    feature_desc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc();
     matrix_descriptor = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMatrixDesc();
     testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
     matrix_4d = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_matrix_4d();
@@ -48,10 +48,10 @@ void CPPNIndividual::createMorphology()
 
 Eigen::VectorXd CPPNIndividual::descriptor(){
     int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
-    if(descriptor == CART_DESC)
-        return morphDesc.getCartDesc();
-    else if(descriptor == ORGAN_POSITION)
-        return matrix_descriptor.getCartDesc();
+    if(descriptor == sim::FEATURES)
+        return feature_desc.to_eigen_vector();
+    else if(descriptor == sim::ORGAN_POSITION)
+        return matrix_descriptor.to_eigen_vector();
     else{
         std::cerr << "Unknown descriptor" << std::endl;
         return Eigen::VectorXd::Zero(1);
@@ -59,7 +59,7 @@ Eigen::VectorXd CPPNIndividual::descriptor(){
 
 }
 
-std::string CPPNIndividual::to_string()
+std::string CPPNIndividual::to_string() const
 {
     bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 

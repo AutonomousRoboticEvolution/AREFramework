@@ -90,7 +90,7 @@ public:
      * @param skeletonHandles - All skeletons including main and children.
      * @param organList - All organs to compare to.
      */
-    void testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
+    void testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
     /**
      * @brief This test if the organ is colliding with another different organ or with an skeleton.
      * @param skeletonHandles - All skeletons including main and children.
@@ -109,7 +109,7 @@ public:
      * work when one organ is inside a second organ.
      * @param skeletonMatrix - Skeleton of the main body
      */
-    void isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix);
+    void isOrganInsideMainSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix);
     /**
      * @brief Removes the organ from the final phenotype.
      */

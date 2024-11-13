@@ -21,15 +21,15 @@ void MEIMIndividual::createMorphology(){
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
     std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(init_position[0],init_position[1],init_position[2]);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
 }
 
 void MEIMIndividual::createController(){
     bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
-    nb_joints = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
-    nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
-    nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
+    nb_joints = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
+    nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
+    nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
     int nb_inputs = nb_sensors + nb_joints + nb_wheels;
     int nb_outputs = nb_joints + nb_wheels;
     if(nb_outputs == 0)
@@ -104,7 +104,7 @@ void MEIMIndividual::update(double delta_time){
 
 
 
-std::string MEIMIndividual::to_string()
+std::string MEIMIndividual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);

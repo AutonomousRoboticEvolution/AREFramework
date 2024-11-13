@@ -168,7 +168,7 @@ void MatrixDesc::create(const PolyVox::RawVolume<uint8_t> &skeleton,
     }
 }
 
-Eigen::VectorXd MatrixDesc::to_eigen_vect() const{
+Eigen::VectorXd MatrixDesc::to_eigen_vector() const{
     Eigen::VectorXd vect_descriptor((morph_const::real_matrix_size)*(morph_const::real_matrix_size)*(morph_const::real_matrix_size));
     int counter = 0;
     for(int k = 0; k < morph_const::real_matrix_size; k++){

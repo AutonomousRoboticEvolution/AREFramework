@@ -40,6 +40,8 @@ else()
         add_subdirectory(visualization)
         add_subdirectory(bodyplantesting_nn2)
     endif()
+    add_subdirectory(meim)
+    add_subdirectory(homeokinesis)
 
 endif()
 install(DIRECTORY common DESTINATION include FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )

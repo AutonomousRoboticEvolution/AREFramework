@@ -45,6 +45,8 @@ if(WITH_NN2)
             "src/learning/ipop_cmaes.cpp"
             "src/learning/cmaes_learner.cpp"
             "src/learning/controller_archive.cpp"
+            "src/learning/Novelty.cpp"
+
             )
 else()
     FILE(GLOB SOURCES    
@@ -64,12 +66,7 @@ target_include_directories(ARE PUBLIC
 target_link_libraries(ARE cmaes tbb ${Boost_LIBRARIES})
 
 
-add_executable(nn2_cppn_serial_to_dot tools/nn2_cppn_serial_to_dot.cpp)
-target_include_directories(nn2_cppn_serial_to_dot PUBLIC
-    "include" "/usr/include/eigen3" "../modules")
-target_link_libraries(nn2_cppn_serial_to_dot ARE ${Boost_LIBRARIES})
 
-install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
 install(TARGETS ARE DESTINATION lib)
 install(DIRECTORY . DESTINATION include/ARE FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

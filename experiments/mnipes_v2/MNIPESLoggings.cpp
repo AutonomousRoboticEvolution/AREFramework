@@ -22,7 +22,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         if(!openOLogFile(mfofs,"/morph_features.csv"))
             return;
         mfofs << genome.morph_genome.id() << ",";
-        Eigen::VectorXd morph_feat = genome.morph_genome.get_cart_desc().getCartDesc();
+        Eigen::VectorXd morph_feat = genome.morph_genome.get_feat_desc().to_eigen_vector();
         mfofs << morph_feat(0);
         for(int j = 1; j < morph_feat.size(); j++){
             mfofs << "," << morph_feat(j);
@@ -36,7 +36,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         if(!openOLogFile(mdofs,"/morph_descriptor.csv"))
             return;
         mdofs << genome.morph_genome.id() << "," << morphology_constants::real_matrix_size << ",";
-        Eigen::VectorXd morph_desc = genome.morph_genome.get_organ_position_desc().getCartDesc();
+        Eigen::VectorXd morph_desc = genome.morph_genome.get_organ_position_desc().to_eigen_vector();
         mdofs << morph_desc(0);
         for(int j = 1; j < morph_desc.size(); j++){
             mdofs << "," <<  morph_desc(j);
@@ -114,7 +114,7 @@ void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
         return;
 
     logFileStream << genome.morph_genome.id() << ",";
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_feat_desc().to_eigen_vector();
     for(int j = 0; j < morphDesc.size(); j++){
         logFileStream << morphDesc(j) << ",";
     }
@@ -221,7 +221,7 @@ void BestGenomesArchiveLog::saveLog(EA::Ptr &ea){
         std::cerr << "Unable to open file " << md_filepath.str() << std::endl;
         return;
     }
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_feat_desc().to_eigen_vector();
     for(int j = 0; j < morphDesc.size(); j++){
         mdofs << morphDesc(j) << ",";
     }

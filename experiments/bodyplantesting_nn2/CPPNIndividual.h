@@ -1,8 +1,8 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "ARE/nn2/NN2CPPNGenome.hpp"
-#include "ARE/nn2/sq_cppn_genome.hpp"
+#include "simulatedER/nn2/NN2CPPNGenome.hpp"
+#include "simulatedER/nn2/sq_cppn_genome.hpp"
 #include "ARE/Individual.h"
 #include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
@@ -23,7 +23,7 @@ public :
     CPPNIndividual(const CPPNIndividual& ind):
             Individual(ind),
             testRes(ind.testRes),
-            morphDesc(ind.morphDesc),
+            feature_desc(ind.feature_desc),
             matrix_descriptor(ind.matrix_descriptor)
     {
         bool use_quadric = settings::getParameter<settings::Boolean>(ind.get_parameters(),"#useQuadric").value;
@@ -44,14 +44,14 @@ public :
     {
         arch & objectives;
         arch & morphGenome;
-        arch & morphDesc;
+        arch & feature_desc;
         arch & matrix_descriptor;
         arch & testRes;
         arch & individual_id;
         arch & generation;
     }
     // Serialization
-    std::string to_string() override;
+    std::string to_string() const override;
     void from_string(const std::string &str) override;
 
     // Setters and getters
@@ -61,10 +61,10 @@ public :
 
 ;
     /// Getters for descritors
-    CartDesc getMorphDesc(){return morphDesc;}
+    const sim::FeaturesDesc &get_feature_desc() const {return feature_desc;}
     std::vector<std::vector<double>> get_matrix_4d(){return matrix_4d;}
     Eigen::VectorXd descriptor() override;
-    const MatrixDesc& get_matrix_descriptor() const {return matrix_descriptor;}
+    const sim::MatrixDesc& get_matrix_descriptor() const {return matrix_descriptor;}
 
 
     void set_morph_id(int id){morphGenome->set_id(id);}
@@ -76,8 +76,8 @@ protected:
     std::vector<bool> testRes;
 
     /// Descritors
-    CartDesc morphDesc;
-    MatrixDesc matrix_descriptor;
+    sim::FeaturesDesc feature_desc;
+    sim::MatrixDesc matrix_descriptor;
     std::vector<std::vector<double>> matrix_4d;
 };
 

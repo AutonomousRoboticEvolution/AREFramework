@@ -114,14 +114,14 @@ void BODYPLANTESTING::epoch(){
         std::vector<size_t> pop_indexes;
 
         std::vector<double> distances;
-        if(descriptor == CART_DESC)
-            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
-        else if(descriptor == ORGAN_POSITION)
-           distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
+        //if(descriptor == CART_DESC)
+        distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
+        //else if(descriptor == ORGAN_POSITION)
+        //   distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
 
         //Compute novelty
         double ind_nov = novelty::sparseness<novelty_params>(distances);
-        if(descriptor == CART_DESC)
+        if(descriptor == sim::FEATURES)
             ind_nov /= 2.64;
         //set the objetives
 

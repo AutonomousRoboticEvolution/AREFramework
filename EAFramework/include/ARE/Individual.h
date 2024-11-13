@@ -85,7 +85,7 @@ public:
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
-    virtual std::string to_string();
+    virtual std::string to_string() const;
     virtual void from_string(const std::string &str);
 
     template<class archive>

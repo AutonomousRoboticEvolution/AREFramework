@@ -20,6 +20,8 @@ add_library(visualization SHARED
     ../common/barrelTask.cpp
     ../common/exploration.cpp
     ../common/locomotion.cpp
+    ../common/hill_climbing.cpp
+    ../common/push_object.cpp
     )
 target_include_directories(visualization PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>

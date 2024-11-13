@@ -128,10 +128,7 @@ public:
     double get_energy_cost(){return energy_cost;}
     void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
 
-    void setManRes();
 
-    /// Setters for descritors
-    void setMorphDesc();
 
 
     template<class archive>
@@ -155,7 +152,7 @@ public:
         arch & visited_zones;
     }
 
-    std::string to_string() override;
+    std::string to_string() const override;
     void from_string(const std::string &) override;
 
 

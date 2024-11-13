@@ -45,8 +45,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/leni/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#modelRepository,string,None
-#isExportModel,bool,0
+#isExportModel,bool,1
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 #imageRepository,string,images

@@ -5,6 +5,8 @@
 #include "barrelTask.hpp"
 #include "exploration.hpp"
 #include "locomotion.hpp"
+#include "hill_climbing.hpp"
+#include "push_object.hpp"
 #include "env_settings.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
@@ -24,6 +26,12 @@ extern "C" are::Environment::Ptr environmentFactory
         env.reset(new are::sim::Exploration(param));
     else if(env_type == are::sim::LOCOMOTION)
         env.reset(new are::sim::Locomotion(param));
+    else if(env_type == are::sim::HILL_CLIMBING)
+        env = std::make_shared<are::sim::HillClimbing>(param);
+    else if(env_type == are::sim::PUSH_OBJECT)
+        env = std::make_shared<are::sim::PushObject>(param);
+    else
+        std::cerr << "factory env: unknown environement" << std::endl;
     return env;
 }
 

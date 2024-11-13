@@ -54,8 +54,8 @@ public:
     void symmetrical_crossover(const Individual::Ptr &partner, Individual* child1, Individual *child2) override;
 
 
-    std::string to_string();
-    void from_string(const std::string&);
+    std::string to_string() const override;
+    void from_string(const std::string&) override;
 
     template<class archive>
     void serialize(archive &arch, const unsigned int v)

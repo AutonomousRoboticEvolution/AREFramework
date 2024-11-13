@@ -2,7 +2,7 @@
 #define MEIM_HPP
 
 #include <ARE/EA.h>
-#include <ARE/nn2/NN2CPPNGenome.hpp>
+#include <simulatedER/nn2/NN2CPPNGenome.hpp>
 #include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
@@ -71,7 +71,7 @@ public:
 
     void reset_control(){control.reset();}
 
-    std::string to_string() override;
+    std::string to_string() const override;
     void from_string(const std::string &) override;
 
     void set_init_position(const std::vector<double>& ip){init_position = ip;}

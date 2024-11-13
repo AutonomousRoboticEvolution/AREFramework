@@ -102,10 +102,10 @@ void M_NIPESIndividual::createMorphology(){
     init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[i*3],init_position[i*3+1],init_position[i*3+2]);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_cart_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getCartDesc());
+    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
     std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
-    setMorphDesc();
-    setManRes();
+    morphDesc = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMorphDesc();
+    testRes = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getRobotManRes();
 }
 
 void M_NIPESIndividual::createController(){
@@ -198,15 +198,6 @@ void M_NIPESIndividual::update(double delta_time){
     sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 }
 
-void M_NIPESIndividual::setMorphDesc()
-{
-    morphDesc = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getMorphDesc();
-}
-
-void M_NIPESIndividual::setManRes()
-{
-    testRes = std::dynamic_pointer_cast<CPPNMorph>(morphology)->getRobotManRes();
-}
 
 
 Eigen::VectorXd M_NIPESIndividual::descriptor(){
@@ -225,7 +216,7 @@ Eigen::VectorXd M_NIPESIndividual::descriptor(){
     }
 }
 
-std::string M_NIPESIndividual::to_string()
+std::string M_NIPESIndividual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
@@ -501,11 +492,11 @@ bool M_NIPES::update(const Environment::Ptr &env){
 
                     learner.ctrl_learner.set_nbr_dropped_eval(std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_nbr_dropped_eval());
                     if(ind->get_ctrl_genome()->get_type() == "empty_genome"){//if ctrl genome is empty
-                        learner.morph_genome.set_cart_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_cart_desc());
+                        learner.morph_genome.set_feature_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_feat_desc());
                         learner.morph_genome.set_organ_position_desc(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome())->get_organ_position_desc());
-                        int wheel_nbr = learner.morph_genome.get_cart_desc().wheelNumber;
-                        int joint_nbr = learner.morph_genome.get_cart_desc().jointNumber;
-                        int sensor_nbr = learner.morph_genome.get_cart_desc().sensorNumber;
+                        int wheel_nbr = learner.morph_genome.get_feat_desc().wheel_number;
+                        int joint_nbr = learner.morph_genome.get_feat_desc().joint_number;
+                        int sensor_nbr = learner.morph_genome.get_feat_desc().sensor_number;
                         if(wheel_nbr > 0 || joint_nbr > 0){
                             init_new_learner(learner.ctrl_learner,wheel_nbr,joint_nbr,sensor_nbr);
                             init_new_ctrl_pop(learner);
@@ -591,8 +582,8 @@ bool M_NIPES::update(const Environment::Ptr &env){
                                 best_ctrl_gen.set_nn_type(nn_type);
                                 //update the archive
                                 if(use_ctrl_arch){
-                                    CartDesc morph_desc = learner.morph_genome.get_cart_desc();
-                                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheelNumber,morph_desc.jointNumber,morph_desc.sensorNumber);
+                                    sim::FeaturesDesc morph_desc = learner.morph_genome.get_feat_desc();
+                                    controller_archive.update(std::make_shared<NNParamGenome>(best_ctrl_gen),best_controller.objectives[0],morph_desc.wheel_number,morph_desc.joint_number,morph_desc.sensor_number);
                                 }
                                 //-
                             }
@@ -781,9 +772,9 @@ void M_NIPES::compute_novelty_scores(){
 
     std::vector<Eigen::VectorXd> genes_desc;
     for(auto& gene :gene_pool)
-        genes_desc.push_back(gene.morph_genome.get_organ_position_desc().getCartDesc());
+        genes_desc.push_back(gene.morph_genome.get_organ_position_desc().to_eigen_vector());
     for(auto& gene :gene_pool){
-        Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+        Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().to_eigen_vector();
         std::vector<double> dists = Novelty::distances(desc,novelty_archive,genes_desc,Novelty::distance_fcts::positional);
         gene.objectives.resize(2);
         gene.objectives[1] = novelty::sparseness<novelty_params>(dists);
@@ -791,7 +782,7 @@ void M_NIPES::compute_novelty_scores(){
     bool with_archive = settings::getParameter<settings::Boolean>(parameters,"#morphNoveltyWithArchive").value;
     if(with_archive){
         for(auto& gene :gene_pool){
-            Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().getCartDesc();
+            Eigen::VectorXd desc = gene.morph_genome.get_organ_position_desc().to_eigen_vector();
             novelty::update_archive<novelty_params>(desc,gene.objectives[1],novelty_archive,randomNum);
         }
     }

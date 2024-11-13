@@ -12,16 +12,16 @@ using namespace are::sim;
 
 
 
-void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn){
+void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn){
 
     //- Test if the coordinate are out of bound, if yes exit
-    PolyVox::Region region = areMatrix.getEnclosingRegion();
+    PolyVox::Region region = skeleton.getEnclosingRegion();
     if(x < region.getLowerX() || x > region.getUpperX() ||
        y < region.getLowerY() || y > region.getUpperX() ||
        z < region.getLowerZ() || z > region.getUpperX())
         return;
     //- check if this voxel is aready assigned
-    if(areMatrix.getVoxel(x,y,z).bone != 128)
+    if(skeleton.getVoxel(x,y,z) != 128)
         return;
 
     double ix = static_cast<double>(x)/static_cast<double>(region.getUpperX());
@@ -29,27 +29,27 @@ void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox
     double iz = static_cast<double>(z)/static_cast<double>(region.getUpperZ());
     std::vector<double> input{ix, iy, iz, sqrt(ix*ix+iy*iy+iz*iz)}; // Vector used as input of the Neural Network (NN)
     cppn.step(input);
-    AREVoxel voxel;
+    uint8_t voxel;
     if(cppn.outf()[1] > 0.000001){ //test if value is positive
-        voxel.bone = morph_const::filled_voxel;
-        areMatrix.setVoxel(x,y,z,voxel);
-        assignSkeletonVoxel(x+1,y,z,areMatrix,cppn);
-        assignSkeletonVoxel(x-1,y,z,areMatrix,cppn);
-        assignSkeletonVoxel(x,y+1,z,areMatrix,cppn);
-        assignSkeletonVoxel(x,y-1,z,areMatrix,cppn);
-        assignSkeletonVoxel(x,y,z+1,areMatrix,cppn);
-        assignSkeletonVoxel(x,y,z-1,areMatrix,cppn);
+        voxel= morph_const::filled_voxel;
+        skeleton.setVoxel(x,y,z,voxel);
+        assignSkeletonVoxel(x+1,y,z,skeleton,cppn);
+        assignSkeletonVoxel(x-1,y,z,skeleton,cppn);
+        assignSkeletonVoxel(x,y+1,z,skeleton,cppn);
+        assignSkeletonVoxel(x,y-1,z,skeleton,cppn);
+        assignSkeletonVoxel(x,y,z+1,skeleton,cppn);
+        assignSkeletonVoxel(x,y,z-1,skeleton,cppn);
     }else{
-        voxel.bone = morph_const::empty_voxel;
-        areMatrix.setVoxel(x,y,z,voxel);
+        voxel = morph_const::empty_voxel;
+        skeleton.setVoxel(x,y,z,voxel);
     }
 }
 
 
 
-void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn){
+void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<uint8_t>& skeleton, nn2_cppn_t &cppn){
     std::cout << "Growth of skeleton" << std::endl;
-    PolyVox::Region region = areMatrix.getEnclosingRegion();
+    PolyVox::Region region = skeleton.getEnclosingRegion();
     // int32_t centre_x = region.getCentreX();
     // int32_t centre_y = region.getCentreY();
     int32_t centre_z = region.getCentreZ();
@@ -59,16 +59,9 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& 
             if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit &&
                 y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit)
                 continue;
-            assignSkeletonVoxel(x,y,centre_z,areMatrix,cppn);
+            assignSkeletonVoxel(x,y,centre_z,skeleton,cppn);
         }
     }
-    //Starts from the voxels in the center:
-    // assignSkeletonVoxel(centre_x+1,centre_y,centre_z,areMatrix,cppn);
-    // assignSkeletonVoxel(centre_x-1,centre_y,centre_z,areMatrix,cppn);
-    // assignSkeletonVoxel(centre_x,centre_y+1,centre_z,areMatrix,cppn);
-    // assignSkeletonVoxel(centre_x,centre_y-1,centre_z,areMatrix,cppn);
-    // assignSkeletonVoxel(centre_x,centre_y,centre_z+1,areMatrix,cppn);
-    // assignSkeletonVoxel(centre_x,centre_y,centre_z-1,areMatrix,cppn);
 
     std::vector<std::tuple<int32_t,int32_t,int32_t>> voxels_to_be_filled;
 
@@ -76,23 +69,23 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& 
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                AREVoxel voxel = areMatrix.getVoxel(x,y,z);
-                if(voxel.bone == 128){
-                    voxel.bone = morph_const::empty_voxel;
-                    areMatrix.setVoxel(x,y,z,voxel);
-                }else if(voxel.bone == morph_const::empty_voxel){
+                uint8_t voxel = skeleton.getVoxel(x,y,z);
+                if(voxel == 128){
+                    voxel = morph_const::empty_voxel;
+                    skeleton.setVoxel(x,y,z,voxel);
+                }else if(voxel == morph_const::empty_voxel){
                     int counter = 0;
-                    if(x+1 < region.getUpperX() && areMatrix.getVoxel(x+1,y,z).bone == morph_const::filled_voxel)
+                    if(x+1 < region.getUpperX() && skeleton.getVoxel(x+1,y,z) == morph_const::filled_voxel)
                         counter++;
-                    if(x-1 > region.getLowerX() && areMatrix.getVoxel(x-1,y,z).bone == morph_const::filled_voxel)
+                    if(x-1 > region.getLowerX() && skeleton.getVoxel(x-1,y,z) == morph_const::filled_voxel)
                         counter++;
-                    if(y+1 < region.getUpperY() && areMatrix.getVoxel(x,y+1,z).bone == morph_const::filled_voxel)
+                    if(y+1 < region.getUpperY() && skeleton.getVoxel(x,y+1,z) == morph_const::filled_voxel)
                         counter++;
-                    if(y-1 > region.getLowerY() && areMatrix.getVoxel(x,y-1,z).bone == morph_const::filled_voxel)
+                    if(y-1 > region.getLowerY() && skeleton.getVoxel(x,y-1,z) == morph_const::filled_voxel)
                         counter++;
-                    if(z+1 < region.getUpperZ() && areMatrix.getVoxel(x,y,z+1).bone == morph_const::filled_voxel)
+                    if(z+1 < region.getUpperZ() && skeleton.getVoxel(x,y,z+1) == morph_const::filled_voxel)
                         counter++;
-                    if(z-1 > region.getLowerZ() && areMatrix.getVoxel(x,y,z-1).bone == morph_const::filled_voxel)
+                    if(z-1 > region.getLowerZ() && skeleton.getVoxel(x,y,z-1) == morph_const::filled_voxel)
                         counter++;
                     if(counter >= 3)
                         voxels_to_be_filled.push_back({x,y,z});
@@ -104,16 +97,15 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<AREVoxel>& 
 
 
     for(const std::tuple<int32_t,int32_t,int32_t> &coord: voxels_to_be_filled){
-        AREVoxel voxel;
-        voxel.bone = morph_const::filled_voxel;
-        areMatrix.setVoxel(get<0>(coord),get<1>(coord),get<2>(coord),voxel);
+        uint8_t voxel = morph_const::filled_voxel;;
+        skeleton.setVoxel(get<0>(coord),get<1>(coord),get<2>(coord),voxel);
     }
 
 }
 
-void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<AREVoxel> &areMatrix, quadric_t<quadric_params> &quadric){
+void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, quadric_t<quadric_params> &quadric){
     std::cout << "superquadric decoding" << std::endl;
-    PolyVox::Region region = areMatrix.getEnclosingRegion();
+    PolyVox::Region region = skeleton.getEnclosingRegion();
 
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
@@ -123,26 +115,24 @@ void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<AREVoxel> 
                 double iz = static_cast<double>(z)/static_cast<double>(region.getUpperZ());
                 double output = quadric(ix,iy,iz);
                 std::cout << output << std::endl;
-                AREVoxel voxel;
+                uint8_t voxel;
 
                 if(output <= 1)
-                    voxel.bone = morph_const::filled_voxel;
+                    voxel = morph_const::filled_voxel;
                 else
-                    voxel.bone = morph_const::empty_voxel;
-                areMatrix.setVoxel(x,y,z,voxel);
+                    voxel = morph_const::empty_voxel;
+                skeleton.setVoxel(x,y,z,voxel);
             }
         }
     }
 }
 
-void GenomeDecoder::getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels){
-    PolyVox::Region region = areMatrix.getEnclosingRegion();
+void GenomeDecoder::countNumberSkeletonVoxels(const PolyVox::RawVolume<uint8_t> &skeleton, int &numSkeletonVoxels){
+    PolyVox::Region region = skeleton.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                uint8_t voxel = static_cast<uint8_t>(areMatrix.getVoxel(x,y,z).bone);
-                skeletonMatrix.setVoxel(x,y,z,voxel);
-                if(voxel == morph_const::filled_voxel)
+                if(skeleton.getVoxel(x,y,z) == morph_const::filled_voxel)
                     numSkeletonVoxels++;
             }
         }
@@ -150,13 +140,13 @@ void GenomeDecoder::getSkeletonFromAREMatrix(const PolyVox::RawVolume<AREVoxel> 
 }
 
 // makes just the skeleton not the organs
-void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cppn_t &cppn)
+void GenomeDecoder::decodeGenome(PolyVox::RawVolume<uint8_t>& skeleton, nn2_cppn_t &cppn)
 {
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
     std::vector<double> outputs;
-    AREVoxel areVoxel;
+    uint8_t voxel;
     // Generate voxel matrix
-    auto region = areMatrix.getEnclosingRegion();
+    auto region = skeleton.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
             for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
@@ -173,11 +163,11 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
                         o = 0;
 
                 // Take output from NN and store it.
-                areVoxel.bone = morph_const::empty_voxel;
+                voxel = morph_const::empty_voxel;
                 if(outputs[1] > 0.00001) { // Sometimes values are very close to zero and these causes problems.
-                    areVoxel.bone = morph_const::filled_voxel;
+                    voxel = morph_const::filled_voxel;
                 }
-                areMatrix.setVoxel(x, y, z, areVoxel);
+                skeleton.setVoxel(x, y, z, voxel);
             }
         }
     }
@@ -186,12 +176,12 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<AREVoxel>& areMatrix, nn2_cp
 
 
 //checks skeleton is connected to start and not in the head
-void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels)
+void GenomeDecoder::generateSkeleton(const PolyVox::RawVolume<uint8_t> &input_skeleton, PolyVox::RawVolume<uint8_t> &output_skeleton, int &numSkeletonVoxels)
 {
-    AREVoxel areVoxel;
+    uint8_t areVoxel;
     uint8_t uVoxelValue;
     uint8_t voxel;
-    auto region = skeletonMatrix.getEnclosingRegion();
+    auto region = output_skeleton.getEnclosingRegion();
     bool isSkeletonConnected = false;
 
     for(int32_t z = region.getLowerZ()+1; z < region.getLowerZ() + morph_const::skeletonBaseHeight; z += 1) {
@@ -204,10 +194,10 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
                         //isSkeletonConnected = false;
                     }
                     else{
-                        areVoxel = areMatrix.getVoxel(x, y, z);
+                        areVoxel = input_skeleton.getVoxel(x, y, z);
                         // If output greater than threshold write voxel.
                         // NOTE: Hard boundaries seem to work better with convex decomposition
-                        voxel = areVoxel.bone;
+                        voxel = areVoxel;
 
                         if(voxel > 0.5){
                             isSkeletonConnected = true;
@@ -221,10 +211,10 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
         for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
             for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
                 for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                    areVoxel = areMatrix.getVoxel(x, y, z);
+                    areVoxel = input_skeleton.getVoxel(x, y, z);
                     // If output greater than threshold write voxel.
                     // NOTE: Hard boundaries seem to work better with convex decomposition
-                    voxel = areVoxel.bone;
+                    voxel = areVoxel;
 
                     if(voxel > 0.5){
                         uVoxelValue = morph_const::filled_voxel;
@@ -233,7 +223,7 @@ void GenomeDecoder::generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, Po
                     else
                         uVoxelValue = morph_const::empty_voxel;
 
-                    skeletonMatrix.setVoxel(x, y, z, uVoxelValue);
+                    output_skeleton.setVoxel(x, y, z, uVoxelValue);
                 }
             }
         }
@@ -467,9 +457,9 @@ void GenomeDecoder::findSkeletonSurface(const PolyVox::RawVolume<uint8_t> &skele
 
 
 
-void GenomeDecoder::genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int> > > &skeletonSurfaceCoord, int &numSkeletonVoxels){
-    growthBasedSkeletonGeneration(areMatrix,cppn);
-    getSkeletonFromAREMatrix(areMatrix,skeletonMatrix,numSkeletonVoxels);
+void GenomeDecoder::genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix, std::vector<std::vector<std::vector<int> > > &skeletonSurfaceCoord, int &numSkeletonVoxels){
+    growthBasedSkeletonGeneration(skeletonMatrix,cppn);
+    countNumberSkeletonVoxels(skeletonMatrix,numSkeletonVoxels);
     createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);
@@ -478,10 +468,10 @@ void GenomeDecoder::genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<ARE
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
-void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                          std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels){
-    superquadricSkeletonGeneration(areMatrix,quadric);
-    getSkeletonFromAREMatrix(areMatrix,skeletonMatrix,numSkeletonVoxels);
+    superquadricSkeletonGeneration(skeletonMatrix,quadric);
+    countNumberSkeletonVoxels(skeletonMatrix,numSkeletonVoxels);
     createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);
@@ -490,13 +480,13 @@ void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
-void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel> &areMatrix,
+void GenomeDecoder::genomeDecoder(nn2_cppn_t &cppn,
                                  PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                  std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord,
                                  int &numSkeletonVoxels)
 {
-    decodeGenome(areMatrix, cppn);
-    generateSkeleton(areMatrix, skeletonMatrix, numSkeletonVoxels);
+    decodeGenome(skeletonMatrix, cppn);
+    generateSkeleton(skeletonMatrix, skeletonMatrix, numSkeletonVoxels);
     createSkeletonBase(skeletonMatrix, numSkeletonVoxels);
     emptySpaceForHead(skeletonMatrix, numSkeletonVoxels);
     skeletonRegionCounter(skeletonMatrix);

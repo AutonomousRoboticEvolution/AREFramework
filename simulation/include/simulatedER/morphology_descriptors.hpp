@@ -110,7 +110,7 @@ public:
     virtual void create(const PolyVox::RawVolume<uint8_t> &skeleton,
                         const std::vector<sim::Organ> &organ_list) override;
 
-    Eigen::VectorXd to_eigen_vect() const;
+    Eigen::VectorXd to_eigen_vector() const override;
 
     std::string to_string() const override;
 
