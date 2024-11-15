@@ -7,8 +7,11 @@
 #include <boost/archive/text_iarchive.hpp>
 #include <boost/archive/text_oarchive.hpp>
 #include <vector>
+#include "nn2/cppn.hpp"
 #include "ARE/genetic_operators.hpp"
-#include "simulatedER/nn2/NN2CPPNGenome.hpp"
+#include "ARE/Logging.h"
+#include "simulatedER/skeleton_generation.hpp"
+#include "simulatedER/Organ.h"
 
 namespace are{
 
@@ -221,7 +224,7 @@ struct quadric_t{
         // q2.t = child1[7];
         q2 = q1;
     }
-    double operator () (double x, double y, double z){
+    double operator () (double x, double y, double z) const{
         auto quadric_fct = [](double X, double Y, double Z,quadric_param_t p) -> double{
             return pow(p.r*pow(X/p.a,2/p.u) + p.s*pow(Y/p.b,2/p.u),p.u/p.v) + p.t*pow(Z/p.c,2/p.v);
         };
@@ -273,24 +276,72 @@ struct quadric_params{
     static constexpr double _lbound = -2;
     static constexpr double _ubound = 2;
 };
-    
+
+namespace sq_cppn{
+struct params{
+    struct cppn{
+        static int _mutation_type;
+        static bool _mutate_connections;
+        static bool _mutate_neurons;
+        static float _mutation_rate;
+        static float _rate_mutate_conn;
+        static float _rate_mutate_neur;
+        static float _rate_add_neuron;
+        static float _rate_del_neuron;
+        static float _rate_add_conn;
+        static float _rate_del_conn;
+        static float _rate_change_conn;
+        static float _rate_crossover;
+
+        static size_t _min_nb_neurons;
+        static size_t _max_nb_neurons;
+        static size_t _min_nb_conns;
+        static size_t _max_nb_conns;
+
+        static constexpr int nb_inputs = 3;
+        static constexpr int nb_outputs = 1;
+    };
+    struct evo_float{
+        static float mutation_rate;
+        static constexpr float cross_rate = 0.f;
+        static constexpr nn2::evo_float::mutation_t mutation_type = nn2::evo_float::gaussian;
+        static constexpr nn2::evo_float::cross_over_t cross_over_type = nn2::evo_float::no_cross_over;
+        static constexpr float eta_m = 15.f; //parameter for polynomial mutation
+        static constexpr float eta_c = 15.f; //parameter for polynomial mutation
+        static constexpr float sigma = 0.5; //parameter for gaussian mutation
+        static constexpr float min = -1;
+        static constexpr float max = 1;
+    };
+};
+
+using af_t = nn2::AfCppn<nn2::cppn::AfParams<params>>;
+using pf_t = nn2::PfWSum<nn2::EvoFloat<1,params>>;
+using neuron_t = nn2::Neuron<pf_t,af_t>;
+using connection_t = nn2::Connection<nn2::EvoFloat<1,params>>;
+
+using cppn_t = nn2::CPPN<neuron_t,connection_t,params>;
+
+}//sq_cppn
 
 class SQCPPNGenome: public Genome{
 public:
+    using cppn_t = sq_cppn::cppn_t;
+    using sq_t = quadric_t<quadric_params>;
+
     typedef std::shared_ptr<SQCPPNGenome> Ptr;
     typedef std::shared_ptr<const SQCPPNGenome> ConstPtr;
     SQCPPNGenome() : Genome(){
-        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
+        cppn = cppn_t(sq_cppn::params::cppn::nb_inputs,sq_cppn::params::cppn::nb_outputs);
         type = "sq_cppn_genome";
     }
     SQCPPNGenome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param) :
         Genome(rn,param){
-        cppn = nn2_cppn_t(cppn_params::cppn::nb_inputs,cppn_params::cppn::nb_outputs);
+        cppn = cppn_t(sq_cppn::params::cppn::nb_inputs,sq_cppn::params::cppn::nb_outputs);
         type = "sq_cppn_genome";
     }
 
-    SQCPPNGenome(const nn2_cppn_t &nn2_cppn_gen,const quadric_t<quadric_params> &quadric_gen) :
-    cppn(nn2_cppn_gen), quadric(quadric_gen){}
+    SQCPPNGenome(const cppn_t &cppn_gen,const sq_t &quadric_gen) :
+    cppn(cppn_gen), quadric(quadric_gen){}
 
     SQCPPNGenome(const SQCPPNGenome &gen) :
         Genome(gen), cppn(gen.cppn), quadric(gen.quadric){
@@ -320,12 +371,12 @@ public:
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
-        are::nn2_cppn_t cppn_child;
-        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_cppn();
+        cppn_t cppn_child;
+        cppn_t cppn_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child);
         
-        quadric_t<quadric_params> quadric_child;
-        quadric_t<quadric_params> quadric_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_quadric();
+        sq_t quadric_child;
+        sq_t quadric_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_quadric();
         quadric.crossover(quadric_partner,quadric_child,randomNum);
         *std::dynamic_pointer_cast<SQCPPNGenome>(child) = SQCPPNGenome(cppn_child,quadric_child);
         child->set_parameters(parameters);
@@ -334,13 +385,13 @@ public:
     }
 
     void symmetrical_crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override{
-        are::nn2_cppn_t cppn_child1, cppn_child2;
-        are::nn2_cppn_t cppn_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_cppn();
+        cppn_t cppn_child1, cppn_child2;
+        cppn_t cppn_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_cppn();
         cppn.crossover(cppn_partner,cppn_child1);
         cppn_partner.crossover(cppn,cppn_child2);
         
-        quadric_t<quadric_params> quadric_child1, quadric_child2;
-        quadric_t<quadric_params> quadric_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_quadric();
+        sq_t quadric_child1, quadric_child2;
+        sq_t quadric_partner = std::dynamic_pointer_cast<SQCPPNGenome>(partner)->get_quadric();
         quadric.crossover(quadric_partner,quadric_child1,randomNum);
         quadric_partner.crossover(quadric,quadric_child2,randomNum);
 
@@ -381,11 +432,11 @@ public:
     }
 
     
-    void set_cppn(const nn2_cppn_t &c){cppn = c;}
-    const nn2_cppn_t& get_cppn() const {return cppn;}
+    void set_cppn(const cppn_t &c){cppn = c;}
+    const cppn_t& get_cppn() const {return cppn;}
 
-    void set_quadric(const quadric_t<quadric_params> &q){quadric = q;}
-    const quadric_t<quadric_params> &get_quadric() const{return quadric;}
+    void set_quadric(const sq_t &q){quadric = q;}
+    const sq_t &get_quadric() const{return quadric;}
 
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
@@ -398,8 +449,32 @@ public:
 
 
 private:
-    nn2_cppn_t cppn;
-    quadric_t<quadric_params> quadric;
+    cppn_t cppn;
+    sq_t quadric;
+};
+
+namespace  sq_cppn_decoder {
+    using sq_t = quadric_t<quadric_params>;
+    using cppn_t = sq_cppn::cppn_t;
+    struct organ_info{
+        organ_info(int t,const std::vector<double> &p,const std::vector<double> &o):
+            type(t),position(p),orientation(o){}
+        int type;
+        std::vector<double> position;
+        std::vector<double> orientation;
+    };
+    using organ_list_t = std::vector<organ_info>;
+
+    void decode(const sq_t &quadric,
+                const cppn_t &cppn,
+                skeleton::type& skeleton,
+                organ_list_t &organ_list,
+                int &number_voxels);
+    void generate_skeleton(const sq_t &quadric,
+                           skeleton::type& skeleton);
+    void generate_organ_list(const cppn_t &cppn,
+                             const skeleton::coord_t &surface_coords,
+                             organ_list_t &organ_list);
 };
 
 namespace sq_cppn{

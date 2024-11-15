@@ -379,7 +379,8 @@ void GenomeDecoder::exploreSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonM
 }
 
 //generates a list of coords in a region
-void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonMatrix, PolyVox::RawVolume<bool> &visitedVoxels,
+void GenomeDecoder::exploreSkeletonRegion(PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                                          PolyVox::RawVolume<bool> &visitedVoxels,
                                           int32_t posX, int32_t posY,int32_t posZ, int regionCounter)
 {
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited

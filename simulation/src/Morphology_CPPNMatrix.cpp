@@ -78,7 +78,7 @@ void Morphology_CPPNMatrix::create()
         simSetObjectSpecialProperty(meshHandle,0); // Non-collidable, non-detectable, etc.
 
 
-        convexDecompositionSuccess = convex_decomposition(mainHandle,meshHandle,numSkeletonVoxels,skeletonHandles);
+        convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
         if(convexDecompositionSuccess)
             check_repress_organs(skeletonMatrix,gripperHandles);
         else // Stop generating body plan if convex decomposition fails
@@ -124,7 +124,7 @@ void Morphology_CPPNMatrix::create()
     simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
 }
 
-bool Morphology_CPPNMatrix::convex_decomposition(int mainHandle, int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles){
+bool Morphology_CPPNMatrix::convex_decomposition(int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles){
     bool convexDecompositionSuccess = false;
     try {
         int convexHandle, brainHandle;

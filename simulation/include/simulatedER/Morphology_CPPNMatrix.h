@@ -81,7 +81,7 @@ public:
     void setPosition(float,float,float);
     void load();
 
-    bool convex_decomposition(int mainHandle, int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles);
+    bool convex_decomposition(int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles);
 
     void check_repress_organs(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, const std::vector<int> &gripperHandles);
 
