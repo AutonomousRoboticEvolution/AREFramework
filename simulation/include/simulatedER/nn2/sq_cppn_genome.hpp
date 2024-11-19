@@ -344,7 +344,7 @@ public:
     cppn(cppn_gen), quadric(quadric_gen){}
 
     SQCPPNGenome(const SQCPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), quadric(gen.quadric){
+        Genome(gen), cppn(gen.cppn), quadric(gen.quadric), nbr_organs(gen.nbr_organs){
     }
     ~SQCPPNGenome() override {}
 
@@ -363,11 +363,19 @@ public:
     void random() override{
         cppn.random();
         quadric.random(randomNum);
+        nbr_organs = randomNum->randInt(4,8);
     }
 
     void mutate() override {
         cppn.mutate();
         quadric.mutate(randomNum);
+        if(randomNum->randDouble(0,1) < quadric_params::_mutation_rate){
+            nbr_organs += randomNum->randInt(-1,1);
+            if(nbr_organs < 4)
+                nbr_organs = 4;
+            else if(nbr_organs > 8)
+                nbr_organs = 8;
+        }
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
@@ -429,6 +437,7 @@ public:
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
         arch & quadric;
+        arch & nbr_organs;
     }
 
     
@@ -438,43 +447,37 @@ public:
     void set_quadric(const sq_t &q){quadric = q;}
     const sq_t &get_quadric() const{return quadric;}
 
+    void set_nbr_organs(int nbr_o){nbr_organs = nbr_o;}
+    int get_nbr_organs(){return nbr_organs;}
+
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
-
-
-    void set_randNum(const misc::RandNum::Ptr& rn) override{
-        randomNum = rn;
-        //nn2::rgen_t::gen.seed(randomNum->getSeed());
-    }
-
 
 private:
     cppn_t cppn;
     sq_t quadric;
+    int nbr_organs = 0;
 };
 
 namespace  sq_cppn_decoder {
+    using namespace sim::organ;
     using sq_t = quadric_t<quadric_params>;
     using cppn_t = sq_cppn::cppn_t;
-    struct organ_info{
-        organ_info(int t,const std::vector<double> &p,const std::vector<double> &o):
-            type(t),position(p),orientation(o){}
-        int type;
-        std::vector<double> position;
-        std::vector<double> orientation;
-    };
-    using organ_list_t = std::vector<organ_info>;
+
 
     void decode(const sq_t &quadric,
-                const cppn_t &cppn,
+                cppn_t &cppn,
+                int nbr_organs,
                 skeleton::type& skeleton,
                 organ_list_t &organ_list,
                 int &number_voxels);
     void generate_skeleton(const sq_t &quadric,
                            skeleton::type& skeleton);
-    void generate_organ_list(const cppn_t &cppn,
+    void generate_organ_list(cppn_t &cppn,
                              const skeleton::coord_t &surface_coords,
+                             int nbr_organs,
                              organ_list_t &organ_list);
+    int cppn_to_organ_type(cppn_t &cppn,const std::vector<double> &input);
 };
 
 namespace sq_cppn{

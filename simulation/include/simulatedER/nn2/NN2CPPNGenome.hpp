@@ -8,6 +8,7 @@
 #include "ARE/Genome.h"
 #include "ARE/Logging.h"
 #include "simulatedER/morphology_descriptors.hpp"
+#include "simulatedER/skeleton_generation.hpp"
 
 namespace are {
 
@@ -191,6 +192,26 @@ private:
     sim::MatrixDesc matrix_desc;
     int generation=0;
     std::vector<std::vector<double>> matrix_4d;
+};
+
+namespace  nn2_cppn_decoder {
+
+using namespace sim::organ;
+
+void decode(nn2_cppn_t &cppn,
+            skeleton::type& skeleton,
+            organ_list_t &organ_list,
+            int &number_voxels,
+            bool growing = false);
+void generate_skeleton(nn2_cppn_t &cppn,
+                       skeleton::type& skeleton);
+void generate_skeleton_growing(nn2_cppn_t &cppn,
+                       skeleton::type& skeleton);
+void generate_organ_list(nn2_cppn_t &cppn,
+                         const skeleton::coord_t &surface_coords,
+                         int nbr_organs,
+                         organ_list_t &organ_list);
+int cppn_to_organ_type(nn2_cppn_t &cppn,const std::vector<double> &input);
 };
 
 namespace nn2_cppn {

@@ -2,6 +2,7 @@
 
 using namespace are;
 using namespace are::sq_cppn;
+using namespace sim::organ;
 
 quadric_param_t::quadric_param_t(double _a, double _b, double _c,
                                  double _u, double _v,
@@ -82,7 +83,7 @@ size_t sq_cppn::params::cppn::_max_nb_conns = 100;
 float sq_cppn::params::evo_float::mutation_rate = 0.1f;
 
 
-void sq_cppn_decoder::decode(const sq_t &quadric, const cppn_t &cppn,
+void sq_cppn_decoder::decode(const sq_t &quadric, cppn_t &cppn, int nbr_organs,
                         skeleton::type &skeleton, organ_list_t &organ_list, int &number_voxels){
     generate_skeleton(quadric,skeleton);
     skeleton::create_base(skeleton);
@@ -91,7 +92,7 @@ void sq_cppn_decoder::decode(const sq_t &quadric, const cppn_t &cppn,
     skeleton::count_number_voxels(skeleton,number_voxels);
     skeleton::coord_t surface_coords;
     skeleton::find_skeleton_surface(skeleton,surface_coords);
-
+    generate_organ_list(cppn,surface_coords,nbr_organs,organ_list);
 }
 
 void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& skeleton){
@@ -116,10 +117,10 @@ void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& ske
     }
 }
 
-void sq_cppn_decoder::generate_organ_list(const cppn_t &cppn, const skeleton::coord_t &surface_coords, organ_list_t &organ_list){
+void sq_cppn_decoder::generate_organ_list(cppn_t &cppn, const skeleton::coord_t &surface_coords, int nbr_organs, organ_list_t &organ_list){
     std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
-    std::vector<double> output;
     int organ_type;
+    organ_list_t  full_list;
     for(int m = 0; m < surface_coords.size(); m++) {
         // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
         // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
@@ -136,40 +137,79 @@ void sq_cppn_decoder::generate_organ_list(const cppn_t &cppn, const skeleton::co
             input[0] = x;
             input[1] = y;
             input[2] = z;
-            organ_type = get_organ_from_cppn(input); // TO DO decoding of cppn
+
+            organ_type = cppn_to_organ_type(cppn,input);
+
+
             // Create organ if any
             if(organ_type > 0){
-                std::vector<double> position(3);
-                position.at(0) = static_cast<double>(surface_coords[m][n].at(0) * morph_const::voxel_real_size);
-                position.at(1) = static_cast<double>(surface_coords[m][n].at(1) * morph_const::voxel_real_size);
-                position.at(2) = static_cast<double>(surface_coords[m][n].at(2) * morph_const::voxel_real_size);
+                std::vector<float> position(3);
+                position.at(0) = static_cast<float>(surface_coords[m][n].at(0) * morph_const::voxel_real_size);
+                position.at(1) = static_cast<float>(surface_coords[m][n].at(1) * morph_const::voxel_real_size);
+                position.at(2) = static_cast<float>(surface_coords[m][n].at(2) * morph_const::voxel_real_size);
                 position.at(2) += morph_const::matrix_size/2 * morph_const::voxel_real_size;
 
 
                 // Gives the direction of the organ given the direction of the surface
-                std::vector<double> orientation(3);
+                std::vector<float> orientation(3);
+
                 int nx = surface_coords[m][n].at(3),ny = surface_coords[m][n].at(4),nz = surface_coords[m][n].at(5);
-                if ((nx < 0) && (ny == 0) && (nz == 0)){
-                    orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
-                } else if ((nx == 0) && (ny < 0) && (nz == 0)){
-                    orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
-                } else if ((nx == 0) && (ny > 0) && (nz == 0)){
-                    orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
-                } else if ((nx > 0) && (ny == 0) && (nz == 0)) {
-                    orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
-                } else {
-                    orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
-                    std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
-                              << y << " " << z << std::endl;
-                }
+                sim::organ::generate_orientation(nx,ny,nz,orientation);
                 organ_info organ(organ_type, position, orientation);
-                organ_list.push_back(organ);
+                full_list.push_back(organ);
             }
         }
     }
 
     //Select a maximum of 8 location with the maximum distance between them.
+    std::function<float(std::vector<float>,std::vector<float>)> distance =
+        [](std::vector<float> v1, std::vector<float> v2) -> float{
+        return sqrt((v1[0]-v2[0])*(v1[0]-v2[0])
+                    +(v1[1]-v2[1])*(v1[1]-v2[1])
+                    +(v1[2]-v2[2])*(v1[2]-v2[2]));
+    };
+    std::vector<float> distances;
+    for(const organ_info &o1: full_list){
+        std::vector<float> p1 = o1.position;
+        float max_dist = 0;
+        for (const organ_info &o2: full_list){
+            std::vector<float> p2 = o2.position;
+            float dist = distance(p1,p2);
+            if(max_dist < dist)
+                max_dist = dist;
+        }
+        distances.push_back(max_dist);
+    }
+    std::vector<int> indexes(distances.size());
+    std::iota(indexes.begin(),indexes.end(),0);
+    std::sort(indexes.begin(),indexes.end(),[&](int i, int j){return distances[i]>distances[j];});
+    for(int i = 0; i < nbr_organs; i++)
+        organ_list.push_back(full_list[indexes[i]]);
 
+}
+
+int sq_cppn_decoder::cppn_to_organ_type(cppn_t &cppn,const std::vector<double> &input){
+    int organ_type = -1;
+    cppn.step(input);
+    double output = cppn.outf()[0] + 1;
+
+
+    // Is there an organ?
+    if(output < 0.4) //no organ
+        organ_type = -1;
+    else if(output >= 0.4 && output < 0.8) // Wheel
+        organ_type = 1;
+    else if(output >= 0.8 && output < 1.2) // Sensor
+        organ_type = 2;
+    else if(output >= 1.2 && output < 1.6)// Joint
+        organ_type = 3;
+    else if(output >= 1.6) // Caster
+        organ_type = 4;
+    else{
+        std::cerr << "We shouldn't be here: " << __func__ << " max_element: " << output << std::endl;
+        exit(-1);
+    }
+    return organ_type;
 }
 
 void QuadricsLog::saveLog(EA::Ptr &ea){

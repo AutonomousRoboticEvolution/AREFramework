@@ -22,6 +22,20 @@ namespace are {
 
 namespace sim{
 
+namespace organ {
+struct organ_info{
+    organ_info(int t,const std::vector<float> &p,const std::vector<float> &o):
+        type(t),position(p),orientation(o){}
+    int type;
+    std::vector<float> position;
+    std::vector<float> orientation;
+};
+using organ_list_t = std::vector<organ_info>;
+
+void generate_orientation(int x, int y, int z, std::vector<float> &orientation);
+
+}
+
 class Organ{
 private:
     int organHandle;
