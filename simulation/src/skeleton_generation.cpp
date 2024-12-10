@@ -170,6 +170,8 @@ void skeleton::find_skeleton_surface(const skeleton::type &skeleton, skeleton::c
             // Explore neighbourhood.
             // finds surface on the top of robot but doesnt actually use them as organ can't be on the top
             for (int dz = -1; dz <= 1; dz+=1) {
+                if(dz == 0)
+                    continue;
                 if (z + dz > -morph_const::matrix_size/2 && z + dz < morph_const::matrix_size/2) {
                     voxel = skeleton.getVoxel(x, y, z + dz);
                     if (!visited.getVoxel(x, y, z + dz) && voxel == morph_const::filled_voxel) {
@@ -181,6 +183,8 @@ void skeleton::find_skeleton_surface(const skeleton::type &skeleton, skeleton::c
             // finds surfaces in the y direction
             // saves it to be facing in the y direction +/-
             for (int dy = -1; dy <= 1; dy+=1) {
+                if(dy == 0)
+                    continue;
                 if (y + dy > -morph_const::matrix_size/2 && y + dy < morph_const::matrix_size/2) {
                     voxel = skeleton.getVoxel(x, y + dy, z);
                     if (!visited.getVoxel(x, y + dy, z) && voxel == morph_const::filled_voxel) {
@@ -194,6 +198,8 @@ void skeleton::find_skeleton_surface(const skeleton::type &skeleton, skeleton::c
             }
             // finds surfaces in the x direction
             for (int dx = -1; dx <= 1; dx+=1) {
+                if(dx == 0)
+                    continue;
                 if (x + dx > -morph_const::matrix_size/2 && x + dx < morph_const::matrix_size/2) {
                     voxel = skeleton.getVoxel(x + dx, y, z);
                     if (!visited.getVoxel(x + dx, y, z) && voxel == morph_const::filled_voxel) {
@@ -211,7 +217,6 @@ void skeleton::find_skeleton_surface(const skeleton::type &skeleton, skeleton::c
     // This matrix stores the visited elements.
     PolyVox::RawVolume<bool> visited(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
                                                            PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
-    skeleton::coord_t coords;
     uint8_t voxel;
     int counter = 0;
     auto region = skeleton.getEnclosingRegion();
@@ -221,8 +226,8 @@ void skeleton::find_skeleton_surface(const skeleton::type &skeleton, skeleton::c
                 voxel = skeleton.getVoxel(x, y, z);
                 if(voxel == morph_const::filled_voxel && !visited.getVoxel(x, y, z)){
                     counter++;
-                    coords.resize(counter);
-                    generate_coordinates(skeleton, coords, visited, x, y, z, counter);
+                    skeleton_surface.resize(counter);
+                    generate_coordinates(skeleton, skeleton_surface, visited, x, y, z, counter);
                 }
             }
         }

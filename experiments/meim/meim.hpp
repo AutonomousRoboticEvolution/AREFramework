@@ -3,6 +3,8 @@
 
 #include <ARE/EA.h>
 #include <simulatedER/nn2/NN2CPPNGenome.hpp>
+#include <simulatedER/nn2/sq_cppn_genome.hpp>
+#include <simulatedER/are_morphology.hpp>
 #include <simulatedER/Morphology_CPPNMatrix.h>
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
@@ -32,7 +34,7 @@ typedef std::vector<act_obs_sample> rollout_t;
 
 
 typedef struct genome_t{
-    genome_t(NN2CPPNGenome::Ptr mg,hk::Homeokinesis::Ptr ctrl, std::vector<double> objs):
+    genome_t(Genome::Ptr mg,hk::Homeokinesis::Ptr ctrl, std::vector<double> objs):
         morph_genome(mg),controller(ctrl),objectives(objs){}
     genome_t(const genome_t &g) :
         morph_genome(g.morph_genome),
@@ -40,7 +42,7 @@ typedef struct genome_t{
         objectives(g.objectives),
         trajectory(g.trajectory),
         rollout(g.rollout){}
-    NN2CPPNGenome::Ptr morph_genome;
+    Genome::Ptr morph_genome;
     hk::Homeokinesis::Ptr controller;
     std::vector<double> objectives;
     std::vector<waypoint> trajectory;
@@ -48,7 +50,6 @@ typedef struct genome_t{
 } genome_t;
 
 
-using CPPNMorph = sim::Morphology_CPPNMatrix;
 /**
  * @brief The MEIMIndividual class
  */
@@ -56,7 +57,7 @@ class MEIMIndividual : public Individual
 {
 public:
     MEIMIndividual() : Individual(){}
-    MEIMIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen)
+    MEIMIndividual(const Genome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen)
         : Individual(morph_gen,ctrl_gen)
     {}
     MEIMIndividual(const MEIMIndividual& ind):
@@ -160,7 +161,7 @@ private:
 
    void reproduction();
    void remove_worst_parent();
-   NN2CPPNGenome best_of_subset(const std::vector<genome_t>);
+   Genome::Ptr best_of_subset(const std::vector<genome_t>);
 
    double weight = 0;
    double bias = 0;

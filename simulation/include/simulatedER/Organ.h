@@ -31,9 +31,8 @@ struct organ_info{
     std::vector<float> orientation;
 };
 using organ_list_t = std::vector<organ_info>;
-
+void generate_orientation(float x, float y, float z, std::vector<float> &orientation);
 void generate_orientation(int x, int y, int z, std::vector<float> &orientation);
-
 }
 
 class Organ{

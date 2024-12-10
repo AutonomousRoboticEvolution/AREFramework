@@ -14,22 +14,46 @@ std::string act_obs_sample::to_string() const{
 }
 
 void MEIMIndividual::createMorphology(){
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+
     init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     individual_id = morphGenome->id();
-    morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
-    nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->id());
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->createAtPosition(init_position[0],init_position[1],init_position[2]);
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
-    std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getOrganPosDesc());
+    if(use_quadric){
+        morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
+        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
+        quadric_t<quadric_params> quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
+        int nbr_organs = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_nbr_organs();
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_nbr_organs(nbr_organs);
+
+    }else{
+        morphology = std::make_shared<sim::CPPNMorphology>(parameters);
+        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+        std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(cppn);
+
+    }
+
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(morphGenome->id());
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[0],init_position[1],init_position[2]);
+    if(use_quadric){
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getMatrixDesc());
+
+    }else{
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getMatrixDesc());
+    }
+
 }
 
 void MEIMIndividual::createController(){
     bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
-    nb_joints = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
-    nb_wheels = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
-    nb_sensors = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
+    nb_joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_jointHandles().size();
+    nb_wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheelHandles().size();
+    nb_sensors = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_proxHandles().size();
     int nb_inputs = nb_sensors + nb_joints + nb_wheels;
     int nb_outputs = nb_joints + nb_wheels;
     if(nb_outputs == 0)
@@ -106,21 +130,31 @@ void MEIMIndividual::update(double delta_time){
 
 std::string MEIMIndividual::to_string() const
 {
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<MEIMIndividual>();
-    oarch.register_type<NN2CPPNGenome>();
+    if(use_quadric)
+        oarch.register_type<SQCPPNGenome>();
+    else
+        oarch.register_type<NN2CPPNGenome>();
     oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
 }
 
 void MEIMIndividual::from_string(const std::string &str){
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<MEIMIndividual>();
-    iarch.register_type<NN2CPPNGenome>();
+    if(use_quadric)
+        iarch.register_type<SQCPPNGenome>();
+    else
+        iarch.register_type<NN2CPPNGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
@@ -130,7 +164,7 @@ void MEIMIndividual::from_string(const std::string &str){
 }
 
 
-NN2CPPNGenome MEIM::best_of_subset(const std::vector<genome_t> gene_list){
+Genome::Ptr MEIM::best_of_subset(const std::vector<genome_t> gene_list){
    // int obj_idx = settings::getParameter<settings::Integer>(gene_list[0].morph_genome->get_parameters(),"#morphSelectionObjective").value;
 
     double best_fitness = gene_list[0].objectives[0];
@@ -141,15 +175,15 @@ NN2CPPNGenome MEIM::best_of_subset(const std::vector<genome_t> gene_list){
             best_idx = i;
         }
     }
-    nn2_cppn_t cppn = gene_list[best_idx].morph_genome->get_cppn();
-    cppn.mutate();
-    NN2CPPNGenome new_gene(cppn);
-    new_gene.set_parents_ids({gene_list[best_idx].morph_genome->id(),-1});
+    Genome::Ptr new_gene = gene_list[best_idx].morph_genome->clone();
+    new_gene->mutate();
+    new_gene->set_parents_ids({gene_list[best_idx].morph_genome->id(),-1});
     return new_gene;
 }
 
 void MEIM::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
 
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
@@ -165,10 +199,14 @@ void MEIM::init(){
         int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
         population.resize(pop_size);
         for(auto& ind: population){
-            NN2CPPNGenome::Ptr morph_gen = std::make_shared<NN2CPPNGenome>();
+            Genome::Ptr morph_gen;
+            if(use_quadric)
+                morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            else
+                morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
             morph_gen->random();
             morph_gen->set_id(highest_morph_id++);
-            Genome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
+            EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
 
             ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
             ind->set_parameters(parameters);
@@ -183,8 +221,13 @@ void MEIM::init(){
         }
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
-        NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-        MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morphgenome,ctrl_gen);
+        Genome::Ptr morph_gen;
+        if(use_quadric)
+            morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+        else
+            morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+
+        MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -222,15 +265,14 @@ void MEIM::reproduction(){
         std::vector<genome_t> gene_subset;
         for(const int &idx: random_indexes)
             gene_subset.push_back(parent_pool[idx]);
-        NN2CPPNGenome new_morph_gene = best_of_subset(gene_subset);
-        new_morph_gene.set_id(highest_morph_id++);
-        new_morph_gene.set_parameters(parameters);
-        new_morph_gene.set_randNum(randomNum);
+        Genome::Ptr new_morph_gene = best_of_subset(gene_subset);
+        new_morph_gene->set_id(highest_morph_id++);
+        new_morph_gene->set_parameters(parameters);
+        new_morph_gene->set_randNum(randomNum);
 
         //Add it to the population
-        NN2CPPNGenome::Ptr morph_genome = std::make_shared<NN2CPPNGenome>(new_morph_gene);
         EmptyGenome::Ptr ctrl_genome = std::make_shared<EmptyGenome>();
-        MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_genome,ctrl_genome);
+        MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(new_morph_gene,ctrl_genome);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         if(use_fixed_control)
@@ -260,6 +302,7 @@ bool MEIM::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+        bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
         for(int &index : newly_evaluated){
             std::cout << "update for individual indexed " << index << std::endl;
@@ -269,7 +312,11 @@ bool MEIM::update(const Environment::Ptr &env){
             int nb_joints = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_nb_joints();
             int nb_wheels = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_nb_wheels();
             if(nb_joints == 0 && nb_wheels == 0){
-                NN2CPPNGenome::Ptr morph_gen = std::make_shared<NN2CPPNGenome>();
+                Genome::Ptr morph_gen;
+                if(use_quadric)
+                    morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+                else
+                    morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
                 morph_gen->random();
                 morph_gen->set_id(highest_morph_id++);
                 Genome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
@@ -285,7 +332,7 @@ bool MEIM::update(const Environment::Ptr &env){
             }else{ // otherwise add this new individual to the parent pool and perform replacement
                 numberEvaluation++;
                 //add new gene in gene_pool                
-                genome_t new_gene(std::dynamic_pointer_cast<NN2CPPNGenome>(ind->get_morph_genome()),
+                genome_t new_gene(ind->get_morph_genome(),
                                   std::dynamic_pointer_cast<hk::Homeokinesis>(ind->get_control()),
                                   ind->getObjectives());
                 new_gene.trajectory = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_trajectory();

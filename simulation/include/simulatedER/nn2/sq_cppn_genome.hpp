@@ -12,6 +12,10 @@
 #include "ARE/Logging.h"
 #include "simulatedER/skeleton_generation.hpp"
 #include "simulatedER/Organ.h"
+#include "simulatedER/morphology_descriptors.hpp"
+
+#include <pcl/point_cloud.h>
+#include <pcl/point_types.h>
 
 namespace are{
 
@@ -300,6 +304,8 @@ struct params{
 
         static constexpr int nb_inputs = 3;
         static constexpr int nb_outputs = 1;
+
+        static double _expressiveness;
     };
     struct evo_float{
         static float mutation_rate;
@@ -344,8 +350,12 @@ public:
     cppn(cppn_gen), quadric(quadric_gen){}
 
     SQCPPNGenome(const SQCPPNGenome &gen) :
-        Genome(gen), cppn(gen.cppn), quadric(gen.quadric), nbr_organs(gen.nbr_organs){
-    }
+        Genome(gen), cppn(gen.cppn),
+        quadric(gen.quadric),
+        nbr_organs(gen.nbr_organs),
+        feat_desc(gen.feat_desc),
+        organ_position_desc(gen.organ_position_desc),
+        matrix_desc(gen.matrix_desc){}
     ~SQCPPNGenome() override {}
 
     Genome::Ptr clone() const override {
@@ -353,14 +363,13 @@ public:
     }
 
     void init() override {
+        sq_cppn::params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.init();
     }
 
-    void fixed_structure(){
-        cppn.build_fixed_structure();
-    }
 
     void random() override{
+        sq_cppn::params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.random();
         quadric.random(randomNum);
         nbr_organs = randomNum->randInt(4,8);
@@ -438,6 +447,9 @@ public:
         arch & cppn;
         arch & quadric;
         arch & nbr_organs;
+        arch & feat_desc;
+        arch & organ_position_desc;
+        arch & matrix_desc;
     }
 
     
@@ -453,10 +465,22 @@ public:
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
 
+    const sim::FeaturesDesc& get_feat_desc() const {return feat_desc;}
+    void set_feature_desc(const sim::FeaturesDesc& md){feat_desc = md;}
+
+    const sim::OrganMatrixDesc& get_organ_position_desc() const {return organ_position_desc;}
+    void set_organ_position_desc(const sim::OrganMatrixDesc& opd){organ_position_desc = opd;}
+
+    const sim::MatrixDesc& get_matrix_desc() const {return matrix_desc;}
+    void set_matrix_desc(const sim::MatrixDesc& mat){matrix_desc = mat;}
+
 private:
     cppn_t cppn;
     sq_t quadric;
     int nbr_organs = 0;
+    sim::FeaturesDesc feat_desc;
+    sim::OrganMatrixDesc organ_position_desc; //deprecated
+    sim::MatrixDesc matrix_desc;
 };
 
 namespace  sq_cppn_decoder {
@@ -473,8 +497,10 @@ namespace  sq_cppn_decoder {
                 int &number_voxels);
     void generate_skeleton(const sq_t &quadric,
                            skeleton::type& skeleton);
+    void generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr &sites_locations);
+// void clustering(const skeleton::coord_t &surface_coord, skeleton::coord_t &site_locations);
     void generate_organ_list(cppn_t &cppn,
-                             const skeleton::coord_t &surface_coords,
+                             const pcl::PointCloud<pcl::PointNormal>::Ptr & site_locations,
                              int nbr_organs,
                              organ_list_t &organ_list);
     int cppn_to_organ_type(cppn_t &cppn,const std::vector<double> &input);

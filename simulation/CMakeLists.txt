@@ -52,6 +52,7 @@ else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
 find_package(PolyVox REQUIRED)
+find_package(PCL 1.14.1 REQUIRED)
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
@@ -78,6 +79,7 @@ target_include_directories(simulatedER PUBLIC
     "include"
     "ERClient/include"
     "../EAFramework/include"
+    ${PCL_INCLUDE_DIRS}
 )
 
 target_compile_definitions(simulatedER PUBLIC
@@ -87,15 +89,15 @@ target_compile_definitions(simulatedER PUBLIC
 target_link_libraries(simulatedER
     dlibxx dl rt
     ${Boost_LIBRARIES} tbb cmaes zmq
-    ARE
+    ARE ${PCL_LIBRARIES}
     )
 
 
-set_target_properties(simulatedER PROPERTIES
-    CXX_STANDARD 14
-#    COMPILE_FLAGS "-w"
-    POSITION_INDEPENDENT_CODE ON
-)
+# set_target_properties(simulatedER PROPERTIES
+#     CXX_STANDARD 17
+# #    COMPILE_FLAGS "-w"
+#     POSITION_INDEPENDENT_CODE ON
+# )
 
 if(VREP_FOUND)
     SET(LIB_EXT v_repExtER)

@@ -233,12 +233,33 @@ def load_controller_archive(filename):
                     lines.append([coord[0],coord[2],float(row[0])])
     return pd.DataFrame(data=lines,columns=["number of wheels","number of sensors","fitness"])
 
+def load_parenting(filename):
+    parenting = dict()
+    with open(filename) as file:
+        lines = file.readlines()
+        for line in lines:
+            _id = int(line.split(',')[0])
+            parenting[_id] = [int(line.split(',')[1]),int(line.split(',')[2])]
+    return parenting
+
+def compute_lineage_dict_rec(par_id: int,parents: dict):
+    if(par_id == -1):
+        return []
+    return [par_id] + compute_lineage_dict_rec(parents[par_id][0],parents)
+        
+def compute_lineage_dict(parents: dict):
+    lineages = dict()
+    for _id in parents.keys():
+        lineages[_id] = compute_lineage_dict_rec(_id,parents)
+    return lineages
+
 def compute_lineage_rec(ids,par_id,parents):
     if(par_id == -1):
         return []
     for i, _id in zip(range(len(ids)),ids):
         if(par_id == _id):
             return [_id] + compute_lineage_rec(ids,parents[i],parents)
+        
 def compute_lineage(ids,parents):
     lineages = dict()
     for i, _id in zip(range(len(ids)),ids):

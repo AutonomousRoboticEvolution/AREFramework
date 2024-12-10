@@ -5,6 +5,8 @@ add_compile_options("$<$<CONFIG:RELEASE>:-O3>$<$<CONFIG:DEBUG>:-O0>")
 add_compile_options("$<$<CONFIG:DEBUG>:-Wall>")
 add_compile_options("$<$<CONFIG:RELEASE>:-DNDEBUG>")
 add_compile_options("-rdynamic")
+add_compile_options("-std=c++17")
+
 
 if(NOT RASPBERRY)
     set(RASPBERRY 0)

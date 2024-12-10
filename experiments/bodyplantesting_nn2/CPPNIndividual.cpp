@@ -1,4 +1,5 @@
 #include "CPPNIndividual.h"
+#include "simulatedER/are_morphology.hpp"
 
 using namespace are;
 
@@ -16,31 +17,34 @@ void CPPNIndividual::createMorphology()
 
     bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
-    morphology = std::make_shared<sim::Morphology_CPPNMatrix>(parameters);
     if(use_quadric){
-        nn2_cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
+        morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
+        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
         quadric_t<quadric_params> quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_quadric(quadric);
+        int nbr_organs = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_nbr_organs();
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_nbr_organs(nbr_organs);
     }else{
+        morphology = std::make_shared<sim::CPPNMorphology>(parameters);
         nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-        std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->setNN2CPPN(cppn);
+        std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(cppn);
 
     }
-    std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->set_morph_id(morphGenome->id());
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(morphGenome->id());
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 
     if(!use_quadric){
         if(ctrlGenome->get_type() != "empty_genome")
-            assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_feat_desc() == std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
-        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc());
+            assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_feat_desc() == std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->getFeatureDesc());
     }
 
-    feature_desc = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getFeatureDesc();
-    matrix_descriptor = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getMatrixDesc();
-    testRes = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->getRobotManRes();
-    matrix_4d = std::dynamic_pointer_cast<sim::Morphology_CPPNMatrix>(morphology)->get_matrix_4d();
+    feature_desc = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->getFeatureDesc();
+    matrix_descriptor = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->getMatrixDesc();
+    testRes = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_man_test_res().get_results();
+    // matrix_4d = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_matrix_4d();
 }
 
 

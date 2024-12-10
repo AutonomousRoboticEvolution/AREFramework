@@ -8,6 +8,7 @@
 #include "ARE/Genome.h"
 #include "ARE/Logging.h"
 #include "simulatedER/morphology_descriptors.hpp"
+#include "simulatedER/morphology_constants.hpp"
 #include "simulatedER/skeleton_generation.hpp"
 
 namespace are {
@@ -34,6 +35,7 @@ struct cppn_params{
 
         static int nb_inputs;
         static int nb_outputs;
+        static double _expressiveness;
     };
     struct evo_float{
         static float mutation_rate;
@@ -91,14 +93,17 @@ public:
     }
 
     void init() override {
+        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.init();
     }
 
     void fixed_structure(){
+        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.build_fixed_structure();
     }
 
     void random() override{
+        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.random();
     }
 
@@ -208,8 +213,7 @@ void generate_skeleton(nn2_cppn_t &cppn,
 void generate_skeleton_growing(nn2_cppn_t &cppn,
                        skeleton::type& skeleton);
 void generate_organ_list(nn2_cppn_t &cppn,
-                         const skeleton::coord_t &surface_coords,
-                         int nbr_organs,
+                         skeleton::coord_t &surface_coords,
                          organ_list_t &organ_list);
 int cppn_to_organ_type(nn2_cppn_t &cppn,const std::vector<double> &input);
 };

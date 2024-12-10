@@ -16,7 +16,7 @@
 
 #manualDesignFile,string,None
 #saveBlueprint,bool,0
-#growingDecoding,bool,1
+#growingDecoding,bool,0
 #useQuadric,bool,1
 
 #noiseLevel,double,0.
@@ -45,7 +45,7 @@
 #isBootstrapEvolution,bool,0
 #loadExperiment,string,/home/leni/are-logs/
 #bootstrapFile,string,CLRNrobotList.csv
-#isExportModel,bool,1
+#isExportModel,bool,0
 #isScreenshotEnable,bool,1
 #imagesInLogFolder,bool,1
 #imageRepository,string,images

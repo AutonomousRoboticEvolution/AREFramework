@@ -24,6 +24,8 @@ size_t cppn_params::cppn::_max_nb_neurons = 5;
 size_t cppn_params::cppn::_min_nb_conns = 10;
 size_t cppn_params::cppn::_max_nb_conns = 100;
 
+double cppn_params::cppn::_expressiveness = 10.f;
+
 int cppn_params::cppn::nb_inputs = 4;
 int cppn_params::cppn::nb_outputs = 6;
 
@@ -33,8 +35,20 @@ void nn2_cppn_decoder::decode(nn2_cppn_t &cppn,
                               skeleton::type& skeleton,
                               organ_list_t &organ_list,
                               int &number_voxels,
-                              bool growing){
-
+                              bool growing)
+{
+    if(growing)
+        generate_skeleton_growing(cppn,skeleton);
+    else
+        generate_skeleton(cppn,skeleton);
+    skeleton::create_base(skeleton);
+    skeleton::empty_space_for_head(skeleton);
+    skeleton::remove_skeleton_regions(skeleton);
+    skeleton::remove_hoverhangs(skeleton);
+    skeleton::count_number_voxels(skeleton,number_voxels);
+    skeleton::coord_t surface_coords;
+    skeleton::find_skeleton_surface(skeleton,surface_coords);
+    generate_organ_list(cppn,surface_coords,organ_list);
 }
 
 void nn2_cppn_decoder::generate_skeleton(nn2_cppn_t &cppn,skeleton::type &skeleton){
@@ -207,8 +221,7 @@ void nn2_cppn_decoder::generate_skeleton_growing(nn2_cppn_t &cppn,skeleton::type
 }
 
 void nn2_cppn_decoder::generate_organ_list(nn2_cppn_t &cppn,
-                         const skeleton::coord_t &surface_coords,
-                         int nbr_organs,
+                         skeleton::coord_t &surface_coords,
                          organ_list_t &organ_list){
     std::vector<double> input{0,0,0,0}; // Vector used as input of the Neural Network (NN).
     std::vector<double> output;

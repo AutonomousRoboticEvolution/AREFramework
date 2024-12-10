@@ -15,12 +15,15 @@ struct morphology_constants{
     static constexpr int voxels_number = 1331;//real_matrix_size*real_matrix_size*real_matrix_size;
     static constexpr short int empty_voxel=0;
     static constexpr short int filled_voxel=255;
+    static constexpr float organ_voxel_size= 0.05;
 
     // Skeleton dimmesions in voxels
     static constexpr short int xHeadUpperLimit = 2;
     static constexpr short int xHeadLowerLimit = -2;
     static constexpr short int yHeadUpperLimit = 2;
     static constexpr short int yHeadLowerLimit = -2;
+    static constexpr short int zHeadUpperLimit = 0;
+    static constexpr short int zHeadLowerLimit = -5;
 
     // Parameters for skeleton base
     static constexpr short int skeletonBaseThickness = 1;
@@ -30,4 +33,4 @@ struct morphology_constants{
 using morph_const = struct morphology_constants;
 }//are
 
-#endif MORPHOLOGY_CONSTANTS_HPP
+#endif //MORPHOLOGY_CONSTANTS_HPP

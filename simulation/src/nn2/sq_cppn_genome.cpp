@@ -1,4 +1,9 @@
 #include "simulatedER/nn2/sq_cppn_genome.hpp"
+#include <PolyVox/MarchingCubesSurfaceExtractor.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/filters/voxel_grid.h>
 
 using namespace are;
 using namespace are::sq_cppn;
@@ -80,6 +85,8 @@ size_t sq_cppn::params::cppn::_max_nb_neurons = 2;
 size_t sq_cppn::params::cppn::_min_nb_conns = 10;
 size_t sq_cppn::params::cppn::_max_nb_conns = 100;
 
+double sq_cppn::params::cppn::_expressiveness = 10.f;
+
 float sq_cppn::params::evo_float::mutation_rate = 0.1f;
 
 
@@ -90,9 +97,9 @@ void sq_cppn_decoder::decode(const sq_t &quadric, cppn_t &cppn, int nbr_organs,
     skeleton::empty_space_for_head(skeleton);
     skeleton::remove_skeleton_regions(skeleton);
     skeleton::count_number_voxels(skeleton,number_voxels);
-    skeleton::coord_t surface_coords;
-    skeleton::find_skeleton_surface(skeleton,surface_coords);
-    generate_organ_list(cppn,surface_coords,nbr_organs,organ_list);
+    pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations(new pcl::PointCloud<pcl::PointNormal>());
+    generate_organs_sites(skeleton,sites_locations);
+    generate_organ_list(cppn,sites_locations,nbr_organs,organ_list);
 }
 
 void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& skeleton){
@@ -117,74 +124,120 @@ void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& ske
     }
 }
 
-void sq_cppn_decoder::generate_organ_list(cppn_t &cppn, const skeleton::coord_t &surface_coords, int nbr_organs, organ_list_t &organ_list){
-    std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
-    int organ_type;
-    organ_list_t  full_list;
-    for(int m = 0; m < surface_coords.size(); m++) {
-        // This sorts the vectors along the z-axis. This allows to generate organs from the bottom of the robot to the top hence reducing the number of useless organs.
-        // Solution taken from https://stackoverflow.com/questions/45494567/c-how-to-sort-the-rows-of-a-2d-vector-by-the-values-in-each-rows-column
-        std::sort(surface_coords[m].begin(),
-                  surface_coords[m].end(),
-                  [] (const std::vector<int> &a, const std::vector<int> &b)
-                  {
-                      return a[2] < b[2];
-                  });
-        for (int n = 0; n < surface_coords[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
-            double x = static_cast<double>(surface_coords[m][n].at(0))/static_cast<double>(morph_const::real_matrix_size/2);
-            double y = static_cast<double>(surface_coords[m][n].at(1))/static_cast<double>(morph_const::real_matrix_size/2);
-            double z = static_cast<double>(surface_coords[m][n].at(2))/static_cast<double>(morph_const::real_matrix_size/2);
-            input[0] = x;
-            input[1] = y;
-            input[2] = z;
-
-            organ_type = cppn_to_organ_type(cppn,input);
-
-
-            // Create organ if any
-            if(organ_type > 0){
-                std::vector<float> position(3);
-                position.at(0) = static_cast<float>(surface_coords[m][n].at(0) * morph_const::voxel_real_size);
-                position.at(1) = static_cast<float>(surface_coords[m][n].at(1) * morph_const::voxel_real_size);
-                position.at(2) = static_cast<float>(surface_coords[m][n].at(2) * morph_const::voxel_real_size);
-                position.at(2) += morph_const::matrix_size/2 * morph_const::voxel_real_size;
-
-
-                // Gives the direction of the organ given the direction of the surface
-                std::vector<float> orientation(3);
-
-                int nx = surface_coords[m][n].at(3),ny = surface_coords[m][n].at(4),nz = surface_coords[m][n].at(5);
-                sim::organ::generate_orientation(nx,ny,nz,orientation);
-                organ_info organ(organ_type, position, orientation);
-                full_list.push_back(organ);
-            }
-        }
+void sq_cppn_decoder::generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr &sites_locations){
+    auto sign = [](float x) -> int {return (x>0) - (x < 0);};
+    PolyVox::Mesh<PolyVox::MarchingCubesVertex<uint8_t>> mesh =
+        PolyVox::extractMarchingCubesMesh<skeleton::type>(&skeleton,skeleton.getEnclosingRegion());
+    PolyVox::Mesh<PolyVox::Vertex<uint8_t>> surface_mesh= PolyVox::decodeMesh(mesh);
+    pcl::PointCloud<pcl::PointNormal>::Ptr surface_cloud(new pcl::PointCloud<pcl::PointNormal>());
+    std::cout << "number of points " << surface_mesh.getNoOfVertices() << std::endl;
+    for(int i = 0; i < surface_mesh.getNoOfVertices(); i++){
+        PolyVox::Vertex<uint8_t> vertex = surface_mesh.getVertex(i);
+        int nx = fabs(vertex.normal.getX()) > 0.5 ? 1*sign(vertex.normal.getX()) : 0;
+        int ny = fabs(vertex.normal.getY()) > 0.5 ? 1*sign(vertex.normal.getY()) : 0;
+        if(nx == 0 && ny == 0)
+            continue;
+        int x = vertex.position.getX() - morph_const::matrix_size/2;
+        int y = vertex.position.getY() - morph_const::matrix_size/2;
+        int z = vertex.position.getZ() - morph_const::matrix_size/2;
+        if(x <= morph_const::xHeadUpperLimit && x >= morph_const::xHeadLowerLimit
+            && y <= morph_const::yHeadUpperLimit && y >= morph_const::yHeadLowerLimit
+            && z <= morph_const::zHeadUpperLimit && z >= morph_const::zHeadLowerLimit)
+            continue;
+        if(x >= 5 || x <= -5 || y >= 5 || y <= -5)
+            continue;
+        surface_cloud->push_back(pcl::PointNormal(x,y,z,nx,ny,0));
     }
 
-    //Select a maximum of 8 location with the maximum distance between them.
+    pcl::VoxelGrid<pcl::PointNormal> voxel_grid;
+    voxel_grid.setInputCloud(surface_cloud);
+    voxel_grid.setLeafSize(1.5,1.5,1.5);
+    voxel_grid.filter(*sites_locations);
+    std::vector<int> to_erase;
+    for(int i = 0; i < sites_locations->size(); i++){
+        int nx = fabs(sites_locations->at(i).normal_x) > 0.5 ? 1*sign(sites_locations->at(i).normal_x) : 0;
+        int ny = fabs(sites_locations->at(i).normal_y) > 0.5 ? 1*sign(sites_locations->at(i).normal_y) : 0;
+        if(nx == 0 && ny == 0)
+            to_erase.push_back(i);
+        sites_locations->points[i].normal_x = nx;
+        sites_locations->points[i].normal_y = ny;
+    }
+    for(int i : to_erase)
+        sites_locations->erase(sites_locations->begin()+i);
+    std::cout << "number of sites " << sites_locations->size() << std::endl;
+
+
+
+    //uncomment to visulize the sites for organs placement
+    // pcl::visualization::PCLVisualizer::Ptr viewer (new pcl::visualization::PCLVisualizer ("3D Viewer"));
+    // viewer->setBackgroundColor (0, 0, 0);
+    // viewer->addPointCloud<pcl::PointNormal>(sites_locations,"site locations");
+    // viewer->addPointCloud<pcl::PointNormal>(surface_cloud,"surface locations");
+    // viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,5.0, "surface locations");
+    // viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE,10.0, "site locations");
+    // viewer->addPointCloudNormals<pcl::PointNormal>(sites_locations,1,1,"site normals");
+    // viewer->addCoordinateSystem(1,0,0,0);
+    // while (!viewer->wasStopped ())
+    // {
+    //     viewer->spinOnce (100);
+    // }
+
+}
+
+void sq_cppn_decoder::generate_organ_list(cppn_t &cppn, const pcl::PointCloud<pcl::PointNormal>::Ptr & site_locations, int nbr_organs, organ_list_t &organ_list){
     std::function<float(std::vector<float>,std::vector<float>)> distance =
         [](std::vector<float> v1, std::vector<float> v2) -> float{
         return sqrt((v1[0]-v2[0])*(v1[0]-v2[0])
                     +(v1[1]-v2[1])*(v1[1]-v2[1])
                     +(v1[2]-v2[2])*(v1[2]-v2[2]));
     };
-    std::vector<float> distances;
-    for(const organ_info &o1: full_list){
-        std::vector<float> p1 = o1.position;
-        float max_dist = 0;
-        for (const organ_info &o2: full_list){
-            std::vector<float> p2 = o2.position;
-            float dist = distance(p1,p2);
-            if(max_dist < dist)
-                max_dist = dist;
+
+    std::vector<double> input{0,0,0}; // Vector used as input of the Neural Network (NN).
+    int organ_type;
+    organ_list_t  full_list;
+    for(const pcl::PointNormal &site : *site_locations){
+        input[0] = static_cast<float>(site.x* morph_const::voxel_real_size);
+        input[1] = static_cast<float>(site.y* morph_const::voxel_real_size);
+        input[2] = static_cast<float>(site.z* morph_const::voxel_real_size);
+
+
+        organ_type = cppn_to_organ_type(cppn,input);
+        if(organ_type > 0){
+            std::vector<float> position(3);
+            position.at(0) = input[0];
+            position.at(1) = input[1];
+            position.at(2) = input[2];
+            position.at(2) += morph_const::matrix_size/2 * morph_const::voxel_real_size;
+            //float pi_2 = static_cast<float>(M_PI_2);
+            std::vector<float> orientation(3);//{site.normal_x*pi_2,site.normal_y*pi_2,site.normal_z*pi_2};
+            generate_orientation(site.normal_x,site.normal_y,site.normal_z,orientation);
+
+            // Gives the direction of the organ given the direction of the surface
+            organ_info organ(organ_type, position, orientation);
+            organ_list.push_back(organ);
         }
-        distances.push_back(max_dist);
     }
-    std::vector<int> indexes(distances.size());
-    std::iota(indexes.begin(),indexes.end(),0);
-    std::sort(indexes.begin(),indexes.end(),[&](int i, int j){return distances[i]>distances[j];});
-    for(int i = 0; i < nbr_organs; i++)
-        organ_list.push_back(full_list[indexes[i]]);
+    //std::cout << full_list.size() << " organ placed" << std::endl;
+    // organ_list = full_list;
+ 
+
+    //Select a maximum of 8 location with the maximum distance between them.
+
+    // std::vector<float> distances;
+    // for(const organ_info &o1: full_list){
+    //     std::vector<float> p1 = o1.position;
+    //     float mean_dist = 0;
+    //     for (const organ_info &o2: full_list){
+    //         std::vector<float> p2 = o2.position;
+    //         mean_dist += distance(p1,p2);
+    //     }
+    //     distances.push_back(mean_dist/static_cast<float>(full_list.size()-1));
+    // }
+    // std::vector<int> indexes(distances.size());
+    // std::iota(indexes.begin(),indexes.end(),0);
+    // std::sort(indexes.begin(),indexes.end(),[&](int i, int j){return distances[i]>distances[j];});
+    // for(int i = 0; i < nbr_organs; i++)
+    //     organ_list.push_back(full_list[indexes[i]]);
 
 }
 
@@ -276,7 +329,7 @@ void GraphVizLog::saveLog(EA::Ptr &ea){
                                    )->id() << ".dot";
         if(!openOLogFile(logFileStream, filename.str()))
             return;
-        nn2_cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(
+        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(
                               ea->get_population()[i]->get_morph_genome()
                               )->get_cppn();
         cppn.write_dot(logFileStream);

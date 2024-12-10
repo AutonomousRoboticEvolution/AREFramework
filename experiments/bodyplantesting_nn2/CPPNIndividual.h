@@ -4,7 +4,6 @@
 #include "simulatedER/nn2/NN2CPPNGenome.hpp"
 #include "simulatedER/nn2/sq_cppn_genome.hpp"
 #include "ARE/Individual.h"
-#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "ARE/learning/NSGA2.hpp"
 

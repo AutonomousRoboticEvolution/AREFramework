@@ -15,11 +15,46 @@ using namespace are::sim;
 //namespace cop = coppelia;
 using mc = are::morph_const;
 
+void organ::generate_orientation(float x, float y, float z, std::vector<float> &orientation)
+{
+    /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
+    // Gives the direction of the organ given the direction of the surface
+    if ((x > 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x < 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x > 0) && (y < 0) && (z == 0)){
+        orientation.at(0) =  -M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
+                  << y << " " << z << std::endl;
+    }
+}
+
 void organ::generate_orientation(int x, int y, int z, std::vector<float> &orientation)
 {
     /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
     // Gives the direction of the organ given the direction of the surface
-    if ((x < 0) && (y == 0) && (z == 0)){
+    if ((x > 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x < 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x > 0) && (y < 0) && (z == 0)){
+        orientation.at(0) =  -M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y == 0) && (z == 0)){
         orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
     } else if ((x == 0) && (y < 0) && (z == 0)){
         orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
