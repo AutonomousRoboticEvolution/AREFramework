@@ -31,16 +31,9 @@ add_library(meim SHARED
     meim_logging.cpp
     ../common/fixed_controller.cpp
   )
-target_include_directories(meim PUBLIC ${INCLUDES}
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
-    "../../simulation/include"
-    "../../EAFramework/include"
-    "../common/"
-    "/usr/include/eigen3"
-    "../../modules")
+target_include_directories(meim PUBLIC ${INCLUDES})
 target_link_libraries(meim ARE simulatedER cmaes tbb)
 
 install(TARGETS meim DESTINATION lib)
-install(DIRECTORY . DESTINATION include/intrinsic_motivation FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+install(DIRECTORY . DESTINATION include/meim FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
