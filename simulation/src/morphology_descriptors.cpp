@@ -35,13 +35,13 @@ void FeaturesDesc::create(const PolyVox::RawVolume<uint8_t> &skeleton,const std:
                 if(y < min_y)
                     min_y = y;
                 if(z < min_z)
-                    min_y = y;
+                    min_z = z;
                 if(x > max_x)
                     max_x = x;
                 if(y > max_y)
                     max_y = y;
                 if(z > max_z)
-                    max_y = y;
+                    max_z = z;
                 voxel_number++;
             }
         }
@@ -54,9 +54,9 @@ void FeaturesDesc::create(const PolyVox::RawVolume<uint8_t> &skeleton,const std:
 
 Eigen::VectorXd FeaturesDesc::to_eigen_vector() const{
     Eigen::VectorXd desc(8);
-    desc(0) = robot_width / morph_const::dimension_limit;
-    desc(1) = robot_depth / morph_const::dimension_limit;
-    desc(2) = robot_height / morph_const::dimension_limit;
+    desc(0) = robot_width / morph_const::real_matrix_size;
+    desc(1) = robot_depth / morph_const::real_matrix_size;
+    desc(2) = robot_height / morph_const::real_matrix_size;
     desc(3) = (double) voxel_number / morph_const::voxels_number;
     desc(4) = (double) wheel_number / morph_const::organ_trait_limit;
     desc(5) = (double) sensor_number / morph_const::organ_trait_limit;
