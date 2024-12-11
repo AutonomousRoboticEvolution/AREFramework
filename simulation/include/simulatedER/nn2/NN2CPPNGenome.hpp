@@ -93,17 +93,14 @@ public:
     }
 
     void init() override {
-        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.init();
     }
 
     void fixed_structure(){
-        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.build_fixed_structure();
     }
 
     void random() override{
-        cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.random();
     }
 

@@ -30,6 +30,11 @@ void BODYPLANTESTING::init()
     cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
+    cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
+
+    quadric_params::_mutation_rate = settings::getParameter<settings::Double>(parameters,"#sqMutationRate").value;
+    quadric_params::_sigma = settings::getParameter<settings::Double>(parameters,"#sqMutationSigma").value;
+
 
     initPopulation();
 

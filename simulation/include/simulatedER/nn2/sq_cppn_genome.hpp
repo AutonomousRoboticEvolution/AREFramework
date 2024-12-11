@@ -275,8 +275,8 @@ struct quadric_t{
 };
 
 struct quadric_params{
-    static constexpr double _mutation_rate = 0.1f;
-    static constexpr double _sigma = 0.1f;
+    static double _mutation_rate;
+    static double _sigma;
     static constexpr double _lbound = -2;
     static constexpr double _ubound = 2;
 };

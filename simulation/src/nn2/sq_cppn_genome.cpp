@@ -67,6 +67,9 @@ void quadric_param_t::from_string(const std::string& str){
     t = std::stod(splitted_str[7]);
 }
 
+double quadric_params::_mutation_rate = 0.1f;
+double quadric_params::_sigma = 0.1f;
+
 int sq_cppn::params::cppn::_mutation_type = 0; //uniform
 bool sq_cppn::params::cppn::_mutate_connections = true;
 bool sq_cppn::params::cppn::_mutate_neurons = true;
