@@ -42,7 +42,7 @@ int load_fct_exp_plugin(std::function<fct_type>& fct, std::unique_ptr<dlibxx::ha
         auto fct_sym = libhandler->lookup<fct_type>(fct_name);
         if(!fct_sym)
         {
-            std::cerr << "Funtion under symbol " << fct_name << " not found" << std::endl;
+            std::cerr << "Function under symbol " << fct_name << " not found" << std::endl;
             return 0;
         }
 

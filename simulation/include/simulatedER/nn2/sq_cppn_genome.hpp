@@ -363,13 +363,11 @@ public:
     }
 
     void init() override {
-        sq_cppn::params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.init();
     }
 
 
     void random() override{
-        sq_cppn::params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
         cppn.random();
         quadric.random(randomNum);
         nbr_organs = randomNum->randInt(4,8);
