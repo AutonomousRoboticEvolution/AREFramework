@@ -1,6 +1,5 @@
 #include "simulatedER/nn2/sq_cppn_genome.hpp"
 #include <PolyVox/MarchingCubesSurfaceExtractor.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/filters/voxel_grid.h>
