@@ -79,6 +79,6 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep
 
 ## export LD_LIBRARY_PATH=/usr/local/lib
 ## example run
-#python3 run_cluster.py 20 --vrep ../../vrep-3.6.2/are_sim.sh --client are-client --params /are/AREFramework/experiments/meim/parameters_docker.csv --port-start 10000 --xvfb 0
+#python3 run_cluster.py 20 --vrep ../../vrep-3.6.2/are_sim.sh --client are-client --params /are/AREFramework/experiments/meim/parameters_docker.csv --port-start 10000 --xvfb 1
 
 WORKDIR /are

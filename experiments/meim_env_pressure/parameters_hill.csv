@@ -1,6 +1,6 @@
 #experimentName,string,meim_env_pressure
 #expPluginName,string,/usr/local/lib/libmeim.so
-#scenePath,string,/are/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#scenePath,string,/are/AREFramework/simulation/models/scenes/hill.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
 #robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
@@ -35,7 +35,7 @@
 #arenaSize,double,2.
 #cellSize,double,0.25
 #useArucoAsInput,bool,0
-#initPosition,sequence_double,0.;0;0.12
+#initPosition,sequence_double,1.5;-1.5;0.12
 #robotOrientation,sequence_float,0;-1.5708;0
 #genType,int,2
 #withBeacon,bool,1
