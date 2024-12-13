@@ -70,7 +70,6 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j ${N_CPU} && make insta
 # To force rebuild try different values on command line ./build.sh --build-arg="REBUILD_ARE=1"
 ARG REBUILD_ARE=0
 ARG BRANCH=main
-ENV BRANCH=${BRANCH}
 WORKDIR /are
 RUN git clone -b ${BRANCH} --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git
 WORKDIR /are/AREFramework/build
