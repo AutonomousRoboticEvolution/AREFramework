@@ -55,14 +55,29 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j ${N_CPU} && make insta
 #WORKDIR /are
 #RUN git clone https://github.com/resibots/limbo.git
 
-# ARE Framework
-ARG REBUILD_ARE=0
+# PCL
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  libvtk9-dev \
+  libflann-dev \
+  libusb-1.0-0-dev \
+  libpcap-dev
 WORKDIR /are
-RUN git clone -b melai --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git
+RUN git clone https://github.com/PointCloudLibrary/pcl.git
+WORKDIR /are/pcl/build
+RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j ${N_CPU} && make install
+
+# ARE Framework
+# To force rebuild try different values on command line ./build.sh --build-arg="REBUILD_ARE=1"
+ARG REBUILD_ARE=0 
+WORKDIR /are
+RUN git clone -b main --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git
 WORKDIR /are/AREFramework/build
 RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DONLY_SIMULATION=1 .. && make -j ${N_CPU} && make install
 #If using Limbo
 #RUN cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DLIMBO_FODLER=/are/limbo -DONLY_SIMULATION=1 .. && make -j ${N_CPU} && make install
 
 ## export LD_LIBRARY_PATH=/usr/local/lib
+## example run
+#python3 run_cluster.py 20 --vrep ../../vrep-3.6.2/are_sim.sh --client are-client --params /are/AREFramework/experiments/meim/parameters_docker.csv --port-start 10000 --xvfb 0
+
 WORKDIR /are
