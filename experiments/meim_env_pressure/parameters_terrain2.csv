@@ -1,5 +1,5 @@
 #experimentName,string,meim_env_pressure
-#expPluginName,string,/usr/local/lib/libmeim.so
+#expPluginName,string,/usr/local/lib/libmeim_env_pressure.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/terrain_2.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
