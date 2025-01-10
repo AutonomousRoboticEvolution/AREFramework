@@ -32,7 +32,7 @@
 #quadricFile,string,quadrics.csv
 
 #maxVelocity,double,6.
-#arenaSize,double,4.
+#arenaSize,double,2.
 #cellSize,double,0.25
 #useArucoAsInput,bool,0
 #initPosition,sequence_double,0.;0;0.12
