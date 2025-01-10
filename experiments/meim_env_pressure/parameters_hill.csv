@@ -32,7 +32,7 @@
 #quadricFile,string,quadrics.csv
 
 #maxVelocity,double,6.
-#arenaSize,double,2.
+#arenaSize,double,4.
 #cellSize,double,0.25
 #useArucoAsInput,bool,0
 #initPosition,sequence_double,1.5;-1.5;0.12
@@ -52,7 +52,7 @@
 #useJointFeedback,bool,1
 #useWheelFeedback,bool,1
 
-#fixedController,bool,1
+#fixedController,bool,0
 
 #isWheel,bool,1
 #isSensor,bool,1
