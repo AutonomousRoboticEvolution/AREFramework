@@ -70,9 +70,9 @@ std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std:
     indexes.first = std::trunc(pos[0]/cell_size + std::round(grid_size/2));
     indexes.second = std::trunc(pos[1]/cell_size + std::round(grid_size/2));
     if(indexes.first == grid_size)
-        indexes.first = 7;
+        indexes.first = grid_size - 1;
     if(indexes.second == grid_size)
-        indexes.second = 7;
+        indexes.second = grid_size - 1;
     return indexes;
 }
 
