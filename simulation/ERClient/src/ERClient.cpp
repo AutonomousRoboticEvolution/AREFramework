@@ -85,6 +85,14 @@ int main(int argc, char* argv[])
     client->set_parameters(parameters);
     //-
 
+    if(settings::getParameter<settings::Integer>(parameters,"#instanceType").value == settings::INSTANCE_REGULAR){
+        std::cerr << "--- Launch Error ---"  << std::endl
+                  << "Experiment launch as regular instance (sequential). This program should be launch in server instance (parallel)" << std::endl
+                  << "Please set #instanceType parameter to 1 and relaunch the experiment." << std::endl
+                  << "Aborting application." << std::endl;
+        return 1;
+    }
+
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
     if(seed < 0){
         std::random_device rd;
