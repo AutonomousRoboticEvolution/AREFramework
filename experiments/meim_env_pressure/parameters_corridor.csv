@@ -2,12 +2,12 @@
 #expPluginName,string,/usr/local/lib/libmeim_env_pressure.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/long_arena.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#modelsPath,string,/areAREFramework/simulation/models/
+#modelsPath,string,/are/AREFramework/simulation/models/
 #robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
 #maxEvalTime,float,1200
 #repository,string,/are/logs/
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #realTimeSim,bool,0
 #timeStep,float,0.02
@@ -32,7 +32,7 @@
 #quadricFile,string,quadrics.csv
 
 #maxVelocity,double,6.
-#arenaSize,double,2.
+#arenaSize,sequence_double,12.;2.
 #cellSize,double,0.25
 #useArucoAsInput,bool,0
 #initPosition,sequence_double,0.0;0.0;0.12
