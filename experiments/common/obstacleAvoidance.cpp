@@ -41,8 +41,8 @@ void ObstacleAvoidance::init(){
     std::vector<double> arena_size = settings::getParameter<settings::Sequence<double>>(parameters,"#arenaSize").value;
     double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
-    std::vector<int> grid_size({static_cast<int>(std::round(arena_size[0]/cell_size)),
-                                static_cast<int>(std::round(arena_size[1]/cell_size))});
+    grid_size = {static_cast<int>(std::round(arena_size[0]/cell_size)),
+                                static_cast<int>(std::round(arena_size[1]/cell_size))};
 
     grid_zone = Eigen::MatrixXi::Zero(grid_size[0],grid_size[1]);
     number_of_collisions = 0;
