@@ -12,7 +12,7 @@ ObstacleAvoidance::ObstacleAvoidance(const settings::ParametersMapPtr& params)
     name = "obstacle_avoidance";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<settings::Double>(2.));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<settings::Sequence<double>>(std::vector<double>({2.,2.})));
     settings::defaults::parameters->emplace("#cellSize",std::make_shared<settings::Double>(0.25));
     settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<settings::Integer>(2));
     settings::defaults::parameters->emplace("#flatFloor",std::make_shared<settings::Boolean>(true));
@@ -38,12 +38,13 @@ void ObstacleAvoidance::init(){
 
     trajectory.clear();
 
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+    std::vector<double> arena_size = settings::getParameter<settings::Sequence<double>>(parameters,"#arenaSize").value;
     double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
-    grid_size = std::round(arena_size/cell_size);
+    grid_size = {static_cast<int>(std::round(arena_size[0]/cell_size)),
+                                static_cast<int>(std::round(arena_size[1]/cell_size))};
 
-    grid_zone = Eigen::MatrixXi::Zero(grid_size,grid_size);
+    grid_zone = Eigen::MatrixXi::Zero(grid_size[0],grid_size[1]);
     number_of_collisions = 0;
 
 
@@ -59,7 +60,7 @@ void ObstacleAvoidance::init(){
 
 std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
    // if(number_of_collisions == 0)
-    return {static_cast<double>(grid_zone.sum())/static_cast<double>(grid_size*grid_size)};
+    return {static_cast<double>(grid_zone.sum())/static_cast<double>(grid_size[0]*grid_size[1])};
     //return {(static_cast<double>(grid_zone.sum())/static_cast<double>(number_of_collisions))/64.f};
 }
 
@@ -67,12 +68,12 @@ std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std:
     std::pair<int,int> indexes;
     double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
-    indexes.first = std::trunc(pos[0]/cell_size + std::round(grid_size/2));
-    indexes.second = std::trunc(pos[1]/cell_size + std::round(grid_size/2));
-    if(indexes.first == grid_size)
-        indexes.first = 7;
-    if(indexes.second == grid_size)
-        indexes.second = 7;
+    indexes.first = std::trunc(pos[0]/cell_size + std::round(grid_size[0]/2));
+    indexes.second = std::trunc(pos[1]/cell_size + std::round(grid_size[1]/2));
+    if(indexes.first == grid_size[0])
+        indexes.first = grid_size[0] - 1;
+    if(indexes.second == grid_size[1])
+        indexes.second = grid_size[1] - 1;
     return indexes;
 }
 

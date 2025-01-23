@@ -27,7 +27,7 @@
 #inputNoiseLevel,double,0.
 #outputNoiseLevel,double,0.
 #maxVelocity,double,6.
-#arenaSize,double,2.
+#arenaSize,sequence_double,2.;2.
 #useArucoAsInput,bool,1
 #initPosition,sequence_double,0;0;0.2
 #targetPosition,sequence_double,0.775;0.025;0.2

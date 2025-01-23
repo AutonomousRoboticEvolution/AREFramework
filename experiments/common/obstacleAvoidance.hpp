@@ -46,7 +46,7 @@ public:
 private:
     int move_counter = 0;
     int number_of_collisions = 0;
-    int grid_size = 8;
+    std::vector<int> grid_size = {8,8};
     Eigen::MatrixXi grid_zone;
 };
 

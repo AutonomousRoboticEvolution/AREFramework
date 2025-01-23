@@ -1,18 +1,18 @@
-#experimentName,string,visualization
-#expPluginName,string,/usr/local/lib/libvisualization.so
-#scenePath,string,/are/AREFramework/simulation/models/scenes/ARE_arena.ttt
+#experimentName,string,visualization2
+#expPluginName,string,/usr/local/lib/libvisualization2.so
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/ARE_arena.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #folderToLoad,string,/media/leni/DATADRIVE1/are-logs/meim_ds_10659/locomotion/nipes_9_3_5-57-38-8586-522496819/
-#modelsPath,string,/are/AREFramework/simulation/models/
+#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
 #robotPath,string,None
 #manualDesignFile,string,None
+#useQuadric,bool,0
+#quadricFile,string,quadrics.csv
 #idToLoad,int,-1
-#genToLoad,int,1
-#indToLoad,int,0
 #maxEvalTime,float,1
 #numberOfGeneration,int,0
 #populationSize,int,1
-#repository,string,/are/logs/
+#repository,string,/home/leni/are-logs/
 #verbose,bool,1
 #instanceType,int,0
 #killWhenNotConnected,bool,0
@@ -21,6 +21,7 @@
 #ctrlUpdateFrequency,double,0.1
 #shouldReopenConnections,bool,0
 #seed,int,-1
+
 
 #envType,int,6
 #maxDistance,double,11

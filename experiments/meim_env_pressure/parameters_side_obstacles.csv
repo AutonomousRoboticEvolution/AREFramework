@@ -1,5 +1,5 @@
 #experimentName,string,meim_env_pressure
-#expPluginName,string,/usr/local/lib/libmeim.so
+#expPluginName,string,/usr/local/lib/libmeim_env_pressure.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
@@ -19,7 +19,7 @@
 #envNumber,int,1
 
 #populationSize,int,100
-#maxNbrEval,int,10000
+#maxNbrEval,int,5000
 #tournamentSize,int,4
 
 #manualDesignFile,string,None
@@ -32,7 +32,7 @@
 #quadricFile,string,quadrics.csv
 
 #maxVelocity,double,6.
-#arenaSize,double,2.
+#arenaSize,sequence_double,2.;2.
 #cellSize,double,0.25
 #useArucoAsInput,bool,0
 #initPosition,sequence_double,0.;0;0.12
@@ -52,7 +52,7 @@
 #useJointFeedback,bool,1
 #useWheelFeedback,bool,1
 
-#fixedController,bool,1
+#fixedController,bool,0
 
 #isWheel,bool,1
 #isSensor,bool,1
@@ -77,8 +77,8 @@
 
 #descriptor,int,0
 
-#epsilonA,double,0.12
-#epsilonC,double,0.1
+#epsilonA,double,0.1
+#epsilonC,double,0.08
 #add_noise,bool,1
-#noise_strength,double,0.4
-#creativity,double,2.0
+#noise_strength,double,0.3
+#creativity,double,1.0

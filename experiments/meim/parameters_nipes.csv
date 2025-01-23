@@ -38,7 +38,7 @@
 #archiveFile,string,archive.csv
 
 #seed,int,-1
-#arenaSize,double,2.
+#arenaSize,sequence_double,2.;2.
 #maxDistance,double,11.
 #maxHeight,double,0.55
 #objectWeight,float,1.
