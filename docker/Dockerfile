@@ -20,7 +20,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     libzmq3-dev \
     jupyter \
     fish \
-    python3-pip && pip3 install psutil dlib numpy=='1.26.4' scikit-learn=='1.5.0' pandas=='2.2.2' paretoset matplotlib=='3.9.0' seaborn=='0.13.2'
+    python3-pip && pip3 install psutil dlib numpy=='1.26.4' scikit-learn=='1.5.0' pandas=='2.2.2' paretoset matplotlib=='3.9.0' seaborn=='0.13.2' umap-learn
 
 # x11-apps only to test GUI xclock within docker
 
