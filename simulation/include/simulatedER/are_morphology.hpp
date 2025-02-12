@@ -11,6 +11,7 @@
 #include "simulatedER/skeleton_generation.hpp"
 #include "simulatedER/nn2/NN2CPPNGenome.hpp"
 #include "simulatedER/nn2/sq_cppn_genome.hpp"
+#include "simulatedER/nn2/sq_genome.hpp"
 
 
 namespace are {
@@ -119,7 +120,7 @@ public:
     void set_man_test_res(const ManRes& mtr){man_test_res = mtr;}
 
 protected:
-    void check_repress_organs(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles);
+    virtual void check_repress_organs(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles);
 
     void create_organ_list(const organ::organ_list_t &organ_i_list);
 
@@ -216,6 +217,140 @@ private:
     void create_organs();
 
     cppn_t cppn;
+    sq_t quadric;
+    int nbr_organs;
+
+};
+
+template<typename cg_param_t, typename sq_param_t>
+class SQMorphology: public AREMorphology{
+public:
+    using cg_t = ComponentsGenome<cg_param_t>;
+    using sq_t = quadric_t<sq_param_t>;
+
+    typedef std::shared_ptr<SQMorphology> Ptr;
+    typedef std::shared_ptr<const SQMorphology> ConstPtr;
+
+    SQMorphology(const settings::ParametersMapPtr &param) : AREMorphology(param){}
+    SQMorphology(const SQMorphology& arem):
+        AREMorphology(arem), comp_gen(arem.comp_gen), quadric(arem.quadric)
+    {}
+
+    are::Morphology::Ptr clone() const override
+    {return std::make_shared<SQMorphology>(*this);}
+
+    void create() override
+    {
+        int meshHandle = -1;
+        mainHandle = -1;
+        bool convexDecompositionSuccess = false;
+        std::vector<int> gripperHandles;
+        createGripper(gripperHandles);
+        numSkeletonVoxels = 0;
+        createHead();
+        skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
+                                                    PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
+        organ::organ_list_t organ_i_list;
+        sq_decoder::decode<sq_t,cg_t>(quadric,comp_gen,nbr_organs,skeleton_matrix,organ_i_list,numSkeletonVoxels);
+        create_organ_list(organ_i_list);
+
+        // Create mesh for skeleton
+        bool indVerResult = generate_skeleton_mesh(skeleton_matrix,meshHandle);
+        if(indVerResult)
+            convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
+        if(!convexDecompositionSuccess){
+            // Stop generating body plan if convex decomposition fails
+            std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
+            return;
+        }
+
+        if(convexDecompositionSuccess){
+            check_repress_organs(skeleton_matrix,gripperHandles);
+            //create_organs();
+        }
+        else{
+            // Stop generating body plan if convex decomposition fails
+            std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
+            return;
+        }
+
+        //Create morphological descriptors
+        if(indVerResult || convexDecompositionSuccess){
+            feat_desc.create(skeleton_matrix,organ_list);
+            matrix_desc.create(skeleton_matrix,organ_list);
+            organ_mat_desc.create(skeleton_matrix,organ_list); //todo remove this one or put an option for either matrix or organ_mat
+        }
+
+        //create blueprint
+        if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
+            blueprint.createBlueprint(organ_list);
+        destroyGripper(gripperHandles);
+        destroy_physical_connectors();
+        // Export model
+        if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+            std::string model_folder = settings::getParameter<settings::String>(parameters,"#modelRepository").value;
+            if(model_folder.empty() || model_folder == "None")
+                exportRobotModel(morph_id);
+            else
+                exportRobotModel(morph_id,model_folder);
+        }
+
+        retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
+        // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
+        // this might mess up with the physics engine if the shape is non-convex!
+        // I set this flag to prevent the warning showing and stopping evolution.
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    }
+
+    void set_comp_gen(const cg_t &nn){comp_gen = nn;}
+    const cg_t &get_comp_gen(){return comp_gen;}
+
+    void set_quadric(const sq_t& sq){quadric = sq;}
+    const sq_t &get_quadric(){return quadric;}
+
+    int get_nbr_organs(){return nbr_organs;}
+    void set_nbr_organs(int no){nbr_organs = no;}
+
+private:
+    void create_organs(){
+            for(Organ &organ: organ_list)
+        organ.createOrgan(mainHandle);
+    }
+    void check_repress_organs(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles) override
+    {
+        std::vector<int> bad_organs_idxs;
+        bool no_bad_organs = false;
+        create_organs();
+        while(!no_bad_organs){
+            //STEP 1: Check organs which are colliding with others or with the skeleton
+            for(int i = 0; i < organ_list.size(); i++){
+                //TODO joints number limit
+                Organ &organ = organ_list[i];
+                // organ.createOrgan(mainHandle);
+                if(organ.getOrganType() != 0)
+                    organ.testOrgan(skeleton_matrix, -1, skeletonHandles, organ_list);
+                if(organ.organColliding || organ.organInsideSkeleton)
+                    bad_organs_idxs.push_back(i);
+            }
+            //STEP 2: Randomly pick one and repress it
+            if(!bad_organs_idxs.empty()){
+                int rand_idx = randomNum->randInt(0,bad_organs_idxs.size()-1);
+                comp_gen.remove(bad_organs_idxs[rand_idx]-1);
+                organ_list[bad_organs_idxs[rand_idx]].repressOrgan();
+                organ_list.erase(organ_list.begin() + bad_organs_idxs[rand_idx]);
+            }else no_bad_organs = true;
+            for(Organ &organ: organ_list){
+                organ.organColliding = false;
+                organ.organInsideSkeleton = false;
+            }
+
+            bad_organs_idxs.clear();
+        }
+    }
+
+
+    std::vector<int> repressed_comp_genes;
+    cg_t comp_gen;
     sq_t quadric;
     int nbr_organs;
 
