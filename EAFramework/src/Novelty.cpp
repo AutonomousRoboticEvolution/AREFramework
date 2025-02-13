@@ -72,7 +72,7 @@ Novelty::distance_fct_t Novelty::distance_fcts::positional = [](Eigen::VectorXd 
 
     //add to the sum the N first distances (closest organs) and _dim_ if the organs are different.
     //where N is the largest number of organs in different position between the two body-plans
-    for(int i = 0; i < std::max(v_coord.size(),w_coord.size()); i++){
+    for(size_t i = 0; i < std::max(v_coord.size(),w_coord.size()); i++){
         auto dist = distances[i][0]; //get the pair with the smallest distance
         int j = L.second[dist[1]][0] + L.second[dist[1]][1]*dim + L.second[dist[1]][2]*dim*dim;
         int k = S.second[dist[2]][0] + S.second[dist[2]][1]*dim + S.second[dist[2]][2]*dim*dim;

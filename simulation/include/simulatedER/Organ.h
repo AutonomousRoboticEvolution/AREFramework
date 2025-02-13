@@ -80,12 +80,12 @@ public:
         organRemoved(o.organRemoved),
         organChecked(o.organChecked),
         parameters(o.parameters),
+        connector_frame_pos(o.connector_frame_pos),
         organPos(o.organPos),
         connectorPos(o.connectorPos),
         organOri(o.organOri),
         organInsideSkeleton(o.organInsideSkeleton),
         organColliding(o.organColliding),
-        connector_frame_pos(o.connector_frame_pos),
         organGripperAccess(o.organGripperAccess){}
     /**
      * @brief This method creates, places and rotates the simulated organ. The parent will be the skeleton hangle passed.

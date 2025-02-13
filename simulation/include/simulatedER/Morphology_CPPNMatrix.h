@@ -172,7 +172,7 @@ public:
     void setNN2CPPN(const nn2_cppn_t &nn){
         nn2_cppn = nn;
     }
-    void set_quadric(const quadric_t<quadric_params> &quad){
+    void set_quadric(const quadric_t<quadric_mut_params> &quad){
         quadric = quad;
     }
     void set_matrix_4d(const std::vector<std::vector<double>> m4d){matrix_4d = m4d;}
@@ -210,7 +210,7 @@ public:
 
 private:
     nn2_cppn_t nn2_cppn;
-    quadric_t<quadric_params> quadric;
+    quadric_t<quadric_mut_params> quadric;
     std::vector<std::vector<int>> list_of_voxels;
 
     unsigned int id = 0;

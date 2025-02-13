@@ -28,12 +28,12 @@ public:
     Morphology(const settings::ParametersMapPtr &param) : are::Morphology(param){}
     Morphology(const Morphology& morph) :
         mainHandle(morph.mainHandle),
+        morph_id(morph.morph_id),
         jointHandles(morph.jointHandles),
-        wheelHandles(morph.wheelHandles),
         proxHandles(morph.proxHandles),
         IRHandles(morph.IRHandles),
-        camera_handle(morph.camera_handle),
-        morph_id(morph.morph_id)
+        wheelHandles(morph.wheelHandles),
+        camera_handle(morph.camera_handle)
     {}
     virtual ~Morphology()
     {

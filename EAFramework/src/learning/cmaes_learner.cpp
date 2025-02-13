@@ -222,7 +222,7 @@ if(verbose)
 
 std::vector<CMAESLearner::w_b_pair_t> CMAESLearner::get_remaining_population(){
     std::vector<w_b_pair_t>  new_pop;
-    for(int k = _population.size() - current_nbr_ind; k < _population.size(); k++){
+    for(size_t k = _population.size() - current_nbr_ind; k < _population.size(); k++){
         auto gen = _population[k];
         std::vector<double> weights;
         std::vector<double> biases;

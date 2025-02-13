@@ -58,8 +58,8 @@ void Population::push_back(const Individual::Ptr& ind){
 }
 
 bool Population::check_doublons(){
-    for(int i = 0; i < _indexes.size(); i++){
-        for(int j = 0; j < _indexes.size(); j++){
+    for(size_t i = 0; i < _indexes.size(); i++){
+        for(size_t j = 0; j < _indexes.size(); j++){
             if(i != j && _indexes[i] == _indexes[j])
                 return true;
         }
