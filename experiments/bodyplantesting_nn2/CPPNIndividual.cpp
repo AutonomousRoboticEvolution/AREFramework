@@ -5,14 +5,6 @@ using namespace are;
 
 void CPPNIndividual::createMorphology()
 {
-    auto round = [](const Eigen::VectorXd &v) -> Eigen::VectorXd{
-        Eigen::VectorXd rv(v.rows());
-        for(int i = 0; i < v.rows(); i++)
-            rv(i) = std::round(v(i));
-        return rv;
-    };
-//    individual_id = morphGenome->id();
-
     bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
     if(use_quadric){

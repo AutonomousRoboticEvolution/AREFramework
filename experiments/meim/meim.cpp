@@ -14,7 +14,7 @@ std::string act_obs_sample::to_string() const{
 }
 
 void MEIMIndividual::createMorphology(){
-    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
     init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     individual_id = morphGenome->id();
@@ -152,7 +152,7 @@ void MEIMIndividual::update(double delta_time){
 
 std::string MEIMIndividual::to_string() const
 {
-    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
@@ -170,7 +170,7 @@ std::string MEIMIndividual::to_string() const
 }
 
 void MEIMIndividual::from_string(const std::string &str){
-    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
     std::stringstream sstream;
     sstream << str;
@@ -230,7 +230,7 @@ Genome::Ptr MEIM::best_of_subset(const std::vector<genome_t> gene_list){
 
 void MEIM::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
-    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
@@ -363,7 +363,7 @@ bool MEIM::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
+        int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
         for(int &index : newly_evaluated){
             std::cout << "update for individual indexed " << index << std::endl;

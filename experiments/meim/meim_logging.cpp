@@ -4,7 +4,7 @@ using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
-    int genome_type = settings::getParameter<settings::Boolean>(ea->get_parameters(),"#morphGenomeType").value;
+    int genome_type = settings::getParameter<settings::Integer>(ea->get_parameters(),"#morphGenomeType").value;
     for(const auto &genome:  static_cast<MEIM*>(ea.get())->get_new_genes()){
 
         //- Log the cppn
