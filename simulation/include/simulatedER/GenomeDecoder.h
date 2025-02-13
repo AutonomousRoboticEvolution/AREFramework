@@ -39,7 +39,7 @@ public:
     void genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                        std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
-    void superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+    void superquadricsDecoder(quadric_t<quadric_mut_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                               std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
     /**
@@ -53,7 +53,7 @@ public:
 
     static void growthBasedSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn);
 
-    static void superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, quadric_t<quadric_params> &quadric);
+    static void superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, quadric_t<quadric_mut_params> &quadric);
 
     static void countNumberSkeletonVoxels(const PolyVox::RawVolume<uint8_t> &skeleton,int &numSkeletonVoxels);
 

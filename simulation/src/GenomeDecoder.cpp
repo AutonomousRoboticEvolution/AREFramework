@@ -12,7 +12,9 @@ using namespace are::sim;
 
 
 
-void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn){
+void GenomeDecoder::assignSkeletonVoxel(int32_t x, int32_t y, int32_t z,
+                                        PolyVox::RawVolume<uint8_t> &skeleton,
+                                        nn2_cppn_t &cppn){
 
     //- Test if the coordinate are out of bound, if yes exit
     PolyVox::Region region = skeleton.getEnclosingRegion();
@@ -103,7 +105,8 @@ void GenomeDecoder::growthBasedSkeletonGeneration(PolyVox::RawVolume<uint8_t>& s
 
 }
 
-void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, quadric_t<quadric_params> &quadric){
+void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton,
+                                                   quadric_t<quadric_mut_params> &quadric){
     std::cout << "superquadric decoding" << std::endl;
     PolyVox::Region region = skeleton.getEnclosingRegion();
 
@@ -127,7 +130,8 @@ void GenomeDecoder::superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &
     }
 }
 
-void GenomeDecoder::countNumberSkeletonVoxels(const PolyVox::RawVolume<uint8_t> &skeleton, int &numSkeletonVoxels){
+void GenomeDecoder::countNumberSkeletonVoxels(const PolyVox::RawVolume<uint8_t> &skeleton,
+                                              int &numSkeletonVoxels){
     PolyVox::Region region = skeleton.getEnclosingRegion();
     for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
         for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
@@ -176,7 +180,8 @@ void GenomeDecoder::decodeGenome(PolyVox::RawVolume<uint8_t>& skeleton, nn2_cppn
 
 
 //checks skeleton is connected to start and not in the head
-void GenomeDecoder::generateSkeleton(const PolyVox::RawVolume<uint8_t> &input_skeleton, PolyVox::RawVolume<uint8_t> &output_skeleton, int &numSkeletonVoxels)
+void GenomeDecoder::generateSkeleton(const PolyVox::RawVolume<uint8_t> &input_skeleton,
+                                     PolyVox::RawVolume<uint8_t> &output_skeleton, int &numSkeletonVoxels)
 {
     uint8_t areVoxel;
     uint8_t uVoxelValue;
@@ -334,7 +339,8 @@ void GenomeDecoder::removeSkeletonRegions(PolyVox::RawVolume<uint8_t> &skeletonM
 // recures through each direction
 void GenomeDecoder::exploreSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                     PolyVox::RawVolume<bool> &visitedVoxels, int32_t posX, int32_t posY,
-                                    int32_t posZ, int surfaceCounter, std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
+                                    int32_t posZ, int surfaceCounter,
+                                    std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord)
 {
     visitedVoxels.setVoxel(posX, posY, posZ, true); // Cell visited
     uint8_t voxel;
@@ -469,7 +475,8 @@ void GenomeDecoder::genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<uin
     findSkeletonSurface(skeletonMatrix, skeletonSurfaceCoord);
 }
 
-void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+void GenomeDecoder::superquadricsDecoder(quadric_t<quadric_mut_params> &quadric,
+                                         nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                                          std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels){
     superquadricSkeletonGeneration(skeletonMatrix,quadric);
     countNumberSkeletonVoxels(skeletonMatrix,numSkeletonVoxels);

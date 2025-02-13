@@ -615,7 +615,7 @@ void SQCPPNMorphology::create(){
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
                                                    PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
     organ::organ_list_t organ_i_list;
-    sq_cppn_decoder::decode(quadric,cppn,nbr_organs,skeleton_matrix,organ_i_list,numSkeletonVoxels);
+    sq_cppn_decoder::decode(quadric,cppn,skeleton_matrix,organ_i_list,numSkeletonVoxels);
     create_organ_list(organ_i_list);
 
     // Create mesh for skeleton
@@ -668,4 +668,103 @@ void SQCPPNMorphology::create(){
 void SQCPPNMorphology::create_organs(){
     for(Organ &organ: organ_list)
         organ.createOrgan(mainHandle);
+}
+
+
+void SQMorphology::create(){
+    int meshHandle = -1;
+    mainHandle = -1;
+    bool convexDecompositionSuccess = false;
+    std::vector<int> gripperHandles;
+    createGripper(gripperHandles);
+    numSkeletonVoxels = 0;
+    createHead();
+    skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
+                                                   PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
+    organ::organ_list_t organ_i_list;
+    sq_decoder::decode(quadric,comp_gen,skeleton_matrix,organ_i_list,numSkeletonVoxels);
+    create_organ_list(organ_i_list);
+
+    // Create mesh for skeleton
+    bool indVerResult = generate_skeleton_mesh(skeleton_matrix,meshHandle);
+    if(indVerResult)
+        convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
+    if(!convexDecompositionSuccess){
+        // Stop generating body plan if convex decomposition fails
+        std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
+        return;
+    }
+
+    if(convexDecompositionSuccess){
+        check_repress_organs(skeleton_matrix,gripperHandles);
+        //create_organs();
+    }
+    else{
+        // Stop generating body plan if convex decomposition fails
+        std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
+        return;
+    }
+
+    //Create morphological descriptors
+    if(indVerResult || convexDecompositionSuccess){
+        feat_desc.create(skeleton_matrix,organ_list);
+        matrix_desc.create(skeleton_matrix,organ_list);
+        organ_mat_desc.create(skeleton_matrix,organ_list); //todo remove this one or put an option for either matrix or organ_mat
+    }
+
+    //create blueprint
+    if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
+        blueprint.createBlueprint(organ_list);
+    destroyGripper(gripperHandles);
+    destroy_physical_connectors();
+    // Export model
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        std::string model_folder = settings::getParameter<settings::String>(parameters,"#modelRepository").value;
+        if(model_folder.empty() || model_folder == "None")
+            exportRobotModel(morph_id);
+        else
+            exportRobotModel(morph_id,model_folder);
+    }
+
+    retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
+    // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
+    // this might mess up with the physics engine if the shape is non-convex!
+    // I set this flag to prevent the warning showing and stopping evolution.
+    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+}
+void SQMorphology::create_organs(){
+    for(Organ &organ: organ_list)
+        organ.createOrgan(mainHandle);
+}
+void SQMorphology::check_repress_organs(const skeleton::type &skeleton_matrix,
+                                        const std::vector<int> &gripper_handles)
+{
+    std::vector<int> bad_organs_idxs;
+    bool no_bad_organs = false;
+    create_organs();
+    while(!no_bad_organs){
+        //STEP 1: Check organs which are colliding with others or with the skeleton
+        for(int i = 0; i < organ_list.size(); i++){
+            //TODO joints number limit
+            Organ &organ = organ_list[i];
+            // organ.createOrgan(mainHandle);
+            if(organ.getOrganType() != 0)
+                organ.testOrgan(skeleton_matrix, -1, skeletonHandles, organ_list);
+            if(organ.organColliding || organ.organInsideSkeleton)
+                bad_organs_idxs.push_back(i);
+        }
+        //STEP 2: Randomly pick one and repress it
+        if(!bad_organs_idxs.empty()){
+            int rand_idx = randomNum->randInt(0,bad_organs_idxs.size()-1);
+            comp_gen.remove(bad_organs_idxs[rand_idx]-1);
+            organ_list[bad_organs_idxs[rand_idx]].repressOrgan();
+            organ_list.erase(organ_list.begin() + bad_organs_idxs[rand_idx]);
+        }else no_bad_organs = true;
+        for(Organ &organ: organ_list){
+            organ.organColliding = false;
+            organ.organInsideSkeleton = false;
+        }
+
+        bad_organs_idxs.clear();
+    }
 }

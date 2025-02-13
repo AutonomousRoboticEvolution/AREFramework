@@ -31,7 +31,7 @@ double sq_cppn::params::cppn::_expressiveness = 10.f;
 float sq_cppn::params::evo_float::mutation_rate = 0.1f;
 
 
-void sq_cppn_decoder::decode(const sq_t &quadric, cppn_t &cppn, int nbr_organs,
+void sq_cppn_decoder::decode(const sq_t &quadric, cppn_t &cppn,
                         skeleton::type &skeleton, organ_list_t &organ_list, int &number_voxels){
     generate_skeleton(quadric,skeleton);
     skeleton::create_base(skeleton);
@@ -40,7 +40,7 @@ void sq_cppn_decoder::decode(const sq_t &quadric, cppn_t &cppn, int nbr_organs,
     skeleton::count_number_voxels(skeleton,number_voxels);
     pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations(new pcl::PointCloud<pcl::PointNormal>());
     generate_organs_sites(skeleton,sites_locations);
-    generate_organ_list(cppn,sites_locations,nbr_organs,organ_list);
+    generate_organ_list(cppn,sites_locations,organ_list);
 }
 
 void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& skeleton){
@@ -65,7 +65,8 @@ void sq_cppn_decoder::generate_skeleton(const sq_t &quadric, skeleton::type& ske
     }
 }
 
-void sq_cppn_decoder::generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr &sites_locations){
+void sq_cppn_decoder::generate_organs_sites(skeleton::type &skeleton,
+                                            pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations){
     auto sign = [](float x) -> int {return (x>0) - (x < 0);};
     PolyVox::Mesh<PolyVox::MarchingCubesVertex<uint8_t>> mesh =
         PolyVox::extractMarchingCubesMesh<skeleton::type>(&skeleton,skeleton.getEnclosingRegion());
@@ -89,22 +90,22 @@ void sq_cppn_decoder::generate_organs_sites(skeleton::type &skeleton, pcl::Point
             continue;
         surface_cloud->push_back(pcl::PointNormal(x,y,z,nx,ny,0));
     }
-
+    pcl::PointCloud<pcl::PointNormal>::Ptr filtered_cloud = std::make_shared<pcl::PointCloud<pcl::PointNormal>>();
     pcl::VoxelGrid<pcl::PointNormal> voxel_grid;
     voxel_grid.setInputCloud(surface_cloud);
     voxel_grid.setLeafSize(1.5,1.5,1.5);
-    voxel_grid.filter(*sites_locations);
-    std::vector<int> to_erase;
-    for(int i = 0; i < sites_locations->size(); i++){
-        int nx = fabs(sites_locations->at(i).normal_x) > 0.5 ? 1*sign(sites_locations->at(i).normal_x) : 0;
-        int ny = fabs(sites_locations->at(i).normal_y) > 0.5 ? 1*sign(sites_locations->at(i).normal_y) : 0;
-        if(nx == 0 && ny == 0)
-            to_erase.push_back(i);
-        sites_locations->points[i].normal_x = nx;
-        sites_locations->points[i].normal_y = ny;
+    voxel_grid.filter(*filtered_cloud);
+
+    for(auto point: *filtered_cloud){
+        int nx = fabs(point.normal_x) > 0.5 ? 1*sign(point.normal_x) : 0;
+        int ny = fabs(point.normal_y) > 0.5 ? 1*sign(point.normal_y) : 0;
+        if(nx != 0 || ny != 0)
+        {
+            point.normal_x = nx;
+            point.normal_y = ny;
+            sites_locations->push_back(point);
+        }
     }
-    for(int i : to_erase)
-        sites_locations->erase(sites_locations->begin()+i);
     std::cout << "number of sites " << sites_locations->size() << std::endl;
 
 
@@ -125,7 +126,9 @@ void sq_cppn_decoder::generate_organs_sites(skeleton::type &skeleton, pcl::Point
 
 }
 
-void sq_cppn_decoder::generate_organ_list(cppn_t &cppn, const pcl::PointCloud<pcl::PointNormal>::Ptr & site_locations, int nbr_organs, organ_list_t &organ_list){
+void sq_cppn_decoder::generate_organ_list(cppn_t &cppn,
+                                          const pcl::PointCloud<pcl::PointNormal>::Ptr site_locations,
+                                          organ_list_t &organ_list){
     std::function<float(std::vector<float>,std::vector<float>)> distance =
         [](std::vector<float> v1, std::vector<float> v2) -> float{
         return sqrt((v1[0]-v2[0])*(v1[0]-v2[0])
@@ -158,28 +161,6 @@ void sq_cppn_decoder::generate_organ_list(cppn_t &cppn, const pcl::PointCloud<pc
             organ_list.push_back(organ);
         }
     }
-    //std::cout << full_list.size() << " organ placed" << std::endl;
-    // organ_list = full_list;
- 
-
-    //Select a maximum of 8 location with the maximum distance between them.
-
-    // std::vector<float> distances;
-    // for(const organ_info &o1: full_list){
-    //     std::vector<float> p1 = o1.position;
-    //     float mean_dist = 0;
-    //     for (const organ_info &o2: full_list){
-    //         std::vector<float> p2 = o2.position;
-    //         mean_dist += distance(p1,p2);
-    //     }
-    //     distances.push_back(mean_dist/static_cast<float>(full_list.size()-1));
-    // }
-    // std::vector<int> indexes(distances.size());
-    // std::iota(indexes.begin(),indexes.end(),0);
-    // std::sort(indexes.begin(),indexes.end(),[&](int i, int j){return distances[i]>distances[j];});
-    // for(int i = 0; i < nbr_organs; i++)
-    //     organ_list.push_back(full_list[indexes[i]]);
-
 }
 
 int sq_cppn_decoder::cppn_to_organ_type(cppn_t &cppn,const std::vector<double> &input){

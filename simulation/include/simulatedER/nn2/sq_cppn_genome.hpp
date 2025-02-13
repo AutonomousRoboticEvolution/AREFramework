@@ -71,7 +71,6 @@ using cppn_t = nn2::CPPN<neuron_t,connection_t,params>;
 class SQCPPNGenome: public Genome{
 public:
     using cppn_t = sq_cppn::cppn_t;
-    using sq_t = quadric_t<quadric_params>;
 
     typedef std::shared_ptr<SQCPPNGenome> Ptr;
     typedef std::shared_ptr<const SQCPPNGenome> ConstPtr;
@@ -91,7 +90,6 @@ public:
     SQCPPNGenome(const SQCPPNGenome &gen) :
         Genome(gen), cppn(gen.cppn),
         quadric(gen.quadric),
-        nbr_organs(gen.nbr_organs),
         feat_desc(gen.feat_desc),
         organ_position_desc(gen.organ_position_desc),
         matrix_desc(gen.matrix_desc){}
@@ -109,19 +107,11 @@ public:
     void random() override{
         cppn.random();
         quadric.random(randomNum);
-        nbr_organs = randomNum->randInt(4,8);
     }
 
     void mutate() override {
         cppn.mutate();
         quadric.mutate(randomNum);
-        if(randomNum->randDouble(0,1) < quadric_params::_mutation_rate){
-            nbr_organs += randomNum->randInt(-1,1);
-            if(nbr_organs < 4)
-                nbr_organs = 4;
-            else if(nbr_organs > 8)
-                nbr_organs = 8;
-        }
     }
 
     void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
@@ -183,7 +173,6 @@ public:
         arch & boost::serialization::base_object<Genome>(*this);
         arch & cppn;
         arch & quadric;
-        arch & nbr_organs;
         arch & feat_desc;
         arch & organ_position_desc;
         arch & matrix_desc;
@@ -195,9 +184,6 @@ public:
 
     void set_quadric(const sq_t &q){quadric = q;}
     const sq_t &get_quadric() const{return quadric;}
-
-    void set_nbr_organs(int nbr_o){nbr_organs = nbr_o;}
-    int get_nbr_organs(){return nbr_organs;}
 
     int get_nb_neurons(){return cppn.get_nb_neurons();}
     int get_nb_connections(){return cppn.get_nb_connections();}
@@ -214,7 +200,6 @@ public:
 private:
     cppn_t cppn;
     sq_t quadric;
-    int nbr_organs = 0;
     sim::FeaturesDesc feat_desc;
     sim::OrganMatrixDesc organ_position_desc; //deprecated
     sim::MatrixDesc matrix_desc;
@@ -222,23 +207,20 @@ private:
 
 namespace  sq_cppn_decoder {
     using namespace sim::organ;
-    using sq_t = quadric_t<quadric_params>;
     using cppn_t = sq_cppn::cppn_t;
 
 
     void decode(const sq_t &quadric,
                 cppn_t &cppn,
-                int nbr_organs,
                 skeleton::type& skeleton,
                 organ_list_t &organ_list,
                 int &number_voxels);
     void generate_skeleton(const sq_t &quadric,
                            skeleton::type& skeleton);
-    void generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr &sites_locations);
+    void generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations);
 // void clustering(const skeleton::coord_t &surface_coord, skeleton::coord_t &site_locations);
     void generate_organ_list(cppn_t &cppn,
-                             const pcl::PointCloud<pcl::PointNormal>::Ptr & site_locations,
-                             int nbr_organs,
+                             const pcl::PointCloud<pcl::PointNormal>::Ptr site_locations,
                              organ_list_t &organ_list);
     int cppn_to_organ_type(cppn_t &cppn,const std::vector<double> &input);
 };
