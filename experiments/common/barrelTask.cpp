@@ -19,7 +19,7 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
 
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
-    for(int i = 0; i < targets.size();i+=3)
+    for(size_t i = 0; i < targets.size();i+=3)
         barrel_initial_positions.push_back({targets[i],targets[i+1],targets[i+2]});
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;

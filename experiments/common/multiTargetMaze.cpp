@@ -19,7 +19,7 @@ MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
 
 
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
-    for(int i = 0; i < targets.size();i+=3)
+    for(size_t i = 0; i < targets.size();i+=3)
         target_positions.push_back({targets[i],targets[i+1],targets[i+2]});
 
     trajectories.resize(target_positions.size());
