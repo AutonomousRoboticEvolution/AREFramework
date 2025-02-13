@@ -1,11 +1,10 @@
 #ifndef MEIM_HPP
 #define MEIM_HPP
 
-#include <ARE/EA.h>
-#include <simulatedER/nn2/NN2CPPNGenome.hpp>
-#include <simulatedER/nn2/sq_cppn_genome.hpp>
-#include <simulatedER/are_morphology.hpp>
-#include <simulatedER/Morphology_CPPNMatrix.h>
+#include "ARE/EA.h"
+#include "simulatedER/morph_genomes.hpp"
+#include "simulatedER/are_morphology.hpp"
+#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
 #include "fixed_controller.hpp"
@@ -48,6 +47,7 @@ typedef struct genome_t{
     std::vector<waypoint> trajectory;
     rollout_t rollout;
 } genome_t;
+
 
 
 /**
@@ -136,7 +136,7 @@ public:
     typedef std::unique_ptr<const MEIM> ConstPtr;
 
     MEIM() : EA(){}
-    MEIM(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param): EA(rn,param){}
+    MEIM(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param);
 
     void init() override;
     void init_next_pop() override;

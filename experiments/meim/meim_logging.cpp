@@ -4,33 +4,49 @@ using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
-    bool use_quadric = settings::getParameter<settings::Boolean>(ea->get_parameters(),"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Boolean>(ea->get_parameters(),"#morphGenomeType").value;
     for(const auto &genome:  static_cast<MEIM*>(ea.get())->get_new_genes()){
 
         //- Log the cppn
-        std::stringstream morph_filepath;
-        morph_filepath << Logging::log_folder << "/cppn_" << genome.morph_genome->id();
-        if(boost::filesystem::exists(morph_filepath.str()))
-            continue;
-        std::ofstream mofstr(morph_filepath.str());
-        boost::archive::text_oarchive oarch(mofstr);
-        if(use_quadric)
-            oarch << std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_cppn();
-        else
-            oarch << std::dynamic_pointer_cast<NN2CPPNGenome>(genome.morph_genome)->get_cppn();
-        mofstr.close();
+        if(genome_type == morph_genome_type::CPPN || genome_type == morph_genome_type::SQ_CPPN){
+            std::stringstream morph_filepath;
+            morph_filepath << Logging::log_folder << "/cppn_" << genome.morph_genome->id();
+            if(boost::filesystem::exists(morph_filepath.str()))
+                continue;
+            std::ofstream mofstr(morph_filepath.str());
+            boost::archive::text_oarchive oarch(mofstr);
+            if(genome_type == morph_genome_type::CPPN)
+                oarch << std::dynamic_pointer_cast<NN2CPPNGenome>(genome.morph_genome)->get_cppn();
+            else if(genome_type == morph_genome_type::SQ_CPPN)
+                oarch << std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_cppn();
+            mofstr.close();
+        }
         //-
 
         //- Log the superquadric
-        if(use_quadric){
+        if(genome_type == morph_genome_type::SQ_CPPN || genome_type == morph_genome_type::SQ_CG){
             std::string quadric_file = settings::getParameter<settings::String>(ea->get_parameters(),"#quadricFile").value;
             std::ofstream qofstr;
             if(!openOLogFile(qofstr,quadric_file))
                 return;
-            qofstr << genome.morph_genome->id() << ";"
-                   << std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_quadric().to_string()
-                   << std::endl;
+            qofstr << genome.morph_genome->id() << ";";
+            if(genome_type == morph_genome_type::SQ_CPPN)
+                qofstr << std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_quadric().to_string();
+            else if(genome_type == morph_genome_type::SQ_CG)
+                qofstr << std::dynamic_pointer_cast<SQGenome>(genome.morph_genome)->get_quadric().to_string();
+            qofstr << std::endl;
             qofstr.close();
+        }
+        if(genome_type == morph_genome_type::SQ_CG){
+            std::string cg_file = settings::getParameter<settings::String>(ea->get_parameters(),"#compGenFile").value;
+            std::ofstream cgofstr;
+            if(!openOLogFile(cgofstr,cg_file))
+                return;
+            cgofstr << genome.morph_genome->id() << "-"
+                    << std::dynamic_pointer_cast<SQGenome>(
+                           genome.morph_genome
+                           )->get_components_genome().to_string() << std::endl;
+            cgofstr.close();
         }
 
 
@@ -40,12 +56,15 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             return;
         mfofs << genome.morph_genome->id() << ",";
         Eigen::VectorXd morph_feat;
-        if(use_quadric)
-            morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
-        else
+        if(genome_type == morph_genome_type::CPPN)
             morph_feat = std::dynamic_pointer_cast<NN2CPPNGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::SQ_CPPN)
+            morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::SQ_CG)
+            morph_feat = std::dynamic_pointer_cast<SQGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
+
         mfofs << morph_feat(0);
-        for(int j = 1; j < morph_feat.size(); j++){
+        for(size_t j = 1; j < morph_feat.size(); j++){
             mfofs << "," << morph_feat(j);
         }
         mfofs << std::endl;
@@ -58,12 +77,15 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             return;
         mdofs << genome.morph_genome->id() << "," << morphology_constants::real_matrix_size << ",";
         Eigen::VectorXd morph_desc;
-        if(use_quadric)
-            morph_desc = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
-        else
+        if(genome_type == morph_genome_type::CPPN)
             morph_desc = std::dynamic_pointer_cast<NN2CPPNGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::SQ_CPPN)
+            morph_desc = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::SQ_CG)
+            morph_desc = std::dynamic_pointer_cast<SQGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
+
         mdofs << morph_desc(0);
-        for(int j = 1; j < morph_desc.size(); j++){
+        for(size_t j = 1; j < morph_desc.size(); j++){
             mdofs << "," <<  morph_desc(j);
         }
         mdofs << std::endl;

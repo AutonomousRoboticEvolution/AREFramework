@@ -13,7 +13,7 @@ extern "C" are::Environment::Ptr environmentFactory
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
-    return std::make_unique<are::MEIM>(rn,st);;
+    return std::make_unique<are::MEIM>(rn,st);
 }
 
 extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
@@ -27,4 +27,5 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     std::string gp_log_file = are::settings::getParameter<are::settings::String>(param,"#parentsPoolFile").value;
     are::ParentsPoolLog::Ptr gplog = std::make_shared<are::ParentsPoolLog>(gp_log_file);
     logs.push_back(gplog);
+
 }

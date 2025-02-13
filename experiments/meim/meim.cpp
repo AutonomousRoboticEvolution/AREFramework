@@ -14,38 +14,60 @@ std::string act_obs_sample::to_string() const{
 }
 
 void MEIMIndividual::createMorphology(){
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
 
     init_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     individual_id = morphGenome->id();
-    if(use_quadric){
-        morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
-        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
-        quadric_t<quadric_params> quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
-        int nbr_organs = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_nbr_organs();
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_nbr_organs(nbr_organs);
-
-    }else{
+    if(genome_type == morph_genome_type::CPPN){
         morphology = std::make_shared<sim::CPPNMorphology>(parameters);
         nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
         std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(cppn);
-
+    }
+    else if(genome_type == morph_genome_type::SQ_CPPN){
+        morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
+        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
+        sq_t quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
+        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
+    }
+    else if(genome_type == morph_genome_type::SQ_CG){
+        morphology = std::make_shared<sim::SQMorphology>(parameters);
+        cg_t comp_gen = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_components_genome();
+        sq_t quadric = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_quadric();
+        std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_comp_gen(comp_gen);
+        std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_quadric(quadric);
+    }else{
+        std::cerr << "Unknown type of morphological genome" << std::endl;
+        std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+        std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+        exit(1);
     }
 
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(morphGenome->id());
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_randNum(randNum);
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_position[0],init_position[1],init_position[2]);
-    if(use_quadric){
-        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getFeatureDesc());
-        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getOrganPosDesc());
-        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getMatrixDesc());
-
-    }else{
+    if(genome_type == morph_genome_type::CPPN){
         std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getFeatureDesc());
         std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getOrganPosDesc());
         std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getMatrixDesc());
+    }else if(genome_type == morph_genome_type::SQ_CPPN){
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getMatrixDesc());
+    }else if(genome_type == morph_genome_type::SQ_CG){
+        cg_t cg = std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->get_comp_gen();
+        std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_components_genome(cg);
+        std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getMatrixDesc());
+    }else{
+        std::cerr << "Unknown type of morphological genome" << std::endl;
+        std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+        std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+        exit(1);
     }
+
+
 
 }
 
@@ -130,31 +152,36 @@ void MEIMIndividual::update(double delta_time){
 
 std::string MEIMIndividual::to_string() const
 {
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
 
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<MEIMIndividual>();
-    if(use_quadric)
-        oarch.register_type<SQCPPNGenome>();
-    else
+    if(genome_type == morph_genome_type::CPPN)
         oarch.register_type<NN2CPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CPPN)
+        oarch.register_type<SQCPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CG)
+        oarch.register_type<SQGenome>();
+
     oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
 }
 
 void MEIMIndividual::from_string(const std::string &str){
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
 
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<MEIMIndividual>();
-    if(use_quadric)
-        iarch.register_type<SQCPPNGenome>();
-    else
+    if(genome_type == morph_genome_type::CPPN)
         iarch.register_type<NN2CPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CPPN)
+        iarch.register_type<SQCPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CG)
+        iarch.register_type<SQGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
@@ -164,12 +191,32 @@ void MEIMIndividual::from_string(const std::string &str){
 }
 
 
+MEIM::MEIM(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& param):
+    EA(rn,param){
+    comp_mut_params::_position_mutation_rate =
+        settings::getParameter<settings::Double>(parameters,"#compPositionMutRate").value;
+    comp_mut_params::_type_mutation_rate =
+        settings::getParameter<settings::Double>(parameters,"#compTypeMutRate").value;
+    comp_mut_params::_modify_comp_list_mutation_rate =
+        settings::getParameter<settings::Double>(parameters,"#compListMutRate").value;
+    comp_mut_params::_add_remove_comp_prob =
+        settings::getParameter<settings::Double>(parameters,"#addRemoveCompProb").value;
+    quadric_mut_params::_mutation_rate =
+        settings::getParameter<settings::Double>(parameters,"#quadricsParamMutRate").value;
+    quadric_mut_params::_sigma =
+        settings::getParameter<settings::Double>(parameters,"#quadricsSigma").value;
+    quadric_mut_params::_symmetry_mutation_rate =
+        settings::getParameter<settings::Double>(parameters,"#quadricsSymmetryMutRate").value;
+
+        
+}
+
 Genome::Ptr MEIM::best_of_subset(const std::vector<genome_t> gene_list){
    // int obj_idx = settings::getParameter<settings::Integer>(gene_list[0].morph_genome->get_parameters(),"#morphSelectionObjective").value;
 
     double best_fitness = gene_list[0].objectives[0];
     int best_idx = 0;
-    for(int i = 1; i < gene_list.size(); i++){
+    for(size_t i = 1; i < gene_list.size(); i++){
         if(best_fitness < gene_list[i].objectives[0]){
             best_fitness = gene_list[i].objectives[0];
             best_idx = i;
@@ -183,8 +230,7 @@ Genome::Ptr MEIM::best_of_subset(const std::vector<genome_t> gene_list){
 
 void MEIM::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
-
+    int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
 
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
@@ -200,10 +246,18 @@ void MEIM::init(){
         population.resize(pop_size);
         for(auto& ind: population){
             Genome::Ptr morph_gen;
-            if(use_quadric)
-                morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
-            else
+            if(genome_type == morph_genome_type::CPPN)
                 morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::SQ_CPPN)
+                morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::SQ_CG)
+                morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+            else{
+                std::cerr << "Unknown type of morphological genome" << std::endl;
+                std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+                std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+                exit(1);
+            }
             morph_gen->random();
             morph_gen->set_id(highest_morph_id++);
             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
@@ -222,11 +276,18 @@ void MEIM::init(){
     }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
         Genome::Ptr morph_gen;
-        if(use_quadric)
-            morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
-        else
+        if(genome_type == morph_genome_type::CPPN)
             morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-
+        else if(genome_type == morph_genome_type::SQ_CPPN)
+            morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::SQ_CG)
+            morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+        else{
+            std::cerr << "Unknown type of morphological genome" << std::endl;
+            std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+            std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+            exit(1);
+        }
         MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
@@ -302,7 +363,7 @@ bool MEIM::update(const Environment::Ptr &env){
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
     if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
-        bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+        int genome_type = settings::getParameter<settings::Boolean>(parameters,"#morphGenomeType").value;
 
         for(int &index : newly_evaluated){
             std::cout << "update for individual indexed " << index << std::endl;
@@ -313,10 +374,18 @@ bool MEIM::update(const Environment::Ptr &env){
             int nb_wheels = std::dynamic_pointer_cast<MEIMIndividual>(ind)->get_nb_wheels();
             if(nb_joints == 0 && nb_wheels == 0){
                 Genome::Ptr morph_gen;
-                if(use_quadric)
-                    morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
-                else
+                if(genome_type == morph_genome_type::CPPN)
                     morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+                else if(genome_type == morph_genome_type::SQ_CPPN)
+                    morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+                else if(genome_type == morph_genome_type::SQ_CG)
+                    morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+                else{
+                    std::cerr << "Unknown type of morphological genome" << std::endl;
+                    std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+                    std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+                    exit(1);
+                }
                 morph_gen->random();
                 morph_gen->set_id(highest_morph_id++);
                 Genome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
@@ -404,6 +473,6 @@ void MEIM::remove_worst_parent(){
 }
 
 void MEIM::fill_ind_to_eval(std::vector<int> &ind_to_eval){
-	for(int i = 0; i < population.size(); i++)
+    for(size_t i = 0; i < population.size(); i++)
 		ind_to_eval.push_back(population.get_index(i));
 }
