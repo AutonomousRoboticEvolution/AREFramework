@@ -281,13 +281,13 @@ void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gri
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
-    isGripperCollision(gripperHandle, skeletonHandles, organList);
+    //isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
 void Organ::repressOrgan()
 {
-    if(organInsideSkeleton || organColliding || !organGripperAccess){
+    if(organInsideSkeleton || organColliding){// || !organGripperAccess){
         simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(physics_connector_handle);
