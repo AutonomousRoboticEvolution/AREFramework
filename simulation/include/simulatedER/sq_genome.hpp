@@ -32,29 +32,6 @@ struct ComponentsGenome{
     std::vector<int> positions; //position of the components as an index of the list of the location sites.
     std::vector<int> types; //type of the components
 
-    // void random(const misc::RandNum::Ptr &rn){
-    //     int nbr_comp = rn->randInt(1,8);
-    //     positions.resize(nbr_comp);
-    //     types.resize(nbr_comp);
-    //     for(int n = 0; n < nbr_comp; n++){
-    //         int rand_pos = 0;
-    //         bool is_new_idx = true;
-    //         do{
-    //             is_new_idx = true;
-    //             rand_pos = rn->randInt(0,100);
-    //             for(int i = 0; i < n; i++){
-    //                 if(rand_pos == positions[i]){
-    //                     is_new_idx = false;
-    //                     break;
-    //                 }
-    //             }
-    //         }while(!is_new_idx);
-
-    //         positions[n] = rand_pos;
-    //         types[n] = rn->randInt(1,4);
-    //     }
-    // }
-
     void random(const misc::RandNum::Ptr &rn){
         int nbr_comp = rn->randInt(1,8);
         positions.resize(nbr_comp);
@@ -159,18 +136,17 @@ struct ComponentsGenome{
     }
 };
 
-struct comp_genome_params{
+struct comp_mut_params{
     static double _position_mutation_rate;
     static double _type_mutation_rate;
     static double _modify_comp_list_mutation_rate;
     static double _add_remove_comp_prob;
 };
 
-template<typename comp_mut_params, typename quadrics_mut_params>
+using cg_t =  ComponentsGenome<comp_mut_params>;
+
 class SQGenome: public Genome{
 public:
-    using sq_t = quadric_t<quadrics_mut_params>;
-    using cg_t = ComponentsGenome<comp_mut_params>;
 
     typedef std::shared_ptr<SQGenome> Ptr;
     typedef std::shared_ptr<const SQGenome> ConstPtr;
@@ -189,7 +165,6 @@ public:
         Genome(gen), 
         components_genome(gen.components_genome),
         quadric(gen.quadric),
-        nbr_organs(gen.nbr_organs),
         feat_desc(gen.feat_desc),
         organ_position_desc(gen.organ_position_desc),
         matrix_desc(gen.matrix_desc){}
@@ -203,75 +178,17 @@ public:
     }
 
 
-    void random() override{
-        components_genome.random(randomNum);
-        quadric.random(randomNum);
-        nbr_organs = randomNum->randInt(4,8);
-    }
+    void random() override;
 
-    void mutate() override {
-        components_genome.mutate(randomNum);
-        quadric.mutate(randomNum);
-        if(randomNum->randDouble(0,1) < quadric_params::_mutation_rate){
-            nbr_organs += randomNum->randInt(-1,1);
-            if(nbr_organs < 4)
-                nbr_organs = 4;
-            else if(nbr_organs > 8)
-                nbr_organs = 8;
-        }
-    }
+    void mutate() override;
 
-    void crossover(const Genome::Ptr &partner,Genome::Ptr child) override {
-        cg_t cg_child;
-        cg_t cg_partner = std::dynamic_pointer_cast<SQGenome>(partner)->get_components_genome();
-        components_genome.crossover(cg_partner,cg_child,randomNum);
-        
-        sq_t quadric_child;
-        sq_t quadric_partner = std::dynamic_pointer_cast<SQGenome>(partner)->get_quadric();
-        quadric.crossover(quadric_partner,quadric_child,randomNum);
-        *std::dynamic_pointer_cast<SQGenome>(child) = SQGenome(cg_child,quadric_child);
-        child->set_parameters(parameters);
-        child->set_randNum(randomNum);
-        std::dynamic_pointer_cast<SQGenome>(child)->set_parents_ids({_id,partner->id()});
-    }
+    void crossover(const Genome::Ptr &partner,Genome::Ptr child) override;
 
-    void symmetrical_crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override{
-        cg_t cg_child1, cg_child2;
-        cg_t cg_partner = std::dynamic_pointer_cast<SQGenome>(partner)->get_components_genome();
-        components_genome.crossover(cg_partner,cg_child1,randomNum);
-        cg_partner.crossover(components_genome,cg_child2,randomNum);
-        
-        sq_t quadric_child1, quadric_child2;
-        sq_t quadric_partner = std::dynamic_pointer_cast<SQGenome>(partner)->get_quadric();
-        quadric.crossover(quadric_partner,quadric_child1,randomNum);
-        quadric_partner.crossover(quadric,quadric_child2,randomNum);
+    void symmetrical_crossover(const Genome::Ptr &partner,Genome::Ptr child1,Genome::Ptr child2) override;
 
-        *std::dynamic_pointer_cast<SQGenome>(child1) = SQGenome(cg_child1,quadric_child1);
-        *std::dynamic_pointer_cast<SQGenome>(child2) = SQGenome(cg_child2,quadric_child2);
-        child1->set_parameters(parameters);
-        child2->set_parameters(parameters);
-        child1->set_randNum(randomNum);
-        child2->set_randNum(randomNum);
-        std::dynamic_pointer_cast<SQGenome>(child1)->set_parents_ids({_id,partner->id()});
-        std::dynamic_pointer_cast<SQGenome>(child2)->set_parents_ids({partner->id(),_id});
-    }
+    void from_string(const std::string & str) override;
 
-    void from_string(const std::string & str) override
-    {
-        std::stringstream sstream;
-        sstream << str;
-        boost::archive::text_iarchive iarch(sstream);
-        iarch.register_type<SQGenome>();
-        iarch >> *this;
-    }
-    std::string to_string() const override
-    {
-        std::stringstream sstream;
-        boost::archive::text_oarchive oarch(sstream);
-        oarch.register_type<SQGenome>();
-        oarch << *this;
-        return sstream.str();
-    }
+    std::string to_string() const override;
 
     friend class boost::serialization::access;
     template <class archive>
@@ -280,7 +197,6 @@ public:
         arch & boost::serialization::base_object<Genome>(*this);
         arch & components_genome;
         arch & quadric;
-        arch & nbr_organs;
         arch & feat_desc;
         arch & organ_position_desc;
         arch & matrix_desc;
@@ -291,9 +207,6 @@ public:
 
     void set_quadric(const sq_t &q){quadric = q;}
     const sq_t &get_quadric() const{return quadric;}
-
-    void set_nbr_organs(int nbr_o){nbr_organs = nbr_o;}
-    int get_nbr_organs(){return nbr_organs;}
 
 
     const sim::FeaturesDesc& get_feat_desc() const {return feat_desc;}
@@ -309,7 +222,6 @@ private:
     cg_t components_genome;
     sq_t quadric; //genome for the skeleton
 
-    int nbr_organs = 0;
     sim::FeaturesDesc feat_desc;
     sim::OrganMatrixDesc organ_position_desc; //deprecated
     sim::MatrixDesc matrix_desc;
@@ -319,78 +231,25 @@ private:
 namespace  sq_decoder {
 using namespace sim::organ;
 
-template<typename sq_t>
-void generate_skeleton(const sq_t &quadric,
-                       skeleton::type& skeleton){
-    PolyVox::Region region = skeleton.getEnclosingRegion();
-
-    for(int32_t z = region.getLowerZ()+1; z < region.getUpperZ(); z += 1) {
-        for(int32_t y = region.getLowerY()+1; y < region.getUpperY(); y += 1) {
-            for(int32_t x = region.getLowerX()+1; x < region.getUpperX(); x += 1) {
-                double ix = static_cast<double>(x)/static_cast<double>(region.getUpperX());
-                double iy = static_cast<double>(y)/static_cast<double>(region.getUpperY());
-                double iz = static_cast<double>(z)/static_cast<double>(region.getUpperZ());
-                double output = quadric(ix,iy,iz);
-                uint8_t voxel;
-
-                if(output <= 1)
-                    voxel = morph_const::filled_voxel;
-                else
-                    voxel = morph_const::empty_voxel;
-                skeleton.setVoxel(x,y,z,voxel);
-            }
-        }
-    }
-}
-template<typename cg_t>
-void generate_organ_list(cg_t &comp_gen,
-                         const pcl::PointCloud<pcl::PointNormal>::Ptr & site_locations,
-                         int nbr_organs,
-                         organ_list_t &organ_list){
-    float number_sites = static_cast<float>(site_locations->size());
-    float ratio = number_sites/100;
-    std::vector<float> position(3);
-
-    for(int i = 0; i < comp_gen.positions.size(); i++){
-        int organ_type = comp_gen.types[i];
-        int site_index = static_cast<int>(std::trunc(static_cast<float>(comp_gen.positions[i])*ratio));
-        assert(site_index < site_locations->size());
-        position[0] = site_locations->at(site_index).x*morph_const::voxel_real_size;
-        position[1] = site_locations->at(site_index).y*morph_const::voxel_real_size;
-        position[2] = site_locations->at(site_index).z*morph_const::voxel_real_size;
-        position[2] += morph_const::matrix_size/2 * morph_const::voxel_real_size;
-        std::vector<float> orientation(3);
-        generate_orientation(site_locations->at(site_index).normal_x,
-                             site_locations->at(site_index).normal_y,
-                             site_locations->at(site_index).normal_z,orientation);
-        organ_info organ(organ_type, position, orientation);
-        organ_list.push_back(organ);
-    }
-}
-
-void generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr &sites_locations);
-
-template<typename sq_t, typename cg_t>
 void decode(const sq_t &quadric,
             cg_t &comp_gen,
-            int nbr_organs,
             skeleton::type& skeleton,
             organ_list_t &organ_list,
-            int &number_voxels){
-    generate_skeleton<sq_t>(quadric,skeleton);
-    skeleton::create_base(skeleton);
-    skeleton::empty_space_for_head(skeleton);
-    skeleton::remove_skeleton_regions(skeleton);
-    skeleton::count_number_voxels(skeleton,number_voxels);
-    pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations = std::make_shared<pcl::PointCloud<pcl::PointNormal>>();
-    generate_organs_sites(skeleton,sites_locations);
-    generate_organ_list<cg_t>(comp_gen,sites_locations,nbr_organs,organ_list);
-    sites_locations.reset();
-}
+            int &number_voxels);
+
+void generate_skeleton(const sq_t &quadric,
+                       skeleton::type& skeleton);
+
+void generate_organ_list(cg_t &comp_gen,
+                         const pcl::PointCloud<pcl::PointNormal>::Ptr site_locations,
+                         organ_list_t &organ_list);
+
+void generate_organs_sites(skeleton::type &skeleton, pcl::PointCloud<pcl::PointNormal>::Ptr sites_locations);
+
+
 }//sq_decoder
 
 namespace sq_genome{
-using sq_genome_t = SQGenome<comp_genome_params,quadric_params>;
 class QuadricsLog : public Logging
 {
 public:
@@ -415,7 +274,6 @@ public:
     void loadLog(const std::string& log_file){}
 };
 
-
 class ParentingLog : public Logging
 {
 public:
@@ -423,9 +281,7 @@ public:
     void saveLog(EA::Ptr & ea);
     void loadLog(const std::string& log_file){}
 };
-
-
-}//sq_cppn
+}//sq_genome
 
 } //are
 
