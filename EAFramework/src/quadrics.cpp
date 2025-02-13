@@ -60,6 +60,6 @@ void quadric_param_t::from_string(const std::string& str){
     t = std::stod(splitted_str[7]);
 }
 
-double quadric_params::_mutation_rate = 0.1f;
-double quadric_params::_sigma = 0.1f;
-double quadric_params::_symmetry_mutation_rate = 0.1f;
+double quadric_mut_params::_mutation_rate = 0.1f;
+double quadric_mut_params::_sigma = 0.1f;
+double quadric_mut_params::_symmetry_mutation_rate = 0.1f;

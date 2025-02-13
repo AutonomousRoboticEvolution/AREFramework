@@ -267,13 +267,15 @@ struct quadric_t{
     }
 };
 
-struct quadric_params{
+struct quadric_mut_params{
     static double _mutation_rate;
     static double _sigma;
     static double _symmetry_mutation_rate;
     static constexpr double _lbound = -2;
     static constexpr double _ubound = 2;
 };
+
+using sq_t = quadric_t<quadric_mut_params>;
 
 }//are
 
