@@ -167,6 +167,7 @@ if __name__ == "__main__":
         fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
         fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))
         print("Number of individuals =",len(fitnesses))
+        print(fitnesses)
         if distance == "L2":
             L2_norm = lambda v,w: np.linalg.norm(v-w)
             sparsity = compute_sparsity(descriptors,15,L2_norm)
