@@ -32,8 +32,8 @@ void BODYPLANTESTING::init()
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
     cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
 
-    quadric_params::_mutation_rate = settings::getParameter<settings::Double>(parameters,"#sqMutationRate").value;
-    quadric_params::_sigma = settings::getParameter<settings::Double>(parameters,"#sqMutationSigma").value;
+    quadric_mut_params::_mutation_rate = settings::getParameter<settings::Double>(parameters,"#sqMutationRate").value;
+    quadric_mut_params::_sigma = settings::getParameter<settings::Double>(parameters,"#sqMutationSigma").value;
 
 
     initPopulation();
@@ -52,7 +52,7 @@ void BODYPLANTESTING::initPopulation()
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
         Genome::Ptr morphgenome;
         if(use_quadric){
-            morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
         }
         else{
             morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
@@ -70,7 +70,7 @@ void BODYPLANTESTING::initPopulation()
 
             Genome::Ptr morphgenome;
             if(use_quadric){
-                morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+                morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
             }
             else{
                 morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);

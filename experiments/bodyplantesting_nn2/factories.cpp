@@ -24,22 +24,26 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     if(are::settings::getParameter<are::settings::Boolean>(param,"#useQuadric").value){
         std::string quad_file = are::settings::getParameter<are::settings::String>(param,"#quadricFile").value;
-        are::sq_cppn::QuadricsLog::Ptr quad_log = std::make_shared<are::sq_cppn::QuadricsLog>(quad_file);
+        are::sq_genome::QuadricsLog::Ptr quad_log = std::make_shared<are::sq_genome::QuadricsLog>(quad_file);
         logs.push_back(quad_log);
 
-        are::sq_cppn::SQCPPNGenomeLog::Ptr genlog = std::make_shared<are::sq_cppn::SQCPPNGenomeLog>();
+        std::string comp_file = are::settings::getParameter<are::settings::String>(param,"#compGenFile").value;
+        are::sq_genome::CompGenLog::Ptr comp_log = std::make_shared<are::sq_genome::CompGenLog>(comp_file);
+        logs.push_back(comp_log);
+
+        are::sq_genome::SQGenomeLog::Ptr genlog = std::make_shared<are::sq_genome::SQGenomeLog>();
         logs.push_back(genlog);
 
         std::string par_file = are::settings::getParameter<are::settings::String>(param,"#parentingFile").value;
-        are::sq_cppn::ParentingLog::Ptr parlog = std::make_shared<are::sq_cppn::ParentingLog>(par_file);
+        are::sq_genome::ParentingLog::Ptr parlog = std::make_shared<are::sq_genome::ParentingLog>(par_file);
         logs.push_back(parlog);
 
-        are::sq_cppn::GraphVizLog::Ptr gvlog = std::make_shared<are::sq_cppn::GraphVizLog>();
-        logs.push_back(gvlog);
+        // are::sq_cppn::GraphVizLog::Ptr gvlog = std::make_shared<are::sq_genome::GraphVizLog>();
+        // logs.push_back(gvlog);
 
-        std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
-        are::sq_cppn::NbrConnNeurLog::Ptr ncnlog = std::make_shared<are::sq_cppn::NbrConnNeurLog>(ncn_file);
-        logs.push_back(ncnlog);
+        // std::string ncn_file = are::settings::getParameter<are::settings::String>(param,"#nbrConnNeuFile").value;
+        // are::sq_cppn::NbrConnNeurLog::Ptr ncnlog = std::make_shared<are::sq_cppn::NbrConnNeurLog>(ncn_file);
+        // logs.push_back(ncnlog);
     }else{
         are::nn2_cppn::NN2CPPNGenomeLog::Ptr genlog = std::make_shared<are::nn2_cppn::NN2CPPNGenomeLog>();
         logs.push_back(genlog);

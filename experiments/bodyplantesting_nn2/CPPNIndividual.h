@@ -1,8 +1,7 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "simulatedER/nn2/NN2CPPNGenome.hpp"
-#include "simulatedER/nn2/sq_cppn_genome.hpp"
+#include "simulatedER/morph_genomes.hpp"
 #include "ARE/Individual.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "ARE/learning/NSGA2.hpp"
@@ -12,7 +11,6 @@ namespace are {
 class CPPNIndividual : public Individual, public NSGAIndividual<CPPNIndividual>
 {
 public :
-
     typedef std::shared_ptr<CPPNIndividual> Ptr;
     typedef std::shared_ptr<const CPPNIndividual> ConstPtr;
 
@@ -27,7 +25,7 @@ public :
     {
         bool use_quadric = settings::getParameter<settings::Boolean>(ind.get_parameters(),"#useQuadric").value;
         if(use_quadric)
-            morphGenome = std::make_shared<SQCPPNGenome>(*std::dynamic_pointer_cast<SQCPPNGenome>(ind.morphGenome));
+            morphGenome = std::make_shared<SQGenome>(*std::dynamic_pointer_cast<SQGenome>(ind.morphGenome));
         else
             morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
         ctrlGenome = std::make_shared<EmptyGenome>(*std::dynamic_pointer_cast<EmptyGenome>(ind.ctrlGenome));

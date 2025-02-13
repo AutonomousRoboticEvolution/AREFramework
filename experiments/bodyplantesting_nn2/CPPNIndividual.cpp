@@ -3,8 +3,6 @@
 
 using namespace are;
 
-
-
 void CPPNIndividual::createMorphology()
 {
     auto round = [](const Eigen::VectorXd &v) -> Eigen::VectorXd{
@@ -18,13 +16,11 @@ void CPPNIndividual::createMorphology()
     bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
     if(use_quadric){
-        morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
-        sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
-        quadric_t<quadric_params> quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
-        int nbr_organs = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_nbr_organs();
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
-        std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_nbr_organs(nbr_organs);
+        morphology = std::make_shared<sim::SQMorphology>(parameters);
+        cg_t comp_gen = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_components_genome();
+        sq_t quadric = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_quadric();
+        std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_comp_gen(comp_gen);
+        std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_quadric(quadric);
     }else{
         morphology = std::make_shared<sim::CPPNMorphology>(parameters);
         nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
@@ -32,9 +28,15 @@ void CPPNIndividual::createMorphology()
 
     }
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(morphGenome->id());
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_randNum(randNum);
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],0.15);
 
+    //if use_quadric feedback the updated comp_gen to the genome.
+    if(use_quadric){
+        cg_t cg = std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->get_comp_gen();
+        std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_components_genome(cg);
+    }
     if(!use_quadric){
         if(ctrlGenome->get_type() != "empty_genome")
             assert(std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_feat_desc() == std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->getFeatureDesc());
@@ -72,7 +74,7 @@ std::string CPPNIndividual::to_string() const
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<CPPNIndividual>();
     if(use_quadric)
-        oarch.register_type<SQCPPNGenome>();
+        oarch.register_type<SQGenome>();
     else
         oarch.register_type<NN2CPPNGenome>();
     oarch << *this;
@@ -87,7 +89,7 @@ void CPPNIndividual::from_string(const std::string &str){
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<CPPNIndividual>();
     if(use_quadric)
-        iarch.register_type<SQCPPNGenome>();
+        iarch.register_type<SQGenome>();
     else
         iarch.register_type<NN2CPPNGenome>();
     iarch >> *this;
