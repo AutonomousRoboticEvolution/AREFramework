@@ -85,6 +85,7 @@ target_include_directories(simulatedER PUBLIC
 target_compile_definitions(simulatedER PUBLIC
     "NON_MATLAB_PARSING"
     "MAX_EXT_API_CONNECTIONS=255"
+    ${PCL_DEFINITIONS}
 )
 target_link_libraries(simulatedER
     dlibxx dl rt

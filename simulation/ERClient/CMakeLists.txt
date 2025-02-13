@@ -32,6 +32,7 @@ target_link_libraries(are-client
 target_compile_definitions(are-client PUBLIC
     "NON_MATLAB_PARSING"
     "MAX_EXT_API_CONNECTIONS=255"
+    ${PCL_DEFINITIONS}
 )
 
 set_target_properties(are-client PROPERTIES
