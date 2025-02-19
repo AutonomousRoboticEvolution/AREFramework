@@ -1,0 +1,80 @@
+Bootstrap: docker
+From: ubuntu:22.04
+
+
+%environment
+    export LD_LIBRARY_PATH=/usr/local/lib
+
+%post
+    # Update and install dependencies
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        libeigen3-dev \
+        git \
+        cmake \
+        build-essential \
+        wget \
+        libopencv-dev \
+        libtbb-dev \
+        liblua5.1-0-dev \
+        qtbase5-dev \
+        x11-apps \
+        xvfb \
+        psmisc \
+        vim \
+        libzmq5 \
+        libzmq3-dev \
+        jupyter \
+        fish \
+        python3-pip && \
+    pip3 install psutil dlib numpy==1.26.4 scikit-learn==1.5.0 pandas==2.2.2 paretoset matplotlib==3.9.0 seaborn==0.13.2
+    mkdir /are
+
+    # Boost 1.77 installation
+    cd /are && \
+    wget https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.gz && \
+    tar -xf boost_1_77_0.tar.gz && rm boost_1_77_0.tar.gz && \
+    cd boost_1_77_0 && ./bootstrap.sh && ./b2 install --prefix=/usr/local
+
+    # Polyvox installation
+    cd /are && \
+    git clone https://github.com/portaloffreedom/polyvox.git && \
+    mkdir polyvox/build && \
+    cd polyvox/build && \
+    cmake -E env CXXFLAGS="-O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer"  cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+
+    # Libdlibxx installation
+    cd /are && \
+    git clone https://github.com/m-renaud/libdlibxx.git && \
+    mkdir libdlibxx/build && \
+    cd libdlibxx/build && \
+    cmake -E env CXXFLAGS="-O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer" cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make && make install
+
+    # LibCMAES installation
+    cd /are && \
+    git clone https://github.com/LeniLeGoff/libcmaes && \
+    mkdir libcmaes/build && \
+    cd libcmaes/build && \
+    cmake -E env CXXFLAGS="-O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer" cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+
+    # PCL dependencies and installation
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        libvtk9-dev \
+        libflann-dev \
+        libusb-1.0-0-dev \
+        freeglut3-dev \
+        libpcap-dev && \
+    cd /are && \
+    git clone https://github.com/PointCloudLibrary/pcl.git && \
+    mkdir pcl/build && \
+    cd pcl/build && \
+    cmake -E env CXXFLAGS="-O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer" cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+
+    # ARE Framework installation
+    cd /are && \
+    git clone -b meim_env_pressure --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git && \
+    mkdir AREFramework/build && \
+    cd AREFramework/build && \
+    cmake -E env CXXFLAGS="-O3 -march=znver1 -mtune=znver1 -mfma -mavx2 -m3dnow -fomit-frame-pointer" cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DONLY_SIMULATION=1 .. && make -j16 && make install
+
+%runscript
+    exec /bin/bash

@@ -55,7 +55,7 @@ def load_parent_pool(filename):
 
 def filter_to_parent_pool(data,parent_ids):
     filtered = []
-    data_dict = {d[0]: d[1:] for d in data}
+    data_dict = {d[0]: d[1:].__add__([idx]) for idx, d in enumerate(data)}
     prev_ids = []
     iter = 0
     ind_idx = 0
