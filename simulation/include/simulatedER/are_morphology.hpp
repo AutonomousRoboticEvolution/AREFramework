@@ -119,7 +119,18 @@ public:
     void set_man_test_res(const ManRes& mtr){man_test_res = mtr;}
 
 protected:
-    virtual void check_repress_organs(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles);
+    /**
+     * @brief check_repress_organs_biased check the components which are not colliding with others or with the skeleton. They will be removed until having only 8 left. There is a bias toward keeping low components
+     * @param skeleton_matrix
+     * @param gripper_handles
+     */
+    virtual void check_repress_organs_biased(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles);
+    /**
+     * @brief check_repress_organs_nobias check the components which are not colliding with others or with the skeleton. They will be removed until having only 8 left
+     * @param skeleton_matrix
+     * @param gripper_handles
+     */
+    virtual void check_repress_organs_nobias(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles);
 
     void create_organ_list(const organ::organ_list_t &organ_i_list);
 
@@ -239,7 +250,13 @@ public:
 
 private:
     void create_organs();
-    void check_repress_organs(const skeleton::type &skeleton_matrix,
+
+    /**
+     * @brief check_repress_organs_nobias Specific implementation for this encoding
+     * @param skeleton_matrix
+     * @param gripper_handles
+     */
+    void check_repress_organs_nobias(const skeleton::type &skeleton_matrix,
                               const std::vector<int> &gripper_handles) override;
 
 

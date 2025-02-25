@@ -382,7 +382,7 @@ void AREMorphology::create_organ_list(const organ::organ_list_t &organ_i_list){
         organ_list.push_back(new_organ);
     }
 }
-void AREMorphology::check_repress_organs(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles){
+void AREMorphology::check_repress_organs_biased(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles){
     int joints_number = 0;
     // Create organs
     for(Organ &organ : organ_list){
@@ -422,6 +422,44 @@ void AREMorphology::check_repress_organs(const skeleton::type &skeleton_matrix, 
     }
     test_robot();
 }
+
+void AREMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles){
+    std::vector<int> bad_organs_idxs;
+    bool no_bad_organs = false;
+    for(Organ &organ: organ_list)
+        organ.createOrgan(mainHandle);
+    while(!no_bad_organs){
+        //STEP 1: Check organs which are colliding with others or with the skeleton
+        for(int i = 0; i < organ_list.size(); i++){
+            //TODO joints number limit
+            Organ &organ = organ_list[i];
+            // organ.createOrgan(mainHandle);
+            if(organ.getOrganType() != 0)
+                organ.testOrgan(skeleton_matrix, -1, skeletonHandles, organ_list);
+            if(organ.organColliding || organ.organInsideSkeleton)
+                bad_organs_idxs.push_back(i);
+        }
+        //STEP 2: Randomly pick one and repress it
+        if(!bad_organs_idxs.empty()){
+            int rand_idx = randomNum->randInt(0,bad_organs_idxs.size()-1);
+            organ_list[bad_organs_idxs[rand_idx]].repressOrgan();
+            organ_list.erase(organ_list.begin() + bad_organs_idxs[rand_idx]);
+        }else no_bad_organs = true;
+        for(Organ &organ: organ_list){
+            organ.organColliding = false;
+            organ.organInsideSkeleton = false;
+        }
+
+        bad_organs_idxs.clear();
+    }
+
+    while(organ_list.size() > 8){
+        int rand_idx = randomNum->randInt(0,organ_list.size());
+        organ_list.erase(organ_list.begin() + rand_idx);
+        organ_list.shrink_to_fit();
+    }
+}
+
 void ManuallyDesignedMorphology::create(){
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
     if(manual_design == "None"){
@@ -566,7 +604,7 @@ void CPPNMorphology::create(){
     }
 
     if(convexDecompositionSuccess){
-        check_repress_organs(skeleton_matrix,gripperHandles);
+        check_repress_organs_biased(skeleton_matrix,gripperHandles);
     }
     else{
         // Stop generating body plan if convex decomposition fails
@@ -629,7 +667,7 @@ void SQCPPNMorphology::create(){
     }
 
     if(convexDecompositionSuccess){
-        check_repress_organs(skeleton_matrix,gripperHandles);
+        check_repress_organs_nobias(skeleton_matrix,gripperHandles);
     }
     else{
         // Stop generating body plan if convex decomposition fails
@@ -696,7 +734,7 @@ void SQMorphology::create(){
     }
 
     if(convexDecompositionSuccess){
-        check_repress_organs(skeleton_matrix,gripperHandles);
+        check_repress_organs_nobias(skeleton_matrix,gripperHandles);
         //create_organs();
     }
     else{
@@ -736,7 +774,7 @@ void SQMorphology::create_organs(){
     for(Organ &organ: organ_list)
         organ.createOrgan(mainHandle);
 }
-void SQMorphology::check_repress_organs(const skeleton::type &skeleton_matrix,
+void SQMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_matrix,
                                         const std::vector<int> &gripper_handles)
 {
     std::vector<int> bad_organs_idxs;
