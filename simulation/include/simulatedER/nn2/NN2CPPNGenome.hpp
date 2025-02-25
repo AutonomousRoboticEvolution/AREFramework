@@ -158,6 +158,7 @@ public:
         arch & cppn;
         arch & feat_desc;
         arch & organ_position_desc;
+        arch & matrix_desc;
         arch & matrix_4d;
         arch & generation;
     }
