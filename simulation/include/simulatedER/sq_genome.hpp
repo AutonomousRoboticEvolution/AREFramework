@@ -143,6 +143,10 @@ struct comp_mut_params{
     static double _add_remove_comp_prob;
 };
 
+namespace cg{
+    std::string components_genome_from_file(std::string &filename, int id);
+}
+
 using cg_t =  ComponentsGenome<comp_mut_params>;
 
 class SQGenome: public Genome{

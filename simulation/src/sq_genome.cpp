@@ -10,6 +10,21 @@ double comp_mut_params::_type_mutation_rate = 0.1;
 double comp_mut_params::_modify_comp_list_mutation_rate = 0.05;
 double comp_mut_params::_add_remove_comp_prob = 0.5;
 
+std::string cg::components_genome_from_file(std::string &filename, int id){
+        std::ifstream ifs(filename);
+    std::string line, res;
+    std::vector<std::string> split_line;
+    while(std::getline(ifs,line)){
+        misc::split_line(line,"-",split_line); 
+        if(id == std::stoi(split_line[0])){
+            res = split_line[1];
+            return res;
+        }
+    }
+    std::cerr << "Loading components error --- id " << id << " not found." << std::endl;
+    return "";
+}
+
 void SQGenome::random(){
     components_genome.random(randomNum);
     quadric.random(randomNum);
