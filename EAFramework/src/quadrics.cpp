@@ -1,4 +1,7 @@
 #include "ARE/quadrics.hpp"
+#include <fstream>
+#include <iostream>
+#include "ARE/misc/utilities.h"
 
 using namespace are;
 
@@ -58,6 +61,26 @@ void quadric_param_t::from_string(const std::string& str){
     r = std::stod(splitted_str[5]);
     s = std::stod(splitted_str[6]);
     t = std::stod(splitted_str[7]);
+}
+
+std::string sq::quadrics_from_file(std::string &filename, int id){
+    std::ifstream ifs(filename);
+    std::string line, res;
+    std::vector<std::string> split_line;
+    while(std::getline(ifs,line)){
+        misc::split_line(line,";",split_line); //will have to change for future quadrics file formats
+        if(id == std::stoi(split_line[0])){
+            res = split_line[1] + std::string(";") +
+                split_line[2] + std::string(";") +
+                split_line[3] + std::string(";") +
+                split_line[4] + std::string(";") +
+                split_line[5] + std::string(";") +
+                split_line[6] + std::string(";");
+            return res;
+        }
+    }
+    std::cerr << "Loading quadrics error --- id " << id << " not found." << std::endl;
+    return "";
 }
 
 double quadric_mut_params::_mutation_rate = 0.1f;

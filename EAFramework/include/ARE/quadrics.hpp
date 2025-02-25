@@ -275,6 +275,10 @@ struct quadric_mut_params{
     static constexpr double _ubound = 2;
 };
 
+namespace sq{
+std::string quadrics_from_file(std::string& filename, int id);
+}
+
 using sq_t = quadric_t<quadric_mut_params>;
 
 }//are
