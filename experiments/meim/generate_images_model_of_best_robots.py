@@ -116,7 +116,7 @@ if __name__ == "__main__":
             parameters["#modelRepository"] = robot_repo
             parameters["#scenePath"] = are_framework + "/simulation/models/scenes/ARE_arena.ttt"
             parameters["#modelsPath"] = are_framework+ "/simulation/models/"
-            parameters["#useQuadric"] = False
+            parameters["#morphGenomeType"] = 2
             write_parameters(parameters,robot_repo,"parameters_visu_" + str(id) + ".csv")
 
         if(len(sys.argv) == 5):    

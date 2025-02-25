@@ -29,7 +29,7 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             std::ofstream qofstr;
             if(!openOLogFile(qofstr,quadric_file))
                 return;
-            qofstr << genome.morph_genome->id() << ";";
+            qofstr << genome.morph_genome->id() << "-";
             if(genome_type == morph_genome_type::SQ_CPPN)
                 qofstr << std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_quadric().to_string();
             else if(genome_type == morph_genome_type::SQ_CG)

@@ -35,6 +35,6 @@ target_include_directories(meim PUBLIC ${INCLUDES} ${PCL_INCLUDE_DIRS})
 target_compile_definitions(meim PUBLIC ${PCL_DEFINITIONS})
 target_link_libraries(meim ARE simulatedER cmaes tbb ${PCL_LIBRARIES})
 
-install(TARGETS meim DESTINATION lib)
-install(DIRECTORY . DESTINATION include/meim FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+install(TARGETS meim DESTINATION lib/ARE/experiments)
+install(DIRECTORY . DESTINATION include/ARE/experiements/meim FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

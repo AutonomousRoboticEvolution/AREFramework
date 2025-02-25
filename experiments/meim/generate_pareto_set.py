@@ -9,26 +9,33 @@ import paretoset as pareto
 import pandas as pd
 import copy
 
-def load_fitnesses(filename: str) -> dict:
+def load_fitnesses(filename: str, max = -1) -> dict:
     ''' load fitness.csv file from meim, mnipes_v2 experiments
         output: dictionary with id: fitness value '''
-    
     with open(filename) as file:
+        counter = 0
         lines = file.readlines()
         fitnesses = dict()
         for line in lines:
+            if counter == max:
+                break
             line = line.split(",")
             fitnesses[int(line[0])] = float(line[-2])
+            counter+=1
+
         return fitnesses
     
-def load_descriptors(filename: str) -> dict:
+def load_descriptors(filename: str, max = -1) -> dict:
     ''' Load descriptors from morph_descriptor.csv from meim, mnipes_v2 experiments
         output: dictionary with id: numpy.array'''
 
     with open(filename) as file:
+        counter = 0
         lines = file.readlines()
         descriptors = dict()
         for line in lines:
+            if counter == max:
+                break
             line = line.split(",")
             id = int(line[0])
             dim = int(line[1])
@@ -36,6 +43,7 @@ def load_descriptors(filename: str) -> dict:
             for i in range(dim*dim*dim):
                 desc.append(int(line[i+2]))
             descriptors[id] = np.array(desc)
+            counter += 1
         return descriptors
 
 # def sparsity_fct(descriptors: dict, key: int,k: int) -> float:
@@ -163,11 +171,11 @@ if __name__ == "__main__":
         exp_folder = folder_name + "/" + folder
         if os.path.exists(exp_folder + "/" + sys.argv[2]):
             continue
-        descriptors = load_descriptors(exp_folder + "/morph_descriptor.csv")
-        fitnesses = load_fitnesses(exp_folder + "/fitness.csv")
+        descriptors = load_descriptors(exp_folder + "/morph_descriptor.csv",max=5000)
+        fitnesses = load_fitnesses(exp_folder + "/fitness.csv",max=5000)
         fitnesses, descriptors = apply_fitness_threshold(fitnesses,descriptors,float(sys.argv[3]))
         print("Number of individuals =",len(fitnesses))
-        print(fitnesses)
+       # print(fitnesses)
         if distance == "L2":
             L2_norm = lambda v,w: np.linalg.norm(v-w)
             sparsity = compute_sparsity(descriptors,15,L2_norm)
