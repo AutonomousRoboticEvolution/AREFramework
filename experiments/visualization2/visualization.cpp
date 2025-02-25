@@ -3,7 +3,8 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "simulatedER/are_morphology.hpp"
 #include "ARE/nn2/NN2Settings.hpp"
-#include "simulatedER/nn2/sq_cppn_genome.hpp"
+#include "ARE/quadrics.hpp"
+#include "simulatedER/morph_genomes.hpp"
 
 using namespace are;
 namespace  fs = boost::filesystem;
@@ -13,7 +14,6 @@ void VisuInd::createMorphology(){
     std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
     // if(manual_design != "None"){
     //     morphology = std::make_shared<sim::ManuallyDesignedMorphology>(parameters);
@@ -24,18 +24,30 @@ void VisuInd::createMorphology(){
     // }
 
     if(fixed_morph_path == "None"){
-        if(!use_quadric){
+        int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+        if(genome_type == morph_genome_type::CPPN){
             morphology = std::make_shared<sim::CPPNMorphology>(parameters);
-            morphology->set_randNum(randNum);
-            nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-            std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(gen);
-        }else{
+            nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+            std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(cppn);
+        }
+        else if(genome_type == morph_genome_type::SQ_CPPN){
             morphology = std::make_shared<sim::SQCPPNMorphology>(parameters);
-            morphology->set_randNum(randNum);
             sq_cppn::cppn_t cppn = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_cppn();
-            quadric_t<quadric_params> quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
+            sq_t quadric = std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->get_quadric();
             std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_cppn(cppn);
             std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_quadric(quadric);
+        }
+        else if(genome_type == morph_genome_type::SQ_CG){
+            morphology = std::make_shared<sim::SQMorphology>(parameters);
+            cg_t comp_gen = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_components_genome();
+            sq_t quadric = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_quadric();
+            std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_comp_gen(comp_gen);
+            std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_quadric(quadric);
+        }else{
+            std::cerr << "Unknown type of morphological genome" << std::endl;
+            std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+            std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+            exit(1);
         }
         int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
         std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(id);
@@ -224,6 +236,7 @@ void Visu::init(){
     std::string morph_gen_file;
     std::string cppn_file;
     std::string quadrics_file;
+    std::string comp_gen_file;
 
     if(manual_design != "None"){
         std::vector<std::vector<int>> list_of_voxel;
@@ -238,18 +251,20 @@ void Visu::init(){
     }
 
     std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
-    if(!use_quadric){
+    if(genome_type == CPPN || genome_type == SQ_CPPN){
         std::stringstream sstr2;
         sstr2 << folder_to_load << "/cppn_" << id;
-        morph_gen_file = sstr2.str();
-    }else{
-        std::stringstream cppn_sstr;
-        cppn_sstr << folder_to_load << "/cppn_" << id;
-        cppn_file = cppn_sstr.str();
+        cppn_file = sstr2.str();
+    }
+    if(genome_type == SQ_CPPN || genome_type == SQ_CG){
         std::string sq_file = settings::getParameter<settings::String>(parameters,"#quadricFile").value;
         quadrics_file = folder_to_load + std::string("/") + sq_file;
+    }
+    if(genome_type == SQ_CG){
+        std::string cg_file = settings::getParameter<settings::String>(parameters,"#componentsGenomeFile").value;
+        comp_gen_file = folder_to_load + std::string("/") + cg_file;
     }
     if(!empty_ctrl_gen){
         std::stringstream sstr;
@@ -261,17 +276,33 @@ void Visu::init(){
 
     if(fixed_morph_path == "None"){
         //load morphology genome
-        if(!use_quadric){
+        if(genome_type == CPPN){
             nn2_cppn_t cppn;
-            std::ifstream ifs(morph_gen_file);
+            std::ifstream ifs(cppn_file);
             boost::archive::text_iarchive iarch(ifs);
             iarch >> cppn;
             morph_gen = std::make_shared<NN2CPPNGenome>(cppn);
             morph_gen->set_randNum(randomNum);
             morph_gen->set_parameters(parameters);
-        }else{
+        }else if(genome_type == SQ_CPPN){
+            sq_cppn::cppn_t cppn;
+            std::ifstream ifs(cppn_file);
+            boost::archive::text_iarchive iarch(ifs);
+            iarch >> cppn;
+            sq_t sq;
+            sq.from_string(sq::quadrics_from_file(quadrics_file,id));
             morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
-          //  std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->load_from_files(cppn_file,quadrics_file);
+            std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_cppn(cppn);
+            std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_quadric(sq);
+        }else if(genome_type == SQ_CG){//TODO
+            sq_t sq;
+            sq.from_string(sq::quadrics_from_file(quadrics_file,id));
+            cg_t cg;
+            cg.from_string(cg::components_genome_from_file(comp_gen_file,id));
+            morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_components_genome(cg);
+            std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_quadric(sq);
+
         }
         morph_gen->set_id(id);
         if(empty_ctrl_gen)

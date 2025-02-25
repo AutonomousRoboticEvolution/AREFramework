@@ -33,5 +33,5 @@ target_include_directories(visualization2 PUBLIC
     "../../modules"
     )
 target_link_libraries(visualization2 ARE simulatedER)
-install(TARGETS visualization2 DESTINATION lib)
-install(DIRECTORY . DESTINATION include/visualization2  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+install(TARGETS visualization2 DESTINATION lib/ARE/experiments/)
+install(DIRECTORY . DESTINATION include/ARE/experiments/visualization2  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
