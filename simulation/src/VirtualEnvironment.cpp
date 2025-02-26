@@ -41,6 +41,7 @@ void VirtualEnvironment::build_tiled_floor(std::vector<int> &tiles_handles){
     double tile_size[3] = {0.249f,0.249f,0.01f};
     double tile_increment = 0.25;
     double starting_pos[3] = {-0.875f,-0.875f,0.005f};
+    //TODO --- Update to fit any size of the arena
     for(int i = 0; i < 8; i++){
         for(int j = 0; j < 8; j++){
             tiles_handles.push_back(simCreatePrimitiveShape(sim_primitiveshape_cuboid,tile_size,0));

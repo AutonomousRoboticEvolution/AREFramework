@@ -7,20 +7,16 @@ add_link_options("$<$<CONFIG:DEBUG>:-fsanitize=address>")
 
 FILE(GLOB_RECURSE SOURCES
     "src/*"
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApi.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c>
+    ${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApi.c
+    ${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApiPlatform.c
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c
 )
 
 add_executable(are-client ${SOURCES})
 target_include_directories(are-client PUBLIC
     "include"
     "../include"
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/>
+    ${COPPELIASIM_FOLDER}/programming/
 )
 
 target_link_libraries(are-client

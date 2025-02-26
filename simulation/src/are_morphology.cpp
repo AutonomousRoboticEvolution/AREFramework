@@ -17,10 +17,8 @@ void AREMorphology::createAtPosition(float x, float y, float z)
 
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     if(verbose){
-        float mass;
-        float inertiaMatrix[9];
-        float centerOfMass[3];
-        simGetShapeMassAndInertia(mainHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+        double mass;
+        simGetShapeMass(mainHandle,&mass);
         std::cout << "Mass of the main frame (skeleton + head organ) :" << mass << std::endl;
     }
     setPosition(x,y,z);
@@ -30,7 +28,7 @@ void AREMorphology::createAtPosition(float x, float y, float z)
 
 void AREMorphology::setPosition(float x, float y, float z)
 {
-    simFloat robotPos[3];
+    double robotPos[3];
     robotPos[0] = x;
     robotPos[1] = y;
     robotPos[2] = z;
@@ -78,7 +76,7 @@ bool AREMorphology::convex_decomposition(int meshHandle, int numSkeletonVoxels, 
         //            floatParams[7]: V-HACD: beta (0.0-1.0, 0.05 is default).
         //            floatParams[8]: V-HACD: gamma (0.0-1.0, 0.00125 is default).
         //            floatParams[9]: V-HACD: min. volume per convex hull (0.0-0.01, 0.0001 is default).
-        float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
+        double conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
                                      0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
 
         convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
@@ -88,19 +86,16 @@ bool AREMorphology::convex_decomposition(int meshHandle, int numSkeletonVoxels, 
         // The issue come from a mismatch between the mass computed by verp and the one expected.
         //Call this to compute the approximate moment of inertia and center of mass
         simComputeMassAndInertia(convexHandle, 84); //kg.m-3
-        float skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
-        float mass;
-        float inertiaMatrix[9];
-        float centerOfMass[3];
-        simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
-        simSetShapeMassAndInertia(convexHandle,skeletonMass,inertiaMatrix,centerOfMass,nullptr);
+        double skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
+        simSetShapeMass(convexHandle,skeletonMass);
         //*/
 
         mainHandle = convexHandle;
         // Create brain primitive
-        float brainSize[3] = {0.084,0.084,0.11};
-        brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
-        float brainPos[3] = {0.0,0.0,0.06};
+        double brainSize[3] = {0.084,0.084,0.11};
+        brainHandle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,brainSize,0);
+        simSetShapeMass(brainHandle,0.503); //Head organ weighs 503g
+        double brainPos[3] = {0.0,0.0,0.06};
         simSetObjectPosition(brainHandle,-1,brainPos);
         // Group primitives
         int groupHandles[2] = {convexHandle, brainHandle};
@@ -114,13 +109,13 @@ bool AREMorphology::convex_decomposition(int meshHandle, int numSkeletonVoxels, 
 #ifndef ISROBOTSTATIC
         std::cerr << "We shouldn't be here!" << __func__ << std::endl;
 #elif ISROBOTSTATIC == 0
-        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Param(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
         simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
-        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
+        simSetObjectInt32Param(mainHandle, sim_shapeintparam_respondable, 1);
         //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
-        simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
+        simSetObjectInt32Param(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
 
     } catch (std::exception &e) {
         //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
@@ -152,11 +147,11 @@ bool AREMorphology::generate_skeleton_mesh(skeleton::type &skeleton_matrix, int 
     std::ostringstream name;
     name.str("VoxelBone");
     name << id;
-    simSetObjectName(mesh_handle, name.str().c_str());
+    simSetObjectAlias(mesh_handle, name.str().c_str(),0);
     /// \todo EB: Since the bounding box for each shape changes the origin changes as well Therefore, an offset is needed.
-    simFloat currentObjectPosition[3];
+    double currentObjectPosition[3];
     simGetObjectPosition(mesh_handle,-1,currentObjectPosition);
-    simFloat nextObjectPosition[3];
+    double nextObjectPosition[3];
     nextObjectPosition[0] = currentObjectPosition[0] - 0.11879;
     nextObjectPosition[1] = currentObjectPosition[1] - 0.11879;
     nextObjectPosition[2] = currentObjectPosition[2];
@@ -172,7 +167,7 @@ void AREMorphology::load(const std::string &filepath){
     if(handle == -1)
     {
         std::cerr << "unable to load robot model" << std::endl;
-        simChar* lastError = simGetLastError();
+        char* lastError = simGetLastError();
         std::cerr << "simGetLastError : " << lastError << std::endl;
         simReleaseBuffer(lastError);
         exit(1);
@@ -234,8 +229,8 @@ void AREMorphology::createHead()
 void AREMorphology::createGripper(std::vector<int>& gripperHandles)
 {
     gripperHandles.resize(4);
-    float gripperPosition[3];
-    float gripperOrientation[3];
+    double gripperPosition[3];
+    double gripperOrientation[3];
     int tempGripperHandle = -1;
     std::string models_path = settings::getParameter<settings::String>(parameters,"#modelsPath").value;
     std::string gripperWheelPath = models_path + "/utils/gripper_w.ttm";
@@ -268,7 +263,7 @@ void AREMorphology::createGripper(std::vector<int>& gripperHandles)
 #ifndef ISROBOTSTATIC
         std::cerr << "We shouldn't be here!" << __func__ << std::endl;
 #elif ISROBOTSTATIC == 0
-        simSetObjectInt32Parameter(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+        simSetObjectInt32Param(i, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
 #elif ISROBOTSTATIC == 1
         simSetObjectInt32Parameter(i, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
 #endif
@@ -340,10 +335,10 @@ void AREMorphology::exportRobotModel(int indNum, const std::string &folder)
 
 
         // Export mesh file
-        const auto **verticesMesh = new const simFloat *[2];
-        const auto **indicesMesh = new const simInt *[2];
-        auto *verticesSizesMesh = new simInt[2];
-        auto *indicesSizesMesh = new simInt[2];
+        const double **verticesMesh = new const double *[2];
+        const int **indicesMesh = new const int *[2];
+        int *verticesSizesMesh = new int[2];
+        int *indicesSizesMesh = new int[2];
         verticesMesh[0] = skeletonListVertices.data();
         verticesSizesMesh[0] = skeletonListVertices.size();
         indicesMesh[0] = skeletonListIndices.data();
@@ -470,7 +465,7 @@ void ManuallyDesignedMorphology::create(){
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
     std::vector<int> gripperHandles;
-    createGripper(gripperHandles);
+    createGripper(gripperHandles); //remove gripper operations
     numSkeletonVoxels = 0;
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
@@ -509,7 +504,7 @@ void ManuallyDesignedMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 
 }
 
@@ -636,7 +631,7 @@ void CPPNMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 
 }
 
@@ -700,7 +695,7 @@ void SQCPPNMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
 
 void SQCPPNMorphology::create_organs(){
@@ -768,7 +763,7 @@ void SQMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
 void SQMorphology::create_organs(){
     for(Organ &organ: organ_list)

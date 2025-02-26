@@ -20,7 +20,7 @@
 #include <simLib/simExp.h>
 
 /// an unique pointer to ER_VREP class
-are::sim::ER::Ptr ERVREP;
+are::sim::ER::Ptr ER;
 // TODO: EB  do we need these variables? I guess they are used for client-server mode.
 int counter = 0;
 int timeCount = 0;

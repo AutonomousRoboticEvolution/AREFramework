@@ -92,9 +92,9 @@ void Organ::createOrgan(int skeletonHandle)
 
     /// \todo: EB: Maybe we should move this to a method
     // Get object handles for collision detection
-    int* selectionSize;
-    int* obj_handles = simGetObjectsInTree(organHandle,sim_handle_all,2,selectionSize);
-    for (int i = 0; i < *selectionSize; i++) {
+    int selectionSize;
+    int* obj_handles = simGetObjectsInTree(organHandle,sim_handle_all,2,&selectionSize);
+    for (int i = 0; i < selectionSize; i++) {
         char* componentName;
         componentName = simGetObjectAlias(obj_handles[i],-1);
         if('P' == componentName[0]){
@@ -103,7 +103,6 @@ void Organ::createOrgan(int skeletonHandle)
         simReleaseBuffer(componentName);
     }
     simReleaseBuffer(obj_handles);
-    simReleaseBuffer(selectionSize);
 
     // For force sensor
     int fsParams[5];
@@ -281,15 +280,10 @@ void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gri
 
 void Organ::repressOrgan()
 {
-<<<<<<< HEAD
-    if(organInsideSkeleton || organColliding || !organGripperAccess){
-        int parent_handle[1];
-        parent_handle[0] = simGetObjectParent(organHandle);
-        simRemoveObjects(parent_handle,1); // Remove force sensor.
-=======
+
     if(organInsideSkeleton || organColliding){// || !organGripperAccess){
-        simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
->>>>>>> update_decoding
+        int parent_handle[1] = {simGetObjectParent(organHandle)};
+        simRemoveObjects(parent_handle,1); // Remove force sensor.
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(physics_connector_handle);
         organRemoved = true;

@@ -5,9 +5,6 @@ using namespace are;
 settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<settings::ParametersMap>(
             []() -> settings::ParametersMap{
                 settings::ParametersMap parameters;
-                parameters.emplace("#experimentName",std::make_shared<settings::String>("neuroEvolution"));
-                parameters.emplace("#expPluginName",std::make_shared<settings::String>("/usr/local/lib/libneuroEvolution.so"));
-                parameters.emplace("#scenePath",std::make_shared<settings::String>("~/evolutionary_robotics_framework/EvolutionVREP/experiments/sim/ARE_arena.ttt"));
                 parameters.emplace("#repository",std::make_shared<settings::String>("~/are-logs"));
                 parameters.emplace("#populationSize",std::make_shared<settings::Integer>(50));
                 parameters.emplace("#maxEvalTime",std::make_shared<settings::Float>(60));

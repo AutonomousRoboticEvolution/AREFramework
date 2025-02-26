@@ -100,7 +100,7 @@ void ER::initIndividual(){
 
 
     //int length;
-    //simChar* message = simGetStringSignal("currentInd",&length);
+    //char* message = simGetStringSignal("currentInd",&length);
     if(message.empty()){
         std::cerr << "No individual received" << std::endl;
         return;
@@ -240,7 +240,7 @@ void ER::endOfSimulation()
             nbrEval = 0;
             ind_received = false;
         }
-        simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
+        simSetInt32Signal("evalIsFinish",evalIsFinish);
     }
 }
 

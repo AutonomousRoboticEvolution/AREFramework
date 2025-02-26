@@ -111,7 +111,7 @@ SIM_DLLEXPORT int simInit(SSimInit *info)
 
     simulationState = INITIALIZING;
     // Construct classes
-    ERVREP = std::make_unique<are::sim::ER>();   // The class used to handle the EA
+    ER = std::make_unique<are::sim::ER>();   // The class used to handle the EA
 
     if(verbose){
         std::cout << "Parameters Loaded" << std::endl;
@@ -121,7 +121,7 @@ SIM_DLLEXPORT int simInit(SSimInit *info)
     }
     //are_sett::Property::Ptr properties(new are_sett::Property);
     //ERVREP->set_properties(properties);
-    ERVREP->set_parameters(parameters);  // Initialize settings in the constructor
+    ER->set_parameters(parameters);  // Initialize settings in the constructor
     if(seed < 0){
         std::random_device rd;
         seed = rd();
@@ -130,8 +130,8 @@ SIM_DLLEXPORT int simInit(SSimInit *info)
 
 
     are::misc::RandNum rn(seed);
-    ERVREP->set_randNum(std::make_shared<are::misc::RandNum>(rn));
-    ERVREP->initialize();
+    ER->set_randNum(std::make_shared<are::misc::RandNum>(rn));
+    ER->initialize();
     simulationState = FREE;
 //    //properties.reset();
 
@@ -151,7 +151,6 @@ SIM_DLLEXPORT int simInit(SSimInit *info)
 
 
     return(2); // initialization went fine, we return the version number of this plugin (can be queried with simGetModuleName)
-    // version 1 for VRep 3.6.2
     // version 2 for coppeliaSim 4.5 and above
 }
 
@@ -164,7 +163,7 @@ SIM_DLLEXPORT void simCleanup()
 SIM_DLLEXPORT void simMsg(SSimMsg* msg)
 {
 
-    are_sett::ParametersMapPtr param = ERVREP->get_parameters();
+    are_sett::ParametersMapPtr param = ER->get_parameters();
     //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
     int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
@@ -180,7 +179,7 @@ SIM_DLLEXPORT void simMsg(SSimMsg* msg)
 }
 
 void localMessageHandler(int message){
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+    are_sett::ParametersMap param = (*ER->get_parameters());
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     int errorModeSaved;
@@ -197,7 +196,7 @@ void localMessageHandler(int message){
             simSetBoolParam(sim_boolparam_video_recording_triggered,1);
 
         // Initializes population
-        ERVREP->startOfSimulation();  //start from here after simStartSimulation is called
+        ER->startOfSimulation();  //start from here after simStartSimulation is called
         if (verbose) {
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
@@ -206,14 +205,14 @@ void localMessageHandler(int message){
     else if (message == sim_message_eventcallback_modulehandle)
     {
         assert(simulationState == BUSY);
-        ERVREP->handleSimulation(); // handling the simulation.
+        ER->handleSimulation(); // handling the simulation.
     }
     // SIMULATION ENDED
     else if (message == sim_message_eventcallback_simulationended)
     {
         assert(simulationState == BUSY);
         simulationState = CLEANUP;
-        ERVREP->endOfSimulation();
+        ER->endOfSimulation();
         loadingPossible = true;  // start another simulation
         if (verbose) {
             std::cout << "SIMULATION ENDED" << std::endl;
@@ -230,13 +229,13 @@ void localMessageHandler(int message){
     }
 
     // START NEW SIMULATION
-    if (simulationState == FREE && ERVREP->get_ea()->get_population().size() > 0)
+    if (simulationState == FREE && ER->get_ea()->get_population().size() > 0)
     {
         simulationState = STARTING;
         counter = 0;
         simStartSimulation();
-    }else if(simulationState == FREE && ERVREP->get_ea()->get_population().size() == 0){
-        ERVREP->endOfSimulation();
+    }else if(simulationState == FREE && ER->get_ea()->get_population().size() == 0){
+        ER->endOfSimulation();
     }
 }
 
@@ -249,7 +248,7 @@ void clientMessageHandler(int message){
     if(message == sim_message_eventcallback_modelloaded)
         return;
 
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
+    are_sett::ParametersMap param = (*ER->get_parameters());
     bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     // client and v-rep plugin communicates using signal and remote api
@@ -289,8 +288,8 @@ void clientMessageHandler(int message){
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         }
         //        simStartSimulation();
-        ERVREP->initEnv();
-        ERVREP->initIndividual();//startOfSimulation();
+        ER->initEnv();
+        ER->initIndividual();//startOfSimulation();
         // Initializes population
         simSetInt32Signal("simulationState",are_c::BUSY);
         simSetFloatSignal("simulationTime",0);
@@ -300,18 +299,18 @@ void clientMessageHandler(int message){
     //Runing Simulation
     else if (message == sim_message_eventcallback_modulehandle) //&& clientState[0] == BUSY)
     {
-        ERVREP->handleSimulation(); // handling the simulation.
+        ER->handleSimulation(); // handling the simulation.
         simSetInt32Signal("simulationState",are_c::BUSY);
     }\
     // SIMULATION ENDED
     else if (message == sim_message_eventcallback_simulationended)
     {
         simulationState = CLEANUP;
-        ERVREP->endOfSimulation();
-        std::cout << ERVREP->get_evalIsFinish() << std::endl;
-        if(ERVREP->get_evalIsFinish()){
+        ER->endOfSimulation();
+        std::cout << ER->get_evalIsFinish() << std::endl;
+        if(ER->get_evalIsFinish()){
 
-            std::string indString = ERVREP->get_currentInd()->to_string();
+            std::string indString = ER->get_currentInd()->to_string();
             simSetStringSignal("currentInd",indString.c_str(),indString.size());
             simSetInt32Signal("simulationState",are_c::FINISH);
 
@@ -327,19 +326,11 @@ void clientMessageHandler(int message){
             }
             simSetInt32Signal("simulationState",are_c::RESTART);
             simulationState = RESTART;
-            std::string indString = ERVREP->get_currentInd()->to_string();
+            std::string indString = ER->get_currentInd()->to_string();
             simSetStringSignal("currentInd",indString.c_str(),indString.size());
             loadingPossible = true;  // start another simulation
             return;
        }
-
-//        std::string indString = ERVREP->get_currentInd()->to_string();
-//        simSetStringSignal("currentInd",indString.c_str(),indString.size());
-//        simSetIntegerSignal("simulationState",are_c::FINISH);
-
-//        if (verbose) {
-//            std::cout << "SIMULATION ENDED" << std::endl;
-//        }
     }
 
     if (clientState[0] == are_c::IDLE)

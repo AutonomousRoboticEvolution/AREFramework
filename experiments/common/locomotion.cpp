@@ -1,9 +1,5 @@
 #include "locomotion.hpp"
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
 #include "simLib/simLib.h"
-#endif
 #include <boost/algorithm/string.hpp>
 #include <simulatedER/Morphology.h>
 

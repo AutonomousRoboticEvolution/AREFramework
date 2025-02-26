@@ -9,7 +9,7 @@ int ER::init(int nbrOfInst, int port){
     nbr_of_instances = nbrOfInst;
     for (int i = 0; i < nbrOfInst; i++) {
         auto new_slave = std::make_unique<SlaveConnection>("127.0.0.1", i + port);
-        std::cout << "Connecting to vrep on port " << new_slave->port() << std::endl;
+        std::cout << "Connecting to coppeliaSim on port " << new_slave->port() << std::endl;
         float max_eval_time = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
         int env_number = settings::getParameter<settings::Integer>(parameters,"#envNumber").value;
         int timeout = env_number*max_eval_time*1000 + 60000;
@@ -383,7 +383,7 @@ void ER::finishConnections()
 void ER::openConnections()
 {
     for (auto &slave: serverInstances) {
-        std::cout << "Reconnecting to vrep on port " << slave->port() << std::endl;
+        std::cout << "Reconnecting to coppeliaSim on port " << slave->port() << std::endl;
         slave->connect(5000);
         slave->getIntegerSignalStreaming("simulationState");
     }

@@ -1,5 +1,5 @@
 #experimentName,string,meim
-#expPluginName,string,/usr/local/lib/are/experiments/libmeim.so
+#expPluginName,string,/usr/local/lib/ARE/experiments/libmeim.so
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
@@ -7,7 +7,7 @@
 #maxEvalTime,float,1200
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #realTimeSim,bool,0
 #timeStep,float,0.02

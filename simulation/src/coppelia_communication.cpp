@@ -72,7 +72,6 @@ void sim::readPassivIRSensors(const std::vector<int> handles, std::vector<double
         float dist = norm_L2(position_passive[0], position_passive[1], position_passive[2]);
         // Did the sensor detected something?
         if (det > 0) {
-            double ref_euler[3];
             if (position_passive[0] == 0) position_passive[1] += 1e-3; // small inaccuracy in case of x = 0;
             double euler[3] = {static_cast<float>(std::atan2(position_passive[2], position_passive[1]) - M_PI / 2.f),
                               static_cast<float>(std::asin(position_passive[0] / dist)),
@@ -226,7 +225,7 @@ void sim::getJointsPosition(const std::vector<int>& handles,std::vector<double>&
 }
 
 void sim::getWheelsPosition(const std::vector<int>& handles,std::vector<double>& positions){
-    float pos;
+    double pos;
     for(const int& handle : handles){
         simGetJointPosition(handle,&pos);
         positions.push_back(static_cast<double>(pos));

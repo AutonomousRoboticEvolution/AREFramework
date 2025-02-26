@@ -112,7 +112,7 @@ public:
     std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();}
     std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();}
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
-    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<double> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
     const ManRes &get_man_test_res(){return man_test_res;}
@@ -143,7 +143,7 @@ protected:
     //skeleton information
     int numSkeletonVoxels;
     std::vector<int> skeletonHandles;
-    std::vector<float> skeletonListVertices;
+    std::vector<double> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
 
