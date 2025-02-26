@@ -79,6 +79,8 @@ public:
         _nn = std::make_shared<nn_t>(nb_input,nb_hidden,nb_output);
         if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            std::cerr << "nb inputs: " << nb_input << " - nb outputs: " << nb_output << " - nb hidden: " << nb_hidden << std::endl;
+            std::cerr << "weights: " << weights.size() << " - nb of connections: " << _nn->get_nb_connections() << " - biases: " << biases.size() << " - nb of neurons: " << _nn->get_nb_neurons() << std::endl;
             return;
         }
         _nn->set_all_weights(weights);
@@ -91,6 +93,12 @@ public:
         _nn = std::make_shared<nn_t>(nb_input,nb_hidden,nb_output, joint_subs);
         if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            std::cerr << "nb inputs: " << nb_input << " - nb outputs: " << nb_output << " - nb hidden: " << nb_hidden << std::endl;
+            std::cerr << "weights: " << weights.size() << " - nb of connections: " << _nn->get_nb_connections() << " - biases: " << biases.size() << " - nb of neurons: " << _nn->get_nb_neurons() << std::endl;
+            std::cerr << "joint substrate: ";
+            for(int i: joint_subs)
+                std::cerr << i << ";";
+            std::cerr << std::endl;
             return;
         }
         _nn->set_all_weights(weights);
@@ -163,6 +171,12 @@ public:
         _nn = std::make_shared<cpg_t>(nb_input,nb_hidden,nb_output, joint_subs);
         if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            std::cerr << "nb inputs: " << nb_input << " - nb outputs: " << nb_output << " - nb hidden: " << nb_hidden << std::endl;
+            std::cerr << "weights: " << weights.size() << " - nb of connections: " << _nn->get_nb_connections() << " - biases: " << biases.size() << " - nb of neurons: " << _nn->get_nb_neurons() << std::endl;
+            std::cerr << "joint substrate: ";
+            for(int i: joint_subs)
+                std::cerr << i << ";";
+            std::cerr << std::endl;
             return;
         }
         _nn->set_all_weights(weights);
@@ -227,6 +241,12 @@ public:
         _nn = std::make_shared<ff_cpg_t>(nb_input,nb_hidden,nb_output, joint_subs);
         if(_nn->get_nb_connections() != weights.size() || _nn->get_nb_neurons() != biases.size()){
             std::cerr << "NN2 init error: Wrong number of parameters" << std::endl;
+            std::cerr << "nb inputs: " << nb_input << " - nb outputs: " << nb_output << " - nb hidden: " << nb_hidden << std::endl;
+            std::cerr << "weights: " << weights.size() << " - nb of connections: " << _nn->get_nb_connections() << " - biases: " << biases.size() << " - nb of neurons: " << _nn->get_nb_neurons() << std::endl;
+            std::cerr << "joint substrate: ";
+            for(int i: joint_subs)
+                std::cerr << i << ";";
+            std::cerr << std::endl;
             return;
         }
         _nn->set_all_weights(weights);

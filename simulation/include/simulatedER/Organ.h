@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include "ARE/Settings.h"
-#include "ARE/morphology_descriptors.hpp"
+#include "simulatedER/morphology_constants.hpp"
 
 #if defined (VREP)
 #include "v_repLib.h"
@@ -21,6 +21,19 @@
 namespace are {
 
 namespace sim{
+
+namespace organ {
+struct organ_info{
+    organ_info(int t,const std::vector<float> &p,const std::vector<float> &o):
+        type(t),position(p),orientation(o){}
+    int type;
+    std::vector<float> position;
+    std::vector<float> orientation;
+};
+using organ_list_t = std::vector<organ_info>;
+void generate_orientation(float x, float y, float z, std::vector<float> &orientation);
+void generate_orientation(int x, int y, int z, std::vector<float> &orientation);
+}
 
 class Organ{
 private:
@@ -67,12 +80,12 @@ public:
         organRemoved(o.organRemoved),
         organChecked(o.organChecked),
         parameters(o.parameters),
+        connector_frame_pos(o.connector_frame_pos),
         organPos(o.organPos),
         connectorPos(o.connectorPos),
         organOri(o.organOri),
         organInsideSkeleton(o.organInsideSkeleton),
         organColliding(o.organColliding),
-        connector_frame_pos(o.connector_frame_pos),
         organGripperAccess(o.organGripperAccess){}
     /**
      * @brief This method creates, places and rotates the simulated organ. The parent will be the skeleton hangle passed.
@@ -90,7 +103,7 @@ public:
      * @param skeletonHandles - All skeletons including main and children.
      * @param organList - All organs to compare to.
      */
-    void testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
+    void testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
     /**
      * @brief This test if the organ is colliding with another different organ or with an skeleton.
      * @param skeletonHandles - All skeletons including main and children.
@@ -109,7 +122,7 @@ public:
      * work when one organ is inside a second organ.
      * @param skeletonMatrix - Skeleton of the main body
      */
-    void isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix);
+    void isOrganInsideMainSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix);
     /**
      * @brief Removes the organ from the final phenotype.
      */

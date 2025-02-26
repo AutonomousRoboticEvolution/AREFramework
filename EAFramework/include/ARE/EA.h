@@ -122,6 +122,7 @@ public:
     virtual void fill_ind_to_eval(std::vector<int> &ind_to_eval);
 
     //GETTERS & SETTERS
+    void update_individual(int index,Individual::Ptr& ind){population[index] = ind;}
     void setCurrentIndIndex(int index){currentIndIndex = index;}
     virtual Individual::Ptr getIndividual(size_t index) const;
     const Individual::Ptr & get_current_ind() const {return population[currentIndIndex];}
@@ -146,6 +147,7 @@ public:
     void set_objectives(const std::vector<double>& objs){objectives = objs;}
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
     void set_trajectory(const std::vector<waypoint> &traj){trajectory = traj;}
+
 
 protected:
     /// This method initilizes a population of genomes

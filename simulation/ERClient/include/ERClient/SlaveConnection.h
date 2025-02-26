@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <exception>
+#include "simulatedER/zmq_com.hpp"
 
 
 extern "C" {
@@ -41,6 +42,10 @@ private:
     int _individualNum;
     State _state;
     int reconnection_trials = 0;
+
+    zmq::context_t _context;
+    zmq::socket_t _individual_channel;
+    int zmq_timeout = 100000;
 
 public:
     explicit SlaveConnection(const std::string& address, int port);
@@ -85,6 +90,10 @@ public:
     int get_clientID(){return _clientID;}
     void incr_reconnection_trials(){reconnection_trials++;}
     int get_reconnection_trials(){return reconnection_trials;}
+
+    void reset_ind_channel();
+
+    zmq::socket_t &get_ind_channel(){return _individual_channel;}
 };
 
 class VrepRemoteException: public std::exception

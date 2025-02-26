@@ -20,8 +20,8 @@ blob_detection_parameters.filterByInertia = True
 blob_detection_parameters.minInertiaRatio = 0.01
 
 # aruco dictionary and parameters
-aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
-aruco_parameters = aruco.DetectorParameters_create()
+#aruco_dict = aruco.Dictionary_get(aruco.DICT_4X4_50)
+#aruco_parameters = aruco.DetectorParameters_create()
 
 resolution_width = -1 # set negative to leave as the default for your camera
 resolution_height = -1 # set negative to leave as the default for your camera
@@ -99,6 +99,32 @@ elif location == "napier":
     pixel_scale = 500 #nc
 
     crop_rectangle = [-1]
+elif location == "robotarium":
+    pipe = "tcpclientsrc host=192.168.2.2 port=5000 ! h264parse ! avdec_h264 ! videoconvert ! tee ! appsink"
+
+    show_frames = True
+
+    brainMin = ((160,100,0),)
+    brainMax = ((179,255,150),)
+
+    centre_reference = (550,550)
+    pixel_scale = 450 #nc
+
+    crop_rectangle = [-1]
+
+elif location == "localhost":
+    pipe = "v4l2src device=/dev/video0 ! videoconvert ! appsink"
+
+    show_frames = True
+
+    brainMin = ((169,100,165),)
+    brainMax = ((179,255,255),)
+
+    centre_reference = (600,545)
+    pixel_scale = 500 #nc
+
+    crop_rectangle = [-1]
+
 
 elif location == "amsterdam":
     pipe = "rtsp://admin:Robocam_0@10.15.1.198:554/cam/realmonitor?channel=1&subtype=0"

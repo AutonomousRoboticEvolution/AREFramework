@@ -127,6 +127,7 @@ public:
     void set_novelty_ratio(double nr){novelty_ratio = nr; start_novelty_ratio = nr;}
     void set_novelty_decr(double nd){novelty_decr = nd;}
     void set_pop_stag_thres(float pst){pop_stag_thres = pst;}
+    void set_gen_stag_thres(float gst){gen_stag_thres = gst;}
     void set_fit_stagnation_method(const std::string &method){fit_stagnation_method = method;}
     void set_initial_fitness(double ifit){initial_fitness = ifit;}
     const individual_t &get_best_seen_solution(){return best_seen_solution;}
@@ -166,6 +167,7 @@ private:
     individual_t best_seen_solution;
     int len_of_stag = 20;
     float pop_stag_thres = 0.05;
+    float gen_stag_thres = 0.05;
     double novelty_ratio = 0;
     double start_novelty_ratio = 0;
     double novelty_decr = 0.05;
@@ -185,6 +187,7 @@ class CMAESStateLog : public Logging
 {
 public:
     CMAESStateLog() : Logging(){} //Logging at the end of the generation
+    CMAESStateLog(bool eog,bool eor): Logging(eog,eor){}
     void saveLog(EA::Ptr & ea){
         int gen = ea->get_generation();
         std::stringstream filename;

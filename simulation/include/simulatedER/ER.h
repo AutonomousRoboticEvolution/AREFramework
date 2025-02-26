@@ -21,6 +21,7 @@
 #include "ARE/misc/utilities.h"
 #include "simulatedER/VirtualEnvironment.hpp"
 #include "ARE/Logging.h"
+#include "simulatedER/zmq_com.hpp"
 
 namespace are {
 
@@ -33,9 +34,12 @@ public:
     typedef std::unique_ptr<ER> Ptr;
     typedef std::unique_ptr<const ER> ConstPtr;
 
-    ER(){
+    ER(): _context(1)
+      , _individual_channel(_context,ZMQ_REP){
         reference_time = hr_clock::now();
     }
+
+
     virtual ~ER(){
         if(parameters.get())
             parameters.reset();
@@ -97,6 +101,8 @@ public:
     bool get_evalIsFinish(){return evalIsFinish;}
     int get_nbr_eval(){return nbrEval;}
 
+    zmq::socket_t &get_ind_channel(){return _individual_channel;}
+
 protected:
     ///pointer to settting of EA
     //Settings::Ptr settings;
@@ -122,6 +128,7 @@ protected:
     std::vector<Logging::Ptr> logs;
 
     void saveLogs(bool endOfGen = true);
+    void saveEndLogs();
 
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)
@@ -135,7 +142,9 @@ protected:
     bool client = false;
     int clientID = 0;
 
-    bool evalIsFinish;
+    bool evalIsFinish = false;
+    bool ind_received = false; //for server mode
+
 
     hr_clock::time_point reference_time;
     hr_clock::time_point start_eval_time;
@@ -143,6 +152,9 @@ protected:
 
     hr_clock::time_point start_overhead_time;
     hr_clock::time_point end_overhead_time;
+
+    zmq::context_t _context;
+    zmq::socket_t _individual_channel;
 };
 
 }//sim

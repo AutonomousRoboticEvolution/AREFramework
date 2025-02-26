@@ -3,28 +3,37 @@
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
-#include "simulatedER/obstacleAvoidance.hpp"
+#include "env_settings.hpp"
+#include "obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
-#include "simulatedER/exploration.hpp"
+#include "exploration.hpp"
+#include "locomotion.hpp"
+#include "hill_climbing.hpp"
+#include "push_object.hpp"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)
 {
     int env_type = are::settings::getParameter<are::settings::Integer>(param,"#envType").value;
     are::Environment::Ptr env;
-    if(env_type == 0){
+    if(env_type == are::sim::MAZE){
         env = std::make_shared<are::sim::MazeEnv>();
         env->set_parameters(param);
     }
-    else if(env_type == 1)
+    else if(env_type == are::sim::OBSTACLES)
         env = std::make_shared<are::sim::ObstacleAvoidance>(param);
-    else if(env_type == 2)
-        env = std::make_shared<are::sim::BarrelTask>(param);
-    else if(env_type == 3)
-        env = std::make_shared<are::sim::Exploration>(param);
-    else if(env_type == 4)
+    else if(env_type == are::sim::MULTI_TARGETS)
         env = std::make_shared<are::sim::MultiTargetMaze>(param);
-
+    else if(env_type == are::sim::LOCOMOTION)
+        env = std::make_shared<are::sim::Locomotion>(param);
+    else if(env_type == are::sim::BARREL)
+        env = std::make_shared<are::sim::BarrelTask>(param);
+    else if(env_type == are::sim::HILL_CLIMBING)
+        env = std::make_shared<are::sim::HillClimbing>(param);
+    else if(env_type == are::sim::PUSH_OBJECT)
+        env = std::make_shared<are::sim::PushObject>(param);
+    else
+        std::cerr << "factory env: unknown environement" << std::endl;
 
     return env;
 }
@@ -47,29 +56,33 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::BehavDescLog<are::sim::NN2Individual>::Ptr bdlog = std::make_shared<are::BehavDescLog<are::sim::NN2Individual>>(behav_desc_log_file);
     logs.push_back(bdlog);
 
-    are::NNParamGenomeLog::Ptr nnpglog = std::make_shared<are::NNParamGenomeLog>();
-    logs.push_back(nnpglog);
+    are::BestIndividualLog::Ptr bilog = std::make_shared<are::BestIndividualLog>();
+    logs.push_back(bilog);
 
-    are::TrajectoryLog<are::sim::NN2Individual>::Ptr trajlog = std::make_shared<are::TrajectoryLog<are::sim::NN2Individual>>();
-    logs.push_back(trajlog);
+//    double obj_thre = are::settings::getParameter<are::settings::Double>(param,"#loggingObjThreshold").value;
+//    are::NNParamGenomeLog::Ptr nnpglog = std::make_shared<are::NNParamGenomeLog>(obj_thre);
+//    logs.push_back(nnpglog);
 
-    std::string stop_crit_log_file = are::settings::getParameter<are::settings::String>(param,"#stopCritFile").value;
-    are::StopCritLog::Ptr sclog = std::make_shared<are::StopCritLog>(stop_crit_log_file);
-    logs.push_back(sclog);
+//    are::TrajectoryLog<are::sim::NN2Individual>::Ptr trajlog = std::make_shared<are::TrajectoryLog<are::sim::NN2Individual>>(obj_thre);
+//    logs.push_back(trajlog);
 
-    std::string archive_log_file = are::settings::getParameter<are::settings::String>(param,"#archiveFile").value;
-    are::ArchiveLog<are::NIPES>::Ptr arclog = std::make_shared<are::ArchiveLog<are::NIPES>>(archive_log_file);
-    logs.push_back(arclog);
+//    std::string stop_crit_log_file = are::settings::getParameter<are::settings::String>(param,"#stopCritFile").value;
+//    are::StopCritLog::Ptr sclog = std::make_shared<are::StopCritLog>(stop_crit_log_file);
+//    logs.push_back(sclog);
 
-    std::string ec_log_file = are::settings::getParameter<are::settings::String>(param,"#energyCostFile").value;
-    are::EnergyCostLog<are::sim::NN2Individual>::Ptr eclog = std::make_shared<are::EnergyCostLog<are::sim::NN2Individual>>(ec_log_file);
-    logs.push_back(eclog);
+//    std::string archive_log_file = are::settings::getParameter<are::settings::String>(param,"#archiveFile").value;
+//    are::ArchiveLog<are::NIPES>::Ptr arclog = std::make_shared<are::ArchiveLog<are::NIPES>>(archive_log_file);
+//    logs.push_back(arclog);
 
-    std::string st_log_file = are::settings::getParameter<are::settings::String>(param,"#simTimeFile").value;
-    are::SimTimeLog<are::sim::NN2Individual>::Ptr stlog = std::make_shared<are::SimTimeLog<are::sim::NN2Individual>>(st_log_file);
-    logs.push_back(stlog);
+//    std::string ec_log_file = are::settings::getParameter<are::settings::String>(param,"#energyCostFile").value;
+//    are::EnergyCostLog<are::sim::NN2Individual>::Ptr eclog = std::make_shared<are::EnergyCostLog<are::sim::NN2Individual>>(ec_log_file);
+//    logs.push_back(eclog);
 
-    are::CMAESStateLog<are::NIPES>::Ptr cstlog = std::make_shared<are::CMAESStateLog<are::NIPES>>();
+//    std::string st_log_file = are::settings::getParameter<are::settings::String>(param,"#simTimeFile").value;
+//    are::SimTimeLog<are::sim::NN2Individual>::Ptr stlog = std::make_shared<are::SimTimeLog<are::sim::NN2Individual>>(st_log_file);
+//    logs.push_back(stlog);
+
+    are::CMAESStateLog<are::NIPES>::Ptr cstlog = std::make_shared<are::CMAESStateLog<are::NIPES>>(false,true); //Logging at the end of run
     logs.push_back(cstlog);
 }
 

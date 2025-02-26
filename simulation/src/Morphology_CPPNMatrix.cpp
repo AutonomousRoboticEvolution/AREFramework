@@ -15,23 +15,31 @@ using namespace are::sim;
 void Morphology_CPPNMatrix::create()
 {
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
-
+    bool growing_decoding = settings::getParameter<settings::Boolean>(parameters,"#growingDecoding").value;
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
     int meshHandle = -1;
     mainHandle = -1;
-    int convexHandle, brainHandle;
+    bool convexDecompositionSuccess = false;
     std::vector<int> gripperHandles;
     createGripper(gripperHandles);
     //simSetBooleanParameter(sim_boolparam_display_enabled, false); // To turn off display
     numSkeletonVoxels = 0;
     createHead();
-    PolyVox::RawVolume<AREVoxel> areMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
     PolyVox::RawVolume<uint8_t> skeletonMatrix(PolyVox::Region(PolyVox::Vector3DInt32(-mc::matrix_size/2, -mc::matrix_size/2, -mc::matrix_size/2), PolyVox::Vector3DInt32(mc::matrix_size/2, mc::matrix_size/2, mc::matrix_size/2)));
 
     if(manual_design != "None"){
         generateFromManualDesign(skeletonMatrix,organList,list_of_voxels);
     }else{
         GenomeDecoder genomeDecoder;
-        genomeDecoder.genomeDecoder(nn2_cppn,areMatrix,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        if(use_quadric){
+            genomeDecoder.superquadricsDecoder(quadric,nn2_cppn,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        }
+        else{
+            if(growing_decoding)
+                genomeDecoder.genomeDecoderGrowth(nn2_cppn,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+            else
+                genomeDecoder.genomeDecoder(nn2_cppn,skeletonMatrix,skeletonSurfaceCoord,numSkeletonVoxels);
+        }
 
     }
 
@@ -43,7 +51,6 @@ void Morphology_CPPNMatrix::create()
     skeletonListIndices.reserve(decodedMesh.getNoOfIndices());
     bool indVerResult = false;
     indVerResult = getIndicesVertices(decodedMesh);
-    bool convexDecompositionSuccess = false;
     // Import mesh to V-REP
     if (indVerResult) {
         if(manual_design == "None")
@@ -70,6 +77,7 @@ void Morphology_CPPNMatrix::create()
 
         simSetObjectSpecialProperty(meshHandle,0); // Non-collidable, non-detectable, etc.
 
+<<<<<<< HEAD
         // Convex decompositon
         try {
             // Convex decomposition with HACD
@@ -195,8 +203,14 @@ void Morphology_CPPNMatrix::create()
         }
         else{
             // Stop generating body plan if convex decomposition fails
+=======
+
+        convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
+        if(convexDecompositionSuccess)
+            check_repress_organs(skeletonMatrix,gripperHandles);
+        else // Stop generating body plan if convex decomposition fails
+>>>>>>> update_decoding
             std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
-        }
     } else {
         // Don't generate mesh if there are no points.
         std::cerr << "Not generating robot because volume is empty.  Stopping simulation." << std::endl;
@@ -207,13 +221,8 @@ void Morphology_CPPNMatrix::create()
         robotManRes.noBadOrientations = false;
         robotManRes.noCollisions = false;
     }
-    // Segmented robots
-    if((indVerResult && convexDecompositionSuccess) && settings::getParameter<settings::Boolean>(parameters,"#isSegmentedRobot").value){
-        // Since the list of organ is going to increase, it's better to cap it to prevent accessing elements out of range.
-        int originalSize = organList.size();
-        for(int i = 0; i < originalSize; i++){
-            if (organList.at(i).getOrganType() == 3 && !organList.at(i).isOrganRemoved() && organList.at(i).isOrganChecked()) {
 
+<<<<<<< HEAD
                 int childSkeletonHandle;
                 double sizeCuboid[3] = {0.025, 0.025, 0.025};
                 childSkeletonHandle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,sizeCuboid,0);
@@ -325,29 +334,167 @@ void Morphology_CPPNMatrix::create()
             }
         }
     }
+=======
+>>>>>>> update_decoding
 //    usleep(1000000);
     if(settings::getParameter<settings::Boolean>(parameters,"#isCPPNGenome").value && manual_design == "None")
         retrieve_matrices_from_cppn();
-    // Get info from body plan for body plan descriptors or logging.
+    //Create morphological descriptors
     if(indVerResult || convexDecompositionSuccess){
-        indDesc.getRobotDimensions(organList);
-        indDesc.cartDesc.voxelNumber = numSkeletonVoxels;
-        indDesc.countOrgans(organList);
-        indDesc.getOrganPositions(organList);
+        feat_desc.create(skeletonMatrix,organList);
+        matrix_desc.create(skeletonMatrix,organList);
+        organ_mat_desc.create(skeletonMatrix,organList); //todo remove this one or put an option for either matrix or organ_mat
     }
+    //create blueprint
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organList);
     destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
-    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value)
-        exportRobotModel(morph_id);
+    if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
+        std::string model_folder = settings::getParameter<settings::String>(parameters,"#modelRepository").value;
+        if(model_folder.empty() || model_folder == "None")
+            exportRobotModel(morph_id);
+        else
+            exportRobotModel(morph_id,model_folder);
+    }
 
     retrieveOrganHandles(mainHandle,proxHandles,IRHandles,wheelHandles,jointHandles,camera_handle);
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
     simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
+}
+
+bool Morphology_CPPNMatrix::convex_decomposition(int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles){
+    bool convexDecompositionSuccess = false;
+    try {
+        int convexHandle, brainHandle;
+        // Convex decomposition with HACD
+        // EB: V-HACD is not a good idea. It crashes randomly. This is an issue with the library itself.
+        // http://forum.coppeliarobotics.com/viewtopic.php?f=5&t=8024
+        // Convex decomposition parameters
+        // EB: Warning, the more triangles are used the more accurate would me the final representation. However,
+        // This make the decomposition process slower and more important the likelihood of the decomposition to
+        // crash higher. To prevent this I decided to decrease the maximum concavity as mush as possible.
+        // EB: IMPORTANT! for the pre-morphogensis stage keep the number of triangles low (100) and high concavity (100).
+        // This will speed-up evolution. However...
+        // For the morphognesis stage keep the number of triangles high (at least 1200) and low concavity (0.5)
+        // This will make a more accurate representation of the skeleton.
+        //            intParams[0]: HACD: the minimum number of clusters to be generated (e.g. 1)
+        //            intParams[1]: HACD: the targeted number of triangles of the decimated mesh (e.g. 500)
+        //            intParams[2]: HACD: the maximum number of vertices for each generated convex hull (e.g. 100)
+        //            intParams[3]: HACD: the maximum number of iterations. Use 0 for the default value (i.e. 4).
+        //            intParams[4]: reserved. Set to 0.
+        //            intParams[5]: V-HACD: resolution (10000-64000000, 100000 is default).
+        //            intParams[6]: V-HACD: depth (1-32, 20 is default).
+        //            intParams[7]: V-HACD: plane downsampling (1-16, 4 is default).
+        //            intParams[8]: V-HACD: convex hull downsampling (1-16, 4 is default).
+        //            intParams[9]: V-HACD: max. number of vertices per convex hull (4-1024, 64 is default).
+        int conDecIntPams[10] = {1, 100, 20, 1, 0, //HACD
+                                 10000, 20, 4, 4, 64}; //V-HACD
+        //            floatParams[0]: HACD: the maximum allowed concavity (e.g. 100.0)
+        //            floatParams[1]: HACD: the maximum allowed distance to get convex clusters connected (e.g. 30)
+        //            floatParams[2]: HACD: the threshold to detect small clusters. The threshold is expressed as a percentage of the total mesh surface (e.g. 0.25)
+        //            floatParams[3]: reserved. Set to 0.0
+        //            floatParams[4]: reserved. Set to 0.0
+        //            floatParams[5]: V-HACD: concavity (0.0-1.0, 0.0025 is default).
+        //            floatParams[6]: V-HACD: alpha (0.0-1.0, 0.05 is default).
+        //            floatParams[7]: V-HACD: beta (0.0-1.0, 0.05 is default).
+        //            floatParams[8]: V-HACD: gamma (0.0-1.0, 0.00125 is default).
+        //            floatParams[9]: V-HACD: min. volume per convex hull (0.0-0.01, 0.0001 is default).
+        float conDecFloatPams[10] = {100, 30, 0.25, 0.0, 0.0,//HACD
+                                     0.0025, 0.05, 0.05, 0.00125, 0.0001};//V-HACD
+
+        convexHandle = simConvexDecompose(meshHandle, 8u | 16u, conDecIntPams, conDecFloatPams);
+        if(convexHandle >= 0)
+            convexDecompositionSuccess = true;
+        //** Compute Mass and Inertia of skeleton. The following method is a "dirty" workaround to have a mass close from the printed skeleton.
+        // The issue come from a mismatch between the mass computed by verp and the one expected.
+        //Call this to compute the approximate moment of inertia and center of mass
+        simComputeMassAndInertia(convexHandle, 84); //kg.m-3
+        float skeletonMass = numSkeletonVoxels*0.00116 + 0.114; //real mass of the skeleton
+        float mass;
+        float inertiaMatrix[9];
+        float centerOfMass[3];
+        simGetShapeMassAndInertia(convexHandle,&mass, inertiaMatrix, centerOfMass, nullptr);
+        simSetShapeMassAndInertia(convexHandle,skeletonMass,inertiaMatrix,centerOfMass,nullptr);
+        //*/
+
+        mainHandle = convexHandle;
+        // Create brain primitive
+        float brainSize[3] = {0.084,0.084,0.11};
+        brainHandle = simCreatePureShape(0,0,brainSize,0.503,nullptr); //Head organ weighs 503g
+        float brainPos[3] = {0.0,0.0,0.06};
+        simSetObjectPosition(brainHandle,-1,brainPos);
+        // Group primitives
+        int groupHandles[2] = {convexHandle, brainHandle};
+        mainHandle = simGroupShapes(groupHandles, 2);
+        skeletonHandles.push_back(mainHandle);
+
+        // Set parenthood
+        simSetObjectParent(meshHandle,mainHandle, 1);
+        simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
+                                                    sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
+#ifndef ISROBOTSTATIC
+        std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+#elif ISROBOTSTATIC == 0
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+#elif ISROBOTSTATIC == 1
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+#endif
+        simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_respondable, 1);
+        //simSetModelProperty(mainHandle,sim_modelproperty_not_visible);
+        simSetObjectInt32Parameter(mainHandle,sim_objintparam_visibility_layer, 0); // This hides convex decomposition.
+
+    } catch (std::exception &e) {
+        //std::clog << "Decomposition failed: why? " << e.what() << __func__ << std::endl;
+        convexDecompositionSuccess = false;
+    }
+    return convexDecompositionSuccess;
+}
+
+void Morphology_CPPNMatrix::check_repress_organs(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, const std::vector<int> &gripperHandles){
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
+    int joints_number = 0;
+    // Create organs
+    for(Organ &organ : organList){
+        // Limit number of legs to 4
+        if(organ.getOrganType() == 3 && joints_number == 4 && manual_design == "None"){
+            organ.set_organ_removed(true);
+            organ.set_organ_checked(true);
+            continue;
+        }
+
+        if(manual_design == "None")
+            if(organ.getOrganType() != 0)
+                setOrganOrientation(organ); // Along z-axis relative to the organ itself
+        organ.createOrgan(mainHandle);
+        if(organ.getOrganType() != 0){
+            if(organ.getOrganType() == 1)
+                organ.testOrgan(skeletonMatrix, gripperHandles.at(0), skeletonHandles, organList);
+            else if(organ.getOrganType() == 2)
+                organ.testOrgan(skeletonMatrix, gripperHandles.at(1), skeletonHandles, organList);
+            else if(organ.getOrganType() == 3)
+                organ.testOrgan(skeletonMatrix, gripperHandles.at(2), skeletonHandles, organList);
+            else if(organ.getOrganType() == 4)
+                organ.testOrgan(skeletonMatrix, gripperHandles.at(3), skeletonHandles, organList);
+            organ.repressOrgan();
+        }
+        // Count number of good organs.
+        if(!organ.isOrganRemoved() && organ.isOrganChecked() && organ.getOrganType() == 3)
+            joints_number++;
+        // Cap the number of all organs to 8.
+        short int goodOrganCounter = 0;
+        for(auto & j : organList){
+            if(!j.isOrganRemoved() && j.isOrganChecked())
+                goodOrganCounter++;
+
+        }
+        if(goodOrganCounter >= 8) /// \todo EB: Move this constant elsewhere!
+            break;
+    }
+    testRobot();
 }
 
 void Morphology_CPPNMatrix::load(){
@@ -527,17 +674,20 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
                       return a[2] < b[2];
                   });
         for (int n = 0; n < skeletonSurfaceCoord[m].size(); n+=1) { /// \todo EB: Define this constant elsewhere!
-            input[0] = static_cast<double>(skeletonSurfaceCoord[m][n].at(0));
-            input[1] = static_cast<double>(skeletonSurfaceCoord[m][n].at(1));
-            input[2] = static_cast<double>(skeletonSurfaceCoord[m][n].at(2));
-            input[3] = static_cast<double>(sqrt(pow(skeletonSurfaceCoord[m][n].at(0),2)+pow(skeletonSurfaceCoord[m][n].at(1),2)+pow(skeletonSurfaceCoord[m][n].at(2),2)));
+            double x = static_cast<double>(skeletonSurfaceCoord[m][n].at(0))/static_cast<double>(mc::real_matrix_size/2);
+            double y = static_cast<double>(skeletonSurfaceCoord[m][n].at(1))/static_cast<double>(mc::real_matrix_size/2);
+            double z = static_cast<double>(skeletonSurfaceCoord[m][n].at(2))/static_cast<double>(mc::real_matrix_size/2);
+            input[0] = x;
+            input[1] = y;
+            input[2] = z;
+            input[3] = sqrt(x*x+y*y+z*z);
             organ_type = get_organ_from_cppn(input);
             // Create organ if any
             if(organ_type > 0){
                 std::vector<float> tempPosVector(3);
-                tempPosVector.at(0) = static_cast<float>(input[0] * mc::voxel_real_size);
-                tempPosVector.at(1) = static_cast<float>(input[1] * mc::voxel_real_size);
-                tempPosVector.at(2) = static_cast<float>(input[2] * mc::voxel_real_size);
+                tempPosVector.at(0) = static_cast<float>(skeletonSurfaceCoord[m][n].at(0) * mc::voxel_real_size);
+                tempPosVector.at(1) = static_cast<float>(skeletonSurfaceCoord[m][n].at(1) * mc::voxel_real_size);
+                tempPosVector.at(2) = static_cast<float>(skeletonSurfaceCoord[m][n].at(2) * mc::voxel_real_size);
                 tempPosVector.at(2) += mc::matrix_size/2 * mc::voxel_real_size;
                 std::vector<float> tempOriVector(3);
                 generateOrientations(skeletonSurfaceCoord[m][n].at(3), skeletonSurfaceCoord[m][n].at(4), skeletonSurfaceCoord[m][n].at(5), tempOriVector);
@@ -548,12 +698,12 @@ void Morphology_CPPNMatrix::generateOrgans(std::vector<std::vector<std::vector<i
     }
 }
 
-void Morphology_CPPNMatrix::exportRobotModel(int indNum)
+void Morphology_CPPNMatrix::exportRobotModel(int indNum, const std::string &folder)
 {
     simSetObjectProperty(mainHandle,sim_objectproperty_selectmodelbaseinstead);
 
     std::stringstream filepath;
-    filepath << Logging::log_folder << "/model_" << indNum << ".ttm";
+    filepath << folder << "/model_" << indNum << ".ttm";
 
     int p = simGetModelProperty(mainHandle);
     p = (p|sim_modelproperty_not_model)-sim_modelproperty_not_model;
@@ -571,10 +721,10 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     {
         std::stringstream sst_blueprint;
         sst_blueprint << "/blueprint_" << indNum << ".csv";
-        std::ofstream ofs_blueprint(Logging::log_folder + sst_blueprint.str());
+        std::ofstream ofs_blueprint(folder + "/" + sst_blueprint.str());
         if(!ofs_blueprint)
         {
-            std::cerr << "unable to open : " << Logging::log_folder  + sst_blueprint.str() << std::endl;
+            std::cerr << "unable to open : " << folder + "/" + sst_blueprint.str() << std::endl;
             return;
         }
         std::vector<int> tempOrganTypes = blueprint.getOrganTypes();
@@ -588,7 +738,32 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
                           << tempOrganOri.at(i).at(2) << ","
                           << std::endl;
         }
+
+
+
+        // Export mesh file
+        const auto **verticesMesh = new const simFloat *[2];
+        const auto **indicesMesh = new const simInt *[2];
+        auto *verticesSizesMesh = new simInt[2];
+        auto *indicesSizesMesh = new simInt[2];
+        verticesMesh[0] = skeletonListVertices.data();
+        verticesSizesMesh[0] = skeletonListVertices.size();
+        indicesMesh[0] = skeletonListIndices.data();
+        indicesSizesMesh[0] = skeletonListIndices.size();
+
+        std::stringstream filepath_mesh;
+        filepath_mesh << folder << "/mesh_" << indNum << ".stl";
+
+        //fileformat: the fileformat to export to:
+        //  0: OBJ format, 3: TEXT STL format, 4: BINARY STL format, 5: COLLADA format, 6: TEXT PLY format, 7: BINARY PLY format
+        simExportMesh(3, filepath_mesh.str().c_str(), 0, 1.0f, 1, verticesMesh, verticesSizesMesh, indicesMesh, indicesSizesMesh, nullptr, nullptr);
+
+        delete[] verticesMesh;
+        delete[] verticesSizesMesh;
+        delete[] indicesMesh;
+        delete[] indicesSizesMesh;
     }
+<<<<<<< HEAD
 
     // Export mesh file
     const double **verticesMesh = new const double *[2];
@@ -614,9 +789,11 @@ void Morphology_CPPNMatrix::exportRobotModel(int indNum)
     delete[] verticesSizesMesh;
     delete[] indicesMesh;
     delete[] indicesSizesMesh;
+=======
+>>>>>>> update_decoding
 }
 
-void Morphology_CPPNMatrix::testRobot(PolyVox::RawVolume<uint8_t>& skeletonMatrix)
+void Morphology_CPPNMatrix::testRobot()
 {
     // Manufacturability tests for organs.
     for(auto & i : organList) {
@@ -696,19 +873,19 @@ int Morphology_CPPNMatrix::get_organ_from_cppn(std::vector<double> input)
     max_element = std::max_element(output.begin()+2, output.end()) - output.begin();
     if(max_element == 2){ // Wheel
         // These if statements should be always true but they are here for debugging.
-        if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
+        //if(settings::getParameter<settings::Boolean>(parameters,"#isWheel").value) // For debugging only
             organ_type = 1;
     }
     else if(max_element == 3) { // Sensor
-        if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
+       // if(settings::getParameter<settings::Boolean>(parameters,"#isSensor").value) // For debugging only
             organ_type = 2;
     }
     else if(max_element == 4) { // Joint
-        if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
+      //  if(settings::getParameter<settings::Boolean>(parameters,"#isJoint").value) // For debugging only
             organ_type = 3;
     }
     else if(max_element == 5) { // Caster
-        if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
+//        if(settings::getParameter<settings::Boolean>(parameters,"#isCaster").value) // For debugging only
             organ_type = 4;
     } else{
         std::cerr << "We shouldn't be here: " << __func__ << " max_element: " << max_element << std::endl;

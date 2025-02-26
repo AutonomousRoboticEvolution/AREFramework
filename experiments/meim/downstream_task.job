@@ -1,0 +1,3 @@
+#!/bin/sh
+#SBATCH -N 1
+python3 -u /share/llegoff/evolutionary_robotics_framework/simulation/Cluster/run_cluster.py --xvfb 1 --params $1 --client /share/llegoff/library/bin/are-client --vrep /share/llegoff/V-REP_PRO_EDU_V3_6_2_Ubuntu18_04/vrep.sh --port-start $2 $3

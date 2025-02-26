@@ -2,19 +2,21 @@
 #define STRAIGHT_LINE_ENV_HPP
 
 #include <cmath>
-#include "ARE/Environment.h"
+#include "simulatedER/VirtualEnvironment.hpp"
 #include "ARE/Individual.h"
 
 namespace are {
 
-class StraightLine : public Environment
+namespace sim{
+
+class StraightLine : public VirtualEnvironment
 {
 public:
 
     typedef std::shared_ptr<StraightLine> Ptr;
     typedef std::shared_ptr<const StraightLine> ConstPtr;
 
-    StraightLine();
+    StraightLine(const settings::ParametersMapPtr& params);
 
     ~StraightLine(){}
     void init() override;
@@ -31,6 +33,7 @@ private:
     int move_counter = 0;
     /// Straight line variables
 };
+}
 
 } //are
 

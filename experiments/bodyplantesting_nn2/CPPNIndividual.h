@@ -1,9 +1,8 @@
 #ifndef CPPNINDIVIDUAL_H
 #define CPPNINDIVIDUAL_H
 
-#include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "simulatedER/morph_genomes.hpp"
 #include "ARE/Individual.h"
-#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "ARE/learning/NSGA2.hpp"
 
@@ -12,19 +11,23 @@ namespace are {
 class CPPNIndividual : public Individual, public NSGAIndividual<CPPNIndividual>
 {
 public :
-
     typedef std::shared_ptr<CPPNIndividual> Ptr;
     typedef std::shared_ptr<const CPPNIndividual> ConstPtr;
 
     CPPNIndividual() : Individual(){}
-    CPPNIndividual(const NN2CPPNGenome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
+    CPPNIndividual(const Genome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
             Individual(morph_gen, ctrl_gen){}
     CPPNIndividual(const CPPNIndividual& ind):
             Individual(ind),
             testRes(ind.testRes),
-            morphDesc(ind.morphDesc)
+            feature_desc(ind.feature_desc),
+            matrix_descriptor(ind.matrix_descriptor)
     {
-        morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
+        bool use_quadric = settings::getParameter<settings::Boolean>(ind.get_parameters(),"#useQuadric").value;
+        if(use_quadric)
+            morphGenome = std::make_shared<SQGenome>(*std::dynamic_pointer_cast<SQGenome>(ind.morphGenome));
+        else
+            morphGenome = std::make_shared<NN2CPPNGenome>(*std::dynamic_pointer_cast<NN2CPPNGenome>(ind.morphGenome));
         ctrlGenome = std::make_shared<EmptyGenome>(*std::dynamic_pointer_cast<EmptyGenome>(ind.ctrlGenome));
     }
     Individual::Ptr clone() override{
@@ -38,30 +41,30 @@ public :
     {
         arch & objectives;
         arch & morphGenome;
-        arch & morphDesc;
+        arch & feature_desc;
+        arch & matrix_descriptor;
         arch & testRes;
         arch & individual_id;
         arch & generation;
     }
     // Serialization
-    std::string to_string();
-    void from_string(const std::string &str);
+    std::string to_string() const override;
+    void from_string(const std::string &str) override;
 
     // Setters and getters
     std::vector<bool> getManRes(){return testRes;}
 
 
-    void setManRes();
 
-    /// Setters for descritors
-    void setMorphDesc();
-    void set_4d_matrix();
+;
     /// Getters for descritors
-    CartDesc getMorphDesc(){return morphDesc;}
+    const sim::FeaturesDesc &get_feature_desc() const {return feature_desc;}
     std::vector<std::vector<double>> get_matrix_4d(){return matrix_4d;}
-    Eigen::VectorXd descriptor();
-    const OrganPositionDesc& get_organ_position_descriptor() const {return organ_position_descriptor;}
-    void set_organ_position_descriptor();
+    Eigen::VectorXd descriptor() override;
+    const sim::MatrixDesc& get_matrix_descriptor() const {return matrix_descriptor;}
+
+
+    void set_morph_id(int id){morphGenome->set_id(id);}
 
 protected:
     void createMorphology() override;
@@ -70,8 +73,8 @@ protected:
     std::vector<bool> testRes;
 
     /// Descritors
-    CartDesc morphDesc;
-    OrganPositionDesc organ_position_descriptor;
+    sim::FeaturesDesc feature_desc;
+    sim::MatrixDesc matrix_descriptor;
     std::vector<std::vector<double>> matrix_4d;
 };
 

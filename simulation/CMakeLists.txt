@@ -49,6 +49,7 @@ else()
     message(FATAL_ERROR "(should never reach here) VREP_FOLDER or COPPELIASIM_FOLDER variables not set, please set the variable to the vrep/coppeliasim location. Example: -DVREP_FOLDER=/usr/share/vrep/ or -DCOPPELIASIM_FOLDER=/usr/share/coppeliasim")
 endif()
 find_package(PolyVox REQUIRED)
+find_package(PCL 1.14.1 REQUIRED)
 
 SET(VREP_SRC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
@@ -75,24 +76,34 @@ target_include_directories(simulatedER PUBLIC
     "include"
     "ERClient/include"
     "../EAFramework/include"
+    ${PCL_INCLUDE_DIRS}
 )
 
 target_compile_definitions(simulatedER PUBLIC
     "NON_MATLAB_PARSING"
     "MAX_EXT_API_CONNECTIONS=255"
+    ${PCL_DEFINITIONS}
 )
 target_link_libraries(simulatedER
     dlibxx dl rt
-    ${Boost_LIBRARIES} tbb cmaes
-    ARE
+    ${Boost_LIBRARIES} tbb cmaes zmq
+    ARE ${PCL_LIBRARIES}
     )
 
 
+<<<<<<< HEAD
 #set_target_properties(simulatedER PROPERTIES
 #    CXX_STANDARD 14
 ##    COMPILE_FLAGS "-w"
 #    POSITION_INDEPENDENT_CODE ON
 #)
+=======
+# set_target_properties(simulatedER PROPERTIES
+#     CXX_STANDARD 17
+# #    COMPILE_FLAGS "-w"
+#     POSITION_INDEPENDENT_CODE ON
+# )
+>>>>>>> update_decoding
 
 if(VREP_FOUND)
     SET(LIB_EXT v_repExtER)
@@ -120,6 +131,17 @@ target_compile_definitions(${LIB_EXT} PUBLIC
     "MAX_EXT_API_CONNECTIONS=255"
 )
 
+<<<<<<< HEAD
+=======
+add_executable(nn2_cppn_serial_to_dot tools/nn2_cppn_serial_to_dot.cpp)
+target_include_directories(nn2_cppn_serial_to_dot PUBLIC
+    "include" "/usr/include/eigen3" "../modules"
+    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
+    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_INCLUDE_DIR}>)
+target_link_libraries(nn2_cppn_serial_to_dot ARE ${Boost_LIBRARIES} simulatedER)
+install(TARGETS nn2_cppn_serial_to_dot DESTINATION bin)
+
+>>>>>>> update_decoding
 # tool to help remove the warnings when using GCC
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
 

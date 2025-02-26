@@ -46,7 +46,15 @@ void ER::initialize()
     loggingFactory(logs,parameters);
 
     libhandler->close();
+
+    if(instance_type == settings::INSTANCE_SERVER){
+        //setup zmq communication channel to send individual
+        std::string port = settings::getParameter<settings::String>(parameters,"#port").value;
+        _individual_channel.bind("tcp://*:"+ port + "1");
+    }
+
 }
+
 
 
 /// When V-REP starts, this function is called. Depending on the settings, it initializes the properties of the
@@ -80,18 +88,31 @@ void ER::startOfSimulation()
 }
 
 void ER::initIndividual(){
-    int length;
-    char* message = simGetStringSignal("currentInd",&length);
-    if(message == nullptr){
+    if(ind_received){
+        currentInd->init();
+        return;
+    }
+    std::string message;
+    receive_string_no_reply(message,_individual_channel,"ind ");
+    std::cout << "received individual" << std::endl;
+    ind_received = true;
+    
+
+
+    //int length;
+    //simChar* message = simGetStringSignal("currentInd",&length);
+    if(message.empty()){
         std::cerr << "No individual received" << std::endl;
         return;
     }
-    std::string mess(message);
-    mess.resize(length);
+    
+//    std::string mess(message);
+//    mess.resize(length);
     currentInd = ea->get_population()[0];
     if(nbrEval == 0)
-        currentInd->from_string(mess);
+        currentInd->from_string(message);
     currentInd->init();
+    
     int ind_id = currentInd->get_morph_genome()->id();
     evalIsFinish = false;
     if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
@@ -106,7 +127,7 @@ void ER::initIndividual(){
             robotScreenshot(ind_id,image_repo);
         }
     }
-    simReleaseBuffer(message);
+//    simReleaseBuffer(message);
 }
 
 void ER::handleSimulation()
@@ -131,6 +152,8 @@ void ER::handleSimulation()
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
+    //std::vector<double> instant_reward = environment->fitnessFunction(currentInd);
+  //  currentInd->set_instant_reward(instant_reward);
     if (simulationTime >
         settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
         ea->finish_eval(environment)) {
@@ -193,6 +216,7 @@ void ER::endOfSimulation()
         }
 
         if(ea->is_finish()){
+            saveEndLogs();
             if(verbose)
             {
                 std::cout << "---------------------" << std::endl;
@@ -212,17 +236,26 @@ void ER::endOfSimulation()
         }
         ea->setObjectives(currentIndIndex,objectives);
         evalIsFinish = ea->update(environment);
-        if(evalIsFinish)
+        if(evalIsFinish){
             nbrEval = 0;
-
-        simSetInt32Signal("evalIsFinish",static_cast<int>(evalIsFinish));
+            ind_received = false;
+        }
+        simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
     }
 }
 
 void ER::saveLogs(bool endOfGen)
 {
     for(const auto &log : logs){
-        if(log->isEndOfGen() == endOfGen){
+        if(log->isEndOfGen() == endOfGen && !log->isEndOfRun()){
+            log->saveLog(ea);
+        }
+    }
+}
+
+void ER::saveEndLogs(){
+    for(const auto &log : logs){
+        if(log->isEndOfRun()){
             log->saveLog(ea);
         }
     }

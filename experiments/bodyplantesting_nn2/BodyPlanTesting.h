@@ -4,7 +4,6 @@
 #include "ARE/EA.h"
 #include "CPPNIndividual.h"
 #include "eigen3/Eigen/Core"
-#include "multineat/Population.h"
 #include "ARE/learning/Novelty.hpp"
 
 
@@ -37,16 +36,12 @@ public:
     std::vector<int> listInds();
 
 private:
-    std::unique_ptr<NEAT::Population> morph_population;
-
-    NEAT::Parameters params;
-
     std::vector<Eigen::VectorXd> archive;
 
 protected:
-    NEAT::RNG rng;
     int currentIndIndex;
     int repetition =0;
+    int highest_morph_id = 0;
 
 };
 

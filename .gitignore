@@ -36,7 +36,6 @@ experiments/scripts/mdpi_journal.ipynb
 
 experiments/typescript
 
-modules/nn2
 
 simulation/.idea/
 
@@ -61,3 +60,9 @@ image_processing/scripts/Raw_pic.jpg
 image_processing/Tracking_system/temporary_output.avi
 
 RoboFab/temporary_output.avi
+
+*.out
+*.dat
+vrep-3.6.2/system/settings.dat
+*.so
+__pycache__

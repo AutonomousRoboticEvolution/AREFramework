@@ -10,24 +10,15 @@
 #include "ARE/learning/cmaes_learner.hpp"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "simulatedER/mazeEnv.h"
-#include "simulatedER/obstacleAvoidance.hpp"
+#include "obstacleAvoidance.hpp"
+#include "locomotion.hpp"
+#include "multiTargetMaze.hpp"
+#include "barrelTask.hpp"
 #include "boost/filesystem.hpp"
+#include "env_settings.hpp"
 
 namespace are {
 using CPPNMorph = sim::Morphology_CPPNMatrix;
-
-
-
-typedef enum task_t{
-    MAZE = 0,
-    OBSTACLES = 1,
-    MULTI_TARGETS = 2,
-    EXPLORATION = 3,
-    BARREL = 4,
-    GRADUAL = 5
-} task_t;
-
-
 
 typedef struct learner_t{
 
@@ -56,7 +47,8 @@ typedef struct genome_t{
         behavioral_descriptor(g.behavioral_descriptor),
         nbr_eval(g.nbr_eval),
         environment(g.environment),
-        task(g.task){}
+        task(g.task),
+	learning_progress(g.learning_progress){}
     genome_t(const NN2CPPNGenome &mg, const NNParamGenome &cg, const std::vector<double> &obj,double lp = 0) :
         morph_genome(mg), ctrl_genome(cg), objectives(obj), age(0), learning_progress(lp){}
     NN2CPPNGenome morph_genome;
@@ -114,7 +106,6 @@ public:
         final_position(ind.final_position),
         trajectories(ind.trajectories),
         energy_cost(ind.energy_cost),
-        sim_time(ind.sim_time),
         controller_archive(ind.controller_archive),
         nbr_dropped_eval(ind.nbr_dropped_eval),
         descriptor_type(ind.descriptor_type),
@@ -135,13 +126,9 @@ public:
     void set_trajectories(const std::vector<std::vector<waypoint>>& traj){trajectories = traj;}
     const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
     double get_energy_cost(){return energy_cost;}
-    double get_sim_time(){return sim_time;}
     void set_ctrl_genome(const NNParamGenome::Ptr &gen){std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome) = gen;}
 
-    void setManRes();
 
-    /// Setters for descritors
-    void setMorphDesc();
 
 
     template<class archive>
@@ -154,7 +141,6 @@ public:
         arch & final_position;
 //        arch & energy_cost;
         arch & trajectories;
-//        arch & sim_time;
         arch & controller_archive;
         arch & morphDesc;
         arch & nbr_dropped_eval;
@@ -165,7 +151,7 @@ public:
         arch & visited_zones;
     }
 
-    std::string to_string() override;
+    std::string to_string() const override;
     void from_string(const std::string &) override;
 
 
@@ -206,9 +192,10 @@ private:
     bool no_sensors = false;
 
 
-    double energy_cost;
+    double energy_cost = 0;
     std::vector<std::vector<waypoint>> trajectories;
-    double sim_time;
+
+    double sum_ctrl_freq = 0;
     std::vector<double> final_position;
     std::vector<double> init_position;
     int nbr_dropped_eval = 0;
@@ -220,6 +207,8 @@ private:
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
     bool drop_learning = false;
+
+
 
 
 };
@@ -257,7 +246,7 @@ public:
     void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
         int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-        if(simulator_side && (env_type == MULTI_TARGETS || env_type == EXPLORATION))
+        if(simulator_side && (env_type == sim::MULTI_TARGETS || env_type == sim::EXPLORATION || env_type == sim::BARREL))
             std::dynamic_pointer_cast<M_NIPESIndividual>(population[indIndex])->add_reward(objectives[0]);
         currentIndIndex = indIndex;
         population[indIndex]->setObjectives(objectives);
@@ -267,6 +256,9 @@ public:
     void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
 
     const std::vector<genome_t>& get_gene_pool() const {return gene_pool;}
+    const std::vector<genome_t>& get_new_genes() const {return new_genes;}
+    void clear_new_genes(){new_genes.clear();}
+
     const std::vector<genome_t>& get_best_gene_archive() const {return best_gene_archive;}
     const std::vector<learner_t>& get_learning_pool() const {return learning_pool;}
     const ControllerArchive::controller_archive_t& get_controller_archive() const {return controller_archive.archive;}
@@ -282,7 +274,6 @@ public:
 //    void update_pools();
 
 private:
-
     void init_new_learner(CMAESLearner &learner, const int wheel_nbr, int joint_nbr, int sensor_nbr);
     void init_new_ctrl_pop(learner_t &gene);
     void push_back_remaining_ctrl(learner_t &gene);
@@ -307,6 +298,7 @@ private:
 
     selection_fct_t selection_fct;
 
+    std::vector<genome_t> new_genes; //for logging
     std::vector<genome_t> gene_pool;
     std::vector<genome_t> best_gene_archive;
     std::vector<learner_t> learning_pool;
@@ -327,8 +319,11 @@ private:
     double evolvability_score = 0.0;
     int highest_morph_id=0;
 
+    //attribute for gradual tasks
+    int nbr_of_successful_solution = 0;
+    int current_gradual_scene = 0;
+    int nbr_eval_current_task = 0;
 
-    std::string _task_name(are::task_t task);
 };
 
 

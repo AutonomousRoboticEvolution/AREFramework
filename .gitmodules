@@ -1,0 +1,3 @@
+[submodule "modules/nn2"]
+	path = modules/nn2
+	url = https://github.com/LeniLeGoff/nn2.git

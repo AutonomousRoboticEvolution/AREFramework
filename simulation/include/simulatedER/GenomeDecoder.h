@@ -7,20 +7,14 @@
 
 #include "PolyVox/RawVolume.h"
 #include <vector>
-#include "ARE/morphology_descriptors.hpp"
-#include "ARE/nn2/NN2CPPNGenome.hpp"
+#include "simulatedER/nn2/NN2CPPNGenome.hpp"
+#include "simulatedER/nn2/sq_cppn_genome.hpp"
 
 namespace are {
 
 namespace sim {
 
-struct AREVoxel{
-    uint8_t bone;
-    uint8_t wheel;
-    uint8_t sensor;
-    uint8_t joint;
-    uint8_t caster;
-};
+
 
 typedef PolyVox::RawVolume<uint8_t> skeleton_matrix_t;
 
@@ -39,16 +33,29 @@ public:
      * @param skeletonSurfaceCoord - Voxels on the surface of the skeleton.
      * @param numSkeletonVoxels - Keeps track of the number of voxels (for descriptor purposes).
      */
-    void genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<AREVoxel>& areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+    void genomeDecoder(nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
                        std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
+    void genomeDecoderGrowth(nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                       std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
+
+    void superquadricsDecoder(quadric_t<quadric_mut_params> &quadric, nn2_cppn_t &cppn, PolyVox::RawVolume<uint8_t> &skeletonMatrix,
+                              std::vector<std::vector<std::vector<int>>> &skeletonSurfaceCoord, int &numSkeletonVoxels);
 
     /**
      * @brief Reads the cppn from nn2 and creates the regions for each organ.
      * @param areMatrix - All regions for each organ.
      * @param cppn - Body plan genome
      */
-    static void decodeGenome(PolyVox::RawVolume<AREVoxel> &areMatrix, nn2_cppn_t &cppn);
+    static void decodeGenome(PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn);
+
+    static void assignSkeletonVoxel(int32_t x, int32_t y, int32_t z, PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn);
+
+    static void growthBasedSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, nn2_cppn_t &cppn);
+
+    static void superquadricSkeletonGeneration(PolyVox::RawVolume<uint8_t> &skeleton, quadric_t<quadric_mut_params> &quadric);
+
+    static void countNumberSkeletonVoxels(const PolyVox::RawVolume<uint8_t> &skeleton,int &numSkeletonVoxels);
 
     /**
      * @brief Creates the skeleton.
@@ -56,7 +63,7 @@ public:
      * @param skeletonMatrix - Main skeleton matrix.
      * @param numSkeletonVoxels - Keeps track of the number of voxels (for descriptor purposes).
      */
-    static void generateSkeleton(PolyVox::RawVolume<AREVoxel> &areMatrix, PolyVox::RawVolume<uint8_t> &skeletonMatrix, int &numSkeletonVoxels);
+    static void generateSkeleton(const PolyVox::RawVolume<uint8_t> &input_skeleton, PolyVox::RawVolume<uint8_t> &output_skeleton, int &numSkeletonVoxels);
     /**
      * @brief This creates the skeleton seed in the main skeleton.
      * @param skeletonMatrix - Main skeleton matrix.

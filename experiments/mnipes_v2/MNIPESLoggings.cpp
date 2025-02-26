@@ -2,95 +2,108 @@
 
 using namespace are;
 
-
-
-
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
-    if(static_cast<M_NIPES*>(ea.get())->get_gene_pool().empty())
-        return;
-    const genome_t& genome = static_cast<M_NIPES*>(ea.get())->get_gene_pool().back();
-    //Log the morph genome
-    std::stringstream morph_filepath;
-    morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();
-    if(boost::filesystem::exists(morph_filepath.str()))
-        return;
+    for(const genome_t& genome : static_cast<M_NIPES*>(ea.get())->get_new_genes()){
+        //Log the morph genome
+        std::stringstream morph_filepath;
+        morph_filepath << Logging::log_folder << "/morph_genome_" << genome.morph_genome.id();
+        if(boost::filesystem::exists(morph_filepath.str()))
+            continue;
 
-    std::ofstream mofstr(morph_filepath.str());
-    boost::archive::text_oarchive oarch(mofstr);
-    oarch << genome.morph_genome.get_cppn();
-    mofstr.close();
-    //-
+        std::ofstream mofstr(morph_filepath.str());
+        boost::archive::text_oarchive oarch(mofstr);
+        oarch << genome.morph_genome.get_cppn();
+        mofstr.close();
+        //-
 
-    //Log descriptor
-    std::ofstream mdofs;
-    if(!openOLogFile(mdofs,"/morph_descriptors.csv"))
-        return;
-    mdofs << genome.morph_genome.id() << ",";
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
-    for(int j = 0; j < morphDesc.size(); j++){
-        mdofs << morphDesc(j) << ",";
-    }
-    mdofs << std::endl;
-    mdofs.close();
-
-    //Log the ctrl genome
-    if(!genome.ctrl_genome.get_weights().empty()){
-        std::stringstream ctrl_filepath;
-        ctrl_filepath << Logging::log_folder << "/ctrl_genome_" << genome.morph_genome.id();
-        std::ofstream cofstr(ctrl_filepath.str());
-        cofstr << genome.ctrl_genome.to_string();
-        cofstr.close();
-
-        //If there is a ctrl genome there is a trajectory and a behavioural descriptor
-        //Log Trajectory
-        int i = 0;
-        for(const auto &traj: genome.trajectories)
-        {
-            if(traj.empty()){
-                i++;
-                continue;
-            }
-            std::stringstream traj_filepath;
-            traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id() << "_" << i;
-            std::ofstream tofs(traj_filepath.str());
-            for(const auto &wp: traj)
-                tofs << wp.to_string() << std::endl;
-            tofs.close();
-            i++;
-        }
-
-        //Log descriptor
-        std::ofstream dofs;
-        if(!openOLogFile(dofs,"/behavioral_descriptors"))
+        //- Log morph features <width,depth,height,voxels,wheels,sensor,joint,caster>
+        std::ofstream mfofs;
+        if(!openOLogFile(mfofs,"/morph_features.csv"))
             return;
-        dofs << genome.morph_genome.id() << std::endl;
-        dofs << genome.behavioral_descriptor << std::endl;
-        dofs.close();
+        mfofs << genome.morph_genome.id() << ",";
+        Eigen::VectorXd morph_feat = genome.morph_genome.get_feat_desc().to_eigen_vector();
+        mfofs << morph_feat(0);
+        for(int j = 1; j < morph_feat.size(); j++){
+            mfofs << "," << morph_feat(j);
+        }
+        mfofs << std::endl;
+        mfofs.close();
+        //-
+
+        //- Log morph organ position descriptor: matrix of 11x11x11
+        std::ofstream mdofs;
+        if(!openOLogFile(mdofs,"/morph_descriptor.csv"))
+            return;
+        mdofs << genome.morph_genome.id() << "," << morphology_constants::real_matrix_size << ",";
+        Eigen::VectorXd morph_desc = genome.morph_genome.get_organ_position_desc().to_eigen_vector();
+        mdofs << morph_desc(0);
+        for(int j = 1; j < morph_desc.size(); j++){
+            mdofs << "," <<  morph_desc(j);
+        }
+        mdofs << std::endl;
+        mdofs.close();
+        //-
+
+        //Log the ctrl genome
+        if(!genome.ctrl_genome.get_weights().empty()){
+            std::stringstream ctrl_filepath;
+            ctrl_filepath << Logging::log_folder << "/ctrl_genome_" << genome.morph_genome.id();
+            std::ofstream cofstr(ctrl_filepath.str());
+            cofstr << genome.ctrl_genome.to_string();
+            cofstr.close();
+
+            //If there is a ctrl genome there is a trajectory and a behavioural descriptor
+            //Log Trajectory
+            int i = 0;
+            for(const auto &traj: genome.trajectories)
+            {
+                if(traj.empty()){
+                    i++;
+                    continue;
+                }
+                std::stringstream traj_filepath;
+                traj_filepath << Logging::log_folder << "/traj_" << genome.morph_genome.id() << "_" << i;
+                std::ofstream tofs(traj_filepath.str());
+                for(const auto &wp: traj)
+                    tofs << wp.to_string() << std::endl;
+                tofs.close();
+                i++;
+            }
+
+            //Log descriptor
+            std::ofstream dofs;
+            if(!openOLogFile(dofs,"/behavioral_descriptors"))
+                return;
+            dofs << genome.morph_genome.id() << std::endl;
+            dofs << genome.behavioral_descriptor << std::endl;
+            dofs.close();
+        }
+        //-
+
+        //Log the fitness and parents ids
+        std::ofstream fitness_file_stream;
+        if(!openOLogFile(fitness_file_stream))
+            return;
+        fitness_file_stream << genome.morph_genome.id() << ",";
+        for(const int& id: genome.morph_genome.get_parents_ids())
+            fitness_file_stream << id << ",";
+        for(const double& obj: genome.objectives)
+            fitness_file_stream << obj << ",";
+        fitness_file_stream << genome.nbr_eval << "," << genome.learning_progress;
+
+        fitness_file_stream << "\n";
+        fitness_file_stream.close();
+        //-
+
+        //Log the id and the total number of evaluations in the whole evolution used before finishing the training of this robot
+        std::ofstream neofs;
+        if(!openOLogFile(neofs,"/number_of_evaluations.csv"))
+            return;
+        neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
+        neofs.close();
     }
-    //-
-
-    //Log the fitness and parents ids
-    std::ofstream fitness_file_stream;
-    if(!openOLogFile(fitness_file_stream))
-        return;
-    fitness_file_stream << genome.morph_genome.id() << ",";
-    for(const int& id: genome.morph_genome.get_parents_ids())
-        fitness_file_stream << id << ",";
-    for(const double& obj: genome.objectives)
-        fitness_file_stream << obj << ",";
-    fitness_file_stream << genome.nbr_eval << "," << genome.learning_progress;
-
-    fitness_file_stream << "\n";
-    fitness_file_stream.close();
-    //-
-
-    //Log the id and the total number of evaluations in the whole evolution used before finishing the training of this robot
-    std::ofstream neofs;
-    if(!openOLogFile(neofs,"/number_of_evaluations.csv"))
-        return;
-    neofs << genome.morph_genome.id() << "," << ea->get_numberEvaluation() << "\n";
-    neofs.close();
+    static_cast<M_NIPES*>(ea.get())->clear_new_genes();
 }
 
 void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
@@ -101,7 +114,7 @@ void MorphDescCartWHDLog::saveLog(EA::Ptr &ea)
         return;
 
     logFileStream << genome.morph_genome.id() << ",";
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_feat_desc().to_eigen_vector();
     for(int j = 0; j < morphDesc.size(); j++){
         logFileStream << morphDesc(j) << ",";
     }
@@ -145,16 +158,28 @@ void ControllerArchiveLog::saveLog(EA::Ptr &ea){
 }
 
 void GenomesPoolLog::saveLog(EA::Ptr &ea){
+    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
+
     const std::vector<genome_t>& genomes = static_cast<M_NIPES*>(ea.get())->get_gene_pool();
-    if(genomes.empty())
+    if(genomes.size() != pop_size)
+        return;
+    std::ifstream ifs(Logging::log_folder + std::string("/")  + logFile);
+    std::string l,line;
+    if(ifs)
+        while(std::getline(ifs,l))
+		line = l;
+	
+
+    std::stringstream sstr;
+    sstr << genomes.front().morph_genome.id();
+    for(size_t i = 1; i < genomes.size(); i++)
+        sstr << "," << genomes.at(i).morph_genome.id();
+    if(!line.empty() && sstr.str() == line) //genome pool didn't change
         return;
     std::ofstream ofs;
     if(!openOLogFile(ofs))
         return;
-    ofs << genomes.front().morph_genome.id();
-    for(size_t i = 1; i < genomes.size(); i++)
-        ofs << "," << genomes.at(i).morph_genome.id();
-    ofs << std::endl;
+    ofs << sstr.str() << std::endl;
     ofs.close();
 }
 
@@ -196,7 +221,7 @@ void BestGenomesArchiveLog::saveLog(EA::Ptr &ea){
         std::cerr << "Unable to open file " << md_filepath.str() << std::endl;
         return;
     }
-    Eigen::VectorXd morphDesc = genome.morph_genome.get_cart_desc().getCartDesc();
+    Eigen::VectorXd morphDesc = genome.morph_genome.get_feat_desc().to_eigen_vector();
     for(int j = 0; j < morphDesc.size(); j++){
         mdofs << morphDesc(j) << ",";
     }

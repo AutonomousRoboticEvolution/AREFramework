@@ -53,20 +53,19 @@ extern "C" {
 #define strConCat(x,y,z)	CONCAT(x,y,z)
 
 LIBRARY simLib;
+int timeout = 60;
 
-///save time log
-void saveLog(int num)
-{
-    std::ofstream logFile;
-    logFile.open("timeLog" + std::to_string(num) +".csv", std::ios::app);
-    clock_t now = clock();
-    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time for completing " << counter << " individuals = ," << deltaSysTime << std::endl;
-    sysTime = clock();
-    counter = 0;
-    logFile.close();
-}
+are::sim::ER *ERVREP = NULL;
+int counter = 0;
+int timeCount = 0;
+bool timerOn = false;
+double timeElapsed;
+bool loadingPossible = true; // Indicate whether the plugin is ready to accept/load genome sent from client
+std::chrono::time_point<std::chrono::system_clock> sysTime; // Measure simulation time.
+int instance_type = are::settings::INSTANCE_REGULAR;
+bool verbose = true;
+/// This variable marks the start of evolution.
+bool startEvolution;
 
 VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 {
@@ -100,6 +99,8 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 #endif /* __linux || __APPLE__ */
 
 
+
+
     simLib = loadVrepLibrary(temp.c_str());
     if (simLib == NULL)
     {
@@ -115,6 +116,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
         return(0); // Means error, V-REP will unload this plugin
     }
+
 
     // Check the V-REP version:
     int vrepVer;
@@ -132,9 +134,19 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
     are_sett::ParametersMapPtr parameters = std::make_shared<are_sett::ParametersMap>(
                 are_sett::loadParameters(parameters_filepath));
     simReleaseBuffer(parameters_filepath);
-    int instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
+    instance_type = are_sett::getParameter<are_sett::Integer>(parameters,"#instanceType").value;
+    verbose = are_sett::getParameter<are_sett::Boolean>(parameters,"#verbose").value;
     int seed = are_sett::getParameter<are_sett::Integer>(parameters,"#seed").value;
+    timeout += are_sett::getParameter<are_sett::Float>(parameters,"#maxEvalTime").value;
+
+    //get simulator port
+    std::string argument = simGetStringParameter(sim_stringparam_app_arg2);
+    if(!argument.empty()){
+        std::vector<std::string> split_arg;
+        are::misc::split_line(argument,"_",split_arg);
+        std::cout << split_arg[1] << std::endl;
+        parameters->emplace("#port",std::make_shared<are_sett::String>(split_arg[1]));
+    }
 
     if(verbose){
         if(instance_type == are_sett::INSTANCE_REGULAR)
@@ -145,7 +157,7 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
     simulationState = INITIALIZING;
     // Construct classes
-    ERVREP = std::make_unique<are::sim::ER>();   // The class used to handle the EA
+    ERVREP = new are::sim::ER();   // The class used to handle the EA
 
     if(verbose){
         std::cout << "Parameters Loaded" << std::endl;
@@ -183,31 +195,33 @@ VREP_DLLEXPORT unsigned char v_repStart(void* reservedPointer, int reservedInt)
 
 // Release the v-rep lib
 VREP_DLLEXPORT void v_repEnd()
-{ // This is called just once, at the end of V-REP
+{
+    delete ERVREP;
+    // This is called just once, at the end of V-REP
     unloadVrepLibrary(simLib); // release the library
 }
 
 VREP_DLLEXPORT void* v_repMessage(int message, int* auxiliaryData, void* customData, int* replyData)
 {
-    are_sett::ParametersMapPtr param = ERVREP->get_parameters();
+    //are_sett::ParametersMapPtr param = ERVREP->get_parameters();
     //    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
-    int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
+  //  int instanceType = are_sett::getParameter<are_sett::Integer>(param,"#instanceType").value;
 
-    if(instanceType == are_sett::INSTANCE_REGULAR)
+    if(instance_type == are_sett::INSTANCE_REGULAR)
     {
         localMessageHandler(message);
     }
-    else if(instanceType == are_sett::INSTANCE_SERVER)
+    else if(instance_type == are_sett::INSTANCE_SERVER)
     {
         clientMessageHandler(message);
     }
-    param.reset();
+    //param.reset();
     return NULL;
 }
 
 void localMessageHandler(int message){
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+   // are_sett::ParametersMap param = (*ERVREP->get_parameters());
+   // bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
 //    int errorModeSaved;
 //    simGetIntegerParameter(sim_intparam_error_report_mode, &errorModeSaved);
@@ -279,30 +293,32 @@ void clientMessageHandler(int message){
     if(message == sim_message_eventcallback_modelloaded)
         return;
 
-    are_sett::ParametersMap param = (*ERVREP->get_parameters());
-    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
+   // are_sett::ParametersMap param = (*ERVREP->get_parameters());
+//    bool verbose = are_sett::getParameter<are_sett::Boolean>(param,"#verbose").value;
 
     // client and v-rep plugin communicates using signal and remote api
     int clientState[1] = {10111};
-    simGetIntegerSignal((simChar*) "clientState", clientState);
+    int ret = simGetIntegerSignal((simChar*) "clientState", clientState);
 
-    if (simulationState == FREE
-            && simGetSimulationState() == sim_simulation_stopped)
+
+    if (simulationState == FREE || ret < 1)
+            //&& simGetSimulationState() == sim_simulation_stopped)
     {
         simSetIntegerSignal("simulationState",are_c::IDLE);
 
         // time out when not receiving commands for 5 minutes.
         if (!timerOn) {
-            sysTime = clock();
+            sysTime = std::chrono::system_clock::now();
             timeElapsed = 0;
             timerOn = true;
         } else {
             // printf("Time taken: %.4fs\n", (double)(clock() - tStart) / CLOCKS_PER_SEC);
-            timeElapsed = (double) (clock() - sysTime) / CLOCKS_PER_SEC;
-            if (timeElapsed > 300)
+            timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now() - sysTime).count();
+            if (timeElapsed > timeout)
             {
-                std::cout << "Didn't receive a signal for 5 minutes. Shutting down server " << std::endl;
+                std::cout << "Didn't receive a signal for " << timeout <<  " seconds. Shutting down server " << std::endl;
                 simQuitSimulator(true);
+                exit(0);
             }
         }
 
@@ -343,7 +359,12 @@ void clientMessageHandler(int message){
         if(ERVREP->get_evalIsFinish()){
 
             std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            std::cout << "size of message sent " << indString.size() << std::endl;
+            std::string req;
+            are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
+            std::cout << "send individual" << std::endl;
+
+//            std::cout << "return value from simsetstringsignal " << simSetStringSignal("currentInd",indString.c_str(),indString.size()) << std::endl;
             simSetIntegerSignal("simulationState",are_c::FINISH);
 
             //loadingPossible = true;  // start another simulation
@@ -356,26 +377,39 @@ void clientMessageHandler(int message){
             if (verbose) {
                 std::cout << "SIMULATION ENDED" << std::endl;
             }
-            simSetIntegerSignal("simulationState",are_c::RESTART);
+            simSetIntegerSignal("simulationState",are_c::BUSY);
             simulationState = RESTART;
-            std::string indString = ERVREP->get_currentInd()->to_string();
-            simSetStringSignal("currentInd",indString.c_str(),indString.size());
+            //std::string indString = ERVREP->get_currentInd()->to_string();
+           // std::string req;
+          //  are::send_string_no_reply(indString,ERVREP->get_ind_channel(),"ind ");
+           // simSetStringSignal("currentInd",indString.c_str(),indString.size());
             loadingPossible = true;  // start another simulation
             return;
        }
     }
 
+    if (simulationState == CLEANUP) {
+        timeCount++;  //need to wait a few time steps to start a new simulation
+    }
+
+    if (simulationState == CLEANUP && timeCount > 10) {
+        simulationState = FREE;
+        timeCount = 0;
+    }
+
+
     if (clientState[0] == are_c::IDLE)
     {
-        timerOn = false;
         simulationState = STARTING;
         simSetIntegerSignal("simulationState",are_c::READY);
     }else if(clientState[0] == are_c::READY && (simulationState == STARTING || simulationState == RESTART)){
+        timerOn = false;
         simStartSimulation();
     }
     else if(clientState[0] == 99){
         std::cout << "Stop Instance !" << std::endl;
         simQuitSimulator(true);
+        exit(0);
     }
 
 }

@@ -79,13 +79,13 @@ public:
     void set_generation(int g){generation = g;}
     int get_generation(){return generation;}
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
-    const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    const settings::ParametersMapPtr &get_parameters() const {return parameters;}
     bool isEvaluated(){return isEval;}
     void set_isEvaluated(bool b){isEval = b;}
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
-    virtual std::string to_string();
+    virtual std::string to_string() const;
     virtual void from_string(const std::string &str);
 
     template<class archive>

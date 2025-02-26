@@ -18,7 +18,7 @@ def run_server(args,rank: int):
     print(f'Starting server rank {rank} listening on port {server_port}')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
-    logfilename = "./sim_" + str(rank) + "_" + formated_time + ".out";    
+    logfilename = args.log_folder + "/sim_" + str(rank) + "_" + formated_time + ".out";    
     logfile = open(logfilename,'w+')
     # parameters
     # [1] path to the parameter file
@@ -48,14 +48,14 @@ def run_client(args):
     print('Starting client')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
-    logfilename = "./client_" + formated_time + ".out";
+    logfilename = args.log_folder + "/client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
     return subprocess.Popen([#"gdb","--args",
         args.client,
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ])#stdout=logfile,stderr=logfile)
+    ],stdout=logfile,stderr=logfile)
 
 
 def wait(servers, client, timeout=None):
@@ -85,21 +85,19 @@ def kill(servers, client):
     for p in processes:
         if p.stdout is not None:
             p.stdout.close()
-       # parent = psutil.Process(p.pid)
-       # for child in parent.children(recursive=True):
-       #     child.kill()
         p.terminate()
         p.wait()
-    try:
-        wait(servers, client, timeout=30)
-    except subprocess.TimeoutExpired:
-        for p in processes:
-            p.poll()
-            if p.returncode is not None:
-               # parent = psutil.Process(p.pid)
-               # for child in parent.children(recursive=True):
-               #     child.kill()
-                p.kill()
+       
+    #try:
+    #    wait(servers, client, timeout=30)
+    #except subprocess.TimeoutExpired:
+    #    for p in processes:
+    #        p.poll()
+    #        if p.returncode is not None:
+    #            parent = psutil.Process(p.pid)
+    #            for child in parent.children(recursive=True):
+    #                child.kill()
+    #            p.kill()
 
 
 def main():
@@ -152,5 +150,12 @@ if __name__ == "__main__":
                         default='vrep.sh',
                         help='path to the vrep starting script')
 
+
+    parser.add_argument('--log-folder', type=str,
+                        default='.',
+                        help='path where to store the output files')
+
     args = parser.parse_args()
     main()
+    if(args.xvfb):
+        subprocess.call(["killall","-9","Xvfb"])

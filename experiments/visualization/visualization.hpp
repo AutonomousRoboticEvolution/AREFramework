@@ -60,7 +60,7 @@ public:
         arch & generation;
     }
 
-    std::string to_string() override;
+    std::string to_string() const override;
     void from_string(const std::string &str) override;
 
     void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
@@ -70,6 +70,8 @@ private:
     void createMorphology() override;
     void createController() override;
     std::vector<waypoint> trajectory;
+    double sum_ctrl_freq = 0;
+
 
 };
 

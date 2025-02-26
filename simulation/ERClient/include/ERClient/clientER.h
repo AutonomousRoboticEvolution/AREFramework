@@ -5,6 +5,8 @@
 #include "ERClient/SlaveConnection.h"
 #include "ERClient/sim_state.h"
 
+#include "simulatedER/zmq_com.hpp"
+
 #include <boost/archive/text_oarchive.hpp>
 #include <boost/interprocess/managed_shared_memory.hpp>
 

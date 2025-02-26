@@ -25,6 +25,11 @@ add_library(NIPES SHARED
     NIPESLoggings.cpp
     NIPES.cpp
     ../common/barrelTask.cpp
+    ../common/exploration.cpp
+    ../common/multiTargetMaze.cpp
+    ../common/locomotion.cpp
+    ../common/hill_climbing.cpp
+    ../common/push_object.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE simulatedER cmaes)

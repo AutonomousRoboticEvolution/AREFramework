@@ -5,6 +5,15 @@ add_compile_options("$<$<CONFIG:RELEASE>:-O3>$<$<CONFIG:DEBUG>:-O0>")
 add_compile_options("$<$<CONFIG:DEBUG>:-Wall>")
 add_compile_options("$<$<CONFIG:RELEASE>:-DNDEBUG>")
 add_compile_options("-rdynamic")
+# add_compile_options("-std=c++17")
+
+# add_compile_options("-mno-avx")
+# add_compile_options("-march=native")
+# add_compile_options("-mavx2")
+# add_compile_options("-mno-avx512f")
+
+
+
 
 if(NOT RASPBERRY)
     set(RASPBERRY 0)
@@ -43,10 +52,10 @@ else()
     add_subdirectory(experiments)
 endif()
 
-if(NOT RASPBERRY)
-    if(COPPELIASIM_FOLDER)
-       file(COPY are_sim.sh DESTINATION ${COPPELIASIM_FOLDER})
-    elseif(VREP_FOLDER)
-       file(COPY are_sim.sh DESTINATION ${VREP_FOLDER})
-    endif()
-endif()
+# if(NOT RASPBERRY)
+#     if(COPPELIASIM_FOLDER)
+#        file(COPY are_sim.sh DESTINATION ${COPPELIASIM_FOLDER})
+#     elseif(VREP_FOLDER)
+#        file(COPY are_sim.sh DESTINATION ${VREP_FOLDER})
+#     endif()
+# endif()

@@ -18,8 +18,12 @@ void VisuInd::createMorphology(){
         return;
     }
     if(fixed_morph_path == "None"){
-        morphology = std::make_shared<CPPNMorph>(parameters);
+
+        int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
+
+        morphology.reset(new CPPNMorph(parameters));
         morphology->set_randNum(randNum);
+        std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(id);
 
         nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
@@ -51,16 +55,25 @@ void VisuInd::createController(){
     const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
     int wheel_nbr,joint_nbr,sensor_nbr;
     if(fixed_morph_path == "None"){
-        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheelNumber();
-        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_jointNumber();
-        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensorNumber();
+        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
     }else{
         wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
         joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
         sensor_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
     }
 
-    int nb_inputs = sensor_nbr*2 + 1;
+    bool use_ir = settings::getParameter<settings::Boolean>(parameters,"#useIR").value;
+    bool use_camera = settings::getParameter<settings::Boolean>(parameters,"#useCamera").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+
+    int nb_inputs = sensor_nbr + //proximity sensors
+            (use_ir ? sensor_nbr : 0) + // IR sensors
+            (use_joint_feedback ? joint_nbr : 0) + // joint positions
+            (use_wheel_feedback ? wheel_nbr : 0) + // wheel positions
+            (use_camera ? 1 : 0); // camera
     int nb_outputs = wheel_nbr + joint_nbr;
 
     int nbr_weights, nbr_bias;
@@ -133,19 +146,34 @@ void VisuInd::update(double delta_time){
     bool empty_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
     if(empty_gen)
         return;
+
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
-    if( diff < 0.1){
+
+    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
+        sum_ctrl_freq = 0;
+        //- Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
-        for(const double& i : inputs)
-            std::cout << i << ";";
-        std::cout << std::endl;
+
+        if(use_joint_feedback){
+            std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
+            for(double &j: joints)
+                j = 2.*j/M_PI;
+            inputs.insert(inputs.end(),joints.begin(),joints.end());
+        }
+        if(use_wheel_feedback){
+            std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
+            inputs.insert(inputs.end(),wheels.begin(),wheels.end());
+        }
         std::vector<double> outputs = control->update(inputs);
         morphology->command(outputs);
     }
+    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
 }
 
-std::string VisuInd::to_string()
+std::string VisuInd::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
@@ -233,25 +261,34 @@ void Visu::init(){
         }
 
     }else{
-        for(const std::string& path: ctrl_gen_files){
-
-            morph_gen = std::make_shared<EmptyGenome>();
-            if(empty_ctrl_gen)
-                ctrl_gen = std::make_shared<EmptyGenome>();
-            else{
-                ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
-                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
-            }
-
-            Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
+        morph_gen = std::make_shared<EmptyGenome>();
+        if(empty_ctrl_gen){
+            ctrl_gen = std::make_shared<EmptyGenome>();
+            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
+        }else{
+            for(const std::string& path: ctrl_gen_files){
+
+                ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
+                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
+
+                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+            }
         }
     }
 
     morph_gen.reset();
     ctrl_gen.reset();
+
+    if(population.empty()){
+        std::cerr << "ERROR: Population is empty" << std::endl;
+        exit(1);
+    }
 }
 
 bool Visu::update(const Environment::Ptr &env){

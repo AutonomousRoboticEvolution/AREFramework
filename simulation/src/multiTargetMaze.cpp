@@ -17,8 +17,9 @@ MultiTargetMaze::MultiTargetMaze(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<const settings::Integer>(2));
     settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
 
+
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
-    for(int i = 0; i < targets.size();i+=3)
+    for(size_t i = 0; i < targets.size();i+=3)
         target_positions.push_back({targets[i],targets[i+1],targets[i+2]});
 
     trajectories.resize(target_positions.size());
@@ -40,11 +41,17 @@ void MultiTargetMaze::init(){
             std::cout << simGetObjectAlias(handle,0) << std::endl;
             i++;
         }
+        std::cout << "current target : ";
+        for(const double& t: target_positions[current_target])
+            std::cout << t << " ";
+        std::cout << std::endl;
     }
 
     final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     bool withBeacon = settings::getParameter<settings::Boolean>(parameters,"#withBeacon").value;
+
+
 
     if(withBeacon){
         double bSize[3] = {0.1f,0.1f,0.1f};
@@ -71,27 +78,28 @@ void MultiTargetMaze::init(){
 }
 
 std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     auto distance = [](std::vector<double> a,std::vector<double> b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
+                         (a[1] - b[1])*(a[1] - b[1]));// +
+                      //   (a[2] - b[2])*(a[2] - b[2]));
     };
+
+    double max_dist = distance(init_pos,target_positions[current_target]);
     std::vector<double> d(1);
     d[0] = 1 - distance(final_position,target_positions[current_target])/max_dist;
 
-    for(double& f : d)
-        if(std::isnan(f) || std::isinf(f) || f < 0)
-            f = 0;
-        else if(f > 1) f = 1;
 
+
+    if(std::isnan(d[0]) || std::isinf(d[0]))
+        d[0] = 0;
+    else if(d[0] > 1) d[0] = 1;
     //Go to next target
     current_target+=1;
     if(current_target >= target_positions.size())
         current_target=0;
-
+    
     return d;
 }
 

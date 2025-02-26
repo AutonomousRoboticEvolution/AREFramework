@@ -19,7 +19,9 @@ public:
     typedef std::shared_ptr<const Genome> ConstPtr;
     typedef Genome::Ptr (Factory)(int, misc::RandNum::Ptr);
 
-    Genome(int id = 0) : _id(id){}
+    Genome(int id = 0) : _id(id){
+        parents_ids= std::vector<int>(2,-1);
+    }
     Genome(const misc::RandNum::Ptr &rn, const settings::ParametersMapPtr &param, int id = 0);
     Genome(const Genome& gen) :
         parameters(gen.parameters),
@@ -27,7 +29,8 @@ public:
         randomNum(gen.randomNum),
         initialized(gen.initialized),
         type(gen.type),
-        _id(gen._id)
+        _id(gen._id),
+        parents_ids(gen.parents_ids)
     {}
     virtual ~Genome();
 
@@ -63,13 +66,15 @@ public:
     const std::string& get_type(){return type;}
     const int id() const {return _id;}
     void set_id(int id){_id = id;}
-
+    const std::vector<int>& get_parents_ids() const {return parents_ids;}
+    void set_parents_ids(const std::vector<int>& ids){parents_ids = ids;}
 
     template <class archive>
     void serialize(archive &arch, const unsigned int v)
     {
         arch & _id;
         arch & type;
+        arch & parents_ids;
 //        arch & initialized;
     }
 
@@ -83,6 +88,7 @@ protected:
     bool initialized = false;
     std::string type;
     int _id;
+    std::vector<int> parents_ids;
 
 
 };

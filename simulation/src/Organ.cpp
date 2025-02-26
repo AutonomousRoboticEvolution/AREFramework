@@ -11,6 +11,60 @@ using namespace are::sim;
 //namespace cop = coppelia;
 using mc = are::morph_const;
 
+void organ::generate_orientation(float x, float y, float z, std::vector<float> &orientation)
+{
+    /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
+    // Gives the direction of the organ given the direction of the surface
+    if ((x > 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x < 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x > 0) && (y < 0) && (z == 0)){
+        orientation.at(0) =  -M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
+                  << y << " " << z << std::endl;
+    }
+}
+
+void organ::generate_orientation(int x, int y, int z, std::vector<float> &orientation)
+{
+    /// \todo: EB: Remove z > 0 amd z < 0 as the organ cannot face these directions.
+    // Gives the direction of the organ given the direction of the surface
+    if ((x > 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x < 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +M_PI_4; orientation.at(2) = -M_PI_2;
+    }else if ((x > 0) && (y < 0) && (z == 0)){
+        orientation.at(0) =  -M_PI_2; orientation.at(1) = -M_PI_4; orientation.at(2) = M_PI_2;
+    }else if ((x < 0) && (y == 0) && (z == 0)){
+        orientation.at(0) = +0.0; orientation.at(1) = +M_PI_2; orientation.at(2) = +0.0;
+    } else if ((x == 0) && (y < 0) && (z == 0)){
+        orientation.at(0) = -M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = +M_PI_2;
+    } else if ((x == 0) && (y > 0) && (z == 0)){
+        orientation.at(0) = +M_PI_2; orientation.at(1) = +0.0; orientation.at(2) = -M_PI_2;
+    } else if ((x > 0) && (y == 0) && (z == 0)) {
+        orientation.at(0) = +0.0; orientation.at(1) = -M_PI_2; orientation.at(2) = +M_PI;
+    } else {
+        orientation.at(0) = +0.6154; orientation.at(1) = -0.5236; orientation.at(2) = -2.1862;
+        std::cerr << "We shouldn't be here: " << __func__ << " " << x << " "
+                  << y << " " << z << std::endl;
+    }
+}
+
 void Organ::createOrgan(int skeletonHandle)
 {
     organChecked = true;
@@ -217,20 +271,25 @@ void Organ::createMaleConnector()
     connector_frame_pos.at(2) = temp_connector_frame_pos[2] - 0.0098;
 }
 
-void Organ::testOrgan(PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
+void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
-    isGripperCollision(gripperHandle, skeletonHandles, organList);
+    //isGripperCollision(gripperHandle, skeletonHandles, organList);
     isOrganInsideMainSkeleton(skeletonMatrix);
 }
 
 void Organ::repressOrgan()
 {
+<<<<<<< HEAD
     if(organInsideSkeleton || organColliding || !organGripperAccess){
         int parent_handle[1];
         parent_handle[0] = simGetObjectParent(organHandle);
         simRemoveObjects(parent_handle,1); // Remove force sensor.
+=======
+    if(organInsideSkeleton || organColliding){// || !organGripperAccess){
+        simRemoveObject(simGetObjectParent(organHandle)); // Remove force sensor.
+>>>>>>> update_decoding
         simRemoveModel(organHandle); // Remove model.
         simRemoveModel(physics_connector_handle);
         organRemoved = true;
@@ -360,7 +419,7 @@ void Organ::isGripperCollision(int gripperHandle, const std::vector<int>& skelet
     simSetObjectPosition(gripperHandle, -1, gripperPosition);
 }
 
-void Organ::isOrganInsideMainSkeleton(PolyVox::RawVolume<uint8_t> &skeletonMatrix)
+void Organ::isOrganInsideMainSkeleton(const PolyVox::RawVolume<uint8_t> &skeletonMatrix)
 {
     // Transform organPos from m to voxels
     int xPos = static_cast<int>(std::round(organPos[0]/mc::voxel_real_size));

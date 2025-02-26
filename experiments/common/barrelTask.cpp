@@ -19,7 +19,7 @@ BarrelTask::BarrelTask(const settings::ParametersMapPtr& params)
     settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
 
     std::vector<double> targets = settings::getParameter<settings::Sequence<double>>(parameters,"#targets").value;
-    for(int i = 0; i < targets.size();i+=3)
+    for(size_t i = 0; i < targets.size();i+=3)
         barrel_initial_positions.push_back({targets[i],targets[i+1],targets[i+2]});
 
     target_position = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
@@ -43,6 +43,10 @@ void BarrelTask::init(){
             std::cout << simGetObjectAlias(handle,0) << std::endl;
             i++;
         }
+        std::cout << "current barrel initial position : ";
+        for(const double& t: barrel_initial_positions[current_target])
+            std::cout << t << " ";
+        std::cout << std::endl;
     }
 
     final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
@@ -121,7 +125,7 @@ std::vector<double> BarrelTask::fitnessFunction(const Individual::Ptr &ind){
                          (a[2] - b[2])*(a[2] - b[2]));
     };
     std::vector<double> d(1);
-    d[0] = 1 - (distance(final_position,barrel_current_position)/max_dist)/2 - (distance(target_position,barrel_current_position)/max_dist)/2;
+    d[0] = 1 - (distance(target_position,barrel_current_position)/max_dist);///2 - (distance(final_position,barrel_current_position)/max_dist)/2;
 
     for(double& f : d)
         if(std::isnan(f) || std::isinf(f) || f < 0)
@@ -130,7 +134,7 @@ std::vector<double> BarrelTask::fitnessFunction(const Individual::Ptr &ind){
 
     //Go to next target
     current_target+=1;
-    if(current_target >= barrel_current_position.size())
+    if(current_target >= barrel_initial_positions.size())
         current_target=0;
 
     return d;

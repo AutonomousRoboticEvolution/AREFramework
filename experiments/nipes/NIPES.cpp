@@ -1,6 +1,5 @@
 #include "NIPES.hpp"
 
-
 using namespace are;
 
 Eigen::VectorXd NIPESIndividual::descriptor()
@@ -68,6 +67,7 @@ void NIPES::init(){
     double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
     double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
     float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+    float gen_stag_thres = settings::getParameter<settings::Float>(parameters,"#generationalStagnationThreshold").value;
     std::string fit_stagnation_method = settings::getParameter<settings::String>(parameters,"#fitStagnationMethod").value;
 
     novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
@@ -125,6 +125,7 @@ void NIPES::init(){
     _cma_strat->set_novelty_ratio(novelty_ratio);
     _cma_strat->set_novelty_decr(novelty_decr);
     _cma_strat->set_pop_stag_thres(pop_stag_thres);
+    _cma_strat->set_gen_stag_thres(gen_stag_thres);
     _cma_strat->set_fit_stagnation_method(fit_stagnation_method);
 
     if(bootstrapCtrl == "None"){
@@ -164,6 +165,16 @@ void NIPES::init(){
 
 void NIPES::epoch(){
 
+    healthy_generation = true;
+    for(auto &ind: population){
+        if(ind->getObjectives()[0] == 0){
+            healthy_generation = false;
+            return;
+        }
+    }
+
+    std::cout << numberEvaluation << "/" << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << " evaluations" << std::endl;
+
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
@@ -179,8 +190,9 @@ void NIPES::epoch(){
             std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
         }
     }
+    /**/
 
-    /** NOVELTY **/
+    /**NOVELTY**/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
         if(novelty_params::k_value >= population.size())
             novelty_params::k_value = population.size()/2;
@@ -203,6 +215,18 @@ void NIPES::epoch(){
             novelty::update_archive<novelty_params>(ind_desc,ind_nov,archive,randomNum);
         }
     }
+    /**/
+
+    /**Get best individual**/
+    double best_fit = population[0]->getObjectives()[0];
+    size_t best_idx = 0;
+    for(size_t i = 1; i < population.size(); i++){
+        if(population[i]->getObjectives()[0] > best_fit){
+            best_fit = population[i]->getObjectives()[0];
+            best_idx = i;
+        }
+    }
+    best_individual = std::make_pair(best_idx,population[best_idx]);
     /**/
 
     std::vector<IPOPCMAStrategy::individual_t> pop;
@@ -231,11 +255,13 @@ void NIPES::epoch(){
 
         if(incrPop){
             int max_pop_size = settings::getParameter<settings::Integer>(parameters,"#cmaesMaxPopSize").value;
-            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size)
+            if(max_pop_size < 0 || _cma_strat->get_parameters().lambda() < max_pop_size){
                 _cma_strat->lambda_inc();
+                _cma_strat->reset_search_state();
+            }
         }
 
-        _cma_strat->reset_search_state();
+
         if(!elitist_restart){
             float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
             _cma_strat->get_parameters().set_x0(-max_weight,max_weight);
@@ -244,6 +270,10 @@ void NIPES::epoch(){
 }
 
 void NIPES::init_next_pop(){
+
+    if(!healthy_generation)
+        return;
+
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
     const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
@@ -283,16 +313,24 @@ void NIPES::init_next_pop(){
 
 void NIPES::setObjectives(size_t indIdx, const std::vector<double> &objectives){
     int env_type = settings::getParameter<settings::Integer>(parameters,"#envType").value;
-    if(env_type == 4 && simulator_side){//MultiTargetMaze
+    if((env_type == sim::MULTI_TARGETS || env_type == sim::BARREL) && simulator_side){//MultiTargetMaze
         std::dynamic_pointer_cast<NIPESIndividual>(population[indIdx])->add_reward(objectives[0]);
     }
     population[indIdx]->setObjectives(objectives);
+    newly_evaluated.push_back(indIdx);
 }
 
 
 bool NIPES::update(const Environment::Ptr & env){
-    numberEvaluation++;
-    reevaluated++;
+
+    for(const int& idx :newly_evaluated)
+    {
+        if(population[idx]->getObjectives()[0] > 0){
+            numberEvaluation++;
+            reevaluated++;
+        }
+    }
+
 
     if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
@@ -301,8 +339,12 @@ bool NIPES::update(const Environment::Ptr & env){
         if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-        }else if(env->get_name() == "multi_target_maze"){
-            int number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+        }else if(env->get_name() == "multi_target_maze" || env->get_name() == "barrel_task"){
+            int number_of_targets = 0;
+            if(env->get_name() == "multi_target_maze")
+                number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+            else if(env->get_name() == "barrel_task")
+                number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
             if(std::dynamic_pointer_cast<NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
                 return false;
             }else{
@@ -310,10 +352,16 @@ bool NIPES::update(const Environment::Ptr & env){
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->compute_fitness();
                 //std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
     //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-                std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectory(env->get_trajectory());
-            }
-        }
+                if(env->get_name() == "multi_target_maze")
+                    std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+                else if(env->get_name() == "multi_target_maze")
+                    std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());            }
+        }else if(env->get_name() == "push_object")
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_object_trajectory(std::dynamic_pointer_cast<sim::PushObject>(env)->get_object_trajectory());
+
+
     }
+    newly_evaluated.clear();
 
 //    int nbReEval = settings::getParameter<settings::Integer>(parameters,"#numberOfReEvaluation").value;
 //    if(reevaluated < nbReEval)
@@ -325,12 +373,12 @@ bool NIPES::update(const Environment::Ptr & env){
 
 bool NIPES::is_finish(){
     int maxNbrEval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
-
     return /*_is_finish ||*/ numberEvaluation >= maxNbrEval;
 }
 
 bool NIPES::finish_eval(const Environment::Ptr & env){
 
+<<<<<<< HEAD
     std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
@@ -347,12 +395,36 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
     std::vector<double> pos = std::dynamic_pointer_cast<sim::VirtualEnvironment>(env)->get_object_position(handle);
 
     double dist = distance(pos,target)/sqrt(2*arenaSize*arenaSize);
+=======
+//    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
+//    double t_pos[3] = {target[0],target[1],target[2]};
+//    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+//    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
-    if(dist < fTarget){
-        std::cout << "STOP !" << std::endl;
-    }
+//    auto distance = [](double* a,double* b) -> double
+//    {
+//        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
+//                         (a[1] - b[1])*(a[1] - b[1]) +
+//                         (a[2] - b[2])*(a[2] - b[2]));
+//    };
 
-    return  dist < fTarget;
+//    int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
+//    float pos[3];
+//    simGetObjectPosition(handle,-1,pos);
+//    double posd[3];
+//    posd[0] = static_cast<double>(pos[0]);
+//    posd[1] = static_cast<double>(pos[1]);
+//    posd[2] = static_cast<double>(pos[2]);
+
+//    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
+>>>>>>> update_decoding
+
+//    if(dist < fTarget){
+//        std::cout << "STOP !" << std::endl;
+//    }
+
+//    return  dist < fTarget;
+    return false;
 }
 
 void NIPES::update_pop_info(const std::vector<double> &obj, const Eigen::VectorXd &desc){

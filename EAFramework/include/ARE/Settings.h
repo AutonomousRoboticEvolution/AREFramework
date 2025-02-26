@@ -11,6 +11,7 @@
 #include <list>
 #include <vector>
 #include "misc/utilities.h"
+#include <stdexcept>
 
 namespace are {
 
@@ -36,7 +37,9 @@ public:
     Boolean(bool b) : value(b){name = "bool";}
     bool value = false;
     const bool& get_value() const{return value;}
-    void fromString(const std::string& str){value = std::stoi(str);}
+    void fromString(const std::string& str){
+        value = std::stoi(str);
+    }
     friend std::ostream & operator << (std::ostream &out, const Boolean &s){
         out << s.value;
         return out;
@@ -56,7 +59,9 @@ public:
     Integer(int i) : value(i) {name = "int";}
     int value = 0;
     const int& get_value() const{return value;}
-    void fromString(const std::string& str){value = std::stoi(str);}
+    void fromString(const std::string& str){
+        value = std::stoi(str);
+    }
     friend std::ostream & operator << (std::ostream &out, const Integer &s){
         out << s.value;
         return out;
@@ -76,7 +81,9 @@ public:
     Float(float f) : value(f) {name = "float";}
     float value = 0.0;
     const float& get_value() const{return value;}
-    void fromString(const std::string& str){value = std::stof(str);}
+    void fromString(const std::string& str){
+        value = std::stof(str);
+    }
     friend std::ostream & operator << (std::ostream &out, const Float &s){
         out << s.value;
         return out;
@@ -97,7 +104,9 @@ public:
     Double(double d) : value(d) {name = "double";}
     double value = 0.0;
     const double& get_value() const{return value;}
-    void fromString(const std::string& str){value = std::stod(str);}
+    void fromString(const std::string& str){
+        value = std::stof(str);
+    }
     friend std::ostream & operator << (std::ostream &out, const Double &s){
         out << s.value;
         return out;
@@ -155,6 +164,7 @@ public:
         arch & value;
     }
 };
+
 
 template<>
 class Sequence<int> : public Type
@@ -300,9 +310,14 @@ struct random{
 
 template<typename T>
 T getParameter(const ParametersMapPtr &params,const std::string& name)
-{
+{    
+    if(params == nullptr){
+        std::cerr << "are::settings::getParamter error: params is empty - queried parameter: " << name << std::endl;
+        exit(1);
+        return T();
+    }
     if(params->find(name) == params->end()){
-        std::cerr << "Unable to find parameters " << name << " of type " << T().name << std::endl
+        std::cerr << "are::settings::getParamter error: Unable to find parameters " << name << " of type " << T().name << std::endl
                   << "You should define it in the parameters file." << std::endl;
         if(settings::defaults::parameters->find(name) == settings::defaults::parameters->end()){
             std::cerr << "No default value found" << std::endl;
@@ -312,12 +327,19 @@ T getParameter(const ParametersMapPtr &params,const std::string& name)
         std::cerr << "Using default value : " << res << std::endl;
         return res;
     }
+
+    if(cast<T>(params->at(name)).get() == nullptr){
+        std::cerr << "are::settings::getParamter error: wrong type for parameter " << name << std::endl;
+        exit(1);
+        return T();
+    }
+
     return *(cast<T>(params->at(name)));
 }
 
 template<typename T>
 T getParameter(const ParametersMap &params,const std::string& name)
-{
+{    
     if(params.find(name) == params.end()){
         std::cerr << "Unable to find parameters " << name << " of type " << T().name << std::endl
                   << "You should define it in the parameters file." << std::endl;
@@ -329,10 +351,16 @@ T getParameter(const ParametersMap &params,const std::string& name)
         std::cerr << "Using default value : " << res << std::endl;
         return res;
     }
+
+    if(cast<T>(params.at(name)).get() == nullptr){
+        std::cerr << "are::settings::getParamter error: wrong type for parameter " << name << std::endl;
+        exit(1);
+        return T();
+    }
     return *(cast<T>(params.at(name)));
+
 }
 
-//TODO: define a tostring and fromstring for the parameters
 
 std::string toString(const ParametersMap& params);
 ParametersMap fromString(const std::string& str_params);
@@ -380,7 +408,8 @@ enum genomeType {
 typedef enum obsType {
     FINAL_POS = 0,
     TRAJECTORY = 1,
-    POS_TRAJ = 2
+    POS_TRAJ = 2,
+    OBJ = 3
 }obsType;
 
 typedef enum jointCtrlType {

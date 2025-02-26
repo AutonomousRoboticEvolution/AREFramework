@@ -31,7 +31,7 @@ public:
     virtual Control::Ptr clone() const = 0;
 
     /**
-    @brief Take sensorInput and returns output
+    @brief Take senosry values and returns controls values.
     @param sensorValues sensor values
     */
     virtual std::vector<double> update(const std::vector<double> &sensorValues) = 0;
@@ -39,6 +39,7 @@ public:
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
+    void set_random_number(const misc::RandNum::Ptr &rnd){randomNum = rnd;}
 
 protected:
     misc::RandNum::Ptr randomNum;

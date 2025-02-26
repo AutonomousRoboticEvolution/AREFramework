@@ -23,7 +23,7 @@ void Individual::symmetrical_crossover(const Individual::Ptr &partner, Individua
     morphGenome->symmetrical_crossover(partner->get_morph_genome(),child1->get_morph_genome(),child2->get_morph_genome());
 }
 
-std::string Individual::to_string()
+std::string Individual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);

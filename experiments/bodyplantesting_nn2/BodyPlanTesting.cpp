@@ -2,6 +2,10 @@
 
 using namespace are;
 
+int BODYPLANTESTING::novelty_params::k_value = 15;
+double BODYPLANTESTING::novelty_params::novelty_thr = 0.9;
+double BODYPLANTESTING::novelty_params::archive_adding_prob = 0.4;
+
 void BODYPLANTESTING::init()
 {
     nb_obj = 1;
@@ -26,6 +30,11 @@ void BODYPLANTESTING::init()
     cppn_params::cppn::_rate_del_neuron = settings::getParameter<settings::Float>(parameters,"#rateDeleteNeuron").value;
     cppn_params::cppn::_rate_crossover = settings::getParameter<settings::Float>(parameters,"#rateCrossover").value;
     cppn_params::evo_float::mutation_rate = settings::getParameter<settings::Float>(parameters,"#CPPNParametersMutationRate").value;
+    cppn_params::cppn::_expressiveness = settings::getParameter<settings::Double>(parameters,"#cppnExpressiveness").value;
+
+    quadric_mut_params::_mutation_rate = settings::getParameter<settings::Double>(parameters,"#sqMutationRate").value;
+    quadric_mut_params::_sigma = settings::getParameter<settings::Double>(parameters,"#sqMutationSigma").value;
+
 
     initPopulation();
 
@@ -36,30 +45,39 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    bool cppn_fixed = settings::getParameter<settings::Boolean>(parameters,"#cppnFixedStructure").value;
+    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
 
-    rng.Seed(randomNum->getSeed());
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
-        NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-        if(cppn_fixed)
-            morphgenome->fixed_structure();
-        else
-            morphgenome->random();
+        Genome::Ptr morphgenome;
+        if(use_quadric){
+            morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
+        }
+        else{
+            morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+        }
+        morphgenome->random();
         CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
     }else{
         const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+
         for (size_t i = 0; i < population_size; i++){ // Body plans
             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
-            NN2CPPNGenome::Ptr morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
-            if(cppn_fixed)
-                morphgenome->fixed_structure();
-            else
-                morphgenome->random();
+
+            Genome::Ptr morphgenome;
+            if(use_quadric){
+                morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
+            }
+            else{
+                morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            }
+
+            morphgenome->random();
+            morphgenome->set_id(highest_morph_id++);
             CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
@@ -70,24 +88,17 @@ void BODYPLANTESTING::initPopulation()
 }
 
 void BODYPLANTESTING::init_next_pop(){
-    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
-    if(repetition < nbr_rep){
-        repetition++;
-        return;
-    }
-    repetition = 0;
+
     NSGA2::init_next_pop();
+    for(Individual::Ptr &ind : population){
+        std::dynamic_pointer_cast<CPPNIndividual>(ind)->set_morph_id(highest_morph_id++);
+    }
 }
 
 void BODYPLANTESTING::epoch(){
     const int population_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    int nbr_rep = settings::getParameter<settings::Integer>(parameters,"#nbrRepetitions").value;
     int descriptor = settings::getParameter<settings::Integer>(parameters,"#descriptor").value;
 
-    if(repetition < nbr_rep){
-        std::cout << "number of repetitions : " << repetition << " over " << nbr_rep << std::endl;
-        return;
-    }
 
     /** NOVELTY **/
     if(novelty_params::k_value >= population.size())
@@ -108,14 +119,14 @@ void BODYPLANTESTING::epoch(){
         std::vector<size_t> pop_indexes;
 
         std::vector<double> distances;
-        if(descriptor == CART_DESC)
-            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
-        else if(descriptor == ORGAN_POSITION)
-            distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::positional);
+        //if(descriptor == CART_DESC)
+        distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
+        //else if(descriptor == ORGAN_POSITION)
+        //   distances = Novelty::distances(ind_desc,archive,pop_desc,pop_indexes,Novelty::distance_fcts::euclidian);
 
         //Compute novelty
         double ind_nov = novelty::sparseness<novelty_params>(distances);
-        if(descriptor == CART_DESC)
+        if(descriptor == sim::FEATURES)
             ind_nov /= 2.64;
         //set the objetives
 

@@ -1,10 +1,18 @@
 #experimentName,string,nipes
 #expPluginName,string,/usr/local/lib/libNIPES.so
+<<<<<<< HEAD
 #envType,int,1
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_blind_ant/model_0.ttm
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
+=======
+#envType,int,2
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arenas.ttt
+#scenes,sequence_string,ARE_arena.ttt
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/robots/are_blind_ant/model_0.ttm
+#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
+>>>>>>> update_decoding
 #repository,string,/home/leni/are-logs/
 
 #verbose,bool,1
@@ -39,7 +47,7 @@
 #seed,int,-1
 #arenaSize,double,2.
 #targetPosition,sequence_double,0.775;0.025;0.20
-#targets,sequence_double,0.0;0.5;0.12;0.0;0.5;0.12;0.0;-0.5;0.12
+#targets,sequence_double,0.6;0.6;0.12;0.6;-0.6;0.12;-0.6;-0.6;0.12
 #initPosition,sequence_double,-0.6;0.6;0.2
 #withTiles,bool,1
 #flatFloor,bool,1
@@ -47,7 +55,7 @@
 
 #MaxWeight,float,1.0
 
-#NNType,int,4
+#NNType,int,2
 #NbrInputNeurones,int,1
 #NbrOutputNeurones,int,12
 #NbrHiddenNeurones,int,6
@@ -74,5 +82,11 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #reloadController,bool,0
+<<<<<<< HEAD
 #isScreenshotEnable,bool,0
 
+=======
+
+#generationalStagnationThreshold,float,0.01
+#fitStagnationMethod,string,best
+>>>>>>> update_decoding

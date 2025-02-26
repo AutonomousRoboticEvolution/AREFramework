@@ -17,6 +17,10 @@ add_library(visualization SHARED
     visualization.cpp
     factories.cpp
     ../common/barrelTask.cpp
+    ../common/exploration.cpp
+    ../common/locomotion.cpp
+    ../common/hill_climbing.cpp
+    ../common/push_object.cpp
     )
 target_include_directories(visualization PUBLIC
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
@@ -29,4 +33,4 @@ target_include_directories(visualization PUBLIC
     )
 target_link_libraries(visualization ARE simulatedER)
 install(TARGETS visualization DESTINATION lib)
-install(DIRECTORY . DESTINATION include/visu_population  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+install(DIRECTORY . DESTINATION include/visualization  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

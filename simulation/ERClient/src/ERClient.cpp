@@ -25,22 +25,11 @@
 #include <random>
 #include <execinfo.h>
 #include <signal.h>
+//#include <segvcatch.h>
+
 
 using namespace are;
 
-clock_t tStart;
-clock_t sysTime;
-
-void saveLog(int counter) {
-    std::ofstream logFile;
-    logFile.open("files/timeLog.csv", std::ios::app);
-    std::clock_t now = std::clock();
-    //	double deltaSysTime = difftime((double) time(0), sysTime) ;
-    int deltaSysTime = now - sysTime;
-    logFile << "time after generation " << counter << " = ," << deltaSysTime  << "," << std::endl;
-    sysTime = clock();
-    logFile.close();
-}
 
 /**
  * @brief signal handler to generate a stacktrace after getting a segfault signal.
@@ -67,6 +56,9 @@ int main(int argc, char* argv[])
 
     srand(time(NULL));
 
+   // segvcatch::init_segv(&are::misc::handle_segv);
+
+
     if(argc != 4)
     {
         std::cout << "usage :" << std::endl;
@@ -92,6 +84,14 @@ int main(int argc, char* argv[])
     client->set_properties(std::make_shared<settings::Property>(settings::Property()));
     client->set_parameters(parameters);
     //-
+
+    if(settings::getParameter<settings::Integer>(parameters,"#instanceType").value == settings::INSTANCE_REGULAR){
+        std::cerr << "--- Launch Error ---"  << std::endl
+                  << "Experiment launch as regular instance (sequential). This program should be launch in server instance (parallel)" << std::endl
+                  << "Please set #instanceType parameter to 1 and relaunch the experiment." << std::endl
+                  << "Aborting application." << std::endl;
+        return 1;
+    }
 
     int seed = settings::getParameter<settings::Integer>(parameters,"#seed").value;
     if(seed < 0){
@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
     while (client->execute()) usleep(5000);
 
     extApi_sleepMs(5000);
-    client->quitSimulation();
+//client->quitSimulation();
     parameters.reset();
     client.reset();
     extApi_sleepMs(8000);

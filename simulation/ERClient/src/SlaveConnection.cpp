@@ -30,6 +30,8 @@ SlaveConnection::SlaveConnection(const std::string& address, int port)
     , _clientID(-1)
     , _individual(-1)
     , _state(State::NOT_CONNECTED)
+    , _context(1)
+    ,_individual_channel(_context,ZMQ_REQ)
 {}
 
 SlaveConnection::SlaveConnection(const SlaveConnection &other)
@@ -38,6 +40,8 @@ SlaveConnection::SlaveConnection(const SlaveConnection &other)
     , _clientID(other._clientID)
     , _individual(other._individual)
     , _state(other._state)
+    , _context(1)
+    ,_individual_channel(_context,ZMQ_REQ)
 {}
 
 SlaveConnection::SlaveConnection(SlaveConnection &&other)
@@ -46,6 +50,8 @@ SlaveConnection::SlaveConnection(SlaveConnection &&other)
     , _clientID(other._clientID)
     , _individual(other._individual)
     , _state(other._state)
+    , _context(1)
+    ,_individual_channel(_context,ZMQ_REQ)
 {}
 
 SlaveConnection::~SlaveConnection()
@@ -53,6 +59,7 @@ SlaveConnection::~SlaveConnection()
 
 bool SlaveConnection::connect(int connectionTimeoutMs)
 {
+    zmq_timeout = connectionTimeoutMs;
     simxInt result = simxStart(
         this->_address.c_str(), // connectionAddress
         this->_port,            // connectionPort
@@ -60,6 +67,12 @@ bool SlaveConnection::connect(int connectionTimeoutMs)
         false,                  // doNotReconnectOnceDisconnected
         connectionTimeoutMs,    // timeOutInMs
         5);                     // commThreadCycleInMs
+
+    //setup zmq communication channel to retrieve the individual
+    std::stringstream zmq_address;
+    zmq_address << "tcp://" << this->_address << ":" << this->_port << "1" ;
+    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&zmq_timeout,sizeof(zmq_timeout));
+    _individual_channel.connect(zmq_address.str());
 
     if (result == -1) {
         return false;
@@ -99,6 +112,18 @@ bool SlaveConnection::reconnect()
     }
 
     return this->connect();
+}
+
+void SlaveConnection::reset_ind_channel(){
+    _individual_channel.close();
+    _individual_channel = zmq::socket_t(_context,ZMQ_REQ);
+    
+    _individual_channel.setsockopt(ZMQ_RCVTIMEO,&zmq_timeout,sizeof(zmq_timeout));
+    
+    std::stringstream zmq_address;
+    zmq_address << "tcp://" << this->_address << ":" << this->_port << "1" ;
+    _individual_channel.connect(zmq_address.str());
+
 }
 
 simxInt SlaveConnection::getIntegerSignal(const std::string& signalName) const
@@ -162,12 +187,13 @@ void SlaveConnection::getStringSignal(const std::string& signalName, std::string
     if(ret_value == 0){
         message = std::string((char*)states,length);
         message.resize(length);
+        std::cerr << "Server " << _port << " receive message of length " << length << std::endl;
         //simxSetIntegerSignal(this->_clientID,"receptAck",0,)
     }
     else
     {
         message = "";
-        std::cerr << "simxGetStringSignal returned with the following error value: " << ret_value << std::endl;
+        std::cerr << "Server " << _port << " simxGetStringSignal returned with the following error value: " << ret_value << std::endl;
     }
 //    }else{
 //        std::cerr << "simxGetStringSignal did not finish properly." << std::endl;
