@@ -667,7 +667,7 @@ void SQCPPNMorphology::create(){
     }
 
     if(convexDecompositionSuccess){
-        check_repress_organs_nobias(skeleton_matrix,gripperHandles);
+        check_repress_organs_biased(skeleton_matrix,gripperHandles);
     }
     else{
         // Stop generating body plan if convex decomposition fails

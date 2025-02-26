@@ -1,5 +1,5 @@
 #experimentName,string,meim
-#expPluginName,string,/usr/local/lib/libmeim.so
+#expPluginName,string,/usr/local/lib/are/experiments/libmeim.so
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
@@ -24,12 +24,13 @@
 
 #manualDesignFile,string,None
 #growingDecoding,bool,0
-#cppnExpressiveness,double,1
-#useQuadric,bool,1
+#cppnExpressiveness,double,10
+#morphGenomeType,int,1
 
 #parentsPoolFile,string,parent_pool.csv
 #fitnessFile,string,fitness.csv
 #quadricFile,string,quadrics.csv
+#compGenFile,string,components_genomes.csv
 
 #maxVelocity,double,6.
 #arenaSize,sequence_double,2.;2.
@@ -52,7 +53,7 @@
 #useJointFeedback,bool,1
 #useWheelFeedback,bool,1
 
-#fixedController,bool,1
+#fixedController,bool,0
 
 #isWheel,bool,1
 #isSensor,bool,1
@@ -71,8 +72,21 @@
 #imageRepository,string,/home/le_goff/git/robotlibrary/wide_corridor/morph_56/
 #nbrWaypoints,int,3600
 
-#isNEATGenome,bool,0
-#isCPPNGenome,bool,1
 #isLeg,bool,1
 
 #descriptor,int,0
+
+#compPositionMutRate,double,0.2
+#compTypeMutRate,double,0.2
+#compListMutRate,double,0.5
+#addRemoveCompProb,double,0.
+#quadricsParamMutRate,double,0.1
+#quadricsSigma,double,0.2
+#quadricsSymmetryMutRate,double,0.1
+
+
+#epsilonA,double,0.1
+#epsilonC,double,0.08
+#add_noise,bool,1
+#noise_strength,double,0.3
+#creativity,double,1.0

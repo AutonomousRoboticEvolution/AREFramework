@@ -26,7 +26,7 @@ size_t sq_cppn::params::cppn::_max_nb_neurons = 2;
 size_t sq_cppn::params::cppn::_min_nb_conns = 10;
 size_t sq_cppn::params::cppn::_max_nb_conns = 100;
 
-double sq_cppn::params::cppn::_expressiveness = 10.f;
+double sq_cppn::params::cppn::_expressiveness = 100.f;
 
 float sq_cppn::params::evo_float::mutation_rate = 0.1f;
 

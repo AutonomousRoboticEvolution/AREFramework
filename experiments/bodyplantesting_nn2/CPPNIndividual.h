@@ -18,7 +18,7 @@ public :
     CPPNIndividual(const Genome::Ptr& morph_gen,const EmptyGenome::Ptr& ctrl_gen) :
             Individual(morph_gen, ctrl_gen){}
     CPPNIndividual(const CPPNIndividual& ind):
-            Individual(ind),
+            Individual(ind), NSGAIndividual<CPPNIndividual>(ind),
             testRes(ind.testRes),
             feature_desc(ind.feature_desc),
             matrix_descriptor(ind.matrix_descriptor)
