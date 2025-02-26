@@ -2,7 +2,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 #include <boost/algorithm/string.hpp>
 #include <simulatedER/Morphology.h>
@@ -39,7 +39,7 @@ void PushObject::init(){
         std::cout << "Loaded scene : " << scenePath << std::endl;
         std::cout << "Objects in the scene : " << std::endl;
         while((handle = simGetObjects(i,sim_handle_all)) >= 0){
-            std::cout << simGetObjectName(handle) << std::endl;
+            std::cout << simGetObjectAlias(handle,0) << std::endl;
             i++;
         }
         std::cout << "current object initial position : ";
@@ -48,11 +48,12 @@ void PushObject::init(){
         std::cout << std::endl;
     }
 
-    float bSize[3] = {0.1f,0.1f,0.1f};
-    object_handle = simCreatePureShape(0,0,bSize,0.05f,nullptr); //create a sphere as beacon;
+    double bSize[3] = {0.1f,0.1f,0.1f};
+    object_handle = simCreatePrimitiveShape(sim_primitiveshape_cuboid,bSize,0); //create a box;
+    simSetShapeMass(object_handle,0.05f);
 
-    simSetObjectName(object_handle,"IRBeacon_0");
-    const float tPos[3] = {static_cast<float>(object_initial_position[0]),
+    simSetObjectAlias(object_handle,"IRBeacon_0",0);
+    const double tPos[3] = {static_cast<float>(object_initial_position[0]),
                      static_cast<float>(object_initial_position[1]),
                      static_cast<float>(object_initial_position[2])};
 
@@ -64,7 +65,7 @@ void PushObject::init(){
 //        simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
     simSetObjectSpecialProperty(object_handle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
-    simSetObjectInt32Parameter(object_handle, sim_shapeintparam_respondable, 1);
+    simSetObjectInt32Param(object_handle, sim_shapeintparam_respondable, 1);
     float obj_weight = settings::getParameter<settings::Float>(parameters,"#objectWeight").value;
     simComputeMassAndInertia(object_handle, obj_weight);
     float color[3] = {0.1f,1.0f,0.1f};
@@ -148,29 +149,3 @@ float PushObject::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     return 0;
 }
 
-void PushObject::build_tiled_floor(std::vector<int> &tiles_handles){
-    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
-
-    float tile_size[3] = {0.249f,0.249f,0.01f};
-    float tile_increment = 0.25;
-    float starting_pos[3] = {-0.875f,-0.875f,0.005f};
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            tiles_handles.push_back(simCreatePureShape(0,8,tile_size,0.05f,nullptr));
-            std::stringstream name;
-            name << "tile_" << i << j;
-            simSetObjectName(tiles_handles.back(),name.str().c_str());
-            float height = -0.004;
-            if(!flatFloor){
-                height = (i+j)%2 == 0 ? -0.004 : 0.006;
-
-//                height = randNum->randFloat(-0.005,-0.001);
-            }
-            float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
-            simSetObjectPosition(tiles_handles.back(),-1,pos);
-            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,1000);//randNum->randFloat(0,1000));
-            simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
-            simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
-        }
-    }
-}
