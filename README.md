@@ -1,5 +1,8 @@
 # Autonomous Robotic Evolution Framework
 
+## ICRA 2025
+If you are looking for the code and containers for the paper Efficient and Diverse Generative Robot Designs using Evolution and Intrinsic Motivation by Leni Le Goff and Simón C. Smith published in ICRA 2025, please follow this [link to the corresponding branch](https://github.com/AutonomousRoboticEvolution/AREFramework/tree/icra_2025).
+
 ## Introduction
 
 The ARE Framework is an evolutionary robotic framework made within the ARE project. It is structured around an evolutionary algorithm structure allowing to evolve morphologies and controllers. Currently, it is designed as a plugin to the V-REP simulator (Coppelia). The following instruction is related to the master branch. 
