@@ -1,5 +1,6 @@
 #include "ERClient/SlaveConnection.h"
 #include <iostream>
+#include <zmqRemoteApi/clients/cpp/RemoteAPIClient.h>
 
 using namespace are::client;
 
@@ -73,6 +74,9 @@ bool SlaveConnection::connect(int connectionTimeoutMs)
     zmq_address << "tcp://" << this->_address << ":" << this->_port << "1" ;
     _individual_channel.setsockopt(ZMQ_RCVTIMEO,&zmq_timeout,sizeof(zmq_timeout));
     _individual_channel.connect(zmq_address.str());
+
+    RemoteAPIClient client;
+    _sim = client.getObject().sim();
 
     if (result == -1) {
         return false;
@@ -158,13 +162,13 @@ simxInt SlaveConnection::getIntegerSignalStreaming(const std::string& signalName
 simxInt SlaveConnection::getIntegerSignalBuffer(const std::string& signalName) const
 {
     simxInt states[1];
-    simxGetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_buffer);
+    simxGetInt32Signal(this->_clientID, (simxChar*) signalName.c_str(), states, simx_opmode_blocking);
 	return states[0];
 }
 
 void SlaveConnection::setIntegerSignal(const std::string& signalName, simxInt state)
 {
-    simxSetIntegerSignal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking);
+    simxSetInt32Signal(this->_clientID, (simxChar*) signalName.c_str(), state, simx_opmode_blocking);
 }
 
 simxFloat SlaveConnection::getFloatSignal(const std::string& signalName) const

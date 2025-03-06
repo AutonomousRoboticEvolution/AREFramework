@@ -235,8 +235,8 @@ bool ER::updateSimulation()
 
                 int state = serverInstances[slaveIdx]->getIntegerSignal("simulationState");
                
-               // if(verbose)
-               //     std::cout << "Slave : " << slaveIdx << " " << sim_state_to_string(state) << std::endl;
+               if(verbose)
+                   std::cout << "Slave : " << slaveIdx << " " << sim_state_to_string(state) << std::endl;
                // all_instances_finish = all_instances_finish && state == READY && indToEval.empty();
 
                 //        std::cout << "CLIENT " << slave->get_clientID() << " spin" << std::endl;

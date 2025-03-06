@@ -26,8 +26,8 @@ def run_server(args,rank: int):
     if(not args.xvfb) :
         return [subprocess.Popen([#"gdb","--batch","--ex=r","--ex=bt","--args",
             args.vrep,
-            'simulation','-c\"require(\'simER\')\"','-h',
-            f'-GzmqRemoteApi.rpcPort={server_port}',
+            '-c\"require(\'simER\')\"','-h',
+           # f'-GzmqRemoteApi.rpcPort={server_port}',
             f'-g{args.params}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile,stderr=logfile),logfile]
@@ -36,9 +36,9 @@ def run_server(args,rank: int):
         return [subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
          # "gdb","--ex=r","--args",
             args.vrep,
-            'simulation',"-crequire('simER')",'-h',
+            '-c\"require(\'simER\')\"','-h',
             f'-g{args.params}',
-            f'-GzmqRemoteApi.rpcPort={server_port}',
+          #  f'-GzmqRemoteApi.rpcPort={server_port}',
             f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
         ],stdout=logfile,stderr=logfile),logfile]
 
@@ -55,7 +55,7 @@ def run_client(args):
         str(args.params),
         str(args.port_start),
         str(args.n_vrep),
-    ],stdout=logfile,stderr=logfile)
+    ])#,stdout=logfile,stderr=logfile)
 
 
 def wait(servers, client, timeout=None):

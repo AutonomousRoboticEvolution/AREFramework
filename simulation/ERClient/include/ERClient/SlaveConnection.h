@@ -8,15 +8,11 @@
 
 
 extern "C" {
-#if defined (VREP)
-#include "v_repLib.h"
-#include "v_repConst.h"
-#elif defined (COPPELIASIM)
 #include "simLib/simConst.h"
 #include "simLib/simLib.h"
-#endif
 #include "legacyRemoteApi/remoteApi/extApi.h"
 }
+#include <zmqRemoteApi/clients/cpp/RemoteAPIObjects.h>
 
 #define CONNECTION_TIMEOUT 5000
 
@@ -42,6 +38,8 @@ private:
     int _individualNum;
     State _state;
     int reconnection_trials = 0;
+
+    RemoteAPIObject::sim _sim;
 
     zmq::context_t _context;
     zmq::socket_t _individual_channel;
