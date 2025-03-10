@@ -1,0 +1,12 @@
+get_filename_component(NN2_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+find_package(Boost REQUIRED COMPONENTS serialization)
+find_package(Eigen3 REQUIRED)
+
+if(NOT TARGET NN2::NN2)
+    include("${NN2_CMAKE_DIR}/NN2Targets.cmake")
+    target_include_directories(NN2::NN2 INTERFACE "@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_INCLUDEDIR@")
+endif()
+
+set(NN2_LIBRARIES NN2::NN2)
