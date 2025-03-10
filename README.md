@@ -170,3 +170,14 @@ Finally, to launch the experiment:
 cd simulation/Cluster
 python3 run_cluster.py N --vrep /<are framework folder>/vrep-3.6.2/vrep.sh --client /<installation folder>/bin/are-client --params /<are framework folder>/experiments/nipes/parameters_downstream_task.csv --port_start PORT-START --xvfb 0
 ```
+
+
+## Visualize robots behaviours
+
+### Homeokinesis
+
+TO DO
+
+### Learned controller
+
+TO DO
