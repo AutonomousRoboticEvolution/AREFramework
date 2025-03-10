@@ -1,5 +1,7 @@
 # Autonomous Robotic Evolution Framework
 
+![robots](plots/media/robots_example.png)
+
 Version of the ARE Framework used for the paper Efficient and Diverse Generative Robot Designs using Evolution and Intrinsic Motivation presented at ICRA 2025 in Atlanta. Link to the _paper_.
 
 The ARE Framework is an evolutionary robotic framework made within the ARE project to generate robotic designs and controllers. Currently, it is designed as a plugin to the V-REP simulator (Coppelia).
