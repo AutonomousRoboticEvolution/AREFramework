@@ -8,7 +8,9 @@ The ARE Framework is an evolutionary robotic framework made within the ARE proje
 
 You can install the framework or use the docker image
 
-# Docker
+# Containers
+
+For a fast way to run the experiments check the [docker folder](https://github.com/AutonomousRoboticEvolution/AREFramework/tree/icra_2025/docker) for steps on how to run them on Docker or Apptainer containers.
 
 # Without Docker
 
