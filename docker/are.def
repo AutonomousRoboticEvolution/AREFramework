@@ -1,7 +1,6 @@
 Bootstrap: docker
 From: ubuntu:22.04
 
-
 %environment
     export LD_LIBRARY_PATH=/usr/local/lib
 
@@ -40,7 +39,7 @@ From: ubuntu:22.04
     git clone https://github.com/portaloffreedom/polyvox.git && \
     mkdir polyvox/build && \
     cd polyvox/build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j{{ N_CPUS }} && make install
 
     # Libdlibxx installation
     cd /are && \
@@ -54,7 +53,7 @@ From: ubuntu:22.04
     git clone https://github.com/LeniLeGoff/libcmaes && \
     mkdir libcmaes/build && \
     cd libcmaes/build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j{{ N_CPUS }} && make install
 
     # PCL dependencies and installation
     apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -67,14 +66,14 @@ From: ubuntu:22.04
     git clone https://github.com/PointCloudLibrary/pcl.git && \
     mkdir pcl/build && \
     cd pcl/build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j16 && make install
+    cmake -DCMAKE_INSTALL_PREFIX=/usr/local .. && make -j{{ N_CPUS }} && make install
 
     # ARE Framework installation
     cd /are && \
-    git clone -b meim_env_pressure --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git && \
+    git clone -b {{ BRANCH }} --recurse-submodules https://github.com/AutonomousRoboticEvolution/AREFramework.git && \
     mkdir AREFramework/build && \
     cd AREFramework/build && \
-    cmake -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DONLY_SIMULATION=1 .. && make -j16 && make install
+    cmake -DENUCC=1 -DCMAKE_INSTALL_PREFIX=/usr/local -DVREP_FOLDER=/are/AREFramework/vrep-3.6.2 -DONLY_SIMULATION=1 .. && make -j{{ N_CPUS }} && make install
 
 %runscript
     exec /bin/bash

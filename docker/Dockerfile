@@ -28,7 +28,7 @@ ENV LD_LIBRARY_PATH=/usr/local/lib
 
 # Boost 1.77
 WORKDIR /are
-RUN wget https://boostorg.jfrog.io/artifactory/main/release/1.77.0/source/boost_1_77_0.tar.gz \
+RUN wget https://archives.boost.io/release/1.77.0/source/boost_1_77_0.tar.gz \
     && tar -xf boost_1_77_0.tar.gz && rm boost_1_77_0.tar.gz
 WORKDIR /are/boost_1_77_0
 RUN ./bootstrap.sh && ./b2 install --prefix=/usr/local
