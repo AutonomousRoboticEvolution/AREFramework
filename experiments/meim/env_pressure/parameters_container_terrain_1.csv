@@ -3,7 +3,6 @@
 #scenePath,string,/are/AREFramework/simulation/models/scenes/terrain_1.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
-#robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
 #maxEvalTime,float,1200
 #repository,string,/are/logs/
 #verbose,bool,1
@@ -25,7 +24,6 @@
 #manualDesignFile,string,None
 #growingDecoding,bool,0
 #cppnExpressiveness,double,1
-#useQuadric,bool,0
 
 #parentsPoolFile,string,parent_pool.csv
 #fitnessFile,string,fitness.csv
@@ -71,8 +69,8 @@
 #imageRepository,string,/home/le_goff/git/robotlibrary/wide_corridor/morph_56/
 #nbrWaypoints,int,3600
 
-#isNEATGenome,bool,0
-#isCPPNGenome,bool,1
+#isNEATGenome,bool,1
+#isCPPNGenome,bool,0
 #isLeg,bool,1
 
 #descriptor,int,0
@@ -91,3 +89,6 @@
 #add_noise,bool,1
 #noise_strength,double,0.3
 #creativity,double,1.0
+
+
+#compGenFile,string,components_genome.csv
