@@ -1,9 +1,8 @@
-#experimentName,string,meim_env_pressure
+#experimentName,string,meim
 #expPluginName,string,/usr/local/lib/ARE/experiments/libmeim.so
 #scenePath,string,/are/AREFramework/simulation/models/scenes/flat_arena.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/are/AREFramework/simulation/models/
-#robotPath,string,/are/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
 #maxEvalTime,float,1200
 #repository,string,/are/logs/
 #verbose,bool,1
@@ -25,11 +24,12 @@
 #manualDesignFile,string,None
 #growingDecoding,bool,0
 #cppnExpressiveness,double,1
-#useQuadric,bool,0
+#morphGenomeType,int,1
 
 #parentsPoolFile,string,parent_pool.csv
 #fitnessFile,string,fitness.csv
 #quadricFile,string,quadrics.csv
+#compGenFile,string,components_genome.csv
 
 #maxVelocity,double,6.
 #arenaSize,sequence_double,4.;4.
@@ -41,17 +41,17 @@
 #withBeacon,bool,1
 #withTiles,bool,1
 #flatFloor,bool,1
-#jointControllerType,int,2
-#proportionalGain,float,1
+#jointControllerType,int,1
+#proportionalGain,float,0.5
 #randomOrientation,bool,0
 #loadAllMorphGenome,bool,0
 
+#withSensors,bool,0
 
 #useCamera,bool,0
 #useIR,bool,0
 #useJointFeedback,bool,1
 #useWheelFeedback,bool,1
-
 #fixedController,bool,0
 
 #isWheel,bool,1
@@ -71,8 +71,6 @@
 #imageRepository,string,/home/le_goff/git/robotlibrary/wide_corridor/morph_56/
 #nbrWaypoints,int,3600
 
-#isNEATGenome,bool,0
-#isCPPNGenome,bool,1
 #isLeg,bool,1
 
 #descriptor,int,0
@@ -84,7 +82,7 @@
 #quadricsParamMutRate,double,0.1
 #quadricsSigma,double,0.2
 #quadricsSymmetryMutRate,double,0.1
-#morphGenomeType,int,1
+ 
 
 #epsilonA,double,0.1
 #epsilonC,double,0.08
