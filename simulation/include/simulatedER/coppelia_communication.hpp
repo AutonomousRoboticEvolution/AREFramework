@@ -9,11 +9,8 @@
 #include <boost/algorithm/string.hpp>
 #include "ARE/misc/utilities.h"
 
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
+
 #include "simLib/simLib.h"
-#endif
 
 namespace are {
 
