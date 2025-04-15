@@ -2,29 +2,22 @@
 #define NIPES_HPP
 
 
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
+
 #include "simLib/simLib.h"
-#endif
+
 
 #include "simulatedER/mazeEnv.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/Settings.h"
-<<<<<<< HEAD
-#include "simulatedER/obstacleAvoidance.hpp"
-#include "simulatedER/exploration.hpp"
-#include "simulatedER/multiTargetMaze.hpp"
-=======
+
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
-#include "multiTargetMaze.hpp"
+// #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"
 #include "push_object.hpp"
 #include "env_settings.hpp"
->>>>>>> update_decoding
 
 namespace are{
 
@@ -46,8 +39,8 @@ public:
           descriptor_type(ind.descriptor_type),
           rewards(ind.rewards){}
 
-    std::string to_string();
-    void from_string(const std::string&);
+    std::string to_string() const override;
+    void from_string(const std::string&) override;
     Eigen::VectorXd descriptor() override;
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}

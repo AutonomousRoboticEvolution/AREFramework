@@ -17,7 +17,7 @@ Eigen::VectorXd NIPESIndividual::descriptor()
 
 }
 
-std::string NIPESIndividual::to_string()
+std::string NIPESIndividual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
@@ -339,11 +339,11 @@ bool NIPES::update(const Environment::Ptr & env){
         if(env->get_name() == "obstacle_avoidance" || env->get_name() == "exploration"){
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_visited_zones(std::dynamic_pointer_cast<sim::ObstacleAvoidance>(env)->get_visited_zone_matrix());
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_descriptor_type(VISITED_ZONES);
-        }else if(env->get_name() == "multi_target_maze" || env->get_name() == "barrel_task"){
+        }else if(/*env->get_name() == "multi_target_maze" ||*/ env->get_name() == "barrel_task"){
             int number_of_targets = 0;
-            if(env->get_name() == "multi_target_maze")
-                number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
-            else if(env->get_name() == "barrel_task")
+            // if(env->get_name() == "multi_target_maze")
+            //     number_of_targets = std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_number_of_targets();
+            if(env->get_name() == "barrel_task")
                 number_of_targets = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_number_of_targets();
             if(std::dynamic_pointer_cast<NIPESIndividual>(ind)->get_number_times_evaluated() < number_of_targets){
                 return false;
@@ -352,9 +352,9 @@ bool NIPES::update(const Environment::Ptr & env){
                 std::dynamic_pointer_cast<NIPESIndividual>(ind)->compute_fitness();
                 //std::dynamic_pointer_cast<NIPESIndividual>(ind)->reset_rewards();
     //            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-                if(env->get_name() == "multi_target_maze")
-                    std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
-                else if(env->get_name() == "multi_target_maze")
+                // if(env->get_name() == "multi_target_maze")
+                    // std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::MultiTargetMaze>(env)->get_trajectories());
+                if(env->get_name() == "barrel_task")
                     std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_trajectories(std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_trajectories());            }
         }else if(env->get_name() == "push_object")
             std::dynamic_pointer_cast<NIPESIndividual>(ind)->set_object_trajectory(std::dynamic_pointer_cast<sim::PushObject>(env)->get_object_trajectory());
@@ -377,25 +377,6 @@ bool NIPES::is_finish(){
 }
 
 bool NIPES::finish_eval(const Environment::Ptr & env){
-
-<<<<<<< HEAD
-    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
-    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-
-    auto distance = [](std::vector<double> a,std::vector<double> b) -> double
-    {
-        return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
-                         (a[1] - b[1])*(a[1] - b[1]) +
-                         (a[2] - b[2])*(a[2] - b[2]));
-    };
-
-    int handle = std::dynamic_pointer_cast<sim::Morphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
-
-    std::vector<double> pos = std::dynamic_pointer_cast<sim::VirtualEnvironment>(env)->get_object_position(handle);
-
-    double dist = distance(pos,target)/sqrt(2*arenaSize*arenaSize);
-=======
 //    std::vector<double> target = settings::getParameter<settings::Sequence<double>>(parameters,"#targetPosition").value;
 //    double t_pos[3] = {target[0],target[1],target[2]};
 //    double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
@@ -417,7 +398,6 @@ bool NIPES::finish_eval(const Environment::Ptr & env){
 //    posd[2] = static_cast<double>(pos[2]);
 
 //    double dist = distance(posd,t_pos)/sqrt(2*arenaSize*arenaSize);
->>>>>>> update_decoding
 
 //    if(dist < fTarget){
 //        std::cout << "STOP !" << std::endl;

@@ -4,7 +4,6 @@
 #include "ARE/EA.h"
 #include "simulatedER/morph_genomes.hpp"
 #include "simulatedER/are_morphology.hpp"
-#include "simulatedER/Morphology_CPPNMatrix.h"
 #include "homeokinesis_controller.hpp"
 #include "obstacleAvoidance.hpp"
 #include "fixed_controller.hpp"

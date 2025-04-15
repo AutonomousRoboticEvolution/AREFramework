@@ -5,14 +5,11 @@
 #include <boost/algorithm/string.hpp>
 #include "ARE/EA.h"
 #include "ARE/Individual.h"
-#include "simulatedER/Morphology_CPPNMatrix.h"
-
 #include "ARE/Settings.h"
 
 
 namespace are {
 
-using CPPNMorph = sim::Morphology_CPPNMatrix;
 
 class ManualDesign: public Genome{
 public:

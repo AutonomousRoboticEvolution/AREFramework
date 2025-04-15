@@ -3,8 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
 
 set(INCLUDES
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_INCLUDE_DIR}>
+   ${COPPELIASIM_INCLUDE_DIR}
     "../../simulation/include"
     "../../EAFramework/include"
     "../common/"
@@ -12,10 +11,8 @@ set(INCLUDES
     "../../modules/")
 
 SET(VREP_SRC
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c>
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c
     )
 
 
@@ -26,10 +23,11 @@ add_library(NIPES SHARED
     NIPES.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
-    ../common/multiTargetMaze.cpp
+    #../common/multiTargetMaze.cpp
     ../common/locomotion.cpp
     ../common/hill_climbing.cpp
     ../common/push_object.cpp
+    ../common/obstacleAvoidance.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE simulatedER cmaes)
@@ -39,6 +37,6 @@ add_executable(nipes_test nipes_test.cpp)
 target_include_directories(nipes_test PUBLIC ${INCLUDES})
 target_link_libraries(nipes_test ARE NIPES cmaes)
 
-install(TARGETS NIPES DESTINATION lib)
+install(TARGETS NIPES DESTINATION lib/ARE/experiments/)
 install(DIRECTORY . DESTINATION include/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

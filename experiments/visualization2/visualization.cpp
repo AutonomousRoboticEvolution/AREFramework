@@ -78,9 +78,9 @@ void VisuInd::createController(){
     const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
     int wheel_nbr,joint_nbr,sensor_nbr;
     if(fixed_morph_path == "None"){
-        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
-        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
-        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
+        wheel_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_sensor_number();
     }else{
         wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
         joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
@@ -240,7 +240,7 @@ void Visu::init(){
 
     if(manual_design != "None"){
         std::vector<std::vector<int>> list_of_voxel;
-        sim::Morphology_CPPNMatrix::load_manual_design(manual_design,list_of_voxel);
+        sim::ManuallyDesignedMorphology::load_manual_design(manual_design,list_of_voxel);
         morph_gen.reset(new ManualDesign(list_of_voxel));
         ctrl_gen.reset(new EmptyGenome);
         Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
