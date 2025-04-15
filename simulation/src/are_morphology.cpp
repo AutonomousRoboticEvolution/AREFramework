@@ -39,6 +39,10 @@ void AREMorphology::setPosition(float x, float y, float z)
     }
 }
 
+void AREMorphology::create_organs(){
+    for(Organ &organ: organ_list)
+        organ.createOrgan(mainHandle);
+}
 bool AREMorphology::convex_decomposition(int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles){
     bool convexDecompositionSuccess = false;
     try {
@@ -104,6 +108,7 @@ bool AREMorphology::convex_decomposition(int meshHandle, int numSkeletonVoxels, 
 
         // Set parenthood
         simSetObjectParent(meshHandle,mainHandle, 1);
+        simSetBoolProperty(mainHandle,"modelBase",1);
         simSetObjectSpecialProperty(mainHandle, sim_objectspecialproperty_collidable | sim_objectspecialproperty_measurable |
                                                     sim_objectspecialproperty_detectable_all | sim_objectspecialproperty_renderable); // Detectable, collidable, etc.
 #ifndef ISROBOTSTATIC
@@ -285,8 +290,9 @@ void AREMorphology::destroyGripper(const std::vector<int>& gripperHandles)
 void AREMorphology::destroy_physical_connectors()
 {
     for (const Organ &organ: organ_list) {
-        if (!organ.isOrganRemoved() && organ.isOrganChecked()) {
-            simRemoveModel(organ.get_graphical_connector_handle());
+        if (organ.getOrganType() != 0 && !organ.isOrganRemoved() && organ.isOrganChecked()) {
+            int handle[1] = {organ.get_graphical_connector_handle()};
+            assert(simRemoveObjects(handle,1) != -1);
         }
     }
 }
@@ -380,6 +386,7 @@ void AREMorphology::create_organ_list(const organ::organ_list_t &organ_i_list){
 void AREMorphology::check_repress_organs_biased(const skeleton::type &skeleton_matrix, const std::vector<int> &gripper_handles){
     int joints_number = 0;
     // Create organs
+    // create_organs();
     for(Organ &organ : organ_list){
         // Limit number of legs to 4
         if(organ.getOrganType() == 3 && joints_number == 4){
@@ -392,14 +399,7 @@ void AREMorphology::check_repress_organs_biased(const skeleton::type &skeleton_m
         //     setOrganOrientation(organ); // Along z-axis relative to the organ itself
         organ.createOrgan(mainHandle);
         if(organ.getOrganType() != 0){
-            if(organ.getOrganType() == 1)
-                organ.testOrgan(skeleton_matrix, gripper_handles.at(0), skeletonHandles, organ_list);
-            else if(organ.getOrganType() == 2)
-                organ.testOrgan(skeleton_matrix, gripper_handles.at(1), skeletonHandles, organ_list);
-            else if(organ.getOrganType() == 3)
-                organ.testOrgan(skeleton_matrix, gripper_handles.at(2), skeletonHandles, organ_list);
-            else if(organ.getOrganType() == 4)
-                organ.testOrgan(skeleton_matrix, gripper_handles.at(3), skeletonHandles, organ_list);
+            organ.testOrgan(skeleton_matrix, skeletonHandles, organ_list);
             organ.repressOrgan();
         }
         // Count number of good organs.
@@ -430,7 +430,7 @@ void AREMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_m
             Organ &organ = organ_list[i];
             // organ.createOrgan(mainHandle);
             if(organ.getOrganType() != 0)
-                organ.testOrgan(skeleton_matrix, -1, skeletonHandles, organ_list);
+                organ.testOrgan(skeleton_matrix, skeletonHandles, organ_list);
             if(organ.organColliding || organ.organInsideSkeleton)
                 bad_organs_idxs.push_back(i);
         }
@@ -464,8 +464,8 @@ void ManuallyDesignedMorphology::create(){
     int meshHandle = -1;
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
-    std::vector<int> gripperHandles;
-    createGripper(gripperHandles); //remove gripper operations
+    // std::vector<int> gripperHandles;
+    // createGripper(gripperHandles); //remove gripper operations
     numSkeletonVoxels = 0;
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
@@ -489,7 +489,7 @@ void ManuallyDesignedMorphology::create(){
     //create blueprint
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organ_list);
-    destroyGripper(gripperHandles);
+    // destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -569,6 +569,35 @@ void ManuallyDesignedMorphology::generate(skeleton::type &skeleton_matrix, std::
         }
     }
 }
+void ManuallyDesignedMorphology::load_manual_design(const std::string &filename, std::vector<std::vector<int> > &list_of_voxels){
+    std::ifstream logFileStream;
+    logFileStream.open(filename);
+    if(!logFileStream){
+        std::cerr << "ManuallyDesignedMorphology -- Unable to open manual design " << filename << std::endl;
+        return;
+    }
+
+    std::string line;
+    std::vector<std::string> splitted;
+    while(std::getline(logFileStream,line)){
+        misc::split_line(line," ",splitted);
+        if(splitted[0] == "#")
+            continue;
+        std::vector<int> voxel = {std::stoi(splitted[0]),std::stoi(splitted[1]),std::stoi(splitted[2])};
+        if(splitted[3] == "ffffff") //HEXA for white, bone
+            voxel.push_back(1);
+        else if(splitted[3] == "ff0000") //HEXA for red, wheel
+            voxel.push_back(2);
+        else if(splitted[3] == "00ff00") //HEXA for green, sensor
+            voxel.push_back(3);
+        else if(splitted[3] == "0000ff") //HEXA for blue, leg
+            voxel.push_back(4);
+        else if(splitted[3] == "000000") //HEXA for black, caster
+            voxel.push_back(5);
+        list_of_voxels.push_back(voxel);
+    }
+
+}
 
 void CPPNMorphology::create(){
     bool growing_decoding = settings::getParameter<settings::Boolean>(parameters,"#growingDecoding").value;
@@ -577,7 +606,7 @@ void CPPNMorphology::create(){
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
     std::vector<int> gripperHandles;
-    createGripper(gripperHandles);
+    // createGripper(gripperHandles);
     numSkeletonVoxels = 0;
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
@@ -616,7 +645,7 @@ void CPPNMorphology::create(){
     //create blueprint
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organ_list);
-    destroyGripper(gripperHandles);
+    // destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -631,7 +660,7 @@ void CPPNMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
+    // simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 
 }
 
@@ -642,7 +671,7 @@ void SQCPPNMorphology::create(){
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
     std::vector<int> gripperHandles;
-    createGripper(gripperHandles);
+    // createGripper(gripperHandles);
     numSkeletonVoxels = 0;
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
@@ -655,11 +684,7 @@ void SQCPPNMorphology::create(){
     bool indVerResult = generate_skeleton_mesh(skeleton_matrix,meshHandle);
     if(indVerResult)
         convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
-    if(!convexDecompositionSuccess){
-        // Stop generating body plan if convex decomposition fails
-        std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
-        return;
-    }
+
 
     if(convexDecompositionSuccess){
         check_repress_organs_biased(skeleton_matrix,gripperHandles);
@@ -680,7 +705,7 @@ void SQCPPNMorphology::create(){
     //create blueprint
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organ_list);
-    destroyGripper(gripperHandles);
+    // destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -695,13 +720,10 @@ void SQCPPNMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
+    // simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
 
-void SQCPPNMorphology::create_organs(){
-    for(Organ &organ: organ_list)
-        organ.createOrgan(mainHandle);
-}
+
 
 
 void SQMorphology::create(){
@@ -709,7 +731,7 @@ void SQMorphology::create(){
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
     std::vector<int> gripperHandles;
-    createGripper(gripperHandles);
+    // createGripper(gripperHandles);
     numSkeletonVoxels = 0;
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
@@ -722,15 +744,11 @@ void SQMorphology::create(){
     bool indVerResult = generate_skeleton_mesh(skeleton_matrix,meshHandle);
     if(indVerResult)
         convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
-    if(!convexDecompositionSuccess){
-        // Stop generating body plan if convex decomposition fails
-        std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
-        return;
-    }
+
 
     if(convexDecompositionSuccess){
         check_repress_organs_nobias(skeleton_matrix,gripperHandles);
-        //create_organs();
+        // create_organs();
     }
     else{
         // Stop generating body plan if convex decomposition fails
@@ -738,7 +756,7 @@ void SQMorphology::create(){
         return;
     }
 
-    //Create morphological descriptors
+    // Create morphological descriptors
     if(indVerResult || convexDecompositionSuccess){
         feat_desc.create(skeleton_matrix,organ_list);
         matrix_desc.create(skeleton_matrix,organ_list);
@@ -748,7 +766,7 @@ void SQMorphology::create(){
     //create blueprint
     if(settings::getParameter<settings::Boolean>(parameters,"#saveBlueprint").value)
         blueprint.createBlueprint(organ_list);
-    destroyGripper(gripperHandles);
+    // destroyGripper(gripperHandles);
     destroy_physical_connectors();
     // Export model
     if(settings::getParameter<settings::Boolean>(parameters,"#isExportModel").value){
@@ -763,14 +781,11 @@ void SQMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
+    // simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
-void SQMorphology::create_organs(){
-    for(Organ &organ: organ_list)
-        organ.createOrgan(mainHandle);
-}
+
 void SQMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_matrix,
-                                        const std::vector<int> &gripper_handles)
+                                               const std::vector<int> &gripper_handles)
 {
     std::vector<int> bad_organs_idxs;
     bool no_bad_organs = false;
@@ -782,7 +797,7 @@ void SQMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_ma
             Organ &organ = organ_list[i];
             // organ.createOrgan(mainHandle);
             if(organ.getOrganType() != 0)
-                organ.testOrgan(skeleton_matrix, -1, skeletonHandles, organ_list);
+                organ.testOrgan(skeleton_matrix, skeletonHandles, organ_list);
             if(organ.organColliding || organ.organInsideSkeleton)
                 bad_organs_idxs.push_back(i);
         }

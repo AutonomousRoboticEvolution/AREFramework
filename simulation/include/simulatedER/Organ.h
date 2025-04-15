@@ -12,11 +12,8 @@
 #include "ARE/Settings.h"
 #include "simulatedER/morphology_constants.hpp"
 
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
+
 #include "simLib/simLib.h"
-#endif
 
 namespace are {
 
@@ -103,7 +100,7 @@ public:
      * @param skeletonHandles - All skeletons including main and children.
      * @param organList - All organs to compare to.
      */
-    void testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
+    void testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, const std::vector<int>& skeletonHandles, const std::vector<Organ>& organList);
     /**
      * @brief This test if the organ is colliding with another different organ or with an skeleton.
      * @param skeletonHandles - All skeletons including main and children.

@@ -88,6 +88,7 @@ void Organ::createOrgan(int skeletonHandle)
         assert(false);
 
     organHandle = simLoadModel(modelsPath.c_str());
+    // simSetBoolProperty(organHandle,"modelBase",0);
     assert(organHandle != -1);
 
     /// \todo: EB: Maybe we should move this to a method
@@ -138,6 +139,7 @@ void Organ::createOrgan(int skeletonHandle)
         assert(false);
     /// \todo EB: Destroy this dummy
     connectorHandle = simCreateDummy(0.01,nullptr);
+    simSetBoolProperty(organHandle,"modelBase",1);
     simSetObjectParent(connectorHandle, organHandle, 1);
     simSetObjectPosition(connectorHandle,-1,tempConnectorPos);
 
@@ -158,7 +160,7 @@ void Organ::createOrgan(int skeletonHandle)
     organOri.at(0) = tempOrganOri[0]; organOri.at(1) = tempOrganOri[1]; organOri.at(2) = tempOrganOri[2];
     // Set parents
     simSetObjectParent(forceSensor,skeletonHandle,1);
-    simSetObjectParent(organHandle, forceSensor, 1);
+    simSetObjectParent(organHandle,forceSensor, 1);
     // This moves the organ slightly away from the surface. This parameters were calibrated through visual inspection
     /// \todo: EB: We might not need this in the future
     tempOrganPos[0] = 0.0; tempOrganPos[1] = 0.0; tempOrganPos[2] = 0.0;
@@ -199,13 +201,13 @@ void Organ::createOrgan(int skeletonHandle)
     connectorOri.push_back(newConnectorOri[1]);
     connectorOri.push_back(newConnectorOri[2]);
 
-#ifndef ISROBOTSTATIC
-    std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
-#elif ISROBOTSTATIC == 0
-    simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
-#elif ISROBOTSTATIC == 1
-    simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
-#endif
+// #ifndef ISROBOTSTATIC
+//     std::cerr << "We shouldn't be here!" << __fun__ << std::endl;
+// #elif ISROBOTSTATIC == 0
+//     simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 0); // Keeps skeleton fix in the absolute position. For testing purposes
+// #elif ISROBOTSTATIC == 1
+//     simSetObjectInt32Param(organHandle, sim_shapeintparam_static, 1); // Keeps skeleton fix in the absolute position. For testing purposes
+// #endif
     connector_frame_pos.resize(3);
     if(organType != 0)
         createMaleConnector();
@@ -218,7 +220,6 @@ void Organ::createMaleConnector()
     double tempConnectorPosition[3];
     double tempConnectorOrientation[3];
     double temp_connector_frame_pos[3];
-    int temp_physics_connector_handle;
     int temp_visual_connector_handle = -1;
 
 
@@ -235,13 +236,16 @@ void Organ::createMaleConnector()
     visual_path += "utils/male_connector_visual.ttm";
     physics_path += "utils/male_connector_physics.ttm";
 
-    temp_physics_connector_handle = simLoadModel(physics_path.c_str());
-    assert(temp_physics_connector_handle != -1);
+    physics_connector_handle = simLoadModel(physics_path.c_str());
+    assert(physics_connector_handle != -1);
+    // simSetBoolProperty(temp_physics_connector_handle,"modelBase",0);
+
     temp_visual_connector_handle = simLoadModel(visual_path.c_str());
     assert(temp_visual_connector_handle != -1);
+    // simSetBoolProperty(temp_visual_connector_handle,"modelBase",0);
 
-    simSetObjectPosition(temp_physics_connector_handle, -1, tempConnectorPosition);
-    simSetObjectOrientation(temp_physics_connector_handle, -1, tempConnectorOrientation);
+    simSetObjectPosition(physics_connector_handle, -1, tempConnectorPosition);
+    simSetObjectOrientation(physics_connector_handle, -1, tempConnectorOrientation);
     simSetObjectPosition(temp_visual_connector_handle, -1, tempConnectorPosition);
     simSetObjectOrientation(temp_visual_connector_handle, -1, tempConnectorOrientation);
 
@@ -258,11 +262,11 @@ void Organ::createMaleConnector()
     simSetObjectOrientation(temp_visual_connector_handle, temp_visual_connector_handle, tempConnectorOrientation);
     simSetObjectParent(temp_visual_connector_handle, organHandle, 1);
 
-    simSetObjectPosition(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorPosition);
-    simSetObjectOrientation(temp_physics_connector_handle, temp_physics_connector_handle, tempConnectorOrientation);
-    simSetObjectParent(temp_physics_connector_handle, organHandle, 1);
+    simSetObjectPosition(physics_connector_handle, physics_connector_handle, tempConnectorPosition);
+    simSetObjectOrientation(physics_connector_handle, physics_connector_handle, tempConnectorOrientation);
+    simSetObjectParent(physics_connector_handle, organHandle, 1);
 
-    physics_connector_handle = temp_physics_connector_handle;
+
 
     simGetObjectPosition(simGetObjectChild(temp_visual_connector_handle,0),-1,temp_connector_frame_pos); // Get the position of the dummy for the blueprint
     connector_frame_pos.at(0) = temp_connector_frame_pos[0];
@@ -270,7 +274,7 @@ void Organ::createMaleConnector()
     connector_frame_pos.at(2) = temp_connector_frame_pos[2] - 0.0098;
 }
 
-void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, int gripperHandle, const std::vector<int>& skeletonHandles,
+void Organ::testOrgan(const PolyVox::RawVolume<uint8_t> &skeletonMatrix, const std::vector<int>& skeletonHandles,
                       const std::vector<Organ>& organList)
 {
     IsOrganColliding(skeletonHandles, organList);
@@ -284,8 +288,7 @@ void Organ::repressOrgan()
     if(organInsideSkeleton || organColliding){// || !organGripperAccess){
         int parent_handle[1] = {simGetObjectParent(organHandle)};
         simRemoveObjects(parent_handle,1); // Remove force sensor.
-        simRemoveModel(organHandle); // Remove model.
-        simRemoveModel(physics_connector_handle);
+        simRemoveModel(organHandle); // Remove organ model (including physical connector)
         organRemoved = true;
     }
     else{
@@ -300,6 +303,7 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     for (int oH : objectHandles) {
         for (int skeletonHandle : skeletonHandles) {
             collisionResult = simCheckCollision(oH, skeletonHandle);
+            assert(collisionResult >= 0);
             if (collisionResult == 1) { // Collision detected!
                 organColliding = true;
                 return;
@@ -315,6 +319,7 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
                 continue;
             for (auto &i : organComp.objectHandles) {
                 collisionResult = simCheckCollision(oH, i);
+                assert(collisionResult >= 0);
                 if (collisionResult == 1) { // Collision detected!
                     organColliding = true;
                     return;
@@ -325,12 +330,18 @@ void Organ::IsOrganColliding(const std::vector<int>& skeletonHandles, const std:
     // Check connector collision
 //    for (int oH : objectHandles) {
         for (auto &organComp : organList) {
+            if(organComp.organType == 0)
+                continue;
+            if(organComp.getOrganHandle() == -1)
+                continue;
             if(organComp.isOrganRemoved() && organComp.isOrganChecked()) // Prevent comparing to organs already removed.
                 continue;
             if(organComp.getOrganHandle() == organHandle) // Prevent comparing organ with itself.
                 continue;
             //for (auto &i : organComp.objectHandles) {
+            assert(physics_connector_handle != -1 && organComp.get_graphical_connector_handle() != -1);
             collisionResult = simCheckCollision(physics_connector_handle, organComp.get_graphical_connector_handle());
+            assert(collisionResult >= 0);
             if (collisionResult == 1) { // Collision detected!
                 organColliding = true;
                 return;
