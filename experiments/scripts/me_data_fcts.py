@@ -27,6 +27,8 @@ def load_fitness(filename):
     parents = []
     evals = []
     deltas = []
+    replicate_index = []
+    replicate_idx = 0
     with open(filename) as file :
         lines = file.read().splitlines()
         for line in lines:
@@ -39,7 +41,9 @@ def load_fitness(filename):
             if(len(line) == 6):
                 evals.append(int(line[4]))
                 deltas.append(float(line[5]))
-    return ids, parents, fits, evals, deltas
+            replicate_index.append(replicate_idx)
+            replicate_idx += 1 
+    return ids, parents, fits, evals, deltas, replicate_index
 
 def load_parent_pool(filename):
     parent_ids = []
@@ -55,7 +59,7 @@ def load_parent_pool(filename):
 
 def filter_to_parent_pool(data,parent_ids):
     filtered = []
-    data_dict = {d[0]: d[1:] for d in data}
+    data_dict = {d[0]: d[1:].__add__([idx]) for idx, d in enumerate(data)}
     prev_ids = []
     iter = 0
     ind_idx = 0
@@ -158,6 +162,7 @@ def load_feature_descriptor(filename) :
     Load a list of descriptor from a file
     Trait descriptor: <width,depth,height,voxels,wheels,sensor,joint,caster>
     '''
+    replicate_idx = 0
     with open(filename) as file :
         descriptors = []
         for row in file.readlines():
@@ -165,7 +170,8 @@ def load_feature_descriptor(filename) :
             desc = [row[0]] 
             for r in row[1:] :
                 desc.append(float(r))
-            descriptors.append(desc + [la.norm(desc[1:]),la.norm(desc[1:5]),la.norm(desc[5:])])
+            descriptors.append(desc + [la.norm(desc[1:]),la.norm(desc[1:5]),la.norm(desc[5:]),replicate_idx])
+            replicate_idx += 1
         return descriptors
 
 def load_component_descriptor(filename):
