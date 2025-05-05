@@ -36,7 +36,7 @@ bool are::send_string_no_reply(const std::string &message_string, zmq::socket_t 
 
 bool are::receive_string_no_reply(std::string &message_string, zmq::socket_t &socket, const std::string &topic){
     zmq::message_t message;
-    if(socket.recv(&message)){
+    if(socket.recv(message)){
         message_string.assign(static_cast<char*>(message.data()),message.size());
         //    message_string.resize(message.size()); // truncate to the right length, otherwise static_cast reads extra (nonsense) data
 
