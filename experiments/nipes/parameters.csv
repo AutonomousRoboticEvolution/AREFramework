@@ -1,14 +1,24 @@
 #experimentName,string,nipes
+<<<<<<< Updated upstream
 #expPluginName,string,/usr/local/lib/libNIPES.so
 #envType,int,2
 #scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arenas.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #robotPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/robots/are_blind_ant/model_0.ttm
 #modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
+=======
+#expPluginName,string,/usr/local/lib/ARE/experiments/libNIPES.so
+#envType,int,1
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#scenes,sequence_string,ARE_arena.ttt
+#robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_blind_ant/model_0.ttm
+#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
+>>>>>>> Stashed changes
 #repository,string,/home/leni/are-logs/
+#envNumber,int,1
 
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #updateSimulatorList,bool,0
@@ -37,7 +47,8 @@
 #archiveFile,string,archive.csv
 
 #seed,int,-1
-#arenaSize,double,2.
+#arenaSize,sequence_double,2.;2.
+#cellSize,double,0.25
 #targetPosition,sequence_double,0.775;0.025;0.20
 #targets,sequence_double,0.6;0.6;0.12;0.6;-0.6;0.12;-0.6;-0.6;0.12
 #initPosition,sequence_double,-0.6;0.6;0.2
@@ -47,8 +58,13 @@
 
 #MaxWeight,float,1.0
 
+#useCamera,bool,0
+#useIR,bool,0
+#useJointFeedback,bool,1
+#useWheelFeedback,bool,1
+
 #NNType,int,2
-#NbrInputNeurones,int,1
+#NbrInputNeurones,int,12
 #NbrOutputNeurones,int,12
 #NbrHiddenNeurones,int,6
 #jointSubs,sequence_int,-1;-1;-1;-1;-1;-1;0;1;2;3;4;5

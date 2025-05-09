@@ -334,3 +334,49 @@ def compute_runtime(filename,nbr_eval):
                 end_time = float(row[2])
             i+=1
     return end_time - start_time
+
+
+def load_quadrics_params(filename):
+    with open(filename) as file:
+        data = []
+        lines = file.readlines()
+        for line in lines:
+            id = int(line.split("-")[0])
+            l_splt = line.split(";")
+            sym_x = int(l_splt[0].split('-')[1])
+            sym_y = int(l_splt[1])
+            q1 = [float(param) for param in l_splt[2].split(",")]
+            q2 = [float(param) for param in l_splt[3].split(",")]
+            q3 = [float(param) for param in l_splt[4].split(",")]
+            q4 = [float(param) for param in l_splt[5].split(",")]
+            data.append([id,sym_x,sym_y,q1,q2,q3,q4])
+        return data
+    
+def superquadrics_classifier(a,b,c,u,v,r,s,t):
+    if r > 0 and s > 0 and t > 0:
+        if u < v/2 or abs(u - v/2) < 0.1:
+            return "pyramid"
+        if v < u/2 or abs(v - u/2) < 0.1:
+            return "rectangular_pyramid"
+        else:
+            return "ellipsoid"
+    if r < 0 and s > 0 and t > 0:
+        if u < v/2:
+            return "pyramidal_cross"
+        if v < u/2:
+            return "cross_roof"
+        else:
+            return "cross"
+    if r > 0 and s < 0 and t > 0:
+        if u < v/2:
+            return "pyramidal_cross"
+        if v < u/2:
+            return "cross_roof"
+        else:
+            return "cross"
+    if r > 0 and s < 0 and t < 0:
+        if u < v/2:
+            return "hourglass"
+        if v < u/2:
+            return "hyperboloid"
+    return "unknown"    
