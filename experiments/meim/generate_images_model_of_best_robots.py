@@ -116,7 +116,7 @@ if __name__ == "__main__":
             parameters["#modelRepository"] = robot_repo
             parameters["#scenePath"] = are_framework + "/simulation/models/scenes/ARE_arena.ttt"
             parameters["#modelsPath"] = are_framework+ "/simulation/models/"
-            parameters["#morphGenomeType"] = 2
+            parameters["#morphGenomeType"] = 1
             write_parameters(parameters,robot_repo,"parameters_visu_" + str(id) + ".csv")
 
         if(len(sys.argv) == 5):    
@@ -130,6 +130,6 @@ if __name__ == "__main__":
                     print(robot_repo,robot_id,": robot image and model already generated skip")
                     continue
                 param_file = robot_repo + "/" + filename
-                sp.run([vrep_exec, "-h", "-g" + param_file])
+                sp.run(['xvfb-run','--auto-servernum','--server-num=1',vrep_exec, "-h", "-g" + param_file])
 
 

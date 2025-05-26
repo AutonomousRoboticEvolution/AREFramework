@@ -66,16 +66,21 @@ void quadric_param_t::from_string(const std::string& str){
 std::string sq::quadrics_from_file(std::string &filename, int id){
     std::ifstream ifs(filename);
     std::string line, res;
-    std::vector<std::string> split_line;
+    std::vector<std::string> split_line, split_line2;
     while(std::getline(ifs,line)){
-        misc::split_line(line,";",split_line); //will have to change for future quadrics file formats
+        // misc::split_line(line,";",split_line); //will have to change for future quadrics file formats
+        misc::split_line(line,"-",split_line);
         if(id == std::stoi(split_line[0])){
-            res = split_line[1] + std::string(";") +
+            split_line.clear();
+            misc::split_line(line,";",split_line);
+            misc::split_line(split_line[0],"-",split_line2);
+            res = split_line2[1] + std::string(";") +
+                split_line[1] + std::string(";") +
                 split_line[2] + std::string(";") +
                 split_line[3] + std::string(";") +
                 split_line[4] + std::string(";") +
-                split_line[5] + std::string(";") +
-                split_line[6] + std::string(";");
+                split_line[5] + std::string(";");
+                split_line[5] + std::string(";");
             return res;
         }
     }

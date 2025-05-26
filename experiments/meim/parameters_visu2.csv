@@ -22,6 +22,7 @@
 #ctrlUpdateFrequency,double,0.1
 #shouldReopenConnections,bool,0
 #seed,int,-1
+#envNumber,int,1
 
 
 #envType,int,6
