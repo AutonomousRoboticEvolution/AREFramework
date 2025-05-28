@@ -59,9 +59,9 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     are::BestIndividualLog::Ptr bilog = std::make_shared<are::BestIndividualLog>();
     logs.push_back(bilog);
 
-//    double obj_thre = are::settings::getParameter<are::settings::Double>(param,"#loggingObjThreshold").value;
-//    are::NNParamGenomeLog::Ptr nnpglog = std::make_shared<are::NNParamGenomeLog>(obj_thre);
-//    logs.push_back(nnpglog);
+   // double obj_thre = are::settings::getParameter<are::settings::Double>(param,"#loggingObjThreshold").value;
+   are::NNParamGenomeLog::Ptr nnpglog = std::make_shared<are::NNParamGenomeLog>(0);
+   logs.push_back(nnpglog);
 
 //    are::TrajectoryLog<are::sim::NN2Individual>::Ptr trajlog = std::make_shared<are::TrajectoryLog<are::sim::NN2Individual>>(obj_thre);
 //    logs.push_back(trajlog);

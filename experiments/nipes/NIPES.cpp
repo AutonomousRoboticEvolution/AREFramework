@@ -56,106 +56,116 @@ double NIPES::novelty_params::archive_adding_prob = 0.4;
 double NIPES::novelty_params::novelty_thr = 0.9;
 
 void NIPES::init(){
-    int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
+    if(settings::INSTANCE_REGULAR || !simulator_side)
+    {
+        int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
-    int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
-    float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
-    double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
-    double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
-    double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
-    double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
-    float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
-    float gen_stag_thres = settings::getParameter<settings::Float>(parameters,"#generationalStagnationThreshold").value;
-    std::string fit_stagnation_method = settings::getParameter<settings::String>(parameters,"#fitStagnationMethod").value;
+        int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        float max_weight = settings::getParameter<settings::Float>(parameters,"#MaxWeight").value;
+        double step_size = settings::getParameter<settings::Double>(parameters,"#CMAESStep").value;
+        double ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
+        bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+        bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
+        double novelty_ratio = settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value;
+        double novelty_decr = settings::getParameter<settings::Double>(parameters,"#noveltyDecrement").value;
+        float pop_stag_thres = settings::getParameter<settings::Float>(parameters,"#populationStagnationThreshold").value;
+        float gen_stag_thres = settings::getParameter<settings::Float>(parameters,"#generationalStagnationThreshold").value;
+        std::string fit_stagnation_method = settings::getParameter<settings::String>(parameters,"#fitStagnationMethod").value;
 
-    novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
-    novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
-    novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
+        novelty_params::k_value = settings::getParameter<settings::Integer>(parameters,"#kValue").value;
+        novelty_params::novelty_thr = settings::getParameter<settings::Double>(parameters,"#noveltyThreshold").value;
+        novelty_params::archive_adding_prob = settings::getParameter<settings::Double>(parameters,"#archiveAddingProb").value;
 
-    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
-    const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
+        int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+        const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
+        const int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+        const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
+        const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
-    int nbr_weights, nbr_bias;
-    if(nn_type == settings::nnType::FFNN)
-        NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::RNN)
-        NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN)
-        NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN_CPG)
-        NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-    else if(nn_type == settings::nnType::CPG)
-        NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-    else if(nn_type == settings::nnType::FF_CPG)
-        NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-    else {
-        std::cerr << "unknown type of neural network" << std::endl;
-        return;
-    }
-
-    std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
-    std::vector<double> initial_point;
-    if(bootstrapCtrl != "None"){
-        NNParamGenome ctrl_gen;
-        ctrl_gen.from_file(bootstrapCtrl);
-        initial_point = ctrl_gen.get_full_genome();
-    }else initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
-
-    double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
-    for(int i = 0; i < nbr_weights+nbr_bias; i++){
-        lb[i] = -max_weight;
-        ub[i] = max_weight;
-    }
-
-    geno_pheno_t gp(lb,ub,nbr_weights+nbr_bias);
-
-    cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed(),gp);
-    cmaParam.set_ftarget(ftarget);
-    cmaParam.set_quiet(!verbose);
-
-
-    _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
-    _cma_strat->set_elitist_restart(elitist_restart);
-    _cma_strat->set_length_of_stagnation(lenStag);
-    _cma_strat->set_novelty_ratio(novelty_ratio);
-    _cma_strat->set_novelty_decr(novelty_decr);
-    _cma_strat->set_pop_stag_thres(pop_stag_thres);
-    _cma_strat->set_gen_stag_thres(gen_stag_thres);
-    _cma_strat->set_fit_stagnation_method(fit_stagnation_method);
-
-    if(bootstrapCtrl == "None"){
-        std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
-        if(learnerfile != "None"){
-            _cma_strat->from_file(learnerfile);
-            pop_size =  _cma_strat->get_parameters().lambda();
+        int nbr_weights, nbr_bias;
+        if(nn_type == settings::nnType::FFNN)
+            NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        else if(nn_type == settings::nnType::RNN)
+            NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        else if(nn_type == settings::nnType::ELMAN)
+            NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        else if(nn_type == settings::nnType::ELMAN_CPG)
+            NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        else if(nn_type == settings::nnType::CPG)
+            NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        else if(nn_type == settings::nnType::FF_CPG)
+            NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        else {
+            std::cerr << "unknown type of neural network" << std::endl;
+            return;
         }
-    }
 
-    dMat init_samples = _cma_strat->ask();
+        std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
+        std::vector<double> initial_point;
+        if(bootstrapCtrl != "None"){
+            NNParamGenome ctrl_gen;
+            ctrl_gen.from_file(bootstrapCtrl);
+            initial_point = ctrl_gen.get_full_genome();
+        }else initial_point = randomNum->randVectd(-max_weight,max_weight,nbr_weights + nbr_bias);
 
-    std::vector<double> weights(nbr_weights);
-    std::vector<double> biases(nbr_bias);
+        double lb[nbr_weights+nbr_bias], ub[nbr_weights+nbr_bias];
+        for(int i = 0; i < nbr_weights+nbr_bias; i++){
+            lb[i] = -max_weight;
+            ub[i] = max_weight;
+        }
 
-    for(int u = 0; u < pop_size; u++){
-        for(int v = 0; v < nbr_weights; v++)
-            weights[v] = init_samples(v,u);
-        for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
-            biases[w-nbr_weights] = init_samples(w,u);
+        geno_pheno_t gp(lb,ub,nbr_weights+nbr_bias);
 
+        cma::CMAParameters<geno_pheno_t> cmaParam(initial_point,step_size,pop_size,randomNum->getSeed(),gp);
+        cmaParam.set_ftarget(ftarget);
+        cmaParam.set_quiet(!verbose);
+
+
+        _cma_strat = std::make_shared<IPOPCMAStrategy>([](const double*,const int&)->double{},cmaParam);
+        _cma_strat->set_elitist_restart(elitist_restart);
+        _cma_strat->set_length_of_stagnation(lenStag);
+        _cma_strat->set_novelty_ratio(novelty_ratio);
+        _cma_strat->set_novelty_decr(novelty_decr);
+        _cma_strat->set_pop_stag_thres(pop_stag_thres);
+        _cma_strat->set_gen_stag_thres(gen_stag_thres);
+        _cma_strat->set_fit_stagnation_method(fit_stagnation_method);
+
+        if(bootstrapCtrl == "None"){
+            std::string learnerfile = settings::getParameter<settings::String>(parameters,"#learnerFile").value;
+            if(learnerfile != "None"){
+                _cma_strat->from_file(learnerfile);
+                pop_size =  _cma_strat->get_parameters().lambda();
+            }
+        }
+
+        dMat init_samples = _cma_strat->ask();
+
+        std::vector<double> weights(nbr_weights);
+        std::vector<double> biases(nbr_bias);
+
+        for(int u = 0; u < pop_size; u++){
+            for(int v = 0; v < nbr_weights; v++)
+                weights[v] = init_samples(v,u);
+            for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
+                biases[w-nbr_weights] = init_samples(w,u);
+
+            EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
+            NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
+            ctrl_gen->set_weights(weights);
+            ctrl_gen->set_biases(biases);
+            ctrl_gen->set_nbr_output(nb_output);
+            ctrl_gen->set_nbr_input(nb_input);
+            ctrl_gen->set_nbr_hidden(nb_hidden);
+            ctrl_gen->set_nn_type(nn_type);
+            NIPESIndividual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
+            ind->set_parameters(parameters);
+            ind->set_randNum(randomNum);
+            population.push_back(ind);
+        }
+    }else if(settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
         NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
-        ctrl_gen->set_weights(weights);
-        ctrl_gen->set_biases(biases);
-        ctrl_gen->set_nbr_output(nb_output);
-        ctrl_gen->set_nbr_input(nb_input);
-        ctrl_gen->set_nbr_hidden(nb_hidden);
-        ctrl_gen->set_nn_type(nn_type);
-        Individual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
+        NIPESIndividual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
@@ -164,8 +174,7 @@ void NIPES::init(){
 }
 
 void NIPES::epoch(){
-
-    healthy_generation = true;
+        healthy_generation = true;
     for(auto &ind: population){
         if(ind->getObjectives()[0] == 0){
             healthy_generation = false;

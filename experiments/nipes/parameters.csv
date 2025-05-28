@@ -1,19 +1,10 @@
 #experimentName,string,nipes
-<<<<<<< Updated upstream
 #expPluginName,string,/usr/local/lib/libNIPES.so
-#envType,int,2
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/ARE_arenas.ttt
-#scenes,sequence_string,ARE_arena.ttt
-#robotPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/robots/are_blind_ant/model_0.ttm
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-=======
-#expPluginName,string,/usr/local/lib/ARE/experiments/libNIPES.so
-#envType,int,1
+#envType,int,0
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_blind_ant/model_0.ttm
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
->>>>>>> Stashed changes
 #repository,string,/home/leni/are-logs/
 #envNumber,int,1
 
@@ -49,12 +40,12 @@
 #seed,int,-1
 #arenaSize,sequence_double,2.;2.
 #cellSize,double,0.25
-#targetPosition,sequence_double,0.775;0.025;0.20
+#targetPosition,sequence_double,0.6;0.6;0.20
 #targets,sequence_double,0.6;0.6;0.12;0.6;-0.6;0.12;-0.6;-0.6;0.12
 #initPosition,sequence_double,-0.6;0.6;0.2
 #withTiles,bool,1
 #flatFloor,bool,1
-#robotOrientation,sequence_float,-1.57;0;-1.57
+#robotOrientation,sequence_float,0;-1.57;0
 
 #MaxWeight,float,1.0
 

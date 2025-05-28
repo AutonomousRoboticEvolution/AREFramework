@@ -14,7 +14,7 @@ MazeEnv::MazeEnv()
     settings::defaults::parameters->emplace("#targetPosition",std::make_shared<const settings::Sequence<double>>(std::vector<double>({0.,0.,0.1})));
     settings::defaults::parameters->emplace("#initPosition",std::make_shared<const settings::Sequence<double>>(std::vector<double>({0.,0.,0.1})));
     settings::defaults::parameters->emplace("#withBeacon",std::make_shared<const settings::Boolean>(true));
-    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<const settings::Double>(2.));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<const settings::Sequence<double>>(std::vector<double>({2.,2.})));
     settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<const settings::Integer>(2));
     settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
     settings::defaults::parameters->emplace("#withTiles",std::make_shared<const settings::Boolean>(true));
@@ -74,8 +74,8 @@ void MazeEnv::init(){
 }
 
 std::vector<double> MazeEnv::fitnessFunction(const Individual::Ptr &ind){
-    double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
-    double max_dist = sqrt(2*arena_size*arena_size);
+    std::vector<double> arena_size = settings::getParameter<settings::Sequence<double>>(parameters,"#arenaSize").value;
+    double max_dist = sqrt(2*arena_size[0]*arena_size[1]);
     auto distance = [](std::vector<double> a,std::vector<double> b) -> float
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +

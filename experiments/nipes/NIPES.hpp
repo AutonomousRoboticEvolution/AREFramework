@@ -31,14 +31,19 @@ typedef enum DescriptorType{
 class NIPESIndividual : public sim::NN2Individual
 {
 public:
-    NIPESIndividual() : sim::NN2Individual(){}
+    NIPESIndividual() : sim::NN2Individual(){
+        visited_zones = Eigen::MatrixXi::Zero(8,8);
+    }
     NIPESIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
-        : sim::NN2Individual(morph_gen,ctrl_gen){}
+        : sim::NN2Individual(morph_gen,ctrl_gen){
+        visited_zones = Eigen::MatrixXi::Zero(8,8);
+    }
     NIPESIndividual(const NIPESIndividual& ind)
         : sim::NN2Individual(ind),
           visited_zones(ind.visited_zones),
           descriptor_type(ind.descriptor_type),
-          rewards(ind.rewards){}
+          rewards(ind.rewards),
+        object_trajectory(ind.object_trajectory){}
 
     std::string to_string();
     void from_string(const std::string&);
@@ -52,11 +57,12 @@ public:
         arch & objectives;
         arch & ctrlGenome;
         arch & final_position;
-        arch & visited_zones;
+        // arch & visited_zones;
         arch & descriptor_type;
         arch & rewards;
       //  arch & energy_cost;
         arch & trajectory;
+        arch & trajectories;
         arch & object_trajectory;
       //  arch & sim_time;
     }
