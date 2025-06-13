@@ -54,14 +54,15 @@ public:
      */
     virtual std::vector<double> update();
 
-    std::vector<double> get_joints_positions();
-    std::vector<double> get_wheels_positions();
+    std::vector<double> get_joints_positions() override;
+    std::vector<double> get_wheels_positions() override;
 
     /**
      * @brief Sends command to the actuators of the robot with the following order : wheel commands and joints commands.
      */
     virtual void command(const std::vector<double>&);
 
+    virtual void reset_actuators();
 
     //GETTERS & SETTERS
     virtual int getMainHandle(){return mainHandle;}

@@ -37,10 +37,12 @@ void sim::readProximitySensors(const std::vector<int> handles, std::vector<doubl
     // for all proximity sensors reads there vaule
     for (size_t i = 0; i < handles.size(); i++)
     {
+        pos[0] = 0; pos[1] = 0; pos[2] = 0; pos[3] = 0;
         det = simReadProximitySensor(handles[i],pos,&detected_object_handle,norm);
         if(det > 0)
             sensorValues.push_back(norm_L2(pos[0],pos[1],pos[2]));
         else if(det <= 0) sensorValues.push_back(0);
+        simResetProximitySensor(handles[i]);
     }
 }
 

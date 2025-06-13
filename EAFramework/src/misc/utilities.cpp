@@ -86,9 +86,37 @@ std::string misc::int_to_string(int n){
     return sstr.str();
 }
 
+// double misc::string_to_double(const std::string& str){
+//     std::string str_cpy = str;
+//     double res=0;
+//     int i=0;
+//     bool neg = false;
+//     if(str[0] == '-'){
+//         i++;
+//         neg = true;
+//         str_cpy.erase(str_cpy.begin()+2);
+//     }else{
+//         str_cpy.erase(str_cpy.begin()+1);
+//     }
+//     for(;i < str_cpy.size(); i++){
+//         int c = str_cpy[i] - '0';
+//         int coef = str_cpy.size()-(neg?(i-1):i)-1;
+//         double mult = std::pow(10,coef);
+//         res+=c*mult;
+//     }
+//     res = res/std::pow(10,(str_cpy.size()-(neg?2:1)));
+//     if(neg)
+//         return -res;
+//     return res;
+// }
+
 int misc::generate_unique_id(int n){
     using namespace std::chrono;
     system_clock::time_point tp = system_clock::now();
     auto dtn = duration_cast<nanoseconds>(tp.time_since_epoch());
     return dtn.count()%static_cast<long int>(pow(10,n));
+}
+
+double misc::round_at_precision(double value, int precision){
+    return std::round(value*std::pow(10,precision))/std::pow(10,precision);
 }

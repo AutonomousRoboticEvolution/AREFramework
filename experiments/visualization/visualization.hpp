@@ -33,16 +33,16 @@ public:
     std::vector<std::vector<int>> list_of_voxels;
 };
 
-class VisuInd : public Individual
+class VisuInd : public sim::NN2Individual
 {
 public:
-    VisuInd() : Individual(){}
+    VisuInd() : NN2Individual(){}
     VisuInd(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen)
-        : Individual(morph_gen,ctrl_gen)
+        : NN2Individual(morph_gen,ctrl_gen)
     {
     }
     VisuInd(const VisuInd& ind) :
-        Individual(ind)
+        NN2Individual(ind)
     {}
     Individual::Ptr clone() override{
         return std::make_shared<VisuInd>(*this);
@@ -58,6 +58,7 @@ public:
         arch & morphGenome;
         arch & individual_id;
         arch & generation;
+        arch & rollout;
     }
 
     std::string to_string() const override;
@@ -70,9 +71,6 @@ private:
     void createMorphology() override;
     void createController() override;
     std::vector<waypoint> trajectory;
-    double sum_ctrl_freq = 0;
-
-
 };
 
 class Visu : public EA

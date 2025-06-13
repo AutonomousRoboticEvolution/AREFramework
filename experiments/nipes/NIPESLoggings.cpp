@@ -31,7 +31,7 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
     std::ofstream ctrl_ofs;
 
     std::stringstream filename;
-    filename << "ctrlGenome_" << generation << "_" << best_ind.first;
+    filename << "best_ctrlGenome_" << generation << "_" << best_ind.first;
     if(!openOLogFile(ctrl_ofs, filename.str()))
         return;
     ctrl_ofs << std::dynamic_pointer_cast<NNParamGenome>(
@@ -85,5 +85,14 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
             traj_ofs << wp.to_string() << std::endl;
         traj_ofs.close();
     }
+
+    //log rollout
+    std::stringstream roll_filepath;
+    roll_filepath << Logging::log_folder << "/rollout_" << generation << "_" << best_ind.first;
+    std::ofstream roll_filestream(roll_filepath.str());
+    rollout_t rollout = std::dynamic_pointer_cast<NIPESIndividual>(best_ind.second)->get_rollout();
+    for(const act_obs_sample& aos: rollout)
+        roll_filestream << aos.to_string() << std::endl;
+    roll_filestream.close();
 
 }

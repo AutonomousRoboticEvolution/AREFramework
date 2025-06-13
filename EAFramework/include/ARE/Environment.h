@@ -16,8 +16,20 @@
 namespace are {
 
 struct waypoint{
-    float position[3];
-    float orientation[3];
+    float position[3] = {0,0,0};
+    float orientation[3] = {0,0,0};
+
+    waypoint(){}
+
+    waypoint(const waypoint &wp){
+        position[0] = wp.position[0];
+        position[1] = wp.position[1];
+        position[2] = wp.position[2];
+
+        orientation[0] = wp.orientation[0];
+        orientation[1] = wp.orientation[1];
+        orientation[2] = wp.orientation[2];
+    }
 
     std::string to_string() const{
         std::stringstream sstr;

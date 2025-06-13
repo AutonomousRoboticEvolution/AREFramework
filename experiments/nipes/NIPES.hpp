@@ -13,6 +13,7 @@
 #include "ARE/learning/Novelty.hpp"
 #include "simulatedER/nn2/NN2Individual.hpp"
 #include "ARE/Settings.h"
+#include "ARE/EA.h"
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
 #include "multiTargetMaze.hpp"
@@ -33,10 +34,12 @@ class NIPESIndividual : public sim::NN2Individual
 public:
     NIPESIndividual() : sim::NN2Individual(){
         visited_zones = Eigen::MatrixXi::Zero(8,8);
+        trajectory = std::vector<waypoint>(1);
     }
     NIPESIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
         : sim::NN2Individual(morph_gen,ctrl_gen){
         visited_zones = Eigen::MatrixXi::Zero(8,8);
+        trajectory = std::vector<waypoint>(1);
     }
     NIPESIndividual(const NIPESIndividual& ind)
         : sim::NN2Individual(ind),
@@ -45,8 +48,8 @@ public:
           rewards(ind.rewards),
         object_trajectory(ind.object_trajectory){}
 
-    std::string to_string();
-    void from_string(const std::string&);
+    std::string to_string() const override;
+    void from_string(const std::string&) override;
     Eigen::VectorXd descriptor() override;
     void set_visited_zones(const Eigen::MatrixXi& vz){visited_zones = vz;}
     void set_descriptor_type(DescriptorType dt){descriptor_type = dt;}
@@ -57,13 +60,14 @@ public:
         arch & objectives;
         arch & ctrlGenome;
         arch & final_position;
-        // arch & visited_zones;
+        arch & visited_zones;
         arch & descriptor_type;
-        arch & rewards;
+        // arch & rewards;
       //  arch & energy_cost;
         arch & trajectory;
         arch & trajectories;
         arch & object_trajectory;
+        arch & rollout;
       //  arch & sim_time;
     }
 
@@ -89,7 +93,6 @@ private:
 
     std::vector<std::vector<waypoint>> trajectories;
     std::vector<waypoint> object_trajectory;
-
 };
 
 class NIPES : public EA

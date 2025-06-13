@@ -17,28 +17,29 @@ void VisuInd::createMorphology(){
         std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
         return;
     }
+    sim::NN2Individual::createMorphology();
 
-    if(fixed_morph_path == "None"){
+    // if(fixed_morph_path == "None"){
 
-        int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
+    //     int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
 
-        morphology.reset(new CPPNMorph(parameters));
-        morphology->set_randNum(randNum);
-        std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(id);
-
-
-        nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-        std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
-
-        std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
-    }else{
-        morphology.reset(new sim::FixedMorphology(parameters));
-        std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
-        morphology->set_randNum(randNum);
+    //     morphology.reset(new CPPNMorph(parameters));
+    //     morphology->set_randNum(randNum);
+    //     std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(id);
 
 
-        std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);;
-    }
+    //     nn2_cppn_t gen = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
+    //     std::dynamic_pointer_cast<CPPNMorph>(morphology)->setNN2CPPN(gen);
+
+    //     std::dynamic_pointer_cast<CPPNMorph>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+    // }else{
+    //     morphology.reset(new sim::FixedMorphology(parameters));
+    //     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
+    //     morphology->set_randNum(randNum);
+
+
+    //     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);;
+    // }
 
 
     //    float pos[3];
@@ -46,101 +47,12 @@ void VisuInd::createMorphology(){
 }
 
 void VisuInd::createController(){
-    std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
 
     bool empty_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
     if(empty_gen)
         return;
 
-    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
-    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
-    int wheel_nbr,joint_nbr,sensor_nbr;
-    if(fixed_morph_path == "None"){
-        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
-        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
-        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
-    }else{
-        wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
-        joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
-        sensor_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
-    }
-
-    bool use_ir = settings::getParameter<settings::Boolean>(parameters,"#useIR").value;
-    bool use_camera = settings::getParameter<settings::Boolean>(parameters,"#useCamera").value;
-    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
-    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
-
-    int nb_inputs = sensor_nbr + //proximity sensors
-            (use_ir ? sensor_nbr : 0) + // IR sensors
-            (use_joint_feedback ? joint_nbr : 0) + // joint positions
-            (use_wheel_feedback ? wheel_nbr : 0) + // wheel positions
-            (use_camera ? 1 : 0); // camera
-    int nb_outputs = wheel_nbr + joint_nbr;
-
-    int nbr_weights, nbr_bias;
-    if(nn_type == settings::nnType::FFNN)
-        NN2Control<ffnn_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::RNN)
-        NN2Control<rnn_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN)
-        NN2Control<elman_t>::nbr_parameters(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias);
-    else if(nn_type == settings::nnType::ELMAN_CPG)
-        NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
-    else if(nn_type == settings::nnType::CPG)
-        NN2Control<cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
-    else if(nn_type == settings::nnType::FF_CPG)
-        NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_inputs,nb_hidden,nb_outputs,nbr_weights,nbr_bias,joint_subs);
-    else {
-        std::cerr << "unknown type of neural network" << std::endl;
-        return;
-    }
-
-    std::cout << "number of weights : " << nbr_weights << " and number of biases : " << nbr_bias << std::endl;
-
-    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
-    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
-
-    if(nn_type == settings::nnType::FFNN){
-        control = std::make_shared<NN2Control<ffnn_t>>();
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
-    }
-    else if(nn_type == settings::nnType::ELMAN){
-        control = std::make_shared<NN2Control<elman_t>>();
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
-    }
-    else if(nn_type == settings::nnType::RNN){
-        control = std::make_shared<NN2Control<rnn_t>>();
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
-    }
-    else if(nn_type == st::nnType::ELMAN_CPG){
-        control.reset(new NN2Control<elman_cpg_t>());
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
-    }
-    else if(nn_type == st::nnType::CPG){
-        control.reset(new NN2Control<cpg_t>());
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
-    }
-    else if(nn_type == st::nnType::FF_CPG){
-        control.reset(new NN2Control<ff_cpg_t>());
-        control->set_parameters(parameters);
-        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
-    }
-    else {
-        std::cerr << "unknown type of neural network" << std::endl;
-    }
-
+    sim::NN2Individual::createController();
 }
 
 void VisuInd::update(double delta_time){
@@ -149,32 +61,10 @@ void VisuInd::update(double delta_time){
     if(empty_gen)
         return;
 
-    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
-    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
-
-    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-
-    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
-        sum_ctrl_freq = 0;
-        //- Retrieve sensors, joints and wheels values
-        std::vector<double> inputs = morphology->update();
-
-        if(use_joint_feedback){
-            std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
-            for(double &j: joints)
-                j = 2.*j/M_PI;
-            inputs.insert(inputs.end(),joints.begin(),joints.end());
-        }
-        if(use_wheel_feedback){
-            std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
-            for(double &w: wheels)
-                w = w/M_PI;
-            inputs.insert(inputs.end(),wheels.begin(),wheels.end());
-        }
-        std::vector<double> outputs = control->update(inputs);
-        morphology->command(outputs);
-    }
-    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    Individual::update(delta_time);
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    if(fabs(sum_ctrl_freq - time_step) < 0.0001 && !rollout.empty())
+        std::cout << rollout.back().to_string() << std::endl;
 }
 
 std::string VisuInd::to_string() const
@@ -274,7 +164,7 @@ void Visu::init(){
             population.push_back(ind);
         }else{
             for(const std::string& path: ctrl_gen_files){
-
+                std::cout << "ctrl file loading: " << path << std::endl;
                 ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
                 std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
 

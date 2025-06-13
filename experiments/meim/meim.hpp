@@ -15,21 +15,21 @@ namespace are{
 /**
  * @brief
  */
-typedef struct act_obs_sample{
-    act_obs_sample(){}
-    act_obs_sample(const std::vector<double>& obs, const std::vector<double>& act) :
-        observation(obs), next_action(act){}
-    std::vector<double> observation;
-    std::vector<double> next_action;
-    std::string to_string() const;
-    template<class archive>
-    void serialize(archive &arch, const unsigned int v)
-    {
-        arch & observation;
-        arch & next_action;
-    }
-}act_obs_sample;
-typedef std::vector<act_obs_sample> rollout_t;
+// typedef struct act_obs_sample{
+//     act_obs_sample(){}
+//     act_obs_sample(const std::vector<double>& obs, const std::vector<double>& act) :
+//         observation(obs), next_action(act){}
+//     std::vector<double> observation;
+//     std::vector<double> next_action;
+//     std::string to_string() const;
+//     template<class archive>
+//     void serialize(archive &arch, const unsigned int v)
+//     {
+//         arch & observation;
+//         arch & next_action;
+//     }
+// }act_obs_sample;
+// typedef std::vector<act_obs_sample> rollout_t;
 
 
 typedef struct genome_t{
@@ -106,7 +106,7 @@ public:
     void set_weight_bias(double w, double b){weight = w; bias = b;}
     double get_weight(){return weight;}
     double get_bias(){return bias;}
-    const rollout_t &get_rollout(){return rollout;}
+    // const rollout_t &get_rollout(){return rollout;}
 
 private:
     void createMorphology() override;
@@ -125,7 +125,7 @@ private:
     double weight = 0;
     double bias = 0;
 
-    rollout_t rollout;
+    // rollout_t rollout;
     double ctrl_time_counter = 0;
 };
 

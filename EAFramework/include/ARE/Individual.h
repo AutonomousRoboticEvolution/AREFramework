@@ -15,6 +15,23 @@
 #include <boost/archive/text_oarchive.hpp>
 
 namespace are {
+
+typedef struct act_obs_sample{
+    act_obs_sample(){}
+    act_obs_sample(const std::vector<double>& obs, const std::vector<double>& act) :
+        observation(obs), next_action(act){}
+    std::vector<double> observation;
+    std::vector<double> next_action;
+    std::string to_string() const;
+    template<class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & observation;
+        arch & next_action;
+    }
+}act_obs_sample;
+typedef std::vector<act_obs_sample> rollout_t;
+
 class Individual
 {
 public:
@@ -50,7 +67,7 @@ public:
         }
     }
 
-    virtual void update(double delta_time) = 0;
+    virtual void update(double delta_time);
     virtual void mutate()
     {
         morphGenome->mutate();
@@ -85,6 +102,9 @@ public:
     void set_client_id(int cid){client_id = cid;}
     int get_client_id(){return client_id;}
 
+    const rollout_t &get_rollout() const {return rollout;}
+    void set_rollout(const rollout_t& ro){rollout = ro;}
+
     virtual std::string to_string() const;
     virtual void from_string(const std::string &str);
 
@@ -117,6 +137,9 @@ protected:
     int generation;
 
     int client_id;
+    double sum_ctrl_freq = 0;
+    rollout_t rollout;
+
 //    std::function<Genome::Factory> createGenome;
 
     virtual void createController() = 0;

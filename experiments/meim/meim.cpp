@@ -2,16 +2,6 @@
 
 using namespace are;
 
-std::string act_obs_sample::to_string() const{
-    std::stringstream sstr;
-    sstr << observation[0];
-    for(size_t i = 1; i < observation.size(); i++)
-        sstr << "," << observation[i];
-    sstr << ";" << next_action[0];
-    for(size_t i = 1; i < next_action.size(); i++)
-        sstr << "," << next_action[i];
-    return sstr.str();
-}
 
 void MEIMIndividual::createMorphology(){
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
@@ -97,51 +87,10 @@ void MEIMIndividual::createController(){
 }
 
 void MEIMIndividual::update(double delta_time){
-    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-    double time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
-    // double diff = delta_time/ctrl_freq - std::trunc(delta_time/ctrl_freq);
-    double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
-    double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
+
     if(control == nullptr)
         return;
-    if( fabs(ctrl_time_counter - ctrl_freq) < 0.00001){
-        ctrl_time_counter = 0;
-        //- Retrieve sensors, joints and wheels values
-        act_obs_sample aos;
-        std::vector<double> inputs = morphology->update();
-        assert(nb_sensors == inputs.size());
-        std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
-        assert(nb_joints == joints.size());
-        for(double &j: joints)
-            j = 2.*j/M_PI;
-        std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
-        for(double &w: wheels)
-            w = w/M_PI;
-        assert(wheels.size() == nb_wheels);
-        inputs.insert(inputs.end(),joints.begin(),joints.end());
-        inputs.insert(inputs.end(),wheels.begin(),wheels.end());
-        aos.observation = inputs;
-        //- add noise to the inputs
-        for(double& v: inputs)
-            v = randNum->normalDist(v,input_noise_lvl);
-//        std::cout << "inputs: ";
-//        for(const double& i : inputs)
-//            std::cout << i << ";";
-        //- get ouputs from the controller
-        std::vector<double> outputs = control->update(inputs);
-        aos.next_action = outputs;
-        //- add noise to the outputs
-        for(double &o: outputs)
-            o = randNum->normalDist(o,output_noise_lvl);
-//        std::cout << "outputs: ";
-//        for(const double& o : outputs)
-//            std::cout << o << ";";
-//        std::cout << std::endl;
-        //- send command to the robot
-        morphology->command(outputs);
-        rollout.push_back(aos);
-    }
-    ctrl_time_counter += time_step;
+    Individual::update(delta_time);
     //sim_time = delta_time;
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
     float position[3];

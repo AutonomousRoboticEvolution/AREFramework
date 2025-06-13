@@ -47,11 +47,15 @@ public:
     virtual void command(const std::vector<double>&) = 0;
 
 
+
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
     void set_randNum(misc::RandNum::Ptr& rn){randomNum = rn;}
     double get_energy_cost(){return energy_cost;}
+
+    virtual std::vector<double> get_joints_positions() = 0;
+    virtual std::vector<double> get_wheels_positions() = 0;
 
 protected:
     misc::RandNum::Ptr randomNum;

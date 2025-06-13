@@ -4,12 +4,33 @@ using namespace are::sim;
 namespace st = are::settings;
 
 void NN2Individual::createController(){
+    std::string fixed_morph_path = settings::getParameter<settings::String>(parameters,"#robotPath").value;
 
-    int nn_type = st::getParameter<settings::Integer>(parameters,"#NNType").value;
-    int nb_input = st::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
-    int nb_hidden = st::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
-    int nb_output = st::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
-    std::vector<int> joint_subs = st::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
+
+    int wheel_nbr,joint_nbr,sensor_nbr;
+    if(fixed_morph_path == "None"){
+        wheel_nbr = std::dynamic_pointer_cast<AREMorphology>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<AREMorphology>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<AREMorphology>(morphology)->get_sensor_number();
+    }else{
+        wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
+        joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
+        sensor_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
+    }
+    bool use_ir = settings::getParameter<settings::Boolean>(parameters,"#useIR").value;
+    bool use_camera = settings::getParameter<settings::Boolean>(parameters,"#useCamera").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+
+    int nb_inputs = sensor_nbr + //proximity sensors
+                    (use_ir ? sensor_nbr : 0) + // IR sensors
+                    (use_joint_feedback ? joint_nbr : 0) + // joint positions
+                    (use_wheel_feedback ? wheel_nbr : 0) + // wheel positions
+                    (use_camera ? 1 : 0); // camera
+    int nb_outputs = wheel_nbr + joint_nbr;
 
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
@@ -19,45 +40,45 @@ void NN2Individual::createController(){
         control = std::make_shared<NN2Control<ffnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+        std::dynamic_pointer_cast<NN2Control<ffnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN){
         control = std::make_shared<NN2Control<elman_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+        std::dynamic_pointer_cast<NN2Control<elman_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
 
     }
     else if(nn_type == st::nnType::RNN){
         control = std::make_shared<NN2Control<rnn_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+        std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else if(nn_type == st::nnType::FCP){
 
         control = std::make_shared<NN2Control<fcp_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias);
+        std::dynamic_pointer_cast<NN2Control<fcp_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN_CPG){
         control = std::make_shared<NN2Control<elman_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+        std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::CPG){
         control = std::make_shared<NN2Control<cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+        std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::FF_CPG){
         control = std::make_shared<NN2Control<ff_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->set_randonNum(randNum);
-        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_input,nb_hidden,nb_output,weights,bias, joint_subs);
+        std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else {
         std::cerr << "ERROR: unknown type of neural network" << std::endl;
@@ -75,44 +96,10 @@ void NN2Individual::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->reset_actuators();
 }
 
-void NN2Individual::update(double delta_time){
 
-    //bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
-    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
-
-    double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
-
-    if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
-        sum_ctrl_freq = 0;
-        //- Retrieve sensors, joints and wheels values
-        std::vector<double> inputs = morphology->update();
-
-        if(use_joint_feedback){
-            std::vector<double> joints = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_joints_positions();
-            for(double &j: joints)
-                j = 2.*j/M_PI;
-            inputs.insert(inputs.end(),joints.begin(),joints.end());
-        }
-        if(use_wheel_feedback){
-            std::vector<double> wheels = std::dynamic_pointer_cast<sim::Morphology>(morphology)->get_wheels_positions();
-            for(double &w: wheels)
-                w = w/M_PI;
-            inputs.insert(inputs.end(),wheels.begin(),wheels.end());
-        }
-        std::vector<double> outputs = control->update(inputs);
-        morphology->command(outputs);
-        energy_cost+=std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_energy_cost();
-        if(std::isnan(energy_cost))
-            energy_cost = 0;
-    }
-    sum_ctrl_freq += settings::getParameter<settings::Float>(parameters,"#timeStep").value;
-
-
-    sim_time = delta_time;
-}
 
 void NN2Individual::crossover(const Individual::Ptr &partner, Individual* child){
     Genome::Ptr child_genome = std::make_shared<NNParamGenome>();

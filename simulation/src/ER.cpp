@@ -149,6 +149,10 @@ void ER::handleSimulation()
     //    if(instance_type == settings::INSTANCE_SERVER)
     //        simSetFloatSignal("simulationTime",simulationTime);
 
+    //warm up time
+    float time_step = settings::getParameter<settings::Float>(parameters,"#timeStep").value;
+    if(simulationTime < 5*time_step)
+        return;
 
     currentInd->update(simulationTime);
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
@@ -176,6 +180,9 @@ void ER::endOfSimulation()
         if(currentIndIndex < ea->get_population().size())
         {
             std::vector<double> objectives = environment->fitnessFunction(currentInd);
+            for(double& o: objectives)
+                o = misc::round_at_precision(o,2);
+
             if(verbose){
                 std::cout << "fitnesses = " << std::endl;
                 for(const double fitness : objectives)

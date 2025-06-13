@@ -44,7 +44,7 @@ int main(int argc, char** argv)
     parameters.emplace("#noveltyRatio",std::make_shared<are_set::Double>(0.));
     parameters.emplace("#noveltyDecrement",std::make_shared<are_set::Double>(0.05));
     parameters.emplace("#populationStagnationThreshold",std::make_shared<are_set::Float>(0.));
-    parameters.emplace("#arenaSize",std::make_shared<are_set::Double>(2.));
+    parameters.emplace("#arenaSize",std::make_shared<are_set::Sequence<double>>(std::vector<double>({2.,2.})));
     parameters.emplace("#withRestart",std::make_shared<are_set::Boolean>(true));
     parameters.emplace("#incrPop",std::make_shared<are_set::Boolean>(true));
 

@@ -67,3 +67,15 @@ void Morphology::command(const std::vector<double> &ctrl_com){
     }
 }
 
+void Morphology::reset_actuators(){
+    double maxVelocity = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
+    if(!wheelHandles.empty()){
+        std::vector<double> zeros(wheelHandles.size(),0);
+        sentCommandToJointsDirect(wheelHandles,zeros);
+        sentCommandToWheels(wheelHandles,zeros,maxVelocity);
+    }
+    if(!jointHandles.empty()){
+        std::vector<double> zeros(jointHandles.size(),0);
+        sentCommandToJointsDirect(jointHandles,zeros);
+    }
+}

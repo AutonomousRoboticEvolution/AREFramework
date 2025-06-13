@@ -34,6 +34,7 @@ double sinusoidal(double amplitude, double time, double frequency, double time_o
 double get_next_joint_position(double nn_output, double time, double previous_position);
 
 std::string int_to_string(int n);
+// double string_to_double(const std::string& str);
 
 /**
  * @brief generate_unique_id
@@ -41,6 +42,8 @@ std::string int_to_string(int n);
  * @return unique id
  */
 int generate_unique_id(int n);
+
+double round_at_precision(double value, int precision);
 
 }//misc
 

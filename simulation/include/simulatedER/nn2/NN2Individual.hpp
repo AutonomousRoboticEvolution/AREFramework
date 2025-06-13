@@ -4,6 +4,7 @@
 #include "ARE/Individual.h"
 #include "ARE/Genome.h"
 #include "simulatedER/FixedMorphology.hpp"
+#include "simulatedER/are_morphology.hpp"
 #include "simulatedER/mazeEnv.h"
 #include "ARE/nn2/NN2Control.hpp"
 #include "ARE/NNParamGenome.hpp"
@@ -24,7 +25,7 @@ public:
     typedef std::shared_ptr<const NN2Individual> ConstPtr;
 
     NN2Individual() : Individual(){}
-    NN2Individual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen) :
+    NN2Individual(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen) :
         Individual(morph_gen,ctrl_gen){}
     NN2Individual(const NN2Individual& ind) :
         Individual(ind),
@@ -38,7 +39,7 @@ public:
         return std::make_shared<NN2Individual>(*this);
     }
 
-    void update(double delta_time) override;
+    // void update(double delta_time) override;
 
     //specific to the current ARE arenas
     Eigen::VectorXd descriptor() override{
@@ -65,6 +66,7 @@ public:
         arch & final_position;
       //  arch & energy_cost;
         arch & trajectory;
+        arch & rollout;
       //  arch & sim_time;
     }
 
@@ -77,10 +79,10 @@ public:
     double get_sim_time(){return sim_time;}
 
 
+
 protected:
     void createMorphology() override;
     void createController() override;
-    double sum_ctrl_freq = 0;
 
     std::vector<double> final_position;
     std::vector<waypoint> trajectory;

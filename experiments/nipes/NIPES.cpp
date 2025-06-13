@@ -5,9 +5,9 @@ using namespace are;
 Eigen::VectorXd NIPESIndividual::descriptor()
 {
     if(descriptor_type == FINAL_POSITION){
-        double arena_size = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
+        std::vector<double> arena_size = settings::getParameter<settings::Sequence<double>>(parameters,"#arenaSize").value;
         Eigen::VectorXd desc(3);
-        desc << (final_position[0]+arena_size/2.)/arena_size, (final_position[1]+arena_size/2.)/arena_size, (final_position[2]+arena_size/2.)/arena_size;
+        desc << (final_position[0]+arena_size[0]/2.)/arena_size[0], (final_position[1]+arena_size[1]/2.)/arena_size[1], final_position[2];
         return desc;
     }else if(descriptor_type == VISITED_ZONES){
         Eigen::MatrixXd vz = visited_zones.cast<double>();
@@ -17,7 +17,7 @@ Eigen::VectorXd NIPESIndividual::descriptor()
 
 }
 
-std::string NIPESIndividual::to_string()
+std::string NIPESIndividual::to_string() const
 {
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
@@ -56,7 +56,8 @@ double NIPES::novelty_params::archive_adding_prob = 0.4;
 double NIPES::novelty_params::novelty_thr = 0.9;
 
 void NIPES::init(){
-    if(settings::INSTANCE_REGULAR || !simulator_side)
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
+    if(instance_type == settings::INSTANCE_REGULAR || !simulator_side)
     {
         int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -145,9 +146,9 @@ void NIPES::init(){
 
         for(int u = 0; u < pop_size; u++){
             for(int v = 0; v < nbr_weights; v++)
-                weights[v] = init_samples(v,u);
+                weights[v] = misc::round_at_precision(init_samples(v,u),2);
             for(int w = nbr_weights; w < nbr_weights+nbr_bias; w++)
-                biases[w-nbr_weights] = init_samples(w,u);
+                biases[w-nbr_weights] = misc::round_at_precision(init_samples(w,u),2);
 
             EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
             NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
@@ -162,7 +163,7 @@ void NIPES::init(){
             ind->set_randNum(randomNum);
             population.push_back(ind);
         }
-    }else if(settings::INSTANCE_SERVER && simulator_side){
+    }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
         NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         NIPESIndividual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
@@ -301,9 +302,9 @@ void NIPES::init_next_pop(){
     for(int i = 0; i < pop_size ; i++){
 
         for(int j = 0; j < nbr_weights; j++)
-            weights[j] = new_samples(j,i);
+            weights[j] = misc::round_at_precision(new_samples(j,i),2);
         for(int j = nbr_weights; j < nbr_weights+nbr_bias; j++)
-            biases[j-nbr_weights] = new_samples(j,i);
+            biases[j-nbr_weights] = misc::round_at_precision(new_samples(j,i),2);
 
         EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
         NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
