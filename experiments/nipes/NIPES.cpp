@@ -1,6 +1,61 @@
 #include "NIPES.hpp"
+#include "mlp.hpp"
+#include "simulatedER/are_morphology.hpp"
+#include "simulatedER/FixedMorphology.hpp"
 
 using namespace are;
+
+void NIPESIndividual::createController(){
+    std::string fixed_morph_path = settings::getParameter<settings::String>(parameters,"#robotPath").value;
+
+    int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
+    int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
+
+    int wheel_nbr,joint_nbr,sensor_nbr;
+    if(fixed_morph_path == "None"){
+        wheel_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_sensor_number();
+    }else{
+        wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
+        joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
+        sensor_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_proxHandles().size();
+    }
+    bool use_ir = settings::getParameter<settings::Boolean>(parameters,"#useIR").value;
+    bool use_camera = settings::getParameter<settings::Boolean>(parameters,"#useCamera").value;
+    bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
+    bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
+
+    int nb_inputs = sensor_nbr + //proximity sensors
+                    (use_ir ? sensor_nbr : 0) + // IR sensors
+                    (use_joint_feedback ? joint_nbr : 0) + // joint positions
+                    (use_wheel_feedback ? wheel_nbr : 0) + // wheel positions
+                    (use_camera ? 1 : 0); // camera
+    int nb_outputs = wheel_nbr + joint_nbr;
+
+    std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
+    std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
+
+    control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
+    std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
+    control->set_parameters(parameters);
+    control->set_random_number(randNum);
+
+}
+
+
+void NIPESIndividual::createMorphology(){
+    morphology = std::make_shared<sim::FixedMorphology>(parameters);
+    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
+    morphology->set_randNum(randNum);
+
+
+    std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
+
+    std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+    std::dynamic_pointer_cast<sim::Morphology>(morphology)->reset_actuators();
+}
 
 Eigen::VectorXd NIPESIndividual::descriptor()
 {
@@ -84,22 +139,23 @@ void NIPES::init(){
         const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
         int nbr_weights, nbr_bias;
-        if(nn_type == settings::nnType::FFNN)
-            NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-        else if(nn_type == settings::nnType::RNN)
-            NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-        else if(nn_type == settings::nnType::ELMAN)
-            NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
-        else if(nn_type == settings::nnType::ELMAN_CPG)
-            NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-        else if(nn_type == settings::nnType::CPG)
-            NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-        else if(nn_type == settings::nnType::FF_CPG)
-            NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
-        else {
-            std::cerr << "unknown type of neural network" << std::endl;
-            return;
-        }
+        // if(nn_type == settings::nnType::FFNN)
+        //     NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        // else if(nn_type == settings::nnType::RNN)
+        //     NN2Control<rnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        // else if(nn_type == settings::nnType::ELMAN)
+        //     NN2Control<elman_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
+        // else if(nn_type == settings::nnType::ELMAN_CPG)
+        //     NN2Control<elman_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        // else if(nn_type == settings::nnType::CPG)
+        //     NN2Control<cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        // else if(nn_type == settings::nnType::FF_CPG)
+        //     NN2Control<ff_cpg_t>::nbr_parameters_cpg(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias,joint_subs);
+        // else {
+        //     std::cerr << "unknown type of neural network" << std::endl;
+        //     return;
+        // }
+        MLPControl::nbr_parameters(nb_input,nb_output,nb_hidden,nbr_weights,nbr_bias);
 
         std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
         std::vector<double> initial_point;
@@ -192,15 +248,15 @@ void NIPES::epoch(){
     double energy_budget = settings::getParameter<settings::Double>(parameters,"#energyBudget").value;
     bool energy_reduction = settings::getParameter<settings::Boolean>(parameters,"#energyReduction").value;
 
-    /**Energy Cost**/
-    if(energy_reduction){
-        for(const auto &ind : population){
-            double ec = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->get_energy_cost();
-            if(ec > energy_budget) ec = energy_budget;
-            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
-        }
-    }
-    /**/
+    // /**Energy Cost**/
+    // if(energy_reduction){
+    //     for(const auto &ind : population){
+    //         double ec = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->get_energy_cost();
+    //         if(ec > energy_budget) ec = energy_budget;
+    //         std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(1 - ec/energy_budget);
+    //     }
+    // }
+    // /**/
 
     /**NOVELTY**/
     if(settings::getParameter<settings::Double>(parameters,"#noveltyRatio").value > 0.){
@@ -215,7 +271,7 @@ void NIPES::epoch(){
         for(const auto& ind : population){
             Eigen::VectorXd ind_desc = ind->descriptor();
             double ind_nov = novelty::sparseness<novelty_params>(Novelty::distances(ind_desc,archive,pop_desc));
-            std::dynamic_pointer_cast<sim::NN2Individual>(ind)->addObjective(ind_nov);
+            std::dynamic_pointer_cast<NIPESIndividual>(ind)->addObjective(ind_nov);
         }
 
         //update archive
@@ -243,8 +299,8 @@ void NIPES::epoch(){
     for(const auto &ind : population){
         IPOPCMAStrategy::individual_t cma_ind;
         cma_ind.genome = std::dynamic_pointer_cast<NNParamGenome>(ind->get_ctrl_genome())->get_full_genome();
-        cma_ind.descriptor = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->get_final_position();
-        cma_ind.objectives = std::dynamic_pointer_cast<sim::NN2Individual>(ind)->getObjectives();
+        cma_ind.descriptor = std::dynamic_pointer_cast<NIPESIndividual>(ind)->get_final_position();
+        cma_ind.objectives = std::dynamic_pointer_cast<NIPESIndividual>(ind)->getObjectives();
         pop.push_back(cma_ind);
     }
 

@@ -31,7 +31,7 @@ int main(int argc, char** argv)
     parameters.emplace("#kValue",std::make_shared<are_set::Integer>(15));
     parameters.emplace("#noveltyThreshold",std::make_shared<are_set::Double>(0.9));
     parameters.emplace("#archiveAddingProb",std::make_shared<are_set::Double>(0.4));
-    parameters.emplace("#NNType",std::make_shared<are_set::Integer>(are_set::nnType::FFNN));
+    // parameters.emplace("#NNType",std::make_shared<are_set::Integer>(are_set::nnType::FFNN));
     parameters.emplace("#NbrInputNeurones",std::make_shared<are_set::Integer>(1));
     parameters.emplace("#NbrHiddenNeurones",std::make_shared<are_set::Integer>(0));
     parameters.emplace("#NbrOutputNeurones",std::make_shared<are_set::Integer>(1));
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
             avg_fitness+=fit;
             if(fit > 200) fit =  200;
             norm_fit = 1. - fit/200.;
-            std::dynamic_pointer_cast<are::sim::NN2Individual>(ind)->set_final_position({genome[0],genome[1],genome[2]}); //fake position because mandatory for novelty in this experiment
+            std::dynamic_pointer_cast<are::NIPESIndividual>(ind)->set_final_position({genome[0],genome[1],genome[2]}); //fake position because mandatory for novelty in this experiment
             ind->setObjectives({norm_fit});
             if(fit < best_fit){
                 best_fit = fit;

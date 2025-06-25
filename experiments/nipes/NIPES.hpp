@@ -11,7 +11,7 @@
 #include "simulatedER/mazeEnv.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"
-#include "simulatedER/nn2/NN2Individual.hpp"
+#include "ARE/Individual.h"
 #include "ARE/Settings.h"
 #include "ARE/EA.h"
 #include "obstacleAvoidance.hpp"
@@ -29,25 +29,25 @@ typedef enum DescriptorType{
     VISITED_ZONES = 1
 }DescriptorType;
 
-class NIPESIndividual : public sim::NN2Individual
+class NIPESIndividual : public Individual
 {
 public:
-    NIPESIndividual() : sim::NN2Individual(){
+    NIPESIndividual() : Individual(){
         visited_zones = Eigen::MatrixXi::Zero(8,8);
-        trajectory = std::vector<waypoint>(1);
     }
     NIPESIndividual(const Genome::Ptr& morph_gen,const NNParamGenome::Ptr& ctrl_gen)
-        : sim::NN2Individual(morph_gen,ctrl_gen){
+        : Individual(morph_gen,ctrl_gen){
         visited_zones = Eigen::MatrixXi::Zero(8,8);
-        trajectory = std::vector<waypoint>(1);
     }
     NIPESIndividual(const NIPESIndividual& ind)
-        : sim::NN2Individual(ind),
+        : Individual(ind),
           visited_zones(ind.visited_zones),
           descriptor_type(ind.descriptor_type),
           rewards(ind.rewards),
         object_trajectory(ind.object_trajectory){}
-
+    Individual::Ptr clone() override {
+        return std::make_shared<NIPESIndividual>(*this);
+    }
     std::string to_string() const override;
     void from_string(const std::string&) override;
     Eigen::VectorXd descriptor() override;
@@ -71,6 +71,7 @@ public:
       //  arch & sim_time;
     }
 
+    void addObjective(double obj){objectives.push_back(obj);}
 
     int get_number_times_evaluated(){return rewards.size();}
     void reset_rewards(){rewards.clear();}
@@ -84,13 +85,22 @@ public:
     const std::vector<waypoint> &get_object_trajectory() const {return object_trajectory;}
     void set_object_trajectory(const std::vector<waypoint> &obj_traj){object_trajectory = obj_traj;}
 
+    void set_final_position(const std::vector<double>& final_pos){final_position = final_pos;}
+    const std::vector<double>& get_final_position(){return final_position;}
+    void set_trajectory(const std::vector<waypoint>& traj){trajectory = traj;}
+    const std::vector<waypoint>& get_trajectory(){return trajectory;}
+
 private:
+
+    void createController() override;
+    void createMorphology() override;
 
     Eigen::MatrixXi visited_zones;
     DescriptorType descriptor_type = FINAL_POSITION;
 
     std::vector<double> rewards;
-
+    std::vector<double> final_position;
+    std::vector<waypoint> trajectory;
     std::vector<std::vector<waypoint>> trajectories;
     std::vector<waypoint> object_trajectory;
 };

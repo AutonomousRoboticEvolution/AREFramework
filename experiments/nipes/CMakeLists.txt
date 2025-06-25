@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.0)
 
 add_definitions(-DNDEBUG -DEIGEN3_ENABLED)
 
+find_package(Torch REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
+
 set(INCLUDES
     $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
     $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
@@ -28,6 +31,7 @@ add_library(NIPES SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
+    mlp.cpp
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
@@ -38,10 +42,10 @@ add_library(NIPES SHARED
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
-    simulatedER cmaes)
+    simulatedER cmaes "${TORCH_LIBRARIES}")
 
 add_executable(nipes_test nipes_test.cpp)
-target_include_directories(nipes_test PUBLIC ${INCLUDES})
+target_include_directories(nipes_test PUBLIC ${INCLUDES} ${TORCH_INCLUDE_DIRS})
 target_link_libraries(nipes_test ARE NIPES cmaes)
 
 install(TARGETS NIPES DESTINATION lib)
