@@ -8,6 +8,7 @@
 #include "hill_climbing.hpp"
 #include "push_object.hpp"
 #include "env_settings.hpp"
+#include "ARE/Logging.h"
 
 extern "C" are::Environment::Ptr environmentFactory
     (const are::settings::ParametersMapPtr& param)

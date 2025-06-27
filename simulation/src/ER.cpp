@@ -47,11 +47,11 @@ void ER::initialize()
 
     libhandler->close();
 
-    if(instance_type == settings::INSTANCE_SERVER){
-        //setup zmq communication channel to send individual
-        std::string port = settings::getParameter<settings::String>(parameters,"#port").value;
-        _individual_channel.bind("tcp://*:"+ port + "1");
-    }
+    // if(instance_type == settings::INSTANCE_SERVER){
+    //     //setup zmq communication channel to send individual
+    //     std::string port = settings::getParameter<settings::String>(parameters,"#port").value;
+    //     _individual_channel.bind("tcp://*:"+ port + "1");
+    // }
 
 }
 
@@ -88,29 +88,36 @@ void ER::startOfSimulation()
 }
 
 void ER::initIndividual(){
-    if(ind_received){
-        currentInd->init();
-        return;
-    }
-    std::string message;
-    receive_string_no_reply(message,_individual_channel,"ind ");
-    std::cout << "received individual" << std::endl;
-    ind_received = true;
+    // if(ind_received){
+    //     currentInd->init();
+    //     return;
+    // }
+    // std::string message;
+    // receive_string_no_reply(message,_individual_channel,"ind ");
+    // std::cout << "received individual" << std::endl;
+    // ind_received = true;
     
 
 
     //int length;
-    //simChar* message = simGetStringSignal("currentInd",&length);
-    if(message.empty()){
-        std::cerr << "No individual received" << std::endl;
-        return;
-    }
+    //char* message = simGetStringSignal("currentInd",&length);
+    // if(message.empty()){
+    //     std::cerr << "No individual received" << std::endl;
+    //     return;
+    // }
     
 //    std::string mess(message);
 //    mess.resize(length);
+    if(current_ind_str.empty()){
+        std::cerr << "sim::ER : No individual serialized" << std::endl;
+        exit(1);
+    }
+
     currentInd = ea->get_population()[0];
     if(nbrEval == 0)
-        currentInd->from_string(message);
+        currentInd->from_string(current_ind_str);
+
+    //     currentInd->from_string(message);
     currentInd->init();
     
     int ind_id = currentInd->get_morph_genome()->id();
@@ -129,19 +136,37 @@ void ER::initIndividual(){
     }
 //    simReleaseBuffer(message);
 }
-
+void ER::init_individual(const std::string &serialized_ind){
+    if(serialized_ind.empty()){
+        std::cerr << "No individual received" << std::endl;
+        return;
+    }
+    
+//    std::string mess(message);
+//    mess.resize(length);
+    currentInd = ea->get_population()[0];
+    if(nbrEval == 0)
+        currentInd->from_string(serialized_ind);
+    currentInd->init();
+    
+    evalIsFinish = false;
+    if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
+        int ind_id = currentInd->get_morph_genome()->id();
+        std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
+        bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
+        if(images_in_logs){
+            Logging::create_folder(Logging::log_folder + "/" + image_repo);
+            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
+        }
+        else{
+            Logging::create_folder(image_repo);
+            robotScreenshot(ind_id,image_repo);
+        }
+    }
+}
 void ER::handleSimulation()
 {
-    int instance_type =
-            settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    /* This function is called every simulation step. Note that the behavior of
-    * the robot drastically changes when slowing down the simulation since this
-    * function will be called more often. All simulated individuals will be
-    * updated until the maximum simulation time, as specified in the environment
-    * class, is reached.
-    */
-    if (instance_type == settings::INSTANCE_DEBUGGING) {
-        simStopSimulation();
+    if(currentInd.get() == nullptr)
         return;
     }
 
@@ -158,9 +183,8 @@ void ER::handleSimulation()
     environment->updateEnv(simulationTime,std::dynamic_pointer_cast<Morphology>(currentInd->get_morphology()));
     //std::vector<double> instant_reward = environment->fitnessFunction(currentInd);
   //  currentInd->set_instant_reward(instant_reward);
-    if (simulationTime >
-        settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value ||
-        ea->finish_eval(environment)) {
+    if (ea->finish_eval(environment)) {
+        std::cout << "STOP SIMULATION EARLY!!!" << std::endl;
         simStopSimulation();
     }
 }
@@ -247,7 +271,7 @@ void ER::endOfSimulation()
             nbrEval = 0;
             ind_received = false;
         }
-        simSetIntegerSignal("evalIsFinish",(simInt)evalIsFinish);
+        simSetInt32Signal("evalIsFinish",evalIsFinish);
     }
 }
 

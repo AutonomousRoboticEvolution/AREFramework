@@ -258,14 +258,14 @@ bool NIPES::finish_eval(const Environment::Ptr &env){
     if(env_type == 1){
         target = std::dynamic_pointer_cast<sim::BarrelTask>(env)->get_current_target();
     }
-    float tPos[3];
-    tPos[0] = static_cast<float>(target[0]);
-    tPos[1] = static_cast<float>(target[1]);
-    tPos[2] = static_cast<float>(target[2]);
+    double tPos[3];
+    tPos[0] = target[0];
+    tPos[1] = target[1];
+    tPos[2] = target[2];
     double fTarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
     double arenaSize = settings::getParameter<settings::Double>(parameters,"#arenaSize").value;
 
-    auto distance = [](float* a,float* b) -> double
+    auto distance = [](double* a,double* b) -> double
     {
         return std::sqrt((a[0] - b[0])*(a[0] - b[0]) +
                 (a[1] - b[1])*(a[1] - b[1]) +
@@ -273,7 +273,7 @@ bool NIPES::finish_eval(const Environment::Ptr &env){
     };
 
     int handle = std::dynamic_pointer_cast<sim::FixedMorphology>(population[currentIndIndex]->get_morphology())->getMainHandle();
-    float pos[3];
+    double pos[3];
     simGetObjectPosition(handle,-1,pos);
     double dist = distance(pos,tPos)/sqrt(2*arenaSize*arenaSize);
 

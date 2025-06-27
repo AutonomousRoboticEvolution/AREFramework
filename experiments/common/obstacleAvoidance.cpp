@@ -20,18 +20,9 @@ void ObstacleAvoidance::init(){
 
     VirtualEnvironment::init();
 
-    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
+    //bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
     std::string scenePath = settings::getParameter<settings::String>(parameters,"#scenePath").value;
-    if(verbose){
-        int i = 0;
-        int handle = 0;
-        std::cout << "Loaded scene : " << scenePath << std::endl;
-        std::cout << "Objects in the scene : " << std::endl;
-        while((handle = simGetObjects(i,sim_handle_all)) >= 0){
-            std::cout << simGetObjectName(handle) << std::endl;
-            i++;
-        }
-    }
+
     final_position = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
     trajectory.clear();
@@ -40,7 +31,7 @@ void ObstacleAvoidance::init(){
     double cell_size = settings::getParameter<settings::Double>(parameters,"#cellSize").value;
 
     grid_size = {static_cast<int>(std::round(arena_size[0]/cell_size)),
-                                static_cast<int>(std::round(arena_size[1]/cell_size))};
+                               static_cast<int>(std::round(arena_size[1]/cell_size))};
 
     grid_zone = Eigen::MatrixXi::Zero(grid_size[0],grid_size[1]);
     number_of_collisions = 0;
@@ -79,11 +70,17 @@ std::pair<int,int> ObstacleAvoidance::real_coordinate_to_matrix_index(const std:
 float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
-    int morphHandle = morph->getMainHandle();
 
     waypoint wp;
-    simGetObjectPosition(morphHandle, -1, wp.position);
-    simGetObjectOrientation(morphHandle,-1,wp.orientation);
+    std::vector<double> position = morph->get_position();
+    std::vector<double> orientation = morph->get_orientation();
+    wp.position[0] = position[0];
+    wp.position[1] = position[1];
+    wp.position[2] = position[2];
+    wp.orientation[0] = orientation[0];
+    wp.orientation[1] = orientation[1];
+    wp.orientation[2] = orientation[2];
+
 
 //    int obst_handle;
 //    int coll;
@@ -126,29 +123,4 @@ float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &
     return 0;
 }
 
-void ObstacleAvoidance::build_tiled_floor(std::vector<int> &tiles_handles){
-    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
 
-    float tile_size[3] = {0.249f,0.249f,0.01f};
-    float tile_increment = 0.25;
-    float starting_pos[3] = {-0.875f,-0.875f,0.005f};
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            tiles_handles.push_back(simCreatePureShape(0,8,tile_size,0.05f,nullptr));
-            std::stringstream name;
-            name << "tile_" << i << j;
-            simSetObjectName(tiles_handles.back(),name.str().c_str());
-            float height = -0.004;
-            if(!flatFloor){
-                height = (i+j)%2 == 0 ? -0.004 : 0.006;
-
-//                height = randNum->randFloat(-0.005,-0.001);
-            }
-            float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
-            simSetObjectPosition(tiles_handles.back(),-1,pos);
-            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,1000);//randNum->randFloat(0,1000));
-            simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
-            simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
-        }
-    }
-}

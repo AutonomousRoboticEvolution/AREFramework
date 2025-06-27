@@ -4,7 +4,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "ARE/Environment.h"
@@ -58,6 +58,12 @@ public:
     float get_maxTime(){return maxTime;}
     const std::string &get_name(){return name;}
     void set_randNum(misc::RandNum::Ptr &rn){randNum = rn;}
+
+    void build_tiled_floor(std::vector<int> &tiles_handles);
+
+    //wrapper for coppeliaSim function
+    double get_sim_time(){return simGetSimulationTime();}
+    std::vector<double> get_object_position(int handle);
 
 protected:
     ///handle of the object in the environment

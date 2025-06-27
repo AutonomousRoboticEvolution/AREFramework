@@ -92,9 +92,9 @@ void MEIMIndividual::update(double delta_time){
         return;
     Individual::update(delta_time);
     //sim_time = delta_time;
-    int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
-    float position[3];
-    simGetObjectPosition(morphHandle, -1, position);
+    // int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morphology)->getMainHandle();
+    // double position[3];
+    // simGetObjectPosition(morphHandle, -1, position);
 }
 
 

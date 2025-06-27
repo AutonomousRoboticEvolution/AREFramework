@@ -6,7 +6,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "simulatedER/VirtualEnvironment.hpp"

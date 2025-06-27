@@ -22,7 +22,7 @@
 #realTimeSim,bool,0
 #ctrlUpdateFrequency,double,0.1
 #populationSize,int,10
-#maxEvalTime,float,10
+#maxEvalTime,float,60
 #maxNbrEval,int,10000
 #numberOfGeneration,int,2
 
@@ -81,6 +81,11 @@
 #flatFloor,bool,1
 #jointControllerType,int,2
 #reloadController,bool,0
+<<<<<<< HEAD
+#isScreenshotEnable,bool,0
+
+=======
 
 #generationalStagnationThreshold,float,0.01
 #fitStagnationMethod,string,best
+>>>>>>> update_decoding

@@ -350,9 +350,8 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
 
     //Check if the robot is moving
     int handle = std::dynamic_pointer_cast<CPPNMorph>(population[currentIndIndex]->get_morphology())->getMainHandle();
-    float pos[3];
-    simGetObjectPosition(handle,-1,pos);
-    float sim_time = simGetSimulationTime();
+    std::vector<double> pos = std::dynamic_pointer_cast<sim::VirtualEnvironment>(env)->get_object_position(handle);
+    double sim_time = std::dynamic_pointer_cast<sim::VirtualEnvironment>(env)->get_sim_time();
     if(sim_time < 0.1){
         current_ind_past_pos[0] = pos[0];
         current_ind_past_pos[1] = pos[1];
@@ -369,7 +368,7 @@ bool M_NIPES::finish_eval(const Environment::Ptr &env){
         current_ind_past_pos[2] = pos[2];
     }
 
-    bool drop_eval = simGetSimulationTime() > 10.0 && move_counter <= 10;
+    bool drop_eval = sim_time > 10.0 && move_counter <= 10;
     if(drop_eval)
         std::dynamic_pointer_cast<M_NIPESIndividual>(population[currentIndIndex])->incr_nbr_dropped_eval();
 
@@ -531,7 +530,6 @@ bool M_NIPES::update(const Environment::Ptr &env){
                         learner.ctrl_learner.to_be_erased();
                     }else{
                         numberEvaluation++;
-                        nbr_eval_current_task++;
                         //update learner
                         auto trajs = std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->get_trajectories();
                         int env_type = are::settings::getParameter<are::settings::Integer>(parameters,"#envType").value;
@@ -758,6 +756,10 @@ void M_NIPES::reproduction(){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
+<<<<<<< HEAD
+
+=======
+>>>>>>> update_decoding
         init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);
@@ -916,6 +918,10 @@ void M_NIPES::init_new_learner(CMAESLearner &learner, const int wheel_nbr, int j
     learner.set_randNum(randomNum);
 
     double ftarget;
+<<<<<<< HEAD
+
+=======
+>>>>>>> update_decoding
     ftarget = settings::getParameter<settings::Double>(parameters,"#FTarget").value;
 
 
@@ -1016,7 +1022,10 @@ void M_NIPES::bootstrap_evolution(const std::string &folder){
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         std::vector<double> init_pos;
+<<<<<<< HEAD
+=======
 
+>>>>>>> update_decoding
         init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
         std::dynamic_pointer_cast<M_NIPESIndividual>(ind)->set_init_position(init_pos);
         population.push_back(ind);

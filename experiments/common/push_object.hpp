@@ -27,7 +27,6 @@ public:
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 
-    void build_tiled_floor(std::vector<int> &tiles_handles);
 
     const std::vector<waypoint> &get_object_trajectory() const {return object_trajectory;}
 

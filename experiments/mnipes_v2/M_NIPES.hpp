@@ -147,7 +147,6 @@ public:
         arch & descriptor_type;
         arch & copy_rewards;
         arch & drop_learning;
-        arch & current_gradual_scene;
         arch & init_position;
         arch & visited_zones;
     }
@@ -178,9 +177,6 @@ public:
 
     bool is_learning_dropped(){return drop_learning;}
 
-    void incr_gradual_scene(){current_gradual_scene++;}
-    int get_current_gradual_scene(){return current_gradual_scene;}
-    void set_current_gradual_scene(int cgs){current_gradual_scene = cgs;}
 
 private:
     void createMorphology() override;
@@ -211,7 +207,6 @@ private:
     std::vector<double> rewards;
     std::vector<double> copy_rewards;
     bool drop_learning = false;
-    int current_gradual_scene = 0;
 
 
 
@@ -292,7 +287,6 @@ private:
     void compute_novelty_scores();
     void update_novelty_archive();
 
-    void incr_gradual_scene();
 
     void bootstrap_evolution(const std::string &folder);
     void load_experiment(const std::string &folder);
@@ -316,7 +310,7 @@ private:
     nn2_cppn_t seed_cppn;
     NN2CPPNGenome::Ptr seed_morph_genome;
 
-    float current_ind_past_pos[3];
+    double current_ind_past_pos[3];
     int move_counter = 0;
 
     bool warming_up = true; //whether the algorithm is initialisation phase.

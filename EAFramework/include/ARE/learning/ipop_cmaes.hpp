@@ -114,7 +114,8 @@ public:
         ipop_cmaes_t::lambda_inc();
     }
 
-    double learning_progress(){return best_seen_solution.objectives[0] - initial_fitness;}
+    double learning_progress(){std::cout << best_seen_solution.objectives[0] << " - " << initial_fitness << std::endl;
+        return best_seen_solution.objectives[0] - initial_fitness;}
 
     void add_individual(const individual_t &ind){_pop.push_back(ind);}
     void set_population(const std::vector<Individual::Ptr>& pop);

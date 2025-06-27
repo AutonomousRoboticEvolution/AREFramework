@@ -6,7 +6,7 @@
 #if defined (VREP)
 #include "v_repLib.h"
 #elif defined (COPPELIASIM)
-#include "simLib.h"
+#include "simLib/simLib.h"
 #endif
 
 #include "simulatedER/VirtualEnvironment.hpp"
@@ -37,7 +37,6 @@ public:
 
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
-    void build_tiled_floor(std::vector<int> &tiles_handles);
 
     std::pair<int,int> real_coordinate_to_matrix_index(const std::vector<double> &pos);
 

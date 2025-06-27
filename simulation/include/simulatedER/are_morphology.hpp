@@ -65,6 +65,7 @@ public:
 
     void setPosition(float,float,float);
     void load(const std::string &filepath);
+    void create_organs();
     bool convex_decomposition(int meshHandle, int numSkeletonVoxels, std::vector<int> &skeletonHandles);
     bool generate_skeleton_mesh(skeleton::type &skeleton_matrix, int &mesh_handle);
     /**
@@ -112,7 +113,7 @@ public:
     std::vector<int> getOrganTypes(){return blueprint.getOrganTypes();}
     std::vector<std::vector<float>> getOrganPosList(){return blueprint.getOrganPosList();}
     std::vector<std::vector<float>> getOrganOriList(){return blueprint.getOrganOriList();}
-    const std::vector<float> &getSkeletonListVertices() const {return skeletonListVertices;}
+    const std::vector<double> &getSkeletonListVertices() const {return skeletonListVertices;}
     const std::vector<int> &getSkeletonListIndices() const {return skeletonListIndices;}
 
     const ManRes &get_man_test_res(){return man_test_res;}
@@ -143,7 +144,7 @@ protected:
     //skeleton information
     int numSkeletonVoxels;
     std::vector<int> skeletonHandles;
-    std::vector<float> skeletonListVertices;
+    std::vector<double> skeletonListVertices;
     std::vector<int> skeletonListIndices;
     std::vector<std::vector<std::vector<int>>> skeletonSurfaceCoord;
 
@@ -172,6 +173,17 @@ public:
 
     void create() override;
     void generate(skeleton::type &skeleton_matrix, std::vector<Organ> &organs_list, const std::vector<std::vector<int>> &list_of_voxels);
+    /**
+     * @brief Read a text file exported for goxel containing list of voxels with color values in hexa.
+     *        ffffff white => 1 bone
+     *        ff0000 red => 2 wheel
+     *        00ff00 green => 3 sensor
+     *        0000ff blue => 4 leg
+     *        000000 black => 5 caster
+     * @param filename
+     * @param list_of_voxels
+     */
+    static void load_manual_design(const std::string& filename, std::vector<std::vector<int>> &list_of_voxels);
 };
 
 class CPPNMorphology: public AREMorphology{
@@ -221,7 +233,6 @@ public:
 
 
 private:
-    void create_organs();
     cppn_t cppn;
     sq_t quadric;
 };
@@ -249,8 +260,6 @@ public:
     const sq_t &get_quadric(){return quadric;}
 
 private:
-    void create_organs();
-
     /**
      * @brief check_repress_organs_nobias Specific implementation for this encoding
      * @param skeleton_matrix

@@ -14,7 +14,7 @@ def run_servers(args,n: int):
 
 
 def run_server(args,rank: int):
-    server_port = args.port_start + rank
+    server_port = args.port_start + 2*rank
     print(f'Starting server rank {rank} listening on port {server_port}')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
@@ -23,27 +23,19 @@ def run_server(args,rank: int):
     # parameters
     # [1] path to the parameter file
     # [2] server port
-    if(not args.xvfb) :
-        return [subprocess.Popen([#"gdb","--batch","--ex=r","--ex=bt","--args",
-            args.vrep,
-            '-c\"require(\'simER\')\"','-h',
-           # f'-GzmqRemoteApi.rpcPort={server_port}',
-            f'-g{args.params}',
-            f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ],stdout=logfile,stderr=logfile),logfile]
-    else :
-        print("run with xvfb")
-        return [subprocess.Popen(['xvfb-run','--auto-servernum','--server-num=1',
-         # "gdb","--ex=r","--args",
-            args.vrep,
-            '-c\"require(\'simER\')\"','-h',
-            f'-g{args.params}',
-          #  f'-GzmqRemoteApi.rpcPort={server_port}',
-            f'-gREMOTEAPISERVERSERVICE_{server_port}_TRUE_TRUE',
-        ],stdout=logfile,stderr=logfile),logfile]
+    are_plugin = "'simARE'"
+    cmd = [f"{args.coppelia}",f"-GzmqRemoteApi.rpcPort={server_port}",f"-g{args.params}",f"-g{args.params}"]
+    if(args.headless == 1):
+        if(not args.xvfb) :
+            cmd.append("-h")
+        else :
+            print("run with xvfb")
+            cmd = ["xvfb-run","--auto-servernum","--server-num=1"] + cmd + ["-h"]
+    elif(args.headless > 1):
+        cmd.append("-H")
 
+    return [subprocess.Popen(cmd,stdout=logfile,stderr=logfile),logfile]
 
-   
 def run_client(args):
     print('Starting client')
     time = datetime.datetime.today()
@@ -106,6 +98,7 @@ def main():
     try:
         import time
         servers = run_servers(args,args.n_vrep)
+        print(servers[0][0].args)
         client = run_client(args)
         time.sleep(1)
 
@@ -132,7 +125,9 @@ if __name__ == "__main__":
     parser.add_argument('n_vrep', metavar='N', type=int,
                         help='Number of VREP instances')
     
-    parser.add_argument('--xvfb',type=int,default=0,help='run with xvfb')
+    parser.add_argument('--xvfb',type=int,default=0,help='run with xvfb. default 0. this option is unnecessary if headless is 0 or 2')
+
+    parser.add_argument('--headless',type=int,default=1,help='0: with GUI| 1: no GUI but with graphic rendering | 2: true headless. Default 1')
 
     parser.add_argument('--params', type=str,
                         default=0,
@@ -146,9 +141,9 @@ if __name__ == "__main__":
                         default=10400,
                         help='client executable')
 
-    parser.add_argument('--vrep', type=str,
-                        default='vrep.sh',
-                        help='path to the vrep starting script')
+    parser.add_argument('--coppelia', type=str,
+                        default='coppeliaSim.sh',
+                        help='path to the coppeliasim starting script')
 
 
     parser.add_argument('--log-folder', type=str,

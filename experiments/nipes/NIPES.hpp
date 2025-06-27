@@ -2,11 +2,9 @@
 #define NIPES_HPP
 
 
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
-#include "simLib.h"
-#endif
+
+#include "simLib/simLib.h"
+
 
 #include "simulatedER/mazeEnv.h"
 #include "ARE/learning/ipop_cmaes.hpp"
@@ -16,7 +14,7 @@
 #include "ARE/EA.h"
 #include "obstacleAvoidance.hpp"
 #include "exploration.hpp"
-#include "multiTargetMaze.hpp"
+// #include "multiTargetMaze.hpp"
 #include "barrelTask.hpp"
 #include "push_object.hpp"
 #include "env_settings.hpp"

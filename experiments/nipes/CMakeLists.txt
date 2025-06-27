@@ -6,8 +6,7 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 set(INCLUDES
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+   ${COPPELIASIM_INCLUDE_DIR}
     "../../simulation/include"
     "../../EAFramework/include"
     "../common/"
@@ -15,18 +14,12 @@ set(INCLUDES
     "../../modules/")
 
 SET(VREP_SRC
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/simLib.cpp>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/common/shared_memory.c>
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c
     )
 
 
-add_library(NIPES SHARED 
+add_library(NIPES SHARED
     ${VREP_SRC}
     factories.cpp
     NIPESLoggings.cpp
@@ -35,10 +28,11 @@ add_library(NIPES SHARED
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
-    ../common/multiTargetMaze.cpp
+    #../common/multiTargetMaze.cpp
     ../common/locomotion.cpp
     ../common/hill_climbing.cpp
     ../common/push_object.cpp
+    ../common/obstacleAvoidance.cpp
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
@@ -48,6 +42,6 @@ add_executable(nipes_test nipes_test.cpp)
 target_include_directories(nipes_test PUBLIC ${INCLUDES} ${TORCH_INCLUDE_DIRS})
 target_link_libraries(nipes_test ARE NIPES cmaes)
 
-install(TARGETS NIPES DESTINATION lib)
+install(TARGETS NIPES DESTINATION lib/ARE/experiments/)
 install(DIRECTORY . DESTINATION include/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 

@@ -1,7 +1,7 @@
 #include "simulatedER/mazeEnv.h"
 #include "emptyEnv.hpp"
 #include "visualization.hpp"
-#include "obstacleAvoidance.hpp"
+#include "simulatedER/obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
 #include "locomotion.hpp"
@@ -39,16 +39,13 @@ extern "C" are::Environment::Ptr environmentFactory
 
 extern "C" are::EA::Ptr EAFactory(const are::misc::RandNum::Ptr &rn, const are::settings::ParametersMapPtr &st)
 {
-    are::EA::Ptr ea;
-
-    ea.reset(new are::Visu(rn,st));
-    return ea;
+    return std::make_unique<are::Visu>(rn,st);
 }
 
 extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
                                const are::settings::ParametersMapPtr &param)
 {
 
-    are::TrajectoryLog<are::VisuInd>::Ptr trajlog(new are::TrajectoryLog<are::VisuInd>);
+    are::TrajectoryLog<are::VisuInd>::Ptr trajlog = std::make_shared<are::TrajectoryLog<are::VisuInd>>();
     logs.push_back(trajlog);
 }

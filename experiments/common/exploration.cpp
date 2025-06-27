@@ -11,9 +11,9 @@ Exploration::Exploration(const settings::ParametersMapPtr& params)
     name = "exploration";
 
     // Definition of default values of the parameters.
-    settings::defaults::parameters->emplace("#arenaSize",new settings::Double(2.));
-    settings::defaults::parameters->emplace("#nbrWaypoints",new settings::Integer(2));
-    settings::defaults::parameters->emplace("#flatFloor",new settings::Boolean(true));
+    settings::defaults::parameters->emplace("#arenaSize",std::make_shared<const settings::Double>(2.));
+    settings::defaults::parameters->emplace("#nbrWaypoints",std::make_shared<const settings::Integer>(2));
+    settings::defaults::parameters->emplace("#flatFloor",std::make_shared<const settings::Boolean>(true));
 
     std::string models_folder = settings::getParameter<settings::String>(parameters,"#modelsPath").value;
     std::vector<std::string> scenes_names = settings::getParameter<settings::Sequence<std::string>>(parameters,"#scenes").value;
@@ -37,8 +37,8 @@ void Exploration::init(){
     bool real_time = settings::getParameter<settings::Boolean>(parameters,"#realTimeSim").value;
     // Sets time step
     if(!real_time)
-        simSetFloatingParameter(sim_floatparam_simulation_time_step,time_step);
-    simSetBoolParameter(sim_boolparam_realtime_simulation,real_time);
+        simSetFloatParam(sim_floatparam_simulation_time_step,time_step);
+    simSetBoolParam(sim_boolparam_realtime_simulation,real_time);
 
     if(verbose){
         int i = 0;
@@ -46,7 +46,7 @@ void Exploration::init(){
         std::cout << "Loaded scene : " << scenes_path[current_scene] << std::endl;
         std::cout << "Objects in the scene : " << std::endl;
         while((handle = simGetObjects(i,sim_handle_all)) >= 0){
-            std::cout << simGetObjectName(handle) << std::endl;
+            std::cout << simGetObjectAlias(handle,0) << std::endl;
             i++;
         }
     }
@@ -142,32 +142,6 @@ float Exploration::updateEnv(float simulationTime, const Morphology::Ptr &morph)
     return 0;
 }
 
-void Exploration::build_tiled_floor(std::vector<int> &tiles_handles){
-    bool flatFloor = settings::getParameter<settings::Boolean>(parameters,"#flatFloor").value;
-
-    float tile_size[3] = {0.249f,0.249f,0.01f};
-    float tile_increment = 0.25;
-    float starting_pos[3] = {-0.875f,-0.875f,0.005f};
-    for(int i = 0; i < 8; i++){
-        for(int j = 0; j < 8; j++){
-            tiles_handles.push_back(simCreatePureShape(0,8,tile_size,0.05f,nullptr));
-            std::stringstream name;
-            name << "tile_" << i << j;
-            simSetObjectName(tiles_handles.back(),name.str().c_str());
-            float height = -0.004;
-            if(!flatFloor){
-                height = (i+j)%2 == 0 ? -0.004 : 0.006;
-
-//                height = randNum->randFloat(-0.005,-0.001);
-            }
-            float pos[3] = {starting_pos[0] + i*tile_increment,starting_pos[1] + j*tile_increment,height};
-            simSetObjectPosition(tiles_handles.back(),-1,pos);
-            simSetEngineFloatParameter(sim_bullet_body_friction,tiles_handles.back(),nullptr,1000);//randNum->randFloat(0,1000));
-            simSetObjectSpecialProperty(tiles_handles.back(),sim_objectspecialproperty_detectable_ultrasonic);
-            simSetModelProperty(tiles_handles.back(), sim_modelproperty_not_dynamic);
-        }
-    }
-}
 
 void Exploration::print_info(){
     std::cout<<"Fitness computed as:\t";

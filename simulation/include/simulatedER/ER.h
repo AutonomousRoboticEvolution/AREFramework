@@ -84,6 +84,8 @@ public:
     virtual void endOfSimulation();
 
     void initIndividual();
+    void init_individual(const std::string &serialized_ind);
+    void set_ind_str(const std::string &ind_str){current_ind_str = ind_str;}
     void initEnv(){environment->init();}
 
     //GETTERS & SETTERS
@@ -102,6 +104,7 @@ public:
     int get_nbr_eval(){return nbrEval;}
 
     zmq::socket_t &get_ind_channel(){return _individual_channel;}
+
 
 protected:
     ///pointer to settting of EA
@@ -133,6 +136,7 @@ protected:
     // parameters
     /// Tracks the individual number (corresponding to genomes in the population)
     size_t currentIndIndex = 0;
+    std::string current_ind_str;
     /// generation counter
     int generation = 0;
     int nbrEval = 0;

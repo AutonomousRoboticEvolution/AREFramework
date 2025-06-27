@@ -1,5 +1,5 @@
-#ifndef BARRELTASK_HPP
-#define BARRELTASK_HPP
+#ifndef MULTITARGETMAZE_HPP
+#define MULTITARGETMAZE_HPP
 
 #include <cmath>
 
@@ -17,16 +17,16 @@ namespace are {
 
 namespace sim{
 
-class BarrelTask : public VirtualEnvironment
+class MultiTargetMaze : public VirtualEnvironment
 {
 public:
 
-    typedef std::shared_ptr<BarrelTask> Ptr;
-    typedef std::shared_ptr<const BarrelTask> ConstPtr;
+    typedef std::shared_ptr<MultiTargetMaze> Ptr;
+    typedef std::shared_ptr<const MultiTargetMaze> ConstPtr;
 
-    BarrelTask(const settings::ParametersMapPtr& params);
+    MultiTargetMaze(const settings::ParametersMapPtr& params);
 
-    ~BarrelTask(){}
+    ~MultiTargetMaze(){}
     void init() override;
 
     std::vector<double> fitnessFunction(const Individual::Ptr &ind) override;
@@ -37,19 +37,16 @@ public:
 
     const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
-    int get_number_of_targets(){return barrel_initial_positions.size();}
-    const std::vector<double> &get_current_target(){return barrel_initial_positions[current_target];}
+
+    int get_number_of_targets(){return target_positions.size();}
+    const std::vector<double> &get_current_target(){return target_positions[current_target];}
 
     const std::vector<std::vector<waypoint>>& get_trajectories(){return trajectories;}
 
 private:
     int current_target = 0;
+    std::vector<std::vector<double>> target_positions;
     int move_counter = 0;
-
-    std::vector<std::vector<double>> barrel_initial_positions;
-    std::vector<double> barrel_current_position;
-    std::vector<double> target_position;
-    int barrel_handle;
     std::vector<std::vector<waypoint>> trajectories;
 
 };
@@ -58,5 +55,5 @@ private:
 
 } //are
 
-#endif //BARRELTASK_HPP
+#endif //MULTITARGETMAZE_HPP
 

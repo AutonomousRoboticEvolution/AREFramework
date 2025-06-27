@@ -78,9 +78,9 @@ void VisuInd::createController(){
     const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
     int wheel_nbr,joint_nbr,sensor_nbr;
     if(fixed_morph_path == "None"){
-        wheel_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_wheel_number();
-        joint_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_joint_number();
-        sensor_nbr = std::dynamic_pointer_cast<CPPNMorph>(morphology)->get_sensor_number();
+        wheel_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_wheel_number();
+        joint_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_joint_number();
+        sensor_nbr = std::dynamic_pointer_cast<sim::AREMorphology>(morphology)->get_sensor_number();
     }else{
         wheel_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_wheelHandles().size();
         joint_nbr = std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->get_jointHandles().size();
@@ -200,23 +200,37 @@ void VisuInd::update(double delta_time){
 
 std::string VisuInd::to_string() const
 {
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<VisuInd>();
     oarch.register_type<NNParamGenome>();
-    oarch.register_type<NN2CPPNGenome>();
     oarch.register_type<EmptyGenome>();
+    if(genome_type == morph_genome_type::CPPN)
+        oarch.register_type<NN2CPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CPPN)
+        oarch.register_type<SQCPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CG)
+        oarch.register_type<SQGenome>();
     oarch << *this;
     return sstream.str();
 }
 
 void VisuInd::from_string(const std::string &str){
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<VisuInd>();
     iarch.register_type<NNParamGenome>();
-    iarch.register_type<NN2CPPNGenome>();
+    if(genome_type == morph_genome_type::CPPN)
+        iarch.register_type<NN2CPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CPPN)
+        iarch.register_type<SQCPPNGenome>();
+    else if(genome_type == morph_genome_type::SQ_CG)
+        iarch.register_type<SQGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
@@ -228,127 +242,155 @@ void VisuInd::from_string(const std::string &str){
 }
 
 void Visu::init(){
-    int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
     bool empty_ctrl_gen = settings::getParameter<settings::Boolean>(parameters,"#emptyCtrlGenome").value;
-    std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
-    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
-    Genome::Ptr morph_gen;
-    Genome::Ptr ctrl_gen;
-    std::string ctrl_gen_file;
-    std::string morph_gen_file;
-    std::string cppn_file;
-    std::string quadrics_file;
-    std::string comp_gen_file;
-
-    if(manual_design != "None"){
-        std::vector<std::vector<int>> list_of_voxel;
-        sim::Morphology_CPPNMatrix::load_manual_design(manual_design,list_of_voxel);
-        morph_gen.reset(new ManualDesign(list_of_voxel));
-        ctrl_gen.reset(new EmptyGenome);
-        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-        ind->set_parameters(parameters);
-        ind->set_randNum(randomNum);
-        population.push_back(ind);
-        return;
-    }
-
-    std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
-    if(genome_type == CPPN || genome_type == SQ_CPPN){
-        std::stringstream sstr2;
-        sstr2 << folder_to_load << "/cppn_" << id;
-        cppn_file = sstr2.str();
-    }
-    if(genome_type == SQ_CPPN || genome_type == SQ_CG){
-        std::string sq_file = settings::getParameter<settings::String>(parameters,"#quadricFile").value;
-        quadrics_file = folder_to_load + std::string("/") + sq_file;
-    }
-    if(genome_type == SQ_CG){
-        std::string cg_file = settings::getParameter<settings::String>(parameters,"#componentsGenomeFile").value;
-        comp_gen_file = folder_to_load + std::string("/") + cg_file;
-    }
-    if(!empty_ctrl_gen){
-        std::stringstream sstr;
-        sstr << folder_to_load << "/ctrl_genome_" << id;
-        ctrl_gen_file = sstr.str();
-    }
+    if(!simulator_side){
+        int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;
+        std::string fixed_morph_path =  settings::getParameter<settings::String>(parameters,"#robotPath").value;
+        std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
+        Genome::Ptr morph_gen;
+        Genome::Ptr ctrl_gen;
+        std::string ctrl_gen_file;
+        std::string morph_gen_file;
+        std::string cppn_file;
+        std::string quadrics_file;
+        std::string comp_gen_file;
 
-
-
-    if(fixed_morph_path == "None"){
-        //load morphology genome
-        if(genome_type == CPPN){
-            nn2_cppn_t cppn;
-            std::ifstream ifs(cppn_file);
-            boost::archive::text_iarchive iarch(ifs);
-            iarch >> cppn;
-            morph_gen = std::make_shared<NN2CPPNGenome>(cppn);
-            morph_gen->set_randNum(randomNum);
-            morph_gen->set_parameters(parameters);
-        }else if(genome_type == SQ_CPPN){
-            sq_cppn::cppn_t cppn;
-            std::ifstream ifs(cppn_file);
-            boost::archive::text_iarchive iarch(ifs);
-            iarch >> cppn;
-            sq_t sq;
-            sq.from_string(sq::quadrics_from_file(quadrics_file,id));
-            morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
-            std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_cppn(cppn);
-            std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_quadric(sq);
-        }else if(genome_type == SQ_CG){//TODO
-            sq_t sq;
-            sq.from_string(sq::quadrics_from_file(quadrics_file,id));
-            cg_t cg;
-            cg.from_string(cg::components_genome_from_file(comp_gen_file,id));
-            morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
-            std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_components_genome(cg);
-            std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_quadric(sq);
-
-        }
-        morph_gen->set_id(id);
-        if(empty_ctrl_gen)
+        if(manual_design != "None"){
+            std::vector<std::vector<int>> list_of_voxel;
+            sim::ManuallyDesignedMorphology::load_manual_design(manual_design,list_of_voxel);
+            morph_gen.reset(new ManualDesign(list_of_voxel));
             ctrl_gen.reset(new EmptyGenome);
-        else{
-            ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
-            std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
+            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+            ind->set_parameters(parameters);
+            ind->set_randNum(randomNum);
+            population.push_back(ind);
+            return;
         }
-        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-        ind->set_parameters(parameters);
-        ind->set_randNum(randomNum);
-        population.push_back(ind);
-    }else{
-        morph_gen = std::make_shared<EmptyGenome>();
-        if(empty_ctrl_gen){
-            ctrl_gen = std::make_shared<EmptyGenome>();
+
+        std::string folder_to_load = settings::getParameter<settings::String>(parameters,"#folderToLoad").value;
+
+        if(genome_type == CPPN || genome_type == SQ_CPPN){
+            std::stringstream sstr2;
+            sstr2 << folder_to_load << "/cppn_" << id;
+            cppn_file = sstr2.str();
+        }
+        if(genome_type == SQ_CPPN || genome_type == SQ_CG){
+            std::string sq_file = settings::getParameter<settings::String>(parameters,"#quadricFile").value;
+            quadrics_file = folder_to_load + std::string("/") + sq_file;
+        }
+        if(genome_type == SQ_CG){
+            std::string cg_file = settings::getParameter<settings::String>(parameters,"#componentsGenomeFile").value;
+            comp_gen_file = folder_to_load + std::string("/") + cg_file;
+        }
+        if(!empty_ctrl_gen){
+            std::stringstream sstr;
+            sstr << folder_to_load << "/ctrl_genome_" << id;
+            ctrl_gen_file = sstr.str();
+        }
+
+
+
+        if(fixed_morph_path == "None"){
+            //load morphology genome
+            if(genome_type == CPPN){
+                nn2_cppn_t cppn;
+                std::ifstream ifs(cppn_file);
+                boost::archive::text_iarchive iarch(ifs);
+                iarch >> cppn;
+                morph_gen = std::make_shared<NN2CPPNGenome>(cppn);
+                morph_gen->set_randNum(randomNum);
+                morph_gen->set_parameters(parameters);
+            }else if(genome_type == SQ_CPPN){
+                sq_cppn::cppn_t cppn;
+                std::ifstream ifs(cppn_file);
+                boost::archive::text_iarchive iarch(ifs);
+                iarch >> cppn;
+                sq_t sq;
+                sq.from_string(sq::quadrics_from_file(quadrics_file,id));
+                morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+                std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_cppn(cppn);
+                std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_quadric(sq);
+            }else if(genome_type == SQ_CG){//TODO
+                sq_t sq;
+                sq.from_string(sq::quadrics_from_file(quadrics_file,id));
+                cg_t cg;
+                cg.from_string(cg::components_genome_from_file(comp_gen_file,id));
+                morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+                std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_components_genome(cg);
+                std::dynamic_pointer_cast<SQGenome>(morph_gen)->set_quadric(sq);
+
+            }
+            morph_gen->set_id(id);
+            if(empty_ctrl_gen)
+                ctrl_gen.reset(new EmptyGenome);
+            else{
+                ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
+                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
+            }
             Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
         }else{
-            ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
-            std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
+            morph_gen = std::make_shared<EmptyGenome>();
+            if(empty_ctrl_gen){
+                ctrl_gen = std::make_shared<EmptyGenome>();
+                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+            }else{
+                ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
+                std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
 
-            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-            ind->set_parameters(parameters);
-            ind->set_randNum(randomNum);
-            population.push_back(ind);
+                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                ind->set_parameters(parameters);
+                ind->set_randNum(randomNum);
+                population.push_back(ind);
+            }
         }
-    }
 
-    morph_gen.reset();
-    ctrl_gen.reset();
+        morph_gen.reset();
+        ctrl_gen.reset();
 
-    if(population.empty()){
-        std::cerr << "ERROR: Population is empty" << std::endl;
-        exit(1);
+        if(population.empty()){
+            std::cerr << "ERROR: Population is empty" << std::endl;
+            exit(1);
+        }
+    }if(simulator_side){
+        Genome::Ptr ctrl_gen;
+        if(empty_ctrl_gen)
+            ctrl_gen = std::make_shared<EmptyGenome>();
+        else
+            ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
+        Genome::Ptr morph_gen;
+        if(genome_type == morph_genome_type::CPPN)
+            morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::SQ_CPPN)
+            morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::SQ_CG)
+            morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+        else{
+            std::cerr << "Unknown type of morphological genome" << std::endl;
+            std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+            std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+            exit(1);
+        }
+        VisuInd::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
     }
 }
 
 bool Visu::update(const Environment::Ptr &env){
-    Individual::Ptr ind = population[currentIndIndex];
-    std::dynamic_pointer_cast<VisuInd>(ind)->set_trajectory(env->get_trajectory());
-    return true;
+    if(simulator_side){
+        Individual::Ptr ind = population[currentIndIndex];
+        std::dynamic_pointer_cast<VisuInd>(ind)->set_trajectory(env->get_trajectory());
+        return true;
+    }
 }
 
 bool Visu::is_finish(){
