@@ -1,6 +1,5 @@
 #include "barrelTask.hpp"
 
-#include <boost/algorithm/string.hpp>
 
 using namespace are::sim;
 

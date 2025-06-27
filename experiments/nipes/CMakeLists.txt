@@ -31,7 +31,7 @@ add_library(NIPES SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
-    mlp.cpp
+    ../common/mlp.cpp
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp

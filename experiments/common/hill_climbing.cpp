@@ -4,7 +4,6 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
-#include <boost/algorithm/string.hpp>
 #include <simulatedER/Morphology.h>
 
 using namespace are;

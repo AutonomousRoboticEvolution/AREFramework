@@ -37,8 +37,11 @@ void NIPESIndividual::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
+    std::cout << "Creating MLP with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
     control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
+    std::dynamic_pointer_cast<MLPControl>(control)->_nn->print_nn_structure();
     std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
+    std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
     control->set_parameters(parameters);
     control->set_random_number(randNum);
 

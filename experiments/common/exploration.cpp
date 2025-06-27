@@ -1,7 +1,5 @@
 #include "exploration.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 using namespace are::sim;
 
 Exploration::Exploration(const settings::ParametersMapPtr& params)

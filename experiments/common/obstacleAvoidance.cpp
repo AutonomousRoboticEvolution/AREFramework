@@ -1,7 +1,5 @@
 #include "obstacleAvoidance.hpp"
 
-#include <boost/algorithm/string.hpp>
-
 using namespace are::sim;
 
 ObstacleAvoidance::ObstacleAvoidance(const settings::ParametersMapPtr& params)

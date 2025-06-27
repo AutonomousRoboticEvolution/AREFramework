@@ -2,7 +2,6 @@
 #define FIXED_MORPHOLOGY_HPP
 
 #include <cmath>
-#include <boost/algorithm/string.hpp>
 #include "simulatedER/Morphology.h"
 
 namespace are {

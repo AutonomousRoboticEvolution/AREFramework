@@ -2,8 +2,6 @@
 
 using namespace are;
 
-
-
 void NNParamGenome::mutate(){
     int mutation_type = settings::getParameter<settings::Integer>(parameters,"#mutationType").value;
     double mutation_rate = settings::getParameter<settings::Double>(parameters,"#mutationRate").value;
@@ -109,8 +107,8 @@ std::string NNParamGenome::to_string() const{
 
 void NNParamGenome::from_string(const std::string &gen_str){
     std::vector<std::string> split_str,split_str2;
-    boost::split(split_str,gen_str,boost::is_any_of("\n"),boost::token_compress_on); // boost::token_compress_on means it will ignore any empty lines (where there is adjacent newline charaters)
-    boost::split(split_str2,split_str[0],boost::is_any_of(" "));
+    misc::split_line(gen_str,"\n",split_str);
+    misc::split_line(split_str[0]," ",split_str2);
 
     nn_type = std::stoi(split_str2[0]);
     nbr_input = std::stoi(split_str2[1]);

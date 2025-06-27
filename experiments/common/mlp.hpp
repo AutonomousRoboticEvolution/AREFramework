@@ -13,12 +13,16 @@ namespace tnn{
         void set_weights_biases(const std::vector<double> &weights, const std::vector<double> &biases);
         std::vector<double> get_weights();
         std::vector<double> get_biases();
+        void print_nn_structure();
 
         int _nbr_inputs;
-        int _nbr_ouputs;
+        int _nbr_outputs;
         int _nbr_hidden;
+
         torch::nn::Linear _in_to_hid{nullptr};
         torch::nn::Linear _hid_to_out{nullptr};
+    private:
+        torch::nn::Sequential _nn{nullptr};
     };
 }//tnn
 

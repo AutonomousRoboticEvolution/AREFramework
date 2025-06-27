@@ -1,7 +1,5 @@
 #include "simulatedER/mazeEnv.h"
 
-#include <boost/algorithm/string.hpp>
-
 using namespace are::sim;
 
 MazeEnv::MazeEnv()
@@ -117,8 +115,11 @@ float MazeEnv::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     final_position[2] = static_cast<double>(wp.position[2]);
 
     float interval = evalTime/static_cast<float>(nbr_wp);
-    if(simulationTime >= interval*trajectory.size())
+    if(simulationTime >= interval*trajectory.size()){
+        std::cout << "POSITION : " <<  final_position[0] << ";" << final_position[1] << ";" << final_position[2] << " - "
+                  << wp.orientation[0] << ";" << wp.orientation[1] << ";" << wp.orientation[2] << " ==== " << std::endl;
         trajectory.push_back(wp);
+    }
 
     return 0;
 }

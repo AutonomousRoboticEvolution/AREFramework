@@ -2,14 +2,10 @@
 #define NN_PARAM_GENOME_HPP
 
 #include "ARE/Genome.h"
-#include <boost/random.hpp>
-#include <boost/algorithm/string.hpp>
 #include "ARE/Logging.h"
 #include "ARE/genetic_operators.hpp"
 
 namespace are{
-
-
 
 class NNParamGenome : public Genome
 {

@@ -4,7 +4,6 @@
 #elif defined (COPPELIASIM)
 #include "simLib.h"
 #endif
-#include <boost/algorithm/string.hpp>
 #include <simulatedER/Morphology.h>
 
 using namespace are;
@@ -77,6 +76,10 @@ float Locomotion::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     final_position[0] = static_cast<double>(wp.position[0]);
     final_position[1] = static_cast<double>(wp.position[1]);
     final_position[2] = static_cast<double>(wp.position[2]);
+
+    std::cout << final_position[0] << ";"
+              << final_position[1] << ";"
+              << final_position[2] << std::endl;
 
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())

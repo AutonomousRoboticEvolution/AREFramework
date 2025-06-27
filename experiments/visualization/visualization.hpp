@@ -1,48 +1,32 @@
 #ifndef VISU_POP_HPP
 #define VISU_POP_HPP
 
-#include <boost/filesystem.hpp>
-#include <boost/algorithm/string.hpp>
+#include <filesystem>
 #include "ARE/EA.h"
 #include "ARE/Logging.h"
 #include "ARE/Individual.h"
 #include "ARE/NNParamGenome.hpp"
-#include "simulatedER/nn2/NN2Individual.hpp"
-#include "simulatedER/Morphology_CPPNMatrix.h"
-#include "ARE/nn2/NN2Settings.hpp"
+// #include "simulatedER/are_morphology.hpp"
+#include "simulatedER/FixedMorphology.hpp"
+// #include "simulatedER/nn2/NN2Individual.hpp"
+// #include "simulatedER/Morphology_CPPNMatrix.h"
+// #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/Settings.h"
+#include "mlp.hpp"
 
 
 namespace are {
 
-using CPPNMorph = sim::Morphology_CPPNMatrix;
-
-class ManualDesign: public Genome{
-public:
-    ManualDesign(std::vector<std::vector<int>> lov){
-        list_of_voxels = lov;
-    }
-    ManualDesign(const ManualDesign& md):
-        list_of_voxels(md.list_of_voxels){}
-    Genome::Ptr clone() const override{return nullptr;}
-    void init() override{}
-    void mutate() override{}
-    std::string to_string() const override{return "";}
-    void from_string(const std::string &) override{}
-
-    std::vector<std::vector<int>> list_of_voxels;
-};
-
-class VisuInd : public sim::NN2Individual
+class VisuInd : public Individual
 {
 public:
-    VisuInd() : NN2Individual(){}
+    VisuInd() : Individual(){}
     VisuInd(const Genome::Ptr& morph_gen,const Genome::Ptr& ctrl_gen)
-        : NN2Individual(morph_gen,ctrl_gen)
+        : Individual(morph_gen,ctrl_gen)
     {
     }
     VisuInd(const VisuInd& ind) :
-        NN2Individual(ind)
+        Individual(ind)
     {}
     Individual::Ptr clone() override{
         return std::make_shared<VisuInd>(*this);

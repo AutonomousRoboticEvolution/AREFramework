@@ -1,6 +1,5 @@
 #include "simulatedER/mazeEnv.h"
 #include "NIPES.hpp"
-#include "simulatedER/nn2/NN2Individual.hpp"
 #include "NIPESLoggings.hpp"
 #include "simulatedER/Logging.hpp"
 #include "env_settings.hpp"
@@ -53,7 +52,7 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
     logs.push_back(fitlog);
 
     std::string behav_desc_log_file = are::settings::getParameter<are::settings::String>(param,"#behavDescFile").value;
-    are::BehavDescLog<are::sim::NN2Individual>::Ptr bdlog = std::make_shared<are::BehavDescLog<are::sim::NN2Individual>>(behav_desc_log_file);
+    are::BehavDescLog<are::NIPESIndividual>::Ptr bdlog = std::make_shared<are::BehavDescLog<are::NIPESIndividual>>(behav_desc_log_file);
     logs.push_back(bdlog);
 
     are::BestIndividualLog::Ptr bilog = std::make_shared<are::BestIndividualLog>();
