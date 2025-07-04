@@ -5,7 +5,6 @@
 
 #include "simLib/simLib.h"
 
-
 #include "simulatedER/mazeEnv.h"
 #include "ARE/learning/ipop_cmaes.hpp"
 #include "ARE/learning/Novelty.hpp"

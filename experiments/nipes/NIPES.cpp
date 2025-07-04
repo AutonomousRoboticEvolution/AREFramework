@@ -1,5 +1,5 @@
 #include "NIPES.hpp"
-#include "mlp.hpp"
+#include "are_torch/torch_nn.hpp"
 #include "simulatedER/are_morphology.hpp"
 #include "simulatedER/FixedMorphology.hpp"
 
@@ -37,11 +37,21 @@ void NIPESIndividual::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-    std::cout << "Creating MLP with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
-    control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
-    std::dynamic_pointer_cast<MLPControl>(control)->_nn->print_nn_structure();
-    std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
-    std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
+    if(nn_type == tnn::t_MLP){
+        std::cout << "Creating MLP with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
+        std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
+        // std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
+    }else if(nn_type == tnn::t_RNN){
+        std::cout << "Creating RNN with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<RNNControl>(nb_inputs,nb_outputs,nb_hidden);
+        std::dynamic_pointer_cast<RNNControl>(control)->_nn->set_weights_biases(weights,bias);
+        // std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
 
@@ -52,7 +62,6 @@ void NIPESIndividual::createMorphology(){
     morphology = std::make_shared<sim::FixedMorphology>(parameters);
     std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
     morphology->set_randNum(randNum);
-
 
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
 
@@ -114,8 +123,7 @@ double NIPES::novelty_params::archive_adding_prob = 0.4;
 double NIPES::novelty_params::novelty_thr = 0.9;
 
 void NIPES::init(){
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    if(instance_type == settings::INSTANCE_REGULAR || !simulator_side)
+    if(!simulator_side)
     {
         int lenStag = settings::getParameter<settings::Integer>(parameters,"#lengthOfStagnation").value;
 
@@ -158,7 +166,15 @@ void NIPES::init(){
         //     std::cerr << "unknown type of neural network" << std::endl;
         //     return;
         // }
-        MLPControl::nbr_parameters(nb_input,nb_output,nb_hidden,nbr_weights,nbr_bias);
+        if(nn_type == tnn::t_MLP)
+            MLPControl::nbr_parameters(nb_input,nb_output,nb_hidden,nbr_weights,nbr_bias);
+        else if(nn_type == tnn::t_RNN)
+            RNNControl::nbr_parameters(nb_input,nb_output,nb_hidden,nbr_weights,nbr_bias);
+        else {
+            std::cerr << "unknown type of neural network" << std::endl;
+            return;
+        }
+
 
         std::string bootstrapCtrl = settings::getParameter<settings::String>(parameters,"#bootstrapControllerFile").value;
         std::vector<double> initial_point;
@@ -222,7 +238,7 @@ void NIPES::init(){
             ind->set_randNum(randomNum);
             population.push_back(ind);
         }
-    }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
+    }else{
         EmptyGenome::Ptr morph_gen = std::make_shared<EmptyGenome>();
         NNParamGenome::Ptr ctrl_gen = std::make_shared<NNParamGenome>();
         NIPESIndividual::Ptr ind = std::make_shared<NIPESIndividual>(morph_gen,ctrl_gen);
@@ -248,8 +264,8 @@ void NIPES::epoch(){
     bool withRestart = settings::getParameter<settings::Boolean>(parameters,"#withRestart").value;
     bool incrPop = settings::getParameter<settings::Boolean>(parameters,"#incrPop").value;
     bool elitist_restart = settings::getParameter<settings::Boolean>(parameters,"#elitistRestart").value;
-    double energy_budget = settings::getParameter<settings::Double>(parameters,"#energyBudget").value;
-    bool energy_reduction = settings::getParameter<settings::Boolean>(parameters,"#energyReduction").value;
+    // double energy_budget = settings::getParameter<settings::Double>(parameters,"#energyBudget").value;
+    // bool energy_reduction = settings::getParameter<settings::Boolean>(parameters,"#energyReduction").value;
 
     // /**Energy Cost**/
     // if(energy_reduction){

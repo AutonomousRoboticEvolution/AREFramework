@@ -7,6 +7,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 set(INCLUDES
    ${COPPELIASIM_INCLUDE_DIR}
+   "../../are_torch/include"
     "../../simulation/include"
     "../../EAFramework/include"
     "../common/"
@@ -24,7 +25,6 @@ add_library(NIPES SHARED
     factories.cpp
     NIPESLoggings.cpp
     NIPES.cpp
-    ../common/mlp.cpp
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
@@ -36,12 +36,12 @@ add_library(NIPES SHARED
     )
 target_include_directories(NIPES PUBLIC ${INCLUDES})
 target_link_libraries(NIPES ARE
-    simulatedER cmaes "${TORCH_LIBRARIES}")
+    simulatedER cmaes ${TORCH_LIBRARIES} are_torch)
 
 add_executable(nipes_test nipes_test.cpp)
-target_include_directories(nipes_test PUBLIC ${INCLUDES} ${TORCH_INCLUDE_DIRS})
+target_include_directories(nipes_test PUBLIC ${INCLUDES})
 target_link_libraries(nipes_test ARE NIPES cmaes)
 
 install(TARGETS NIPES DESTINATION lib/ARE/experiments/)
-install(DIRECTORY . DESTINATION include/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
+install(DIRECTORY . DESTINATION include/ARE/experiments/nipes FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
