@@ -7,6 +7,8 @@
 #include <iostream>
 #include <memory>
 
+#include <boost/serialization/array.hpp>
+
 #include "ARE/Genome.h"
 #include "ARE/misc/RandNum.h"
 #include "ARE/Settings.h"
@@ -16,20 +18,20 @@
 namespace are {
 
 struct waypoint{
-    float position[3] = {0,0,0};
-    float orientation[3] = {0,0,0};
+    std::array<double,3> position = {0,0,0};
+    std::array<double,3> orientation = {0,0,0};
 
     waypoint(){}
 
-    waypoint(const waypoint &wp){
-        position[0] = wp.position[0];
-        position[1] = wp.position[1];
-        position[2] = wp.position[2];
+    // waypoint(const waypoint &wp){
+    //     position[0] = wp.position[0];
+    //     position[1] = wp.position[1];
+    //     position[2] = wp.position[2];
 
-        orientation[0] = wp.orientation[0];
-        orientation[1] = wp.orientation[1];
-        orientation[2] = wp.orientation[2];
-    }
+    //     orientation[0] = wp.orientation[0];
+    //     orientation[1] = wp.orientation[1];
+    //     orientation[2] = wp.orientation[2];
+    // }
 
     std::string to_string() const{
         std::stringstream sstr;
@@ -67,11 +69,16 @@ public:
     typedef Environment::Ptr (Factory)(const settings::ParametersMapPtr&);
 
 
-    Environment(){}
+    Environment(){
+        trajectory.resize(0);
+        final_position.resize(3);
+    }
     Environment(const Environment& env) :
         name(env.name),
         parameters(env.parameters),
-        randNum(env.randNum){}
+        randNum(env.randNum),
+        trajectory(env.trajectory),
+        final_position(env.final_position){}
 
     ~Environment(){}
 

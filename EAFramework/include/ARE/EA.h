@@ -52,6 +52,7 @@ public:
      */
     virtual void setObjectives(size_t indIndex, const std::vector<double> &objectives)
     {
+        numberEvaluation++;
         currentIndIndex = indIndex;
         population[indIndex]->setObjectives(objectives);
     }
@@ -62,7 +63,6 @@ public:
      */
     virtual bool update(const Environment::Ptr&)
     {
-        numberEvaluation++;
         return true;
     }
 
