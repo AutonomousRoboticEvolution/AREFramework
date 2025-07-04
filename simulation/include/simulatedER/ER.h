@@ -83,7 +83,6 @@ public:
     /// appropriate files.
     virtual void endOfSimulation();
 
-    void initIndividual();
     void init_individual(const std::string &serialized_ind);
     void set_ind_str(const std::string &ind_str){current_ind_str = ind_str;}
     void initEnv(){environment->init();}

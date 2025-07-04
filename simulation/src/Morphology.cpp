@@ -80,14 +80,14 @@ void Morphology::reset_actuators(){
     }
 }
 
-std::vector<double> Morphology::get_position(){
+std::array<double,3> Morphology::get_position(){
     double pos[3];
     simGetObjectPosition(mainHandle,-1,pos);
-    return std::vector<double>({pos[0],pos[1],pos[2]});
+    return std::array<double,3>({pos[0],pos[1],pos[2]});
 }
 
-std::vector<double> Morphology::get_orientation(){
+std::array<double,3> Morphology::get_orientation(){
     double ori[3];
     simGetObjectOrientation(mainHandle,-1,ori);
-    return std::vector<double>({ori[0],ori[1],ori[2]});
+    return std::array<double,3>({ori[0],ori[1],ori[2]});
 }

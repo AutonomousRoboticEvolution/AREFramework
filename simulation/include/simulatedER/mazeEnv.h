@@ -3,11 +3,7 @@
 
 #include <cmath>
 
-#if defined (VREP)
-#include "v_repLib.h"
-#elif defined (COPPELIASIM)
 #include "simLib/simLib.h"
-#endif
 
 #include "simulatedER/VirtualEnvironment.hpp"
 #include "ARE/Individual.h"
@@ -25,6 +21,10 @@ namespace are {
             typedef std::shared_ptr<const MazeEnv> ConstPtr;
 
             MazeEnv();
+            MazeEnv(const MazeEnv& env):
+                VirtualEnvironment(env),
+                target_position(env.target_position),
+                move_counter(env.move_counter){}
 
             ~MazeEnv(){}
             void init() override;
@@ -34,8 +34,6 @@ namespace are {
 
             ///time point to check the status of the robot
             float timeCheck = 0.0;
-
-            const std::vector<waypoint> &get_trajectory(){return trajectory;}
 
 
         private:

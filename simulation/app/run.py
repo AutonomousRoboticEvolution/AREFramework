@@ -24,7 +24,7 @@ def run_server(args,rank: int):
     # [1] path to the parameter file
     # [2] server port
     are_plugin = "'simARE'"
-    cmd = [f"{args.coppelia}",f"-GzmqRemoteApi.rpcPort={server_port}",f"-g{args.params}",f"-g{args.params}"]
+    cmd = [f"{args.coppelia}",f"-GzmqRemoteApi.rpcPort={server_port}",f"-g{args.params}"]
     if(args.headless == 1):
         if(not args.xvfb) :
             cmd.append("-h")
@@ -42,7 +42,7 @@ def run_client(args):
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
     logfilename = args.log_folder + "/client_" + formated_time + ".out";
     logfile = open(logfilename,'w+')
-    return subprocess.Popen([#"gdb","--args",
+    return subprocess.Popen([#"gdb","--ex=r","--args",
         args.client,
         str(args.params),
         str(args.port_start),

@@ -105,11 +105,10 @@ std::vector<double> MultiTargetMaze::fitnessFunction(const Individual::Ptr &ind)
 float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
-    int morphHandle = morph->getMainHandle();
 
     waypoint wp;
-    simGetObjectPosition(morphHandle, -1, wp.position);
-    simGetObjectOrientation(morphHandle,-1,wp.orientation);
+    wp.position = morph->get_position();
+    wp.orientation =  morph->get_orientation();
 //    std::cout << wp.to_string() << std::endl;
 
     if(wp.is_nan())
@@ -125,10 +124,15 @@ float MultiTargetMaze::updateEnv(float simulationTime, const Morphology::Ptr &mo
     final_position[2] = static_cast<double>(wp.position[2]);
 
     float interval = evalTime/static_cast<float>(nbr_wp);
-    if(simulationTime >= interval*trajectory.size())
-        trajectory.push_back(wp);
+    if(simulationTime >= interval*trajectory.size()){
+        trajectory.push_back(waypoint());
+        trajectory.back().position = wp.position;
+        trajectory.back().orientation = wp.orientation;
+    }
     else if(simulationTime >= evalTime){
-        trajectory.push_back(wp);
+        trajectory.push_back(waypoint());
+        trajectory.back().position = wp.position;
+        trajectory.back().orientation = wp.orientation;
         trajectories[current_target] = trajectory;
     }
 

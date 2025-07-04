@@ -1,5 +1,6 @@
 #include "simulatedER/ER.h"
 
+using namespace are;
 using namespace are::sim;
 namespace interproc = boost::interprocess;
 
@@ -87,55 +88,7 @@ void ER::startOfSimulation()
     ea->setCurrentIndIndex(currentIndIndex);
 }
 
-void ER::initIndividual(){
-    // if(ind_received){
-    //     currentInd->init();
-    //     return;
-    // }
-    // std::string message;
-    // receive_string_no_reply(message,_individual_channel,"ind ");
-    // std::cout << "received individual" << std::endl;
-    // ind_received = true;
-    
 
-
-    //int length;
-    //char* message = simGetStringSignal("currentInd",&length);
-    // if(message.empty()){
-    //     std::cerr << "No individual received" << std::endl;
-    //     return;
-    // }
-    
-//    std::string mess(message);
-//    mess.resize(length);
-    if(current_ind_str.empty()){
-        std::cerr << "sim::ER : No individual serialized" << std::endl;
-        exit(1);
-    }
-
-    currentInd = ea->get_population()[0];
-    if(nbrEval == 0)
-        currentInd->from_string(current_ind_str);
-
-    //     currentInd->from_string(message);
-    currentInd->init();
-    
-    int ind_id = currentInd->get_morph_genome()->id();
-    evalIsFinish = false;
-    if(settings::getParameter<settings::Boolean>(parameters,"#isScreenshotEnable").value) {
-        std::string image_repo = settings::getParameter<settings::String>(parameters, "#imageRepository").value;
-        bool images_in_logs = settings::getParameter<settings::Boolean>(parameters, "#imagesInLogFolder").value;
-        if(images_in_logs){
-            Logging::create_folder(Logging::log_folder + "/" + image_repo);
-            robotScreenshot(ind_id,Logging::log_folder + "/" + image_repo);
-        }
-        else{
-            Logging::create_folder(image_repo);
-            robotScreenshot(ind_id,image_repo);
-        }
-    }
-//    simReleaseBuffer(message);
-}
 void ER::init_individual(const std::string &serialized_ind){
     if(serialized_ind.empty()){
         std::cerr << "No individual received" << std::endl;
@@ -168,7 +121,7 @@ void ER::handleSimulation()
 {
     if(currentInd.get() == nullptr)
         return;
-    }
+
 
     simulationTime = simGetSimulationTime();
     //    if(instance_type == settings::INSTANCE_SERVER)
@@ -192,7 +145,6 @@ void ER::handleSimulation()
 void ER::endOfSimulation()
 {
 
-    int instanceType = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
 
     if(verbose)
@@ -200,79 +152,20 @@ void ER::endOfSimulation()
 
     nbrEval++;
 
-    if(instanceType == settings::INSTANCE_REGULAR){
-        if(currentIndIndex < ea->get_population().size())
-        {
-            std::vector<double> objectives = environment->fitnessFunction(currentInd);
-            for(double& o: objectives)
-                o = misc::round_at_precision(o,2);
-
-            if(verbose){
-                std::cout << "fitnesses = " << std::endl;
-                for(const double fitness : objectives)
-                    std::cout << fitness << std::endl;
-            }
-            ea->setObjectives(currentIndIndex,objectives);
-            std::cout << environment << std::endl;
-
-            end_eval_time = hr_clock::now();
-            std::stringstream sstr;
-            sstr << "eval," << std::chrono::duration_cast<std::chrono::microseconds>(start_eval_time - reference_time).count()
-                 << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_eval_time - reference_time).count() << std::endl;
-            Logging::saveStringToFile("times.csv",sstr.str());
-            if(ea->update(environment)){
-                currentIndIndex++;
-                nbrEval = 0;
-                saveLogs(false);
-            }
-            else return;
-
-        }
-
-        if(currentIndIndex >= ea->get_population().size())
-        {
-            start_overhead_time = hr_clock::now();
-            ea->epoch();
-            saveLogs();
-            ea->init_next_pop();
-            if(verbose)
-                std::cout << "-_- GENERATION _-_ " << ea->get_generation() << " finished" << std::endl;
-            ea->incr_generation();
-            currentIndIndex = 0;
-            end_overhead_time = hr_clock::now();
-            std::stringstream sstr;
-            sstr << "overhead," << std::chrono::duration_cast<std::chrono::microseconds>(start_overhead_time - reference_time).count()
-                 << "," << std::chrono::duration_cast<std::chrono::microseconds>(end_overhead_time - reference_time).count() << std::endl;
-            Logging::saveStringToFile("times.csv",sstr.str());
-        }
-
-        if(ea->is_finish()){
-            saveEndLogs();
-            if(verbose)
-            {
-                std::cout << "---------------------" << std::endl;
-                std::cout << "Evolution is Finished" << std::endl;
-                std::cout << "---------------------" << std::endl;
-            }
-            simQuitSimulator(true);
-            return;
-        }
+    std::vector<double> objectives = environment->fitnessFunction(currentInd);
+    if(verbose){
+        std::cout << "fitnesses = " << std::endl;
+        for(const double fitness : objectives)
+            std::cout << fitness << std::endl;
     }
-    else if(instanceType == settings::INSTANCE_SERVER){
-        std::vector<double> objectives = environment->fitnessFunction(currentInd);
-        if(verbose){
-            std::cout << "fitnesses = " << std::endl;
-            for(const double fitness : objectives)
-                std::cout << fitness << std::endl;
-        }
-        ea->setObjectives(currentIndIndex,objectives);
-        evalIsFinish = ea->update(environment);
-        if(evalIsFinish){
-            nbrEval = 0;
-            ind_received = false;
-        }
-        simSetInt32Signal("evalIsFinish",evalIsFinish);
+    ea->setObjectives(currentIndIndex,objectives);
+    evalIsFinish = ea->update(environment);
+    if(evalIsFinish){
+        nbrEval = 0;
+        ind_received = false;
     }
+    simSetInt32Signal("evalIsFinish",evalIsFinish);
+
 }
 
 void ER::saveLogs(bool endOfGen)

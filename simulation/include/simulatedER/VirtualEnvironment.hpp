@@ -23,8 +23,9 @@ public:
     typedef VirtualEnvironment::Ptr (Factory)(const settings::ParametersMapPtr&);
 
 
-    VirtualEnvironment(){}
-    VirtualEnvironment(const VirtualEnvironment& env) :
+    VirtualEnvironment(): Environment(){}
+    VirtualEnvironment(const VirtualEnvironment& env) : 
+        Environment(env),
         envObjectHandles(env.envObjectHandles),
         maxTime(env.maxTime){}
     ~VirtualEnvironment(){}
