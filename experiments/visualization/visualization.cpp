@@ -150,29 +150,31 @@ void Visu::init(){
         std::vector<std::vector<int>> list_of_voxel;
         morph_gen = std::make_shared<EmptyGenome>();
         ctrl_gen = std::make_shared<EmptyGenome>();
-        Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+        Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);
         ind->set_randNum(randomNum);
         population.push_back(ind);
         return;
     }
 
-    if(id >= 0)
-        load_per_id(id,morph_gen_files,ctrl_gen_files);
-    else load_per_gen_ind(indIdx,morph_gen_files,ctrl_gen_files);
+    if(!simulator_side){
+        if(id >= 0)
+            load_per_id(id,morph_gen_files,ctrl_gen_files);
+        else load_per_gen_ind(indIdx,morph_gen_files,ctrl_gen_files);
+    }
 
     // if(fixed_morph_path == "None"){
     //     //load morphology genome
     //     for(size_t i = 0; i < morph_gen_files.size(); i++){
 
-    //         nn2_cppn_t cppn;
-    //         std::ifstream ifs(morph_gen_files[i]);
-    //         boost::archive::text_iarchive iarch(ifs);
-    //         iarch >> cppn;
-    //         morph_gen.reset(new NN2CPPNGenome(cppn));
-    //         std::vector<std::string> split_str;
-    //         misc::split_line(morph_gen_files[i],"_",split_str);
-    //         morph_gen->set_id(std::stoi(split_str.back()));
+        //         nn2_cppn_t cppn;
+        //         std::ifstream ifs(morph_gen_files[i]);
+        //         boost::archive::text_iarchive iarch(ifs);
+        //         iarch >> cppn;
+        //         morph_gen.reset(new NN2CPPNGenome(cppn));
+        //         std::vector<std::string> split_str;
+        //         misc::split_line(morph_gen_files[i],"_",split_str);
+        //         morph_gen->set_id(std::stoi(split_str.back()));
 
     //         morph_gen->set_randNum(randomNum);
     //         morph_gen->set_parameters(parameters);
@@ -192,25 +194,34 @@ void Visu::init(){
     //     }
 
     // }else{
-        morph_gen = std::make_shared<EmptyGenome>();
-        if(empty_ctrl_gen){
-            ctrl_gen = std::make_shared<EmptyGenome>();
-            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
-            ind->set_parameters(parameters);
-            ind->set_randNum(randomNum);
-            population.push_back(ind);
-        }else{
+    morph_gen = std::make_shared<EmptyGenome>();
+    if(empty_ctrl_gen){
+        ctrl_gen = std::make_shared<EmptyGenome>();
+        Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
+        ind->set_parameters(parameters);
+        ind->set_randNum(randomNum);
+        population.push_back(ind);
+    }else{
+        if(!simulator_side){
             for(const std::string& path: ctrl_gen_files){
                 std::cout << "ctrl file loading: " << path << std::endl;
                 ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
                 std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(path);
 
-                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
                 ind->set_parameters(parameters);
                 ind->set_randNum(randomNum);
                 population.push_back(ind);
             }
         }
+        else{
+            ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
+            Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
+            ind->set_parameters(parameters);
+            ind->set_randNum(randomNum);
+            population.push_back(ind);
+        }
+    }
     // }
 
     morph_gen.reset();
@@ -220,15 +231,20 @@ void Visu::init(){
         std::cerr << "ERROR: Population is empty" << std::endl;
         exit(1);
     }
+
 }
 
 bool Visu::update(const Environment::Ptr &env){
-    Individual::Ptr ind = population[currentIndIndex];
-    std::dynamic_pointer_cast<VisuInd>(ind)->set_trajectory(env->get_trajectory());
+
+    if(simulator_side){
+        Individual::Ptr ind = population[currentIndIndex];
+        std::dynamic_pointer_cast<VisuInd>(ind)->set_trajectory(env->get_trajectory());
+    }
+    return true;
 }
 
 bool Visu::is_finish(){
-    return currentIndIndex >= population.size() - 1;
+    return numberEvaluation >= population.size();
 }
 
 void Visu::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){

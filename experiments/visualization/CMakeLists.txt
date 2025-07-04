@@ -4,14 +4,8 @@ find_package(Torch REQUIRED)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
 
 SET(VREP_SRC
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/v_repLib.cpp>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApi.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/common/shared_memory.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApi.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/legacyRemoteApi/remoteApi/extApiPlatform.c>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c>
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/simLib.cpp
+    ${COPPELIASIM_FOLDER}/programming/include/simLib/shared_memory.c
     )
 
 
@@ -19,7 +13,6 @@ add_library(visualization SHARED
     ${VREP_SRC}
     visualization.cpp
     factories.cpp
-    ../common/mlp.cpp
     ../common/obstacleAvoidance.cpp
     ../common/barrelTask.cpp
     ../common/exploration.cpp
@@ -28,15 +21,15 @@ add_library(visualization SHARED
     ../common/push_object.cpp
     )
 target_include_directories(visualization PUBLIC
-    $<$<BOOL:${VREP_FOUND}>:${VREP_FOLDER}/programming/include>
-    $<$<BOOL:${COPPELIASIM_FOUND}>:${COPPELIASIM_FOLDER}/programming/include>
+   ${COPPELIASIM_INCLUDE_DIR}
+   "../../are_torch/include"
     "../../simulation/include"
     "../../EAFramework/include"
     "../common/"
     "/usr/include/eigen3"
     "../../modules"
     )
-target_link_libraries(visualization ARE simulatedER "${TORCH_LIBRARIES}")
+target_link_libraries(visualization ARE simulatedER  are_torch "${TORCH_LIBRARIES}")
 
-install(TARGETS visualization DESTINATION lib)
-install(DIRECTORY . DESTINATION include/visualization  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")
+install(TARGETS visualization DESTINATION lib/ARE/experiments/)
+install(DIRECTORY . DESTINATION include/ARE/experiments/visualization  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

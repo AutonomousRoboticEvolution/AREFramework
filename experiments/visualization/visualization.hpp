@@ -12,7 +12,7 @@
 // #include "simulatedER/Morphology_CPPNMatrix.h"
 // #include "ARE/nn2/NN2Settings.hpp"
 #include "ARE/Settings.h"
-#include "mlp.hpp"
+#include "are_torch/torch_nn.hpp"
 
 
 namespace are {

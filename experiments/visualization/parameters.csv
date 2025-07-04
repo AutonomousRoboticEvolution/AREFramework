@@ -1,14 +1,14 @@
 #experimentName,string,visualization
-#expPluginName,string,/usr/local/lib/libvisualization.so
+#expPluginName,string,/usr/local/lib/ARE/experiments/libvisualization.so
 #scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttm
-#folderToLoad,string,/home/leni/are-logs/nipes_25_5_17-14-33-3033-4103609997/
+#folderToLoad,string,/media/leni/DATADRIVE1/are-logs/nipes_1_6_14-54-8-8140-3780954850/
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
 #robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/AREPuck.ttm
 #manualDesignFile,string,None
 #idToLoad,int,-1
 #genToLoad,int,999
-#indToLoad,int,3
+#indToLoad,int,9
 #maxEvalTime,float,120
 #numberOfGeneration,int,0
 #populationSize,int,25
@@ -30,7 +30,7 @@
 #useArucoAsInput,bool,1
 #initPosition,sequence_double,-0.6;0.6;0.2
 #targetPosition,sequence_double,0.6;0.6;0.2;
-#robotOrientation,sequence_float,0;-1.57;0
+#robotOrientation,sequence_double,0;-1.57;0
 #MaxWeight,float,1.0
 #NNType,int,0
 #NbrHiddenNeurones,int,6
@@ -38,7 +38,7 @@
 #UseInternalBias,bool,1
 #genType,int,2
 #withBeacon,bool,1
-#withTiles,bool,0
+#withTiles,bool,1
 #flatFloor,bool,1
 #jointControllerType,int,2
 #randomOrientation,bool,0

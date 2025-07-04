@@ -1,7 +1,7 @@
 #include "simulatedER/mazeEnv.h"
 #include "emptyEnv.hpp"
 #include "visualization.hpp"
-#include "simulatedER/obstacleAvoidance.hpp"
+#include "obstacleAvoidance.hpp"
 #include "barrelTask.hpp"
 #include "exploration.hpp"
 #include "locomotion.hpp"
