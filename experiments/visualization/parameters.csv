@@ -1,15 +1,15 @@
 #experimentName,string,visualization
 #expPluginName,string,/usr/local/lib/libvisualization.so
-#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/hill.ttt
-#scenes,sequence_string,ARE_arena.ttt
-#folderToLoad,string,/home/leni/remote-folder/meim_ds_tasks2/mehk/hill_climb/nipes_hill_climb_31_6_14-27-8-8834-3152132690/
-#modelsPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/
-#robotPath,string,/home/leni/remote-folder/mehk/meim_4_6_16-59-52-2124-2763705642/selected_robots/model_1742.ttm
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#scenes,sequence_string,ARE_arena.ttm
+#folderToLoad,string,/home/leni/are-logs/nipes_25_5_17-14-33-3033-4103609997/
+#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
+#robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/AREPuck.ttm
 #manualDesignFile,string,None
 #idToLoad,int,-1
-#genToLoad,int,159
-#indToLoad,int,34
-#maxEvalTime,float,240
+#genToLoad,int,999
+#indToLoad,int,3
+#maxEvalTime,float,120
 #numberOfGeneration,int,0
 #populationSize,int,25
 #repository,string,/home/leni/are-logs
@@ -22,17 +22,17 @@
 #shouldReopenConnections,bool,0
 #seed,int,-1
 
-#envType,int,6
+#envType,int,0
 #inputNoiseLevel,double,0.
 #outputNoiseLevel,double,0.
 #maxVelocity,double,6.
-#arenaSize,double,2.
+#arenaSize,sequence_double,2.;2.
 #useArucoAsInput,bool,1
-#initPosition,sequence_double,1.4;1.4;0.12
-#targetPosition,sequence_double,5;0;0.2;
-#robotOrientation,sequence_float,1.57;0;1.57
+#initPosition,sequence_double,-0.6;0.6;0.2
+#targetPosition,sequence_double,0.6;0.6;0.2;
+#robotOrientation,sequence_float,0;-1.57;0
 #MaxWeight,float,1.0
-#NNType,int,2
+#NNType,int,0
 #NbrHiddenNeurones,int,6
 #jointSubs,sequence_int,-1;-1;0;1
 #UseInternalBias,bool,1
@@ -46,8 +46,8 @@
 #loadAllMorphGenome,bool,0
 #objectWeight,float,1
 
-#useJointFeedback,bool,1
-#useWheelFeedback,bool,1
+#useJointFeedback,bool,0
+#useWheelFeedback,bool,0
 #useIR,bool,1
 #useCamera,bool,0
 
