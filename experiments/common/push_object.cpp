@@ -109,11 +109,10 @@ std::vector<double> PushObject::fitnessFunction(const Individual::Ptr &ind){
 float PushObject::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     float evalTime = settings::getParameter<settings::Float>(parameters,"#maxEvalTime").value;
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
-    int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morph)->getMainHandle();
 
     waypoint wp;
-    simGetObjectPosition(morphHandle, -1, wp.position);
-    simGetObjectOrientation(morphHandle,-1,wp.orientation);
+    wp.position = morph->get_position();
+    wp.orientation =  morph->get_orientation();
 
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-3 ||
@@ -126,10 +125,13 @@ float PushObject::updateEnv(float simulationTime, const Morphology::Ptr &morph){
 
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
-        trajectory.push_back(wp);
-
-    simGetObjectPosition(object_handle, -1, wp.position);
-    simGetObjectOrientation(object_handle,-1,wp.orientation);
+    {
+        trajectory.push_back(waypoint());
+        trajectory.back().position = wp.position;
+        trajectory.back().orientation = wp.orientation;
+    }
+    simGetObjectPosition(object_handle, -1, wp.position.data());
+    simGetObjectOrientation(object_handle,-1,wp.orientation.data());
 
     if(wp.is_nan())
         return 1;
@@ -138,8 +140,11 @@ float PushObject::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     object_current_position[1] = static_cast<double>(wp.position[1]);
     object_current_position[2] = static_cast<double>(wp.position[2]);
 
-    if(simulationTime >= interval*object_trajectory.size())
-        object_trajectory.push_back(wp);
+    if(simulationTime >= interval*object_trajectory.size())    {
+        object_trajectory.push_back(waypoint());
+        object_trajectory.back().position = wp.position;
+        object_trajectory.back().orientation = wp.orientation;
+    }
 
 
     return 0;

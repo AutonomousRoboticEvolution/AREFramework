@@ -62,8 +62,8 @@ float Locomotion::updateEnv(float simulationTime, const Morphology::Ptr &morph){
     int morphHandle = std::dynamic_pointer_cast<sim::Morphology>(morph)->getMainHandle();
 
     waypoint wp;
-    simGetObjectPosition(morphHandle, -1, wp.position);
-    simGetObjectOrientation(morphHandle,-1,wp.orientation);
+    wp.position = morph->get_position();
+    wp.orientation =  morph->get_orientation();
 
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-3 ||
@@ -80,8 +80,11 @@ float Locomotion::updateEnv(float simulationTime, const Morphology::Ptr &morph){
 
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
-        trajectory.push_back(wp);
-
+    {
+        trajectory.push_back(waypoint());
+        trajectory.back().position = wp.position;
+        trajectory.back().orientation = wp.orientation;
+    }
     return 0;
 }
 

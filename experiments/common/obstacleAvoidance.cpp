@@ -72,14 +72,8 @@ float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &
     int nbr_wp = settings::getParameter<settings::Integer>(parameters,"#nbrWaypoints").value;
 
     waypoint wp;
-    std::vector<double> position = morph->get_position();
-    std::vector<double> orientation = morph->get_orientation();
-    wp.position[0] = position[0];
-    wp.position[1] = position[1];
-    wp.position[2] = position[2];
-    wp.orientation[0] = orientation[0];
-    wp.orientation[1] = orientation[1];
-    wp.orientation[2] = orientation[2];
+    wp.position = morph->get_position();
+    wp.orientation =  morph->get_orientation();
 
 
 //    int obst_handle;
@@ -116,9 +110,11 @@ float ObstacleAvoidance::updateEnv(float simulationTime, const Morphology::Ptr &
 
     float interval = evalTime/static_cast<float>(nbr_wp);
     if(simulationTime >= interval*trajectory.size())
-        trajectory.push_back(wp);
-    else if(simulationTime >= evalTime)
-        trajectory.push_back(wp);
+    {
+        trajectory.push_back(waypoint());
+        trajectory.back().position = wp.position;
+        trajectory.back().orientation = wp.orientation;
+    }
 
     return 0;
 }
