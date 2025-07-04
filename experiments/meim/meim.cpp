@@ -296,10 +296,9 @@ void MEIM::reproduction(){
 }
 
 bool MEIM::update(const Environment::Ptr &env){
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     //    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+    if(simulator_side){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->set_final_position(env->get_final_position());
         if(env->get_name() == "obstacle_avoidance"){
@@ -311,7 +310,7 @@ bool MEIM::update(const Environment::Ptr &env){
         }
         std::dynamic_pointer_cast<MEIMIndividual>(ind)->reset_control();
     }
-    if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
+    if(!simulator_side){
         int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
         for(int &index : newly_evaluated){
