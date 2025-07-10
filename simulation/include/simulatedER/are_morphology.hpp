@@ -173,6 +173,9 @@ public:
 
     void create() override;
     void generate(skeleton::type &skeleton_matrix, std::vector<Organ> &organs_list, const std::vector<std::vector<int>> &list_of_voxels);
+
+    void set_list_of_voxels(const std::vector<std::vector<int>> &list_of_voxels){_list_of_voxels = list_of_voxels;}
+
     /**
      * @brief Read a text file exported for goxel containing list of voxels with color values in hexa.
      *        ffffff white => 1 bone
@@ -184,6 +187,9 @@ public:
      * @param list_of_voxels
      */
     static void load_manual_design(const std::string& filename, std::vector<std::vector<int>> &list_of_voxels);
+private:
+    std::vector<std::vector<int>> _list_of_voxels;
+
 };
 
 class CPPNMorphology: public AREMorphology{

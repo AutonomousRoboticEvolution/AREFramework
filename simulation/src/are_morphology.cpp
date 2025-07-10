@@ -456,11 +456,7 @@ void AREMorphology::check_repress_organs_nobias(const skeleton::type &skeleton_m
 }
 
 void ManuallyDesignedMorphology::create(){
-    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
-    if(manual_design == "None"){
-        std::cerr << "Error: path to manual design is None" << std::endl;
-        return;
-    }
+
     int meshHandle = -1;
     mainHandle = -1;
     bool convexDecompositionSuccess = false;
@@ -470,15 +466,19 @@ void ManuallyDesignedMorphology::create(){
     createHead();
     skeleton::type skeleton_matrix(PolyVox::Region(PolyVox::Vector3DInt32(-morph_const::matrix_size/2, -morph_const::matrix_size/2, -morph_const::matrix_size/2),
                                                    PolyVox::Vector3DInt32(morph_const::matrix_size/2, morph_const::matrix_size/2, morph_const::matrix_size/2)));
-    generate(skeleton_matrix,organ_list,list_of_voxels);
+    generate(skeleton_matrix,organ_list,_list_of_voxels);
 
     // Create mesh for skeleton
     bool indVerResult = generate_skeleton_mesh(skeleton_matrix,meshHandle);
     if(indVerResult)
         convexDecompositionSuccess = convex_decomposition(meshHandle,numSkeletonVoxels,skeletonHandles);
 
+
     if(!convexDecompositionSuccess) // Stop generating body plan if convex decomposition fails
         std::cerr << "Not generating robot because convex decomposition failed. Stopping simulation." << std::endl;
+    else
+        create_organs();
+
     //Create morphological descriptors
     if(indVerResult || convexDecompositionSuccess){
         feat_desc.create(skeleton_matrix,organ_list);
@@ -504,7 +504,7 @@ void ManuallyDesignedMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
+    // simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 
 }
 

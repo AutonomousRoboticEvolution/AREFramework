@@ -99,11 +99,19 @@ void getJointsPosition(const std::vector<int>& handles, std::vector<double>& pos
 
 
 /**
- * @brief get Wheels' positions
+ * @brief get wheels' positions
  * @param list of the handles of the wheels
  * @param (output) list of positions of the wheels
  */
 void getWheelsPosition(const std::vector<int>& handles, std::vector<double>& positions);
+
+
+/**
+ * @brief get current wheels' velocity
+ * @param list of the handles of the wheels
+ * @param (output) list of positions of the wheels
+ */
+void getWheelsVelocity(const std::vector<int>& handles, std::vector<double>& velocities);
 
 /**
  * @brief sent command to the wheels

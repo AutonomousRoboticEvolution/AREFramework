@@ -56,6 +56,7 @@ public:
 
     std::vector<double> get_joints_positions() override;
     std::vector<double> get_wheels_positions() override;
+    std::vector<double> get_wheels_velocities() override;
 
     /**
      * @brief Sends command to the actuators of the robot with the following order : wheel commands and joints commands.
