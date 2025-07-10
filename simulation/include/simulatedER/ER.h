@@ -68,11 +68,8 @@ public:
 //    bool loadIndividual(int individualNum);
 
     ///////////////////////
-    /// V-REP Functions ///
+    /// CoppeliaSim Functions ///
     ///////////////////////
-    /// Initializes ER as a server to accept genomes from client. If framework is server than just hold information for
-    /// one genome. Else, initilizes the first population of individuals.
-    virtual void startOfSimulation();
 
     /// This function is called every simulation step. Note that the behavior of the robot drastically changes when
     /// slowing down the simulation since this function will be called more often. All simulated individuals will be
