@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import seaborn as sns
+import pandas as pd
 import sys
 
 def load_trajectory(filename):
@@ -17,10 +18,14 @@ def load_trajectory(filename):
 
 if __name__ == "__main__":
     filename = sys.argv[1]
+    x_max = int(sys.argv[2])
+    x_min = int(sys.argv[3])
+    y_max = int(sys.argv[4])
+    y_min = int(sys.argv[5])
 
     traj = load_trajectory(filename)
-    
-
-sns.scatterplot()
-    plt.plot(traj[0],traj[1])
+    df_traj = pd.DataFrame(traj,columns=["time","x","y","z"])
+    ax = sns.scatterplot(df_traj,x="x",y="y",hue="time")
+    ax.set_xlim(x_min,x_max)
+    ax.set_ylim(y_min,x_max)
     plt.show()

@@ -84,11 +84,22 @@ void VisuInd::createController(){
     std::vector<double> weights = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_weights();
     std::vector<double> bias = std::dynamic_pointer_cast<NNParamGenome>(ctrlGenome)->get_biases();
 
-    std::cout << "Creating MLP with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
-    control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
-    std::dynamic_pointer_cast<MLPControl>(control)->_nn->print_nn_structure();
-    std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
-    std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
+
+    if(nn_type == tnn::t_MLP){
+        std::cout << "Creating MLP with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<MLPControl>(nb_inputs,nb_outputs,nb_hidden);
+        std::dynamic_pointer_cast<MLPControl>(control)->_nn->set_weights_biases(weights,bias);
+        std::vector<double> out_weights =  std::dynamic_pointer_cast<MLPControl>(control)->_nn->get_weights();
+    }else if(nn_type == tnn::t_RNN){
+        std::cout << "Creating RNN with " << nb_inputs << " inputs, " << nb_hidden << " hidden neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<RNNControl>(nb_inputs,nb_outputs,nb_hidden);
+        std::dynamic_pointer_cast<RNNControl>(control)->_nn->set_weights_biases(weights,bias);
+        std::vector<double> out_weights =  std::dynamic_pointer_cast<RNNControl>(control)->_nn->get_weights();
+    }
+    else {
+        std::cerr << "unknown type of neural network" << std::endl;
+        return;
+    }
     control->set_parameters(parameters);
     control->set_random_number(randNum);
 }
@@ -244,7 +255,7 @@ bool Visu::update(const Environment::Ptr &env){
 }
 
 bool Visu::is_finish(){
-    return numberEvaluation >= population.size();
+    return numberEvaluation >= population.size()+5;
 }
 
 void Visu::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){
