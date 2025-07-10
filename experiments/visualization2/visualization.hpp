@@ -13,6 +13,11 @@ namespace are {
 
 class ManualDesign: public Genome{
 public:
+    typedef std::shared_ptr<ManualDesign> Ptr;
+    typedef std::shared_ptr<const ManualDesign> ConstPtr;
+
+
+    ManualDesign(): Genome(){}
     ManualDesign(std::vector<std::vector<int>> lov){
         list_of_voxels = lov;
     }
@@ -25,6 +30,14 @@ public:
     void from_string(const std::string &) override{}
 
     std::vector<std::vector<int>> list_of_voxels;
+
+    template <class archive>
+    void serialize(archive &arch, const unsigned int v)
+    {
+        arch & boost::serialization::base_object<Genome>(*this);
+        arch & list_of_voxels;
+    }
+
 };
 
 class VisuInd : public Individual

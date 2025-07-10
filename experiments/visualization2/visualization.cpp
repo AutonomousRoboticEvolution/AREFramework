@@ -15,13 +15,13 @@ void VisuInd::createMorphology(){
     std::vector<double> init_pos = settings::getParameter<settings::Sequence<double>>(parameters,"#initPosition").value;
     std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
 
-    // if(manual_design != "None"){
-    //     morphology = std::make_shared<sim::ManuallyDesignedMorphology>(parameters);
-    //     morphology->set_randNum(randNum);
-    //     std::dynamic_pointer_cast<sim::ManuallyDesignedMorphology>(morphology)->set_list_of_voxels(std::dynamic_pointer_cast<ManualDesign>(morphGenome)->list_of_voxels);
-    //     std::dynamic_pointer_cast<sim::ManuallyDesignedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
-    //     return;
-    // }
+    if(manual_design != "None"){
+        morphology = std::make_shared<sim::ManuallyDesignedMorphology>(parameters);
+        morphology->set_randNum(randNum);
+        std::dynamic_pointer_cast<sim::ManuallyDesignedMorphology>(morphology)->set_list_of_voxels(std::dynamic_pointer_cast<ManualDesign>(morphGenome)->list_of_voxels);
+        std::dynamic_pointer_cast<sim::ManuallyDesignedMorphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
+        return;
+    }
 
     if(fixed_morph_path == "None"){
         int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
@@ -53,7 +53,7 @@ void VisuInd::createMorphology(){
         std::dynamic_pointer_cast<sim::Morphology>(morphology)->set_morph_id(id);
         std::dynamic_pointer_cast<sim::Morphology>(morphology)->createAtPosition(init_pos[0],init_pos[1],init_pos[2]);
     }else{
-        morphology.reset(new sim::FixedMorphology(parameters));
+        morphology = std::make_shared<sim::FixedMorphology>(parameters);
         std::dynamic_pointer_cast<sim::FixedMorphology>(morphology)->loadModel();
         morphology->set_randNum(randNum);
 
@@ -141,19 +141,19 @@ void VisuInd::createController(){
         std::dynamic_pointer_cast<NN2Control<rnn_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias);
     }
     else if(nn_type == st::nnType::ELMAN_CPG){
-        control.reset(new NN2Control<elman_cpg_t>());
+        control = std::make_shared<NN2Control<elman_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<elman_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::CPG){
-        control.reset(new NN2Control<cpg_t>());
+        control = std::make_shared<NN2Control<cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
     }
     else if(nn_type == st::nnType::FF_CPG){
-        control.reset(new NN2Control<ff_cpg_t>());
+        control = std::make_shared<NN2Control<ff_cpg_t>>();
         control->set_parameters(parameters);
         std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->set_randonNum(randNum);
         std::dynamic_pointer_cast<NN2Control<ff_cpg_t>>(control)->init_nn(nb_inputs,nb_hidden,nb_outputs,weights,bias, joint_subs);
@@ -201,31 +201,37 @@ void VisuInd::update(double delta_time){
 std::string VisuInd::to_string() const
 {
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
 
     std::stringstream sstream;
     boost::archive::text_oarchive oarch(sstream);
     oarch.register_type<VisuInd>();
     oarch.register_type<NNParamGenome>();
-    oarch.register_type<EmptyGenome>();
-    if(genome_type == morph_genome_type::CPPN)
+    if(manual_design != "None")
+        oarch.register_type<ManualDesign>();
+    else if(genome_type == morph_genome_type::CPPN)
         oarch.register_type<NN2CPPNGenome>();
     else if(genome_type == morph_genome_type::SQ_CPPN)
         oarch.register_type<SQCPPNGenome>();
     else if(genome_type == morph_genome_type::SQ_CG)
         oarch.register_type<SQGenome>();
+    oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
 }
 
 void VisuInd::from_string(const std::string &str){
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+    std::string manual_design = settings::getParameter<settings::String>(parameters,"#manualDesignFile").value;
 
     std::stringstream sstream;
     sstream << str;
     boost::archive::text_iarchive iarch(sstream);
     iarch.register_type<VisuInd>();
     iarch.register_type<NNParamGenome>();
-    if(genome_type == morph_genome_type::CPPN)
+    if(manual_design != "None")
+        iarch.register_type<ManualDesign>();
+    else if(genome_type == morph_genome_type::CPPN)
         iarch.register_type<NN2CPPNGenome>();
     else if(genome_type == morph_genome_type::SQ_CPPN)
         iarch.register_type<SQCPPNGenome>();
@@ -260,9 +266,9 @@ void Visu::init(){
         if(manual_design != "None"){
             std::vector<std::vector<int>> list_of_voxel;
             sim::ManuallyDesignedMorphology::load_manual_design(manual_design,list_of_voxel);
-            morph_gen.reset(new ManualDesign(list_of_voxel));
-            ctrl_gen.reset(new EmptyGenome);
-            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+            morph_gen = std::make_shared<ManualDesign>(list_of_voxel);
+            ctrl_gen = std::make_shared<EmptyGenome>();
+            Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
@@ -324,12 +330,12 @@ void Visu::init(){
             }
             morph_gen->set_id(id);
             if(empty_ctrl_gen)
-                ctrl_gen.reset(new EmptyGenome);
+                ctrl_gen = std::make_shared<EmptyGenome>();
             else{
-                ctrl_gen.reset(new NNParamGenome(randomNum,parameters));
+                ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
                 std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
             }
-            Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+            Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
             ind->set_parameters(parameters);
             ind->set_randNum(randomNum);
             population.push_back(ind);
@@ -337,7 +343,7 @@ void Visu::init(){
             morph_gen = std::make_shared<EmptyGenome>();
             if(empty_ctrl_gen){
                 ctrl_gen = std::make_shared<EmptyGenome>();
-                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
                 ind->set_parameters(parameters);
                 ind->set_randNum(randomNum);
                 population.push_back(ind);
@@ -345,7 +351,7 @@ void Visu::init(){
                 ctrl_gen = std::make_shared<NNParamGenome>(randomNum,parameters);
                 std::dynamic_pointer_cast<NNParamGenome>(ctrl_gen)->from_file(ctrl_gen_file);
 
-                Individual::Ptr ind(new VisuInd(morph_gen,ctrl_gen));
+                Individual::Ptr ind = std::make_shared<VisuInd>(morph_gen,ctrl_gen);
                 ind->set_parameters(parameters);
                 ind->set_randNum(randomNum);
                 population.push_back(ind);
