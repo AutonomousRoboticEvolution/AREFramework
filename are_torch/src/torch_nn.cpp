@@ -187,6 +187,7 @@ void MLPControl::nbr_parameters(int nbr_inputs, int nbr_outputs, int nbr_hidden,
 }
 
 std::vector<double> RNNControl::update(const std::vector<double> &inputs){
+    std::vector<double> out_weights =  _nn->get_weights();
     std::vector<double> cpy = inputs;
     torch::Tensor t_in = torch::from_blob(cpy.data(),{static_cast<int64_t>(inputs.size())},torch::TensorOptions().dtype(torch::kDouble));
     torch::Tensor t_out = _nn->forward(t_in);
