@@ -149,7 +149,7 @@ void NIPES::init(){
         const int nb_output = settings::getParameter<settings::Integer>(parameters,"#NbrOutputNeurones").value;
         const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
-        int nbr_weights, nbr_bias;
+        int nbr_weights=0, nbr_bias=0;
         // if(nn_type == settings::nnType::FFNN)
         //     NN2Control<ffnn_t>::nbr_parameters(nb_input,nb_hidden,nb_output,nbr_weights,nbr_bias);
         // else if(nn_type == settings::nnType::RNN)

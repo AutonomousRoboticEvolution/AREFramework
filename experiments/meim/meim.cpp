@@ -181,8 +181,7 @@ void MEIM::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
-    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
+    if(!simulator_side){
         bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
         if(use_fixed_control){
             weight = randomNum->randDouble(-0.2,0.2);
@@ -222,7 +221,7 @@ void MEIM::init(){
             morph_gen.reset();
             ctrl_gen.reset();
         }
-    }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
+    }else if(simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
         Genome::Ptr morph_gen;
         if(genome_type == morph_genome_type::CPPN)
