@@ -10,5 +10,5 @@ target_include_directories(are_torch PUBLIC
 )
 target_link_libraries(are_torch ARE simulatedER "${TORCH_LIBRARIES}")
 
-install(TARGETS are_torch DESTINATION lib/)
+install(TARGETS are_torch DESTINATION lib)
 install(DIRECTORY . DESTINATION include/are_torch  FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h")

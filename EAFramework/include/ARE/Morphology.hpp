@@ -56,6 +56,7 @@ public:
 
     virtual std::vector<double> get_joints_positions() = 0;
     virtual std::vector<double> get_wheels_positions() = 0;
+    virtual std::vector<double> get_wheels_velocities() = 0;
 
 protected:
     misc::RandNum::Ptr randomNum;

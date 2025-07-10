@@ -18,14 +18,15 @@ Individual::~Individual(){
 void Individual::update(double delta_time){
     bool use_joint_feedback = settings::getParameter<settings::Boolean>(parameters,"#useJointFeedback").value;
     bool use_wheel_feedback = settings::getParameter<settings::Boolean>(parameters,"#useWheelFeedback").value;
-    double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
-    double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
+    // double input_noise_lvl = settings::getParameter<settings::Double>(parameters,"#inputNoiseLevel").value;
+    // double output_noise_lvl = settings::getParameter<settings::Double>(parameters,"#outputNoiseLevel").value;
     double ctrl_freq = settings::getParameter<settings::Double>(parameters,"#ctrlUpdateFrequency").value;
+    double max_velo = settings::getParameter<settings::Double>(parameters,"#maxVelocity").value;
 
     if( fabs(sum_ctrl_freq - ctrl_freq) < 0.0001){
         act_obs_sample aos;
         sum_ctrl_freq = 0;
-        //- Retrieve sensors, joints and wheels values
+        // - Retrieve sensors, joints and wheels values
         std::vector<double> inputs = morphology->update();
 
         if(use_joint_feedback){
@@ -35,9 +36,9 @@ void Individual::update(double delta_time){
             inputs.insert(inputs.end(),joints.begin(),joints.end());
         }
         if(use_wheel_feedback){
-            std::vector<double> wheels = morphology->get_wheels_positions();
+            std::vector<double> wheels = morphology->get_wheels_velocities();
             for(double &w: wheels)
-                w = w/M_PI;
+                w = w/max_velo;
             inputs.insert(inputs.end(),wheels.begin(),wheels.end());
         }
         for(double& i: inputs)

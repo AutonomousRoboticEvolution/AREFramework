@@ -97,6 +97,10 @@ public:
 
     virtual void print_info(){}
 
+    virtual void clear_data(){
+        trajectory.clear();
+    }
+
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}

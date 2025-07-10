@@ -12,7 +12,6 @@ settings::ParametersMapPtr settings::defaults::parameters = std::make_shared<set
                 parameters.emplace("#maxEvalTime",std::make_shared<settings::Float>(60));
                 parameters.emplace("#timeStep",std::make_shared<settings::Float>(0.05));
                 parameters.emplace("#verbose",std::make_shared<settings::Boolean>(0));
-                parameters.emplace("#instanceType",std::make_shared<settings::Integer>(0));
                 parameters.emplace("#seed",std::make_shared<settings::Integer>(-1));
                 parameters.emplace("#debugDisplayOnPi",std::make_shared<settings::Boolean>(0));
                 return parameters;
