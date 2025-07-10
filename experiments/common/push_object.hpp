@@ -27,6 +27,7 @@ public:
     ///time point to check the status of the robot
     float timeCheck = 0.0;
 
+    void clear_data() override;
 
     const std::vector<waypoint> &get_object_trajectory() const {return object_trajectory;}
 

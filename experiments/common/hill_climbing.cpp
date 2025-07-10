@@ -52,11 +52,19 @@ float HillClimbing::updateEnv(float simulationTime, const Morphology::Ptr &morph
     wp.position = morph->get_position();
     wp.orientation =  morph->get_orientation();
 
-
-    if(wp.position[2] > best_height && simulationTime > 1){
-        best_height = wp.position[2];
-        std::cout << "best height: " << best_height << std::endl;
+    current_height += wp.position[2];
+    counter+=1;
+    if(counter >= 20){
+        current_height/=counter;
+        if(current_height > best_height && simulationTime > 1){
+            best_height = current_height;
+            std::cout << "best height: " << best_height << std::endl;
+        }
+        current_height = 0;
+        counter = 0;
     }
+
+
             
 
     if(fabs(final_position[0] - wp.position[0]) > 1e-3 ||

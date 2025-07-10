@@ -31,6 +31,8 @@ public:
 private:
     int move_counter = 0;
     double best_height = 0;
+    double current_height = 0;
+    double counter = 0;
     /// Straight line variables
 };
 }

@@ -59,9 +59,6 @@ void MazeEnv::init(){
         simSetObjectSpecialProperty(beacon_handle,sim_objectspecialproperty_detectable_infrared);
         simSetModelProperty(beacon_handle,sim_modelproperty_not_collidable | sim_modelproperty_not_dynamic);
     }
-
-    trajectory.clear();
-
     bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
 
     if(with_tiles){

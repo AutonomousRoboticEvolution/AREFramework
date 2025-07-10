@@ -69,15 +69,16 @@ void PushObject::init(){
 
     bool with_tiles = settings::getParameter<settings::Boolean>(parameters,"#withTiles").value;
 
-    trajectory.clear();
-    object_trajectory.clear();
-
     if(with_tiles){
         std::vector<int> th;
         build_tiled_floor(th);
     }
     /// EB: This shouldn't be here!
     move_counter = 0;
+}
+void PushObject::clear_data(){
+    Environment::clear_data();
+    object_trajectory.clear();
 }
 
 std::vector<double> PushObject::fitnessFunction(const Individual::Ptr &ind){
