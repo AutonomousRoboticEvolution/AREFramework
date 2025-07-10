@@ -7,6 +7,7 @@
 static LIBRARY simLib;
 
 void getLogFolder(SScriptCallBack* p){
+    std::cout << "entering getLogFolder" << std::endl;
     int stack = p->stackID;
     CStackArray args;
     args.buildFromStack(stack); 
@@ -20,6 +21,19 @@ void getLogFolder(SScriptCallBack* p){
     }
     else
         simSetLastError(nullptr, "Not enough arguments or wrong arguments.");
+}
+
+void initEnvironment(SScriptCallBack* p){
+    std::cout << "entering initEnvironment" << std::endl;
+    int stack = p->stackID;
+
+    ER->initEnv();
+    std::cout << "environment initialised" << std::endl;
+    CStackArray output;
+    output.pushString("environment initialised");
+    output.buildOntoStack(stack);
+
+    std::cout << "Exiting initEnvironment" << std::endl;
 }
 
 void spawnRobot(SScriptCallBack* p)
@@ -81,6 +95,8 @@ SIM_DLLEXPORT int simInit(SSimInit* info){ // This is called just once, at the s
         return(0); // Means error, CoppeliaSim will unload this plugin
     }
 
+
+
     are::settings::defaults::parameters->emplace("#evaluationOrder",std::make_shared<are::settings::Integer>(1)); //Default first in last out
     
     char* parameters_filepath = simGetStringParam(sim_stringparam_app_arg1);
@@ -111,6 +127,7 @@ SIM_DLLEXPORT int simInit(SSimInit* info){ // This is called just once, at the s
 
     simRegisterScriptCallbackFunction("getLogFolder",nullptr,getLogFolder);
     simRegisterScriptCallbackFunction("spawnRobot",nullptr,spawnRobot);
+    simRegisterScriptCallbackFunction("initEnvironment",nullptr,initEnvironment);
     simRegisterScriptCallbackFunction("sendRobotToClient",nullptr,sendRobotToClient);
     simRegisterScriptCallbackFunction("checkConnection",nullptr,checkConnection);
 
@@ -124,10 +141,12 @@ SIM_DLLEXPORT void simMsg(SSimMsg* info){
 
     if (msg == sim_message_eventcallback_simulationabouttostart)
     {
+
         if (verbose)
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
-        ER->initEnv();
-        // ER->initIndividual();
+        // ER->initEnv();
+        int engine[2] = {4,0};
+        simSetIntArrayProperty(sim_handle_scene,"dynamicsEngine",engine,2);
         env_initialised = true;
 
     }

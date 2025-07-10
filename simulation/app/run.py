@@ -10,6 +10,7 @@ def run_servers(args,n: int):
     processes = []
     for rank in range(n):
         processes.append(run_server(args,rank))
+        time.sleep(0.1)
     return processes
 
 
@@ -46,7 +47,7 @@ def run_client(args):
         args.client,
         str(args.params),
         str(args.port_start),
-        str(args.n_vrep),
+        str(args.n_vrep)
     ])#,stdout=logfile,stderr=logfile)
 
 

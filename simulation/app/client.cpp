@@ -15,11 +15,13 @@ bool Client::init(int nbr_instances, int port){
     for (int i = 0; i < nbr_instances; i++) {
         Simulator sim;
         sim.connect("127.0.0.1",2*i+port,timeout);
-        sim.call_function("getLogFolder",{Logging::log_folder});
+        // usleep(1000);
         std::cout << "Connecting to simulator on port " << sim.port() << std::endl;
         _simulators.push_back(sim);
        // auto list_fcts = sim.get()->getScriptFunctions(sim.get()->getScript(sim.get()->scripttype_sandbox,"simARE"));
-
+    }
+    for (auto &sim: _simulators){
+        sim.call_function("getLogFolder",{Logging::log_folder});
     }
     _ind_vec.resize(_simulators.size());
     _idx_vec.resize(_simulators.size(),-1);
@@ -156,11 +158,15 @@ bool Client::update_simulators(){
                             continue;
                         _ind_vec[sim_idx]->set_individual_id(_idx_vec[sim_idx]);
                         _ind_vec[sim_idx]->set_generation(_ea->get_generation());
+                        if(!sim.is_env_initialized()){
+                            sim.call_function("initEnvironment",{});
+                            sim.env_initialized();
+                        }
                         //    serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
-                        //    std::cout << "slave " << slaveIndex << " send ind" << std::endl;
+                        // //    std::cout << "slave " << slaveIndex << " send ind" << std::endl;
                         if(sim.start()){
                             sim.sim_started();
-                            usleep(1000);
+                            // usleep(1000);
                             sim.call_function("spawnRobot",{_ind_vec[sim_idx]->to_string()});
                             if(verbose)
                                 std::cout << "simulation " << sim_idx <<  " started" << std::endl;

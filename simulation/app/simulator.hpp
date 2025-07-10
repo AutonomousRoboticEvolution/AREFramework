@@ -27,7 +27,8 @@ public:
         _timeout(sim._timeout),
         _port(sim._port),
         _address(sim._address),
-        _individual_ready(sim._individual_ready)
+        _individual_ready(sim._individual_ready),
+        _env_initialized(sim._env_initialized)
     {}
 
     
@@ -88,6 +89,8 @@ public:
     bool is_individual_ready(){return _individual_ready;}
     void ready_for_new_sim(){_individual_ready = false;}
     void sim_started(){_individual_ready = true;}
+    void env_initialized(){_env_initialized = true;}
+    bool is_env_initialized(){return _env_initialized;}
 
     int port(){return _port;}
     const std::string &address(){return _address;}
@@ -102,6 +105,7 @@ private:
     int _port = 10000;
     std::string _address;
     bool _individual_ready = false;
+    bool _env_initialized = false;
 
 };//Simulator
 }//sim

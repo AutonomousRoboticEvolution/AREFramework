@@ -4,6 +4,11 @@ function getLogFolder(args)
     return simARE.getLogFolder(args)
 end
 
+
+function initEnvironment(args)
+    return simARE.initEnvironment(args)
+end
+
 function spawnRobot(args)
     return simARE.spawnRobot(args)
 end

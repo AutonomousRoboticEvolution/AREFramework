@@ -51,7 +51,6 @@ public:
      */
     virtual float updateEnv(float simulationTime, const Morphology::Ptr &morph) = 0;
 
-
     //GETTERS & SETTERS
     void set_parameters(const settings::ParametersMapPtr &param){parameters = param;}
     const settings::ParametersMapPtr &get_parameters(){return parameters;}
