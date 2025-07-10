@@ -27,6 +27,12 @@ std::vector<double> Morphology::get_wheels_positions(){
     return positions;
 }
 
+std::vector<double> Morphology::get_wheels_velocities(){
+    std::vector<double> velocities;
+    getWheelsVelocity(wheelHandles,velocities);
+    return velocities;
+}
+
 void Morphology::command(const std::vector<double> &ctrl_com){
     assert(ctrl_com.size() == wheelHandles.size() + jointHandles.size());
     if(ctrl_com.empty())

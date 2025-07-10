@@ -84,8 +84,10 @@ void Organ::createOrgan(int skeletonHandle)
     }
     else if(organType == 4) // Caster
         modelsPath+= "/organs/caster.ttm";
-    else
-        assert(false);
+    else{
+        std::cerr << "Unknown type of organ: " << organType << std::endl;
+        return;
+    }
 
     organHandle = simLoadModel(modelsPath.c_str());
     // simSetBoolProperty(organHandle,"modelBase",0);
