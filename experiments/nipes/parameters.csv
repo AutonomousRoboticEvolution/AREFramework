@@ -1,15 +1,15 @@
 #experimentName,string,nipes
 #expPluginName,string,/usr/local/lib/ARE/experiments/libNIPES.so
 #envType,int,0
-#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/exp_side_obstacles_hard.ttt
+#scenePath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/scenes/exp_side_obstacles_hard.ttt
 #scenes,sequence_string,ARE_arena.ttt
-#robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/AREPuck.ttm
-#modelsPath,string,/home/leni/git/AREFramework/simulation/models/
-#repository,string,/media/leni/DATADRIVE1/are-logs/
+#robotPath,string,/home/leni/git/evolutionary_robotics_framework/simulation/models/robots/AREPuck.ttm
+#modelsPath,string,/home/leni/git/evolutionary_robotics_framewor/simulation/models/
+#repository,string,/home/leni/are-logs/
 #envNumber,int,1
 
 #verbose,bool,1
-#instanceType,int,1
+#instanceType,int,0
 #killWhenNotConnected,bool,0
 #shouldReopenConnections,bool,0
 #updateSimulatorList,bool,0
