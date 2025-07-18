@@ -281,13 +281,13 @@ void sim::robotScreenshot(int ind_id, std::string repository)
     int generalCamera;
     for(int i = 0; i<4; i++){
         if(i == 0)
-            generalCamera = simGetObject("Camera0",-1,-1,1);
+            generalCamera = simGetObject("/Camera0",-1,-1,1);
         else if(i == 1)
-            generalCamera = simGetObject("Camera1",-1,-1,1);
+            generalCamera = simGetObject("/Camera1",-1,-1,1);
         else if(i == 2)
-            generalCamera = simGetObject("Camera2",-1,-1,1);
+            generalCamera = simGetObject("/Camera2",-1,-1,1);
         else if(i == 3)
-            generalCamera = simGetObject("Camera3",-1,-1,1);
+            generalCamera = simGetObject("/Camera3",-1,-1,1);
         else
             abort();
 
