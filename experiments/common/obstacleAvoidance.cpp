@@ -47,6 +47,13 @@ void ObstacleAvoidance::init(){
 
 }
 
+void ObstacleAvoidance::clear_data(){
+    Environment::clear_data();
+        grid_zone = Eigen::MatrixXi::Zero(grid_size[0],grid_size[1]);
+    number_of_collisions = 0;
+
+}
+
 std::vector<double> ObstacleAvoidance::fitnessFunction(const Individual::Ptr &ind){
    // if(number_of_collisions == 0)
     return {static_cast<double>(grid_zone.sum())/static_cast<double>(grid_size[0]*grid_size[1])};
