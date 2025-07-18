@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Forward/backward compatibility</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>
+Forward/backward compatibility
+</h1>
+
+<p>
+CoppeliaSim is developed by a small team. Unlike larger entities, we embrace an agile development methodology, which means a more frequent update cycle and rapid deployment of fixes. This approach may lead to occasional issues, but allows for swift resolution and the introduction of new features. User feedback, particularly through bug reports on the <a href="https://forum.coppeliarobotics.com/" target="_blank">CoppeliaSim forum</a>, is crucial to this process and is an important means of identifying and addressing problems. </p>
+
+<br>
+
+
+<h2>
+<a name="scriptObjects" id="scriptObjects"></a>Introduction of <a href="newScriptObjects.htm">script objects</a> in CoppeliaSim V4.7 </h2>
+
+<h3>Forward compatibility</h3>
+<p>Associated scripts remain operational, it is however recommended to <a href="newScriptObjects.htm#conversion">convert them to script objects</a>. Automatic conversion is not perfect, and several manual adjustments might have to be done, additionally.</p>
+
+
+<h3>Backward compatibility</h3>
+<p>Scenes and models containing script objects can be converted back to scenes and models containing only associated scripts, by setting the <a href="commandLine.htm#settingsFile">user settings</a> parameter <em>scriptConversion</em> to -1. The related script code is however not touched by this conversion, and manual adjustments will have to be done.</p>
+
+<br>
+
+<p>In case of serious unexpected problems with script objects, one can revert to using old associated scripts, by setting the <a href="commandLine.htm#settingsFile">user settings</a> parameter <em>useSceneObjectScripts</em> to false.</p>
+
+
+<br>
+
+
+<h2>
+<a name="buffers" id="buffers"></a>Introduction of <a href="buffers.htm">buffers</a> in CoppeliaSim V4.7 </h2>
+
+<h3>Forward compatibility</h3>
+<p>There are potentially two problematic situations with existing code:</p>
+
+<ul>
+<li>Code that relies on the usage of the <em>type</em>-function will break with buffers,  e.g.:</li>
+<code class="hljs language-lua coppelia-coppeliasim-script">function sendData(data)
+    if type(data) == 'string' then
+        -- this does not execute when data is a buffer
+    end
+end</code>
+
+<li>Most API functions that clearly return binary data (e.g. sim.getVisionSensorImg) now return the data as a buffer. Comparing that buffer with a string will always resolve to <em>false</em>,   e.g.:</li>
+<code class="hljs language-lua coppelia-coppeliasim-script">print(sim.getVisionSensorImg(h) == anyStringData) -- always prints false</code>
+
+<li>sim.packTable now returns a buffer of different length from previous CoppeliaSim versions (text/strings and buffers are now differentiated and this is reflected in the packed data),   e.g.:</li>
+<code class="hljs language-lua coppelia-coppeliasim-script">local packedTable1 = sim.packTable({'Txt'})
+local packedTable2 = sim.packTable({'Txt\0'})
+local packedTable3 = sim.packTable({tobuffer('Txt')})
+print(packedTable1) -- prints: [buffer (16 bytes)]
+print(packedTable2) -- prints: [buffer (17 bytes)
+print(packedTable3) -- prints: [buffer (16 bytes)
+print(packedTable1 == packedTable2) -- prints: false
+print(packedTable1 == packedTable3) -- prints: false
+print(packedTable2 == packedTable3) -- prints: false
+print(sim.unpackTable(packedTable1)) -- prints: {'Txt'}
+print(sim.unpackTable(packedTable2)) -- prints: {[binary string (4 bytes)]}
+print(sim.unpackTable(packedTable3)) -- prints: {[buffer (3 bytes)]}</code>
+
+</ul>
+
+<p>Workarounds:</p>
+<ul>
+<li>Converting a buffer to string via <em>tostring</em>, before handing it to a code base that is not aware of buffers, is the best way to avoid potential problems </li>
+<li>Where a buffer is compared to a string (and vice-versa), convert one or the other via <em>tostring</em> or <em>tobuffer</em>, otherwise comparison always resolves to <em>false</em></li>
+<li>Usage of buffers can be disabled in the <a href="commandLine.htm#settingsFile">user settings file</a> with variable <em>useBuffers</em></li>
+</ul>
+
+<h3>Backward compatibility</h3>
+<p><em>isbuffer</em> and <em>tobuffer</em> are not recognized functions. Workaround:</p>
+
+<ul>
+  <li>Add following functions to <em>lua/base.lua</em> (alternatively to <em>lua/sim.lua</em>, or to a specific script code):</li>
+<code class="hljs language-lua coppelia-coppeliasim-script">function tobuffer(a)
+    return a
+end
+
+function isbuffer(a)
+    return false
+end</code>
+</ul>
+
+<br>
+<br>
+  
+  </td>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

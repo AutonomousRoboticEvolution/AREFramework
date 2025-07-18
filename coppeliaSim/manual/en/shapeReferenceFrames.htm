@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Shape reference frames</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Shape reference frame and bounding box</h1>
+
+
+<p>A <a href="shapes.htm">shape</a> has a reference frame and a bounding box, as does every <a href="objects.htm">object</a>. The shape reference frame however can be relocated, and its bounding box can be modified, without affecting the shape's other properties.</p>
+<p>The reference frame of selected shapes can be moved in two different ways, via [Edit &gt; Shape reference frame]:</p>
+
+<li><strong>relocate to world origin</strong>: the reference frame will move to the origin of the world </li>
+<li><strong>relocate to mesh center</strong>: the reference frame will move to the center of the bounding box</li>
+
+<p>The shape's inertia properties are unaffected when its reference frame moves, the inertia matrix and center of mass will however be expressed relative to the new reference frame.</p>
+<p>The bounding box of selected shapes can be modified in two different ways, via [Edit &gt; Shape bounding box]:</p>
+
+<li><strong>align with world</strong>: the bounding box will align with the reference frame of the world </li>
+<li><strong>align with mesh</strong>: the bounding box will be chosen so as to minimize its volume</li>
+
+<p align=center><img src="images/shapeFrame1.jpg"></p>
+<p class=imageLabel>[Possible reference frame locations and bounding box orientations for a shape]</p>
+
+<p>Note that the orientation of the bounding box does not need to be the same as the orientation of the reference frame.</p>
+<p>See also <a href="regularApi/simRelocateShapeFrame.htm">sim.relocateShapeFrame</a>, <a href="regularApi/simAlignShapeBB.htm">sim.alignShapeBB</a>, <a href="regularApi/simSetShapeBB.htm">sim.setShapeBB</a> and <a href="regularApi/simScaleObject.htm">sim.scaleObject</a></p>
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

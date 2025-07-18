@@ -1,0 +1,189 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Paths</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Paths</h1>
+
+
+<p>A path is a pseudo <a href="objects.htm">object</a>, representing a succession of points with orientation in space. <em>pseudo </em>object, since it is built using merely <a href="dummies.htm">dummies</a> and a <a href="customizationScripts.htm">customization script</a> that describes its functionality and behaviour.</p>
+<p align=center><img src="images/nakedPath.jpg"></p>
+<p class=imageLabel>[Simple path containing 4 control points]</p>
+<br>
+
+
+<p>Path objects can be added to the <a href="scenes.htm">scene</a> with [Add &gt; Path]. A path is composed by control points that define its curve in space. Control points can be shifted, copy/pasted or deleted. A path's basic properties are accessed and adjusted via its user parameters (implemented via a <a href="userConfigCallbackFunctions.htm">user config callback function</a>), in the scene hierarchy:</p>
+<p align=center><img src="images/scriptSimParams1.jpg"></p>
+<p class=imageLabel>[User parameter icon]</p>
+<br>
+
+<p>A path can also automatically generate extruded <a href="shapes.htm">shapes</a>; this functionality is enabled via its user parameters, and the shape profile, color and other details can be adjusted in its <a href="customizationScripts.htm">customization script</a>, which uses the API function <a href="regularApi/simGenerateShapeFromPath.htm">sim.generateShapefromPath</a>: </p>
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function path.shaping(path, pathIsClosed, upVector)
+    -- following section generates a square extrusion shape:
+    local section = {0.02, -0.02, 0.02, 0.02, -0.02, 0.02, -0.02, -0.02, 0.02, -0.02}
+    local color={0.7, 0.9, 0.9}
+    local options = 0
+    if pathIsClosed then
+        options = options | 4
+    end
+    local shape = sim.generateShapeFromPath(path, section, options, upVector)
+    sim.setShapeColor(shape, nil, sim.colorcomponent_ambient_diffuse, color)
+    return shape
+end</code>
+<p align=center><img src="images/squarePath.jpg"></p>
+<p class=imageLabel>[Simple path generating an extruded square shape]</p>
+<br>
+
+
+<p>To generate an extruded circular shape, use following code to create the section data:</p>
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+local section = {}
+local radius = 0.02
+local sides = 32
+local da = math.pi * 2 / sides
+for i = 0, sides - 1 do
+    section[2 * i + 1] = radius * math.cos(da * i)
+    section[2 * i + 2] = radius * math.sin(da * i)
+end
+-- the section shoujld be closed (first and last points perfect overlap):
+section[#section + 1] = section[1]
+section[#section + 1] = section[2]</code>
+<p align=center><img src="images/circularPath.jpg"></p>
+<p class=imageLabel>[Simple path generating an extruded circular shape]</p>
+<br>
+
+<p>Path data is stored inside of the path object, as a <a href="properties.htm#customData">custom data property</a>. It can be accessed with:</p>
+
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+# control point data (each one has x, y, z, qx, qy, qz, qw (position and quaternion)):
+ctrlPts = sim.unpackDoubleTable(sim.getBufferProperty(pathHandle, 'customData.PATHCTRLPTS'))
+
+# path data (each one has x, y, z, qx, qy, qz, qw (position and quaternion)):
+pathData = sim.unpackDoubleTable(sim.getBufferProperty(pathHandle, 'customData.PATH'))</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+-- control point data (each one has x, y, z, qx, qy, qz, qw (position and quaternion)):
+local ctrlPts = sim.unpackDoubleTable(sim.getBufferProperty(pathHandle, 'customData.PATHCTRLPTS'))
+
+-- path data (each one has x, y, z, qx, qy, qz, qw (position and quaternion)):
+local pathData = sim.unpackDoubleTable(sim.getBufferProperty(pathHandle, 'customData.PATH')</code>
+</div>
+
+<br>
+
+<p>Various <a href="apiFunctions.htm#paths">API functions related to paths</a> are available, e.g. in order to have an object follow a path in position and orientation, one could use following script:</p>
+
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+import numpy as np
+
+
+def sysCall_init():
+    sim = require('sim')
+    self.objectToFollowPath = sim.getObject('..')
+    self.path = sim.getObject('/Path')
+    pathData = sim.unpackDoubleTable(sim.getBufferProperty(self.path, 'customData.PATH'))
+
+    m = np.array(pathData).reshape(len(pathData) // 7, 7)
+    self.pathPositions = m[:, :3].flatten().tolist()
+    self.pathQuaternions = m[:, 3:].flatten().tolist()
+
+    self.pathLengths, self.totalLength = sim.getPathLengths(self.pathPositions, 3)
+    self.velocity = 0.04 # m/s
+    self.posAlongPath = 0
+    self.previousSimulationTime = 0
+    sim.setStepping(True)
+
+def sysCall_thread():
+    while not sim.getSimulationStopping():
+        t = sim.getSimulationTime()
+        self.posAlongPath += self.velocity * (t - self.previousSimulationTime)
+        self.posAlongPath %= self.totalLength
+        pos = sim.getPathInterpolatedConfig(self.pathPositions, self.pathLengths, self.posAlongPath)
+        quat = sim.getPathInterpolatedConfig(self.pathQuaternions, self.pathLengths,
+               self.posAlongPath, None, [2, 2, 2, 2])
+        sim.setObjectPosition(self.objectToFollowPath, pos, self.path)
+        sim.setObjectQuaternion(self.objectToFollowPath, quat, self.path)
+        self.previousSimulationTime = t
+        sim.step()</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function sysCall_init()
+    sim = require('sim')
+    objectToFollowPath = sim.getObject('..')
+    path = sim.getObject('/Path')
+    pathData = sim.unpackDoubleTable(sim.getBufferProperty(path, 'customData.PATH'))
+    local m = Matrix(#pathData // 7, 7, pathData)
+    pathPositions = m:slice(1, 1, m:rows(), 3):data()
+    pathQuaternions = m:slice(1, 4, m:rows(), 7):data()
+    pathLengths, totalLength = sim.getPathLengths(pathPositions, 3)
+    velocity = 0.04 -- m/s
+    posAlongPath = 0
+    previousSimulationTime = 0
+    sim.setStepping(true)
+end
+
+function sysCall_thread()
+    while not sim.getSimulationStopping() do
+        local t = sim.getSimulationTime()
+        posAlongPath = posAlongPath + velocity * (t - previousSimulationTime)
+        posAlongPath = posAlongPath % totalLength
+        local pos = sim.getPathInterpolatedConfig(pathPositions, pathLengths, posAlongPath)
+        local quat = sim.getPathInterpolatedConfig(pathQuaternions, pathLengths,
+                                                 posAlongPath, nil, {2, 2, 2, 2})
+        sim.setObjectPosition(objectToFollowPath, pos, path)
+        sim.setObjectQuaternion(objectToFollowPath, quat, path)
+        previousSimulationTime = t
+        sim.step()
+    end
+end</code>
+</div>
+
+<br>
+<br>
+
+ </tr>
+</table>
+</div>
+
+
+<link rel="stylesheet" href="../js/hljs/11.8.0/styles/default.min.css" />
+<script src="../js/hljs/11.8.0/highlight.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cmake.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cpp.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/java.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/javascript.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/lua.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/matlab.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/python.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/rust.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/xml.min.js"></script>
+<script src="../js/multi-language-switcher.js"></script>
+<script>document.querySelectorAll('code.hljs').forEach(el => {hljs.highlightElement(el);})</script>
+</body>
+
+</html>

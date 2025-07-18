@@ -1,0 +1,23 @@
+rock_manifest = {
+   doc = {
+      LICENSE = "e6a600fd5e1d9cbde2d983680233ad02",
+      README = "28874aa1251cafd362f9f2e79de07d24"
+   },
+   lib = {
+      org = {
+         conman = {
+            ["cbor_c.so"] = "0cc1981e196ec727b5b43c9003b33ff7"
+         }
+      }
+   },
+   lua = {
+      org = {
+         conman = {
+            ["cbor.lua"] = "e682730786ca2e96e318298826bfbd66",
+            ["cbor_s.lua"] = "2dfbcd14fd36cc715d0509b3929264da",
+            ["cbormisc.lua"] = "e835c08ffc0eb9a6732f82a08ab912ae"
+         }
+      }
+   },
+   ["org.conman.cbor-1.3.5-1.rockspec"] = "e6097679ede58290a9a61fbc1899be7a"
+}

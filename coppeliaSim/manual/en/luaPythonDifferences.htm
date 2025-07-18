@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Lua vs Python scripts</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+<h1>Lua vs Python scripts</h1>
+
+<p>The way Lua and Python scripts are handled in CoppeliaSim (next to differences related to the language itself) displays small differences, which are discussed here:</p>
+
+<li>Prior to CoppeliaSim V4.7, Python scripts required a <em>#python</em> header tag as the very first instruction/comment. This is not the case anymore: language is decided at script creation time, or deduced from file extension</li>
+
+<li>Global variables are inconvenient and not recommended in Python:</li>
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+def sysCall_init():
+    self.myVariable = 21
+
+def sysCall_sensing():
+    print(self.myVariable)</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function sysCall_init()
+    myVariable = 21
+end
+
+function sysCall_sensing()
+    print(myVariable)
+end</code>
+</div>
+
+<li>CoppeliaSim selects the default Python interpreter present on your system. If this does not work, or if another interpreter is desired, then one can edit the <em>usrset.txt</em> file entry named <em>defaultPython</em>. The location of the <em>usrset.txt</em> file can be queried via the <a href="propertiesReference.htm#settingsPath">settingsPath</a> property. In addition to that, each script can specify a custom Python executable if required, via the <em>luaExec</em> directive (see further down)</li>
+<li>Lua code always executes in the same thread as CoppeliaSim and is thus quite fast. Python code on the other hand is launched in a new process, which connects to CoppeliaSim via socket communication. This implies that Python code will usually start and run slower than Lua code. However, when Python is operating in non-stepping mode, and doesn't access CoppeliaSim API, it truely runs parallel to CoppeliaSim.</li>
+<li><a name="luaExec"></a>Python scripts are handled via Lua wrapper code, which handles the launch and communication of each Python script. Auxiliary settings, Lua code or Lua functions can be passed via the <em>luaExec</em> directive, within a Python comment section. That code must come immediately at the beginning of the script:</li>
+<br>
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+#luaExec wrapper = 'myWrapperCode' -- looks for myWrapperCode.lua in Lua's search path
+#luaExec pythonExecutable = 'c:/python38/python.exe' -- runs a specific Python executable 
+#luaExec additionalPaths = {'c:/path1', 'c:/path2'} -- adds additional Python module search paths
+#luaExec additionalIncludePaths = {'c:/Python38', 'c:/path2'} -- adds additional paths to search for the include file
+'''luaExec
+function myLuaFunction()
+    print('hello Paul!')
+    sim.callScriptFunction('myPythonFunction', sim.handle_self)
+end
+'''
+
+def myPythonFunction():
+    print('hello Jeanine!')
+
+def sysCall_init():
+    sim = require('sim')
+    sim.callScriptFunction('myLuaFunction', sim.handle_self)
+    print("hello Marc!")</code>
+    
+<li>The import directive does not work when importing the primary Python file, and following should be used instead:</li>
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+include myExternalFile
+
+# myExternalFile is the pythonScript name or path (absolute or relative), without quotes nor the ending '.py'
+# searched paths include:
+# &lt;CoppeliaSim executable path&gt;/ 
+# &lt;CoppeliaSim executable path&gt;/python 
+# &lt;current scene path&gt;/ 
+# &lt;additional path&gt;/ (see system/usrset.txt and value 'additionalPythonPath')
+# additional include paths passed via #luaExec additionalIncludePaths={'c:/Python38'}</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+require('myExternalFile')</code>
+</div>
+
+<li>Python threaded scripts will always execute their initialization section (if present). The clean-up section (and other system callbacks) however are only executed in specific situations or in an asynchronous manner</li>
+
+<li>Python threaded scripts will need to call a message pump (via <a href="regularApi/simHandleExtCalls.htm">sim.handleExtCalls</a>) in order to have user callback functions to be serviced, depending on the situation:</li>
+<div class="multi-language-switcher">
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+def sysCall_thread():
+    xml = '&lt;ui title="Custom UI"&gt; &lt;button text="Click me!" on-click="click_callback"/&gt; &lt;/ui&gt;'
+    ui = simUI.create(xml)
+    while not sim.getThreadExistRequest():
+        sim.handleExtCalls()
+    simUI.destroy(ui)
+
+def click_callback(ui,button):
+    print("button was clicked!")</code>
+    
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function sysCall_thread()
+    xml = '&lt;ui title="Custom UI"&gt; &lt;button text="Click me!" on-click="click_callback"/&gt; &lt;/ui&gt;'
+    ui = simUI.create(xml)
+    while not sim.getThreadExistRequest() do
+        sim.handleExtCalls() -- optional
+    end
+    simUI.destroy(ui)
+end
+
+function click_callback(ui, button)
+    print("button was clicked!")
+end</code>
+</div>
+
+
+<li>When some Python code section needs to be executed without interruption, then one can use following construct:</li>
+<br>
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+def sysCall_thread():
+    sim.acquireLock()
+    
+    # perform some task that involves CoppeliaSim
+    
+    sim.releaseLock()</code>
+
+<li>A few callback functions need to be enabled explicitly, in order to avoid constant slowdowns:</li>
+<br>
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+#luaExec contactCallback = true    -- enable contact callback
+#luaExec dynCallback = true        -- enable dyn callback
+#luaExec eventCallback = true      -- enable event callback
+
+def sysCall_contact(inArg):
+    print(inArg)
+    
+def sysCall_dyn(inArg):
+    print(inArg)
+    
+def sysCall_event(inArg):
+    print(inArg)</code>
+
+<li>Some rare API functions will only be availabe in Lua, while other only in Python.</li>
+
+<li>The word <em>table</em> in the documentation refers to array-like or map-like items in Lua, while in Python, it refers to either <em>lists</em> or <em>dicts</em>.</li>
+
+<li>Finally remember that Python lists have a zero-based numbering, while Lua array-like tables have a 1-based numbering.</li>
+
+
+  <br>
+  <br>
+      </tr>
+</table> 
+</div>  
+  
+  
+<link rel="stylesheet" href="../js/hljs/11.8.0/styles/default.min.css" />
+<script src="../js/hljs/11.8.0/highlight.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cmake.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cpp.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/java.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/javascript.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/lua.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/matlab.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/python.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/rust.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/xml.min.js"></script>
+<script src="../js/multi-language-switcher.js"></script>
+<script>document.querySelectorAll('code.hljs').forEach(el => {hljs.highlightElement(el);})</script>
+</body>
+
+</html>

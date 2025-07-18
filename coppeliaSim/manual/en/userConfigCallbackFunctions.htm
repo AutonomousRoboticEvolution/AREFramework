@@ -1,0 +1,306 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>User config callback functions</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>User config callback functions</h1>
+
+<p>A <a href="customizationScripts.htm">customization script</a> that includes a user config callback function (which is one of many <a href="callbackFunctions.htm#systemCallbacks">system callback functions</a>), displays a configuration dialog icon in the scene hierarchy:</p>
+<p align=center><img src="images/scriptSimParams1.jpg"></p>
+<p class=imageLabel>[Configuration dialog icon]</p>
+<br>
+
+
+<p> For convenience, the icon is also displayed for the customization script's parent. When double-clicked, the user config callback function is triggered. This can be used as a convenient way of displaying a <a href="customUserInterfaces.htm">custom user interface</a>, that is specific to the <a href="objects.htm">object</a>/<a href="models.htm">model</a> the customization script refers to. User data can be read and written to objects with <a href="properties.htm#customData">custom data properties</a> for instance:</p>
+
+<p align=center><img src="images/userConfigCallback.jpg"></p>
+<p class=imageLabel>[Custom configuration dialog]</p>
+<br>
+
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+def sysCall_init():
+    sim = require('sim')
+    simUI = require('simUI')
+    self.modelHandle = sim.getObject('..')
+
+def sysCall_userConfig():
+    xml = '''&lt;ui title="Robot" closeable="true" modal="true" layout="form" on-close="customUiClosed"&gt;
+            &lt;label text="Max. velocity:" /&gt;
+            &lt;edit id="1" value="-" on-editing-finished="velocityChanged"/&gt;
+            &lt;label text="Max. acceleration:" /&gt;
+            &lt;edit id="2" value="-" on-editing-finished="accelerationChanged"/&gt;
+            &lt;/ui&gt;'''
+    ui = simUI.create(xml)
+    data = readData()
+    simUI.setEditValue(ui, 1, str(data['maxVel']))
+    simUI.setEditValue(ui, 2, str(data['maxAccel']))
+
+def customUiClosed(ui):
+    simUI.destroy(ui)
+
+def velocityChanged(ui, id, val):
+    data = readData()
+    val = float(val)
+    if val:
+        if val < 0.1:
+            val = 0.1
+        if val > 0.5:
+            val = 0.5 
+        data['maxVel'] = val
+    simUI.setEditValue(ui, id, str(data['maxVel']))
+    writeData(data)
+
+def accelerationChanged(ui, id, val):
+    data = readData()
+    val = float(val)
+    if val:
+        if val < 0.01:
+            val = 0.01
+        if val > 0.2:
+            val = 0.2 
+        data['maxAccel'] = val
+    simUI.setEditValue(ui, id, str(data['maxAccel']))
+    writeData(data)
+
+def readData():
+    data = sim.unpackTable(sim.getBufferProperty(self.modelHandle, 'customData.RobotParams'))
+    if data == [] or data == {}:
+        data = {}
+        data['maxVel'] = 0.2
+        data['maxAccel'] = 0.05
+    return data
+
+def writeData(data):
+    sim.setBufferProperty(self.modelHandle, 'customData.RobotParams', sim.packTable(data))</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function sysCall_init()
+    sim = require('sim')
+    simUI = require('simUI')
+    modelHandle = sim.getObject('..')
+end
+
+function sysCall_userConfig()
+    local xml = [[&lt;ui title="Robot" closeable="true" modal="true" layout="form" on-close="customUiClosed"&gt;
+            &lt;label text="Max. velocity:" /&gt;
+            &lt;edit id="1" value="-" on-editing-finished="velocityChanged"/&gt;
+            &lt;label text="Max. acceleration:" /&gt;
+            &lt;edit id="2" value="-" on-editing-finished="accelerationChanged"/&gt;
+    &lt;/ui&gt;]]
+    local ui = simUI.create(xml)
+    local data = readData()
+    simUI.setEditValue(ui, 1, tostring(data.maxVel))
+    simUI.setEditValue(ui, 2, tostring(data.maxAccel))
+end
+
+function customUiClosed(ui)
+    simUI.destroy(ui)
+end
+
+function velocityChanged(ui, id, val)
+    local data = readData()
+    val = tonumber(val)
+    if val then
+        if val &lt; 0.1 then
+            val = 0.1
+        end
+        if val &gt; 0.5 then
+            val = 0.5 
+        end
+        data.maxVel = val
+    end
+    simUI.setEditValue(ui, id, tostring(data.maxVel))
+    writeData(data)
+end
+
+function accelerationChanged(ui, id, val)
+    local data = readData()
+    val = tonumber(val)
+    if val then
+        if val &lt; 0.01 then
+            val = 0.01
+        end
+        if val &gt; 0.2 then
+            val = 0.2 
+        end
+        data.maxAccel = val
+    end
+    simUI.setEditValue(ui, id, tostring(data.maxAccel))
+    writeData(data)
+end
+
+function readData()
+    local data = sim.unpackTable(sim.getBufferProperty(modelHandle, 'customData.RobotParams'))
+    if next(data) == nil then
+        data.maxVel = 0.2
+        data.maxAccel = 0.05
+    end
+    return data
+end
+
+function writeData(data)
+    sim.setBufferProperty(modelHandle, 'customData.RobotParams', sim.packTable(data))
+end</code>
+
+</div>
+
+<br>
+
+<p>You may also use the <em>configUI</em> module for quicker set-up of custom configuration dialog, that will also automatically write custom data to objects:</p>
+
+<p align=center><img src="images/userConfigCallback2.jpg"></p>
+<p class=imageLabel>[Custom configuration dialog based on <em>configUI</em> module]</p>
+<br>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+require('configUi')
+
+function sysCall_init()
+    local schema = {
+        floatInput = {
+            default = 0.1,
+            maximum = 4,
+            minimum = 0.05,
+            name = "float input",
+            type = "float",
+            ui = {
+                control = "spinbox",
+                tab = "Tab 1", order = 1, col = 1
+            },
+        },
+        intInput = {
+            default = 1,
+            maximum = 10,
+            minimum = 0,
+            name = "int input",
+            type = "int",
+            ui = {
+                control = "spinbox",
+                tab = "Tab 1", order = 2, col = 2
+            },
+        },
+        checkbox1 = {
+            type = 'bool',
+            name = 'checkbox1',
+            default = true,
+            ui = {tab = "Tab 1", order = 3, col = 1},
+        },
+        checkbox2 = {
+            type = 'bool',
+            name = 'checkbox2',
+            default = false,
+            ui = {tab = "Tab 1", order = 4, col = 2},
+        },
+        colorselect = {
+            type = 'color',
+            name = 'color select',
+            default = {1, 0, 1},
+            ui = {tab = "Tab 2", order = 5, col = 1},
+        },
+        stringInput = {
+            default = "Hello",
+            name = "string input",
+            type = "string",
+            ui = {tab = "Tab 2", order = 6, col = 2},
+        },
+        floatSlider = {
+            default = 0.5,
+            maximum = 1,
+            minimum = 0,
+            name = "float slider",
+            type = "float",
+            ui = {
+                control = "slider",
+                tab = "Tab 2", order = 7, col = 1
+            },
+        },
+        intSlider = {
+            default = 1,
+            maximum = 10,
+            minimum = 0,
+            name = "int slider",
+            type = "int",
+            ui = {
+                control = "slider",
+                tab = "Tab 2", order = 8, col = 2
+            },
+        },
+        choices1 = {
+            default = 2,
+            choices = {"option 1", "option 2", "option 3"},
+            name = "combo choices",
+            type = "choices",
+            ui = {
+                control = "combo",
+                tab = "Tab 3", order = 9, col = 1
+            },
+        },
+        choices2 = {
+            default = 1,
+            choices = {"option 1", "option 2", "option 3"},
+            name = "radio choices",
+            type = "choices",
+            ui = {
+                control = "radio",
+                tab = "Tab 3", order = 10, col = 1
+            },
+        },
+    }
+    sim.setBufferProperty(sim.getObject('..'), 'customData.__schema__', sim.packTable(schema))
+    configUi = ConfigUI('myModelType', nil, modificationCallback)
+    configUi.getObjectCallback = function() return sim.getObject '..' end
+end
+
+function modificationCallback(config)
+    local objectHandle = sim.getObject('..')
+    local txt = "Object '"..sim.getObjectAlias(objectHandle,5).."' just changed.\nNew parameters are:"
+    print(txt)
+    print(config)
+end</code>
+
+
+<br>
+<br>
+ </tr>
+ <tr>
+   <td > 
+ </tr>
+</table> 
+</div>  
+  
+  
+<link rel="stylesheet" href="../js/hljs/11.8.0/styles/default.min.css" />
+<script src="../js/hljs/11.8.0/highlight.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cmake.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cpp.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/java.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/javascript.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/lua.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/matlab.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/python.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/rust.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/xml.min.js"></script>
+<script src="../js/multi-language-switcher.js"></script>
+<script>document.querySelectorAll('code.hljs').forEach(el => {hljs.highlightElement(el);})</script>
+</body>
+
+</html>

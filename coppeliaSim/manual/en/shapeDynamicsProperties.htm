@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Shape dynamics dialog</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Shape dynamics dialog</h1>
+
+<p>The shape dynamics dialog is part of the <a href="shapeProperties.htm">shape dialog</a>. The dialog displays the dynamics settings and parameters of the last selected <a href="shapes.htm">shape</a>. If no object is selected, the dialog is inactive. If more than one shape is selected, then some parameters can be copied from the last selected shape to the other selected shapes (<strong>Apply to selection</strong>-buttons):<br>
+</p>
+<p align=center><img src="images/shapeDynamicsProperties1.jpg"></p>
+<p class=imageLabel>[Shape dynamics dialog]</p>
+<br>
+
+
+
+<li><strong>Body is respondable</strong>: if enabled, then the shape will produce a collision reaction with other respondable shapes, however only if the respective respondable masks overlap (see the item below). See also the <a href="designingDynamicSimulations.htm">designing dynamic simulation</a> section for more details.<br>
+</li>
+
+<li><strong>Respondable mask</strong>: indicates when a collision response is generated (above respondable item needs however to be enabled). The mask is composed by two 8-bit values, local and global. If two colliding shapes share any of their parents (direct or indirect), then the local masks are used, otherwise the global masks are used. If two shapes' <em>AND</em>-combined masks (local or global) is different from zero, then a collision response will be generated.<br>
+</li>
+
+<li><strong>Engine properties</strong>: each physics engine has specific parameters related to shapes. Make sure to read the respective engine documentations to achieve best parameter settings.</li>
+
+<li><strong>Body is dynamic</strong>: when enabled, then the shape's pose will be influenced in a <a href="dynamicsModule.htm">dynamics simulation</a>. See the <a href="designingDynamicSimulations.htm">designing dynamic simulation</a> section for more details.<br>
+</li>
+
+<li><strong>Mass</strong>: the mass of the shape. Selected shapes can have their masses easily computed ([Edit &gt; Shape mass and inertia &gt; compute from uniform density...]) or scaled ([Edit &gt; Shape mass and inertia &gt; scale mass...]).
+</li>
+
+<li><strong>Set to dynamic if gets parent</strong>: when enabled and the shape is attached to another object, then the shape will be automatically made dynamic. This is useful for model bases that should be static when on their own, but dynamic when combined with another model/object (e.g. a robotic manipulator that operates on its own usually has its base static, but when attached to a vehicle, then the base should become dynamic).<br>
+</li>
+
+<li><strong>Inertia matrix</strong>: the inertia matrix. Represented values are mass-less by default (i.e. divided by the mass of the shape). The matrix is expressed relative to the shape reference frame. Selected shapes can have their inertia matrix easily computed ([Edit &gt; Shape mass and inertia &gt; compute from uniform density...]) or scaled ([Edit &gt; Shape mass and inertia &gt; scale inertia...]). </li>
+
+<li><strong>Center of mass</strong>: the position of the center of mass, relative to the shape reference frame.</li>
+
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

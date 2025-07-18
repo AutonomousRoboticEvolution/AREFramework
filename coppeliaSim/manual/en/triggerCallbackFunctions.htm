@@ -1,0 +1,126 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Trigger callback functions</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Trigger callback functions</h1>
+
+<p><a href="scriptObjects.htm">Script objects</a> can include a trigger callback function (which is one of many <a href="callbackFunctions.htm#systemCallbacks">system callback functions</a>), when the script object's parent is a <a href="visionSensors.htm">vision sensor</a> or a <a href="proximitySensors.htm">proximity sensor</a>. </p>
+<p>A vision sensor can generate the trigger signal inside of the <a href="visionCallbackFunctions.htm">vision callback function</a>. The trigger callback (if present) is then called as in following example:<br>
+</p>
+<div class="multi-language-switcher">
+  
+  <code class="hljs language-python coppelia-coppeliasim-script">#python
+    
+    def sysCall_trigger(inData):
+    """
+    We have:
+    inData['handle'] : the handle of the vision sensor.
+    inData['packedPackets'] : an array of data packets, packed (use sim.unpackFloatTable to unpack)
+    the first data packet always contains 15 auxiliary values about the acquired image:
+    - minimum of {intensity, red, green blue and depth value}
+    - maximum of {intensity, red, green blue and depth value}
+    - average of {intensity, red, green blue and depth value}
+    """
+    
+    outData = {}
+    outData['trigger'] = True
+    return outData</code>
+  
+  <code class="hljs language-lua coppelia-coppeliasim-script">--lua
+    
+    function sysCall_trigger(inData)
+    -- We have:
+    -- inData.handle : the handle of the vision sensor.
+    -- inData.packedPackets : an array of data packets, packed (use sim.unpackFloatTable to unpack)
+    --    the first data packet always contains 15 auxiliary values about the acquired image:
+    --    - minimum of {intensity, red, green blue and depth value}
+    --    - maximum of {intensity, red, green blue and depth value}
+    --    - average of {intensity, red, green blue and depth value}
+    
+    local outData = {}
+    outData.trigger = true
+    return outData
+    end</code>
+  
+</div>
+
+<br>
+
+<p>A proximity sensor generates the trigger signal when an object is detected. The trigger callback (if present) is then called as in following example:</p>
+
+<div class="multi-language-switcher">
+
+<code class="hljs language-python coppelia-coppeliasim-script">#python
+
+def sysCall_trigger(inData):
+    """
+    We have:
+    inData['handle'] : the handle of the proximity sensor.
+    inData['detectedObjectHandle'] : handle of detected object
+    inData['detectedPoint'] : detected point, relative to sensor frame
+    inData['normalVector'] : normal vector at detected point, relative to sensor frame
+    """
+
+    outData = {}
+    outData['trigger'] = True
+    return outData</code>
+
+<code class="hljs language-lua coppelia-coppeliasim-script">--lua
+
+function sysCall_trigger(inData)
+    -- We have:
+    -- inData.handle : the handle of the proximity sensor.
+    -- inData.detectedObjectHandle : handle of detected object
+    -- inData.detectedPoint : detected point, relative to sensor frame
+    -- inData.normalVector : normal vector at detected point, relative to sensor frame
+
+    local outData = {}
+    outData.trigger = true
+    return outData
+end</code>
+
+</div>
+
+<br>
+
+<br>
+<br>
+ </tr>
+ <tr>
+   <td > 
+ </tr>
+</table> 
+</div>  
+  
+  
+<link rel="stylesheet" href="../js/hljs/11.8.0/styles/default.min.css" />
+<script src="../js/hljs/11.8.0/highlight.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cmake.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/cpp.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/java.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/javascript.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/lua.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/matlab.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/python.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/rust.min.js"></script>
+<script src="../js/hljs/11.8.0/languages/xml.min.js"></script>
+<script src="../js/multi-language-switcher.js"></script>
+<script>document.querySelectorAll('code.hljs').forEach(el => {hljs.highlightElement(el);})</script>
+</body>
+
+</html>

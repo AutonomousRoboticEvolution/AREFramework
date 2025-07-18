@@ -1,0 +1,7 @@
+{
+    "simCmd": {
+        "setVisible": "simCmd.htm#setVisible",
+        "clearHistory": "simCmd.htm#clearHistory",
+        "setSelectedScript": "simCmd.htm#setSelectedScript"
+    }
+}

@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>Inverse kinematics</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+
+<h1>Kinematics</h1>
+
+
+<p>CoppeliaSim's kinematics functionality is a highly capable and flexible solution for handling a wide range of mechanisms in both inverse kinematics (IK) and forward kinematics (FK) modes. The functionality is made available through the <a href="coppeliaKinematicsRoutines.htm">Coppelia Kinematics Routines</a>, a collection of C++ functions that can be integrated into standalone applications and accessed through the <a href="kinematicsPlugin.htm">kinematics plugin</a>.</p>
+<p>The IK problem involves finding the joint values that correspond to a specific position and/or orientation of a body element, typically the end effector. This can be seen as a transformation from task space coordinates to joint space coordinates. For instance, in the case of a serial manipulator, the problem is to determine the values of all joints given the position (and/or orientation) of the end effector. The reverse problem, finding the end effector position and/or orientation given the joint values, is known as the FK problem and is often considered easier than IK, although this may not be the case for all machines, as demonstrated by the following example:</p>
+
+<p align=center><img src="images/inverseKinematics1.jpg"></p>
+<p class=imageLabel>[Non-trivial FK problem: determining the end effector pose given the joint values indicated by the arrows.]</p>
+<br>
+
+<p>The kinematics functionality is accessed through the <a href="kinematicsPlugin.htm">kinematics plugin</a> and enables the setup of complex kinematics tasks in a separate IK environment, allowing for neat separation from other aspects of the simulation model (such as dynamics, for example). The calculations are based on the Jacobian and various resolution methods are supported, including the Jacobian pseudoinverse, damped least squares pseudoinverse, and null-space projections, among others.</p>
+<p>In CoppeliaSim, IK tasks are solved using <a href="solvingIkAndFk.htm">IK groups and IK elements</a>. To fully understand the capabilities and usage of the inverse kinematics functionality, we recommend reviewing the <a href="inverseKinematicsTutorial.htm">inverse kinematics tutorial</a>and the various example scenes located in the folder scenes/kinematics.</p>
+<br>
+<br>
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

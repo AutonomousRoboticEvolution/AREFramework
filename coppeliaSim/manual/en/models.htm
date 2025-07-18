@@ -1,0 +1,72 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Strict//EN">
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<title>models</title>
+<link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+
+<body>
+
+<div align="center">
+<table class=allEncompassingTable >
+ <tr>
+  <td >
+<p><a href="../index.html" TARGET="_top"><img src="images/homeImg.png"></a></p>
+
+
+<h1>Models <img src="images/models0.jpg"></h1>
+
+<p>A model is a sub-element of a <a href="scenes.htm">scene</a>. A model by itself cannot exist, except in a file (&quot;*.ttm&quot;-file type), nor can it be simulated by itself. A model has to be contained in a scene in order to be operational.
+</p>
+
+<p>Models are defined by a selection of <a href="objects.htm">scene objects</a> built on a same hierarchy tree, where the base of the tree has to be an object tagged as <strong>model</strong>. They can be loaded with [File &gt; Load model...]. It is however much easier and convenient to load a model with a drag-and-drop operation between the<a href="userInterface.htm#ModelBrowser"> model browser</a> and a <a href="pagesAndViews.htm">scene view</a>. Models can be saved with [File &gt; Save model as...], just  make sure one single object tagged as <strong>model </strong> is selected, otherwise the <strong>Save model as...</strong>-menu item will not be available. Make also sure to follow the <a href="buildingAModelTutorial.htm">tutorial on how to build a clean simulation model</a>.</p>
+
+<p>
+A model is defined in following steps:
+</p>
+
+
+<li>
+  attach (directly or indirectly) all objects that logically belong to the model to the base of the model tree</li>
+<li>check <strong>Object is model </strong>in the <a href="commonPropertiesDialog.htm">general scene object properties dialog</a></li>
+
+<li>in the same dialog, clicking <strong>Model properties</strong>, you can define special overriding properties (e.g. make the whole model invisible, non-collidable, etc.). That allows to quickly disable some properties for all objects in the model</li>
+
+<li>
+  for all objects in the model, except for the base object, check <strong>select base of model instead</strong> in the <a href="commonPropertiesDialog.htm">general scene object properties dialog</a>. This protects your model: you won't be able to directly select individual objects in your model</li>
+
+<li>for all objects that are normally not visible, check <strong>Ignored by model bounding box</strong>. This makes the model bounding box appear in the right size around the model</li>  
+
+<li>think about the role of the model: will you be able to attach it to some other object? (e.g. your model is a gripper that you could attach to a manipulator wrist). Or will you be able to attach some other model to it? (e.g. your model is a manipulator that could accept a gripper model). Once the role is decided, define the model's <a href="assembly.htm">assembling behaviour</a>. Refer also to this <a href="designingDynamicSimulations.htm#modelBaseSelection">dynamics design consideration</a></li>
+
+<p>Now, individual objects build on the model base cannot be selected anymore in the scene (selecting them selects the base of the model instead), however they can still be individually selected by holding down the ctrl- and shift-key during selection, or by selecting them in the <a href="userInterface.htm#SceneHierarchy">scene hierarchy</a>. In addition to that, when the base object is selected, a stippled bounding box encompassing the whole model is displayed as can be seen in following figure:
+</p>
+
+<p align=center><img src="images/models1.png"></p>
+<p class=imageLabel>[Scene hierarchy view and corresponding 3D view]</p>
+<br>
+
+<p>Notice the model tag on the left-hand side of the model base:</p>
+
+<p align=center><img src="images/models0.jpg"></p>
+<p class=imageLabel>[Model tag]</p>
+<br>
+
+
+<p>A double-click on a model tag opens the <a href="modelDialog.htm">model dialog</a>, where model properties can be adjusted. It is also good practice to collapse a model's hierarchy once the model was edited in order to easily identify the number of logically grouped elements/models.</p>
+
+<p>Copy and pasting a model behaves exactly like saving the model, then loading it (using however a memory buffer instead of the disk space). Models can be copied from one scene to another like any other object. Model files (&quot;*.ttm&quot;-files) also support drag-and-drop operations between the explorer window and the application window.</p>
+
+<br>
+<br>
+
+ </tr>
+</table> 
+</div>  
+  
+  
+</body>
+
+</html>

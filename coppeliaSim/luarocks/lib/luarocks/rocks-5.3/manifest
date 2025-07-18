@@ -1,0 +1,335 @@
+commands = {}
+dependencies = {
+   dkjson = {
+      ["2.6-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               },
+               {
+                  op = "<",
+                  version = {
+                     5, 5, string = "5.5"
+                  }
+               }
+            },
+            name = "lua"
+         }
+      }
+   },
+   lpeg = {
+      ["1.1.0-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               }
+            },
+            name = "lua"
+         }
+      }
+   },
+   lpeglabel = {
+      ["1.6.2-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               }
+            },
+            name = "lua"
+         }
+      }
+   },
+   ["lua-parser"] = {
+      ["1.0.3-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               }
+            },
+            name = "lua"
+         },
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     1, 6, 0, string = "1.6.0"
+                  }
+               }
+            },
+            name = "lpeglabel"
+         }
+      }
+   },
+   luafilesystem = {
+      ["1.8.0-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               }
+            },
+            name = "lua"
+         }
+      }
+   },
+   luasocket = {
+      ["3.1.0-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               }
+            },
+            name = "lua"
+         }
+      }
+   },
+   ["org.conman.cbor"] = {
+      ["1.3.5-1"] = {
+         {
+            constraints = {
+               {
+                  op = ">=",
+                  version = {
+                     5, 1, string = "5.1"
+                  }
+               },
+               {
+                  op = "<=",
+                  version = {
+                     5, 4, string = "5.4"
+                  }
+               }
+            },
+            name = "lua"
+         },
+         {
+            constraints = {
+               {
+                  op = "~=",
+                  version = {
+                     1, 0, string = "1.0"
+                  }
+               }
+            },
+            name = "lpeg"
+         }
+      }
+   }
+}
+modules = {
+   dkjson = {
+      "dkjson/2.6-1"
+   },
+   lfs = {
+      "luafilesystem/1.8.0-1"
+   },
+   lpeg = {
+      "lpeg/1.1.0-1"
+   },
+   lpeglabel = {
+      "lpeglabel/1.6.2-1"
+   },
+   ltn12 = {
+      "luasocket/3.1.0-1"
+   },
+   ["lua-parser.parser"] = {
+      "lua-parser/1.0.3-1"
+   },
+   ["lua-parser.pp"] = {
+      "lua-parser/1.0.3-1"
+   },
+   ["lua-parser.scope"] = {
+      "lua-parser/1.0.3-1"
+   },
+   ["lua-parser.validator"] = {
+      "lua-parser/1.0.3-1"
+   },
+   mime = {
+      "luasocket/3.1.0-1"
+   },
+   ["mime.core"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["org.conman.cbor"] = {
+      "org.conman.cbor/1.3.5-1"
+   },
+   ["org.conman.cbor_c"] = {
+      "org.conman.cbor/1.3.5-1"
+   },
+   ["org.conman.cbor_s"] = {
+      "org.conman.cbor/1.3.5-1"
+   },
+   ["org.conman.cbormisc"] = {
+      "org.conman.cbor/1.3.5-1"
+   },
+   re = {
+      "lpeg/1.1.0-1"
+   },
+   relabel = {
+      "lpeglabel/1.6.2-1"
+   },
+   socket = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.core"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.ftp"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.headers"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.http"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.serial"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.smtp"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.tp"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.unix"] = {
+      "luasocket/3.1.0-1"
+   },
+   ["socket.url"] = {
+      "luasocket/3.1.0-1"
+   }
+}
+repository = {
+   dkjson = {
+      ["2.6-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {},
+            modules = {
+               dkjson = "dkjson.lua"
+            }
+         }
+      }
+   },
+   lpeg = {
+      ["1.1.0-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {},
+            modules = {
+               lpeg = "lpeg.so",
+               re = "re.lua"
+            }
+         }
+      }
+   },
+   lpeglabel = {
+      ["1.6.2-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {},
+            modules = {
+               lpeglabel = "lpeglabel.so",
+               relabel = "relabel.lua"
+            }
+         }
+      }
+   },
+   ["lua-parser"] = {
+      ["1.0.3-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {
+               lpeglabel = "1.6.2-1"
+            },
+            modules = {
+               ["lua-parser.parser"] = "lua-parser/parser.lua",
+               ["lua-parser.pp"] = "lua-parser/pp.lua",
+               ["lua-parser.scope"] = "lua-parser/scope.lua",
+               ["lua-parser.validator"] = "lua-parser/validator.lua"
+            }
+         }
+      }
+   },
+   luafilesystem = {
+      ["1.8.0-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {},
+            modules = {
+               lfs = "lfs.so"
+            }
+         }
+      }
+   },
+   luasocket = {
+      ["3.1.0-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {},
+            modules = {
+               ltn12 = "ltn12.lua",
+               mime = "mime.lua",
+               ["mime.core"] = "mime/core.so",
+               socket = "socket.lua",
+               ["socket.core"] = "socket/core.so",
+               ["socket.ftp"] = "socket/ftp.lua",
+               ["socket.headers"] = "socket/headers.lua",
+               ["socket.http"] = "socket/http.lua",
+               ["socket.serial"] = "socket/serial.so",
+               ["socket.smtp"] = "socket/smtp.lua",
+               ["socket.tp"] = "socket/tp.lua",
+               ["socket.unix"] = "socket/unix.so",
+               ["socket.url"] = "socket/url.lua"
+            }
+         }
+      }
+   },
+   ["org.conman.cbor"] = {
+      ["1.3.5-1"] = {
+         {
+            arch = "installed",
+            commands = {},
+            dependencies = {
+               lpeg = "1.1.0-1"
+            },
+            modules = {
+               ["org.conman.cbor"] = "org/conman/cbor.lua",
+               ["org.conman.cbor_c"] = "org/conman/cbor_c.so",
+               ["org.conman.cbor_s"] = "org/conman/cbor_s.lua",
+               ["org.conman.cbormisc"] = "org/conman/cbormisc.lua"
+            }
+         }
+      }
+   }
+}
