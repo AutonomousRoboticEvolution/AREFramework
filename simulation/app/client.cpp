@@ -12,16 +12,28 @@ bool Client::init(int nbr_instances, int port){
     float max_eval_time = settings::getParameter<settings::Float>(_parameters,"#maxEvalTime").value;
     int env_number = settings::getParameter<settings::Integer>(_parameters,"#envNumber").value;
     int timeout = env_number*max_eval_time*1000 + 60000;
+    int trials = 0;
     for (int i = 0; i < nbr_instances; i++) {
         Simulator sim;
-        sim.connect("127.0.0.1",2*i+port,timeout);
+        if(!sim.connect("localhost",i+port,timeout)){
+            i--;
+            trials++;
+            if(trials >= _max_connection_trials)
+                return false;
+            continue;
+        }
+
         // usleep(1000);
-        std::cout << "Connecting to simulator on port " << sim.port() << std::endl;
+        std::cout << "Connected to simulator on port " << sim.port() << std::endl;
         _simulators.push_back(sim);
        // auto list_fcts = sim.get()->getScriptFunctions(sim.get()->getScript(sim.get()->scripttype_sandbox,"simARE"));
     }
     for (auto &sim: _simulators){
-        sim.call_function("getLogFolder",{Logging::log_folder});
+        if(sim.state() >= 0){
+            if(sim.call_function("getLogFolder",{Logging::log_folder}).empty())
+                continue;
+        }
+        else std::cerr << "unable to communicate with the simulator" << std::endl;
     }
     _ind_vec.resize(_simulators.size());
     _idx_vec.resize(_simulators.size(),-1);
@@ -132,19 +144,9 @@ bool Client::update_simulators(){
         // for(size_t sim_idx = 0; sim_idx < _simulators.size(); sim_idx++){
                 Simulator &sim = _simulators[sim_idx];
                 // std::cout << "Simulator " << sim_idx << " State : " << Simulator::state_to_string(sim.state()) << std::endl;
-                // std::vector<std::string> response = sim.call_function("checkConnection",{"check"});
-                // if(response.empty()){
-                //     if(verbose)
-                //         std::cout << "Reconnect to simulator " << sim_idx << std::endl;
-                //     sim.reconnect();
-                //     sim.call_function("getLogFolder",{Logging::log_folder});
-                //     continue;
-                // }else{
-                //     std::cout << "Sim " << sim_idx << " " << response[0] << std::endl;
-                // }
                 if(sim.state() == sim_simulation_stopped){//simulation not running
                     if(sim.is_individual_ready()){//there is an individual ready for retrieval
-                        std::vector<std::string> ret = sim.call_function("sendRobotToClient",{});
+                        std::vector<std::string> ret = sim.call_function("sendRobotToClient",{},100000);
                         _ind_vec[sim_idx]->from_string(ret[0]);
                         if(verbose)
                             std::cout << "Simulator " << sim_idx << " received individual with fitness " << _ind_vec[sim_idx]->getObjectives()[0] << std::endl;
@@ -159,7 +161,7 @@ bool Client::update_simulators(){
                         _ind_vec[sim_idx]->set_individual_id(_idx_vec[sim_idx]);
                         _ind_vec[sim_idx]->set_generation(_ea->get_generation());
                         if(!sim.is_env_initialized()){
-                            sim.call_function("initEnvironment",{});
+                            sim.call_function("initEnvironment",{},100000);
                             sim.env_initialized();
                         }
                         //    serverInstances[slaveIndex]->setStringSignal("currentInd",currentIndVec[slaveIndex]->to_string());
@@ -167,20 +169,15 @@ bool Client::update_simulators(){
                         if(sim.start()){
                             sim.sim_started();
                             // usleep(1000);
-                            sim.call_function("spawnRobot",{_ind_vec[sim_idx]->to_string()});
+                            sim.call_function("spawnRobot",{_ind_vec[sim_idx]->to_string()},100000);
                             if(verbose)
                                 std::cout << "simulation " << sim_idx <<  " started" << std::endl;
+                        }else{
+                            std::cerr << "simulation " << sim_idx << " failed to start" << std::endl;
                         }
                     }
 
                 }
-                // else if(sim.state() == sim_simulation_advancing_abouttostop ||
-                //         sim.state() == sim_simulation_advancing_lastbeforestop){
-                //     if(verbose)
-                //         std::cout << "simulation " << sim_idx <<  " stopped early" << std::endl;
-                //     _idx_vec[sim_idx] = -1;
-                //     sim.ready_for_new_sim();
-                // }
                 else if(sim.state() == sim_simulation_advancing_running){
                     // std::cout << "Simulator " << sim_idx << " " << sim.time() << "/" << sim_duration << std::endl;
                     if(sim.time() >= sim_duration){
@@ -188,6 +185,9 @@ bool Client::update_simulators(){
                             std::cout << "simulation " << sim_idx <<  " stopped" << std::endl;
                         }
                     }
+                } else if(sim.state() == -1){
+                    std::cerr << "unable to get simulator state of " << sim_idx << ", try to reconnect" << std::endl;
+                    sim.reconnect();
                 }
                 else
                     continue;

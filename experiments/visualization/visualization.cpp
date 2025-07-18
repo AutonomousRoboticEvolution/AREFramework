@@ -255,7 +255,7 @@ bool Visu::update(const Environment::Ptr &env){
 }
 
 bool Visu::is_finish(){
-    return numberEvaluation >= population.size()+5;
+    return numberEvaluation >= population.size();
 }
 
 void Visu::load_per_gen_ind(int indIdx, std::vector<std::string>& morph_gen_files, std::vector<std::string>& ctrl_gen_files){

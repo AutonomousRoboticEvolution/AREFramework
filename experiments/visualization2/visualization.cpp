@@ -46,7 +46,7 @@ void VisuInd::createMorphology(){
         }else{
             std::cerr << "Unknown type of morphological genome" << std::endl;
             std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-            std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+            std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG" << std::endl;
             exit(1);
         }
         int id = settings::getParameter<settings::Integer>(parameters,"#idToLoad").value;

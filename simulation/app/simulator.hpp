@@ -31,11 +31,15 @@ public:
         _env_initialized(sim._env_initialized)
     {}
 
+    virtual ~Simulator(){
+        _sim.reset();
+        _client.reset();
+    }
     
     bool connect(const std::string &address, int port, int timeout);
     bool reconnect();
 
-    std::vector<std::string> call_function(const std::string &fct, const std::vector<std::string> &arguments);
+    std::vector<std::string> call_function(const std::string &fct, const std::vector<std::string> &arguments, int timeout = 2500);
 
     /**
      * @brief start the simulation in stepping mode
@@ -106,6 +110,8 @@ private:
     std::string _address;
     bool _individual_ready = false;
     bool _env_initialized = false;
+
+    void _print_error(const std::string &fct_name,const std::runtime_error& error,  const std::vector<std::string> fct_args = {});
 
 };//Simulator
 }//sim

@@ -15,7 +15,7 @@ def run_servers(args,n: int):
 
 
 def run_server(args,rank: int):
-    server_port = args.port_start + 2*rank
+    server_port = args.port_start + rank
     print(f'Starting server rank {rank} listening on port {server_port}')
     time = datetime.datetime.today()
     formated_time = time.strftime("%m_%d_%H_%M_%S_%f");
@@ -99,6 +99,7 @@ def main():
     try:
         import time
         servers = run_servers(args,args.n_vrep)
+        time.sleep(1)
         print(servers[0][0].args)
         client = run_client(args)
         time.sleep(1)

@@ -82,6 +82,7 @@ private:
     hr_clock::time_point _end_overhead_time;
 
     bool _is_all_simulators_finished();
+    const int _max_connection_trials = 3;
 };
 
 }//are

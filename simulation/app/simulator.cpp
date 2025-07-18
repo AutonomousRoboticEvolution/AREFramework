@@ -4,8 +4,14 @@ using namespace are::sim;
 using namespace jsoncons;
 
 bool Simulator::connect(const std::string &address, int port, int timeout){
-    _client = std::make_shared<RemoteAPIClient>("localhost",port);
-    _sim = std::make_shared<RemoteAPIObject::sim>(_client.get());
+    _client = std::make_shared<RemoteAPIClient>(address,port);
+    try{
+        _sim = std::make_shared<RemoteAPIObject::sim>(_client.get());
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return false;
+    }
+
     _address = address;
     _port = port;
     _timeout = timeout;
@@ -13,17 +19,34 @@ bool Simulator::connect(const std::string &address, int port, int timeout){
 }
 
 bool Simulator::reconnect(){
-    _client = std::make_shared<RemoteAPIClient>("localhost",_port);
-    _sim = std::make_shared<RemoteAPIObject::sim>(_client.get());
+    _client = std::make_shared<RemoteAPIClient>(_address,_port);
+    try{
+        _sim = std::make_shared<RemoteAPIObject::sim>(_client.get());
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return false;
+    }
     return true;
 }
 
 
-std::vector<std::string> Simulator::call_function(const std::string &fct, const std::vector<std::string> &arguments){
+std::vector<std::string> Simulator::call_function(const std::string &fct, const std::vector<std::string> &arguments, int timeout){
     json args(json_array_arg);
     for(const std::string &arg: arguments)
         args.push_back(arg);
-    json ret = _sim->callScriptFunction(fct,_sim->getScript(sim_scripttype_addonscript,"ARE"),args);
+    json ret;
+    try{
+        ret = _sim->callScriptFunction(fct,_sim->getScript(sim_scripttype_addonscript,"ARE"),args,timeout);
+    }catch(const std::runtime_error& error){
+        std::vector<std::string> args = {fct};
+        args.insert(args.end(),arguments.begin(),arguments.end());
+        std::stringstream sstr;
+        sstr << timeout;
+        args.push_back(sstr.str());
+        _print_error(__func__,error,args);
+        return {};
+    }
+
     std::vector<std::string> returns;
     for(size_t i = 0; i< ret.size(); i++)
         returns.push_back(ret[i].as<std::string>());
@@ -31,19 +54,35 @@ std::vector<std::string> Simulator::call_function(const std::string &fct, const 
 }
 
 bool Simulator::start(bool stepping){
-    _sim->setStepping(stepping);
-    _sim->startSimulation();
-    return (state() == _sim->simulation_advancing_firstafterstop);
+    try{
+        _sim->setStepping(stepping);
+        _sim->startSimulation();
+
+        return (state() == _sim->simulation_advancing_firstafterstop);
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return false;
+    }
 }
 
 bool Simulator::step(){
-    _sim->step();
-    return (state() == _sim->simulation_advancing_running);
+    try{
+        _sim->step();
+        return (state() == _sim->simulation_advancing_running);
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return false;
+    }
 }
 
 bool Simulator::stop(){
-    _sim->stopSimulation(true);
-    return (state() == _sim->simulation_stopped);
+    try{
+        _sim->stopSimulation(true);
+        return (state() == _sim->simulation_stopped);
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return false;
+    }
 }
 
 bool Simulator::run(double duration){
@@ -68,11 +107,28 @@ bool Simulator::run_stepping(double duration){
 }
 
 int Simulator::state(){
-    return _sim->getSimulationState();
+    try{
+        return _sim->getSimulationState();
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return -1;
+    }
 }
 
 double Simulator::time(){
-    return _sim->getSimulationTime();
+    try{
+        return _sim->getSimulationTime();
+    }catch(const std::runtime_error& error){
+        _print_error(__func__,error);
+        return -1;
+    }
+}
+
+void Simulator::_print_error(const std::string &fct_name,const std::runtime_error& error,  const std::vector<std::string> fct_args){
+    std::cerr << "Error in " << fct_name << "(";
+    for(const std::string &arg: fct_args)
+        std::cerr << arg << ",";
+    std::cerr << ")" << " of sim with port " << _port << error.what() << std::endl;
 }
 
 std::string Simulator::state_to_string(int state){
