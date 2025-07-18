@@ -3,6 +3,7 @@
 import sys
 import os
 import copy
+import time
 import pandas as pd
 import subprocess as sp
 import numpy as np
@@ -87,22 +88,22 @@ if __name__ == "__main__":
         print("usage:\n - arg 1: folder path\n",
               "- arg 2: ARE framework path\n", 
               "- arg 3: distance (L2|organ_dist)\n",
-              "- arg 4: whole pareto set (yes|no)" 
-              "- arg 5: quadrics (yes|no)" 
-              "- arg 6: (optional) path to vrep exec")
+              "- arg 4: whole pareto set (yes|no)\n" 
+              "- arg 5: morph genome type 0: CPPN, 1: SQ_CPPN, 2: SQ_CG\n" 
+              "- arg 6: (optional) path to coppeliaSim exec")
         exit(0)
 
     folder_name = sys.argv[1]
     are_framework = sys.argv[2]
     distance = sys.argv[3]
     whole_pareto = sys.argv[4] == "yes"
-    use_quadric = sys.argv[5] == "yes"
-    print("use quadric",use_quadric)
+    morph_genome_type = int(sys.argv[5])
+    print("morph genome type",morph_genome_type)
     if distance != "L2" and distance != "organ_dist":
         print("Error - distance unkown.\ndistance available: L2 or organ_dist")
         exit(0)
     for folder in os.listdir(folder_name):
-        if(folder.split("_")[0] != "sq"):
+        if(folder.split("_")[0] != "meim"):
             continue
         # Create parameter files
         if(whole_pareto):
@@ -140,7 +141,7 @@ if __name__ == "__main__":
             parameters["#modelRepository"] = robot_repo
             parameters["#scenePath"] = are_framework + "/simulation/models/scenes/ARE_arena.ttt"
             parameters["#modelsPath"] = are_framework+ "/simulation/models/"
-            parameters["#useQuadric"] = use_quadric
+            parameters["#morphGenomeType"] = morph_genome_type
             write_parameters(parameters,robot_repo,"parameters_visu_" + str(id) + ".csv")
 
         if(len(sys.argv) == 7):    
@@ -154,6 +155,8 @@ if __name__ == "__main__":
                     print(robot_repo,robot_id,": robot image and model already generated skip")
                     continue
                 param_file = robot_repo + "/" + filename
-                sp.run([vrep_exec, "simulation", "-h", "-g" + param_file])
+                cmd = ["python",are_framework + "/simulation/app/run.py","--headless=1","--xvfb=1","--params="+param_file,"--client=are-client","--port-start=11000","--coppelia="+vrep_exec,"1"]
+                sp.run(cmd)
+                time.sleep(2)
 
 

@@ -141,7 +141,7 @@ if __name__ == "__main__":
 
         if(len(sys.argv) == 6):    
             vrep_exec = sys.argv[5]
-            #run visulaization to create robots images and models
+            #run visualization to create robots images and models
             for filename in os.listdir(robot_repo):
                 if(filename.split("_")[0] != "parameters" and filename.split("_")[1] != "visu"):
                     continue
@@ -150,6 +150,7 @@ if __name__ == "__main__":
                     print(robot_repo,robot_id,": robot image and model already generated skip")
                     continue
                 param_file = robot_repo + "/" + filename
-                sp.run([vrep_exec, "-h", "-g" + param_file])
+                cmd = ["python",are_framework + "/simulation/app/run.py","--headless=1","--params="+param_file,"--client=are-client","--port-start=11000","--coppelia="+vrep_exec,"1"]
+                sp.run(cmd)
 
 
