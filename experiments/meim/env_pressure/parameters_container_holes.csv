@@ -18,7 +18,7 @@
 #envNumber,int,1
 
 #populationSize,int,100
-#maxNbrEval,int,5000
+#maxNbrEval,int,10000
 #tournamentSize,int,4
 
 #manualDesignFile,string,None
