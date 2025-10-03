@@ -28,9 +28,10 @@ void MEIMIndividual::createMorphology(){
         std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->set_nbr_organs(nbr_organs);
 
     }else{
-        morphology = std::make_shared<sim::CPPNMorphology>(parameters);
-        nn2_cppn_t cppn = std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->get_cppn();
-        std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->set_cppn(cppn);
+        morphology = std::make_shared<sim::DualCPPNMorphology>(parameters);
+        std::pair<skel_cppn_t,org_cppn_t> cppns = std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->get_cppns();
+        std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->set_skel_cppn(cppns.first);
+        std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->set_org_cppn(cppns.second);
 
     }
 
@@ -42,9 +43,9 @@ void MEIMIndividual::createMorphology(){
         std::dynamic_pointer_cast<SQCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQCPPNMorphology>(morphology)->getMatrixDesc());
 
     }else{
-        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getFeatureDesc());
-        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getOrganPosDesc());
-        std::dynamic_pointer_cast<NN2CPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::CPPNMorphology>(morphology)->getMatrixDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getMatrixDesc());
     }
 
 }
@@ -138,7 +139,7 @@ std::string MEIMIndividual::to_string() const
     if(use_quadric)
         oarch.register_type<SQCPPNGenome>();
     else
-        oarch.register_type<NN2CPPNGenome>();
+        oarch.register_type<DualCPPNGenome>();
     oarch.register_type<EmptyGenome>();
     oarch << *this;
     return sstream.str();
@@ -154,7 +155,7 @@ void MEIMIndividual::from_string(const std::string &str){
     if(use_quadric)
         iarch.register_type<SQCPPNGenome>();
     else
-        iarch.register_type<NN2CPPNGenome>();
+        iarch.register_type<DualCPPNGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
@@ -203,7 +204,7 @@ void MEIM::init(){
             if(use_quadric)
                 morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
             else
-                morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+                morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
             morph_gen->random();
             morph_gen->set_id(highest_morph_id++);
             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
@@ -225,7 +226,7 @@ void MEIM::init(){
         if(use_quadric)
             morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
         else
-            morph_gen = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
 
         MEIMIndividual::Ptr ind = std::make_shared<MEIMIndividual>(morph_gen,ctrl_gen);
         ind->set_parameters(parameters);

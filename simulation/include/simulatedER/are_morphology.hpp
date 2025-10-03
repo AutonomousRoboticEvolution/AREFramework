@@ -11,6 +11,7 @@
 #include "simulatedER/skeleton_generation.hpp"
 #include "simulatedER/nn2/NN2CPPNGenome.hpp"
 #include "simulatedER/nn2/sq_cppn_genome.hpp"
+#include "simulatedER/nn2/dual_cppn_genome.hpp"
 
 
 namespace are {
@@ -183,6 +184,36 @@ public:
 private:
 
     nn2_cppn_t cppn;
+};
+
+class DualCPPNMorphology: public AREMorphology{
+public:
+    typedef std::shared_ptr<DualCPPNMorphology> Ptr;
+    typedef std::shared_ptr<const DualCPPNMorphology> ConstPtr;
+
+    DualCPPNMorphology(const settings::ParametersMapPtr &param) : AREMorphology(param){}
+    DualCPPNMorphology(const DualCPPNMorphology& arem): AREMorphology(arem),
+        _skel_cppn(arem._skel_cppn), _org_cppn(arem._org_cppn)
+    {}
+
+
+    are::Morphology::Ptr clone() const override
+    {return std::make_shared<DualCPPNMorphology>(*this);}
+
+    void create() override;
+
+    void set_skel_cppn(const skel_cppn_t &nn){_skel_cppn = nn;}
+    const skel_cppn_t &get_skel_cppn(){return _skel_cppn;}
+
+    void set_org_cppn(const org_cppn_t &nn){_org_cppn = nn;}
+    const org_cppn_t &get_org_cppn(){return _org_cppn;}
+    int get_nbr_organs(){return nbr_organs;}
+    void set_nbr_organs(int no){nbr_organs = no;}
+private:
+
+    skel_cppn_t _skel_cppn;
+    org_cppn_t _org_cppn;
+    int nbr_organs;
 };
 
 class SQCPPNMorphology: public AREMorphology{
