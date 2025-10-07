@@ -10,7 +10,6 @@
 #include "simulatedER/Blueprint.h"
 #include "simulatedER/skeleton_generation.hpp"
 #include "simulatedER/morph_genomes.hpp"
-#include "simulatedER/sq_genome.hpp"
 
 
 namespace are {
