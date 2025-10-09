@@ -48,6 +48,25 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
                            )->get_components_genome().to_string() << std::endl;
             cgofstr.close();
         }
+        if(genome_type == morph_genome_type::DUAL_CPPN){
+
+            std::pair<skel_cppn_t,org_cppn_t> cppns = std::dynamic_pointer_cast<DualCPPNGenome>(
+                                                           genome.morph_genome
+                                                           )->get_cppns();
+            std::stringstream filename1;
+            filename1 << Logging::log_folder << "/skel_cppn_" << genome.morph_genome->id();
+            std::ofstream logFileStream;
+            if(!openOLogFile(logFileStream, filename1.str()))
+                return;
+            cppns.first.write_dot(logFileStream);
+            logFileStream.close();
+            std::stringstream filename2;
+            filename1 << Logging::log_folder << "/org_cppn_" << genome.morph_genome->id();
+            if(!openOLogFile(logFileStream, filename1.str()))
+                return;
+            cppns.second.write_dot(logFileStream);
+            logFileStream.close();
+        }
 
 
         //- Log morph features <width,depth,height,voxels,wheels,sensor,joint,caster>
