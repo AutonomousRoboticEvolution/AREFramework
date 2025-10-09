@@ -54,14 +54,14 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
                                                            genome.morph_genome
                                                            )->get_cppns();
             std::stringstream filename1;
-            filename1 << Logging::log_folder << "/skel_cppn_" << genome.morph_genome->id();
+            filename1 << "skel_cppn_" << genome.morph_genome->id();
             std::ofstream logFileStream;
             if(!openOLogFile(logFileStream, filename1.str()))
                 return;
             cppns.first.write_dot(logFileStream);
             logFileStream.close();
             std::stringstream filename2;
-            filename1 << Logging::log_folder << "/org_cppn_" << genome.morph_genome->id();
+            filename1 << "org_cppn_" << genome.morph_genome->id();
             if(!openOLogFile(logFileStream, filename1.str()))
                 return;
             cppns.second.write_dot(logFileStream);
