@@ -316,6 +316,7 @@ int dual_cppn_decoder::cppn_to_organ_type(org_cppn_t &cppn,const std::vector<dou
         std::cerr << "We shouldn't be here: " << __func__ << " max_element: " << output << std::endl;
         exit(-1);
     }
+    return organ_type;
 }
 
 void GenomeLog::saveLog(EA::Ptr &ea){
