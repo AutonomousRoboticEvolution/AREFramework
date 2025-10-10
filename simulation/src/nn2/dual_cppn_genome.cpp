@@ -379,10 +379,10 @@ void GraphVizLog::saveLog(EA::Ptr &ea){
         cppns.first.write_dot(logFileStream);
         logFileStream.close();
         std::stringstream filename2;
-        filename1 << "org_cppn_" << std::dynamic_pointer_cast<DualCPPNGenome>(
+        filename2 << "org_cppn_" << std::dynamic_pointer_cast<DualCPPNGenome>(
                                          ea->get_population()[i]->get_morph_genome()
                                          )->id() << ".dot";
-        if(!openOLogFile(logFileStream, filename1.str()))
+        if(!openOLogFile(logFileStream, filename2.str()))
             return;
         cppns.second.write_dot(logFileStream);
         logFileStream.close();
