@@ -4,6 +4,9 @@ using namespace are::sim;
 using namespace jsoncons;
 
 bool Simulator::connect(const std::string &address, int port, int timeout){
+    _address = address;
+    _port = port;
+    _timeout = timeout;
     _client = std::make_shared<RemoteAPIClient>(address,port);
     try{
         _sim = std::make_shared<RemoteAPIObject::sim>(_client.get());
@@ -12,9 +15,7 @@ bool Simulator::connect(const std::string &address, int port, int timeout){
         return false;
     }
 
-    _address = address;
-    _port = port;
-    _timeout = timeout;
+
     return true;
 }
 
@@ -128,7 +129,7 @@ void Simulator::_print_error(const std::string &fct_name,const std::runtime_erro
     std::cerr << "Error in " << fct_name << "(";
     for(const std::string &arg: fct_args)
         std::cerr << arg << ",";
-    std::cerr << ")" << " of sim with port " << _port << error.what() << std::endl;
+    std::cerr << ")" << " of sim with port " << _port << " " << error.what() << std::endl;
 }
 
 std::string Simulator::state_to_string(int state){

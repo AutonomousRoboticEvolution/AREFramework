@@ -145,7 +145,7 @@ SIM_DLLEXPORT void simMsg(SSimMsg* info){
         if (verbose)
             std::cout << "SIMULATION ABOUT TO START" << std::endl;
         // ER->initEnv();
-        int engine[2] = {4,0};
+        int engine[2] = {0,0};
         simSetIntArrayProperty(sim_handle_scene,"dynamicsEngine",engine,2);
         env_initialised = true;
 

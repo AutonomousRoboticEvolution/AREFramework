@@ -65,9 +65,12 @@ public:
     double get_sim_time(){return simGetSimulationTime();}
     std::vector<double> get_object_position(int handle);
 
+    const std::vector<double> &get_immediate_return(){return _immediate_return;}
+
 protected:
     ///handle of the object in the environment
     std::vector<int> envObjectHandles;
+    std::vector<double> _immediate_return;
     ///maximum simulation time
     float maxTime = 0.0;
 
