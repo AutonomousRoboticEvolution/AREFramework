@@ -12,7 +12,6 @@ namespace cma = libcmaes;
 using geno_pheno_t = cma::GenoPheno<cma::pwqBoundStrategy>;
 using cov_update_t = cma::CovarianceUpdate;
 using ipop_cmaes_t = cma::IPOPCMAStrategy<cov_update_t,geno_pheno_t>;
-using eostrat_t = cma::ESOStrategy<cma::CMAParameters<geno_pheno_t>,cma::CMASolutions,cma::CMAStopCriteria<geno_pheno_t>>;
 
 namespace are {
 
@@ -87,10 +86,10 @@ public:
     }
 
     void init_esolver(){
-        eostrat_t::_pfunc = _defaultPFunc;
-        eostrat_t::_pffunc = _defaultFPFunc;
+        ipop_cmaes_t::_pfunc = _defaultPFunc;
+        ipop_cmaes_t::_pffunc = _defaultFPFunc;
 
-        _esolver = Eigen::EigenMultivariateNormal<double>(false,eostrat_t::_parameters.get_seed()); // seeding the multivariate normal generator.
+        _esolver = Eigen::EigenMultivariateNormal<double>(false,ipop_cmaes_t::_parameters.get_seed()); // seeding the multivariate normal generator.
 
 
         _esolver.setMean(_solutions.xmean());
