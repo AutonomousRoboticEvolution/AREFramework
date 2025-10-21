@@ -57,6 +57,7 @@ void VisuInd::createController(){
 
     int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
     int nb_hidden = settings::getParameter<settings::Integer>(parameters,"#NbrHiddenNeurones").value;
+    int nb_rbf = settings::getParameter<settings::Integer>(parameters,"#NbrRBFNeurones").value;
     const std::vector<int> joint_subs = settings::getParameter<settings::Sequence<int>>(parameters,"#jointSubs").value;
 
     int wheel_nbr,joint_nbr,sensor_nbr;
@@ -95,6 +96,21 @@ void VisuInd::createController(){
         control = std::make_shared<RNNControl>(nb_inputs,nb_outputs,nb_hidden);
         std::dynamic_pointer_cast<RNNControl>(control)->_nn->set_weights_biases(weights,bias);
         std::vector<double> out_weights =  std::dynamic_pointer_cast<RNNControl>(control)->_nn->get_weights();
+    }else if(nn_type == tnn::t_CPGRBF){
+        std::cout << "Creating CPGRBFNetwork with " << nb_rbf <<" RBF neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<CPGRBFControl>(nb_outputs,nb_rbf);
+        std::dynamic_pointer_cast<CPGRBFControl>(control)->_nn->set_out_layer_parameters(weights,bias);
+    }else if(nn_type == tnn::t_CPGRBFRNN){
+        std::cout << "Creating CPGRBFRNN with " << nb_inputs << " inputs, " << nb_hidden << " recurrent neurons, " << nb_rbf <<" RBF neurons, and " << nb_outputs << " ouputs." << std::endl;
+        control = std::make_shared<CPGRBFRNNControl>(nb_inputs,nb_outputs,nb_rbf, nb_hidden);
+        std::vector<double> out_ws(weights.begin(),weights.begin() + nb_rbf*nb_outputs);
+        std::vector<double> rnn_ws(weights.begin()+nb_rbf*nb_outputs,weights.end());
+        std::vector<double> out_bs(bias.begin(),bias.begin()+nb_outputs);
+        std::vector<double> rnn_bs(bias.begin()+nb_outputs,bias.end());
+        std::cout << out_ws.size() << "," << rnn_ws.size() << std::endl;
+        std::dynamic_pointer_cast<CPGRBFRNNControl>(control)->_nn->set_out_layer_parameters(out_ws,out_bs);
+        std::dynamic_pointer_cast<CPGRBFRNNControl>(control)->_nn->set_rnn_parameters(rnn_ws,rnn_bs);
+
     }
     else {
         std::cerr << "unknown type of neural network" << std::endl;
