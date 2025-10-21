@@ -22,6 +22,7 @@ typedef struct act_obs_sample{
         observation(obs), next_action(act){}
     std::vector<double> observation;
     std::vector<double> next_action;
+    double ret;
     std::string to_string() const;
     template<class archive>
     void serialize(archive &arch, const unsigned int v)
@@ -61,7 +62,7 @@ public:
         createMorphology();
         int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
         bool reload_ctrl = settings::getParameter<settings::Boolean>(parameters,"#reloadController").value;
-        if(control == nullptr || instance_type == settings::INSTANCE_SERVER || reload_ctrl){
+        if(control == nullptr || reload_ctrl){
             ctrlGenome->init();
             createController();
         }
