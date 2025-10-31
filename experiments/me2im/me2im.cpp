@@ -163,14 +163,15 @@ ME2IM::ME2IM(const misc::RandNum::Ptr& rn, const settings::ParametersMapPtr& par
 void ME2IM::init(){
     nn2::rgen_t::gen.seed(randomNum->getSeed());
     int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
-    if(!simulator_side){
+    if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
 
         //initialize the grid archive used as parent pool with 6 dimensions: wheels, joints, sensors, width, depth, height
         GridArchive<genome_t>::comparator_t comp = [](const genome_t &a, const genome_t &b){
             return a.objectives[0] > b.objectives[0];
         };
-        parent_pool = GridArchive<genome_t>({12,12,12,6,6,12},{{0,1},{0,1},{0,1},{0.4,1},{0.4,1},{0,1}},comp);
+        parent_pool = GridArchive<genome_t>({6,6,12,12,12,12},{{0.4,1},{0.4,1},{0,1},{0,1},{0,1},{0,1}},comp);
 
         bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
         if(use_fixed_control){
@@ -211,7 +212,7 @@ void ME2IM::init(){
             morph_gen.reset();
             ctrl_gen.reset();
         }
-    }else if(simulator_side){
+    }else if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
         Genome::Ptr morph_gen;
         if(genome_type == morph_genome_type::CPPN)
@@ -267,9 +268,10 @@ void ME2IM::reproduction(){
 }
 
 bool ME2IM::update(const Environment::Ptr &env){
+    int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
     int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
     //    bool verbose = settings::getParameter<settings::Boolean>(parameters,"#verbose").value;
-    if(simulator_side){
+    if((instance_type == settings::INSTANCE_SERVER && simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         Individual::Ptr ind = population[currentIndIndex];
         std::dynamic_pointer_cast<ME2IMIndividual>(ind)->set_final_position(env->get_final_position());
         if(env->get_name() == "obstacle_avoidance"){
@@ -281,7 +283,7 @@ bool ME2IM::update(const Environment::Ptr &env){
         }
         std::dynamic_pointer_cast<ME2IMIndividual>(ind)->reset_control();
     }
-    if(!simulator_side){
+    if((instance_type == settings::INSTANCE_SERVER && !simulator_side) || instance_type == settings::INSTANCE_REGULAR){
         int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
         for(int &index : newly_evaluated){
@@ -334,7 +336,7 @@ bool ME2IM::update(const Environment::Ptr &env){
                     morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
                 else if(genome_type == morph_genome_type::SQ_CG)
                     morph_feat = std::dynamic_pointer_cast<SQGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
-                parent_pool.add_solution(new_gene,morph_feat);
+                parent_pool.add_solution(new_gene,{morph_feat[0],morph_feat[1],morph_feat[2],morph_feat[4],morph_feat[5],morph_feat[6]});
                 new_genes.push_back(new_gene);
                 //-
                 if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
