@@ -264,9 +264,9 @@ public:
 class CPGRBFControl: public Control{
 public:
     CPGRBFControl() : Control(){}
-    CPGRBFControl(int nbr_outputs, int nbr_rbf, 
+    CPGRBFControl(int nbr_outputs, int nbr_rbf,
         double init_state_0 = 0.2, double init_state_1 = -0.2,double alpha = 1.05, double phi = 0.1) : Control(){
-        init_nn(nbr_outputs,nbr_rbf,init_state_0,init_state_1);
+        init_nn(nbr_outputs,nbr_rbf,init_state_0,init_state_1,alpha,phi);
     }
     Control::Ptr clone() const override{
         return std::make_shared<CPGRBFControl>(*this);
@@ -287,7 +287,7 @@ public:
     CPGRBFRNNControl() : Control(){}
     CPGRBFRNNControl(int nbr_inputs,int nbr_outputs, int nbr_rbf, int nbr_rnn, 
         double init_state_0 = 0.2, double init_state_1 = -0.2, double alpha = 1.05, double phi = 0.1) : Control(){
-        init_nn(nbr_inputs,nbr_outputs,nbr_rbf,nbr_rnn,init_state_0,init_state_1);
+        init_nn(nbr_inputs,nbr_outputs,nbr_rbf,nbr_rnn,init_state_0,init_state_1,alpha,phi);
     }
     Control::Ptr clone() const override{
         return std::make_shared<CPGRBFRNNControl>(*this);

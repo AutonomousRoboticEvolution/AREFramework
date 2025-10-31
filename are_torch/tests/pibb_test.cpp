@@ -1,5 +1,6 @@
 #include <iostream>
 #include "are_torch/pi_bb.hpp"
+#include "are_torch/pi_bb_elite.hpp"
 
 using namespace are::learning;
 
@@ -9,13 +10,12 @@ int main(int argc, char** argv){
     [](const torch::Tensor& sol) -> double{
         return torch::sum(torch::square(sol)).item<double>();
     };
-    PiBB pibb;
+    PiBBElite pibb;
     pibb.set_rand_num(std::make_shared<are::misc::RandNum>(rd()));
-    pibb.set_inverse_lambda(1);
-    pibb.init(10,5,1);
-    pibb.policy_params() = torch::rand(5)*10;
+    pibb.init(10,5,0.01,1,1,1,0.5);
+    pibb.policy_params() = torch::rand(5);
     std::cout << "initial solution: " << pibb.policy_params() << std::endl;
-    for(int iter = 0; iter < 1000; iter++){
+    for(int iter = 0; iter < 100; iter++){
         torch::Tensor samples;
         pibb.generate_samples(samples);
         for(int k = 0; k < 10; k++){

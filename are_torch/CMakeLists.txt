@@ -27,7 +27,7 @@ target_include_directories(cpgrbfrnn_test PUBLIC include ../EAFramework/include)
 target_link_libraries(cpgrbfrnn_test "${TORCH_LIBRARIES}")
 
 
-add_executable(pibb_test tests/pibb_test.cpp src/pi_bb.cpp)
+add_executable(pibb_test tests/pibb_test.cpp src/pi_bb.cpp src/pi_bb_elite.cpp)
 target_include_directories(pibb_test PUBLIC include ../EAFramework/include)
 target_link_libraries(pibb_test "${TORCH_LIBRARIES}" ARE)
 
