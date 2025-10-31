@@ -29,6 +29,12 @@ public:
     virtual void create(const PolyVox::RawVolume<uint8_t> &skeleton,
                         const std::vector<sim::Organ> &organ_list) = 0;
     virtual Eigen::VectorXd to_eigen_vector() const = 0;
+    virtual std::vector<double> to_std_vector() const{
+        Eigen::VectorXd ev = to_eigen_vector();
+        std::vector<double> vct;
+        misc::eigenvect_to_stdvect(ev,vct);
+        return vct;
+    }
     virtual std::string to_string() const = 0;
     virtual void from_string(const std::string&) = 0;
 };
@@ -55,6 +61,7 @@ public:
      * @return
      */
     Eigen::VectorXd to_eigen_vector() const override;
+
 
 
     std::string to_string() const override;
