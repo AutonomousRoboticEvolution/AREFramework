@@ -15,6 +15,14 @@ public:
     void loadLog(const std::string& logFile){}
 };
 
+class TensorGenomeLog : public Logging
+{
+public:
+    TensorGenomeLog() : Logging(){} //Logging at the end of the generation
+    void saveLog(EA::Ptr & ea);
+    void loadLog(const std::string& logFile){}
+};
+
 
 
 }//are

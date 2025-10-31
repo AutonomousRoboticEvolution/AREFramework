@@ -3,7 +3,7 @@
 #include "simLib/simLib.h"
 #include "ARE/misc/eigen_boost_serialization.hpp"
 #include "simulatedER/mazeEnv.h"
-#include "are_torch/pi_bb.hpp"
+#include "are_torch/pi_bb_elite.hpp"
 #include "ARE/Individual.h"
 #include "ARE/Settings.h"
 #include "ARE/EA.h"
@@ -184,14 +184,14 @@ public:
 
     void update_pop_info(const std::vector<double>& obj, const Eigen::VectorXd &desc = Eigen::VectorXd::Zero(1));
 
-    const l::PiBB::Ptr &get_pibb(){return _pibb;}
+    const l::PiBBElite::Ptr &get_pibb(){return _pibb;}
     // void set_pibb(const l::PiBB::Ptr& pibb){_pibb = pibb;}
 
     const PiBBIndividual::Ptr &get_current_policy() const {return _current_policy_ind;}
 
 
 protected:
-    l::PiBB::Ptr _pibb;
+    l::PiBBElite::Ptr _pibb;
     bool _is_finish = false;
     int reevaluated = 0;
     std::vector<int> newly_evaluated;

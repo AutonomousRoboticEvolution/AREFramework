@@ -34,10 +34,15 @@ void TensorGenome::from_file(const std::string &str){
         std::cerr << "Error TensorGenome::from_file: cannot open file " << str << std::endl;
         return;
     }
-    boost::archive::text_iarchive iarch(ifs);
-    iarch.register_type<TensorGenome>();
-    iarch >> *this;
+    std::string line;
+    std::vector<double> params;
+    for(;std::getline(ifs,line);){
+        if(line[0] == '[')
+            break;
+        params.push_back(std::stod(line));
+    }
     ifs.close();
+    _tensor = torch::from_blob(params.data(),{static_cast<int64_t>(params.size())},torch::TensorOptions().dtype(torch::kDouble)).clone();
 }
 
 
@@ -88,7 +93,9 @@ void PiBBIndividual::createController(){
         std::cout << "Creating CPGRBFNetwork with " << nb_rbf <<" RBF neurons, and " << nb_outputs << " ouputs." << std::endl;
         torch::Tensor weights = std::dynamic_pointer_cast<TensorGenome>(ctrlGenome)->get_section(0);
         torch::Tensor biases = std::dynamic_pointer_cast<TensorGenome>(ctrlGenome)->get_section(1);
-        control = std::make_shared<CPGRBFControl>(nb_outputs,nb_rbf);
+        double alpha = settings::getParameter<settings::Double>(parameters,"#CPGAlpha").value;
+        double phi = settings::getParameter<settings::Double>(parameters,"#CPGPhi").value;
+        control = std::make_shared<CPGRBFControl>(nb_outputs,nb_rbf,0.2,-0.2,alpha,phi);
         std::dynamic_pointer_cast<CPGRBFControl>(control)->_nn->set_out_layer_parameters(weights,biases);
     }else if(nn_type == tnn::t_CPGRBFRNN){
         std::cout << "Creating CPGRBFRNN with " << nb_inputs << " inputs, " << nb_hidden << " recurrent neurons, " << nb_rbf <<" RBF neurons, and " << nb_outputs << " ouputs." << std::endl;
@@ -96,8 +103,9 @@ void PiBBIndividual::createController(){
         torch::Tensor out_ws = std::dynamic_pointer_cast<TensorGenome>(ctrlGenome)->get_section(1);
         torch::Tensor rnn_bs = std::dynamic_pointer_cast<TensorGenome>(ctrlGenome)->get_section(2);
         torch::Tensor out_bs = std::dynamic_pointer_cast<TensorGenome>(ctrlGenome)->get_section(3);
-
-        control = std::make_shared<CPGRBFRNNControl>(nb_inputs,nb_outputs,nb_rbf, nb_hidden); 
+        double alpha = settings::getParameter<settings::Double>(parameters,"#CPGAlpha").value;
+        double phi = settings::getParameter<settings::Double>(parameters,"#CPGPhi").value;
+        control = std::make_shared<CPGRBFRNNControl>(nb_inputs,nb_outputs,nb_rbf, nb_hidden,0.2,-0.2,alpha,phi);
         std::dynamic_pointer_cast<CPGRBFRNNControl>(control)->_nn->set_out_layer_parameters(out_ws,out_bs);
         std::dynamic_pointer_cast<CPGRBFRNNControl>(control)->_nn->set_rnn_parameters(rnn_ws,rnn_bs);
         
@@ -177,7 +185,12 @@ void PiBB::init(){
     if(!simulator_side)
     {
         int pop_size = settings::getParameter<settings::Integer>(parameters,"#populationSize").value;
+        int max_eval = settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value;
         double sigma = settings::getParameter<settings::Double>(parameters,"#sigma").value;
+        double inverse_lambda = settings::getParameter<settings::Double>(parameters,"#inverseLambda").value;
+        double lambda_decay = settings::getParameter<settings::Double>(parameters,"#inverseLambdaDecay").value;
+        double sigma_decay = settings::getParameter<settings::Double>(parameters,"#sigmaDecay").value;
+        double elite_ratio = settings::getParameter<settings::Double>(parameters,"#eliteRatio").value;
 
         int nn_type = settings::getParameter<settings::Integer>(parameters,"#NNType").value;
         const int nb_input = settings::getParameter<settings::Integer>(parameters,"#NbrInputNeurones").value;
@@ -205,10 +218,9 @@ void PiBB::init(){
         int sum = 0;
         for(int size: param_sizes)
             sum += size;
-        _pibb = std::make_unique<l::PiBB>();
-        _pibb->init(pop_size,sum,sigma,true);
+        _pibb = std::make_unique<l::PiBBElite>();
+        _pibb->init(pop_size,sum,sigma,inverse_lambda,sigma_decay,lambda_decay,elite_ratio,true);
         _pibb->set_rand_num(randomNum);
-        _pibb->set_inverse_lambda(1);
         
 
         std::vector<double> initial_policy = randomNum->randVectd(-1,1,sum);
@@ -249,13 +261,14 @@ void PiBB::init(){
 
 void PiBB::epoch(){
     std::cout << numberEvaluation << "/" << settings::getParameter<settings::Integer>(parameters,"#maxNbrEval").value << " evaluations" << std::endl;
+
+}
+
+void PiBB::init_next_pop(){
     if(!_pibb->iterate()){
         std::cerr << "Error PiBB::epoch: iteration failed" << std::endl;
         exit(1);
     }
-}
-
-void PiBB::init_next_pop(){
     torch::Tensor samples;
     _pibb->generate_samples(samples);
     std::vector<int> param_sizes = std::dynamic_pointer_cast<TensorGenome>(population[0]->get_ctrl_genome())->get_sections();
@@ -303,10 +316,14 @@ bool PiBB::update(const Environment::Ptr & env){
                 numberEvaluation++;
                 reevaluated++;
                 _pibb->step(population[idx]->get_rollout(),
-                            std::dynamic_pointer_cast<PiBBIndividual>(population[idx])->get_immediate_returns(),
+                            {},//std::dynamic_pointer_cast<PiBBIndividual>(population[idx])->get_immediate_returns(),
                             population[idx]->getObjectives()[0]);
+
             }
-            
+            if(std::dynamic_pointer_cast<PiBBIndividual>(population[idx])->is_current_policy()){
+                std::cout << "Current policy evaluated with fitness: " << population[idx]->getObjectives()[0] << std::endl;
+                // std::cout << "policy parameters: " << std::dynamic_pointer_cast<TensorGenome>(population[idx]->get_ctrl_genome())->tensor() << std::endl;
+            }
         }
         newly_evaluated.clear();
     }

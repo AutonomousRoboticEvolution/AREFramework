@@ -57,5 +57,10 @@ extern "C" void loggingFactory(std::vector<are::Logging::Ptr>& logs,
 
     are::BestIndividualLog::Ptr bilog = std::make_shared<are::BestIndividualLog>();
     logs.push_back(bilog);
+
+    are::TensorGenomeLog::Ptr tslog = std::make_shared<are::TensorGenomeLog>();
+    logs.push_back(tslog);
+
+
 }
 

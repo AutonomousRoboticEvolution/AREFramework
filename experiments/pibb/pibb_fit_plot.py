@@ -72,6 +72,7 @@ def main():
     # start animation (interval in ms)
     ani = FuncAnimation(fig, update, interval=int(interval * 1000), blit=True)
     plt.show()
+    # plt.savefig("pibb_fit_plot.png")
 
 if __name__ == "__main__":
     main()

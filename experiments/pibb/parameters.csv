@@ -89,4 +89,11 @@
 
 #generationalStagnationThreshold,float,0.01
 #fitStagnationMethod,string,best
-#sigma,double,1
+
+#sigma,double,0.5
+#sigmaDecay,double,0.999
+#inverseLambda,double,0.5
+#inverseLambdaDecay,double,1.0005
+#eliteRatio,double,0.5
+#CPGAlpha,double,1.05
+#CPGPhi,double,0.5

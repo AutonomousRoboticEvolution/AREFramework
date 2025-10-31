@@ -84,3 +84,20 @@ void BestIndividualLog::saveLog(EA::Ptr &ea){
     roll_filestream.close();
 
 }
+
+void TensorGenomeLog::saveLog(EA::Ptr &ea){
+    int generation = ea->get_generation();
+
+
+    for(int i = 0; i < ea->get_pop_size() - 1; i++){
+        std::ofstream genome_ofs;
+        std::stringstream filename;
+        filename << "policy_params_" << generation << "_" << i;
+        if(!openOLogFile(genome_ofs, filename.str()))
+            return;
+
+        TensorGenome::Ptr tg = std::dynamic_pointer_cast<TensorGenome>(ea->get_population()[i]->get_ctrl_genome());
+        genome_ofs << tg->tensor();
+        genome_ofs.close();
+    }
+}
