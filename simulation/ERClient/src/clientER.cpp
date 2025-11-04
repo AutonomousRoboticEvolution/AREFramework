@@ -326,7 +326,9 @@ bool ER::updateSimulation()
 //        ea->fill_ind_to_eval(indToEval);
 //        return true;
 //    }
-
+    std::cout << "ind to eval size: " << indToEval.size() << std::endl;
+    std::cout << "population size: " << ea->get_population().size() << std::endl;
+    std::cout << "all instances finished: " << isAllInstancesFinished() << std::endl;
     if((indToEval.empty() && isAllInstancesFinished()) || ea->get_population().size() == 0)
     {
         start_overhead_time = hr_clock::now();
