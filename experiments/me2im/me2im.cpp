@@ -246,9 +246,10 @@ void ME2IM::reproduction(){
     while(population.size() < pop_size){
 
         const genome_t& parent = parent_pool.random_solution(randomNum);
-        Genome::Ptr new_morph_gene = parent.morph_genome;
+        Genome::Ptr new_morph_gene = parent.morph_genome->clone();
         new_morph_gene->mutate();
         new_morph_gene->set_id(highest_morph_id++);
+        new_morph_gene->set_parents_ids({parent.morph_genome->id(),-1});
         new_morph_gene->set_parameters(parameters);
         new_morph_gene->set_randNum(randomNum);
 
@@ -336,7 +337,10 @@ bool ME2IM::update(const Environment::Ptr &env){
                     morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
                 else if(genome_type == morph_genome_type::SQ_CG)
                     morph_feat = std::dynamic_pointer_cast<SQGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
-                parent_pool.add_solution(new_gene,{morph_feat[0],morph_feat[1],morph_feat[2],morph_feat[4],morph_feat[5],morph_feat[6]});
+                if(parent_pool.add_solution(new_gene,{morph_feat[0],morph_feat[1],morph_feat[2],morph_feat[4],morph_feat[5],morph_feat[6]})){
+                    std::cout << "new design added in archive!" << std::endl;
+                    std::cout << "archive size : " << parent_pool.size() << std::endl;
+                }
                 new_genes.push_back(new_gene);
                 //-
                 if(settings::getParameter<settings::Boolean>(parameters,"#verbose").value)
@@ -346,7 +350,7 @@ bool ME2IM::update(const Environment::Ptr &env){
         }
 
         newly_evaluated.clear();
-        if(parent_pool.size() >= pop_size)
+        if(parent_pool.size() > 0)
             reproduction();
     }
     return true;

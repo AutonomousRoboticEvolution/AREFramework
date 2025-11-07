@@ -127,9 +127,9 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
 }
 
 void ParentsPoolLog::saveLog(EA::Ptr &ea){
-    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
+
     const std::vector<genome_t>& genomes = static_cast<ME2IM*>(ea.get())->get_parent_pool().get_solutions();
-    if(genomes.size() != pop_size)
+    if(genomes.empty())
         return;
     std::ifstream ifs(Logging::log_folder + std::string("/")  + logFile);
     std::string l,line;
