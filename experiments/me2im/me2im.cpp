@@ -26,10 +26,15 @@ void ME2IMIndividual::createMorphology(){
         sq_t quadric = std::dynamic_pointer_cast<SQGenome>(morphGenome)->get_quadric();
         std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_comp_gen(comp_gen);
         std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->set_quadric(quadric);
+    }else if(genome_type == morph_genome_type::DUAL_CPPN){
+        morphology = std::make_shared<sim::DualCPPNMorphology>(parameters);
+        std::pair<skel_cppn_t,org_cppn_t> cppns = std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->get_cppns();
+        std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->set_skel_cppn(cppns.first);
+        std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->set_org_cppn(cppns.second);
     }else{
         std::cerr << "Unknown type of morphological genome" << std::endl;
         std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-        std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+        std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
         exit(1);
     }
 
@@ -50,10 +55,14 @@ void ME2IMIndividual::createMorphology(){
         std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getFeatureDesc());
         std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getOrganPosDesc());
         std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getMatrixDesc());
+    }else if(genome_type == morph_genome_type::DUAL_CPPN){
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getMatrixDesc());
     }else{
         std::cerr << "Unknown type of morphological genome" << std::endl;
         std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-        std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+        std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
         exit(1);
     }
 
@@ -191,10 +200,12 @@ void ME2IM::init(){
                 morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
             else if(genome_type == morph_genome_type::SQ_CG)
                 morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::DUAL_CPPN)
+                morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
             else{
                 std::cerr << "Unknown type of morphological genome" << std::endl;
                 std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-                std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+                std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
                 exit(1);
             }
             morph_gen->random();
@@ -221,10 +232,12 @@ void ME2IM::init(){
             morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
         else if(genome_type == morph_genome_type::SQ_CG)
             morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::DUAL_CPPN)
+            morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
         else{
             std::cerr << "Unknown type of morphological genome" << std::endl;
             std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-            std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+            std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
             exit(1);
         }
         ME2IMIndividual::Ptr ind = std::make_shared<ME2IMIndividual>(morph_gen,ctrl_gen);
@@ -302,10 +315,12 @@ bool ME2IM::update(const Environment::Ptr &env){
                     morph_gen = std::make_shared<SQCPPNGenome>(randomNum,parameters);
                 else if(genome_type == morph_genome_type::SQ_CG)
                     morph_gen = std::make_shared<SQGenome>(randomNum,parameters);
+                else if(genome_type == morph_genome_type::DUAL_CPPN)
+                    morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
                 else{
                     std::cerr << "Unknown type of morphological genome" << std::endl;
                     std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
-                    std::cerr << "1: CPPN | 2: SQ_CPPN | 3: SQ_CG" << std::endl;
+                    std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
                     exit(1);
                 }
                 morph_gen->random();
