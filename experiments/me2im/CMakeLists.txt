@@ -36,6 +36,10 @@ target_include_directories(me2im PUBLIC ${INCLUDES} ${PCL_INCLUDE_DIRS})
 target_compile_definitions(me2im PUBLIC ${PCL_DEFINITIONS})
 target_link_libraries(me2im ARE simulatedER cmaes tbb ${PCL_LIBRARIES})
 
+add_executable(generate_grid_archive generate_grid_archive.cpp)
+target_include_directories(generate_grid_archive PUBLIC ${INCLUDES})
+
+
 install(TARGETS me2im DESTINATION lib/ARE/experiments)
 install(DIRECTORY . DESTINATION include/ARE/experiements/me2im FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h" )
 
