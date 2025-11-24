@@ -121,6 +121,8 @@ std::string ME2IMIndividual::to_string() const
         oarch.register_type<SQCPPNGenome>();
     else if(genome_type == morph_genome_type::SQ_CG)
         oarch.register_type<SQGenome>();
+    else if(genome_type == morph_genome_type::DUAL_CPPN)
+        oarch.register_type<DualCPPNGenome>();
 
     oarch.register_type<EmptyGenome>();
     oarch << *this;
@@ -140,6 +142,8 @@ void ME2IMIndividual::from_string(const std::string &str){
         iarch.register_type<SQCPPNGenome>();
     else if(genome_type == morph_genome_type::SQ_CG)
         iarch.register_type<SQGenome>();
+    else if(genome_type == morph_genome_type::DUAL_CPPN)
+        iarch.register_type<DualCPPNGenome>();
     iarch.register_type<EmptyGenome>();
     iarch >> *this;
 
