@@ -356,6 +356,8 @@ bool ME2IM::update(const Environment::Ptr &env){
                     morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
                 else if(genome_type == morph_genome_type::SQ_CG)
                     morph_feat = std::dynamic_pointer_cast<SQGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
+                else if(genome_type == morph_genome_type::DUAL_CPPN)
+                    morph_feat = std::dynamic_pointer_cast<DualCPPNGenome>(ind->get_morph_genome())->get_feat_desc().to_std_vector();
                 if(parent_pool.add_solution(new_gene,{morph_feat[0],morph_feat[1],morph_feat[2],morph_feat[4],morph_feat[5],morph_feat[6]})){
                     std::cout << "new design added in archive!" << std::endl;
                     std::cout << "archive size : " << parent_pool.size() << std::endl;
