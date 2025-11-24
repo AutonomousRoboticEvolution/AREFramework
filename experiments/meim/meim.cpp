@@ -57,9 +57,9 @@ void MEIMIndividual::createMorphology(){
         std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getOrganPosDesc());
         std::dynamic_pointer_cast<SQGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getMatrixDesc());
     }else if(genome_type == morph_genome_type::DUAL_CPPN){
-        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getFeatureDesc());
-        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getOrganPosDesc());
-        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::SQMorphology>(morphology)->getMatrixDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_feature_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getFeatureDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_organ_position_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getOrganPosDesc());
+        std::dynamic_pointer_cast<DualCPPNGenome>(morphGenome)->set_matrix_desc(std::dynamic_pointer_cast<sim::DualCPPNMorphology>(morphology)->getMatrixDesc());
     }else{
         std::cerr << "Unknown type of morphological genome" << std::endl;
         std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;

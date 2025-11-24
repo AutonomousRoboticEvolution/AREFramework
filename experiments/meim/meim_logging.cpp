@@ -48,6 +48,25 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
                            )->get_components_genome().to_string() << std::endl;
             cgofstr.close();
         }
+        if(genome_type == morph_genome_type::DUAL_CPPN){
+
+            std::pair<skel_cppn_t,org_cppn_t> cppns = std::dynamic_pointer_cast<DualCPPNGenome>(
+                                                           genome.morph_genome
+                                                           )->get_cppns();
+            std::stringstream filename1;
+            filename1 << "skel_cppn_" << genome.morph_genome->id();
+            std::ofstream logFileStream;
+            if(!openOLogFile(logFileStream, filename1.str()))
+                return;
+            cppns.first.write_dot(logFileStream);
+            logFileStream.close();
+            std::stringstream filename2;
+            filename2 << "org_cppn_" << genome.morph_genome->id();
+            if(!openOLogFile(logFileStream, filename2.str()))
+                return;
+            cppns.second.write_dot(logFileStream);
+            logFileStream.close();
+        }
 
 
         //- Log morph features <width,depth,height,voxels,wheels,sensor,joint,caster>
@@ -62,6 +81,8 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             morph_feat = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
         else if(genome_type == morph_genome_type::SQ_CG)
             morph_feat = std::dynamic_pointer_cast<SQGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::DUAL_CPPN)
+            morph_feat = std::dynamic_pointer_cast<DualCPPNGenome>(genome.morph_genome)->get_feat_desc().to_eigen_vector();
 
         mfofs << morph_feat(0);
         for(size_t j = 1; j < morph_feat.size(); j++){
@@ -83,6 +104,8 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             morph_desc = std::dynamic_pointer_cast<SQCPPNGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
         else if(genome_type == morph_genome_type::SQ_CG)
             morph_desc = std::dynamic_pointer_cast<SQGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
+        else if(genome_type == morph_genome_type::DUAL_CPPN)
+            morph_desc = std::dynamic_pointer_cast<DualCPPNGenome>(genome.morph_genome)->get_matrix_desc().to_eigen_vector();
 
         mdofs << morph_desc(0);
         for(size_t j = 1; j < morph_desc.size(); j++){
