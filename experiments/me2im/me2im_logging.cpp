@@ -58,13 +58,18 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
             std::ofstream logFileStream;
             if(!openOLogFile(logFileStream, filename1.str()))
                 return;
-            cppns.first.write_dot(logFileStream);
+            boost::archive::text_oarchive oarch(logFileStream);
+            oarch << cppns.first;
             logFileStream.close();
+            // cppns.first.write_dot(logFileStream);
+            // logFileStream.close();
             std::stringstream filename2;
             filename2 << "org_cppn_" << genome.morph_genome->id();
             if(!openOLogFile(logFileStream, filename2.str()))
                 return;
-            cppns.second.write_dot(logFileStream);
+            boost::archive::text_oarchive oarch2(logFileStream);
+            oarch2 << cppns.second;
+            // cppns.second.write_dot(logFileStream);
             logFileStream.close();
         }
 
