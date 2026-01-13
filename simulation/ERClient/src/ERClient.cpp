@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
         std::cerr << "Client unable to connect to the simulators instances !" << std::endl;
         return -1; // could not properly connect to servers
     }
-
+    parameters = client->get_parameters();
     //Write parameters in the log folder.
     settings::saveParameters(are::Logging::log_folder + std::string("/parameters.csv"),parameters);
 

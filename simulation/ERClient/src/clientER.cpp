@@ -56,6 +56,7 @@ void ER::initialize(){
     ea = EAFactory(randNum, parameters);
     ea->set_simulator_side(false);
     ea->init();
+    parameters = ea->get_parameters();
     population_size = ea->get_population().size();
     for(int i = 0; i < ea->get_population().size(); i++)
         indToEval.push_back(ea->get_population().get_index(i));
