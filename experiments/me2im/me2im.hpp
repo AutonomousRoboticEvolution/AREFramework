@@ -33,6 +33,7 @@ namespace are{
 
 
 typedef struct genome_t{
+    genome_t() {}
     genome_t(Genome::Ptr mg,hk::Homeokinesis::Ptr ctrl, std::vector<double> objs):
         morph_genome(mg),controller(ctrl),objectives(objs){}
     genome_t(const genome_t &g) :
@@ -47,6 +48,7 @@ typedef struct genome_t{
     std::vector<waypoint> trajectory;
     rollout_t rollout;
 } genome_t;
+
 
 
 
@@ -149,9 +151,8 @@ public:
     const std::vector<genome_t> &get_new_genes() const {return new_genes;}
     void clear_new_genes(){new_genes.clear();}
 
-   void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
-
-
+    void fill_ind_to_eval(std::vector<int> &ind_to_eval) override;
+    void load_parents_from_folder(const std::string& foldername);
 
 private:
    std::vector<int> newly_evaluated;

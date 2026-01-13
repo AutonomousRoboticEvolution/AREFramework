@@ -1,6 +1,8 @@
 #include "me2im.hpp"
-
+#include "ARE/misc/utilities.h"
 using namespace are;
+
+
 
 
 void ME2IMIndividual::createMorphology(){
@@ -179,12 +181,22 @@ void ME2IM::init(){
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
 
     if(!simulator_side || instance_type == settings::INSTANCE_REGULAR){
+        GridArchive<genome_t>::comparator_t comparator([](const genome_t& a, const genome_t& b){
+            return a.objectives[0] > b.objectives[0];
+        });
+        parent_pool = GridArchive<genome_t>({6,6,12,12,12,12},{{0.4,1},{0.4,1},{0,1},{0,1},{0,1},{0,1}},comparator);
+
+
+        std::string start_from_folder = settings::getParameter<settings::String>(parameters,"#startFromFolder").value;
+        if(start_from_folder != "None"){
+            std::cout << "Starting from experiment logged in: " << start_from_folder << std::endl;
+            load_parents_from_folder(start_from_folder);
+            std::cout << "Loading finished" << std::endl;
+            reproduction();
+            return;
+        }
 
         //initialize the grid archive used as parent pool with 6 dimensions: wheels, joints, sensors, width, depth, height
-        GridArchive<genome_t>::comparator_t comp = [](const genome_t &a, const genome_t &b){
-            return a.objectives[0] > b.objectives[0];
-        };
-        parent_pool = GridArchive<genome_t>({6,6,12,12,12,12},{{0.4,1},{0.4,1},{0,1},{0,1},{0,1},{0,1}},comp);
 
         bool use_fixed_control = settings::getParameter<settings::Boolean>(parameters,"#fixedController").value;
         if(use_fixed_control){
@@ -408,4 +420,205 @@ void ME2IM::setObjectives(size_t index, const std::vector<double> &objs){
 void ME2IM::fill_ind_to_eval(std::vector<int> &ind_to_eval){
     for(size_t i = 0; i < population.size(); i++)
 		ind_to_eval.push_back(population.get_index(i));
+}
+
+void ME2IM::load_parents_from_folder(const std::string& foldername)
+{
+
+    parameters = std::make_shared<settings::ParametersMap>(settings::loadParameters(foldername + std::string("/parameters.csv")));
+    parameters->emplace("#startFromFolder",std::make_shared<settings::String>(foldername));
+
+    std::rename((foldername + std::string("/parameters.csv")).c_str(),(foldername + std::string("/parameters_old.csv")).c_str());
+
+    //Load the ids of the archive
+    std::ifstream archive_file(foldername + std::string("/parent_pool.csv"));
+    if(!archive_file){
+        std::cerr << "ME2IM::load_parents_from_folder: unable to open " << foldername << "/parent_pool.csv" << std::endl;
+        return;
+    }
+    are::Logging::log_folder = foldername;
+
+    std::cout << "Loading parent ids..." << std::endl;
+    archive_file.seekg(-1,std::ios_base::end);
+    char ch = ' ';
+    while(ch != '\n'){
+        archive_file.seekg(-2,std::ios_base::cur);
+        if(static_cast<int>(archive_file.tellg()) <= 0){
+            archive_file.seekg(0);
+            break;
+        }
+        archive_file.get(ch);
+    }
+
+
+    std::vector<std::string> values;
+    std::string line;
+    std::getline(archive_file,line);
+    misc::split_line(line,",",values);
+    archive_file.close();
+    std::vector<int> parent_ids;
+    for(const std::string& val: values){
+        parent_ids.push_back(std::stoi(val));
+    }
+    std::cout << "parents archive size: " << parent_ids.size() << std::endl;
+
+
+
+    //Load the fitness values
+    std::cout << "Loading fitness values..." << std::endl;
+    std::ifstream fitness_file(foldername + std::string("/fitness.csv"));
+    if(!archive_file){
+        std::cerr << "ME2IM::load_parents_from_folder: unable to open " << foldername << "/parent_pool.csv" << std::endl;
+        return;
+    }
+    std::map<int,double> fitness_map;
+    for(std::string line; std::getline(fitness_file, line);){
+        std::vector<std::string> fit_values;
+        misc::split_line(line,",",fit_values);
+        int current_id = std::stoi(fit_values[0]);
+        if(current_id >= highest_morph_id)
+            highest_morph_id = current_id + 1;
+        bool is_parent = false;
+        for(const int& id: parent_ids){
+            if(id == current_id){
+                is_parent = true;
+                break;
+            }
+        }
+        if(is_parent)
+            fitness_map[std::stoi(fit_values[0])] = std::stod(fit_values[3]);
+    }
+    fitness_file.close();
+
+    //load the morpholigical descriptors
+    std::cout << "Loading morphological descriptors..." << std::endl;
+    std::ifstream desc_file(foldername + std::string("/morph_features.csv"));
+    if(!archive_file){
+        std::cerr << "ME2IM::load_parents_from_folder: unable to open " << foldername << "/parent_pool.csv" << std::endl;
+        return;
+    }
+
+    std::map<int,std::vector<double>> morph_feat_map;
+    for(std::string file; std::getline(desc_file,line);){
+        std::vector<std::string> desc_values;
+        misc::split_line(line,",",desc_values);
+        if(fitness_map.find(std::stoi(desc_values[0])) == fitness_map.end())
+            continue;
+        morph_feat_map[std::stoi(desc_values[0])] = {std::stod(desc_values[1]),
+                                                     std::stod(desc_values[2]),
+                                                     std::stod(desc_values[3]),
+                                                     std::stod(desc_values[5]),
+                                                     std::stod(desc_values[6]),
+                                                     std::stod(desc_values[7])};
+    }
+    desc_file.close();
+
+
+
+    //load morphological genomes
+    std::cout << "Loading morphological genomes..." << std::endl;
+
+    int gen_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
+    std::map<int,sq_t> sq_map;
+    if(gen_type == SQ_CPPN || gen_type == SQ_CG){
+        std::cout << "Loading quadrics..." << std::endl;
+        std::ifstream sq_file(foldername + std::string("/quadrics.csv"));
+        if(!sq_file){
+            std::cerr << "ME2IM::load_parents_from_folder: unable to open file " << foldername + std::string("/quadrics.csv") << std::endl;
+            exit(1);
+        }
+        for(std::string line; std::getline(sq_file,line);){
+            std::vector<std::string> sq_values;
+            misc::split_line(line,",",sq_values);
+
+            int id = std::stoi(sq_values[0]);
+
+            if(fitness_map.find(id) == fitness_map.end())
+                continue;
+            line.erase(line.begin(),line.begin() + sq_values[0].size() + 1);
+            sq_t quadric;
+            quadric.from_string(line);
+            sq_map[id] = quadric;
+        }
+
+    }
+    std::cout << "Loading cppns and filling the archive ..." << std::endl;
+    for(const int& id: parent_ids){
+        genome_t new_gene;
+        if(gen_type == CPPN){
+            std::stringstream sstr;
+            sstr << foldername << "/cppn_" << id;
+            std::ifstream cppn_file(sstr.str());
+            if(!cppn_file){
+                std::cerr << "ME2IM::load_parents_from_folder: unable to open file " << sstr.str() << std::endl;
+                exit(1);
+            }
+            boost::archive::text_iarchive cppn_arch(cppn_file);
+            nn2_cppn_t cppn;
+            cppn_arch >> cppn;
+            cppn_file.close();
+            new_gene.morph_genome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            new_gene.morph_genome->set_id(id);
+            std::dynamic_pointer_cast<NN2CPPNGenome>(new_gene.morph_genome)->set_cppn(cppn);
+        }
+        else if(gen_type == SQ_CPPN){
+            std::stringstream sstr;
+            sstr << foldername << "/cppn_" << id;
+            std::ifstream cppn_file(sstr.str());
+            if(!cppn_file){
+                std::cerr << "ME2IM::load_parents_from_folder: unable to open file " << sstr.str() << std::endl;
+                exit(1);
+            }
+            boost::archive::text_iarchive cppn_arch(cppn_file);
+            sq_cppn::cppn_t cppn;
+            cppn_arch >> cppn;
+            cppn_file.close();
+            new_gene.morph_genome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            new_gene.morph_genome->set_id(id);
+            std::dynamic_pointer_cast<SQCPPNGenome>(new_gene.morph_genome)->set_cppn(cppn);
+            std::dynamic_pointer_cast<SQCPPNGenome>(new_gene.morph_genome)->set_quadric(sq_map[id]);
+        }
+        else if(gen_type == SQ_CG){
+            std::cerr << " SQ_CG loading not implemented yet" << std::endl;
+            exit(1);
+        }else if(gen_type == DUAL_CPPN){
+            std::stringstream sstr;
+            sstr << foldername << "/skel_cppn_" << id;
+            std::ifstream skel_cppn_file(sstr.str());
+            if(!skel_cppn_file){
+                std::cerr << "ME2IM::load_parents_from_folder: unable to open file " << sstr.str() << std::endl;
+                exit(1);
+            }
+            skel_cppn_t skel_cppn;
+            boost::archive::text_iarchive skel_cppn_arch(skel_cppn_file);
+            skel_cppn_arch >> skel_cppn;
+            skel_cppn_file.close();
+            std::stringstream sstr2;
+            sstr2 << foldername << "/org_cppn_" << id;
+            std::ifstream org_cppn_file(sstr2.str());
+            if(!org_cppn_file){
+                std::cerr << "ME2IM::load_parents_from_folder: unable to open file " << sstr2.str() << std::endl;
+                exit(1);
+            }
+            boost::archive::text_iarchive org_cppn_arch(org_cppn_file);
+            org_cppn_t org_cppn;
+            org_cppn_arch >> org_cppn;
+            org_cppn_file.close();
+            new_gene.morph_genome = std::make_shared<DualCPPNGenome>(skel_cppn, org_cppn);
+            new_gene.morph_genome->set_parameters(parameters);
+            new_gene.morph_genome->set_randNum(randomNum);
+            new_gene.morph_genome->set_id(id);
+        }else{
+            std::cerr << "Unknown type of morphological genome" << std::endl;
+            std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+            std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
+            exit(1);
+        }
+        new_gene.objectives = {fitness_map[id]};
+        parent_pool.add_solution(new_gene, morph_feat_map[id]);
+    }
+
+
+    //Load the solutions
+
 }
