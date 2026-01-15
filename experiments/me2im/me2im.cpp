@@ -476,6 +476,7 @@ void ME2IM::load_parents_from_folder(const std::string& foldername)
         std::vector<std::string> fit_values;
         misc::split_line(line,",",fit_values);
         int current_id = std::stoi(fit_values[0]);
+        numberEvaluation++;
         if(current_id >= highest_morph_id)
             highest_morph_id = current_id + 1;
         bool is_parent = false;
@@ -489,6 +490,7 @@ void ME2IM::load_parents_from_folder(const std::string& foldername)
             fitness_map[std::stoi(fit_values[0])] = std::stod(fit_values[3]);
     }
     fitness_file.close();
+
 
     //load the morpholigical descriptors
     std::cout << "Loading morphological descriptors..." << std::endl;
