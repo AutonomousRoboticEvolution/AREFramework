@@ -1,11 +1,11 @@
-#include "meim_logging.hpp"
+#include "me2im_logging.hpp"
 
 using namespace are;
 
 void GenomeInfoLog::saveLog(EA::Ptr &ea)
 {
     int genome_type = settings::getParameter<settings::Integer>(ea->get_parameters(),"#morphGenomeType").value;
-    for(const auto &genome:  static_cast<MEIM*>(ea.get())->get_new_genes()){
+    for(const auto &genome:  static_cast<ME2IM*>(ea.get())->get_new_genes()){
 
         //- Log the cppn
         if(genome_type == morph_genome_type::CPPN || genome_type == morph_genome_type::SQ_CPPN){
@@ -150,14 +150,14 @@ void GenomeInfoLog::saveLog(EA::Ptr &ea)
         roll_filestream.close();
         //-
     }
-    static_cast<MEIM*>(ea.get())->clear_new_genes();
+    static_cast<ME2IM*>(ea.get())->clear_new_genes();
 
 }
 
 void ParentsPoolLog::saveLog(EA::Ptr &ea){
-    int pop_size = settings::getParameter<settings::Integer>(ea->get_parameters(),"#populationSize").value;
-    const std::vector<genome_t>& genomes = static_cast<MEIM*>(ea.get())->get_parent_pool();
-    if(genomes.size() != pop_size)
+
+    const std::vector<genome_t>& genomes = static_cast<ME2IM*>(ea.get())->get_parent_pool().get_solutions();
+    if(genomes.empty())
         return;
     std::ifstream ifs(Logging::log_folder + std::string("/")  + logFile);
     std::string l,line;
@@ -177,6 +177,7 @@ void ParentsPoolLog::saveLog(EA::Ptr &ea){
         return;
     ofs << sstr.str() << std::endl;
     ofs.close();
+
 }
 
 

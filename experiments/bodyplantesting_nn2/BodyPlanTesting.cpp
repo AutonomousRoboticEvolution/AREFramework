@@ -45,17 +45,25 @@ void BODYPLANTESTING::init()
 void BODYPLANTESTING::initPopulation()
 {
     int instance_type = settings::getParameter<settings::Integer>(parameters,"#instanceType").value;
-    bool use_quadric = settings::getParameter<settings::Boolean>(parameters,"#useQuadric").value;
+    int genome_type = settings::getParameter<settings::Integer>(parameters,"#morphGenomeType").value;
 
     // Morphology
     if(instance_type == settings::INSTANCE_SERVER && simulator_side){
         EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
         Genome::Ptr morphgenome;
-        if(use_quadric){
-            morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
-        }
-        else{
+        if(genome_type == morph_genome_type::CPPN)
             morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::SQ_CPPN)
+            morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::SQ_CG)
+            morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
+        else if(genome_type == morph_genome_type::DUAL_CPPN)
+            morphgenome = std::make_shared<DualCPPNGenome>(randomNum,parameters);
+        else{
+            std::cerr << "Unknown type of morphological genome" << std::endl;
+            std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+            std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
+            exit(1);
         }
         morphgenome->random();
         CPPNIndividual::Ptr ind = std::make_shared<CPPNIndividual>(morphgenome,ctrl_gen);
@@ -69,11 +77,19 @@ void BODYPLANTESTING::initPopulation()
             EmptyGenome::Ptr ctrl_gen = std::make_shared<EmptyGenome>();
 
             Genome::Ptr morphgenome;
-            if(use_quadric){
-                morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
-            }
-            else{
+            if(genome_type == morph_genome_type::CPPN)
                 morphgenome = std::make_shared<NN2CPPNGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::SQ_CPPN)
+                morphgenome = std::make_shared<SQCPPNGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::SQ_CG)
+                morphgenome = std::make_shared<SQGenome>(randomNum,parameters);
+            else if(genome_type == morph_genome_type::DUAL_CPPN)
+                morphgenome = std::make_shared<DualCPPNGenome>(randomNum,parameters);
+            else{
+                std::cerr << "Unknown type of morphological genome" << std::endl;
+                std::cerr << "Possible values for parameter #morphGenomeType" << std::endl;
+                std::cerr << "0: CPPN | 1: SQ_CPPN | 2: SQ_CG | 3: DUAL_CPPN" << std::endl;
+                exit(1);
             }
 
             morphgenome->random();
