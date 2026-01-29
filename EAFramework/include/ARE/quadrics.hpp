@@ -63,11 +63,11 @@ struct quadric_t{
             p = quadric_param_t(1,1,1,1,2,1,1,1);
         }else if(shape_family == 2){//pyramid 2
             p = quadric_param_t(1,1,1,2,1,1,1,1);
-        }else if(shape_family == 3){//hyperpoloid 1-sheet
+        }else if(shape_family == 3){//hyperboloid 1-sheet
             p = quadric_param_t(1,1,1,1,1,-5,5,5);
-        }else if(shape_family == 4){//diagonal wall
+        }else if(shape_family == 4){//cross
             p = quadric_param_t(1,1,1,1,2,-1,1,1);
-        }else if(shape_family == 5){//diagonal wall 2
+        }else if(shape_family == 5){//cross 2
             p = quadric_param_t(1,1,1,2,1,-1,1,1);
         }else if(shape_family == 6){//hyperboloid 2-sheets
             p = quadric_param_t(1,1,1,1,2,1,-1,-1);

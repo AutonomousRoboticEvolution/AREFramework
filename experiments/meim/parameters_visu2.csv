@@ -6,7 +6,7 @@
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
 #robotPath,string,None
 #manualDesignFile,string,None
-#useQuadric,bool,0
+#morphGenomeType,int,0
 #quadricFile,string,quadrics.csv
 #idToLoad,int,-1
 #maxEvalTime,float,1

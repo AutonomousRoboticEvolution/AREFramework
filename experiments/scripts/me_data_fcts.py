@@ -53,6 +53,8 @@ def load_parent_pool(filename):
             line = line.split(',')
             ids = []
             for l in line:
+                if(l == ''):
+                    continue
                 ids.append(int(l))
             parent_ids.append(ids)
     return parent_ids

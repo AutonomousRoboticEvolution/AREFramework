@@ -303,20 +303,22 @@ void Visu::init(){
             std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_cppn(cppn);
             std::dynamic_pointer_cast<SQCPPNGenome>(morph_gen)->set_quadric(sq);
         }else if(genome_type == DUAL_CPPN){
-            // skel_cppn_t skel_cppn;
-            // org_cppn_t org_cppn;
-            // std::ifstream ifs(cppn_file);
-            // boost::archive::text_iarchive iarch(ifs);
-            // iarch >> skel_cppn;
-            // ifs.close();
-            // std::stringstream sstr;
-            // sstr << folder_to_load << "/org_cppn_" << id;
-            // std::ifstream ifs2(sstr.str());
-            // boost::archive::text_iarchive iarch2(ifs2);
-            // iarch2 >> org_cppn;
-            // ifs2.close();
-            // morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
-            // std::dynamic_pointer_cast<DualCPPNGenome>(morph_gen)->set_cppns(std::make_pair(skel_cppn,org_cppn));
+            skel_cppn_t skel_cppn;
+            org_cppn_t org_cppn;
+            std::stringstream sstr;
+            sstr << folder_to_load <<"/skel_cppn_" << id;
+            std::ifstream ifs(sstr.str());
+            boost::archive::text_iarchive iarch(ifs);
+            iarch >> skel_cppn;
+            ifs.close();
+            std::stringstream sstr2;
+            sstr2 << folder_to_load << "/org_cppn_" << id;
+            std::ifstream ifs2(sstr2.str());
+            boost::archive::text_iarchive iarch2(ifs2);
+            iarch2 >> org_cppn;
+            ifs2.close();
+            morph_gen = std::make_shared<DualCPPNGenome>(randomNum,parameters);
+            std::dynamic_pointer_cast<DualCPPNGenome>(morph_gen)->set_cppns(skel_cppn,org_cppn);
         }else if(genome_type == SQ_CG){//TODO
             sq_t sq;
             sq.from_string(sq::quadrics_from_file(quadrics_file,id));

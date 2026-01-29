@@ -1,13 +1,14 @@
 #experimentName,string,me2im
 #expPluginName,string,/usr/local/lib/ARE/experiments/libme2im.so
-#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/big_exp_side_obstacles_hard.ttt
+#scenePath,string,/home/leni/git/AREFramework/simulation/models/scenes/big_arena.ttt
 #scenes,sequence_string,ARE_arena.ttt
 #modelsPath,string,/home/leni/git/AREFramework/simulation/models/
 #robotPath,string,/home/leni/git/AREFramework/simulation/models/robots/are_two_legged/model_0.ttm
+#startFromFolder,string,/media/leni/DATADRIVE1/gecco_2026/reload_test/me2im_cppn_cracks/me2im_cppn_cracks_24_11_23-45-10-406-48310774/
 #maxEvalTime,float,1200
 #repository,string,/home/leni/are-logs
 #verbose,bool,1
-#instanceType,int,0
+#instanceType,int,1
 #killWhenNotConnected,bool,0
 #realTimeSim,bool,0
 #timeStep,float,0.02
@@ -18,14 +19,14 @@
 #seed,int,-1
 #envNumber,int,1
 
-#populationSize,int,100
+#populationSize,int,10
 #maxNbrEval,int,10000
 #tournamentSize,int,4
 
 #manualDesignFile,string,None
 #growingDecoding,bool,0
 #cppnExpressiveness,double,10
-#morphGenomeType,int,1
+#morphGenomeType,int,3
 
 #parentsPoolFile,string,parent_pool.csv
 #fitnessFile,string,fitness.csv

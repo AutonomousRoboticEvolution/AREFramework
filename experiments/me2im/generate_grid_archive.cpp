@@ -23,6 +23,8 @@ int main(int argc, char** argv){
             idx++;
         }
         fit_data.push_back(vals);
+        if(fit_data.size() >= 10000)
+            break;
     }
 
     fit_file.close();
@@ -38,6 +40,8 @@ int main(int argc, char** argv){
             idx++;
         }
         desc_data.push_back(desc_vals);
+        if(desc_data.size() >= 10000)
+            break;
     }
     desc_file.close();
     if(desc_data.size() != fit_data.size()){
