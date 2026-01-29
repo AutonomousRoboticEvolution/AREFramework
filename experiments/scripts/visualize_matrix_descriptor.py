@@ -12,7 +12,7 @@ def load_matrix_desc(filename: str):
             roww = []
             row = []
             matrix = []
-            for elt in line.split(',')[1:-1]:
+            for elt in line.split(',')[2:-1]:
                 row.append(int(elt))
                 i+=1
                 if(i==11):
@@ -33,6 +33,7 @@ if __name__ == "__main__":
     filename = sys.argv[1]
     robot_id = int(sys.argv[2])
     matrix = np.array(load_matrix_desc(filename)[robot_id])
+    print(matrix)
 
 
 
