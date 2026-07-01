@@ -25,7 +25,7 @@ int main(int argc, char** argv){
 
 
     CPGRBFNetwork cpgrbf(40,4);
-    cpgrbf.init_cpg(1.1,0.5);
+    cpgrbf.init_cpg(1.1,0.01);
     cpgrbf.init_rbf();
     cpgrbf.set_out_layer_parameters(weights,biases);
 

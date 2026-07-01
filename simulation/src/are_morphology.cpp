@@ -722,7 +722,7 @@ void DualCPPNMorphology::create(){
     // EB: This flag tells the simulator that the shape is convex even though it might not be. Be careful,
     // this might mess up with the physics engine if the shape is non-convex!
     // I set this flag to prevent the warning showing and stopping evolution.
-    simSetObjectInt32Parameter(mainHandle, sim_shapeintparam_convex, 1);
+    simSetObjectInt32Param(mainHandle, sim_shapeintparam_convex, 1);
 }
 
 
