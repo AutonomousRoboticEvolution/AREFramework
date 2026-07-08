@@ -18,12 +18,6 @@ After having successfully installed the framework, you can refer to the next tut
 
 ### Dependencies 
 
-These instructions are specific to Ubuntu (preferably 18.04).
-
-First, install the libraries available via aptitude :
-```
-sudo apt install libboost-all-dev libeigen3-dev 
-```
 
 Install Polyvox :
 ```
