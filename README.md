@@ -1,7 +1,7 @@
 # Autonomous Robotic Evolution Framework
 The ARE Framework is an evolutionary robotic framework made within the ARE project. It is structured around an evolutionary algorithm structure allowing to evolve morphologies and controllers. Currently, it is designed as a plugin to the V-REP simulator (Coppelia). The following instruction is related to the master branch. 
 
-After having successfully installed the framework, you can refer to the next tutorial: [How to define an experiment within the ARE Framework](https://bitbucket.org/autonomousroboticsevolution/evolutionary_robotics_framework/wiki/Defining%20an%20experiment%20within%20the%20ARE%20Framework).
+After having successfully installed the framework, you can refer to the next tutorial: [How to define an experiment within the ARE Framework](https://github.com/AutonomousRoboticEvolution/AREFramework/wiki/Defining-an-experiment-within-the-ARE-Framework).
 
 ## Required software
 
