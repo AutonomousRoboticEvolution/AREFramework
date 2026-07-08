@@ -102,7 +102,7 @@ Then run the experiments in headless mode and 10 simulators.
 ```
 python3 AREFramework/simulation/app/run.py --xvfb 0 --headless 2 --params AREFramework/experiments/nipes/parameters.csv --client are-client --port-start 10000 --coppelia AREFramework/coppeliaSim/coppeliaSim 10
 ```
-To have a full description of the option:
+To have a full description of the options:
 ```
 python3 AREFramework/simulation/app/run.py -h
 ```
