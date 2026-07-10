@@ -64,7 +64,7 @@ public:
         arch & trajectory;
         arch & trajectories;
         arch & object_trajectory;
-        arch & rollout;
+        //arch & rollout;
       //  arch & sim_time;
     }
 
